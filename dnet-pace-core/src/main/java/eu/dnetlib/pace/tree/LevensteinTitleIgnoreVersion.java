@@ -1,16 +1,18 @@
-package eu.dnetlib.pace.distance.algo;
+package eu.dnetlib.pace.tree;
 
 import com.wcohen.ss.AbstractStringDistance;
 import eu.dnetlib.pace.distance.DistanceClass;
 import eu.dnetlib.pace.distance.SecondStringDistanceAlgo;
+import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 import java.util.Map;
 
 /**
  * Compared compare between two titles, ignoring version numbers. Suitable for Software entities.
  */
-@DistanceClass("LevensteinTitleIgnoreVersion")
-public class LevensteinTitleIgnoreVersion extends SecondStringDistanceAlgo {
+@ComparatorClass("levensteinTitleIgnoreVersion")
+public class LevensteinTitleIgnoreVersion extends AbstractComparator {
 
 	public LevensteinTitleIgnoreVersion(Map<String,Number> params){
 		super(params, new com.wcohen.ss.Levenstein());

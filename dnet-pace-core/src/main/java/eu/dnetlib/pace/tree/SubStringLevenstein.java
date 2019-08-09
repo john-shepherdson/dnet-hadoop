@@ -1,21 +1,21 @@
-package eu.dnetlib.pace.distance.algo;
-
-import eu.dnetlib.pace.distance.DistanceClass;
-import eu.dnetlib.pace.distance.SecondStringDistanceAlgo;
-import org.apache.commons.lang.StringUtils;
+package eu.dnetlib.pace.tree;
 
 import com.wcohen.ss.AbstractStringDistance;
-
 import eu.dnetlib.pace.config.Type;
+import eu.dnetlib.pace.distance.DistanceClass;
+import eu.dnetlib.pace.distance.SecondStringDistanceAlgo;
 import eu.dnetlib.pace.model.Field;
+import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.ComparatorClass;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 
 /**
  * The Class SubStringLevenstein.
  */
-@DistanceClass("SubStringLevenstein")
-public class SubStringLevenstein extends SecondStringDistanceAlgo {
+@ComparatorClass("subStringLevenstein")
+public class SubStringLevenstein extends AbstractComparator {
 
 	/** The limit. */
 	protected int limit;
@@ -69,7 +69,7 @@ public class SubStringLevenstein extends SecondStringDistanceAlgo {
 	 * @see eu.dnetlib.pace.compare.SecondStringDistanceAlgo#compare(eu.dnetlib.pace.model.Field, eu.dnetlib.pace.model.Field)
 	 */
 	@Override
-	public double distance(final Field a, final Field b) {
+	public double compare(final Field a, final Field b) {
 		if (a.getType().equals(Type.String) && b.getType().equals(Type.String))
 			return distance(StringUtils.left(a.stringValue(), limit), StringUtils.left(b.stringValue(), limit));
 

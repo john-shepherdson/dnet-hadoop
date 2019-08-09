@@ -1,8 +1,10 @@
-package eu.dnetlib.pace.distance.algo;
+package eu.dnetlib.pace.tree;
 
 import eu.dnetlib.pace.distance.DistanceAlgo;
 import eu.dnetlib.pace.distance.DistanceClass;
 import eu.dnetlib.pace.model.Field;
+import eu.dnetlib.pace.tree.support.Comparator;
+import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 import java.util.Map;
 
@@ -10,20 +12,14 @@ import java.util.Map;
  * Not all fields of a document need to partecipate in the compare measure. We model those fields as having a
  * NullDistanceAlgo.
  */
-@DistanceClass("Null")
-public class NullDistanceAlgo implements DistanceAlgo {
+@ComparatorClass("null")
+public class NullDistanceAlgo implements Comparator {
 
 	public NullDistanceAlgo(Map<String, Number> params){
 	}
 
 	@Override
-	public double distance(Field a, Field b) {
-		return 0.0;
+	public double compare(Field a, Field b) {
+		return 0;
 	}
-
-	@Override
-	public double getWeight() {
-		return 0.0;
-	}
-
 }

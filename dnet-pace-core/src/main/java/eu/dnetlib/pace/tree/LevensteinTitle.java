@@ -1,39 +1,40 @@
-package eu.dnetlib.pace.distance.algo;
+package eu.dnetlib.pace.tree;
 
 import com.wcohen.ss.AbstractStringDistance;
 import eu.dnetlib.pace.distance.DistanceClass;
 import eu.dnetlib.pace.distance.SecondStringDistanceAlgo;
+import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.ComparatorClass;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Map;
 
-/**
- * Compared compare between two titles, ignoring version numbers. Suitable for Software entities.
- */
-@DistanceClass("LevensteinTitleIgnoreVersion")
-public class LevensteinTitleIgnoreVersion extends SecondStringDistanceAlgo {
+@ComparatorClass("levensteinTitle")
+public class LevensteinTitle extends AbstractComparator {
 
-	public LevensteinTitleIgnoreVersion(Map<String,Number> params){
+	private static final Log log = LogFactory.getLog(LevensteinTitle.class);
+
+	public LevensteinTitle(Map<String,Number> params){
 		super(params, new com.wcohen.ss.Levenstein());
 	}
 
-	public LevensteinTitleIgnoreVersion(final double w) {
+	public LevensteinTitle(final double w) {
 		super(w, new com.wcohen.ss.Levenstein());
 	}
 
-	protected LevensteinTitleIgnoreVersion(final double w, final AbstractStringDistance ssalgo) {
+	protected LevensteinTitle(final double w, final AbstractStringDistance ssalgo) {
 		super(w, ssalgo);
 	}
 
 	@Override
 	public double distance(final String a, final String b) {
-		String ca = cleanup(a);
-		String cb = cleanup(b);
+		final String ca = cleanup(a);
+		final String cb = cleanup(b);
 
-		ca = ca.replaceAll("\\d", "").replaceAll(getRomans(ca), "").trim();
-		cb = cb.replaceAll("\\d", "").replaceAll(getRomans(cb), "").trim();
+		final boolean check = checkNumbers(ca, cb);
 
-		ca = filterAllStopWords(ca);
-		cb = filterAllStopWords(cb);
+		if (check) return 0.5;
 
 		final String cca = finalCleanup(ca);
 		final String ccb = finalCleanup(cb);

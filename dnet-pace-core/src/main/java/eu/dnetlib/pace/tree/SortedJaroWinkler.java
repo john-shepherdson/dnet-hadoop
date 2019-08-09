@@ -1,15 +1,22 @@
-package eu.dnetlib.pace.distance.algo;
+package eu.dnetlib.pace.tree;
 
 import com.wcohen.ss.AbstractStringDistance;
 import eu.dnetlib.pace.distance.DistanceClass;
+import eu.dnetlib.pace.distance.algo.SortedSecondStringDistanceAlgo;
+import eu.dnetlib.pace.tree.support.AbstractSortedComparator;
+import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 import java.util.Map;
 
 /**
  * The Class SortedJaroWinkler.
  */
-@DistanceClass("SortedLevel2JaroWinkler")
-public class SortedLevel2JaroWinkler extends SortedSecondStringDistanceAlgo {
+@ComparatorClass("sortedJaroWinkler")
+public class SortedJaroWinkler extends AbstractSortedComparator {
+
+	public SortedJaroWinkler(Map<String,Number> params){
+		super(params, new com.wcohen.ss.Levenstein());
+	}
 
 	/**
 	 * Instantiates a new sorted jaro winkler.
@@ -17,12 +24,8 @@ public class SortedLevel2JaroWinkler extends SortedSecondStringDistanceAlgo {
 	 * @param weight
 	 *            the weight
 	 */
-	public SortedLevel2JaroWinkler(final double weight) {
-		super(weight, new com.wcohen.ss.Level2JaroWinkler());
-	}
-
-	public SortedLevel2JaroWinkler(final Map<String, Number> params){
-		super(params, new com.wcohen.ss.Level2JaroWinkler());
+	public SortedJaroWinkler(final double weight) {
+		super(weight, new com.wcohen.ss.JaroWinkler());
 	}
 
 	/**
@@ -33,7 +36,7 @@ public class SortedLevel2JaroWinkler extends SortedSecondStringDistanceAlgo {
 	 * @param ssalgo
 	 *            the ssalgo
 	 */
-	protected SortedLevel2JaroWinkler(final double weight, final AbstractStringDistance ssalgo) {
+	protected SortedJaroWinkler(final double weight, final AbstractStringDistance ssalgo) {
 		super(weight, ssalgo);
 	}
 

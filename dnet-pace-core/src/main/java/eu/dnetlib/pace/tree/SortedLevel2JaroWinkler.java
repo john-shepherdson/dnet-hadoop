@@ -1,15 +1,18 @@
-package eu.dnetlib.pace.distance.algo;
+package eu.dnetlib.pace.tree;
 
 import com.wcohen.ss.AbstractStringDistance;
 import eu.dnetlib.pace.distance.DistanceClass;
+import eu.dnetlib.pace.distance.algo.SortedSecondStringDistanceAlgo;
+import eu.dnetlib.pace.tree.support.AbstractSortedComparator;
+import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 import java.util.Map;
 
 /**
  * The Class SortedJaroWinkler.
  */
-@DistanceClass("SortedLevel2JaroWinkler")
-public class SortedLevel2JaroWinkler extends SortedSecondStringDistanceAlgo {
+@ComparatorClass("sortedLevel2JaroWinkler")
+public class SortedLevel2JaroWinkler extends AbstractSortedComparator {
 
 	/**
 	 * Instantiates a new sorted jaro winkler.
