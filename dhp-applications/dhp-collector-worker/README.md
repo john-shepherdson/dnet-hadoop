@@ -2,8 +2,7 @@ Description of the Module
 --------------------------
 This module defines a **collector worker application** that runs on Hadoop.
 
-It is responsible for harvesting metadata using a different plugin, 
-that has been passed as arguments in the main class
+It is responsible for harvesting metadata using different plugins.
 
 The collector worker uses a message queue to inform the progress 
 of the harvesting action (using a message queue for sending **ONGOING** messages) furthermore, 
