@@ -1,2 +1,2 @@
 # dnet-hadoop
-some description here
+Dnet-hadoop is a tool for
