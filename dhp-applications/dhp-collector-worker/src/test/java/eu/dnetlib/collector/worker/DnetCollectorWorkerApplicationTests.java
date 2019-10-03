@@ -3,6 +3,7 @@ package eu.dnetlib.collector.worker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.collector.worker.model.ApiDescriptor;
 import eu.dnetlib.collector.worker.utils.CollectorPluginFactory;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
 import org.junit.After;
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.*;
 public class DnetCollectorWorkerApplicationTests {
 
 
-    private DnetCollectorWorkerArgumentParser argumentParser = mock(DnetCollectorWorkerArgumentParser.class);
+    private ArgumentApplicationParser argumentParser = mock(ArgumentApplicationParser.class);
     private MessageManager messageManager = mock(MessageManager.class);
 
     private DnetCollectorWorker worker;
@@ -26,12 +27,12 @@ public class DnetCollectorWorkerApplicationTests {
     public void setup() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         final String apiJson = mapper.writeValueAsString(getApi());
-        when(argumentParser.getJson()).thenReturn(apiJson);
-        when(argumentParser.getNameNode()).thenReturn("file://tmp/test.seq");
-        when(argumentParser.getHdfsPath()).thenReturn("/tmp/file.seq");
-        when(argumentParser.getUser()).thenReturn("sandro");
-        when(argumentParser.getWorkflowId()).thenReturn("sandro");
-        when(argumentParser.getRabbitOngoingQueue()).thenReturn("sandro");
+        when(argumentParser.get("apidescriptor")).thenReturn(apiJson);
+        when(argumentParser.get("namenode")).thenReturn("file://tmp/test.seq");
+        when(argumentParser.get("hdfsPath")).thenReturn("/tmp/file.seq");
+        when(argumentParser.get("userHDFS")).thenReturn("sandro");
+        when(argumentParser.get("workflowId")).thenReturn("sandro");
+        when(argumentParser.get("rabbitOngoingQueue")).thenReturn("sandro");
 
         when(messageManager.sendMessage(any(Message.class), anyString(), anyBoolean(),anyBoolean())).thenAnswer(a -> {
             System.out.println("sent message: "+a.getArguments()[0]);

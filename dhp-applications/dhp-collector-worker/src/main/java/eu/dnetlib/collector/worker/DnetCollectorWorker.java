@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.collector.worker.model.ApiDescriptor;
 import eu.dnetlib.collector.worker.plugins.CollectorPlugin;
 import eu.dnetlib.collector.worker.utils.CollectorPluginFactory;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
 import eu.dnetlib.message.MessageType;
@@ -29,12 +30,12 @@ public class DnetCollectorWorker {
 
     private final CollectorPluginFactory collectorPluginFactory;
 
-    private final DnetCollectorWorkerArgumentParser argumentParser;
+    private final ArgumentApplicationParser argumentParser;
 
     private final MessageManager manager;
 
 
-    public DnetCollectorWorker(final CollectorPluginFactory collectorPluginFactory, final DnetCollectorWorkerArgumentParser argumentParser, final MessageManager manager) throws DnetCollectorException {
+    public DnetCollectorWorker(final CollectorPluginFactory collectorPluginFactory, final ArgumentApplicationParser argumentParser, final MessageManager manager) throws DnetCollectorException {
         this.collectorPluginFactory = collectorPluginFactory;
         this.argumentParser = argumentParser;
         this.manager = manager;
@@ -44,11 +45,11 @@ public class DnetCollectorWorker {
     public void collect() throws DnetCollectorException {
         try {
             final ObjectMapper jsonMapper = new ObjectMapper();
-            final ApiDescriptor api = jsonMapper.readValue(argumentParser.getJson(), ApiDescriptor.class);
+            final ApiDescriptor api = jsonMapper.readValue(argumentParser.get("apidescriptor"), ApiDescriptor.class);
 
             final CollectorPlugin plugin = collectorPluginFactory.getPluginByProtocol(api.getProtocol());
 
-            final String hdfsuri = argumentParser.getNameNode();
+            final String hdfsuri = argumentParser.get("namenode");
 
             // ====== Init HDFS File System Object
             Configuration conf = new Configuration();
@@ -58,11 +59,11 @@ public class DnetCollectorWorker {
             conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
             conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
 
-            System.setProperty("HADOOP_USER_NAME", argumentParser.getUser());
+            System.setProperty("HADOOP_USER_NAME", argumentParser.get("userHDFS"));
             System.setProperty("hadoop.home.dir", "/");
             //Get the filesystem - HDFS
             FileSystem fs = FileSystem.get(URI.create(hdfsuri), conf);
-            Path hdfswritepath = new Path(argumentParser.getHdfsPath());
+            Path hdfswritepath = new Path(argumentParser.get("hdfsPath"));
 
             log.info("Created path " + hdfswritepath.toString());
 
@@ -81,7 +82,7 @@ public class DnetCollectorWorker {
                     if (counter.get() % 10 == 0) {
                         try {
                             ongoingMap.put("ongoing", "" + counter.get());
-                            log.debug("Sending message: "+ manager.sendMessage(new Message(argumentParser.getWorkflowId(), "Collection", MessageType.ONGOING, ongoingMap), argumentParser.getRabbitOngoingQueue(), true, false));
+                            log.debug("Sending message: "+ manager.sendMessage(new Message(argumentParser.get("workflowId"), "Collection", MessageType.ONGOING, ongoingMap), argumentParser.get("rabbitOngoingQueue"), true, false));
                         } catch (Exception e) {
                             log.error("Error on sending message ", e);
                         }
@@ -95,9 +96,9 @@ public class DnetCollectorWorker {
                 });
             }
             ongoingMap.put("ongoing", "" + counter.get());
-            manager.sendMessage(new Message(argumentParser.getWorkflowId(), "Collection", MessageType.ONGOING, ongoingMap), argumentParser.getRabbitOngoingQueue(), true, false);
+            manager.sendMessage(new Message(argumentParser.get("workflowId"), "Collection", MessageType.ONGOING, ongoingMap), argumentParser.get("rabbitOngoingQueue"), true, false);
             reportMap.put("collected", "" + counter.get());
-            manager.sendMessage(new Message(argumentParser.getWorkflowId(), "Collection", MessageType.REPORT, reportMap), argumentParser.getRabbitOngoingQueue(), true, false);
+            manager.sendMessage(new Message(argumentParser.get("workflowId"), "Collection", MessageType.REPORT, reportMap), argumentParser.get("rabbitOngoingQueue"), true, false);
             manager.close();
         } catch (Throwable e) {
             throw new DnetCollectorException("Error on collecting ",e);

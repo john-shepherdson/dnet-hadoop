@@ -1,0 +1,12 @@
+[
+  {"paramName":"p",   "paramLongName":"hdfsPath",           "paramDescription": "the path where storing the sequential file",           "paramRequired": true},
+  {"paramName":"a",   "paramLongName":"apidescriptor",      "paramDescription": "the JSON encoding of the API Descriptor",              "paramRequired": true},
+  {"paramName":"n",   "paramLongName":"namenode",           "paramDescription": "the Name Node URI",                                    "paramRequired": true},
+  {"paramName":"u",   "paramLongName":"userHDFS",           "paramDescription": "the user wich create the hdfs seq file",               "paramRequired": true},
+  {"paramName":"ru",  "paramLongName":"rabbitUser",         "paramDescription": "the user to connect with RabbitMq for messaging",      "paramRequired": true},
+  {"paramName":"rp",  "paramLongName":"rabbitPassword",     "paramDescription": "the password to connect with RabbitMq for messaging",  "paramRequired": true},
+  {"paramName":"rh",  "paramLongName":"rabbitHost",         "paramDescription": "the host of the RabbitMq server",                      "paramRequired": true},
+  {"paramName":"ro",  "paramLongName":"rabbitOngoingQueue", "paramDescription": "the name of the ongoing queue",                        "paramRequired": true},
+  {"paramName":"rr",  "paramLongName":"rabbitReportQueue",  "paramDescription": "the name of the report queue",                         "paramRequired": true},
+  {"paramName":"w",   "paramLongName":"workflowId",         "paramDescription": "the identifier of the dnet Workflow",                  "paramRequired": true}
+]

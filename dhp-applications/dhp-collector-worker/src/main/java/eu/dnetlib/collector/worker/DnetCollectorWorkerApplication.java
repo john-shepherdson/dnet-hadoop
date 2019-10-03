@@ -1,7 +1,9 @@
 package eu.dnetlib.collector.worker;
 
 import eu.dnetlib.collector.worker.utils.CollectorPluginFactory;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.message.MessageManager;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +23,7 @@ public class DnetCollectorWorkerApplication {
 
     private static CollectorPluginFactory collectorPluginFactory = new CollectorPluginFactory();
 
-    private static DnetCollectorWorkerArgumentParser argumentParser = new DnetCollectorWorkerArgumentParser();
+    private static ArgumentApplicationParser argumentParser;
 
 
     /**
@@ -29,10 +31,11 @@ public class DnetCollectorWorkerApplication {
      */
     public static void main(final String[] args) throws Exception {
 
+        argumentParser= new ArgumentApplicationParser(IOUtils.toString(DnetCollectorWorker.class.getResourceAsStream("/eu/dnetlib/collector/worker/collector_parameter.json")));
         argumentParser.parseArgument(args);
-        log.info("hdfsPath =" + argumentParser.getHdfsPath());
-        log.info("json = " + argumentParser.getJson());
-        final MessageManager manager = new MessageManager(argumentParser.getRabbitHost(), argumentParser.getRabbitUser(), argumentParser.getRabbitPassword(), false, false, null);
+        log.info("hdfsPath =" + argumentParser.get("hdfsPath"));
+        log.info("json = " + argumentParser.get("apidescriptor"));
+        final MessageManager manager = new MessageManager(argumentParser.get("rabbitHost"), argumentParser.get("rabbitUser"), argumentParser.get("rabbitPassword"), false, false, null);
         final DnetCollectorWorker worker = new DnetCollectorWorker(collectorPluginFactory, argumentParser, manager);
         worker.collect();
 
