@@ -1,12 +1,14 @@
 package eu.dnetlib.dhp.collection;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.model.mdstore.Provenance;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
 import eu.dnetlib.message.MessageType;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -57,26 +59,11 @@ public class GenerateNativeStoreSparkJob {
 
     public static void main(String[] args) throws Exception {
 
-        Options options = generateApplicationArguments();
-
-
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse( options, args);
-
-        final String encoding               = cmd.getOptionValue("e");
-        final long dateOfCollection         = new Long(cmd.getOptionValue("d"));
-        final String jsonProvenance         = cmd.getOptionValue("p");
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(GenerateNativeStoreSparkJob.class.getResourceAsStream("/eu/dnetlib/dhp/collection/collection_input_parameters.json")));
+        parser.parseArgument(args);
         final ObjectMapper jsonMapper       = new ObjectMapper();
-        final Provenance provenance         = jsonMapper.readValue(jsonProvenance, Provenance.class);
-        final String xpath                  = cmd.getOptionValue("x");
-        final String inputPath              = cmd.getOptionValue("i");
-        final String outputPath             = cmd.getOptionValue("o");
-        final String rabbitUser 			= cmd.getOptionValue("ru");
-        final String rabbitPassword		    = cmd.getOptionValue("rp");
-        final String rabbitHost 			= cmd.getOptionValue("rh");
-        final String rabbitOngoingQueue 	= cmd.getOptionValue("ro");
-        final String rabbitReportQueue  	= cmd.getOptionValue("rr");
-        final String workflowId 			= cmd.getOptionValue("w");
+        final Provenance provenance         = jsonMapper.readValue(parser.get("provenance"), Provenance.class);
+        final long dateOfCollection         = new Long(parser.get("dateOfCollection"));
 
         final SparkSession spark = SparkSession
                 .builder()
@@ -89,118 +76,31 @@ public class GenerateNativeStoreSparkJob {
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-        final JavaPairRDD<IntWritable, Text> inputRDD = sc.sequenceFile(inputPath, IntWritable.class, Text.class);
+        final JavaPairRDD<IntWritable, Text> inputRDD = sc.sequenceFile(parser.get("input"), IntWritable.class, Text.class);
 
         final LongAccumulator totalItems = sc.sc().longAccumulator("TotalItems");
 
         final LongAccumulator invalidRecords = sc.sc().longAccumulator("InvalidRecords");
 
-        final MessageManager manager = new MessageManager(rabbitHost, rabbitUser, rabbitPassword, false, false, null);
+        final MessageManager manager = new MessageManager(parser.get("rabbitHost"), parser.get("rabbitUser"), parser.get("rabbitPassword"), false, false, null);
 
-        final JavaRDD<MetadataRecord> mappeRDD = inputRDD.map(item -> parseRecord(item._2().toString(), xpath, encoding, provenance, dateOfCollection, totalItems, invalidRecords))
+        final JavaRDD<MetadataRecord> mappeRDD = inputRDD.map(item -> parseRecord(item._2().toString(), parser.get("xpath"), parser.get("encoding"),provenance, dateOfCollection, totalItems, invalidRecords))
                 .filter(Objects::nonNull).distinct();
 
         ongoingMap.put("ongoing", "0");
-        manager.sendMessage(new Message(workflowId,"DataFrameCreation", MessageType.ONGOING, ongoingMap ), rabbitOngoingQueue, true, false);
+        manager.sendMessage(new Message(parser.get("workflowId"),"DataFrameCreation", MessageType.ONGOING, ongoingMap ), parser.get("rabbitOngoingQueue"), true, false);
 
         final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
         final Dataset<MetadataRecord> mdstore = spark.createDataset(mappeRDD.rdd(), encoder);
         final LongAccumulator mdStoreRecords = sc.sc().longAccumulator("MDStoreRecords");
         mdStoreRecords.add(mdstore.count());
         ongoingMap.put("ongoing", ""+ totalItems.value());
-        manager.sendMessage(new Message(workflowId,"DataFrameCreation", MessageType.ONGOING, ongoingMap ), rabbitOngoingQueue, true, false);
+        manager.sendMessage(new Message(parser.get("workflowId"),"DataFrameCreation", MessageType.ONGOING, ongoingMap ), parser.get("rabbitOngoingQueue"), true, false);
 
-        mdstore.write().format("parquet").save(outputPath);
+        mdstore.write().format("parquet").save(parser.get("output"));
         reportMap.put("inputItem" , ""+ totalItems.value());
         reportMap.put("invalidRecords", "" + invalidRecords.value());
         reportMap.put("mdStoreSize", "" + mdStoreRecords.value());
-        manager.sendMessage(new Message(workflowId,"Collection", MessageType.REPORT, reportMap ), rabbitReportQueue, true, false);
-    }
-
-    private static Options generateApplicationArguments() {
-        Options options = new Options();
-        options.addOption(Option.builder("e")
-                .longOpt("encoding")
-                .required(true)
-                .desc("the encoding type should be xml or json")
-                .hasArg() // This option has an argument.
-                .build());
-        options.addOption(Option.builder("d")
-                .longOpt("dateOfCollection")
-                .required(true)
-                .desc("the date of collection")
-                .hasArg() // This option has an argument.
-                .build());
-
-        options.addOption(Option.builder("p")
-                .longOpt("provenance")
-                .required(true)
-                .desc("the json Provenance information")
-                .hasArg() // This option has an argument.
-                .build());
-
-        options.addOption(Option.builder("x")
-                .longOpt("xpath")
-                .required(true)
-                .desc("xpath of the identifier")
-                .hasArg() // This option has an argument.
-                .build());
-
-        options.addOption(Option.builder("i")
-                .longOpt("input")
-                .required(true)
-                .desc("input path of the sequence file")
-                .hasArg() // This option has an argument.
-                .build());
-        options.addOption(Option.builder("o")
-                .longOpt("output")
-                .required(true)
-                .desc("output path of the mdstore")
-                .hasArg()
-                .build());
-
-        options.addOption(Option.builder("ru")
-                .longOpt("rabbitUser")
-                .required(true)
-                .desc("the user to connect with RabbitMq for messaging")
-                .hasArg() // This option has an argument.
-                .build());
-
-        options.addOption(Option.builder("rp")
-                .longOpt("rabbitPassWord")
-                .required(true)
-                .desc("the password to connect with RabbitMq for messaging")
-                .hasArg() // This option has an argument.
-                .build());
-
-        options.addOption(Option.builder("rh")
-                .longOpt("rabbitHost")
-                .required(true)
-                .desc("the host of the RabbitMq server")
-                .hasArg() // This option has an argument.
-                .build());
-
-        options.addOption(Option.builder("ro")
-                .longOpt("rabbitOngoingQueue")
-                .required(true)
-                .desc("the name of the ongoing queue")
-                .hasArg() // This option has an argument.
-                .build());
-
-        options.addOption(Option.builder("rr")
-                .longOpt("rabbitReportQueue")
-                .required(true)
-                .desc("the name of the report queue")
-                .hasArg() // This option has an argument.
-                .build());
-
-
-        options.addOption(Option.builder("w")
-                .longOpt("workflowId")
-                .required(true)
-                .desc("the identifier of the dnet Workflow")
-                .hasArg() // This option has an argument.
-                .build());
-        return options;
+        manager.sendMessage(new Message(parser.get("workflowId"),"Collection", MessageType.REPORT, reportMap ), parser.get("rabbitReportQueue"), true, false);
     }
 }

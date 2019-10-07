@@ -7,21 +7,41 @@ import java.io.Serializable;
 
 
 /**
- * This class models a record inside the new MetadataStore
+ * This class models a record inside the new Metadata store collection on HDFS *
  *
  */
 public class MetadataRecord implements Serializable {
 
+    /**
+     * The D-Net Identifier associated to the record
+     */
     private String id;
 
+    /**
+     * The original Identifier of the record
+     */
     private String originalId;
 
+
+    /**
+     * The encoding of the record, should be JSON or XML
+     */
     private String encoding;
 
+    /**
+     * The information about the provenance of the record see @{@link Provenance}
+     * for the model of this information
+     */
     private Provenance provenance;
 
+    /**
+     * The content of the metadata
+     */
     private String body;
 
+    /**
+     * the date when the record has been stored
+     */
     private long dateOfCollection;
 
 
