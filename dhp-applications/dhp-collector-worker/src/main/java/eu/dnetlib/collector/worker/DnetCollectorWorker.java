@@ -62,7 +62,7 @@ public class DnetCollectorWorker {
             System.setProperty("HADOOP_USER_NAME", argumentParser.get("userHDFS"));
             System.setProperty("hadoop.home.dir", "/");
             //Get the filesystem - HDFS
-            FileSystem fs = FileSystem.get(URI.create(hdfsuri), conf);
+            FileSystem.get(URI.create(hdfsuri), conf);
             Path hdfswritepath = new Path(argumentParser.get("hdfsPath"));
 
             log.info("Created path " + hdfswritepath.toString());

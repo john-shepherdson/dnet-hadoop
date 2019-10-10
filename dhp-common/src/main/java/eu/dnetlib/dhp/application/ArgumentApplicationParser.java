@@ -3,11 +3,12 @@ package eu.dnetlib.dhp.application;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ArgumentApplicationParser {
+public class ArgumentApplicationParser implements Serializable {
 
     private final Options options = new Options();
     private final Map<String, String> objectMap = new HashMap<>();

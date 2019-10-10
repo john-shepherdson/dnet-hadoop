@@ -1,13 +1,11 @@
 package eu.dnetlib.dhp.transformation;
 
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.functions.Cleaner;
+import net.sf.saxon.s9api.*;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.util.LongAccumulator;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
@@ -20,10 +18,11 @@ public class TransformFunction implements MapFunction<MetadataRecord, MetadataRe
     private final LongAccumulator transformedItems;
     private final String trasformationRule;
 
+
     private final long dateOfTransformation;
 
 
-    public TransformFunction(LongAccumulator totalItems, LongAccumulator errorItems, LongAccumulator transformedItems, final String trasformationRule, long dateOfTransformation) {
+    public TransformFunction(LongAccumulator totalItems, LongAccumulator errorItems, LongAccumulator transformedItems, final String trasformationRule, long dateOfTransformation) throws Exception {
         this.totalItems= totalItems;
         this.errorItems = errorItems;
         this.transformedItems = transformedItems;
@@ -35,13 +34,20 @@ public class TransformFunction implements MapFunction<MetadataRecord, MetadataRe
     public MetadataRecord call(MetadataRecord value) {
         totalItems.add(1);
         try {
-            final TransformerFactory factory = TransformerFactory.newInstance();
-            factory.newTransformer();
-            final StreamSource xsltSource = new StreamSource(new ByteArrayInputStream(trasformationRule.getBytes()));
-            final Transformer transformer = factory.newTransformer(xsltSource);
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            final Cleaner cleanFunction = new Cleaner();
+            Processor processor = new Processor(false);
+            processor.registerExtensionFunction(cleanFunction);
+            final XsltCompiler comp = processor.newXsltCompiler();
+            XsltExecutable xslt = comp.compile(new StreamSource(new ByteArrayInputStream(trasformationRule.getBytes())));
+            XdmNode source = processor.newDocumentBuilder().build(new StreamSource(new ByteArrayInputStream(value.getBody().getBytes())));
+            XsltTransformer trans = xslt.load();
+            trans.setInitialContextNode(source);
             final StringWriter output = new StringWriter();
-            transformer.transform(new StreamSource(new ByteArrayInputStream(value.getBody().getBytes())), new StreamResult(output));
+            Serializer out = processor.newSerializer(output);
+            out.setOutputProperty(Serializer.Property.METHOD,"xml");
+            out.setOutputProperty(Serializer.Property.INDENT, "yes");
+            trans.setDestination(out);
+            trans.transform();
             final String xml = output.toString();
             value.setBody(xml);
             value.setDateOfCollection(dateOfTransformation);
@@ -52,4 +58,7 @@ public class TransformFunction implements MapFunction<MetadataRecord, MetadataRe
             return null;
         }
     }
+
+
+
 }
