@@ -1,0 +1,46 @@
+<workflow-app name="distcp" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourceNN</name>
+            <description>the source name node</description>
+        </property>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the target path</description>
+        </property>
+        <property>
+            <name>hbase_dump_distcp_memory_mb</name>
+            <value>6144</value>
+            <description>memory for distcp action copying InfoSpace dump from remote cluster</description>
+        </property>
+        <property>
+            <name>hbase_dump_distcp_num_maps</name>
+            <value>1</value>
+            <description>maximum number of simultaneous copies of InfoSpace dump from remote location</description>
+        </property>
+    </parameters>
+
+    <start to="distcp"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="distcp">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>-Dmapreduce.map.memory.mb=${hbase_dump_distcp_memory_mb}</arg>
+            <arg>-pb</arg>
+            <arg>-m ${hbase_dump_distcp_num_maps}</arg>
+            <arg>${sourceNN}/${sourcePath}</arg>
+            <arg>${nameNode}/${targetPath}</arg>
+        </distcp>
+        <ok to="End" />
+        <error to="Kill" />
+    </action>
+
+    <end name="End"/>
+</workflow-app>
