@@ -147,15 +147,41 @@
             </dependency>
 
             <dependency>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>Saxon-HE</artifactId>
+                <version>9.5.1-5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>1.4.01</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>1.1.6</version>
+            </dependency>
+
+            <dependency>
                 <groupId>net.schmizz</groupId>
                 <artifactId>sshj</artifactId>
                 <version>0.10.0</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.oozie</groupId>
                 <artifactId>oozie-client</artifactId>
                 <version>${dhp.oozie.version}</version>
+                <scope>provided</scope>
                 <exclusions>
                     <!-- conflicts -->
                     <exclusion>
@@ -216,6 +242,7 @@
                     </configuration>
                 </plugin>
 
+                <!--
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
@@ -236,8 +263,7 @@
                         </execution>
                     </executions>
                 </plugin>
-
-
+                -->
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
