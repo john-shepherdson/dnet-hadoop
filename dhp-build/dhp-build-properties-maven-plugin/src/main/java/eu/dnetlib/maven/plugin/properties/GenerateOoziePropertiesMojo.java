@@ -21,7 +21,7 @@ public class GenerateOoziePropertiesMojo extends AbstractMojo {
 	public static final String PROPERTY_NAME_WF_SOURCE_DIR = "workflow.source.dir";
 	public static final String PROPERTY_NAME_SANDBOX_NAME = "sandboxName";
 	
-	private final String[] limiters = {"iis", "dnetlib", "eu"};
+	private final String[] limiters = {"dhp", "dnetlib", "eu"};
 	
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {

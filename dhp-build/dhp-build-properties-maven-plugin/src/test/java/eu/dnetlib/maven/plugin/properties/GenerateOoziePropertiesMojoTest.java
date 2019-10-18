@@ -34,7 +34,7 @@ public class GenerateOoziePropertiesMojoTest {
     @Test
     public void testExecuteSandboxNameAlreadySet() throws Exception {
         // given
-        String workflowSourceDir = "eu/dnetlib/iis/wf/transformers";
+        String workflowSourceDir = "eu/dnetlib/dhp/wf/transformers";
         String sandboxName = "originalSandboxName";
         System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
         System.setProperty(PROPERTY_NAME_SANDBOX_NAME, sandboxName);
@@ -62,7 +62,7 @@ public class GenerateOoziePropertiesMojoTest {
     @Test
     public void testExecuteNullSandboxNameGenerated() throws Exception {
         // given
-        String workflowSourceDir = "eu/dnetlib/iis/";
+        String workflowSourceDir = "eu/dnetlib/dhp/";
         System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
         
         // execute
@@ -75,7 +75,7 @@ public class GenerateOoziePropertiesMojoTest {
     @Test
     public void testExecute() throws Exception {
         // given
-        String workflowSourceDir = "eu/dnetlib/iis/wf/transformers";
+        String workflowSourceDir = "eu/dnetlib/dhp/wf/transformers";
         System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
         
         // execute
