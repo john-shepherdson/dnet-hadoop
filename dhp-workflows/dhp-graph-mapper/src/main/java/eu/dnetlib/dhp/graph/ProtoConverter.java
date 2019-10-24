@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.graph;
 
+import eu.dnetlib.data.proto.DatasourceProtos;
 import eu.dnetlib.data.proto.KindProtos;
 import eu.dnetlib.data.proto.OafProtos;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -7,8 +8,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import java.io.Serializable;
 import java.util.stream.Collectors;
 
-import static eu.dnetlib.dhp.graph.ProtoUtils.mapDataInfo;
-import static eu.dnetlib.dhp.graph.ProtoUtils.mapKV;
+import static eu.dnetlib.dhp.graph.ProtoUtils.*;
 
 public class ProtoConverter implements Serializable {
 
@@ -98,6 +98,57 @@ public class ProtoConverter implements Serializable {
                 .stream()
                 .map(ProtoUtils::mapExtraInfo)
                 .collect(Collectors.toList()));
+
+        result.setOaiprovenance(mapOAIProvenance(entity.getOaiprovenance()));
+
+        //Setting Datasource fields
+        final DatasourceProtos.Datasource.Metadata datasource = entity.getDatasource().getMetadata();
+
+        result.setDatasourcetype(mapQualifier(datasource.getDatasourcetype()));
+        result.setOpenairecompatibility(mapQualifier(datasource.getOpenairecompatibility()));
+
+        result.setOfficialname(mapStringField(datasource.getOfficialname()));
+        result.setEnglishname(mapStringField(datasource.getEnglishname()));
+        result.setWebsiteurl(mapStringField(datasource.getWebsiteurl()));
+        result.setLogourl(mapStringField(datasource.getLogourl()));
+        result.setContactemail(mapStringField(datasource.getContactemail()));
+        result.setNamespaceprefix(mapStringField(datasource.getNamespaceprefix()));
+
+        result.setLatitude(mapStringField(datasource.getLatitude()));
+        result.setLongitude(mapStringField(datasource.getLongitude()));
+        result.setDateofvalidation(mapStringField(datasource.getDateofvalidation()));
+        result.setDescription(mapStringField(datasource.getDescription()));
+
+        result.setSubjects(datasource.getSubjectsList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList())
+        );
+
+        result.setOdnumberofitems(mapStringField(datasource.getOdnumberofitems()));
+        result.setOdnumberofitemsdate(mapStringField(datasource.getOdnumberofitemsdate()));
+        result.setOdpolicies(mapStringField(datasource.getOdpolicies()));
+
+        result.setOdlanguages(datasource
+                .getOdlanguagesList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList())
+        );
+
+        result.setOdcontenttypes(datasource.getOdcontenttypesList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList())
+        );
+
+        result.setAccessinfopackage(datasource.getAccessinfopackageList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList())
+        );
+
+        //TODO r3data fields
 
         return result;
     }
