@@ -7,6 +7,7 @@ import eu.dnetlib.data.proto.OafProtos;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 import java.io.Serializable;
+import java.util.stream.Collectors;
 
 
 public class ProtoConverter implements Serializable {
@@ -52,7 +53,26 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Datasource convertDataSource(OafProtos.Oaf.Builder oaf) {
-        return new Datasource();
+        final Datasource result = new Datasource();
+
+        //setting oaf field
+        //TODO waiting claudio for this method
+        //result.setDataInfo(DataInfo.fromOaf(oaf.getDataInfo()));
+        result.setLastupdatetimestamp(oaf.getLastupdatetimestamp());
+
+        //setting Entity fields
+        result.setId(oaf.getEntity().getId());
+        result.setOriginalId(oaf.getEntity().getOriginalIdList());
+
+        //TODO waiting claudio for this method
+        result.setCollectedfrom(oaf.getEntity().getCollectedfromList()
+                .stream()
+                .map(s->new KeyValue())
+                .collect(Collectors.toList()));
+
+
+
+        return result;
     }
 
     private static Project convertProject(OafProtos.Oaf.Builder oaf) {
