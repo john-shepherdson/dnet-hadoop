@@ -20,47 +20,53 @@ public class Relation extends Oaf {
         return relType;
     }
 
-    public void setRelType(String relType) {
+    public Relation setRelType(String relType) {
         this.relType = relType;
+        return this;
     }
 
     public String getSubRelType() {
         return subRelType;
     }
 
-    public void setSubRelType(String subRelType) {
+    public Relation setSubRelType(String subRelType) {
         this.subRelType = subRelType;
+        return this;
     }
 
     public String getRelClass() {
         return relClass;
     }
 
-    public void setRelClass(String relClass) {
+    public Relation setRelClass(String relClass) {
         this.relClass = relClass;
+        return this;
     }
 
     public String getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public Relation setSource(String source) {
         this.source = source;
+        return this;
     }
 
     public String getTarget() {
         return target;
     }
 
-    public void setTarget(String target) {
+    public Relation setTarget(String target) {
         this.target = target;
+        return this;
     }
 
     public List<KeyValue> getCollectedFrom() {
         return collectedFrom;
     }
 
-    public void setCollectedFrom(List<KeyValue> collectedFrom) {
+    public Relation setCollectedFrom(List<KeyValue> collectedFrom) {
         this.collectedFrom = collectedFrom;
+        return this;
     }
 }

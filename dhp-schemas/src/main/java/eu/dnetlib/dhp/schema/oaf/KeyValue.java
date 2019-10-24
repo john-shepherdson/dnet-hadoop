@@ -14,23 +14,26 @@ public class KeyValue implements Serializable {
         return key;
     }
 
-    public void setKey(String key) {
+    public KeyValue setKey(String key) {
         this.key = key;
+        return this;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public KeyValue setValue(String value) {
         this.value = value;
+        return this;
     }
 
     public DataInfo getDataInfo() {
         return dataInfo;
     }
 
-    public void setDataInfo(DataInfo dataInfo) {
+    public KeyValue setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
+        return this;
     }
 }
