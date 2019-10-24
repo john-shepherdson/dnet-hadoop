@@ -30,14 +30,14 @@ public class SparkGraphImporterJob {
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 
-        final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile("file:///home/sandro/part-m-00000", Text.class, Text.class).map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
+        final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile("file:///Users/miconis/Downloads/part-m-02236", Text.class, Text.class).map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
 
-        Tuple2<String, String> item = inputRDD
+        String body = inputRDD
                 .filter(s -> s._1().split("@")[2].equalsIgnoreCase("body"))
+                .map(Tuple2::_2)
                 .first();
 
-        System.out.println(item._1());
-        System.out.println(item._2());
+        System.out.println("body = " + body);
 
 
 //                .map(Tuple2::_2)
