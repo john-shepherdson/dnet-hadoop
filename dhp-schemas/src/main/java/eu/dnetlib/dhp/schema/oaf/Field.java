@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 
-public abstract class Field<T> implements Serializable {
+public class Field<T> implements Serializable {
 
     private T value;
 
@@ -12,15 +12,17 @@ public abstract class Field<T> implements Serializable {
         return value;
     }
 
-    public void setValue(T value) {
+    public Field<T> setValue(T value) {
         this.value = value;
+        return this;
     }
 
     public DataInfo getDataInfo() {
         return dataInfo;
     }
 
-    public void setDataInfo(DataInfo dataInfo) {
+    public Field<T> setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
+        return this;
     }
 }
