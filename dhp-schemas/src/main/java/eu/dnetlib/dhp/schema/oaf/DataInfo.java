@@ -10,54 +10,60 @@ public class DataInfo implements Serializable {
     private Boolean deletedbyinference;
     private String trust;
     private String inferenceprovenance;
-    private List<Qualifier> provenanceaction;
+    private Qualifier provenanceaction;
 
 
     public Boolean getInvisible() {
         return invisible;
     }
 
-    public void setInvisible(Boolean invisible) {
+    public DataInfo setInvisible(Boolean invisible) {
         this.invisible = invisible;
+        return this;
     }
 
     public Boolean getInferred() {
         return inferred;
     }
 
-    public void setInferred(Boolean inferred) {
+    public DataInfo setInferred(Boolean inferred) {
         this.inferred = inferred;
+        return this;
     }
 
     public Boolean getDeletedbyinference() {
         return deletedbyinference;
     }
 
-    public void setDeletedbyinference(Boolean deletedbyinference) {
+    public DataInfo setDeletedbyinference(Boolean deletedbyinference) {
         this.deletedbyinference = deletedbyinference;
+        return this;
     }
 
     public String getTrust() {
         return trust;
     }
 
-    public void setTrust(String trust) {
+    public DataInfo setTrust(String trust) {
         this.trust = trust;
+        return this;
     }
 
     public String getInferenceprovenance() {
         return inferenceprovenance;
     }
 
-    public void setInferenceprovenance(String inferenceprovenance) {
+    public DataInfo setInferenceprovenance(String inferenceprovenance) {
         this.inferenceprovenance = inferenceprovenance;
+        return this;
     }
 
-    public List<Qualifier> getProvenanceaction() {
+    public Qualifier getProvenanceaction() {
         return provenanceaction;
     }
 
-    public void setProvenanceaction(List<Qualifier> provenanceaction) {
+    public DataInfo setProvenanceaction(Qualifier provenanceaction) {
         this.provenanceaction = provenanceaction;
+        return this;
     }
 }
