@@ -17,6 +17,7 @@
     <modules>
         <module>dhp-aggregation</module>
         <module>dhp-distcp</module>
+        <module>dhp-graph-mapper</module>
     </modules>
 
     <pluginRepositories>
