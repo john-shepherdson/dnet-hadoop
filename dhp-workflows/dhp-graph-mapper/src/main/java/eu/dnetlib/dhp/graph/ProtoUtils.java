@@ -3,12 +3,7 @@ package eu.dnetlib.dhp.graph;
 import com.googlecode.protobuf.format.JsonFormat;
 import eu.dnetlib.data.proto.FieldTypeProtos;
 import eu.dnetlib.data.proto.OafProtos;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-
-import java.util.List;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class ProtoUtils {
 
