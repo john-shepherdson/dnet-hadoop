@@ -14,8 +14,70 @@
     <artifactId>dhp-schemas</artifactId>
     <packaging>jar</packaging>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>dnet-plugin</id>
+            <name>dnet plugin repository</name>
+            <url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet4-bootstrap-release</url>
+            <layout>default</layout>
+        </pluginRepository>
+    </pluginRepositories>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>protoc-jar-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <protocVersion>${google.protobuf.version}</protocVersion>
+                            <inputDirectories>
+                                <include>src/main/resources</include>
+                            </inputDirectories>
+                            <outputDirectory>src/gen/java</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.protobuf-java-format</groupId>
+            <artifactId>protobuf-java-format</artifactId>
+            <version>1.2</version>
+
+        </dependency>
+
+    </dependencies>
 
 
 </project>

@@ -10,28 +10,23 @@
     </parent>
     <artifactId>dhp-applications</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>dhp-collector-worker</module>
+        <module>dhp-is-mapper</module>
     </modules>
 
 
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>eu.dnetlib.dhp</groupId>
-                <artifactId>dhp-common</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-            </dependency>
 
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>2.7.22</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-common</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 
 
 </project>
