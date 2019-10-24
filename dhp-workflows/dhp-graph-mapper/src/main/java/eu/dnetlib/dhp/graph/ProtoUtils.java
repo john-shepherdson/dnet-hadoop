@@ -45,6 +45,35 @@ public class ProtoUtils {
                 .setDataInfo(sp.hasDataInfo() ? mapDataInfo(sp.getDataInfo()) : null);
     }
 
+    public static ExtraInfo mapExtraInfo(FieldTypeProtos.ExtraInfo extraInfo) {
+        return new ExtraInfo()
+                .setName(extraInfo.getName())
+                .setTypology(extraInfo.getTypology())
+                .setProvenance(extraInfo.getProvenance())
+                .setTrust(extraInfo.getTrust())
+                .setValue(extraInfo.getValue());
+    }
+
+
+    public static OAIProvenance mapOAIProvenance(FieldTypeProtos.OAIProvenance oaiProvenance) {
+        return new OAIProvenance().setOriginDescription(mapOriginalDescription(oaiProvenance.getOriginDescription()));
+    }
+
+
+    public static OriginDescription mapOriginalDescription(FieldTypeProtos.OAIProvenance.OriginDescription originDescription) {
+        final OriginDescription originDescriptionResult = new OriginDescription()
+                .setHarvestDate(originDescription.getHarvestDate())
+                .setAltered(originDescription.getAltered())
+                .setBaseURL(originDescription.getBaseURL())
+                .setIdentifier(originDescription.getIdentifier())
+                .setDatestamp(originDescription.getDatestamp())
+                .setMetadataNamespace(originDescription.getMetadataNamespace());
+        if (originDescription.hasOriginDescription())
+            originDescriptionResult.setOriginDescription(mapOriginalDescription(originDescription.getOriginDescription()));
+        return originDescriptionResult;
+
+    }
+
     public static Field<String> mapStringField(FieldTypeProtos.StringField s) {
         return new Field<String>()
                 .setValue(s.getValue())

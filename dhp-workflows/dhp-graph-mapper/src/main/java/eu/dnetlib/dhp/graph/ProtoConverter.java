@@ -67,22 +67,37 @@ public class ProtoConverter implements Serializable {
     private static Datasource convertDataSource(OafProtos.Oaf oaf) {
         final Datasource result = new Datasource();
 
-        //setting oaf field
-        //TODO waiting claudio for this method
-        //result.setDataInfo(DataInfo.fromOaf(oaf.getDataInfo()));
+
+        //Set Oaf Fields
+        result.setDataInfo(ProtoUtils.mapDataInfo(oaf.getDataInfo()));
+
         result.setLastupdatetimestamp(oaf.getLastupdatetimestamp());
 
         //setting Entity fields
-        result.setId(oaf.getEntity().getId());
-        result.setOriginalId(oaf.getEntity().getOriginalIdList());
+        final OafProtos.OafEntity entity = oaf.getEntity();
 
-        //TODO waiting claudio for this method
-        result.setCollectedfrom(oaf.getEntity().getCollectedfromList()
+        result.setId(entity.getId());
+
+        result.setOriginalId(entity.getOriginalIdList());
+
+        result.setCollectedfrom(entity.getCollectedfromList()
                 .stream()
-                .map(s->new KeyValue())
+                .map(ProtoUtils::mapKV)
                 .collect(Collectors.toList()));
 
+        result.setPid(entity.getPidList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
 
+        result.setDateofcollection(entity.getDateofcollection());
+
+        result.setDateoftransformation(entity.getDateoftransformation());
+
+        result.setExtraInfo(entity.getExtraInfoList()
+                .stream()
+                .map(ProtoUtils::mapExtraInfo)
+                .collect(Collectors.toList()));
 
         return result;
     }
