@@ -8,9 +8,6 @@ public abstract class Oaf implements Serializable {
 
     private Long lastupdatetimestamp;
 
-
-//    protected abstract <T extends Oaf> T fromJson(final String json);
-
     public DataInfo getDataInfo() {
         return dataInfo;
     }

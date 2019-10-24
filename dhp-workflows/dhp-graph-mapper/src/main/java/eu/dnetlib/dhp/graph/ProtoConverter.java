@@ -7,6 +7,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import java.io.Serializable;
 import java.util.stream.Collectors;
 
+import static eu.dnetlib.dhp.graph.ProtoUtils.mapDataInfo;
 import static eu.dnetlib.dhp.graph.ProtoUtils.mapKV;
 
 public class ProtoConverter implements Serializable {
@@ -26,17 +27,20 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Relation convertRelation(OafProtos.Oaf oaf) {
-        final Relation rel = new Relation();
         final OafProtos.OafRel r = oaf.getRel();
+        final Relation rel = new Relation();
+        rel.setDataInfo(mapDataInfo(oaf.getDataInfo()));
+        rel.setLastupdatetimestamp(oaf.getLastupdatetimestamp());
         return rel
                 .setSource(r.getSource())
                 .setTarget(r.getTarget())
                 .setRelType(r.getRelType().toString())
                 .setSubRelType(r.getSubRelType().toString())
                 .setRelClass(r.getRelClass())
-                .setCollectedFrom(r.getCollectedfromList().stream()
-                        .map(kv -> mapKV(kv))
-                        .collect(Collectors.toList()));
+                .setCollectedFrom(r.getCollectedfromCount() > 0 ?
+                        r.getCollectedfromList().stream()
+                            .map(kv -> mapKV(kv))
+                            .collect(Collectors.toList()) : null);
     }
 
     private static OafEntity convertEntity(OafProtos.Oaf oaf) {
