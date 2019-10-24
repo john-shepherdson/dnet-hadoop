@@ -45,6 +45,15 @@ public class ProtoUtils {
                 .setDataInfo(sp.hasDataInfo() ? mapDataInfo(sp.getDataInfo()) : null);
     }
 
+    public static ExtraInfo mapExtraInfo(FieldTypeProtos.ExtraInfo extraInfo) {
+        return new ExtraInfo()
+                .setName(extraInfo.getName())
+                .setTypology(extraInfo.getTypology())
+                .setProvenance(extraInfo.getProvenance())
+                .setTrust(extraInfo.getTrust())
+                .setValue(extraInfo.getValue());
+    }
+
     public static Field<String> mapStringField(FieldTypeProtos.StringField s) {
         return new Field<String>()
                 .setValue(s.getValue())
