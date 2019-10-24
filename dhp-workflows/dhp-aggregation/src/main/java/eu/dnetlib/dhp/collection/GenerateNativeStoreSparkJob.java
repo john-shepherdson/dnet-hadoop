@@ -68,11 +68,13 @@ public class GenerateNativeStoreSparkJob {
         final SparkSession spark = SparkSession
                 .builder()
                 .appName("GenerateNativeStoreSparkJob")
-                .master("yarn")
+                .master(parser.get("master"))
                 .getOrCreate();
 
         final Map<String, String> ongoingMap = new HashMap<>();
         final Map<String, String> reportMap = new HashMap<>();
+
+        final boolean test                  = parser.get("isTest") == null?false: Boolean.valueOf(parser.get("isTest"));
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
@@ -88,19 +90,28 @@ public class GenerateNativeStoreSparkJob {
                 .filter(Objects::nonNull).distinct();
 
         ongoingMap.put("ongoing", "0");
-        manager.sendMessage(new Message(parser.get("workflowId"),"DataFrameCreation", MessageType.ONGOING, ongoingMap ), parser.get("rabbitOngoingQueue"), true, false);
+        if (!test) {
+            manager.sendMessage(new Message(parser.get("workflowId"),"DataFrameCreation", MessageType.ONGOING, ongoingMap ), parser.get("rabbitOngoingQueue"), true, false);
+        }
+
 
         final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
         final Dataset<MetadataRecord> mdstore = spark.createDataset(mappeRDD.rdd(), encoder);
         final LongAccumulator mdStoreRecords = sc.sc().longAccumulator("MDStoreRecords");
         mdStoreRecords.add(mdstore.count());
         ongoingMap.put("ongoing", ""+ totalItems.value());
-        manager.sendMessage(new Message(parser.get("workflowId"),"DataFrameCreation", MessageType.ONGOING, ongoingMap ), parser.get("rabbitOngoingQueue"), true, false);
+        if (!test) {
+            manager.sendMessage(new Message(parser.get("workflowId"), "DataFrameCreation", MessageType.ONGOING, ongoingMap), parser.get("rabbitOngoingQueue"), true, false);
 
+        }
         mdstore.write().format("parquet").save(parser.get("output"));
         reportMap.put("inputItem" , ""+ totalItems.value());
         reportMap.put("invalidRecords", "" + invalidRecords.value());
         reportMap.put("mdStoreSize", "" + mdStoreRecords.value());
-        manager.sendMessage(new Message(parser.get("workflowId"),"Collection", MessageType.REPORT, reportMap ), parser.get("rabbitReportQueue"), true, false);
+        if (!test) {
+            manager.sendMessage(new Message(parser.get("workflowId"), "Collection", MessageType.REPORT, reportMap), parser.get("rabbitReportQueue"), true, false);
+            manager.close();
+        }
+
     }
 }

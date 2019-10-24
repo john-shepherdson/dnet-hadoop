@@ -1,4 +1,5 @@
 [
+  {"paramName":"mt",  "paramLongName":"master",            "paramDescription": "should be local or yarn",                                   "paramRequired": true},
   {"paramName":"e",   "paramLongName":"encoding",           "paramDescription": "the encoding of the input record should be JSON or XML",   "paramRequired": true},
   {"paramName":"d",   "paramLongName":"dateOfCollection",   "paramDescription": "the date when the record has been stored",                 "paramRequired": true},
   {"paramName":"p",   "paramLongName":"provenance",         "paramDescription": "the infos about the provenance of the collected records",  "paramRequired": true},
@@ -10,5 +11,6 @@
   {"paramName":"rh",  "paramLongName":"rabbitHost",         "paramDescription": "the host of the RabbitMq server",                          "paramRequired": true},
   {"paramName":"ro",  "paramLongName":"rabbitOngoingQueue", "paramDescription": "the name of the ongoing queue",                            "paramRequired": true},
   {"paramName":"rr",  "paramLongName":"rabbitReportQueue",  "paramDescription": "the name of the report queue",                             "paramRequired": true},
-  {"paramName":"w",   "paramLongName":"workflowId",         "paramDescription": "the identifier of the dnet Workflow",                      "paramRequired": true}
+  {"paramName":"w",   "paramLongName":"workflowId",         "paramDescription": "the identifier of the dnet Workflow",                      "paramRequired": true},
+  {"paramName":"t",  "paramLongName":"isTest",              "paramDescription": "the name of the report queue",                             "paramRequired": false}
 ]

@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.model.mdstore;
 
 import eu.dnetlib.dhp.utils.DHPUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
@@ -43,6 +42,11 @@ public class MetadataRecord implements Serializable {
      * the date when the record has been stored
      */
     private long dateOfCollection;
+
+    /**
+     * the date when the record has been stored
+     */
+    private long dateOfTransformation;
 
 
     public MetadataRecord() {
@@ -107,6 +111,14 @@ public class MetadataRecord implements Serializable {
 
     public void setDateOfCollection(long dateOfCollection) {
         this.dateOfCollection = dateOfCollection;
+    }
+
+    public long getDateOfTransformation() {
+        return dateOfTransformation;
+    }
+
+    public void setDateOfTransformation(long dateOfTransformation) {
+        this.dateOfTransformation = dateOfTransformation;
     }
 
     @Override

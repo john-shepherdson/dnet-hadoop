@@ -9,7 +9,7 @@
             <xsl:copy-of select="//oai:header"/>
             <metadata>
                 <xsl:for-each select="//*[local-name()='subject']">
-                    <subject><xsl:value-of select="eg:clean(.)"/></subject>
+                    <subject><xsl:value-of select="eg:clean(.,'dnet:languages')"/></subject>
                 </xsl:for-each>
             </metadata>
             <oaf:about>

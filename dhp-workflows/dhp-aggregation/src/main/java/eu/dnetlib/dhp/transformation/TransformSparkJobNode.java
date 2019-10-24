@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.transformation;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.GenerateNativeStoreSparkJob;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
+import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
@@ -53,12 +55,18 @@ public class TransformSparkJobNode {
                 .master(master)
                 .getOrCreate();
 
+
+
+
+
         final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
         final Dataset<MetadataRecord> mdstoreInput = spark.read().format("parquet").load(inputPath).as(encoder);
         final LongAccumulator totalItems = spark.sparkContext().longAccumulator("TotalItems");
         final LongAccumulator errorItems = spark.sparkContext().longAccumulator("errorItems");
         final LongAccumulator transformedItems = spark.sparkContext().longAccumulator("transformedItems");
-        final TransformFunction transformFunction = new TransformFunction(totalItems, errorItems, transformedItems, trasformationRule, dateOfCollection) ;
+        final Map<String, Vocabulary> vocabularies = new HashMap<>();
+        vocabularies.put("dnet:languages", VocabularyHelper.getVocabularyFromAPI("dnet:languages"));
+        final TransformFunction transformFunction = new TransformFunction(totalItems, errorItems, transformedItems, trasformationRule, dateOfCollection, vocabularies) ;
         mdstoreInput.map(transformFunction, encoder).write().format("parquet").save(outputPath);
         if (rabbitHost != null) {
             System.out.println("SEND FINAL REPORT");

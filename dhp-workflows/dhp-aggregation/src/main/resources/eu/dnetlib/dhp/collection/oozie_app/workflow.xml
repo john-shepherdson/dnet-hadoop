@@ -55,22 +55,21 @@
         <error to="Kill"/>
     </action>
     <action name="CollectionWorker">
-        <shell xmlns="uri:oozie:shell-action:0.1">
+        <java>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <exec>lib/dhp-collector-worker-1.0.0.jar</exec>
-            <argument>-p</argument><argument>${sequenceFilePath}</argument>
-            <argument>-a</argument><argument>${apiDescription}</argument>
-            <argument>-n</argument><argument>${nameNode}</argument>
-            <argument>-rh</argument><argument>${rmq_host}</argument>
-            <argument>-ru</argument><argument>${rmq_user}</argument>
-            <argument>-rp</argument><argument>${rmq_pwd}</argument>
-            <argument>-rr</argument><argument>${rmq_report}</argument>
-            <argument>-ro</argument><argument>${rmq_ongoing}</argument>
-            <argument>-u</argument><argument>sandro.labruzzo</argument>
-            <argument>-w</argument><argument>${workflowId}</argument>
-            <capture-output/>
-        </shell>
+            <main-class>eu.dnetlib.dhp.collection.worker.DnetCollectorWorker</main-class>
+            <java-opts>-p</java-opts><java-opts>${sequenceFilePath}</java-opts>
+            <java-opts>-a</java-opts><java-opts>${apiDescription}</java-opts>
+            <java-opts>-n</java-opts><java-opts>${nameNode}</java-opts>
+            <java-opts>-rh</java-opts><java-opts>${rmq_host}</java-opts>
+            <java-opts>-ru</java-opts><java-opts>${rmq_user}</java-opts>
+            <java-opts>-rp</java-opts><java-opts>${rmq_pwd}</java-opts>
+            <java-opts>-rr</java-opts><java-opts>${rmq_report}</java-opts>
+            <java-opts>-ro</java-opts><java-opts>${rmq_ongoing}</java-opts>
+            <java-opts>-u</java-opts><java-opts>sandro.labruzzo</java-opts>
+            <java-opts>-w</java-opts><java-opts>${workflowId}</java-opts>
+        </java>
         <ok to="GenerateNativeStoreSparkJob"/>
         <error to="Kill"/>
     </action>
