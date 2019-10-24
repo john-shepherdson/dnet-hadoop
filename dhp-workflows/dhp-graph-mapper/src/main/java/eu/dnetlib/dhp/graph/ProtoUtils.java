@@ -45,4 +45,22 @@ public class ProtoUtils {
                 .setDataInfo(sp.hasDataInfo() ? mapDataInfo(sp.getDataInfo()) : null);
     }
 
+    public static Field<String> mapStringField(FieldTypeProtos.StringField s) {
+        return new Field<String>()
+                .setValue(s.getValue())
+                .setDataInfo(s.hasDataInfo() ? mapDataInfo(s.getDataInfo()) : null);
+    }
+
+    public static Field<Boolean> mapBoolField(FieldTypeProtos.BoolField b) {
+        return new Field<Boolean>()
+                .setValue(b.getValue())
+                .setDataInfo(b.hasDataInfo() ? mapDataInfo(b.getDataInfo()) : null);
+    }
+
+    public static Field<Integer> mapIntField(FieldTypeProtos.IntField b) {
+        return new Field<Integer>()
+                .setValue(b.getValue())
+                .setDataInfo(b.hasDataInfo() ? mapDataInfo(b.getDataInfo()) : null);
+    }
+
 }
