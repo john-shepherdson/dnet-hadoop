@@ -2,13 +2,13 @@ package eu.dnetlib.dhp.graph;
 
 import eu.dnetlib.data.proto.KindProtos;
 import eu.dnetlib.data.proto.OafProtos;
+import eu.dnetlib.data.proto.ProjectProtos;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 import java.io.Serializable;
 import java.util.stream.Collectors;
 
-import static eu.dnetlib.dhp.graph.ProtoUtils.mapDataInfo;
-import static eu.dnetlib.dhp.graph.ProtoUtils.mapKV;
+import static eu.dnetlib.dhp.graph.ProtoUtils.*;
 
 public class ProtoConverter implements Serializable {
 
@@ -88,11 +88,48 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Project convertProject(OafProtos.Oaf oaf) {
-        return new Project();
+        final ProjectProtos.Project.Metadata m = oaf.getEntity().getProject().getMetadata();
+        final Project project = new Project();
+        project.setDataInfo(mapDataInfo(oaf.getDataInfo()));
+        project.setLastupdatetimestamp(oaf.getLastupdatetimestamp());
+        return project
+                .setAcronym(mapStringField(m.getAcronym()))
+                .setCallidentifier(mapStringField(m.getCallidentifier()))
+                .setCode(mapStringField(m.getCode()))
+                .setContactemail(mapStringField(m.getContactemail()))
+                .setContactfax(mapStringField(m.getContactfax()))
+                .setContactfullname(mapStringField(m.getContactfullname()))
+                .setContactphone(mapStringField(m.getContactphone()))
+                .setContracttype(mapQualifier(m.getContracttype()))
+                .setCurrency(mapStringField(m.getCurrency()))
+                .setDuration(mapStringField(m.getDuration()))
+                .setEcarticle29_3(mapStringField(m.getEcarticle293()))
+                .setEcsc39(mapStringField(m.getEcsc39()))
+                .setOamandatepublications(mapStringField(m.getOamandatepublications()))
+                .setStartdate(mapStringField(m.getStartdate()))
+                .setEnddate(mapStringField(m.getEnddate()))
+                .setFundedamount(m.getFundedamount())
+                .setTotalcost(m.getTotalcost())
+                .setKeywords(mapStringField(m.getKeywords()))
+                .setSubjects(m.getSubjectsCount() > 0 ?
+                        m.getSubjectsList().stream()
+                            .map(sp -> mapStructuredProperty(sp))
+                            .collect(Collectors.toList()) : null)
+                .setTitle(mapStringField(m.getTitle()))
+                .setWebsiteurl(mapStringField(m.getWebsiteurl()))
+                .setFundingtree(m.getFundingtreeCount() > 0 ?
+                        m.getFundingtreeList().stream()
+                            .map(f -> mapStringField(f))
+                            .collect(Collectors.toList()) : null)
+                .setJsonextrainfo(mapStringField(m.getJsonextrainfo()))
+                .setSummary(mapStringField(m.getSummary()))
+                .setOptional1(mapStringField(m.getOptional1()))
+                .setOptional2(mapStringField(m.getOptional2()));
     }
 
     private static Result convertResult(OafProtos.Oaf oaf) {
         switch (oaf.getEntity().getResult().getMetadata().getResulttype().getClassid()) {
+
             case "dataset":
                 return createDataset(oaf);
             case "publication":
