@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.graph;
 
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaRDD;
@@ -42,14 +43,14 @@ public class SparkGraphImporterJob {
 
 
 
-        final JavaRDD<Datasource> datasources = inputRDD
+        final JavaRDD<Organization> datasources = inputRDD
                 .filter(s -> s._1().split("@")[2].equalsIgnoreCase("body"))
                 .map(Tuple2::_2)
                 .map(ProtoConverter::convert)
-                .filter(s-> s instanceof Datasource)
-                .map(s->(Datasource)s);
-        final Encoder<Datasource> encoder = Encoders.bean(Datasource.class);
-        final Dataset<Datasource> mdstore = spark.createDataset(datasources.rdd(), encoder);
+                .filter(s-> s instanceof Organization)
+                .map(s->(Organization)s);
+        final Encoder<Organization> encoder = Encoders.bean(Organization.class);
+        final Dataset<Organization> mdstore = spark.createDataset(datasources.rdd(), encoder);
 
 
         System.out.println(mdstore.count());
