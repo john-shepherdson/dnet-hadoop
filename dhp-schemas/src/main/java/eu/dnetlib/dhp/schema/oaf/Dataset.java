@@ -23,55 +23,62 @@ public class Dataset extends Result implements Serializable {
         return storagedate;
     }
 
-    public void setStoragedate(Field<String> storagedate) {
+    public Dataset setStoragedate(Field<String> storagedate) {
         this.storagedate = storagedate;
+        return this;
     }
 
     public Field<String> getDevice() {
         return device;
     }
 
-    public void setDevice(Field<String> device) {
+    public Dataset setDevice(Field<String> device) {
         this.device = device;
+        return this;
     }
 
     public Field<String> getSize() {
         return size;
     }
 
-    public void setSize(Field<String> size) {
+    public Dataset setSize(Field<String> size) {
         this.size = size;
+        return this;
     }
 
     public Field<String> getVersion() {
         return version;
     }
 
-    public void setVersion(Field<String> version) {
+    public Dataset setVersion(Field<String> version) {
         this.version = version;
+        return this;
     }
 
     public Field<String> getLastmetadataupdate() {
         return lastmetadataupdate;
     }
 
-    public void setLastmetadataupdate(Field<String> lastmetadataupdate) {
+    public Dataset setLastmetadataupdate(Field<String> lastmetadataupdate) {
         this.lastmetadataupdate = lastmetadataupdate;
+        return this;
     }
 
     public Field<String> getMetadataversionnumber() {
         return metadataversionnumber;
     }
 
-    public void setMetadataversionnumber(Field<String> metadataversionnumber) {
+    public Dataset setMetadataversionnumber(Field<String> metadataversionnumber) {
         this.metadataversionnumber = metadataversionnumber;
+        return this;
     }
 
     public List<GeoLocation> getGeolocation() {
         return geolocation;
     }
 
-    public void setGeolocation(List<GeoLocation> geolocation) {
+    public Dataset setGeolocation(List<GeoLocation> geolocation) {
         this.geolocation = geolocation;
+        return this;
     }
 }

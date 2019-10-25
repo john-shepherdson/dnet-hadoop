@@ -65,7 +65,7 @@ public class Datasource extends OafEntity implements Serializable {
     private Field<String> databaseaccessrestriction;
 
     // {feeRequired, registration, other}
-    private Field<String> datauploadrestriction9;
+    private Field<String> datauploadrestriction;
 
     private Field<Boolean> versioning;
 
@@ -86,279 +86,314 @@ public class Datasource extends OafEntity implements Serializable {
         return datasourcetype;
     }
 
-    public void setDatasourcetype(Qualifier datasourcetype) {
+    public Datasource setDatasourcetype(Qualifier datasourcetype) {
         this.datasourcetype = datasourcetype;
+        return this;
     }
 
     public Qualifier getOpenairecompatibility() {
         return openairecompatibility;
     }
 
-    public void setOpenairecompatibility(Qualifier openairecompatibility) {
+    public Datasource setOpenairecompatibility(Qualifier openairecompatibility) {
         this.openairecompatibility = openairecompatibility;
+        return this;
     }
 
     public Field<String> getOfficialname() {
         return officialname;
     }
 
-    public void setOfficialname(Field<String> officialname) {
+    public Datasource setOfficialname(Field<String> officialname) {
         this.officialname = officialname;
+        return this;
     }
 
     public Field<String> getEnglishname() {
         return englishname;
     }
 
-    public void setEnglishname(Field<String> englishname) {
+    public Datasource setEnglishname(Field<String> englishname) {
         this.englishname = englishname;
+        return this;
     }
 
     public Field<String> getWebsiteurl() {
         return websiteurl;
     }
 
-    public void setWebsiteurl(Field<String> websiteurl) {
+    public Datasource setWebsiteurl(Field<String> websiteurl) {
         this.websiteurl = websiteurl;
+        return this;
     }
 
     public Field<String> getLogourl() {
         return logourl;
     }
 
-    public void setLogourl(Field<String> logourl) {
+    public Datasource setLogourl(Field<String> logourl) {
         this.logourl = logourl;
+        return this;
     }
 
     public Field<String> getContactemail() {
         return contactemail;
     }
 
-    public void setContactemail(Field<String> contactemail) {
+    public Datasource setContactemail(Field<String> contactemail) {
         this.contactemail = contactemail;
+        return this;
     }
 
     public Field<String> getNamespaceprefix() {
         return namespaceprefix;
     }
 
-    public void setNamespaceprefix(Field<String> namespaceprefix) {
+    public Datasource setNamespaceprefix(Field<String> namespaceprefix) {
         this.namespaceprefix = namespaceprefix;
+        return this;
     }
 
     public Field<String> getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Field<String> latitude) {
+    public Datasource setLatitude(Field<String> latitude) {
         this.latitude = latitude;
+        return this;
     }
 
     public Field<String> getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Field<String> longitude) {
+    public Datasource setLongitude(Field<String> longitude) {
         this.longitude = longitude;
+        return this;
     }
 
     public Field<String> getDateofvalidation() {
         return dateofvalidation;
     }
 
-    public void setDateofvalidation(Field<String> dateofvalidation) {
+    public Datasource setDateofvalidation(Field<String> dateofvalidation) {
         this.dateofvalidation = dateofvalidation;
+        return this;
     }
 
     public Field<String> getDescription() {
         return description;
     }
 
-    public void setDescription(Field<String> description) {
+    public Datasource setDescription(Field<String> description) {
         this.description = description;
+        return this;
     }
 
     public List<StructuredProperty> getSubjects() {
         return subjects;
     }
 
-    public void setSubjects(List<StructuredProperty> subjects) {
+    public Datasource setSubjects(List<StructuredProperty> subjects) {
         this.subjects = subjects;
+        return this;
     }
 
     public Field<String> getOdnumberofitems() {
         return odnumberofitems;
     }
 
-    public void setOdnumberofitems(Field<String> odnumberofitems) {
+    public Datasource setOdnumberofitems(Field<String> odnumberofitems) {
         this.odnumberofitems = odnumberofitems;
+        return this;
     }
 
     public Field<String> getOdnumberofitemsdate() {
         return odnumberofitemsdate;
     }
 
-    public void setOdnumberofitemsdate(Field<String> odnumberofitemsdate) {
+    public Datasource setOdnumberofitemsdate(Field<String> odnumberofitemsdate) {
         this.odnumberofitemsdate = odnumberofitemsdate;
+        return this;
     }
 
     public Field<String> getOdpolicies() {
         return odpolicies;
     }
 
-    public void setOdpolicies(Field<String> odpolicies) {
+    public Datasource setOdpolicies(Field<String> odpolicies) {
         this.odpolicies = odpolicies;
+        return this;
     }
 
     public List<Field<String>> getOdlanguages() {
         return odlanguages;
     }
 
-    public void setOdlanguages(List<Field<String>> odlanguages) {
+    public Datasource setOdlanguages(List<Field<String>> odlanguages) {
         this.odlanguages = odlanguages;
+        return this;
     }
 
     public List<Field<String>> getOdcontenttypes() {
         return odcontenttypes;
     }
 
-    public void setOdcontenttypes(List<Field<String>> odcontenttypes) {
+    public Datasource setOdcontenttypes(List<Field<String>> odcontenttypes) {
         this.odcontenttypes = odcontenttypes;
+        return this;
     }
 
     public List<Field<String>> getAccessinfopackage() {
         return accessinfopackage;
     }
 
-    public void setAccessinfopackage(List<Field<String>> accessinfopackage) {
+    public Datasource setAccessinfopackage(List<Field<String>> accessinfopackage) {
         this.accessinfopackage = accessinfopackage;
+        return this;
     }
 
     public Field<String> getReleasestartdate() {
         return releasestartdate;
     }
 
-    public void setReleasestartdate(Field<String> releasestartdate) {
+    public Datasource setReleasestartdate(Field<String> releasestartdate) {
         this.releasestartdate = releasestartdate;
+        return this;
     }
 
     public Field<String> getReleaseenddate() {
         return releaseenddate;
     }
 
-    public void setReleaseenddate(Field<String> releaseenddate) {
+    public Datasource setReleaseenddate(Field<String> releaseenddate) {
         this.releaseenddate = releaseenddate;
+        return this;
     }
 
     public Field<String> getMissionstatementurl() {
         return missionstatementurl;
     }
 
-    public void setMissionstatementurl(Field<String> missionstatementurl) {
+    public Datasource setMissionstatementurl(Field<String> missionstatementurl) {
         this.missionstatementurl = missionstatementurl;
+        return this;
     }
 
     public Field<Boolean> getDataprovider() {
         return dataprovider;
     }
 
-    public void setDataprovider(Field<Boolean> dataprovider) {
+    public Datasource setDataprovider(Field<Boolean> dataprovider) {
         this.dataprovider = dataprovider;
+        return this;
     }
 
     public Field<Boolean> getServiceprovider() {
         return serviceprovider;
     }
 
-    public void setServiceprovider(Field<Boolean> serviceprovider) {
+    public Datasource setServiceprovider(Field<Boolean> serviceprovider) {
         this.serviceprovider = serviceprovider;
+        return this;
     }
 
     public Field<String> getDatabaseaccesstype() {
         return databaseaccesstype;
     }
 
-    public void setDatabaseaccesstype(Field<String> databaseaccesstype) {
+    public Datasource setDatabaseaccesstype(Field<String> databaseaccesstype) {
         this.databaseaccesstype = databaseaccesstype;
+        return this;
     }
 
     public Field<String> getDatauploadtype() {
         return datauploadtype;
     }
 
-    public void setDatauploadtype(Field<String> datauploadtype) {
+    public Datasource setDatauploadtype(Field<String> datauploadtype) {
         this.datauploadtype = datauploadtype;
+        return this;
     }
 
     public Field<String> getDatabaseaccessrestriction() {
         return databaseaccessrestriction;
     }
 
-    public void setDatabaseaccessrestriction(Field<String> databaseaccessrestriction) {
+    public Datasource setDatabaseaccessrestriction(Field<String> databaseaccessrestriction) {
         this.databaseaccessrestriction = databaseaccessrestriction;
+        return this;
     }
 
-    public Field<String> getDatauploadrestriction9() {
-        return datauploadrestriction9;
+    public Field<String> getDatauploadrestriction() {
+        return datauploadrestriction;
     }
 
-    public void setDatauploadrestriction9(Field<String> datauploadrestriction9) {
-        this.datauploadrestriction9 = datauploadrestriction9;
+    public Datasource setDatauploadrestriction(Field<String> datauploadrestriction) {
+        this.datauploadrestriction = datauploadrestriction;
+        return this;
     }
 
     public Field<Boolean> getVersioning() {
         return versioning;
     }
 
-    public void setVersioning(Field<Boolean> versioning) {
+    public Datasource setVersioning(Field<Boolean> versioning) {
         this.versioning = versioning;
+        return this;
     }
 
     public Field<String> getCitationguidelineurl() {
         return citationguidelineurl;
     }
 
-    public void setCitationguidelineurl(Field<String> citationguidelineurl) {
+    public Datasource setCitationguidelineurl(Field<String> citationguidelineurl) {
         this.citationguidelineurl = citationguidelineurl;
+        return this;
     }
 
     public Field<String> getQualitymanagementkind() {
         return qualitymanagementkind;
     }
 
-    public void setQualitymanagementkind(Field<String> qualitymanagementkind) {
+    public Datasource setQualitymanagementkind(Field<String> qualitymanagementkind) {
         this.qualitymanagementkind = qualitymanagementkind;
+        return this;
     }
 
     public Field<String> getPidsystems() {
         return pidsystems;
     }
 
-    public void setPidsystems(Field<String> pidsystems) {
+    public Datasource setPidsystems(Field<String> pidsystems) {
         this.pidsystems = pidsystems;
+        return this;
     }
 
     public Field<String> getCertificates() {
         return certificates;
     }
 
-    public void setCertificates(Field<String> certificates) {
+    public Datasource setCertificates(Field<String> certificates) {
         this.certificates = certificates;
+        return this;
     }
 
     public List<KeyValue> getPolicies() {
         return policies;
     }
 
-    public void setPolicies(List<KeyValue> policies) {
+    public Datasource setPolicies(List<KeyValue> policies) {
         this.policies = policies;
+        return this;
     }
 
     public Journal getJournal() {
         return journal;
     }
 
-    public void setJournal(Journal journal) {
+    public Datasource setJournal(Journal journal) {
         this.journal = journal;
+        return this;
     }
 }

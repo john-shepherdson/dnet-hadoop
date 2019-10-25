@@ -12,15 +12,17 @@ public abstract class Oaf implements Serializable {
         return dataInfo;
     }
 
-    public void setDataInfo(DataInfo dataInfo) {
+    public Oaf setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
+        return this;
     }
 
     public Long getLastupdatetimestamp() {
         return lastupdatetimestamp;
     }
 
-    public void setLastupdatetimestamp(Long lastupdatetimestamp) {
+    public Oaf setLastupdatetimestamp(Long lastupdatetimestamp) {
         this.lastupdatetimestamp = lastupdatetimestamp;
+        return this;
     }
 }

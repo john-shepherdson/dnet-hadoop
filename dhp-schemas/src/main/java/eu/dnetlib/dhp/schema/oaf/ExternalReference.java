@@ -31,63 +31,71 @@ public class ExternalReference implements Serializable {
         return sitename;
     }
 
-    public void setSitename(String sitename) {
+    public ExternalReference setSitename(String sitename) {
         this.sitename = sitename;
+        return this;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public void setLabel(String label) {
+    public ExternalReference setLabel(String label) {
         this.label = label;
+        return this;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public ExternalReference setUrl(String url) {
         this.url = url;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public ExternalReference setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public Qualifier getQualifier() {
         return qualifier;
     }
 
-    public void setQualifier(Qualifier qualifier) {
+    public ExternalReference setQualifier(Qualifier qualifier) {
         this.qualifier = qualifier;
+        return this;
     }
 
     public String getRefidentifier() {
         return refidentifier;
     }
 
-    public void setRefidentifier(String refidentifier) {
+    public ExternalReference setRefidentifier(String refidentifier) {
         this.refidentifier = refidentifier;
+        return this;
     }
 
     public String getQuery() {
         return query;
     }
 
-    public void setQuery(String query) {
+    public ExternalReference setQuery(String query) {
         this.query = query;
+        return this;
     }
 
     public DataInfo getDataInfo() {
         return dataInfo;
     }
 
-    public void setDataInfo(DataInfo dataInfo) {
+    public ExternalReference setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
+        return this;
     }
 }

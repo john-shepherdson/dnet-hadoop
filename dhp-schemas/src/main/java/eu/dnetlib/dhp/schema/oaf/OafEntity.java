@@ -17,9 +17,6 @@ public abstract class OafEntity extends Oaf implements Serializable {
 
     private String dateoftransformation;
 
-    //TODO remove this field
-    private List<OafEntity> children;
-
     private List<ExtraInfo> extraInfo;
 
     private OAIProvenance oaiprovenance;
@@ -29,71 +26,71 @@ public abstract class OafEntity extends Oaf implements Serializable {
         return id;
     }
 
-    public void setId(String id) {
+    public OafEntity setId(String id) {
         this.id = id;
+        return this;
     }
 
     public List<String> getOriginalId() {
         return originalId;
     }
 
-    public void setOriginalId(List<String> originalId) {
+    public OafEntity setOriginalId(List<String> originalId) {
         this.originalId = originalId;
+        return this;
     }
 
     public List<KeyValue> getCollectedfrom() {
         return collectedfrom;
     }
 
-    public void setCollectedfrom(List<KeyValue> collectedfrom) {
+    public OafEntity setCollectedfrom(List<KeyValue> collectedfrom) {
         this.collectedfrom = collectedfrom;
+        return this;
     }
 
     public List<StructuredProperty> getPid() {
         return pid;
     }
 
-    public void setPid(List<StructuredProperty> pid) {
+    public OafEntity setPid(List<StructuredProperty> pid) {
         this.pid = pid;
+        return this;
     }
 
     public String getDateofcollection() {
         return dateofcollection;
     }
 
-    public void setDateofcollection(String dateofcollection) {
+    public OafEntity setDateofcollection(String dateofcollection) {
         this.dateofcollection = dateofcollection;
+        return this;
     }
 
     public String getDateoftransformation() {
         return dateoftransformation;
     }
 
-    public void setDateoftransformation(String dateoftransformation) {
+    public OafEntity setDateoftransformation(String dateoftransformation) {
         this.dateoftransformation = dateoftransformation;
-    }
-
-    public List<OafEntity> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<OafEntity> children) {
-        this.children = children;
+        return this;
     }
 
     public List<ExtraInfo> getExtraInfo() {
         return extraInfo;
     }
 
-    public void setExtraInfo(List<ExtraInfo> extraInfo) {
+    public OafEntity setExtraInfo(List<ExtraInfo> extraInfo) {
         this.extraInfo = extraInfo;
+        return this;
     }
 
     public OAIProvenance getOaiprovenance() {
         return oaiprovenance;
     }
 
-    public void setOaiprovenance(OAIProvenance oaiprovenance) {
+    public OafEntity setOaiprovenance(OAIProvenance oaiprovenance) {
         this.oaiprovenance = oaiprovenance;
+        return this;
     }
 }

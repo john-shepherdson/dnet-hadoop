@@ -11,7 +11,8 @@ public class Publication extends Result implements Serializable {
         return journal;
     }
 
-    public void setJournal(Journal journal) {
+    public Publication setJournal(Journal journal) {
         this.journal = journal;
+        return this;
     }
 }

@@ -49,172 +49,192 @@ public abstract class Result extends OafEntity implements Serializable {
 
     private List<Instance> instance;
 
-
     public List<Author> getAuthor() {
         return author;
     }
 
-    public void setAuthor(List<Author> author) {
+    public Result setAuthor(List<Author> author) {
         this.author = author;
+        return this;
     }
 
     public Qualifier getResulttype() {
         return resulttype;
     }
 
-    public void setResulttype(Qualifier resulttype) {
+    public Result setResulttype(Qualifier resulttype) {
         this.resulttype = resulttype;
+        return this;
     }
 
     public Qualifier getLanguage() {
         return language;
     }
 
-    public void setLanguage(Qualifier language) {
+    public Result setLanguage(Qualifier language) {
         this.language = language;
+        return this;
     }
 
     public List<Qualifier> getCountry() {
         return country;
     }
 
-    public void setCountry(List<Qualifier> country) {
+    public Result setCountry(List<Qualifier> country) {
         this.country = country;
+        return this;
     }
 
     public List<StructuredProperty> getSubject() {
         return subject;
     }
 
-    public void setSubject(List<StructuredProperty> subject) {
+    public Result setSubject(List<StructuredProperty> subject) {
         this.subject = subject;
+        return this;
     }
 
     public List<StructuredProperty> getTitle() {
         return title;
     }
 
-    public void setTitle(List<StructuredProperty> title) {
+    public Result setTitle(List<StructuredProperty> title) {
         this.title = title;
+        return this;
     }
 
     public List<StructuredProperty> getRelevantdate() {
         return relevantdate;
     }
 
-    public void setRelevantdate(List<StructuredProperty> relevantdate) {
+    public Result setRelevantdate(List<StructuredProperty> relevantdate) {
         this.relevantdate = relevantdate;
+        return this;
     }
 
     public List<Field<String>> getDescription() {
         return description;
     }
 
-    public void setDescription(List<Field<String>> description) {
+    public Result setDescription(List<Field<String>> description) {
         this.description = description;
+        return this;
     }
 
     public Field<String> getDateofacceptance() {
         return dateofacceptance;
     }
 
-    public void setDateofacceptance(Field<String> dateofacceptance) {
+    public Result setDateofacceptance(Field<String> dateofacceptance) {
         this.dateofacceptance = dateofacceptance;
+        return this;
     }
 
     public Field<String> getPublisher() {
         return publisher;
     }
 
-    public void setPublisher(Field<String> publisher) {
+    public Result setPublisher(Field<String> publisher) {
         this.publisher = publisher;
+        return this;
     }
 
     public Field<String> getEmbargoenddate() {
         return embargoenddate;
     }
 
-    public void setEmbargoenddate(Field<String> embargoenddate) {
+    public Result setEmbargoenddate(Field<String> embargoenddate) {
         this.embargoenddate = embargoenddate;
+        return this;
     }
 
     public List<Field<String>> getSource() {
         return source;
     }
 
-    public void setSource(List<Field<String>> source) {
+    public Result setSource(List<Field<String>> source) {
         this.source = source;
+        return this;
     }
 
     public List<Field<String>> getFulltext() {
         return fulltext;
     }
 
-    public void setFulltext(List<Field<String>> fulltext) {
+    public Result setFulltext(List<Field<String>> fulltext) {
         this.fulltext = fulltext;
+        return this;
     }
 
     public List<Field<String>> getFormat() {
         return format;
     }
 
-    public void setFormat(List<Field<String>> format) {
+    public Result setFormat(List<Field<String>> format) {
         this.format = format;
+        return this;
     }
 
     public List<Field<String>> getContributor() {
         return contributor;
     }
 
-    public void setContributor(List<Field<String>> contributor) {
+    public Result setContributor(List<Field<String>> contributor) {
         this.contributor = contributor;
+        return this;
     }
 
     public Qualifier getResourcetype() {
         return resourcetype;
     }
 
-    public void setResourcetype(Qualifier resourcetype) {
+    public Result setResourcetype(Qualifier resourcetype) {
         this.resourcetype = resourcetype;
+        return this;
     }
 
     public List<Field<String>> getCoverage() {
         return coverage;
     }
 
-    public void setCoverage(List<Field<String>> coverage) {
+    public Result setCoverage(List<Field<String>> coverage) {
         this.coverage = coverage;
+        return this;
     }
 
     public Field<String> getRefereed() {
         return refereed;
     }
 
-    public void setRefereed(Field<String> refereed) {
+    public Result setRefereed(Field<String> refereed) {
         this.refereed = refereed;
+        return this;
     }
 
     public List<Context> getContext() {
         return context;
     }
 
-    public void setContext(List<Context> context) {
+    public Result setContext(List<Context> context) {
         this.context = context;
+        return this;
     }
 
     public List<ExternalReference> getExternalReference() {
         return externalReference;
     }
 
-    public void setExternalReference(List<ExternalReference> externalReference) {
+    public Result setExternalReference(List<ExternalReference> externalReference) {
         this.externalReference = externalReference;
+        return this;
     }
 
     public List<Instance> getInstance() {
         return instance;
     }
 
-    public void setInstance(List<Instance> instance) {
+    public Result setInstance(List<Instance> instance) {
         this.instance = instance;
+        return this;
     }
 }

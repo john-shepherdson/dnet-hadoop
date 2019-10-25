@@ -1,14 +1,12 @@
 package eu.dnetlib.dhp.graph;
 
-import eu.dnetlib.data.proto.KindProtos;
-import eu.dnetlib.data.proto.OafProtos;
+import eu.dnetlib.data.proto.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 import java.io.Serializable;
 import java.util.stream.Collectors;
 
-import static eu.dnetlib.dhp.graph.ProtoUtils.mapDataInfo;
-import static eu.dnetlib.dhp.graph.ProtoUtils.mapKV;
+import static eu.dnetlib.dhp.graph.ProtoUtils.*;
 
 public class ProtoConverter implements Serializable {
 
@@ -19,7 +17,7 @@ public class ProtoConverter implements Serializable {
             if (oaf.getKind() == KindProtos.Kind.entity)
                 return convertEntity(oaf);
             else {
-               return convertRelation(oaf);
+                return convertRelation(oaf);
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -39,8 +37,8 @@ public class ProtoConverter implements Serializable {
                 .setRelClass(r.getRelClass())
                 .setCollectedFrom(r.getCollectedfromCount() > 0 ?
                         r.getCollectedfromList().stream()
-                            .map(kv -> mapKV(kv))
-                            .collect(Collectors.toList()) : null);
+                                .map(kv -> mapKV(kv))
+                                .collect(Collectors.toList()) : null);
     }
 
     private static OafEntity convertEntity(OafProtos.Oaf oaf) {
@@ -60,54 +58,109 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Organization convertOrganization(OafProtos.Oaf oaf) {
-        return new Organization();
+        final DatasourceProtos.Datasource.Metadata m = oaf.getEntity().getDatasource().getMetadata();
+        final Organization org = setOaf(new Organization(), oaf);
+        return setEntity(org, oaf);
+
+        //TODO set org fields
     }
 
-
     private static Datasource convertDataSource(OafProtos.Oaf oaf) {
-        final Datasource result = new Datasource();
-
-
-        //Set Oaf Fields
-        result.setDataInfo(ProtoUtils.mapDataInfo(oaf.getDataInfo()));
-
-        result.setLastupdatetimestamp(oaf.getLastupdatetimestamp());
-
-        //setting Entity fields
-        final OafProtos.OafEntity entity = oaf.getEntity();
-
-        result.setId(entity.getId());
-
-        result.setOriginalId(entity.getOriginalIdList());
-
-        result.setCollectedfrom(entity.getCollectedfromList()
-                .stream()
-                .map(ProtoUtils::mapKV)
-                .collect(Collectors.toList()));
-
-        result.setPid(entity.getPidList()
-                .stream()
-                .map(ProtoUtils::mapStructuredProperty)
-                .collect(Collectors.toList()));
-
-        result.setDateofcollection(entity.getDateofcollection());
-
-        result.setDateoftransformation(entity.getDateoftransformation());
-
-        result.setExtraInfo(entity.getExtraInfoList()
-                .stream()
-                .map(ProtoUtils::mapExtraInfo)
-                .collect(Collectors.toList()));
-
-        return result;
+        final DatasourceProtos.Datasource.Metadata m = oaf.getEntity().getDatasource().getMetadata();
+        final Datasource datasource = setOaf(new Datasource(), oaf);
+        return setEntity(datasource, oaf)
+                .setAccessinfopackage(m.getAccessinfopackageList()
+                    .stream()
+                    .map(ProtoUtils::mapStringField)
+                    .collect(Collectors.toList()))
+                .setCertificates(mapStringField(m.getCertificates()))
+                .setCitationguidelineurl(mapStringField(m.getCitationguidelineurl()))
+                .setContactemail(mapStringField(m.getContactemail()))
+                .setDatabaseaccessrestriction(mapStringField(m.getDatabaseaccessrestriction()))
+                .setDatabaseaccesstype(mapStringField(m.getDatabaseaccesstype()))
+                .setDataprovider(mapBoolField(m.getDataprovider()))
+                .setDatasourcetype(mapQualifier(m.getDatasourcetype()))
+                .setDatauploadrestriction(mapStringField(m.getDatauploadrestriction()))
+                .setCitationguidelineurl(mapStringField(m.getCitationguidelineurl()))
+                .setDatauploadtype(mapStringField(m.getDatauploadtype()))
+                .setDateofvalidation(mapStringField(m.getDateofvalidation()))
+                .setDescription(mapStringField(m.getDescription()))
+                .setEnglishname(mapStringField(m.getEnglishname()))
+                .setLatitude(mapStringField(m.getLatitude()))
+                .setLongitude(mapStringField(m.getLongitude()))
+                .setLogourl(mapStringField(m.getLogourl()))
+                .setMissionstatementurl(mapStringField(m.getMissionstatementurl()))
+                .setNamespaceprefix(mapStringField(m.getNamespaceprefix()))
+                .setOdcontenttypes(m.getOdcontenttypesList()
+                    .stream()
+                    .map(ProtoUtils::mapStringField)
+                    .collect(Collectors.toList()))
+                .setOdlanguages(m.getOdlanguagesList()
+                    .stream()
+                    .map(ProtoUtils::mapStringField)
+                    .collect(Collectors.toList()))
+                .setOdnumberofitems(mapStringField(m.getOdnumberofitems()))
+                .setOdnumberofitemsdate(mapStringField(m.getOdnumberofitemsdate()))
+                .setOdpolicies(mapStringField(m.getOdpolicies()))
+                .setOfficialname(mapStringField(m.getOfficialname()))
+                .setOpenairecompatibility(mapQualifier(m.getOpenairecompatibility()))
+                .setPidsystems(mapStringField(m.getPidsystems()))
+                .setPolicies(m.getPoliciesList()
+                    .stream()
+                    .map(ProtoUtils::mapKV)
+                    .collect(Collectors.toList()))
+                .setQualitymanagementkind(mapStringField(m.getQualitymanagementkind()))
+                .setReleaseenddate(mapStringField(m.getReleaseenddate()))
+                .setServiceprovider(mapBoolField(m.getServiceprovider()))
+                .setReleasestartdate(mapStringField(m.getReleasestartdate()))
+                .setSubjects(m.getSubjectsList()
+                    .stream()
+                    .map(ProtoUtils::mapStructuredProperty)
+                    .collect(Collectors.toList()))
+                .setVersioning(mapBoolField(m.getVersioning()))
+                .setWebsiteurl(mapStringField(m.getWebsiteurl()))
+                .setJournal(mapJournal(m.getJournal()));
     }
 
     private static Project convertProject(OafProtos.Oaf oaf) {
-        return new Project();
+        final ProjectProtos.Project.Metadata m = oaf.getEntity().getProject().getMetadata();
+        final Project project = setOaf(new Project(), oaf);
+        return setEntity(project, oaf)
+                .setAcronym(mapStringField(m.getAcronym()))
+                .setCallidentifier(mapStringField(m.getCallidentifier()))
+                .setCode(mapStringField(m.getCode()))
+                .setContactemail(mapStringField(m.getContactemail()))
+                .setContactfax(mapStringField(m.getContactfax()))
+                .setContactfullname(mapStringField(m.getContactfullname()))
+                .setContactphone(mapStringField(m.getContactphone()))
+                .setContracttype(mapQualifier(m.getContracttype()))
+                .setCurrency(mapStringField(m.getCurrency()))
+                .setDuration(mapStringField(m.getDuration()))
+                .setEcarticle29_3(mapStringField(m.getEcarticle293()))
+                .setEcsc39(mapStringField(m.getEcsc39()))
+                .setOamandatepublications(mapStringField(m.getOamandatepublications()))
+                .setStartdate(mapStringField(m.getStartdate()))
+                .setEnddate(mapStringField(m.getEnddate()))
+                .setFundedamount(m.getFundedamount())
+                .setTotalcost(m.getTotalcost())
+                .setKeywords(mapStringField(m.getKeywords()))
+                .setSubjects(m.getSubjectsList().stream()
+                    .map(sp -> mapStructuredProperty(sp))
+                    .collect(Collectors.toList()))
+                .setTitle(mapStringField(m.getTitle()))
+                .setWebsiteurl(mapStringField(m.getWebsiteurl()))
+                .setFundingtree(m.getFundingtreeList().stream()
+                    .map(f -> mapStringField(f))
+                    .collect(Collectors.toList()))
+                .setJsonextrainfo(mapStringField(m.getJsonextrainfo()))
+                .setSummary(mapStringField(m.getSummary()))
+                .setOptional1(mapStringField(m.getOptional1()))
+                .setOptional2(mapStringField(m.getOptional2()));
     }
 
     private static Result convertResult(OafProtos.Oaf oaf) {
         switch (oaf.getEntity().getResult().getMetadata().getResulttype().getClassid()) {
+
             case "dataset":
                 return createDataset(oaf);
             case "publication":
@@ -117,7 +170,7 @@ public class ProtoConverter implements Serializable {
             case "orp":
                 return createORP(oaf);
             default:
-                throw new RuntimeException("received unknown type :"+oaf.getEntity().getResult().getMetadata().getResulttype().getClassid());
+                throw new RuntimeException("received unknown type :" + oaf.getEntity().getResult().getMetadata().getResulttype().getClassid());
         }
     }
 
@@ -131,28 +184,16 @@ public class ProtoConverter implements Serializable {
 
     private static Publication createPublication(OafProtos.Oaf oaf) {
 
-        Publication result = new Publication();
-
-        //Set Oaf Fields
-        result.setDataInfo(ProtoUtils.mapDataInfo(oaf.getDataInfo()));
-
-        result.setLastupdatetimestamp(oaf.getLastupdatetimestamp());
+        ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
+        Publication publication = setOaf(new Publication(), oaf);
+        return setEntity(publication, oaf)
+                .setJournal(mapJournal(m.getJournal()))
+                .setRefereed(mapStringField(m.getRefereed()));
 
         //setting Entity fields
         final OafProtos.OafEntity entity = oaf.getEntity();
 
-        result.setId(entity.getId());
-
-        result.setJournal(null);
-
         result.setAuthor(null);
-
-        result.setChildren(null);
-
-        result.setCollectedfrom(entity.getCollectedfromList()
-                .stream()
-                .map(ProtoUtils::mapKV)
-                .collect(Collectors.toList()));
 
         result.setContext(null);
 
@@ -164,10 +205,6 @@ public class ProtoConverter implements Serializable {
 
         result.setDateofacceptance(result.getDateofacceptance());
 
-        result.setDateofcollection(entity.getDateofcollection());
-
-        result.setDateoftransformation(entity.getDateoftransformation());
-
         result.setDescription(entity.getResult().getMetadata().getDescriptionList()
                 .stream()
                 .map(ProtoUtils::mapStringField)
@@ -177,11 +214,6 @@ public class ProtoConverter implements Serializable {
 
         result.setExternalReference(null);
 
-        result.setExtraInfo(entity.getExtraInfoList()
-                .stream()
-                .map(ProtoUtils::mapExtraInfo)
-                .collect(Collectors.toList()));
-
         result.setFormat(entity.getResult().getMetadata().getFormatList()
                 .stream()
                 .map(ProtoUtils::mapStringField)
@@ -189,22 +221,14 @@ public class ProtoConverter implements Serializable {
 
         result.setFulltext(null);
 
-        result.setInstance(null);
+
+        result.setInstance(entity.getResult().getInstanceList());
 
         result.setLanguage(ProtoUtils.mapQualifier(entity.getResult().getMetadata().getLanguage()));
 
         result.setOaiprovenance(null);
 
-        result.setOriginalId(entity.getOriginalIdList());
-
-        result.setPid(entity.getPidList()
-                .stream()
-                .map(ProtoUtils::mapStructuredProperty)
-                .collect(Collectors.toList()));
-
         result.setPublisher(ProtoUtils.mapStringField(entity.getResult().getMetadata().getPublisher()));
-
-        result.setRefereed(null);
 
         result.setRelevantdate(null);
 
