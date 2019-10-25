@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class Organization extends OafEntity implements Serializable {
+public class Organization extends OafEntity<Organization> implements Serializable {
 
     private Field<String> legalshortname;
 
@@ -178,6 +178,11 @@ public class Organization extends OafEntity implements Serializable {
 
     public Organization setCountry(Qualifier country) {
         this.country = country;
+        return this;
+    }
+
+    @Override
+    protected Organization self() {
         return this;
     }
 }

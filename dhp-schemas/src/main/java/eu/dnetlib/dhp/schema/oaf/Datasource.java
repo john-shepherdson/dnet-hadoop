@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class Datasource extends OafEntity implements Serializable {
+public class Datasource extends OafEntity<Datasource> implements Serializable {
 
     private Qualifier datasourcetype;
 
@@ -394,6 +394,11 @@ public class Datasource extends OafEntity implements Serializable {
 
     public Datasource setJournal(Journal journal) {
         this.journal = journal;
+        return this;
+    }
+
+    @Override
+    protected Datasource self() {
         return this;
     }
 }

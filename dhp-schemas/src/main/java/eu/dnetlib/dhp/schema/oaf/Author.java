@@ -1,19 +1,30 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Author implements Serializable {
 
+    private String fullname;
+
     private String name;
 
-    private String typology;
+    private String surname;
 
-    private String provenance;
+    private Integer rank;
 
-    private String trust;
+    private List<KeyValue> pid;
 
-    // json containing a Citation or Statistics
-    private String value;
+    private List<Field<String>> affiliation;
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public Author setFullname(String fullname) {
+        this.fullname = fullname;
+        return this;
+    }
 
     public String getName() {
         return name;
@@ -24,39 +35,39 @@ public class Author implements Serializable {
         return this;
     }
 
-    public String getTypology() {
-        return typology;
+    public String getSurname() {
+        return surname;
     }
 
-    public Author setTypology(String typology) {
-        this.typology = typology;
+    public Author setSurname(String surname) {
+        this.surname = surname;
         return this;
     }
 
-    public String getProvenance() {
-        return provenance;
+    public Integer getRank() {
+        return rank;
     }
 
-    public Author setProvenance(String provenance) {
-        this.provenance = provenance;
+    public Author setRank(Integer rank) {
+        this.rank = rank;
         return this;
     }
 
-    public String getTrust() {
-        return trust;
+    public List<KeyValue> getPid() {
+        return pid;
     }
 
-    public Author setTrust(String trust) {
-        this.trust = trust;
+    public Author setPid(List<KeyValue> pid) {
+        this.pid = pid;
         return this;
     }
 
-    public String getValue() {
-        return value;
+    public List<Field<String>> getAffiliation() {
+        return affiliation;
     }
 
-    public Author setValue(String value) {
-        this.value = value;
+    public Author setAffiliation(List<Field<String>> affiliation) {
+        this.affiliation = affiliation;
         return this;
     }
 }

@@ -43,7 +43,8 @@ public class ProtoConverterTest {
         assertTrue(result instanceof Publication);
         Publication p = (Publication) result;
 
-        System.out.println(p.getId());
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println(mapper.writeValueAsString(result));
 
     }
 

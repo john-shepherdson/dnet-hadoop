@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class Project extends OafEntity implements Serializable {
+public class Project extends OafEntity<Project> implements Serializable {
 
     private Field<String> websiteurl;
 
@@ -288,6 +288,11 @@ public class Project extends OafEntity implements Serializable {
 
     public Project setFundedamount(Float fundedamount) {
         this.fundedamount = fundedamount;
+        return this;
+    }
+
+    @Override
+    protected Project self() {
         return this;
     }
 }

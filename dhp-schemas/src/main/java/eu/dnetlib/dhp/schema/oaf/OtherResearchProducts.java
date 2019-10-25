@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class OtherResearchProducts extends Result implements Serializable {
+public class OtherResearchProducts extends Result<OtherResearchProducts> implements Serializable {
 
     private List<Field<String>> contactperson;
 
@@ -35,6 +35,11 @@ public class OtherResearchProducts extends Result implements Serializable {
 
     public OtherResearchProducts setTool(List<Field<String>> tool) {
         this.tool = tool;
+        return this;
+    }
+
+    @Override
+    protected OtherResearchProducts self() {
         return this;
     }
 }

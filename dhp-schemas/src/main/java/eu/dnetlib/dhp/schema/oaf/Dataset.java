@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class Dataset extends Result implements Serializable {
+public class Dataset extends Result<Dataset> implements Serializable {
 
     private Field<String> storagedate;
 
@@ -79,6 +79,11 @@ public class Dataset extends Result implements Serializable {
 
     public Dataset setGeolocation(List<GeoLocation> geolocation) {
         this.geolocation = geolocation;
+        return this;
+    }
+
+    @Override
+    protected Dataset self() {
         return this;
     }
 }
