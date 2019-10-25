@@ -5,12 +5,41 @@ import eu.dnetlib.data.proto.FieldTypeProtos;
 import eu.dnetlib.data.proto.OafProtos;
 import eu.dnetlib.dhp.schema.oaf.*;
 
+import java.util.stream.Collectors;
+
 public class ProtoUtils {
 
     public static OafProtos.Oaf parse(String json) throws JsonFormat.ParseException {
         final OafProtos.Oaf.Builder builder =  OafProtos.Oaf.newBuilder();
         JsonFormat.merge(json, builder);
         return builder.build();
+    }
+
+    public static <T extends Oaf> T setOaf(T oaf, OafProtos.Oaf o) {
+        oaf.setDataInfo(mapDataInfo(o.getDataInfo())).setLastupdatetimestamp(o.getLastupdatetimestamp());
+        return oaf;
+    }
+
+    public static <T extends OafEntity> T setEntity(T entity, OafProtos.Oaf oaf) {
+        //setting Entity fields
+        final OafProtos.OafEntity e = oaf.getEntity();
+        entity
+            .setId(e.getId())
+            .setOriginalId(e.getOriginalIdList())
+            .setCollectedfrom(e.getCollectedfromList()
+                .stream()
+                .map(ProtoUtils::mapKV)
+                .collect(Collectors.toList()))
+            .setPid(e.getPidList().stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()))
+            .setDateofcollection(entity.getDateofcollection())
+            .setDateoftransformation(entity.getDateoftransformation())
+            .setExtraInfo(e.getExtraInfoList()
+                .stream()
+                .map(ProtoUtils::mapExtraInfo)
+                .collect(Collectors.toList()));
+        return entity;
     }
 
     public static KeyValue mapKV(FieldTypeProtos.KeyValue kv) {
@@ -54,11 +83,9 @@ public class ProtoUtils {
                 .setValue(extraInfo.getValue());
     }
 
-
     public static OAIProvenance mapOAIProvenance(FieldTypeProtos.OAIProvenance oaiProvenance) {
         return new OAIProvenance().setOriginDescription(mapOriginalDescription(oaiProvenance.getOriginDescription()));
     }
-
 
     public static OriginDescription mapOriginalDescription(FieldTypeProtos.OAIProvenance.OriginDescription originDescription) {
         final OriginDescription originDescriptionResult = new OriginDescription()
@@ -71,7 +98,6 @@ public class ProtoUtils {
         if (originDescription.hasOriginDescription())
             originDescriptionResult.setOriginDescription(mapOriginalDescription(originDescription.getOriginDescription()));
         return originDescriptionResult;
-
     }
 
     public static Field<String> mapStringField(FieldTypeProtos.StringField s) {
@@ -90,6 +116,22 @@ public class ProtoUtils {
         return new Field<Integer>()
                 .setValue(b.getValue())
                 .setDataInfo(b.hasDataInfo() ? mapDataInfo(b.getDataInfo()) : null);
+    }
+
+    public static Journal mapJournal(FieldTypeProtos.Journal j) {
+        return new Journal()
+                .setConferencedate(j.getConferencedate())
+                .setConferenceplace(j.getConferenceplace())
+                .setEdition(j.getEdition())
+                .setEp(j.getEp())
+                .setIss(j.getIss())
+                .setIssnLinking(j.getIssnLinking())
+                .setIssnOnline(j.getIssnOnline())
+                .setIssnPrinted(j.getIssnPrinted())
+                .setName(j.getName())
+                .setSp(j.getSp())
+                .setVol(j.getVol())
+                .setDataInfo(mapDataInfo(j.getDataInfo()));
     }
 
 }
