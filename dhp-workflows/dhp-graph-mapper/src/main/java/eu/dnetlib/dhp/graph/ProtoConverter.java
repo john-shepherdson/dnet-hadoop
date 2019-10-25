@@ -192,6 +192,13 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Software createSoftware(OafProtos.Oaf oaf) {
+        final ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
+        final Software software = setOaf(new Software(), oaf);
+        
+
+
+
+
         return new Software();
     }
 
