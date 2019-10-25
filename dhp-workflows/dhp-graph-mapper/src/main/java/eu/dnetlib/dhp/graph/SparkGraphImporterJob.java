@@ -30,10 +30,10 @@ public class SparkGraphImporterJob {
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-
-        final String path = "file:///home/sandro/part-m-00000";
+        final String path = "file:///Users/miconis/Downloads/part-m-02236";
         final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(path, Text.class, Text.class)
                 .map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
+
 
 
         final String body = inputRDD.filter(s -> s._1().contains("20|") && s._1().split("@")[2].equalsIgnoreCase("body")).map(Tuple2::_2).first();
@@ -41,15 +41,14 @@ public class SparkGraphImporterJob {
         System.out.println(body);
 
 
-        final JavaRDD<Organization> datasources = inputRDD
+        final JavaRDD<Organization> organization = inputRDD
                 .filter(s -> s._1().split("@")[2].equalsIgnoreCase("body"))
                 .map(Tuple2::_2)
                 .map(ProtoConverter::convert)
                 .filter(s-> s instanceof Organization)
                 .map(s->(Organization)s);
         final Encoder<Organization> encoder = Encoders.bean(Organization.class);
-        final Dataset<Organization> mdstore = spark.createDataset(datasources.rdd(), encoder);
-
+        final Dataset<Organization> mdstore = spark.createDataset(organization.rdd(), encoder);
 
         System.out.println(mdstore.count());
 

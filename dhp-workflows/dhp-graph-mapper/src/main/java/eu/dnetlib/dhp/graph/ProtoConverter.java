@@ -207,7 +207,14 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Publication createPublication(OafProtos.Oaf oaf) {
-        return new Publication();
+
+        ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
+        Publication publication = setOaf(new Publication(), oaf);
+        setEntity(publication, oaf);
+        return setResult(publication, oaf)
+                .setJournal(mapJournal(m.getJournal()));
+
+
     }
 
     private static Dataset createDataset(OafProtos.Oaf oaf) {

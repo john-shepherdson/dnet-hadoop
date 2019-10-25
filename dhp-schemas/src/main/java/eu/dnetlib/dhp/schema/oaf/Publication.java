@@ -18,6 +18,6 @@ public class Publication extends Result<Publication> implements Serializable {
 
     @Override
     protected Publication self() {
-        return self();
+        return this;
     }
 }
