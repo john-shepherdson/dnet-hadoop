@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class OafEntity extends Oaf implements Serializable {
+public abstract class OafEntity<T extends OafEntity<T>> extends Oaf<T> implements Serializable {
 
     private String id;
 
@@ -21,76 +21,75 @@ public abstract class OafEntity extends Oaf implements Serializable {
 
     private OAIProvenance oaiprovenance;
 
-
     public String getId() {
         return id;
     }
 
-    public OafEntity setId(String id) {
+    public T setId(String id) {
         this.id = id;
-        return this;
+        return self();
     }
 
     public List<String> getOriginalId() {
         return originalId;
     }
 
-    public OafEntity setOriginalId(List<String> originalId) {
+    public T setOriginalId(List<String> originalId) {
         this.originalId = originalId;
-        return this;
+        return self();
     }
 
     public List<KeyValue> getCollectedfrom() {
         return collectedfrom;
     }
 
-    public OafEntity setCollectedfrom(List<KeyValue> collectedfrom) {
+    public T setCollectedfrom(List<KeyValue> collectedfrom) {
         this.collectedfrom = collectedfrom;
-        return this;
+        return self();
     }
 
     public List<StructuredProperty> getPid() {
         return pid;
     }
 
-    public OafEntity setPid(List<StructuredProperty> pid) {
+    public T setPid(List<StructuredProperty> pid) {
         this.pid = pid;
-        return this;
+        return self();
     }
 
     public String getDateofcollection() {
         return dateofcollection;
     }
 
-    public OafEntity setDateofcollection(String dateofcollection) {
+    public T setDateofcollection(String dateofcollection) {
         this.dateofcollection = dateofcollection;
-        return this;
+        return self();
     }
 
     public String getDateoftransformation() {
         return dateoftransformation;
     }
 
-    public OafEntity setDateoftransformation(String dateoftransformation) {
+    public T setDateoftransformation(String dateoftransformation) {
         this.dateoftransformation = dateoftransformation;
-        return this;
+        return self();
     }
 
     public List<ExtraInfo> getExtraInfo() {
         return extraInfo;
     }
 
-    public OafEntity setExtraInfo(List<ExtraInfo> extraInfo) {
+    public T setExtraInfo(List<ExtraInfo> extraInfo) {
         this.extraInfo = extraInfo;
-        return this;
+        return self();
     }
 
     public OAIProvenance getOaiprovenance() {
         return oaiprovenance;
     }
 
-    public OafEntity setOaiprovenance(OAIProvenance oaiprovenance) {
+    public T setOaiprovenance(OAIProvenance oaiprovenance) {
         this.oaiprovenance = oaiprovenance;
-        return this;
+        return self();
     }
 }

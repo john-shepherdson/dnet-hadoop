@@ -2,27 +2,29 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 
-public abstract class Oaf implements Serializable {
+public abstract class Oaf<T extends Oaf<T>> implements Serializable {
     
     private DataInfo dataInfo;
 
     private Long lastupdatetimestamp;
 
+    protected abstract T self();
+
     public DataInfo getDataInfo() {
         return dataInfo;
     }
 
-    public Oaf setDataInfo(DataInfo dataInfo) {
+    public T setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
-        return this;
+        return self();
     }
 
     public Long getLastupdatetimestamp() {
         return lastupdatetimestamp;
     }
 
-    public Oaf setLastupdatetimestamp(Long lastupdatetimestamp) {
+    public T setLastupdatetimestamp(Long lastupdatetimestamp) {
         this.lastupdatetimestamp = lastupdatetimestamp;
-        return this;
+        return self();
     }
 }

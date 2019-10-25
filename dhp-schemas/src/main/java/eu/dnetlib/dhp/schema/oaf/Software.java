@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class Software extends Result implements Serializable {
+public class Software extends Result<Software> implements Serializable {
 
     private List<Field<String>> documentationUrl;
 
@@ -46,6 +46,11 @@ public class Software extends Result implements Serializable {
 
     public Software setProgrammingLanguage(Qualifier programmingLanguage) {
         this.programmingLanguage = programmingLanguage;
+        return this;
+    }
+
+    @Override
+    protected Software self() {
         return this;
     }
 }

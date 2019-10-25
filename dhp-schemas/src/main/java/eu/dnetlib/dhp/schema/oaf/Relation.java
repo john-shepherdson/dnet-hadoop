@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.util.List;
 
-public class Relation extends Oaf {
+public class Relation extends Oaf<Relation> {
 
     private String relType;
 
@@ -22,7 +22,7 @@ public class Relation extends Oaf {
 
     public Relation setRelType(String relType) {
         this.relType = relType;
-        return this;
+        return self();
     }
 
     public String getSubRelType() {
@@ -31,7 +31,7 @@ public class Relation extends Oaf {
 
     public Relation setSubRelType(String subRelType) {
         this.subRelType = subRelType;
-        return this;
+        return self();
     }
 
     public String getRelClass() {
@@ -40,7 +40,7 @@ public class Relation extends Oaf {
 
     public Relation setRelClass(String relClass) {
         this.relClass = relClass;
-        return this;
+        return self();
     }
 
     public String getSource() {
@@ -49,7 +49,7 @@ public class Relation extends Oaf {
 
     public Relation setSource(String source) {
         this.source = source;
-        return this;
+        return self();
     }
 
     public String getTarget() {
@@ -58,7 +58,7 @@ public class Relation extends Oaf {
 
     public Relation setTarget(String target) {
         this.target = target;
-        return this;
+        return self();
     }
 
     public List<KeyValue> getCollectedFrom() {
@@ -67,6 +67,11 @@ public class Relation extends Oaf {
 
     public Relation setCollectedFrom(List<KeyValue> collectedFrom) {
         this.collectedFrom = collectedFrom;
+        return self();
+    }
+
+    @Override
+    protected Relation self() {
         return this;
     }
 }
