@@ -20,7 +20,7 @@ public class ProtoConverter implements Serializable {
             if (oaf.getKind() == KindProtos.Kind.entity)
                 return convertEntity(oaf);
             else {
-               return convertRelation(oaf);
+                return convertRelation(oaf);
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -40,8 +40,8 @@ public class ProtoConverter implements Serializable {
                 .setRelClass(r.getRelClass())
                 .setCollectedFrom(r.getCollectedfromCount() > 0 ?
                         r.getCollectedfromList().stream()
-                            .map(kv -> mapKV(kv))
-                            .collect(Collectors.toList()) : null);
+                                .map(kv -> mapKV(kv))
+                                .collect(Collectors.toList()) : null);
     }
 
     private static OafEntity convertEntity(OafProtos.Oaf oaf) {
@@ -64,6 +64,7 @@ public class ProtoConverter implements Serializable {
         final DatasourceProtos.Datasource.Metadata m = oaf.getEntity().getDatasource().getMetadata();
         final Organization org = setOaf(new Organization(), oaf);
         return setEntity(org, oaf);
+
         //TODO set org fields
     }
 
@@ -71,11 +72,10 @@ public class ProtoConverter implements Serializable {
         final DatasourceProtos.Datasource.Metadata m = oaf.getEntity().getDatasource().getMetadata();
         final Datasource datasource = setOaf(new Datasource(), oaf);
         return setEntity(datasource, oaf)
-                .setAccessinfopackage(m.getAccessinfopackageCount() > 0 ?
-                        m.getAccessinfopackageList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()) : null)
+                .setAccessinfopackage(m.getAccessinfopackageList()
+                    .stream()
+                    .map(ProtoUtils::mapStringField)
+                    .collect(Collectors.toList()))
                 .setCertificates(mapStringField(m.getCertificates()))
                 .setCitationguidelineurl(mapStringField(m.getCitationguidelineurl()))
                 .setContactemail(mapStringField(m.getContactemail()))
@@ -94,36 +94,32 @@ public class ProtoConverter implements Serializable {
                 .setLogourl(mapStringField(m.getLogourl()))
                 .setMissionstatementurl(mapStringField(m.getMissionstatementurl()))
                 .setNamespaceprefix(mapStringField(m.getNamespaceprefix()))
-                .setOdcontenttypes(m.getOdcontenttypesCount() > 0 ?
-                        m.getOdcontenttypesList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()) : null)
-                .setOdlanguages(m.getOdlanguagesCount() > 0 ?
-                        m.getOdlanguagesList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()) : null)
+                .setOdcontenttypes(m.getOdcontenttypesList()
+                    .stream()
+                    .map(ProtoUtils::mapStringField)
+                    .collect(Collectors.toList()))
+                .setOdlanguages(m.getOdlanguagesList()
+                    .stream()
+                    .map(ProtoUtils::mapStringField)
+                    .collect(Collectors.toList()))
                 .setOdnumberofitems(mapStringField(m.getOdnumberofitems()))
                 .setOdnumberofitemsdate(mapStringField(m.getOdnumberofitemsdate()))
                 .setOdpolicies(mapStringField(m.getOdpolicies()))
                 .setOfficialname(mapStringField(m.getOfficialname()))
                 .setOpenairecompatibility(mapQualifier(m.getOpenairecompatibility()))
                 .setPidsystems(mapStringField(m.getPidsystems()))
-                .setPolicies(m.getPoliciesCount() > 0 ?
-                        m.getPoliciesList()
-                        .stream()
-                        .map(ProtoUtils::mapKV)
-                        .collect(Collectors.toList()) : null)
+                .setPolicies(m.getPoliciesList()
+                    .stream()
+                    .map(ProtoUtils::mapKV)
+                    .collect(Collectors.toList()))
                 .setQualitymanagementkind(mapStringField(m.getQualitymanagementkind()))
                 .setReleaseenddate(mapStringField(m.getReleaseenddate()))
                 .setServiceprovider(mapBoolField(m.getServiceprovider()))
                 .setReleasestartdate(mapStringField(m.getReleasestartdate()))
-                .setSubjects(m.getSubjectsCount() > 0 ?
-                        m.getSubjectsList()
-                        .stream()
-                        .map(ProtoUtils::mapStructuredProperty)
-                        .collect(Collectors.toList()) : null)
+                .setSubjects(m.getSubjectsList()
+                    .stream()
+                    .map(ProtoUtils::mapStructuredProperty)
+                    .collect(Collectors.toList()))
                 .setVersioning(mapBoolField(m.getVersioning()))
                 .setWebsiteurl(mapStringField(m.getWebsiteurl()))
                 .setJournal(mapJournal(m.getJournal()));
@@ -151,16 +147,14 @@ public class ProtoConverter implements Serializable {
                 .setFundedamount(m.getFundedamount())
                 .setTotalcost(m.getTotalcost())
                 .setKeywords(mapStringField(m.getKeywords()))
-                .setSubjects(m.getSubjectsCount() > 0 ?
-                        m.getSubjectsList().stream()
-                            .map(sp -> mapStructuredProperty(sp))
-                            .collect(Collectors.toList()) : null)
+                .setSubjects(m.getSubjectsList().stream()
+                    .map(sp -> mapStructuredProperty(sp))
+                    .collect(Collectors.toList()))
                 .setTitle(mapStringField(m.getTitle()))
                 .setWebsiteurl(mapStringField(m.getWebsiteurl()))
-                .setFundingtree(m.getFundingtreeCount() > 0 ?
-                        m.getFundingtreeList().stream()
-                            .map(f -> mapStringField(f))
-                            .collect(Collectors.toList()) : null)
+                .setFundingtree(m.getFundingtreeList().stream()
+                    .map(f -> mapStringField(f))
+                    .collect(Collectors.toList()))
                 .setJsonextrainfo(mapStringField(m.getJsonextrainfo()))
                 .setSummary(mapStringField(m.getSummary()))
                 .setOptional1(mapStringField(m.getOptional1()))
@@ -179,7 +173,7 @@ public class ProtoConverter implements Serializable {
             case "orp":
                 return createORP(oaf);
             default:
-                throw new RuntimeException("received unknown type :"+oaf.getEntity().getResult().getMetadata().getResulttype().getClassid());
+                throw new RuntimeException("received unknown type :" + oaf.getEntity().getResult().getMetadata().getResulttype().getClassid());
         }
     }
 

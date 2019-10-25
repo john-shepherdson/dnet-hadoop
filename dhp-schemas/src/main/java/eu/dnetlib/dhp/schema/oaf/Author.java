@@ -15,7 +15,6 @@ public class Author implements Serializable {
     // json containing a Citation or Statistics
     private String value;
 
-
     public String getName() {
         return name;
     }

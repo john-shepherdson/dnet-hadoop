@@ -1,14 +1,20 @@
 package eu.dnetlib.dhp.graph;
 
 
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
+
+import javax.xml.crypto.Data;
 
 public class SparkGraphImporterJob {
 
@@ -30,20 +36,24 @@ public class SparkGraphImporterJob {
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 
-        final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile("file:///home/sandro/part-m-00000", Text.class, Text.class).map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
+        final String path = "file:///home/sandro/part-m-00000";
+        final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(path, Text.class, Text.class)
+                .map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
 
-        Tuple2<String, String> item = inputRDD
+
+
+        final JavaRDD<Datasource> datasources = inputRDD
                 .filter(s -> s._1().split("@")[2].equalsIgnoreCase("body"))
-                .first();
+                .map(Tuple2::_2)
+                .map(ProtoConverter::convert)
+                .filter(s-> s instanceof Datasource)
+                .map(s->(Datasource)s);
+        final Encoder<Datasource> encoder = Encoders.bean(Datasource.class);
+        final Dataset<Datasource> mdstore = spark.createDataset(datasources.rdd(), encoder);
 
-        System.out.println(item._1());
-        System.out.println(item._2());
 
+        System.out.println(mdstore.count());
 
-//                .map(Tuple2::_2)
-//                .map(ProtoConverter::convert)
-//                .mapToPair((PairFunction<Oaf, String,Integer>) s-> new Tuple2<String, Integer>(s.getClass().getName(),1))
-//                .reduceByKey(Integer::sum).collect().forEach(System.out::println);
 //
 //
 //                .filter(s -> s instanceof Publication)
