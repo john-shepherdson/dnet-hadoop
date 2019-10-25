@@ -14,26 +14,23 @@ public class StructuredProperty implements Serializable {
         return value;
     }
 
-    public StructuredProperty setValue(String value) {
+    public void setValue(String value) {
         this.value = value;
-        return this;
     }
 
     public Qualifier getQualifier() {
         return qualifier;
     }
 
-    public StructuredProperty setQualifier(Qualifier qualifier) {
+    public void setQualifier(Qualifier qualifier) {
         this.qualifier = qualifier;
-        return this;
     }
 
     public DataInfo getDataInfo() {
         return dataInfo;
     }
 
-    public StructuredProperty setDataInfo(DataInfo dataInfo) {
+    public void setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
-        return this;
     }
 }

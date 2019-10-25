@@ -21,53 +21,47 @@ public class Author implements Serializable {
         return fullname;
     }
 
-    public Author setFullname(String fullname) {
+    public void setFullname(String fullname) {
         this.fullname = fullname;
-        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public Author setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getSurname() {
         return surname;
     }
 
-    public Author setSurname(String surname) {
+    public void setSurname(String surname) {
         this.surname = surname;
-        return this;
     }
 
     public Integer getRank() {
         return rank;
     }
 
-    public Author setRank(Integer rank) {
+    public void setRank(Integer rank) {
         this.rank = rank;
-        return this;
     }
 
     public List<KeyValue> getPid() {
         return pid;
     }
 
-    public Author setPid(List<KeyValue> pid) {
+    public void setPid(List<KeyValue> pid) {
         this.pid = pid;
-        return this;
     }
 
     public List<Field<String>> getAffiliation() {
         return affiliation;
     }
 
-    public Author setAffiliation(List<Field<String>> affiliation) {
+    public void setAffiliation(List<Field<String>> affiliation) {
         this.affiliation = affiliation;
-        return this;
     }
 }

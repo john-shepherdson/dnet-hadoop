@@ -18,44 +18,39 @@ public class ExtraInfo implements Serializable {
         return name;
     }
 
-    public ExtraInfo setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getTypology() {
         return typology;
     }
 
-    public ExtraInfo setTypology(String typology) {
+    public void setTypology(String typology) {
         this.typology = typology;
-        return this;
     }
 
     public String getProvenance() {
         return provenance;
     }
 
-    public ExtraInfo setProvenance(String provenance) {
+    public void setProvenance(String provenance) {
         this.provenance = provenance;
-        return this;
     }
 
     public String getTrust() {
         return trust;
     }
 
-    public ExtraInfo setTrust(String trust) {
+    public void setTrust(String trust) {
         this.trust = trust;
-        return this;
     }
 
     public String getValue() {
         return value;
     }
 
-    public ExtraInfo setValue(String value) {
+    public void setValue(String value) {
         this.value = value;
-        return this;
     }
 }

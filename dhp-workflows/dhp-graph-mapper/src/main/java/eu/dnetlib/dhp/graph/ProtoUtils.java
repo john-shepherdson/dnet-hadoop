@@ -17,220 +17,230 @@ public class ProtoUtils {
     }
 
     public static <T extends Oaf> T setOaf(T oaf, OafProtos.Oaf o) {
-        oaf.setDataInfo(mapDataInfo(o.getDataInfo())).setLastupdatetimestamp(o.getLastupdatetimestamp());
+        oaf.setDataInfo(mapDataInfo(o.getDataInfo()));
+        oaf.setLastupdatetimestamp(o.getLastupdatetimestamp());
         return oaf;
     }
 
     public static <T extends OafEntity> T setEntity(T entity, OafProtos.Oaf oaf) {
         //setting Entity fields
         final OafProtos.OafEntity e = oaf.getEntity();
-        entity
-                .setId(e.getId())
-                .setOriginalId(e.getOriginalIdList())
-                .setCollectedfrom(e.getCollectedfromList()
-                        .stream()
-                        .map(ProtoUtils::mapKV)
-                        .collect(Collectors.toList()))
-                .setPid(e.getPidList().stream()
-                        .map(ProtoUtils::mapStructuredProperty)
-                        .collect(Collectors.toList()))
-                .setDateofcollection(entity.getDateofcollection())
-                .setDateoftransformation(entity.getDateoftransformation())
-                .setExtraInfo(e.getExtraInfoList()
-                        .stream()
-                        .map(ProtoUtils::mapExtraInfo)
-                        .collect(Collectors.toList()));
+        entity.setId(e.getId());
+        entity.setOriginalId(e.getOriginalIdList());
+        entity.setCollectedfrom(e.getCollectedfromList()
+                .stream()
+                .map(ProtoUtils::mapKV)
+                .collect(Collectors.toList()));
+        entity.setPid(e.getPidList().stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
+        entity.setDateofcollection(entity.getDateofcollection());
+        entity.setDateoftransformation(entity.getDateoftransformation());
+        entity.setExtraInfo(e.getExtraInfoList()
+                .stream()
+                .map(ProtoUtils::mapExtraInfo)
+                .collect(Collectors.toList()));
         return entity;
     }
 
     public static <T extends Result> T setResult(T entity, OafProtos.Oaf oaf) {
         //setting Entity fields
         final ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
-        entity
-                .setAuthor(m.getAuthorList()
-                        .stream()
-                        .map(ProtoUtils::mapAuthor)
-                        .collect(Collectors.toList()))
-                .setResulttype(mapQualifier(m.getResulttype()))
-                .setLanguage(ProtoUtils.mapQualifier(m.getLanguage()))
-                .setCountry(m.getCountryList()
-                        .stream()
-                        .map(ProtoUtils::mapQualifier)
-                        .collect(Collectors.toList()))
-                .setSubject(m.getSubjectList()
-                        .stream()
-                        .map(ProtoUtils::mapStructuredProperty)
-                        .collect(Collectors.toList()))
-                .setTitle(m.getTitleList()
-                        .stream()
-                        .map(ProtoUtils::mapStructuredProperty)
-                        .collect(Collectors.toList()))
-                .setRelevantdate(m.getRelevantdateList()
-                        .stream()
-                        .map(ProtoUtils::mapStructuredProperty)
-                        .collect(Collectors.toList()))
-                .setDescription(m.getDescriptionList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setDateofacceptance(ProtoUtils.mapStringField(m.getDateofacceptance()))
-                .setPublisher(ProtoUtils.mapStringField(m.getPublisher()))
-                .setEmbargoenddate(ProtoUtils.mapStringField(m.getEmbargoenddate()))
-                .setSource(m.getSourceList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setFulltext(m.getFulltextList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setFormat(m.getFormatList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setContributor(m.getContributorList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setResourcetype(ProtoUtils.mapQualifier(m.getResourcetype()))
-                .setCoverage(m.getCoverageList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setRefereed(mapStringField(m.getRefereed()))
-                .setContext(m.getContextList()
-                        .stream()
-                        .map(ProtoUtils::mapContext)
-                        .collect(Collectors.toList()));
+        entity.setAuthor(m.getAuthorList()
+                .stream()
+                .map(ProtoUtils::mapAuthor)
+                .collect(Collectors.toList()));
+        entity.setResulttype(mapQualifier(m.getResulttype()));
+        entity.setLanguage(ProtoUtils.mapQualifier(m.getLanguage()));
+        entity.setCountry(m.getCountryList()
+                .stream()
+                .map(ProtoUtils::mapQualifier)
+                .collect(Collectors.toList()));
+        entity.setSubject(m.getSubjectList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
+        entity.setTitle(m.getTitleList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
+        entity.setRelevantdate(m.getRelevantdateList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
+        entity.setDescription(m.getDescriptionList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        entity.setDateofacceptance(ProtoUtils.mapStringField(m.getDateofacceptance()));
+        entity.setPublisher(ProtoUtils.mapStringField(m.getPublisher()));
+        entity.setEmbargoenddate(ProtoUtils.mapStringField(m.getEmbargoenddate()));
+        entity.setSource(m.getSourceList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        entity.setFulltext(m.getFulltextList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        entity.setFormat(m.getFormatList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        entity.setContributor(m.getContributorList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        entity.setResourcetype(ProtoUtils.mapQualifier(m.getResourcetype()));
+        entity.setCoverage(m.getCoverageList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        entity.setRefereed(mapStringField(m.getRefereed()));
+        entity.setContext(m.getContextList()
+                .stream()
+                .map(ProtoUtils::mapContext)
+                .collect(Collectors.toList()));
 
         return entity;
     }
 
     private static Context mapContext(ResultProtos.Result.Context context) {
 
-        return new Context()
-                .setId(context.getId())
-                .setDataInfo(context.getDataInfoList()
-                        .stream()
-                        .map(ProtoUtils::mapDataInfo)
-                        .collect(Collectors.toList()));
+        final Context entity = new Context();
+        entity.setId(context.getId());
+        entity.setDataInfo(context.getDataInfoList()
+                .stream()
+                .map(ProtoUtils::mapDataInfo)
+                .collect(Collectors.toList()));
+        return entity;
     }
 
 
     public static KeyValue mapKV(FieldTypeProtos.KeyValue kv) {
-        return new KeyValue()
-                .setKey(kv.getKey())
-                .setValue(kv.getValue())
-                .setDataInfo(mapDataInfo(kv.getDataInfo()));
+        final KeyValue keyValue = new KeyValue();
+        keyValue.setKey(kv.getKey());
+        keyValue.setValue(kv.getValue());
+        keyValue.setDataInfo(mapDataInfo(kv.getDataInfo()));
+        return keyValue;
     }
 
     public static DataInfo mapDataInfo(FieldTypeProtos.DataInfo d) {
-        return new DataInfo()
-                .setDeletedbyinference(d.getDeletedbyinference())
-                .setInferenceprovenance(d.getInferenceprovenance())
-                .setInferred(d.getInferred())
-                .setInvisible(d.getInvisible())
-                .setProvenanceaction(mapQualifier(d.getProvenanceaction()));
+        final DataInfo dataInfo = new DataInfo();
+        dataInfo.setDeletedbyinference(d.getDeletedbyinference());
+        dataInfo.setInferenceprovenance(d.getInferenceprovenance());
+        dataInfo.setInferred(d.getInferred());
+        dataInfo.setInvisible(d.getInvisible());
+        dataInfo.setProvenanceaction(mapQualifier(d.getProvenanceaction()));
+        return dataInfo;
     }
 
     public static Qualifier mapQualifier(FieldTypeProtos.Qualifier q) {
-        return new Qualifier()
-                .setClassid(q.getClassid())
-                .setClassname(q.getClassname())
-                .setSchemeid(q.getSchemeid())
-                .setSchemename(q.getSchemename());
-        //.setDataInfo(q.hasDataInfo() ? mapDataInfo(q.getDataInfo()) : null);
+        final Qualifier qualifier = new Qualifier();
+        qualifier.setClassid(q.getClassid());
+        qualifier.setClassname(q.getClassname());
+        qualifier.setSchemeid(q.getSchemeid());
+        qualifier.setSchemename(q.getSchemename());
+        return qualifier;
     }
 
     public static StructuredProperty mapStructuredProperty(FieldTypeProtos.StructuredProperty sp) {
-        return new StructuredProperty()
-                .setValue(sp.getValue())
-                .setQualifier(mapQualifier(sp.getQualifier()))
-                .setDataInfo(sp.hasDataInfo() ? mapDataInfo(sp.getDataInfo()) : null);
+        final StructuredProperty structuredProperty = new StructuredProperty();
+        structuredProperty.setValue(sp.getValue());
+        structuredProperty.setQualifier(mapQualifier(sp.getQualifier()));
+        structuredProperty.setDataInfo(mapDataInfo(sp.getDataInfo()));
+        return structuredProperty;
     }
 
     public static ExtraInfo mapExtraInfo(FieldTypeProtos.ExtraInfo extraInfo) {
-        return new ExtraInfo()
-                .setName(extraInfo.getName())
-                .setTypology(extraInfo.getTypology())
-                .setProvenance(extraInfo.getProvenance())
-                .setTrust(extraInfo.getTrust())
-                .setValue(extraInfo.getValue());
+        final ExtraInfo entity = new ExtraInfo();
+        entity.setName(extraInfo.getName());
+        entity.setTypology(extraInfo.getTypology());
+        entity.setProvenance(extraInfo.getProvenance());
+        entity.setTrust(extraInfo.getTrust());
+        entity.setValue(extraInfo.getValue());
+        return entity;
     }
 
     public static OAIProvenance mapOAIProvenance(FieldTypeProtos.OAIProvenance oaiProvenance) {
-        return new OAIProvenance().setOriginDescription(mapOriginalDescription(oaiProvenance.getOriginDescription()));
+        final OAIProvenance entity = new OAIProvenance();
+        entity.setOriginDescription(mapOriginalDescription(oaiProvenance.getOriginDescription()));
+        return entity;
     }
 
     public static OriginDescription mapOriginalDescription(FieldTypeProtos.OAIProvenance.OriginDescription originDescription) {
-        final OriginDescription originDescriptionResult = new OriginDescription()
-                .setHarvestDate(originDescription.getHarvestDate())
-                .setAltered(originDescription.getAltered())
-                .setBaseURL(originDescription.getBaseURL())
-                .setIdentifier(originDescription.getIdentifier())
-                .setDatestamp(originDescription.getDatestamp())
-                .setMetadataNamespace(originDescription.getMetadataNamespace());
-//        if (originDescription.hasOriginDescription())
-//            originDescriptionResult.setOriginDescription(mapOriginalDescription(originDescription.getOriginDescription()));
+        final OriginDescription originDescriptionResult = new OriginDescription();
+        originDescriptionResult.setHarvestDate(originDescription.getHarvestDate());
+        originDescriptionResult.setAltered(originDescription.getAltered());
+        originDescriptionResult.setBaseURL(originDescription.getBaseURL());
+        originDescriptionResult.setIdentifier(originDescription.getIdentifier());
+        originDescriptionResult.setDatestamp(originDescription.getDatestamp());
+        originDescriptionResult.setMetadataNamespace(originDescription.getMetadataNamespace());
         return originDescriptionResult;
     }
 
     public static Field<String> mapStringField(FieldTypeProtos.StringField s) {
-        return new Field<String>()
-                .setValue(s.getValue())
-                .setDataInfo(s.hasDataInfo() ? mapDataInfo(s.getDataInfo()) : null);
+        final Field<String> stringField = new Field<>();
+        stringField.setValue(s.getValue());
+        stringField.setDataInfo(mapDataInfo(s.getDataInfo()));
+        return stringField;
     }
 
     public static Field<Boolean> mapBoolField(FieldTypeProtos.BoolField b) {
-        return new Field<Boolean>()
-                .setValue(b.getValue())
-                .setDataInfo(b.hasDataInfo() ? mapDataInfo(b.getDataInfo()) : null);
+        final Field<Boolean> booleanField = new Field<>();
+        booleanField.setValue(b.getValue());
+        booleanField.setDataInfo(mapDataInfo(b.getDataInfo()));
+        return booleanField;
     }
 
     public static Field<Integer> mapIntField(FieldTypeProtos.IntField b) {
-        return new Field<Integer>()
-                .setValue(b.getValue())
-                .setDataInfo(b.hasDataInfo() ? mapDataInfo(b.getDataInfo()) : null);
+        final Field<Integer> entity = new Field<>();
+        entity.setValue(b.getValue());
+        entity.setDataInfo(mapDataInfo(b.getDataInfo()));
+        return entity;
     }
 
     public static Journal mapJournal(FieldTypeProtos.Journal j) {
-        return new Journal()
-                .setConferencedate(j.getConferencedate())
-                .setConferenceplace(j.getConferenceplace())
-                .setEdition(j.getEdition())
-                .setEp(j.getEp())
-                .setIss(j.getIss())
-                .setIssnLinking(j.getIssnLinking())
-                .setIssnOnline(j.getIssnOnline())
-                .setIssnPrinted(j.getIssnPrinted())
-                .setName(j.getName())
-                .setSp(j.getSp())
-                .setVol(j.getVol())
-                .setDataInfo(mapDataInfo(j.getDataInfo()));
+        final Journal journal = new Journal();
+        journal.setConferencedate(j.getConferencedate());
+        journal.setConferenceplace(j.getConferenceplace());
+        journal.setEdition(j.getEdition());
+        journal.setEp(j.getEp());
+        journal.setIss(j.getIss());
+        journal.setIssnLinking(j.getIssnLinking());
+        journal.setIssnOnline(j.getIssnOnline());
+        journal.setIssnPrinted(j.getIssnPrinted());
+        journal.setName(j.getName());
+        journal.setSp(j.getSp());
+        journal.setVol(j.getVol());
+        journal.setDataInfo(mapDataInfo(j.getDataInfo()));
+        return journal;
     }
 
     public static Author mapAuthor(FieldTypeProtos.Author author) {
-        return new Author()
-                .setFullname(author.getFullname())
-                .setName(author.getName())
-                .setSurname(author.getSurname())
-                .setRank(author.getRank())
-                .setPid(author.getPidList()
-                        .stream()
-                        .map(ProtoUtils::mapKV)
-                        .collect(Collectors.toList()))
-                .setAffiliation(author.getAffiliationList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()));
+        final Author entity = new Author();
+        entity.setFullname(author.getFullname());
+        entity.setName(author.getName());
+        entity.setSurname(author.getSurname());
+        entity.setRank(author.getRank());
+        entity.setPid(author.getPidList()
+                .stream()
+                .map(ProtoUtils::mapKV)
+                .collect(Collectors.toList()));
+        entity.setAffiliation(author.getAffiliationList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        return entity;
 
     }
 
     public static GeoLocation mapGeolocation(ResultProtos.Result.GeoLocation geoLocation) {
-        return new GeoLocation()
-                .setPoint(geoLocation.getPoint())
-                .setBox(geoLocation.getBox())
-                .setPlace(geoLocation.getPlace());
+        final GeoLocation entity = new GeoLocation();
+        entity.setPoint(geoLocation.getPoint());
+        entity.setBox(geoLocation.getBox());
+        entity.setPlace(geoLocation.getPlace());
+        return entity;
     }
 
 }

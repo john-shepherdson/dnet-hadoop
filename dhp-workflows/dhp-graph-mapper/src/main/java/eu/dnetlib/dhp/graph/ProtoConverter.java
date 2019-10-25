@@ -20,7 +20,7 @@ public class ProtoConverter implements Serializable {
                 return convertRelation(oaf);
             }
         } catch (Throwable e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("error on getting " + s, e);
         }
     }
 
@@ -29,16 +29,16 @@ public class ProtoConverter implements Serializable {
         final Relation rel = new Relation();
         rel.setDataInfo(mapDataInfo(oaf.getDataInfo()));
         rel.setLastupdatetimestamp(oaf.getLastupdatetimestamp());
-        return rel
-                .setSource(r.getSource())
-                .setTarget(r.getTarget())
-                .setRelType(r.getRelType().toString())
-                .setSubRelType(r.getSubRelType().toString())
-                .setRelClass(r.getRelClass())
-                .setCollectedFrom(r.getCollectedfromCount() > 0 ?
-                        r.getCollectedfromList().stream()
-                                .map(kv -> mapKV(kv))
-                                .collect(Collectors.toList()) : null);
+        rel.setSource(r.getSource());
+        rel.setTarget(r.getTarget());
+        rel.setRelType(r.getRelType().toString());
+        rel.setSubRelType(r.getSubRelType().toString());
+        rel.setRelClass(r.getRelClass());
+        rel.setCollectedFrom(r.getCollectedfromCount() > 0 ?
+                r.getCollectedfromList().stream()
+                        .map(kv -> mapKV(kv))
+                        .collect(Collectors.toList()) : null);
+        return rel;
     }
 
     private static OafEntity convertEntity(OafProtos.Oaf oaf) {
@@ -60,119 +60,125 @@ public class ProtoConverter implements Serializable {
     private static Organization convertOrganization(OafProtos.Oaf oaf) {
         final OrganizationProtos.Organization.Metadata m = oaf.getEntity().getOrganization().getMetadata();
         final Organization org = setOaf(new Organization(), oaf);
-        return setEntity(org, oaf)
-                .setLegalshortname(mapStringField(m.getLegalshortname()))
-                .setLegalname(mapStringField(m.getLegalname()))
-                .setAlternativeNames(m.getAlternativeNamesList().
-                        stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setWebsiteurl(mapStringField(m.getWebsiteurl()))
-                .setLogourl(mapStringField(m.getLogourl()))
-                .setEclegalbody(mapStringField(m.getEclegalbody()))
-                .setEclegalperson(mapStringField(m.getEclegalperson()))
-                .setEcnonprofit(mapStringField(m.getEcnonprofit()))
-                .setEcresearchorganization(mapStringField(m.getEcresearchorganization()))
-                .setEchighereducation(mapStringField(m.getEchighereducation()))
-                .setEcinternationalorganizationeurinterests(mapStringField(m.getEcinternationalorganizationeurinterests()))
-                .setEcinternationalorganization(mapStringField(m.getEcinternationalorganization()))
-                .setEcenterprise(mapStringField(m.getEcenterprise()))
-                .setEcsmevalidated(mapStringField(m.getEcsmevalidated()))
-                .setEcnutscode(mapStringField(m.getEcnutscode()))
-                .setCountry(mapQualifier(m.getCountry()));
+        setEntity(org, oaf);
+        org.setLegalshortname(mapStringField(m.getLegalshortname()));
+        org.setLegalname(mapStringField(m.getLegalname()));
+        org.setAlternativeNames(m.getAlternativeNamesList().
+                stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        org.setWebsiteurl(mapStringField(m.getWebsiteurl()));
+        org.setLogourl(mapStringField(m.getLogourl()));
+        org.setEclegalbody(mapStringField(m.getEclegalbody()));
+        org.setEclegalperson(mapStringField(m.getEclegalperson()));
+        org.setEcnonprofit(mapStringField(m.getEcnonprofit()));
+        org.setEcresearchorganization(mapStringField(m.getEcresearchorganization()));
+        org.setEchighereducation(mapStringField(m.getEchighereducation()));
+        org.setEcinternationalorganizationeurinterests(mapStringField(m.getEcinternationalorganizationeurinterests()));
+        org.setEcinternationalorganization(mapStringField(m.getEcinternationalorganization()));
+        org.setEcenterprise(mapStringField(m.getEcenterprise()));
+        org.setEcsmevalidated(mapStringField(m.getEcsmevalidated()));
+        org.setEcnutscode(mapStringField(m.getEcnutscode()));
+        org.setCountry(mapQualifier(m.getCountry()));
+
+        return org;
     }
 
     private static Datasource convertDataSource(OafProtos.Oaf oaf) {
         final DatasourceProtos.Datasource.Metadata m = oaf.getEntity().getDatasource().getMetadata();
         final Datasource datasource = setOaf(new Datasource(), oaf);
-        return setEntity(datasource, oaf)
-                .setAccessinfopackage(m.getAccessinfopackageList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setCertificates(mapStringField(m.getCertificates()))
-                .setCitationguidelineurl(mapStringField(m.getCitationguidelineurl()))
-                .setContactemail(mapStringField(m.getContactemail()))
-                .setDatabaseaccessrestriction(mapStringField(m.getDatabaseaccessrestriction()))
-                .setDatabaseaccesstype(mapStringField(m.getDatabaseaccesstype()))
-                .setDataprovider(mapBoolField(m.getDataprovider()))
-                .setDatasourcetype(mapQualifier(m.getDatasourcetype()))
-                .setDatauploadrestriction(mapStringField(m.getDatauploadrestriction()))
-                .setCitationguidelineurl(mapStringField(m.getCitationguidelineurl()))
-                .setDatauploadtype(mapStringField(m.getDatauploadtype()))
-                .setDateofvalidation(mapStringField(m.getDateofvalidation()))
-                .setDescription(mapStringField(m.getDescription()))
-                .setEnglishname(mapStringField(m.getEnglishname()))
-                .setLatitude(mapStringField(m.getLatitude()))
-                .setLongitude(mapStringField(m.getLongitude()))
-                .setLogourl(mapStringField(m.getLogourl()))
-                .setMissionstatementurl(mapStringField(m.getMissionstatementurl()))
-                .setNamespaceprefix(mapStringField(m.getNamespaceprefix()))
-                .setOdcontenttypes(m.getOdcontenttypesList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setOdlanguages(m.getOdlanguagesList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setOdnumberofitems(mapStringField(m.getOdnumberofitems()))
-                .setOdnumberofitemsdate(mapStringField(m.getOdnumberofitemsdate()))
-                .setOdpolicies(mapStringField(m.getOdpolicies()))
-                .setOfficialname(mapStringField(m.getOfficialname()))
-                .setOpenairecompatibility(mapQualifier(m.getOpenairecompatibility()))
-                .setPidsystems(mapStringField(m.getPidsystems()))
-                .setPolicies(m.getPoliciesList()
-                        .stream()
-                        .map(ProtoUtils::mapKV)
-                        .collect(Collectors.toList()))
-                .setQualitymanagementkind(mapStringField(m.getQualitymanagementkind()))
-                .setReleaseenddate(mapStringField(m.getReleaseenddate()))
-                .setServiceprovider(mapBoolField(m.getServiceprovider()))
-                .setReleasestartdate(mapStringField(m.getReleasestartdate()))
-                .setSubjects(m.getSubjectsList()
-                        .stream()
-                        .map(ProtoUtils::mapStructuredProperty)
-                        .collect(Collectors.toList()))
-                .setVersioning(mapBoolField(m.getVersioning()))
-                .setWebsiteurl(mapStringField(m.getWebsiteurl()))
-                .setJournal(mapJournal(m.getJournal()));
+        setEntity(datasource, oaf);
+        datasource.setAccessinfopackage(m.getAccessinfopackageList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        datasource.setCertificates(mapStringField(m.getCertificates()));
+        datasource.setCitationguidelineurl(mapStringField(m.getCitationguidelineurl()));
+        datasource.setContactemail(mapStringField(m.getContactemail()));
+        datasource.setDatabaseaccessrestriction(mapStringField(m.getDatabaseaccessrestriction()));
+        datasource.setDatabaseaccesstype(mapStringField(m.getDatabaseaccesstype()));
+        datasource.setDataprovider(mapBoolField(m.getDataprovider()));
+        datasource.setDatasourcetype(mapQualifier(m.getDatasourcetype()));
+        datasource.setDatauploadrestriction(mapStringField(m.getDatauploadrestriction()));
+        datasource.setCitationguidelineurl(mapStringField(m.getCitationguidelineurl()));
+        datasource.setDatauploadtype(mapStringField(m.getDatauploadtype()));
+        datasource.setDateofvalidation(mapStringField(m.getDateofvalidation()));
+        datasource.setDescription(mapStringField(m.getDescription()));
+        datasource.setEnglishname(mapStringField(m.getEnglishname()));
+        datasource.setLatitude(mapStringField(m.getLatitude()));
+        datasource.setLongitude(mapStringField(m.getLongitude()));
+        datasource.setLogourl(mapStringField(m.getLogourl()));
+        datasource.setMissionstatementurl(mapStringField(m.getMissionstatementurl()));
+        datasource.setNamespaceprefix(mapStringField(m.getNamespaceprefix()));
+        datasource.setOdcontenttypes(m.getOdcontenttypesList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        datasource.setOdlanguages(m.getOdlanguagesList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        datasource.setOdnumberofitems(mapStringField(m.getOdnumberofitems()));
+        datasource.setOdnumberofitemsdate(mapStringField(m.getOdnumberofitemsdate()));
+        datasource.setOdpolicies(mapStringField(m.getOdpolicies()));
+        datasource.setOfficialname(mapStringField(m.getOfficialname()));
+        datasource.setOpenairecompatibility(mapQualifier(m.getOpenairecompatibility()));
+        datasource.setPidsystems(mapStringField(m.getPidsystems()));
+        datasource.setPolicies(m.getPoliciesList()
+                .stream()
+                .map(ProtoUtils::mapKV)
+                .collect(Collectors.toList()));
+        datasource.setQualitymanagementkind(mapStringField(m.getQualitymanagementkind()));
+        datasource.setReleaseenddate(mapStringField(m.getReleaseenddate()));
+        datasource.setServiceprovider(mapBoolField(m.getServiceprovider()));
+        datasource.setReleasestartdate(mapStringField(m.getReleasestartdate()));
+        datasource.setSubjects(m.getSubjectsList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
+        datasource.setVersioning(mapBoolField(m.getVersioning()));
+        datasource.setWebsiteurl(mapStringField(m.getWebsiteurl()));
+        datasource.setJournal(mapJournal(m.getJournal()));
+
+
+        return datasource;
     }
 
     private static Project convertProject(OafProtos.Oaf oaf) {
         final ProjectProtos.Project.Metadata m = oaf.getEntity().getProject().getMetadata();
         final Project project = setOaf(new Project(), oaf);
-        return setEntity(project, oaf)
-                .setAcronym(mapStringField(m.getAcronym()))
-                .setCallidentifier(mapStringField(m.getCallidentifier()))
-                .setCode(mapStringField(m.getCode()))
-                .setContactemail(mapStringField(m.getContactemail()))
-                .setContactfax(mapStringField(m.getContactfax()))
-                .setContactfullname(mapStringField(m.getContactfullname()))
-                .setContactphone(mapStringField(m.getContactphone()))
-                .setContracttype(mapQualifier(m.getContracttype()))
-                .setCurrency(mapStringField(m.getCurrency()))
-                .setDuration(mapStringField(m.getDuration()))
-                .setEcarticle29_3(mapStringField(m.getEcarticle293()))
-                .setEcsc39(mapStringField(m.getEcsc39()))
-                .setOamandatepublications(mapStringField(m.getOamandatepublications()))
-                .setStartdate(mapStringField(m.getStartdate()))
-                .setEnddate(mapStringField(m.getEnddate()))
-                .setFundedamount(m.getFundedamount())
-                .setTotalcost(m.getTotalcost())
-                .setKeywords(mapStringField(m.getKeywords()))
-                .setSubjects(m.getSubjectsList().stream()
-                        .map(sp -> mapStructuredProperty(sp))
-                        .collect(Collectors.toList()))
-                .setTitle(mapStringField(m.getTitle()))
-                .setWebsiteurl(mapStringField(m.getWebsiteurl()))
-                .setFundingtree(m.getFundingtreeList().stream()
-                        .map(f -> mapStringField(f))
-                        .collect(Collectors.toList()))
-                .setJsonextrainfo(mapStringField(m.getJsonextrainfo()))
-                .setSummary(mapStringField(m.getSummary()))
-                .setOptional1(mapStringField(m.getOptional1()))
-                .setOptional2(mapStringField(m.getOptional2()));
+        setEntity(project, oaf);
+        project.setAcronym(mapStringField(m.getAcronym()));
+        project.setCallidentifier(mapStringField(m.getCallidentifier()));
+        project.setCode(mapStringField(m.getCode()));
+        project.setContactemail(mapStringField(m.getContactemail()));
+        project.setContactfax(mapStringField(m.getContactfax()));
+        project.setContactfullname(mapStringField(m.getContactfullname()));
+        project.setContactphone(mapStringField(m.getContactphone()));
+        project.setContracttype(mapQualifier(m.getContracttype()));
+        project.setCurrency(mapStringField(m.getCurrency()));
+        project.setDuration(mapStringField(m.getDuration()));
+        project.setEcarticle29_3(mapStringField(m.getEcarticle293()));
+        project.setEcsc39(mapStringField(m.getEcsc39()));
+        project.setOamandatepublications(mapStringField(m.getOamandatepublications()));
+        project.setStartdate(mapStringField(m.getStartdate()));
+        project.setEnddate(mapStringField(m.getEnddate()));
+        project.setFundedamount(m.getFundedamount());
+        project.setTotalcost(m.getTotalcost());
+        project.setKeywords(mapStringField(m.getKeywords()));
+        project.setSubjects(m.getSubjectsList().stream()
+                .map(sp -> mapStructuredProperty(sp))
+                .collect(Collectors.toList()));
+        project.setTitle(mapStringField(m.getTitle()));
+        project.setWebsiteurl(mapStringField(m.getWebsiteurl()));
+        project.setFundingtree(m.getFundingtreeList().stream()
+                .map(f -> mapStringField(f))
+                .collect(Collectors.toList()));
+        project.setJsonextrainfo(mapStringField(m.getJsonextrainfo()));
+        project.setSummary(mapStringField(m.getSummary()));
+        project.setOptional1(mapStringField(m.getOptional1()));
+        project.setOptional2(mapStringField(m.getOptional2()));
+        return project;
     }
 
     private static Result convertResult(OafProtos.Oaf oaf) {
@@ -195,37 +201,40 @@ public class ProtoConverter implements Serializable {
         ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
         Software software = setOaf(new Software(), oaf);
         setEntity(software, oaf);
-        return setResult(software, oaf)
-                .setDocumentationUrl(m.getDocumentationUrlList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setLicense(m.getLicenseList()
-                        .stream()
-                        .map(ProtoUtils::mapStructuredProperty)
-                        .collect(Collectors.toList()))
-                .setCodeRepositoryUrl(ProtoUtils.mapStringField(m.getCodeRepositoryUrl()))
-                .setProgrammingLanguage(ProtoUtils.mapQualifier(m.getProgrammingLanguage()));
+        setResult(software, oaf);
 
+        software.setDocumentationUrl(m.getDocumentationUrlList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        software.setLicense(m.getLicenseList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
+        software.setCodeRepositoryUrl(ProtoUtils.mapStringField(m.getCodeRepositoryUrl()));
+        software.setProgrammingLanguage(ProtoUtils.mapQualifier(m.getProgrammingLanguage()));
+        return software;
     }
 
     private static OtherResearchProducts createORP(OafProtos.Oaf oaf) {
         ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
         OtherResearchProducts otherResearchProducts = setOaf(new OtherResearchProducts(), oaf);
         setEntity(otherResearchProducts, oaf);
-        return setResult(otherResearchProducts, oaf)
-                .setContactperson(m.getContactpersonList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setContactgroup(m.getContactgroupList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()))
-                .setTool(m.getToolList()
-                        .stream()
-                        .map(ProtoUtils::mapStringField)
-                        .collect(Collectors.toList()));
+        setResult(otherResearchProducts, oaf);
+        otherResearchProducts.setContactperson(m.getContactpersonList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        otherResearchProducts.setContactgroup(m.getContactgroupList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+        otherResearchProducts.setTool(m.getToolList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+
+        return otherResearchProducts;
     }
 
     private static Publication createPublication(OafProtos.Oaf oaf) {
@@ -233,8 +242,9 @@ public class ProtoConverter implements Serializable {
         ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
         Publication publication = setOaf(new Publication(), oaf);
         setEntity(publication, oaf);
-        return setResult(publication, oaf)
-                .setJournal(mapJournal(m.getJournal()));
+        setResult(publication, oaf);
+        publication.setJournal(mapJournal(m.getJournal()));
+        return publication;
     }
 
     private static Dataset createDataset(OafProtos.Oaf oaf) {
@@ -242,16 +252,18 @@ public class ProtoConverter implements Serializable {
         ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
         Dataset dataset = setOaf(new Dataset(), oaf);
         setEntity(dataset, oaf);
-        return setResult(dataset, oaf)
-                .setStoragedate(ProtoUtils.mapStringField(m.getStoragedate()))
-                .setDevice(ProtoUtils.mapStringField(m.getDevice()))
-                .setSize(ProtoUtils.mapStringField(m.getSize()))
-                .setVersion(ProtoUtils.mapStringField(m.getVersion()))
-                .setLastmetadataupdate(ProtoUtils.mapStringField(m.getLastmetadataupdate()))
-                .setMetadataversionnumber(ProtoUtils.mapStringField(m.getMetadataversionnumber()))
-                .setGeolocation(m.getGeolocationList()
-                        .stream()
-                        .map(ProtoUtils::mapGeolocation)
-                        .collect(Collectors.toList()));
+        setResult(dataset, oaf);
+        dataset.setStoragedate(ProtoUtils.mapStringField(m.getStoragedate()));
+        dataset.setDevice(ProtoUtils.mapStringField(m.getDevice()));
+        dataset.setSize(ProtoUtils.mapStringField(m.getSize()));
+        dataset.setVersion(ProtoUtils.mapStringField(m.getVersion()));
+        dataset.setLastmetadataupdate(ProtoUtils.mapStringField(m.getLastmetadataupdate()));
+        dataset.setMetadataversionnumber(ProtoUtils.mapStringField(m.getMetadataversionnumber()));
+        dataset.setGeolocation(m.getGeolocationList()
+                .stream()
+                .map(ProtoUtils::mapGeolocation)
+                .collect(Collectors.toList()));
+        return dataset;
+
     }
 }

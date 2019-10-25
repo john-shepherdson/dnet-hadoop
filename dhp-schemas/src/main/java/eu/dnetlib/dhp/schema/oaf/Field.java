@@ -12,17 +12,15 @@ public class Field<T> implements Serializable {
         return value;
     }
 
-    public Field<T> setValue(T value) {
+    public void setValue(T value) {
         this.value = value;
-        return this;
     }
 
     public DataInfo getDataInfo() {
         return dataInfo;
     }
 
-    public Field<T> setDataInfo(DataInfo dataInfo) {
+    public void setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
-        return this;
     }
 }

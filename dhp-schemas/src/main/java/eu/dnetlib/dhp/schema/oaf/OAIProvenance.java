@@ -10,8 +10,7 @@ public class OAIProvenance  implements Serializable {
         return originDescription;
     }
 
-    public OAIProvenance setOriginDescription(OriginDescription originDescription) {
+    public void setOriginDescription(OriginDescription originDescription) {
         this.originDescription = originDescription;
-        return this;
     }
 }

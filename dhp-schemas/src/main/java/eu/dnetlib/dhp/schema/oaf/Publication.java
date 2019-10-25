@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 
-public class Publication extends Result<Publication> implements Serializable {
+public class Publication extends Result implements Serializable {
 
     // publication specific
     private Journal journal;
@@ -11,13 +11,7 @@ public class Publication extends Result<Publication> implements Serializable {
         return journal;
     }
 
-    public Publication setJournal(Journal journal) {
+    public void setJournal(Journal journal) {
         this.journal = journal;
-        return this;
-    }
-
-    @Override
-    protected Publication self() {
-        return this;
     }
 }

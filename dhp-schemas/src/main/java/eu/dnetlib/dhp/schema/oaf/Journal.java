@@ -32,107 +32,95 @@ public class Journal implements Serializable {
         return name;
     }
 
-    public Journal setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getIssnPrinted() {
         return issnPrinted;
     }
 
-    public Journal setIssnPrinted(String issnPrinted) {
+    public void setIssnPrinted(String issnPrinted) {
         this.issnPrinted = issnPrinted;
-        return this;
     }
 
     public String getIssnOnline() {
         return issnOnline;
     }
 
-    public Journal setIssnOnline(String issnOnline) {
+    public void setIssnOnline(String issnOnline) {
         this.issnOnline = issnOnline;
-        return this;
     }
 
     public String getIssnLinking() {
         return issnLinking;
     }
 
-    public Journal setIssnLinking(String issnLinking) {
+    public void setIssnLinking(String issnLinking) {
         this.issnLinking = issnLinking;
-        return this;
     }
 
     public String getEp() {
         return ep;
     }
 
-    public Journal setEp(String ep) {
+    public void setEp(String ep) {
         this.ep = ep;
-        return this;
     }
 
     public String getIss() {
         return iss;
     }
 
-    public Journal setIss(String iss) {
+    public void setIss(String iss) {
         this.iss = iss;
-        return this;
     }
 
     public String getSp() {
         return sp;
     }
 
-    public Journal setSp(String sp) {
+    public void setSp(String sp) {
         this.sp = sp;
-        return this;
     }
 
     public String getVol() {
         return vol;
     }
 
-    public Journal setVol(String vol) {
+    public void setVol(String vol) {
         this.vol = vol;
-        return this;
     }
 
     public String getEdition() {
         return edition;
     }
 
-    public Journal setEdition(String edition) {
+    public void setEdition(String edition) {
         this.edition = edition;
-        return this;
     }
 
     public String getConferenceplace() {
         return conferenceplace;
     }
 
-    public Journal setConferenceplace(String conferenceplace) {
+    public void setConferenceplace(String conferenceplace) {
         this.conferenceplace = conferenceplace;
-        return this;
     }
 
     public String getConferencedate() {
         return conferencedate;
     }
 
-    public Journal setConferencedate(String conferencedate) {
+    public void setConferencedate(String conferencedate) {
         this.conferencedate = conferencedate;
-        return this;
     }
 
     public DataInfo getDataInfo() {
         return dataInfo;
     }
 
-    public Journal setDataInfo(DataInfo dataInfo) {
+    public void setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
-        return this;
     }
 }

@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class Software extends Result<Software> implements Serializable {
+public class Software extends Result implements Serializable {
 
     private List<Field<String>> documentationUrl;
 
@@ -17,40 +17,31 @@ public class Software extends Result<Software> implements Serializable {
         return documentationUrl;
     }
 
-    public Software setDocumentationUrl(List<Field<String>> documentationUrl) {
+    public void setDocumentationUrl(List<Field<String>> documentationUrl) {
         this.documentationUrl = documentationUrl;
-        return this;
     }
 
     public List<StructuredProperty> getLicense() {
         return license;
     }
 
-    public Software setLicense(List<StructuredProperty> license) {
+    public void setLicense(List<StructuredProperty> license) {
         this.license = license;
-        return this;
     }
 
     public Field<String> getCodeRepositoryUrl() {
         return codeRepositoryUrl;
     }
 
-    public Software setCodeRepositoryUrl(Field<String> codeRepositoryUrl) {
+    public void setCodeRepositoryUrl(Field<String> codeRepositoryUrl) {
         this.codeRepositoryUrl = codeRepositoryUrl;
-        return this;
     }
 
     public Qualifier getProgrammingLanguage() {
         return programmingLanguage;
     }
 
-    public Software setProgrammingLanguage(Qualifier programmingLanguage) {
+    public void setProgrammingLanguage(Qualifier programmingLanguage) {
         this.programmingLanguage = programmingLanguage;
-        return this;
-    }
-
-    @Override
-    protected Software self() {
-        return this;
     }
 }

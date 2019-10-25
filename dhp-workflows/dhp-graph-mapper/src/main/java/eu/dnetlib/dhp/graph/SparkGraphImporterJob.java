@@ -1,7 +1,10 @@
 package eu.dnetlib.dhp.graph;
 
 
-import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -14,49 +17,49 @@ import scala.Tuple2;
 public class SparkGraphImporterJob {
 
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
 
-        //TODO add argument parser
-//        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkGraphImporterJob.class.getResourceAsStream("/eu/dnetlib/dhp/graph/graph_importer_parameters.json")));
-//        parser.parseArgument(args);
 
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkGraphImporterJob.class.getResourceAsStream("/eu/dnetlib/dhp/graph/input_graph_parameters.json")));
+        parser.parseArgument(args);
         final SparkSession spark = SparkSession
                 .builder()
                 .appName("ImportGraph")
-                //TODO replace with: master(parser.get("master"))
-                .master("local[16]")
+                .master(parser.get("master"))
                 .getOrCreate();
-
-
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+        final String inputPath = parser.get("input");
+        final String outputPath = parser.get("outputDir");
 
-        final String path = "file:///Users/miconis/Downloads/part-m-02236";
-        final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(path, Text.class, Text.class)
+        // Read the input file and convert it into RDD of serializable object
+        final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(inputPath, Text.class, Text.class)
                 .map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
 
 
+        final JavaRDD<Oaf> oafRdd = inputRDD.filter(s -> !StringUtils.isBlank(s._2()) && !s._1().contains("@update")).map(Tuple2::_2).map(ProtoConverter::convert);
 
-        final String body = inputRDD.filter(s -> s._1().contains("20|") && s._1().split("@")[2].equalsIgnoreCase("body")).map(Tuple2::_2).first();
+        final Encoder<Organization> organizationEncoder = Encoders.bean(Organization.class);
+        final Encoder<Project> projectEncoder = Encoders.bean(Project.class);
+        final Encoder<Datasource> datasourceEncoder = Encoders.bean(Datasource.class);
 
-        System.out.println(body);
+        final Encoder<eu.dnetlib.dhp.schema.oaf.Dataset> datasetEncoder = Encoders.bean(eu.dnetlib.dhp.schema.oaf.Dataset.class);
+        final Encoder<Publication> publicationEncoder = Encoders.bean(Publication.class);
+        final Encoder<Software> softwareEncoder = Encoders.bean(Software.class);
+        final Encoder<OtherResearchProducts> otherResearchProductsEncoder = Encoders.bean(OtherResearchProducts.class);
+
+        final Encoder<Relation> relationEncoder = Encoders.bean(Relation.class);
 
 
-        final JavaRDD<Organization> organization = inputRDD
-                .filter(s -> s._1().split("@")[2].equalsIgnoreCase("body"))
-                .map(Tuple2::_2)
-                .map(ProtoConverter::convert)
-                .filter(s-> s instanceof Organization)
-                .map(s->(Organization)s);
-        final Encoder<Organization> encoder = Encoders.bean(Organization.class);
-        final Dataset<Organization> mdstore = spark.createDataset(organization.rdd(), encoder);
+        spark.createDataset(oafRdd.filter(s -> s instanceof Organization).map(s -> (Organization) s).rdd(), organizationEncoder).write().save(outputPath + "/organizations");
+        spark.createDataset(oafRdd.filter(s -> s instanceof Project).map(s -> (Project) s).rdd(), projectEncoder).write().save(outputPath + "/projects");
+        spark.createDataset(oafRdd.filter(s -> s instanceof Datasource).map(s -> (Datasource) s).rdd(), datasourceEncoder).write().save(outputPath + "/datasources");
+        spark.createDataset(oafRdd.filter(s -> s instanceof eu.dnetlib.dhp.schema.oaf.Dataset).map(s -> (eu.dnetlib.dhp.schema.oaf.Dataset) s).rdd(), datasetEncoder).write().save(outputPath + "/datasets");
 
-        System.out.println(mdstore.count());
+        spark.createDataset(oafRdd.filter(s -> s instanceof Publication).map(s -> (Publication) s).rdd(), publicationEncoder).write().save(outputPath + "/publications");
+        spark.createDataset(oafRdd.filter(s -> s instanceof Software).map(s -> (Software) s).rdd(), softwareEncoder).write().save(outputPath + "/software");
+        spark.createDataset(oafRdd.filter(s -> s instanceof OtherResearchProducts).map(s -> (OtherResearchProducts) s).rdd(), otherResearchProductsEncoder).write().save(outputPath + "/otherResearchProducts");
 
-//
-//
-//                .filter(s -> s instanceof Publication)
-//                .count();
-
+        spark.createDataset(oafRdd.filter(s -> s instanceof Relation).map(s -> (Relation) s).rdd(), relationEncoder).write().save(outputPath + "/relations");
 
 
 

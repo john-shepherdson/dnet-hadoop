@@ -13,36 +13,31 @@ public class Qualifier implements Serializable {
         return classid;
     }
 
-    public Qualifier setClassid(String classid) {
+    public void setClassid(String classid) {
         this.classid = classid;
-        return this;
     }
 
     public String getClassname() {
         return classname;
     }
 
-    public Qualifier setClassname(String classname) {
+    public void setClassname(String classname) {
         this.classname = classname;
-        return this;
     }
 
     public String getSchemeid() {
         return schemeid;
     }
 
-    public Qualifier setSchemeid(String schemeid) {
+    public void setSchemeid(String schemeid) {
         this.schemeid = schemeid;
-        return this;
     }
 
     public String getSchemename() {
         return schemename;
     }
 
-    public Qualifier setSchemename(String schemename) {
+    public void setSchemename(String schemename) {
         this.schemename = schemename;
-        return this;
     }
-
 }

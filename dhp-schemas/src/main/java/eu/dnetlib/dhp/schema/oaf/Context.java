@@ -12,17 +12,15 @@ public class Context implements Serializable {
         return id;
     }
 
-    public Context setId(String id) {
+    public void setId(String id) {
         this.id = id;
-        return this;
     }
 
     public List<DataInfo> getDataInfo() {
         return dataInfo;
     }
 
-    public Context setDataInfo(List<DataInfo> dataInfo) {
+    public void setDataInfo(List<DataInfo> dataInfo) {
         this.dataInfo = dataInfo;
-        return this;
     }
 }
