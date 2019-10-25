@@ -5,13 +5,11 @@ import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Publication;
-
 import org.apache.commons.io.IOUtils;
-
-import static org.junit.Assert.*;
-
 import org.junit.Test;
-import scala.tools.nsc.doc.model.Public;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProtoConverterTest {
 
