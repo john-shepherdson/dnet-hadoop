@@ -226,4 +226,11 @@ public class ProtoUtils {
 
     }
 
+    public static GeoLocation mapGeolocation(ResultProtos.Result.GeoLocation geoLocation) {
+        return new GeoLocation()
+                .setPoint(geoLocation.getPoint())
+                .setBox(geoLocation.getBox())
+                .setPlace(geoLocation.getPlace());
+    }
+
 }

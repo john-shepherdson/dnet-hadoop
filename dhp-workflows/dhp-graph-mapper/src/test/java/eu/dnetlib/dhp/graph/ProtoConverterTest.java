@@ -1,9 +1,7 @@
 package eu.dnetlib.dhp.graph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -29,8 +27,6 @@ public class ProtoConverterTest {
         ObjectMapper mapper = new ObjectMapper();
         System.out.println(mapper.writeValueAsString(result));
 
-
-
     }
 
     @Test
@@ -44,7 +40,52 @@ public class ProtoConverterTest {
         Publication p = (Publication) result;
 
         ObjectMapper mapper = new ObjectMapper();
-        System.out.println(mapper.writeValueAsString(result));
+        System.out.println(mapper.writeValueAsString(p));
+
+    }
+
+    @Test
+    public void convertDatasetTest() throws Exception {
+        final String json = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/graph/dataset.json"));
+
+        Oaf result = ProtoConverter.convert(json);
+
+        assertNotNull(result);
+        assertTrue(result instanceof Dataset);
+        Dataset d = (Dataset) result;
+
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println(mapper.writeValueAsString(d));
+
+    }
+
+    @Test
+    public void convertORPTest() throws Exception {
+        final String json = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/graph/orp.json"));
+
+        Oaf result = ProtoConverter.convert(json);
+
+        assertNotNull(result);
+        assertTrue(result instanceof OtherResearchProducts);
+        OtherResearchProducts orp = (OtherResearchProducts) result;
+
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println(mapper.writeValueAsString(orp));
+
+    }
+
+    @Test
+    public void convertSoftware() throws Exception {
+        final String json = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/graph/software.json"));
+
+        Oaf result = ProtoConverter.convert(json);
+
+        assertNotNull(result);
+        assertTrue(result instanceof Software);
+        Software s = (Software) result;
+
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println(mapper.writeValueAsString(s));
 
     }
 
