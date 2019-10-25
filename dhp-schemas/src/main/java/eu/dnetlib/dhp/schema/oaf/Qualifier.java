@@ -9,8 +9,6 @@ public class Qualifier implements Serializable {
     private String schemeid;
     private String schemename;
 
-//    private DataInfo dataInfo;
-
     public String getClassid() {
         return classid;
     }
@@ -47,12 +45,4 @@ public class Qualifier implements Serializable {
         return this;
     }
 
-//    public DataInfo getDataInfo() {
-//        return dataInfo;
-//    }
-//
-//    public Qualifier setDataInfo(DataInfo dataInfo) {
-//        this.dataInfo = dataInfo;
-//        return this;
-//    }
 }

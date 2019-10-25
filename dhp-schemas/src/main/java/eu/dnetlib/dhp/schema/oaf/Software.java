@@ -17,31 +17,35 @@ public class Software extends Result implements Serializable {
         return documentationUrl;
     }
 
-    public void setDocumentationUrl(List<Field<String>> documentationUrl) {
+    public Software setDocumentationUrl(List<Field<String>> documentationUrl) {
         this.documentationUrl = documentationUrl;
+        return this;
     }
 
     public List<StructuredProperty> getLicense() {
         return license;
     }
 
-    public void setLicense(List<StructuredProperty> license) {
+    public Software setLicense(List<StructuredProperty> license) {
         this.license = license;
+        return this;
     }
 
     public Field<String> getCodeRepositoryUrl() {
         return codeRepositoryUrl;
     }
 
-    public void setCodeRepositoryUrl(Field<String> codeRepositoryUrl) {
+    public Software setCodeRepositoryUrl(Field<String> codeRepositoryUrl) {
         this.codeRepositoryUrl = codeRepositoryUrl;
+        return this;
     }
 
     public Qualifier getProgrammingLanguage() {
         return programmingLanguage;
     }
 
-    public void setProgrammingLanguage(Qualifier programmingLanguage) {
+    public Software setProgrammingLanguage(Qualifier programmingLanguage) {
         this.programmingLanguage = programmingLanguage;
+        return this;
     }
 }

@@ -37,132 +37,147 @@ public class Organization extends OafEntity implements Serializable {
 
     private Qualifier country;
 
-
     public Field<String> getLegalshortname() {
         return legalshortname;
     }
 
-    public void setLegalshortname(Field<String> legalshortname) {
+    public Organization setLegalshortname(Field<String> legalshortname) {
         this.legalshortname = legalshortname;
+        return this;
     }
 
     public Field<String> getLegalname() {
         return legalname;
     }
 
-    public void setLegalname(Field<String> legalname) {
+    public Organization setLegalname(Field<String> legalname) {
         this.legalname = legalname;
+        return this;
     }
 
     public List<Field<String>> getAlternativeNames() {
         return alternativeNames;
     }
 
-    public void setAlternativeNames(List<Field<String>> alternativeNames) {
+    public Organization setAlternativeNames(List<Field<String>> alternativeNames) {
         this.alternativeNames = alternativeNames;
+        return this;
     }
 
     public Field<String> getWebsiteurl() {
         return websiteurl;
     }
 
-    public void setWebsiteurl(Field<String> websiteurl) {
+    public Organization setWebsiteurl(Field<String> websiteurl) {
         this.websiteurl = websiteurl;
+        return this;
     }
 
     public Field<String> getLogourl() {
         return logourl;
     }
 
-    public void setLogourl(Field<String> logourl) {
+    public Organization setLogourl(Field<String> logourl) {
         this.logourl = logourl;
+        return this;
     }
 
     public Field<String> getEclegalbody() {
         return eclegalbody;
     }
 
-    public void setEclegalbody(Field<String> eclegalbody) {
+    public Organization setEclegalbody(Field<String> eclegalbody) {
         this.eclegalbody = eclegalbody;
+        return this;
     }
 
     public Field<String> getEclegalperson() {
         return eclegalperson;
     }
 
-    public void setEclegalperson(Field<String> eclegalperson) {
+    public Organization setEclegalperson(Field<String> eclegalperson) {
         this.eclegalperson = eclegalperson;
+        return this;
     }
 
     public Field<String> getEcnonprofit() {
         return ecnonprofit;
     }
 
-    public void setEcnonprofit(Field<String> ecnonprofit) {
+    public Organization setEcnonprofit(Field<String> ecnonprofit) {
         this.ecnonprofit = ecnonprofit;
+        return this;
     }
 
     public Field<String> getEcresearchorganization() {
         return ecresearchorganization;
     }
 
-    public void setEcresearchorganization(Field<String> ecresearchorganization) {
+    public Organization setEcresearchorganization(Field<String> ecresearchorganization) {
         this.ecresearchorganization = ecresearchorganization;
+        return this;
     }
 
     public Field<String> getEchighereducation() {
         return echighereducation;
     }
 
-    public void setEchighereducation(Field<String> echighereducation) {
+    public Organization setEchighereducation(Field<String> echighereducation) {
         this.echighereducation = echighereducation;
+        return this;
     }
 
     public Field<String> getEcinternationalorganizationeurinterests() {
         return ecinternationalorganizationeurinterests;
     }
 
-    public void setEcinternationalorganizationeurinterests(Field<String> ecinternationalorganizationeurinterests) {
+    public Organization setEcinternationalorganizationeurinterests(Field<String> ecinternationalorganizationeurinterests) {
         this.ecinternationalorganizationeurinterests = ecinternationalorganizationeurinterests;
+        return this;
     }
 
     public Field<String> getEcinternationalorganization() {
         return ecinternationalorganization;
     }
 
-    public void setEcinternationalorganization(Field<String> ecinternationalorganization) {
+    public Organization setEcinternationalorganization(Field<String> ecinternationalorganization) {
         this.ecinternationalorganization = ecinternationalorganization;
+        return this;
     }
 
     public Field<String> getEcenterprise() {
         return ecenterprise;
     }
 
-    public void setEcenterprise(Field<String> ecenterprise) {
+    public Organization setEcenterprise(Field<String> ecenterprise) {
         this.ecenterprise = ecenterprise;
+        return this;
     }
 
     public Field<String> getEcsmevalidated() {
         return ecsmevalidated;
     }
 
-    public void setEcsmevalidated(Field<String> ecsmevalidated) {
+    public Organization setEcsmevalidated(Field<String> ecsmevalidated) {
         this.ecsmevalidated = ecsmevalidated;
+        return this;
     }
 
     public Field<String> getEcnutscode() {
         return ecnutscode;
     }
 
-    public void setEcnutscode(Field<String> ecnutscode) {
+    public Organization setEcnutscode(Field<String> ecnutscode) {
         this.ecnutscode = ecnutscode;
+        return this;
     }
 
     public Qualifier getCountry() {
         return country;
     }
 
-    public void setCountry(Qualifier country) {
+    public Organization setCountry(Qualifier country) {
         this.country = country;
+        return this;
     }
 }

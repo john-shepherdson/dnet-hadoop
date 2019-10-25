@@ -14,23 +14,26 @@ public class GeoLocation implements Serializable {
         return point;
     }
 
-    public void setPoint(String point) {
+    public GeoLocation setPoint(String point) {
         this.point = point;
+        return this;
     }
 
     public String getBox() {
         return box;
     }
 
-    public void setBox(String box) {
+    public GeoLocation setBox(String box) {
         this.box = box;
+        return this;
     }
 
     public String getPlace() {
         return place;
     }
 
-    public void setPlace(String place) {
+    public GeoLocation setPlace(String place) {
         this.place = place;
+        return this;
     }
 }
