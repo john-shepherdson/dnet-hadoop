@@ -1,21 +1,15 @@
 package eu.dnetlib.dhp.graph;
 
 
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Publication;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
-
-import javax.xml.crypto.Data;
 
 public class SparkGraphImporterJob {
 
@@ -39,6 +33,12 @@ public class SparkGraphImporterJob {
         final String path = "file:///Users/miconis/Downloads/part-m-02236";
         final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(path, Text.class, Text.class)
                 .map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
+
+
+
+        final String body = inputRDD.filter(s -> s._1().contains("20|") && s._1().split("@")[2].equalsIgnoreCase("body")).map(Tuple2::_2).first();
+
+        System.out.println(body);
 
 
         final JavaRDD<Organization> organization = inputRDD

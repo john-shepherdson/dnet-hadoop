@@ -206,6 +206,7 @@ public class ProtoConverter implements Serializable {
                         .collect(Collectors.toList()))
                 .setCodeRepositoryUrl(ProtoUtils.mapStringField(m.getCodeRepositoryUrl()))
                 .setProgrammingLanguage(ProtoUtils.mapQualifier(m.getProgrammingLanguage()));
+
     }
 
     private static OtherResearchProducts createORP(OafProtos.Oaf oaf) {

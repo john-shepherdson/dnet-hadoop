@@ -1,68 +1,68 @@
 {
   "kind": "entity",
   "entity": {
-    "type": "datasource",
-    "datasource": {
+    "type": "organization",
+    "organization": {
       "metadata": {
-        "officialname": {
-          "value": "CRIS UNS (Current Research Information System University of Novi Sad)"
+        "legalname": {
+          "value": "University of Utrecht"
         },
-        "englishname": {
-          "value": "CRIS UNS (Current Research Information System University of Novi Sad)"
+        "eclegalbody": {
+          "value": "false"
         },
-        "websiteurl": {
-          "value": "https://cris.uns.ac.rs/"
+        "eclegalperson": {
+          "value": "false"
         },
-        "accessinfopackage": [
-          {
-            "value": "https://cris.uns.ac.rs/OAIHandlerOpenAIRECRIS"
-          }
-        ],
-        "namespaceprefix": {
-          "value": "CrisUnsNoviS"
+        "ecnonprofit": {
+          "value": "false"
         },
-        "datasourcetype": {
-          "classid": "crissystem",
-          "classname": "CRIS System",
-          "schemeid": "dnet:datasource_typologies",
-          "schemename": "dnet:datasource_typologies"
+        "ecresearchorganization": {
+          "value": "false"
         },
-        "openairecompatibility": {
-          "classid": "openaire-cris_1.1",
-          "classname": "OpenAIRE CRIS v1.1",
-          "schemeid": "dnet:datasourceCompatibilityLevel",
-          "schemename": "dnet:datasourceCompatibilityLevel"
+        "echighereducation": {
+          "value": "false"
         },
-        "latitude": {
-          "value": "0.0"
+        "ecinternationalorganizationeurinterests": {
+          "value": "false"
         },
-        "longitude": {
-          "value": "0.0"
+        "ecinternationalorganization": {
+          "value": "false"
         },
-        "journal": {
-          "issnPrinted": "",
-          "issnOnline": "",
-          "issnLinking": ""
+        "ecenterprise": {
+          "value": "false"
+        },
+        "ecsmevalidated": {
+          "value": "false"
+        },
+        "ecnutscode": {
+          "value": "false"
+        },
+        "country": {
+          "classid": "FI",
+          "classname": "Finland",
+          "schemeid": "dnet:countries",
+          "schemename": "dnet:countries"
         }
       }
     },
     "originalId": [
-      "CRIS_UNS____::openaire"
+      "aka_________::f88cc5f874ff27f0fd6e7cb24842e9fb"
     ],
     "collectedfrom": [
       {
-        "key": "",
-        "value": ""
+        "key": "10|openaire____::6ac933301a3933c8a22ceebea7000326",
+        "value": "Academy of Finland"
       }
     ],
-    "dateofcollection": "2019-04-04",
-    "id": "10|CRIS_UNS____::f66f1bd369679b5b077dcdf006089556",
-    "dateoftransformation": ""
+    "dateofcollection": "2018-09-28",
+    "id": "20|aka_________::0070a5080d7092f960fb33c8a9fca016",
+    "dateoftransformation": "2019-04-16"
   },
   "dataInfo": {
-    "inferred": false,
-    "deletedbyinference": false,
+    "inferred": true,
+    "deletedbyinference": true,
     "trust": "0.9",
+    "inferenceprovenance": "dedup-similarity-organization-simple",
     "provenanceaction": {
       "classid": "sysimport:crosswalk:entityregistry",
       "classname": "sysimport:crosswalk:entityregistry",
