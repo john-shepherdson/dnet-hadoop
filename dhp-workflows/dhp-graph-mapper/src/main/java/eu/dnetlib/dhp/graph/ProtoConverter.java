@@ -80,7 +80,7 @@ public class ProtoConverter implements Serializable {
                 .setEcsmevalidated(mapStringField(m.getEcsmevalidated()))
                 .setEcnutscode(mapStringField(m.getEcnutscode()))
                 .setCountry(mapQualifier(m.getCountry()));
-   }
+    }
 
     private static Datasource convertDataSource(OafProtos.Oaf oaf) {
         final DatasourceProtos.Datasource.Metadata m = oaf.getEntity().getDatasource().getMetadata();
@@ -184,26 +184,48 @@ public class ProtoConverter implements Serializable {
                 return createPublication(oaf);
             case "software":
                 return createSoftware(oaf);
-            case "orp":
+            case "other":
                 return createORP(oaf);
             default:
-                throw new RuntimeException("received unknown type :" + oaf.getEntity().getResult().getMetadata().getResulttype().getClassid());
+                throw new RuntimeException("received unknown type: " + oaf.getEntity().getResult().getMetadata().getResulttype().getClassid());
         }
     }
 
     private static Software createSoftware(OafProtos.Oaf oaf) {
-        final ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
-        final Software software = setOaf(new Software(), oaf);
-        
+        ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
+        Software software = setOaf(new Software(), oaf);
+        setEntity(software, oaf);
+        return setResult(software, oaf)
+                .setDocumentationUrl(m.getDocumentationUrlList()
+                        .stream()
+                        .map(ProtoUtils::mapStringField)
+                        .collect(Collectors.toList()))
+                .setLicense(m.getLicenseList()
+                        .stream()
+                        .map(ProtoUtils::mapStructuredProperty)
+                        .collect(Collectors.toList()))
+                .setCodeRepositoryUrl(ProtoUtils.mapStringField(m.getCodeRepositoryUrl()))
+                .setProgrammingLanguage(ProtoUtils.mapQualifier(m.getProgrammingLanguage()));
 
-
-
-
-        return new Software();
     }
 
     private static OtherResearchProducts createORP(OafProtos.Oaf oaf) {
-        return new OtherResearchProducts();
+        ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
+        OtherResearchProducts otherResearchProducts = setOaf(new OtherResearchProducts(), oaf);
+        setEntity(otherResearchProducts, oaf);
+        return setResult(otherResearchProducts, oaf)
+                .setContactperson(m.getContactpersonList()
+                        .stream()
+                        .map(ProtoUtils::mapStringField)
+                        .collect(Collectors.toList()))
+                .setContactgroup(m.getContactgroupList()
+                        .stream()
+                        .map(ProtoUtils::mapStringField)
+                        .collect(Collectors.toList()))
+                .setTool(m.getToolList()
+                        .stream()
+                        .map(ProtoUtils::mapStringField)
+                        .collect(Collectors.toList()));
     }
 
     private static Publication createPublication(OafProtos.Oaf oaf) {
@@ -213,11 +235,23 @@ public class ProtoConverter implements Serializable {
         setEntity(publication, oaf);
         return setResult(publication, oaf)
                 .setJournal(mapJournal(m.getJournal()));
-
-
     }
 
     private static Dataset createDataset(OafProtos.Oaf oaf) {
-        return new Dataset();
+
+        ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
+        Dataset dataset = setOaf(new Dataset(), oaf);
+        setEntity(dataset, oaf);
+        return setResult(dataset, oaf)
+                .setStoragedate(ProtoUtils.mapStringField(m.getStoragedate()))
+                .setDevice(ProtoUtils.mapStringField(m.getDevice()))
+                .setSize(ProtoUtils.mapStringField(m.getSize()))
+                .setVersion(ProtoUtils.mapStringField(m.getVersion()))
+                .setLastmetadataupdate(ProtoUtils.mapStringField(m.getLastmetadataupdate()))
+                .setMetadataversionnumber(ProtoUtils.mapStringField(m.getMetadataversionnumber()))
+                .setGeolocation(m.getGeolocationList()
+                        .stream()
+                        .map(ProtoUtils::mapGeolocation)
+                        .collect(Collectors.toList()));
     }
 }
