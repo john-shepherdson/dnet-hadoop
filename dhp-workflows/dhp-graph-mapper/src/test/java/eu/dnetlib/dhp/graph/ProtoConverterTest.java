@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.graph;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import org.apache.commons.io.IOUtils;
@@ -22,6 +23,9 @@ public class ProtoConverterTest {
 
         System.out.println(ds.getId());
 
+
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println(mapper.writeValueAsString(result));
 
 
 

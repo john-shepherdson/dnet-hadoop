@@ -65,7 +65,7 @@ public class Datasource extends OafEntity implements Serializable {
     private Field<String> databaseaccessrestriction;
 
     // {feeRequired, registration, other}
-    private Field<String> datauploadrestriction9;
+    private Field<String> datauploadrestriction;
 
     private Field<Boolean> versioning;
 
@@ -298,12 +298,12 @@ public class Datasource extends OafEntity implements Serializable {
         this.databaseaccessrestriction = databaseaccessrestriction;
     }
 
-    public Field<String> getDatauploadrestriction9() {
-        return datauploadrestriction9;
+    public Field<String> getDatauploadrestriction() {
+        return datauploadrestriction;
     }
 
-    public void setDatauploadrestriction9(Field<String> datauploadrestriction9) {
-        this.datauploadrestriction9 = datauploadrestriction9;
+    public void setDatauploadrestriction(Field<String> datauploadrestriction) {
+        this.datauploadrestriction = datauploadrestriction;
     }
 
     public Field<Boolean> getVersioning() {

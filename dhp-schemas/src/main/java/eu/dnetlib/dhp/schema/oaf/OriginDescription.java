@@ -16,7 +16,7 @@ public class OriginDescription implements Serializable {
 
     private String metadataNamespace;
 
-    private OriginDescription originDescription;
+    //private OriginDescription originDescription;
 
     public String getHarvestDate() {
         return harvestDate;
@@ -72,12 +72,12 @@ public class OriginDescription implements Serializable {
         return this;
     }
 
-    public OriginDescription getOriginDescription() {
-        return originDescription;
-    }
-
-    public OriginDescription setOriginDescription(OriginDescription originDescription) {
-        this.originDescription = originDescription;
-        return this;
-    }
+//    public OriginDescription getOriginDescription() {
+//        return originDescription;
+//    }
+//
+//    public OriginDescription setOriginDescription(OriginDescription originDescription) {
+//        this.originDescription = originDescription;
+//        return this;
+//    }
 }

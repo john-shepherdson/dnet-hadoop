@@ -18,7 +18,7 @@ public abstract class OafEntity extends Oaf implements Serializable {
     private String dateoftransformation;
 
     //TODO remove this field
-    private List<OafEntity> children;
+//    private List<OafEntity> children;
 
     private List<ExtraInfo> extraInfo;
 
@@ -73,13 +73,13 @@ public abstract class OafEntity extends Oaf implements Serializable {
         this.dateoftransformation = dateoftransformation;
     }
 
-    public List<OafEntity> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<OafEntity> children) {
-        this.children = children;
-    }
+//    public List<OafEntity> getChildren() {
+//        return children;
+//    }
+//
+//    public void setChildren(List<OafEntity> children) {
+//        this.children = children;
+//    }
 
     public List<ExtraInfo> getExtraInfo() {
         return extraInfo;

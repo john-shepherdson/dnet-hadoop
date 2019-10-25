@@ -34,8 +34,8 @@ public class ProtoUtils {
                 .setClassid(q.getClassid())
                 .setClassname(q.getClassname())
                 .setSchemeid(q.getSchemeid())
-                .setSchemename(q.getSchemename())
-                .setDataInfo(q.hasDataInfo() ? mapDataInfo(q.getDataInfo()) : null);
+                .setSchemename(q.getSchemename());
+                //.setDataInfo(q.hasDataInfo() ? mapDataInfo(q.getDataInfo()) : null);
     }
 
     public static StructuredProperty mapStructuredProperty(FieldTypeProtos.StructuredProperty sp) {
@@ -68,9 +68,29 @@ public class ProtoUtils {
                 .setIdentifier(originDescription.getIdentifier())
                 .setDatestamp(originDescription.getDatestamp())
                 .setMetadataNamespace(originDescription.getMetadataNamespace());
-        if (originDescription.hasOriginDescription())
-            originDescriptionResult.setOriginDescription(mapOriginalDescription(originDescription.getOriginDescription()));
+//        if (originDescription.hasOriginDescription())
+//            originDescriptionResult.setOriginDescription(mapOriginalDescription(originDescription.getOriginDescription()));
         return originDescriptionResult;
+
+    }
+
+    public static Journal mapJournal(FieldTypeProtos.Journal journal) {
+        return new Journal()
+                .setName(journal.getName())
+                .setIssnPrinted(journal.getIssnPrinted())
+                .setIssnOnline(journal.getIssnOnline())
+                .setIssnLinking(journal.getIssnLinking())
+                .setEp(journal.getEp())
+                .setIss(journal.getIss())
+                .setSp(journal.getSp())
+                .setVol(journal.getVol())
+                .setEdition(journal.getEdition())
+                .setConferenceplace(journal.getConferenceplace())
+                .setConferencedate(journal.getConferencedate())
+                .setDataInfo(mapDataInfo(journal.getDataInfo()))
+                ;
+
+
 
     }
 

@@ -20,7 +20,7 @@ public class ProtoConverter implements Serializable {
             if (oaf.getKind() == KindProtos.Kind.entity)
                 return convertEntity(oaf);
             else {
-               return convertRelation(oaf);
+                return convertRelation(oaf);
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -40,8 +40,8 @@ public class ProtoConverter implements Serializable {
                 .setRelClass(r.getRelClass())
                 .setCollectedFrom(r.getCollectedfromCount() > 0 ?
                         r.getCollectedfromList().stream()
-                            .map(kv -> mapKV(kv))
-                            .collect(Collectors.toList()) : null);
+                                .map(kv -> mapKV(kv))
+                                .collect(Collectors.toList()) : null);
     }
 
     private static OafEntity convertEntity(OafProtos.Oaf oaf) {
@@ -151,6 +151,28 @@ public class ProtoConverter implements Serializable {
 
         //TODO r3data fields
 
+        result.setReleasestartdate(mapStringField(datasource.getReleasestartdate()));
+        result.setReleaseenddate(mapStringField(datasource.getReleaseenddate()));
+        result.setMissionstatementurl(mapStringField(datasource.getMissionstatementurl()));
+        result.setDataprovider(mapBoolField(datasource.getDataprovider()));
+        result.setServiceprovider(mapBoolField(datasource.getServiceprovider()));
+        result.setDatabaseaccesstype(mapStringField(datasource.getDatabaseaccesstype()));
+        result.setDatauploadtype(mapStringField(datasource.getDatauploadtype()));
+        result.setDatabaseaccessrestriction(mapStringField(datasource.getDatabaseaccessrestriction()));
+        result.setDatauploadrestriction(mapStringField(datasource.getDatauploadrestriction()));
+        result.setVersioning(mapBoolField(datasource.getVersioning()));
+        result.setCitationguidelineurl(mapStringField(datasource.getCitationguidelineurl()));
+        result.setQualitymanagementkind(mapStringField(datasource.getQualitymanagementkind()));
+        result.setPidsystems(mapStringField(datasource.getPidsystems()));
+        result.setCertificates(mapStringField(datasource.getCertificates()));
+        result.setPolicies(datasource.getPoliciesList()
+                .stream()
+                .map(ProtoUtils::mapKV)
+                .collect(Collectors.toList())
+        );
+
+        result.setJournal(mapJournal(datasource.getJournal()));
+
         return result;
     }
 
@@ -180,14 +202,14 @@ public class ProtoConverter implements Serializable {
                 .setKeywords(mapStringField(m.getKeywords()))
                 .setSubjects(m.getSubjectsCount() > 0 ?
                         m.getSubjectsList().stream()
-                            .map(sp -> mapStructuredProperty(sp))
-                            .collect(Collectors.toList()) : null)
+                                .map(sp -> mapStructuredProperty(sp))
+                                .collect(Collectors.toList()) : null)
                 .setTitle(mapStringField(m.getTitle()))
                 .setWebsiteurl(mapStringField(m.getWebsiteurl()))
                 .setFundingtree(m.getFundingtreeCount() > 0 ?
                         m.getFundingtreeList().stream()
-                            .map(f -> mapStringField(f))
-                            .collect(Collectors.toList()) : null)
+                                .map(f -> mapStringField(f))
+                                .collect(Collectors.toList()) : null)
                 .setJsonextrainfo(mapStringField(m.getJsonextrainfo()))
                 .setSummary(mapStringField(m.getSummary()))
                 .setOptional1(mapStringField(m.getOptional1()))
@@ -206,7 +228,7 @@ public class ProtoConverter implements Serializable {
             case "orp":
                 return createORP(oaf);
             default:
-                throw new RuntimeException("received unknown type :"+oaf.getEntity().getResult().getMetadata().getResulttype().getClassid());
+                throw new RuntimeException("received unknown type :" + oaf.getEntity().getResult().getMetadata().getResulttype().getClassid());
         }
     }
 
