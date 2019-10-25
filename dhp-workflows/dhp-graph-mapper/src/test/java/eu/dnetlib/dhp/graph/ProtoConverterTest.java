@@ -39,7 +39,7 @@ public class ProtoConverterTest {
         assertTrue(result instanceof Publication);
         Publication p = (Publication) result;
 
-        System.out.println(p);
+        System.out.println(p.getId());
 
     }
 

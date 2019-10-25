@@ -130,7 +130,101 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Publication createPublication(OafProtos.Oaf oaf) {
-        return new Publication();
+
+        Publication result = new Publication();
+
+        //Set Oaf Fields
+        result.setDataInfo(ProtoUtils.mapDataInfo(oaf.getDataInfo()));
+
+        result.setLastupdatetimestamp(oaf.getLastupdatetimestamp());
+
+        //setting Entity fields
+        final OafProtos.OafEntity entity = oaf.getEntity();
+
+        result.setId(entity.getId());
+
+        result.setJournal(null);
+
+        result.setAuthor(null);
+
+        result.setChildren(null);
+
+        result.setCollectedfrom(entity.getCollectedfromList()
+                .stream()
+                .map(ProtoUtils::mapKV)
+                .collect(Collectors.toList()));
+
+        result.setContext(null);
+
+        result.setContributor(null);
+
+        result.setCountry(null);
+
+        result.setCoverage(null);
+
+        result.setDateofacceptance(result.getDateofacceptance());
+
+        result.setDateofcollection(entity.getDateofcollection());
+
+        result.setDateoftransformation(entity.getDateoftransformation());
+
+        result.setDescription(entity.getResult().getMetadata().getDescriptionList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+
+        result.setEmbargoenddate(null);
+
+        result.setExternalReference(null);
+
+        result.setExtraInfo(entity.getExtraInfoList()
+                .stream()
+                .map(ProtoUtils::mapExtraInfo)
+                .collect(Collectors.toList()));
+
+        result.setFormat(entity.getResult().getMetadata().getFormatList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+
+        result.setFulltext(null);
+
+        result.setInstance(null);
+
+        result.setLanguage(ProtoUtils.mapQualifier(entity.getResult().getMetadata().getLanguage()));
+
+        result.setOaiprovenance(null);
+
+        result.setOriginalId(entity.getOriginalIdList());
+
+        result.setPid(entity.getPidList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
+
+        result.setPublisher(ProtoUtils.mapStringField(entity.getResult().getMetadata().getPublisher()));
+
+        result.setRefereed(null);
+
+        result.setRelevantdate(null);
+
+        result.setResourcetype(null);
+
+        result.setResulttype(null);
+
+        result.setSource(entity.getResult().getMetadata().getSourceList()
+                .stream()
+                .map(ProtoUtils::mapStringField)
+                .collect(Collectors.toList()));
+
+        result.setSubject(null);
+
+        result.setTitle(entity.getResult().getMetadata().getTitleList()
+                .stream()
+                .map(ProtoUtils::mapStructuredProperty)
+                .collect(Collectors.toList()));
+
+        return result;
     }
 
     private static Dataset createDataset(OafProtos.Oaf oaf) {
