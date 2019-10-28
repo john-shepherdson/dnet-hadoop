@@ -328,8 +328,8 @@
         "optional2": {
           "value": "false"
         },
-        "totalcost": "33.3",
-        "fundedamount": "33",
+        "totalcost": 33,
+        "fundedamount": 33,
         "contactfullname": {
           "value": "false"
         },
