@@ -250,7 +250,7 @@
             <dependency>
                 <groupId>eu.dnetlib</groupId>
                 <artifactId>dnet-openaire-data-protos</artifactId>
-                <version>3.9.5</version>
+                <version>3.9.5-proto250</version>
             </dependency>
 
         </dependencies>
@@ -454,7 +454,7 @@
         <dhp.jackson.version>2.6.5</dhp.jackson.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <scala.version>2.11.8</scala.version>
-        <google.protobuf.version>2.4.1</google.protobuf.version>
+        <google.protobuf.version>2.5.0</google.protobuf.version>
     </properties>
 </project>
 
