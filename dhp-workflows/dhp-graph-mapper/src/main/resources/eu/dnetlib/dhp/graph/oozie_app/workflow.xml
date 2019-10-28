@@ -1,0 +1,38 @@
+<workflow-app name="distcp" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the target path</description>
+        </property>
+    </parameters>
+
+    <start to="MapGraphIntoDataFrame"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="MapGraphIntoDataFrame">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>MapGraphIntoDataFrame</name>
+            <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
+            <jar>dhp-aggregations-1.0.0-SNAPSHOT.jar</jar>
+            <spark-opts>--num-executors 50 --conf -spark.extraListeners=com.cloudera.spark.lineage.NavigatorAppListener -spark.sql.queryExecutionListeners=com.cloudera.spark.lineage.NavigatorQueryListener&quot;</spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--input</arg><arg>${sourcePath}</arg>
+            <arg>--outputDir</arg><arg>${targetPath}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>
