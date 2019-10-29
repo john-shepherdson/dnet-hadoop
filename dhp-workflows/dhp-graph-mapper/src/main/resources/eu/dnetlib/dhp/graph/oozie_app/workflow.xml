@@ -37,7 +37,7 @@
             <name>MapGraphIntoDataFrame</name>
             <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory}</spark-opts>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--input</arg><arg>${sourcePath}</arg>
             <arg>--outputDir</arg><arg>${targetPath}</arg>
