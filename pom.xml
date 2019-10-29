@@ -155,7 +155,8 @@
             <dependency>
                 <groupId>commons-cli</groupId>
                 <artifactId>commons-cli</artifactId>
-                <version>1.4</version>
+                <version>1.2</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -208,6 +209,7 @@
                 <scope>provided</scope>
             </dependency>
 
+
             <dependency>
                 <groupId>javax.persistence</groupId>
                 <artifactId>javax.persistence-api</artifactId>
@@ -244,7 +246,7 @@
             <dependency>
                 <groupId>com.googlecode.protobuf-java-format</groupId>
                 <artifactId>protobuf-java-format</artifactId>
-                <version>1.2</version>
+                <version>1.4</version>
             </dependency>
 
             <dependency>
@@ -450,8 +452,8 @@
         <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
         <dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
         <dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
-        <dhp.spark.version>2.2.0</dhp.spark.version>
-        <dhp.jackson.version>2.6.5</dhp.jackson.version>
+        <dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
+        <dhp.jackson.version>2.9.6</dhp.jackson.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <scala.version>2.11.8</scala.version>
         <google.protobuf.version>2.5.0</google.protobuf.version>

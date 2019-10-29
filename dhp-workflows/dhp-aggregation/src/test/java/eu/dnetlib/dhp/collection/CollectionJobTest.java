@@ -17,10 +17,7 @@ public class CollectionJobTest {
     @Before
     public void setup() throws IOException {
         testDir = Files.createTempDirectory("dhp-collection");
-
-
     }
-
 
     @After
     public void teadDown() throws IOException {
@@ -28,7 +25,7 @@ public class CollectionJobTest {
     }
 
     @Test
-    public void tesCollection () throws Exception {
+    public void tesCollection() throws Exception {
         Provenance provenance = new Provenance("pippo", "puppa", "ns_prefix");
         GenerateNativeStoreSparkJob.main(new String[] {
                 "-mt", "local",

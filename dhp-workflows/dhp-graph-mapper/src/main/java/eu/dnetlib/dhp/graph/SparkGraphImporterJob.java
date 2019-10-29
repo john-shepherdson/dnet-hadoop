@@ -1,6 +1,5 @@
 package eu.dnetlib.dhp.graph;
 
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
@@ -15,9 +14,7 @@ import scala.Tuple2;
 
 public class SparkGraphImporterJob {
 
-
     public static void main(String[] args) throws Exception {
-
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkGraphImporterJob.class.getResourceAsStream("/eu/dnetlib/dhp/graph/input_graph_parameters.json")));
         parser.parseArgument(args);
@@ -34,7 +31,6 @@ public class SparkGraphImporterJob {
         final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(inputPath, Text.class, Text.class)
                 .map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
 
-
         final JavaRDD<Oaf> oafRdd = inputRDD.filter(s -> !StringUtils.isBlank(s._2()) && !s._1().contains("@update")).map(Tuple2::_2).map(ProtoConverter::convert);
 
         final Encoder<Organization> organizationEncoder = Encoders.bean(Organization.class);
@@ -48,7 +44,6 @@ public class SparkGraphImporterJob {
 
         final Encoder<Relation> relationEncoder = Encoders.bean(Relation.class);
 
-
         spark.createDataset(oafRdd.filter(s -> s instanceof Organization).map(s -> (Organization) s).rdd(), organizationEncoder).write().save(outputPath + "/organizations");
         spark.createDataset(oafRdd.filter(s -> s instanceof Project).map(s -> (Project) s).rdd(), projectEncoder).write().save(outputPath + "/projects");
         spark.createDataset(oafRdd.filter(s -> s instanceof Datasource).map(s -> (Datasource) s).rdd(), datasourceEncoder).write().save(outputPath + "/datasources");
@@ -59,8 +54,5 @@ public class SparkGraphImporterJob {
         spark.createDataset(oafRdd.filter(s -> s instanceof OtherResearchProducts).map(s -> (OtherResearchProducts) s).rdd(), otherResearchProductsEncoder).write().save(outputPath + "/otherResearchProducts");
 
         spark.createDataset(oafRdd.filter(s -> s instanceof Relation).map(s -> (Relation) s).rdd(), relationEncoder).write().save(outputPath + "/relations");
-
-
-
     }
 }

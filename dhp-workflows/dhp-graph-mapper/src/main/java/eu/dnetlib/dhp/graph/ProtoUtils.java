@@ -5,14 +5,19 @@ import eu.dnetlib.data.proto.FieldTypeProtos;
 import eu.dnetlib.data.proto.OafProtos;
 import eu.dnetlib.data.proto.ResultProtos;
 import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.util.stream.Collectors;
 
 public class ProtoUtils {
 
-    public static OafProtos.Oaf parse(String json) throws JsonFormat.ParseException {
+    public static OafProtos.Oaf parse(String json) throws IOException {
         final OafProtos.Oaf.Builder builder = OafProtos.Oaf.newBuilder();
-        JsonFormat.merge(json, builder);
+
+        final JsonFormat jf = new JsonFormat();
+        jf.merge(IOUtils.toInputStream(json), builder);
+
         return builder.build();
     }
 

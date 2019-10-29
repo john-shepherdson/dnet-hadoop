@@ -74,7 +74,7 @@ public class GenerateNativeStoreSparkJob {
         final Map<String, String> ongoingMap = new HashMap<>();
         final Map<String, String> reportMap = new HashMap<>();
 
-        final boolean test                  = parser.get("isTest") == null?false: Boolean.valueOf(parser.get("isTest"));
+        final boolean test = parser.get("isTest") == null ? false : Boolean.valueOf(parser.get("isTest"));
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
@@ -86,7 +86,7 @@ public class GenerateNativeStoreSparkJob {
 
         final MessageManager manager = new MessageManager(parser.get("rabbitHost"), parser.get("rabbitUser"), parser.get("rabbitPassword"), false, false, null);
 
-        final JavaRDD<MetadataRecord> mappeRDD = inputRDD.map(item -> parseRecord(item._2().toString(), parser.get("xpath"), parser.get("encoding"),provenance, dateOfCollection, totalItems, invalidRecords))
+        final JavaRDD<MetadataRecord> mappeRDD = inputRDD.map(item -> parseRecord(item._2().toString(), parser.get("xpath"), parser.get("encoding"), provenance, dateOfCollection, totalItems, invalidRecords))
                 .filter(Objects::nonNull).distinct();
 
         ongoingMap.put("ongoing", "0");

@@ -1,5 +1,5 @@
 [
-  {"paramName":"mt",   "paramLongName":"master",            "paramDescription": "should be local or yarn",                                  "paramRequired": true},
+  {"paramName":"mt",  "paramLongName":"master",             "paramDescription": "should be local or yarn",                                  "paramRequired": true},
   {"paramName":"i",   "paramLongName":"input",              "paramDescription": "the path of the sequencial file to read",                  "paramRequired": true},
-  {"paramName":"o",   "paramLongName":"outputDir",          "paramDescription": "the path where store DataFrames on HDFS",                 "paramRequired": true}
+  {"paramName":"o",   "paramLongName":"outputDir",          "paramDescription": "the path where store DataFrames on HDFS",                  "paramRequired": true}
 ]
