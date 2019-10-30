@@ -20,6 +20,10 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
+        <property>
+            <name>filter</name>
+            <description>csv string to filter the entities to generate</description>
+        </property>
     </parameters>
 
     <start to="MapGraphIntoDataFrame"/>
@@ -41,6 +45,8 @@
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--input</arg><arg>${sourcePath}</arg>
             <arg>--outputDir</arg><arg>${targetPath}</arg>
+            <arg>--filter</arg><arg>${filter}</arg>
+
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
