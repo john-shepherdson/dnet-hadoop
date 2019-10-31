@@ -37,9 +37,9 @@
     </ciManagement>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/dnet-team/dnet-hadoop.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:dnet-team/dnet-hadoop.git</developerConnection>
-        <url>https://github.com/dnet-team/dnet-hadoop</url>
+        <connection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</connection>
+        <developerConnection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</developerConnection>
+        <url>https://code-repo.d4science.org/D-Net/dnet-hadoop/</url>
         <tag>HEAD</tag>
     </scm>
 
