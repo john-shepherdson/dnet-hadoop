@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -41,7 +42,7 @@
         <primed.dir>primed</primed.dir>
 
         <oozie.package.dependencies.include.scope>runtime</oozie.package.dependencies.include.scope>
-        <oozie.package.dependencies.exclude.scope />
+        <oozie.package.dependencies.exclude.scope></oozie.package.dependencies.exclude.scope>
         <oozie.package.skip.test.jar>true</oozie.package.skip.test.jar>
 
         <dhpConnectionProperties>${user.home}/.dhp/application.properties</dhpConnectionProperties>
@@ -73,7 +74,7 @@
             <id>attach-test-resources</id>
             <properties>
                 <!--overriding default scope (set to 'runtime') with the 'test' value. Test resources attached to oozie package requires all test dependencies. -->
-                <oozie.package.dependencies.include.scope />
+                <oozie.package.dependencies.include.scope></oozie.package.dependencies.include.scope>
                 <oozie.package.dependencies.exclude.scope>provided</oozie.package.dependencies.exclude.scope>
                 <!-- Do not skip creation of test jar for priming (in oozie-package profile) -->
                 <oozie.package.skip.test.jar>false</oozie.package.skip.test.jar>
@@ -354,7 +355,7 @@
                                         </copy>
 
 
-                                        <fixcrlf srcdir="target/${oozie.package.file.name}/${oozieAppDir}/" encoding="UTF-8" outputencoding="UTF-8" includes="**/*.sh,**/*.json,**/*.py,**/*.sql" eol="lf" />
+                                        <fixcrlf srcdir="target/${oozie.package.file.name}/${oozieAppDir}/" encoding="UTF-8" outputencoding="UTF-8" includes="**/*.sh,**/*.json,**/*.py,**/*.sql" eol="lf"/>
 
 
                                         <!-- creating tar.gz package -->
