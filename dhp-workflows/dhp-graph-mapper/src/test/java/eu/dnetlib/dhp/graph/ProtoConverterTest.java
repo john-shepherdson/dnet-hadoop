@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.graph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.util.ProtoConverter;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 

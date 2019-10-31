@@ -47,7 +47,6 @@
     </pluginRepositories>
 
     <repositories>
-
         <repository>
             <id>dnet45-releases</id>
             <name>D-Net 45 releases</name>
@@ -60,22 +59,6 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
-
-        <!--
-        <repository>
-            <id>dnet45-bootstrap-release</id>
-            <name>dnet45 bootstrap release</name>
-            <url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-bootstrap-release</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        -->
-
         <repository>
             <id>cloudera</id>
             <name>Cloudera Repository</name>
@@ -184,6 +167,12 @@
             </dependency>
 
             <dependency>
+                <groupId>de.javakaffee</groupId>
+                <artifactId>kryo-serializers</artifactId>
+                <version>0.45</version>
+            </dependency>
+
+            <dependency>
                 <groupId>net.schmizz</groupId>
                 <artifactId>sshj</artifactId>
                 <version>0.10.0</version>
@@ -252,7 +241,7 @@
             <dependency>
                 <groupId>eu.dnetlib</groupId>
                 <artifactId>dnet-openaire-data-protos</artifactId>
-                <version>3.9.5-proto250</version>
+                <version>3.9.5</version>
             </dependency>
 
         </dependencies>
@@ -326,30 +315,6 @@
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     </configuration>
                 </plugin>
-
-                <!--
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.19.1</version>
-                    <executions>
-                        <execution>
-                            <id>default-integration-test</id>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                            <configuration>
-                                <groups>eu.dnetlib.dhp.common.IntegrationTest</groups>
-                                <includes>
-                                    <include>**/*Test.java</include>
-                                </includes>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                -->
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
@@ -369,10 +334,8 @@
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>1.12</version>
                 </plugin>
-
             </plugins>
         </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -415,10 +378,7 @@
                 <version>2.10</version>
             </extension>
         </extensions>
-
     </build>
-
-
     <distributionManagement>
         <snapshotRepository>
             <id>dnet45-snapshots</id>
@@ -431,7 +391,6 @@
             <url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
         </repository>
     </distributionManagement>
-
     <reporting>
         <plugins>
             <plugin>
@@ -456,7 +415,7 @@
         <dhp.jackson.version>2.9.6</dhp.jackson.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <scala.version>2.11.8</scala.version>
-        <google.protobuf.version>2.5.0</google.protobuf.version>
+        <google.protobuf.version>2.4.1</google.protobuf.version>
     </properties>
 </project>
 

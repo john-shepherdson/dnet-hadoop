@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.schema.util;
 
 import eu.dnetlib.data.proto.*;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -6,7 +6,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import java.io.Serializable;
 import java.util.stream.Collectors;
 
-import static eu.dnetlib.dhp.graph.ProtoUtils.*;
+import static eu.dnetlib.dhp.schema.util.ProtoUtils.*;
 
 public class ProtoConverter implements Serializable {
 

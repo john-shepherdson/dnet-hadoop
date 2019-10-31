@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.schema.util;
 
 import com.googlecode.protobuf.format.JsonFormat;
 import eu.dnetlib.data.proto.FieldTypeProtos;
