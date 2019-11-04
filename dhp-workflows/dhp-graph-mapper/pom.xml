@@ -21,16 +21,6 @@
             <artifactId>spark-sql_2.11</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>eu.dnetlib</groupId>
-            <artifactId>dnet-openaire-data-protos</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.googlecode.protobuf-java-format</groupId>
-            <artifactId>protobuf-java-format</artifactId>
-        </dependency>
-
 
 
         <dependency>

@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.graph;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
@@ -7,10 +9,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
+
+import java.util.Map;
 
 public class SparkGraphImporterJob {
 
@@ -27,44 +30,33 @@ public class SparkGraphImporterJob {
         final String inputPath = parser.get("input");
         final String outputPath = parser.get("outputDir");
 
-
         final String filter = parser.get("filter");
-
-
 
         // Read the input file and convert it into RDD of serializable object
         final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(inputPath, Text.class, Text.class)
                 .map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
 
-        final JavaRDD<Oaf> oafRdd = inputRDD.filter(s -> !StringUtils.isBlank(s._2()) && !s._1().contains("@update")).map(Tuple2::_2).map(ProtoConverter::convert);
+        final Map<String, Class> types = Maps.newHashMap();
+        types.put("datasource", Datasource.class);
+        types.put("organization", Organization.class);
+        types.put("project", Project.class);
+        types.put("dataset", Dataset.class);
+        types.put("otherresearchproduct", OtherResearchProduct.class);
+        types.put("software", Software.class);
+        types.put("publication", Publication.class);
+        types.put("relation", Relation.class);
 
-        final Encoder<Organization> organizationEncoder = Encoders.bean(Organization.class);
-        final Encoder<Project> projectEncoder = Encoders.bean(Project.class);
-        final Encoder<Datasource> datasourceEncoder = Encoders.bean(Datasource.class);
+        types.forEach((name, clazz) -> {
+            if (StringUtils.isNotBlank(filter) || filter.toLowerCase().contains(name)) {
+                spark.createDataset(inputRDD
+                        .filter(s -> s._1().equals(clazz.getName()))
+                        .map(Tuple2::_2)
+                        .map(s -> new ObjectMapper().readValue(s, clazz))
+                        .rdd(), Encoders.bean(clazz))
+                        .write()
+                        .save(outputPath + "/" + name);
+            }
+        });
 
-        final Encoder<eu.dnetlib.dhp.schema.oaf.Dataset> datasetEncoder = Encoders.bean(eu.dnetlib.dhp.schema.oaf.Dataset.class);
-        final Encoder<Publication> publicationEncoder = Encoders.bean(Publication.class);
-        final Encoder<Software> softwareEncoder = Encoders.bean(Software.class);
-        final Encoder<OtherResearchProducts> otherResearchProductsEncoder = Encoders.bean(OtherResearchProducts.class);
-
-        final Encoder<Relation> relationEncoder = Encoders.bean(Relation.class);
-
-        if (filter == null|| filter.toLowerCase().contains("organization"))
-            spark.createDataset(oafRdd.filter(s -> s instanceof Organization).map(s -> (Organization) s).rdd(), organizationEncoder).write().save(outputPath + "/organizations");
-        if (filter == null|| filter.toLowerCase().contains("project"))
-        spark.createDataset(oafRdd.filter(s -> s instanceof Project).map(s -> (Project) s).rdd(), projectEncoder).write().save(outputPath + "/projects");
-        if (filter == null|| filter.toLowerCase().contains("datasource"))
-            spark.createDataset(oafRdd.filter(s -> s instanceof Datasource).map(s -> (Datasource) s).rdd(), datasourceEncoder).write().save(outputPath + "/datasources");
-        if (filter == null|| filter.toLowerCase().contains("dataset"))
-            spark.createDataset(oafRdd.filter(s -> s instanceof eu.dnetlib.dhp.schema.oaf.Dataset).map(s -> (eu.dnetlib.dhp.schema.oaf.Dataset) s).rdd(), datasetEncoder).write().save(outputPath + "/datasets");
-
-        if (filter == null|| filter.toLowerCase().contains("publication"))
-            spark.createDataset(oafRdd.filter(s -> s instanceof Publication).map(s -> (Publication) s).rdd(), publicationEncoder).write().save(outputPath + "/publications");
-        if (filter == null|| filter.toLowerCase().contains("software"))
-            spark.createDataset(oafRdd.filter(s -> s instanceof Software).map(s -> (Software) s).rdd(), softwareEncoder).write().save(outputPath + "/software");
-        if (filter == null|| filter.toLowerCase().contains("otherresearchproduct"))
-            spark.createDataset(oafRdd.filter(s -> s instanceof OtherResearchProducts).map(s -> (OtherResearchProducts) s).rdd(), otherResearchProductsEncoder).write().save(outputPath + "/otherResearchProducts");
-        if (filter == null|| filter.toLowerCase().contains("relation"))
-            spark.createDataset(oafRdd.filter(s -> s instanceof Relation).map(s -> (Relation) s).rdd(), relationEncoder).write().save(outputPath + "/relations");
     }
 }

@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class OtherResearchProducts extends Result implements Serializable {
+public class OtherResearchProduct extends Result implements Serializable {
 
     private List<Field<String>> contactperson;
 
