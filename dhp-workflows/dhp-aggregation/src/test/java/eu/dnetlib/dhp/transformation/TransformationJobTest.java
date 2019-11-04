@@ -27,8 +27,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class TransformationJobTest {
+
     @Mock
     LongAccumulator accumulator;
 
@@ -42,9 +42,8 @@ public class TransformationJobTest {
         testDir = Files.createTempDirectory("dhp-collection");
     }
 
-
     @After
-    public void teadDown() throws IOException {
+    public void tearDown() throws IOException {
         FileUtils.deleteDirectory(testDir.toFile());
     }
 
@@ -90,10 +89,7 @@ public class TransformationJobTest {
                 "-rh",  "",
                 "-ro",  "",
                 "-rr",  ""});
-
-
     }
-
 
     @Test
     public void tryLoadFolderOnCP() throws Exception {
@@ -101,7 +97,6 @@ public class TransformationJobTest {
         System.out.println("path = " + path);
 
         Path tempDirWithPrefix = Files.createTempDirectory("mdsotre_output");
-
 
         System.out.println(tempDirWithPrefix.toFile().getAbsolutePath());
 
@@ -140,10 +135,6 @@ public class TransformationJobTest {
         Node node = document.selectSingleNode("//CODE/*[local-name()='stylesheet']");
 
         System.out.println(node.asXML());
-
-
-
     }
-
 
 }
