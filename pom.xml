@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.dnetlib.dhp</groupId>
     <artifactId>dhp</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <url>http://www.d-net.research-infrastructures.eu</url>
@@ -37,9 +35,9 @@
     </ciManagement>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/dnet-team/dnet-hadoop.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:dnet-team/dnet-hadoop.git</developerConnection>
-        <url>https://github.com/dnet-team/dnet-hadoop</url>
+        <connection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</connection>
+        <developerConnection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</developerConnection>
+        <url>https://code-repo.d4science.org/D-Net/dnet-hadoop/</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -47,7 +45,6 @@
     </pluginRepositories>
 
     <repositories>
-
         <repository>
             <id>dnet45-releases</id>
             <name>D-Net 45 releases</name>
@@ -60,22 +57,6 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
-
-        <!--
-        <repository>
-            <id>dnet45-bootstrap-release</id>
-            <name>dnet45 bootstrap release</name>
-            <url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-bootstrap-release</url>
-            <layout>default</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        -->
-
         <repository>
             <id>cloudera</id>
             <name>Cloudera Repository</name>
@@ -181,6 +162,12 @@
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
                 <version>1.1.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.javakaffee</groupId>
+                <artifactId>kryo-serializers</artifactId>
+                <version>0.45</version>
             </dependency>
 
             <dependency>
@@ -307,30 +294,6 @@
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     </configuration>
                 </plugin>
-
-                <!--
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.19.1</version>
-                    <executions>
-                        <execution>
-                            <id>default-integration-test</id>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                            <configuration>
-                                <groups>eu.dnetlib.dhp.common.IntegrationTest</groups>
-                                <includes>
-                                    <include>**/*Test.java</include>
-                                </includes>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                -->
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
@@ -350,10 +313,8 @@
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>1.12</version>
                 </plugin>
-
             </plugins>
         </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -396,10 +357,7 @@
                 <version>2.10</version>
             </extension>
         </extensions>
-
     </build>
-
-
     <distributionManagement>
         <snapshotRepository>
             <id>dnet45-snapshots</id>
@@ -412,7 +370,6 @@
             <url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
         </repository>
     </distributionManagement>
-
     <reporting>
         <plugins>
             <plugin>
