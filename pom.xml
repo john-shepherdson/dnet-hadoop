@@ -165,12 +165,6 @@
             </dependency>
 
             <dependency>
-                <groupId>de.javakaffee</groupId>
-                <artifactId>kryo-serializers</artifactId>
-                <version>0.45</version>
-            </dependency>
-
-            <dependency>
                 <groupId>net.schmizz</groupId>
                 <artifactId>sshj</artifactId>
                 <version>0.10.0</version>

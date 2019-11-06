@@ -16,7 +16,7 @@
         <value>spark2</value>
     </property>
     <property>
-        <name>filter</name>
-        <value></value>
+        <name>hive.metastore.uris</name>
+        <value>thrift://iis-cdh5-test-m3.ocean.icm.edu.pl:9083</value>
     </property>
 </configuration>

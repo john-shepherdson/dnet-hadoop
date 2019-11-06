@@ -5,10 +5,6 @@
             <description>the source path</description>
         </property>
         <property>
-            <name>targetPath</name>
-            <description>the target path</description>
-        </property>
-        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -19,10 +15,6 @@
         <property>
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
-        </property>
-        <property>
-            <name>filter</name>
-            <description>csv string to filter the entities to generate</description>
         </property>
     </parameters>
 
@@ -41,12 +33,10 @@
             <name>MapGraphIntoDataFrame</name>
             <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"</spark-opts>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
-            <arg>--filter</arg><arg>${filter}</arg>
-
+            <arg>--hive.metastore.uris</arg><arg>${hive.metastore.uris}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

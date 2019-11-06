@@ -1,6 +1,5 @@
 [
   {"paramName":"mt",  "paramLongName":"master",             "paramDescription": "should be local or yarn",                                  "paramRequired": true},
   {"paramName":"s",   "paramLongName":"sourcePath",         "paramDescription": "the path of the sequencial file to read",                  "paramRequired": true},
-  {"paramName":"f",   "paramLongName":"filter",             "paramDescription": "csv of typology of dataframe to be generated",             "paramRequired": false},
-  {"paramName":"t",   "paramLongName":"targetPath",         "paramDescription": "the path where store DataFrames on HDFS",                  "paramRequired": true}
+  {"paramName":"h",   "paramLongName":"hive.metastore.uris","paramDescription": "the hive metastore uris",                                  "paramRequired": true}
 ]
