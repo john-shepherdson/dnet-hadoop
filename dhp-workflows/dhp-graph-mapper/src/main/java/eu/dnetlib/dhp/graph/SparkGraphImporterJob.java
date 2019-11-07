@@ -21,25 +21,30 @@ public class SparkGraphImporterJob {
                 .builder()
                 .appName(SparkGraphImporterJob.class.getSimpleName())
                 .master(parser.get("master"))
-                .config("hive.metastore.uris", parser.get("hive.metastore.uris"))
+                .config("hive.metastore.uris", parser.get("hive_metastore_uris"))
                 .enableHiveSupport()
                 .getOrCreate();
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
         final String inputPath = parser.get("sourcePath");
+        final String hiveDbName = parser.get("hive_db_name");
+
+        spark.sql(String.format("CREATE DATABASE IF NOT EXISTS %s", hiveDbName));
 
         // Read the input file and convert it into RDD of serializable object
         GraphMappingUtils.types.forEach((name, clazz) -> {
             final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(inputPath + "/" + name, Text.class, Text.class)
                     .map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
+
             spark.createDataset(inputRDD
                     .filter(s -> s._1().equals(clazz.getName()))
                     .map(Tuple2::_2)
                     .map(s -> new ObjectMapper().readValue(s, clazz))
                     .rdd(), Encoders.bean(clazz))
+                    .limit(1000)
                     .write()
                     .mode(SaveMode.Overwrite)
-                    .saveAsTable("openaire." + name);
+                    .saveAsTable(hiveDbName + "." + name);
         });
 
     }

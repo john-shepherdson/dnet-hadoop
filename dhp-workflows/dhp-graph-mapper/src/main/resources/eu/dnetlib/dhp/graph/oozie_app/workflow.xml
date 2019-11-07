@@ -5,6 +5,10 @@
             <description>the source path</description>
         </property>
         <property>
+            <name>hive_db_name</name>
+            <description>the target hive database name</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -36,7 +40,8 @@
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive.metastore.uris</arg><arg>${hive.metastore.uris}</arg>
+            <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
