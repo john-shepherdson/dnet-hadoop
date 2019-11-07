@@ -14,9 +14,8 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-public class DistanceAlgoTest extends AbstractPaceFunctions {
+public class ComparatorTest extends AbstractPaceFunctions {
 
-	private final static String TEST_STRING = "Toshiba NB550D: è un netbook su piattaforma AMD Fusion⁽¹²⁾.";
 	private Map<String, Number> params;
 	private DedupConfig conf;
 
@@ -24,33 +23,14 @@ public class DistanceAlgoTest extends AbstractPaceFunctions {
 	public void setup() {
 		params = new HashMap<>();
 		params.put("weight", 1.0);
-		conf = DedupConfig.load(readFromClasspath("/eu/dnetlib/pace/config/org.curr.conf", DistanceAlgoTest.class));
+		conf = DedupConfig.load(readFromClasspath("/eu/dnetlib/pace/config/organization.current.conf", ComparatorTest.class));
+
 	}
 
 	@Test
 	public void testCleanForSorting() {
 		NGramUtils utils = new NGramUtils();
 		System.out.println("utils = " + utils.cleanupForOrdering("University of Pisa"));
-	}
-
-	@Test
-	public void testGetNumbers() {
-		System.out.println("Numbers        : " + getNumbers(TEST_STRING));
-	}
-
-	@Test
-	public void testRemoveSymbols() {
-		System.out.println("Without symbols: " + removeSymbols(TEST_STRING));
-	}
-
-	@Test
-	public void testFixAliases() {
-		System.out.println("Fixed aliases  : " + fixAliases(TEST_STRING));
-	}
-
-	@Test
-	public void testCleanup() {
-		System.out.println("cleaned up     : " + cleanup(TEST_STRING));
 	}
 
 	@Test
