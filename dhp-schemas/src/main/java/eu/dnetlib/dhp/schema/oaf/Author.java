@@ -13,7 +13,7 @@ public class Author implements Serializable {
 
     private Integer rank;
 
-    private List<KeyValue> pid;
+    private List<StructuredProperty> pid;
 
     private List<Field<String>> affiliation;
 
@@ -49,11 +49,11 @@ public class Author implements Serializable {
         this.rank = rank;
     }
 
-    public List<KeyValue> getPid() {
+    public List<StructuredProperty> getPid() {
         return pid;
     }
 
-    public void setPid(List<KeyValue> pid) {
+    public void setPid(List<StructuredProperty> pid) {
         this.pid = pid;
     }
 
