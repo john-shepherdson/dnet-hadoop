@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.dnetlib.dhp</groupId>
     <artifactId>dhp</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
 
     <url>http://www.d-net.research-infrastructures.eu</url>
@@ -38,7 +38,7 @@
         <connection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</connection>
         <developerConnection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</developerConnection>
         <url>https://code-repo.d4science.org/D-Net/dnet-hadoop/</url>
-        <tag>HEAD</tag>
+        <tag>dhp-1.0.4</tag>
     </scm>
 
     <pluginRepositories>
