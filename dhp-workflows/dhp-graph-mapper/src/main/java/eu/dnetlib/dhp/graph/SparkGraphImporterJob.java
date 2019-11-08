@@ -41,7 +41,6 @@ public class SparkGraphImporterJob {
                     .map(Tuple2::_2)
                     .map(s -> new ObjectMapper().readValue(s, clazz))
                     .rdd(), Encoders.bean(clazz))
-                    .limit(1000)
                     .write()
                     .mode(SaveMode.Overwrite)
                     .saveAsTable(hiveDbName + "." + name);
