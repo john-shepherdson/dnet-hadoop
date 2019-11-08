@@ -10,6 +10,7 @@
     <artifactId>dhp-graph-mapper</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
@@ -19,17 +20,15 @@
             <artifactId>spark-sql_2.11</artifactId>
         </dependency>
 
-
-
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
-            <version>1.0.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-schemas</artifactId>
-            <version>1.0.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>
