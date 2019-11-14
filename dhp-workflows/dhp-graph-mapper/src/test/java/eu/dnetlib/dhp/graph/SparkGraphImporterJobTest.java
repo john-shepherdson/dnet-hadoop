@@ -35,5 +35,4 @@ public class SparkGraphImporterJobTest {
             //Assert.assertEquals(String.format("mapped %s must be %s", t._1(), MAX), MAX, t._2().longValue());
         });
     }
-
 }
