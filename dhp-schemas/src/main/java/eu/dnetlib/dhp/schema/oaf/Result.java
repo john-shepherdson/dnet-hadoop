@@ -45,6 +45,12 @@ public abstract class Result extends OafEntity implements Serializable {
 
     private List<Context> context;
 
+    // ( article | book ) processing charges. Defined here to cope with possible wrongly typed results
+    private Field<String> processingchargeamount;
+
+    // currency - alphabetic code describe in ISO-4217. Defined here to cope with possible wrongly typed results
+    private Field<String> processingchargecurrency;
+
     private List<ExternalReference> externalReference;
 
     private List<Instance> instance;
@@ -215,5 +221,23 @@ public abstract class Result extends OafEntity implements Serializable {
 
     public void setInstance(List<Instance> instance) {
         this.instance = instance;
+    }
+
+    public Field<String> getProcessingchargeamount() {
+        return processingchargeamount;
+    }
+
+    public Result setProcessingchargeamount(Field<String> processingchargeamount) {
+        this.processingchargeamount = processingchargeamount;
+        return this;
+    }
+
+    public Field<String> getProcessingchargecurrency() {
+        return processingchargecurrency;
+    }
+
+    public Result setProcessingchargecurrency(Field<String> processingchargecurrency) {
+        this.processingchargecurrency = processingchargecurrency;
+        return this;
     }
 }
