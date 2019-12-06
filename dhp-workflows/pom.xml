@@ -17,6 +17,7 @@
         <module>dhp-aggregation</module>
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
+        <module>dhp-dedup</module>
     </modules>
 
     <pluginRepositories>
@@ -309,6 +310,7 @@
                             </execution>
                         </executions>
                     </plugin>
+
 
                     <plugin>
                         <!-- this plugin prepares oozie installer package-->

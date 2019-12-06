@@ -114,6 +114,12 @@
                 <version>${dhp.spark.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-graphx_2.11</artifactId>
+                <version>${dhp.spark.version}</version>
+                <scope>provided</scope>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -177,6 +183,17 @@
                 <version>${dhp.jackson.version}</version>
                 <scope>provided</scope>
             </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${dhp.jackson.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+
+
+
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
@@ -188,6 +205,12 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>${dhp.jackson.version}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>dnet-pace-core</artifactId>
+                <version>4.0.0-SNAPSHOT</version>
             </dependency>
 
 
@@ -202,6 +225,16 @@
                 <groupId>com.rabbitmq</groupId>
                 <artifactId>amqp-client</artifactId>
                 <version>5.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>2.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.arakelian</groupId>
+                <artifactId>java-jq</artifactId>
+                <version>0.10.1</version>
             </dependency>
 
             <dependency>
@@ -255,27 +288,6 @@
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-                <plugin>
-                    <groupId>eu.dnetlib</groupId>
-                    <artifactId>protoc-jar-maven-plugin</artifactId>
-                    <version>1.1.0</version>
-                    <executions>
-                        <execution>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <protocVersion>${google.protobuf.version}</protocVersion>
-                                <inputDirectories>
-                                    <include>src/main/resources</include>
-                                </inputDirectories>
-                                <outputDirectory>src/gen/java</outputDirectory>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -341,6 +353,31 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>4.0.1</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                </configuration>
             </plugin>
         </plugins>
 
