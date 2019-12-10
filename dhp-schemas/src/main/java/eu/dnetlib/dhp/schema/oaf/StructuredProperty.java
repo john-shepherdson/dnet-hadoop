@@ -33,4 +33,28 @@ public class StructuredProperty implements Serializable {
     public void setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
     }
+
+    public String toComparableString(){
+        return String.format("%s::%s", value != null ? value.toLowerCase() : "", qualifier != null ? qualifier.toComparableString().toLowerCase() : "");
+    }
+
+    @Override
+    public int hashCode() {
+        return toComparableString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        StructuredProperty other = (StructuredProperty) obj;
+
+        return toComparableString()
+                .equals(other.toComparableString());
+    }
 }

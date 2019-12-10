@@ -73,7 +73,7 @@
             <!-- This profile sets properties that are required for test oozie workflows To be used only with 'oozie-package' profile -->
             <id>attach-test-resources</id>
             <properties>
-                <!--overriding default scope (set to 'runtime') with the 'test' value. Test resources attached to oozie package requires all test dependencies. -->
+                <!--overriding default scope (set to 'runtime') with the 'test' dedupId. Test resources attached to oozie package requires all test dependencies. -->
                 <oozie.package.dependencies.include.scope />
                 <oozie.package.dependencies.exclude.scope>provided</oozie.package.dependencies.exclude.scope>
                 <!-- Do not skip creation of test jar for priming (in oozie-package profile) -->
@@ -326,7 +326,7 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <property name="assembly-resources.loc" value="${maven.dependency.eu.dnetlib.dhp.dhp-build-assembly-resources.jar.path}" />
+                                        <property name="assembly-resources.loc" dedupId="${maven.dependency.eu.dnetlib.dhp.dhp-build-assembly-resources.jar.path}" />
                                         <unjar src="${assembly-resources.loc}" dest="${project.build.directory}/assembly-resources" />
                                     </tasks>
                                 </configuration>

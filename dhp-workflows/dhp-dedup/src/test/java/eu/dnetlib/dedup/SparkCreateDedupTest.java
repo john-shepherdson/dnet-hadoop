@@ -1,5 +1,7 @@
 package eu.dnetlib.dedup;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.schema.oaf.Publication;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -8,36 +10,37 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class SparkCreateDedupTest {
 
-
+    String configuration;
 
     @Before
     public void setUp() throws IOException {
-        FileUtils.deleteDirectory(new File("/tmp/pub_dedup_vertex"));
-        FileUtils.deleteDirectory(new File("/tmp/pub_dedup_rels"));
+        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/pub.curr.conf.json"));
+
     }
-
-
 
     @Test
     @Ignore
-    public void dedupTest() throws Exception {
-        final String configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org.curr.conf.json"));
-
-
+    public void createSimRelsTest() throws Exception {
         SparkCreateSimRels.main(new String[] {
                 "-mt", "local[*]",
-                "-s", "/home/sandro/betadump",
+                "-s", "/Users/miconis/dumps",
                 "-e", "publication",
                 "-c", configuration,
                 "-t", "/tmp/dedup",
         });
+    }
+
+    @Test
+    @Ignore
+    public void createCCTest() throws Exception {
 
         SparkCreateConnectedComponent.main(new String[] {
                 "-mt", "local[*]",
-                "-s", "/home/sandro/betadump",
+                "-s", "/Users/miconis/dumps",
                 "-e", "publication",
                 "-c", configuration,
                 "-t", "/tmp/dedup",
@@ -49,14 +52,10 @@ public class SparkCreateDedupTest {
     public void dedupRecordTest() throws Exception {
         SparkCreateDedupRecord.main(new String[] {
                 "-mt", "local[*]",
-                "-s", "/home/sandro/betadump",
+                "-s", "/Users/miconis/dumps",
                 "-e", "publication",
-                "-c", "configuration",
+                "-c", configuration,
                 "-t", "/tmp/dedup",
         });
     }
-
-
-
-
 }

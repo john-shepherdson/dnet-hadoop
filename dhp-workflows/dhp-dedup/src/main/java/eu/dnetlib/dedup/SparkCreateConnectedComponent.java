@@ -37,8 +37,8 @@ public class SparkCreateConnectedComponent {
         final String inputPath = parser.get("sourcePath");
         final String entity = parser.get("entity");
         final String targetPath = parser.get("targetPath");
-        final DedupConfig dedupConf = DedupConfig.load(IOUtils.toString(SparkCreateConnectedComponent.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf2.json")));
-
+//        final DedupConfig dedupConf = DedupConfig.load(IOUtils.toString(SparkCreateConnectedComponent.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf2.json")));
+        final DedupConfig dedupConf = DedupConfig.load(parser.get("dedupConf"));
 
         final JavaPairRDD<Object, String> vertexes = sc.textFile(inputPath + "/" + entity)
                 .map(s -> MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), s))

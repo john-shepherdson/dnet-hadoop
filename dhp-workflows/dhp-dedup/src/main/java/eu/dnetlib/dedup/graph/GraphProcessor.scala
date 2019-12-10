@@ -1,7 +1,5 @@
 package eu.dnetlib.dedup.graph
 
-
-import eu.dnetlib.pace.model.MapDocument
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
 
@@ -25,7 +23,7 @@ object GraphProcessor {
     }
     val connectedComponents = joinResult.groupByKey()
       .map[ConnectedComponent](cc => asConnectedComponent(cc))
-    (connectedComponents)
+    connectedComponents
   }
 
 

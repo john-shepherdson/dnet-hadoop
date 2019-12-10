@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RESOURCE_PROFILE>
     <HEADER>
-        <RESOURCE_IDENTIFIER value="d6fa79f2-486e-482d-b37c-62129af2cd9a_VHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZXMvVHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZVR5cGU="/>
-        <RESOURCE_TYPE value="TransformationRuleDSResourceType"/>
-        <RESOURCE_KIND value="TransformationRuleDSResources"/>
-        <RESOURCE_URI value=""/>
-        <DATE_OF_CREATION value="2019-04-11T11:15:30+00:00"/>
+        <RESOURCE_IDENTIFIER dedupId="d6fa79f2-486e-482d-b37c-62129af2cd9a_VHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZXMvVHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZVR5cGU="/>
+        <RESOURCE_TYPE dedupId="TransformationRuleDSResourceType"/>
+        <RESOURCE_KIND dedupId="TransformationRuleDSResources"/>
+        <RESOURCE_URI dedupId=""/>
+        <DATE_OF_CREATION dedupId="2019-04-11T11:15:30+00:00"/>
     </HEADER>
     <BODY>
         <CONFIGURATION>
@@ -24,7 +24,7 @@
                                 <xsl:copy-of select="//oai:header"/>
                                 <metadata>
                                     <xsl:for-each select="//*[local-name()='subject']">
-                                        <subject><xsl:value-of select="eg:clean(.,'dnet:languages')"/></subject>
+                                        <subject><xsl:dedupId-of select="eg:clean(.,'dnet:languages')"/></subject>
                                     </xsl:for-each>
                                 </metadata>
                                 <oaf:about>

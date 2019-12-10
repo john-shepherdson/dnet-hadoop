@@ -7,7 +7,7 @@
     "queueMaxSize": "2000",
     "groupMaxSize": "50",
     "slidingWindowSize": "200",
-    "idPath": "$.id",
+    "idPath": ".id",
     "rootBuilder": [
       "organization",
       "projectOrganization_participation_isParticipant",
@@ -117,14 +117,6 @@
           "host": 0.5,
           "path": 0.5
         }
-      },
-      {
-        "name": "gridid",
-        "algo": "Null",
-        "type": "String",
-        "weight": "0.0",
-        "ignoreMissing": "true",
-        "path": ".pid[] | select(.qualifier.classid==\"grid\") | .value"
       }
     ],
     "blacklists": {

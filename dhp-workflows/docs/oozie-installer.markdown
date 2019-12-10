@@ -54,7 +54,7 @@ Properties overriding order is the following:
 2. `~/.dhp/application.properties` defined properties
 3. `${workflow.source.dir}/job.properties`
 4. `job-override.properties` (located in the project root dir)
-5. `maven -Dparam=value`
+5. `maven -Dparam=dedupId`
 
 where the maven `-Dparam` property is overriding all the other ones.
 
@@ -73,7 +73,7 @@ Workflow definition requirements
 
 This property can be set using maven `-D` switch.
 
-`[oozie_app]` is the default directory name however it can be set to any value as soon as `oozieAppDir` property is provided with directory name as value. 
+`[oozie_app]` is the default directory name however it can be set to any dedupId as soon as `oozieAppDir` property is provided with directory name as dedupId.
 
 Subworkflows are supported as well and subworkflow directories should be nested within `[oozie_app]` directory. 
 

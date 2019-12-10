@@ -1,7 +1,8 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class OafEntity extends Oaf implements Serializable {
 
@@ -84,4 +85,32 @@ public abstract class OafEntity extends Oaf implements Serializable {
     public void setOaiprovenance(OAIProvenance oaiprovenance) {
         this.oaiprovenance = oaiprovenance;
     }
+
+    public void mergeFrom(OafEntity e) {
+
+        if (e == null)
+            return;
+
+        originalId = mergeLists(originalId, e.getOriginalId());
+
+        collectedfrom = mergeLists(collectedfrom, e.getCollectedfrom());
+
+        pid = mergeLists(pid, e.getPid());
+
+        dateofcollection = e.getDateofcollection();
+
+        dateoftransformation = e.getDateoftransformation();
+
+        extraInfo = mergeLists(extraInfo, e.getExtraInfo());
+
+        oaiprovenance = e.getOaiprovenance();
+
+    }
+
+    protected <T> List<T> mergeLists(final List<T>... lists) {
+
+        return Arrays.stream(lists).filter(Objects::nonNull).flatMap(List::stream).distinct().collect(Collectors.toList());
+    }
+
+
 }
