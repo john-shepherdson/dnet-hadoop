@@ -3,10 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class Result extends OafEntity implements Serializable {
@@ -253,11 +250,6 @@ public abstract class Result extends OafEntity implements Serializable {
 
         Result r = (Result) e;
 
-
-
-        //TODO mergeFrom is used only for create Dedup Records since the creation of these two fields requires more complex functions (maybe they will be filled in an external function)
-//        dateofacceptance = r.getDateofacceptance();
-
         instance = mergeLists(instance, r.getInstance());
 
         if (r.getResulttype() != null)
@@ -274,7 +266,7 @@ public abstract class Result extends OafEntity implements Serializable {
 
         relevantdate = mergeLists(relevantdate, r.getRelevantdate());
 
-        description = mergeLists(description, r.getDescription());
+        description = longestLists(description, r.getDescription());
 
         if (r.getPublisher() != null)
             publisher = r.getPublisher();
@@ -308,6 +300,17 @@ public abstract class Result extends OafEntity implements Serializable {
 
         externalReference = mergeLists(externalReference, r.getExternalReference());
 
+    }
+
+    private List<Field<String>> longestLists(List<Field<String>> a, List<Field<String>> b) {
+        if(a == null || b == null)
+            return a==null?b:a;
+        if (a.size()== b.size()) {
+            int msa = a.stream().filter(i -> i.getValue() != null).map(i -> i.getValue().length()).max(Comparator.naturalOrder()).orElse(0);
+            int msb = b.stream().filter(i -> i.getValue() != null).map(i -> i.getValue().length()).max(Comparator.naturalOrder()).orElse(0);
+            return  msa>msb?a:b;
+        }
+        return a.size()> b.size()?a:b;
     }
 
 

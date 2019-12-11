@@ -7,7 +7,7 @@
     "queueMaxSize": "2000",
     "groupMaxSize": "50",
     "slidingWindowSize": "200",
-    "idPath": ".id",
+    "idPath": "$.id",
     "rootBuilder": [
       "organization",
       "projectOrganization_participation_isParticipant",
@@ -84,7 +84,7 @@
         "type": "String",
         "weight": "0",
         "ignoreMissing": "false",
-        "path": ".country.classid"
+        "path": "$.country.classid"
       },
       {
         "name": "legalshortname",
@@ -92,7 +92,7 @@
         "type": "String",
         "weight": "0.1",
         "ignoreMissing": "true",
-        "path": ".legalshortname.value"
+        "path": "$.legalshortname.value"
       },
       {
         "name": "legalname",
@@ -100,7 +100,7 @@
         "type": "String",
         "weight": "0.9",
         "ignoreMissing": "false",
-        "path": ".legalname.value",
+        "path": "$.legalname.value",
         "params": {
           "windowSize": 4,
           "threshold": 0.7
@@ -112,11 +112,19 @@
         "type": "URL",
         "weight": "0",
         "ignoreMissing": "true",
-        "path": ".websiteurl.value",
+        "path": "$.websiteurl.value",
         "params": {
           "host": 0.5,
           "path": 0.5
         }
+      },
+      {
+        "name": "gridid",
+        "algo": "Null",
+        "type": "String",
+        "weight": "0.0",
+        "ignoreMissing": "true",
+        "path": "$.pid[?(@.qualifier.classid ==\"grid\")].value"
       }
     ],
     "blacklists": {

@@ -164,4 +164,27 @@ public class Organization extends OafEntity implements Serializable {
     public void setCountry(Qualifier country) {
         this.country = country;
     }
+
+
+    @Override
+    public void mergeFrom(OafEntity e) {
+        super.mergeFrom(e);
+        final Organization o = (Organization) e;
+        legalshortname = o.getLegalshortname() != null ? o.getLegalshortname() : legalshortname;
+        legalname = o.getLegalname() != null ? o.getLegalname() : legalname;
+        alternativeNames = mergeLists(o.getAlternativeNames(), alternativeNames);
+        websiteurl = o.getWebsiteurl() != null ? o.getWebsiteurl() : websiteurl;
+        logourl = o.getLogourl() != null ? o.getLogourl() : logourl;
+        eclegalbody = o.getEclegalbody() != null ? o.getEclegalbody() : eclegalbody;
+        eclegalperson = o.getEclegalperson() != null ? o.getEclegalperson() : eclegalperson;
+        ecnonprofit = o.getEcnonprofit() != null ? o.getEcnonprofit() : ecnonprofit;
+        ecresearchorganization = o.getEcresearchorganization() != null ? o.getEcresearchorganization() : ecresearchorganization;
+        echighereducation = o.getEchighereducation() != null ? o.getEchighereducation() : echighereducation;
+        ecinternationalorganizationeurinterests = o.getEcinternationalorganizationeurinterests() != null ? o.getEcinternationalorganizationeurinterests() : ecinternationalorganizationeurinterests;
+        ecinternationalorganization = o.getEcinternationalorganization() != null ? o.getEcinternationalorganization() : ecinternationalorganization;
+        ecenterprise = o.getEcenterprise() != null ? o.getEcenterprise() :ecenterprise;
+        ecsmevalidated = o.getEcsmevalidated() != null ? o.getEcsmevalidated() :ecsmevalidated;
+        ecnutscode = o.getEcnutscode() != null ? o.getEcnutscode() :ecnutscode;
+        country = o.getCountry() != null ? o.getCountry() :country;
+    }
 }

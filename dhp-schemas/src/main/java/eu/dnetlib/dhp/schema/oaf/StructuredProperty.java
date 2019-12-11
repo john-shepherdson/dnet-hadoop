@@ -35,7 +35,7 @@ public class StructuredProperty implements Serializable {
     }
 
     public String toComparableString(){
-        return String.format("%s::%s", value != null ? value.toLowerCase() : "", qualifier != null ? qualifier.toComparableString().toLowerCase() : "");
+        return  value != null ? value.toLowerCase() : "";
     }
 
     @Override

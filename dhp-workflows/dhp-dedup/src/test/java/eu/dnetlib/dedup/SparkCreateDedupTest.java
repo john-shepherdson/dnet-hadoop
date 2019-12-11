@@ -16,10 +16,11 @@ import java.util.List;
 public class SparkCreateDedupTest {
 
     String configuration;
+    String entity = "organization";
 
     @Before
     public void setUp() throws IOException {
-        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/pub.curr.conf.json"));
+        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org.curr.conf.json"));
 
     }
 
@@ -29,7 +30,7 @@ public class SparkCreateDedupTest {
         SparkCreateSimRels.main(new String[] {
                 "-mt", "local[*]",
                 "-s", "/home/sandro/betadump",
-                "-e", "publication",
+                "-e", entity,
                 "-c", ArgumentApplicationParser.compressArgument(configuration),
                 "-t", "/tmp/dedup",
         });
@@ -42,7 +43,7 @@ public class SparkCreateDedupTest {
         SparkCreateConnectedComponent.main(new String[] {
                 "-mt", "local[*]",
                 "-s", "/home/sandro/betadump",
-                "-e", "publication",
+                "-e", entity,
                 "-c", ArgumentApplicationParser.compressArgument(configuration),
                 "-t", "/tmp/dedup",
         });
@@ -54,7 +55,7 @@ public class SparkCreateDedupTest {
         SparkCreateDedupRecord.main(new String[] {
                 "-mt", "local[*]",
                 "-s", "/home/sandro/betadump",
-                "-e", "publication",
+                "-e", entity,
                 "-c", ArgumentApplicationParser.compressArgument(configuration),
                 "-d", "/tmp/dedup",
         });
