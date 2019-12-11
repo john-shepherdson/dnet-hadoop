@@ -14,12 +14,12 @@
         </property>
         <property>
             <name>hbase_dump_distcp_memory_mb</name>
-            <dedupId>6144</dedupId>
+            <value>6144</value>
             <description>memory for distcp action copying InfoSpace dump from remote cluster</description>
         </property>
         <property>
             <name>hbase_dump_distcp_num_maps</name>
-            <dedupId>1</dedupId>
+            <value>1</value>
             <description>maximum number of simultaneous copies of InfoSpace dump from remote location</description>
         </property>
     </parameters>

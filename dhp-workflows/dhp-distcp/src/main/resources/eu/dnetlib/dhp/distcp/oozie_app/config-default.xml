@@ -1,18 +1,18 @@
 <configuration>
     <property>
         <name>jobTracker</name>
-        <dedupId>yarnRM</dedupId>
+        <value>yarnRM</value>
     </property>
     <property>
         <name>nameNode</name>
-        <dedupId>hdfs://nameservice1</dedupId>
+        <value>hdfs://nameservice1</value>
     </property>
     <property>
         <name>sourceNN</name>
-        <dedupId>webhdfs://namenode2.hadoop.dm.openaire.eu:50071</dedupId>
+        <value>webhdfs://namenode2.hadoop.dm.openaire.eu:50071</value>
     </property>
     <property>
         <name>oozie.use.system.libpath</name>
-        <dedupId>true</dedupId>
+        <value>true</value>
     </property>
 </configuration>

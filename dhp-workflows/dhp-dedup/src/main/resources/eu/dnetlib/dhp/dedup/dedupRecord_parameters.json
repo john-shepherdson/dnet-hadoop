@@ -25,9 +25,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "t",
-    "paramLongName": "targetPath",
-    "paramDescription": "target path to save dedup result",
+    "paramName": "d",
+    "paramLongName": "dedupPath",
+    "paramDescription": "dedup path to load mergeRelation",
     "paramRequired": true
   }
 ]

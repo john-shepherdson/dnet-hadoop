@@ -236,6 +236,11 @@
                 <artifactId>java-jq</artifactId>
                 <version>0.10.1</version>
             </dependency>
+            <dependency>
+                <groupId>edu.cmu</groupId>
+                <artifactId>secondstring</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.oozie</groupId>

@@ -84,4 +84,31 @@ public class Instance implements Serializable {
     public void setDateofacceptance(Field<String> dateofacceptance) {
         this.dateofacceptance = dateofacceptance;
     }
+    public String toComparableString(){
+        return String.format("%s::%s::%s::%s",
+                hostedby != null && hostedby.getKey()!= null  ? hostedby.getKey().toLowerCase() : "",
+                accessright!= null && accessright.getClassid()!= null ? accessright.getClassid() : "",
+                instancetype!= null && instancetype.getClassid()!= null ? instancetype.getClassid() : "",
+                url != null ? url:"");
+    }
+
+    @Override
+    public int hashCode() {
+        return toComparableString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        Instance other = (Instance) obj;
+
+        return toComparableString()
+                .equals(other.toComparableString());
+    }
 }

@@ -1,6 +1,7 @@
 package eu.dnetlib.dedup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -27,9 +28,9 @@ public class SparkCreateDedupTest {
     public void createSimRelsTest() throws Exception {
         SparkCreateSimRels.main(new String[] {
                 "-mt", "local[*]",
-                "-s", "/Users/miconis/dumps",
+                "-s", "/home/sandro/betadump",
                 "-e", "publication",
-                "-c", configuration,
+                "-c", ArgumentApplicationParser.compressArgument(configuration),
                 "-t", "/tmp/dedup",
         });
     }
@@ -40,9 +41,9 @@ public class SparkCreateDedupTest {
 
         SparkCreateConnectedComponent.main(new String[] {
                 "-mt", "local[*]",
-                "-s", "/Users/miconis/dumps",
+                "-s", "/home/sandro/betadump",
                 "-e", "publication",
-                "-c", configuration,
+                "-c", ArgumentApplicationParser.compressArgument(configuration),
                 "-t", "/tmp/dedup",
         });
     }
@@ -52,10 +53,18 @@ public class SparkCreateDedupTest {
     public void dedupRecordTest() throws Exception {
         SparkCreateDedupRecord.main(new String[] {
                 "-mt", "local[*]",
-                "-s", "/Users/miconis/dumps",
+                "-s", "/home/sandro/betadump",
                 "-e", "publication",
-                "-c", configuration,
-                "-t", "/tmp/dedup",
+                "-c", ArgumentApplicationParser.compressArgument(configuration),
+                "-d", "/tmp/dedup",
         });
     }
+
+    @Test
+    public void printCC() throws Exception {
+        System.out.println(ArgumentApplicationParser.compressArgument(configuration));
+    }
+
+
+
 }

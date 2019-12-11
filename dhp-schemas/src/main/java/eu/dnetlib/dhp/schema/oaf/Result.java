@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public abstract class Result extends OafEntity implements Serializable {
 
@@ -251,13 +253,12 @@ public abstract class Result extends OafEntity implements Serializable {
 
         Result r = (Result) e;
 
-        mergeAuthors(r.getAuthor());
+
 
         //TODO mergeFrom is used only for create Dedup Records since the creation of these two fields requires more complex functions (maybe they will be filled in an external function)
-//        if (author == null)
-//            author = r.getAuthor(); //authors will be replaced because they could be too much
 //        dateofacceptance = r.getDateofacceptance();
-//        instance = mergeLists(instance, r.getInstance());
+
+        instance = mergeLists(instance, r.getInstance());
 
         if (r.getResulttype() != null)
             resulttype = r.getResulttype();
@@ -309,80 +310,5 @@ public abstract class Result extends OafEntity implements Serializable {
 
     }
 
-    public void mergeAuthors(List<Author> authors){
-        int c1 = countAuthorsPids(author);
-        int c2 = countAuthorsPids(authors);
-        int s1 = authorsSize(author);
-        int s2 = authorsSize(authors);
 
-
-        //if both have no authors with pids and authors is bigger than author
-        if (c1 == 0 && c2 == 0 && author.size()<authors.size()) {
-            author = authors;
-            return;
-        }
-
-        //author is null and authors have 0 or more authors with pids
-        if (c1<c2 && c1<0) {
-            author = authors;
-            return;
-        }
-
-        //andiamo a mangiare
-
-
-//        if (author == null && authors == null)
-//            return;
-//
-//        int c1 = countAuthorsPids(author);
-//        int c2 = countAuthorsPids(authors);
-//
-//        if (c1<c2 && c1<1){
-//            author = authors;
-//            return;
-//        }
-//
-//        if (c1<c2)
-
-
-
-
-
-
-    }
-
-    public int countAuthorsPids(List<Author> authors){
-        if (authors == null)
-            return -1;
-
-        return (int) authors.stream().map(this::extractAuthorPid).filter(Objects::nonNull).filter(StringUtils::isNotBlank).count();
-    }
-
-    public int authorsSize(List<Author> authors){
-        if (authors == null)
-            return 0;
-        return authors.size();
-    }
-
-    public String extractAuthorPid(Author a){
-
-        if(a == null || a.getPid() == null || a.getPid().size() == 0)
-            return null;
-
-        StringBuilder mainPid = new StringBuilder();
-
-        a.getPid().forEach(pid ->{
-            if (pid.getQualifier().getClassid().equalsIgnoreCase("orcid")) {
-                mainPid.setLength(0);
-                mainPid.append(pid.getValue());
-            }
-            else {
-                if(mainPid.length() == 0)
-                    mainPid.append(pid.getValue());
-            }
-        });
-
-        return mainPid.toString();
-
-    }
 }

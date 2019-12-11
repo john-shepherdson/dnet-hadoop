@@ -18,4 +18,5 @@
 /*/build
 /build
 spark-warehouse
-/dhp-workflows/dhp-graph-mapper/job-override.properties
+/*/*/job-override.properties
+

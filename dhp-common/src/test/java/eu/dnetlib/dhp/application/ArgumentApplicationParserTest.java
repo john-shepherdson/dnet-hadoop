@@ -3,6 +3,10 @@ package eu.dnetlib.dhp.application;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
+import java.util.zip.GZIPOutputStream;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -24,6 +28,7 @@ public class ArgumentApplicationParserTest {
                 "-ro", "value7",
                 "-rr", "value8",
                 "-w", "value9",
+                "-cc", ArgumentApplicationParser.compressArgument(jsonConfiguration)
         });
         assertNotNull(parser.get("hdfsPath"));
         assertNotNull(parser.get("apidescriptor"));
@@ -45,7 +50,12 @@ public class ArgumentApplicationParserTest {
         assertEquals("value7", parser.get("rabbitOngoingQueue"));
         assertEquals("value8", parser.get("rabbitReportQueue"));
         assertEquals("value9", parser.get("workflowId"));
+        assertEquals(jsonConfiguration, parser.get("ccCoco"));
     }
+
+
+
+
 
 
 }

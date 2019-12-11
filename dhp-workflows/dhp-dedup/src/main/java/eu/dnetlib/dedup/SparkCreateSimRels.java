@@ -77,7 +77,7 @@ public class SparkCreateSimRels {
             return r;
         });
 
-        spark.createDataset(isSimilarToRDD.rdd(), Encoders.bean(Relation.class)).write().mode("overwrite").save(targetPath+"/"+entity+"_simrel");
+        spark.createDataset(isSimilarToRDD.rdd(), Encoders.bean(Relation.class)).write().mode("overwrite").save( DedupUtility.createSimRelPath(targetPath,entity));
 
 
 

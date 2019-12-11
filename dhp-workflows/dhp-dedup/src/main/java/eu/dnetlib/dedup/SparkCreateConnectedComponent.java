@@ -46,7 +46,7 @@ public class SparkCreateConnectedComponent {
                         s -> new Tuple2<Object, String>((long) s.hashCode(), s)
                 );
 
-        final Dataset<Relation> similarityRelations = spark.read().load(targetPath + "/" + entity+"_simrel").as(Encoders.bean(Relation.class));
+        final Dataset<Relation> similarityRelations = spark.read().load(DedupUtility.createSimRelPath(targetPath,entity)).as(Encoders.bean(Relation.class));
 
 
         final RDD<Edge<String>> edgeRdd = similarityRelations.javaRDD().map(it -> new Edge<>(it.getSource().hashCode(), it.getTarget().hashCode(), it.getRelClass())).rdd();
@@ -73,7 +73,7 @@ public class SparkCreateConnectedComponent {
                             return tmp.stream();
                         }).iterator()).rdd(), Encoders.bean(Relation.class));
 
-        mergeRelation.write().mode("overwrite").save(targetPath+"/"+entity+"_mergeRels");
+        mergeRelation.write().mode("overwrite").save(DedupUtility.createMergeRelPath(targetPath,entity));
 
 
     }

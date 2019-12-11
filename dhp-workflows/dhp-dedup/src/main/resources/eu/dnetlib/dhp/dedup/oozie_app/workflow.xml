@@ -93,6 +93,31 @@
             <arg>--entity</arg><arg>${entity}</arg>
             <arg>--dedupConf</arg><arg>${dedupConf}</arg>
         </spark>
+        <ok to="CreateDedupRecord"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateDedupRecord">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Connected Components</name>
+            <class>eu.dnetlib.dedup.SparkCreateDedupRecord</class>
+            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory} --conf
+                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
+                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
+                spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--dedupPath</arg><arg>${dedupPath}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--dedupConf</arg><arg>${dedupConf}</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
