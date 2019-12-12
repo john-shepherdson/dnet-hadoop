@@ -109,58 +109,26 @@ public class DedupUtility {
         int sa = authorsSize(a);
         int sb = authorsSize(b);
 
-        if(pa == pb){
-            base = sa>sb?a:b;
-            enrich = sa>sb?b:a;
+        if (pa == pb) {
+            base = sa > sb ? a : b;
+            enrich = sa > sb ? b : a;
         } else {
-            base = pa>pb?a:b;
-            enrich = pa>pb?b:a;
+            base = pa > pb ? a : b;
+            enrich = pa > pb ? b : a;
         }
         enrichPidFromList(base, enrich);
         return base;
-
-
-
-//        //if both have no authors with pids
-//        if (pa < 1 && pb < 1) {
-//            //B is bigger than A
-//            if (sa < sb)
-//                return b;
-//                //A is bigger than B
-//            else
-//                return a;
-//        }
-//        //If A has author with pids
-//        if (pa > 0) {
-//            //B has no author with pid
-//            if (pb < 1)
-//                return a;
-//                //B has author with pid
-//            else {
-//                enrichPidFromList(a, b);
-//                return a;
-//            }
-//        }
-//        //If B has author with pids
-//        //A has no author with pid
-//        if (pa < 1)
-//            return b;
-//            //A has author with pid
-//        else {
-//            enrichPidFromList(b, a);
-//            return b;
-//        }
     }
 
     private static void enrichPidFromList(List<Author> base, List<Author> enrich) {
-        if(base==null || enrich == null)
+        if (base == null || enrich == null)
             return;
         final Map<String, Author> basePidAuthorMap = base.stream()
                 .filter(a -> a.getPid() != null && a.getPid().size() > 0)
                 .flatMap(a -> a.getPid()
                         .stream()
                         .map(p -> new Tuple2<>(p.toComparableString(), a))
-                ).collect(Collectors.toMap(Tuple2::_1, Tuple2::_2));
+                ).collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
         final List<Tuple2<StructuredProperty, Author>> pidToEnrich = enrich
                 .stream()
@@ -171,7 +139,7 @@ public class DedupUtility {
 
         pidToEnrich.forEach(a -> {
             Optional<Tuple2<Double, Author>> simAuhtor = base.stream().map(ba -> new Tuple2<>(sim(ba, a._2()), ba)).max(Comparator.comparing(Tuple2::_1));
-            if (simAuhtor.isPresent() && simAuhtor.get()._1()> THRESHOLD) {
+            if (simAuhtor.isPresent() && simAuhtor.get()._1() > THRESHOLD) {
                 Author r = simAuhtor.get()._2();
                 r.getPid().add(a._1());
             }
@@ -179,15 +147,15 @@ public class DedupUtility {
     }
 
     public static String createEntityPath(final String basePath, final String entityType) {
-        return String.format("%s/%s", basePath,entityType);
+        return String.format("%s/%s", basePath, entityType);
     }
 
     public static String createSimRelPath(final String basePath, final String entityType) {
-        return String.format("%s/%s_simRel", basePath,entityType);
+        return String.format("%s/%s_simRel", basePath, entityType);
     }
 
     public static String createMergeRelPath(final String basePath, final String entityType) {
-        return String.format("%s/%s_mergeRel", basePath,entityType);
+        return String.format("%s/%s_mergeRel", basePath, entityType);
     }
 
     private static Double sim(Author a, Author b) {
@@ -220,6 +188,7 @@ public class DedupUtility {
     private static String nfd(final String s) {
         return Normalizer.normalize(s, Normalizer.Form.NFD);
     }
+
     private static Person parse(Author author) {
         if (StringUtils.isNotBlank(author.getSurname())) {
             return new Person(author.getSurname() + ", " + author.getName(), false);
@@ -233,7 +202,7 @@ public class DedupUtility {
         if (authors == null)
             return 0;
 
-        return (int) authors.stream().map(DedupUtility::extractAuthorPid).filter(Objects::nonNull).filter(StringUtils::isNotBlank).count();
+        return (int) authors.stream().filter(DedupUtility::hasPid).count();
     }
 
     private static int authorsSize(List<Author> authors) {
@@ -242,29 +211,9 @@ public class DedupUtility {
         return authors.size();
     }
 
-
-    private static boolean isAccurate(final Author a) {
-        return StringUtils.isNotBlank(a.getName()) && StringUtils.isNotBlank(a.getSurname());
-    }
-
-    private static String extractAuthorPid(Author a) {
-
+    private static boolean hasPid(Author a) {
         if (a == null || a.getPid() == null || a.getPid().size() == 0)
-            return null;
-
-        StringBuilder mainPid = new StringBuilder();
-
-        a.getPid().forEach(pid -> {
-            if (pid.getQualifier().getClassid().equalsIgnoreCase("orcid")) {
-                mainPid.setLength(0);
-                mainPid.append(pid.getValue());
-            } else {
-                if (mainPid.length() == 0)
-                    mainPid.append(pid.getValue());
-            }
-        });
-
-        return mainPid.toString();
-
+            return false;
+        return a.getPid().stream().anyMatch(p -> p != null && StringUtils.isNotBlank(p.getValue()));
     }
 }

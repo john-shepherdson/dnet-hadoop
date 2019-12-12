@@ -21,8 +21,9 @@ public class Publication extends Result implements Serializable {
 
         Publication p = (Publication) e;
 
-        if (p.getJournal() != null)
+        if (p.getJournal() != null && compareTrust(this, e)<0)
             journal = p.getJournal();
+        mergeOAFDataInfo(e);
     }
 
 

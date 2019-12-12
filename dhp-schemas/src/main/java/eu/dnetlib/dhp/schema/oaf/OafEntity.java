@@ -86,6 +86,7 @@ public abstract class OafEntity extends Oaf implements Serializable {
         this.oaiprovenance = oaiprovenance;
     }
 
+
     public void mergeFrom(OafEntity e) {
 
         if (e == null)
@@ -97,13 +98,16 @@ public abstract class OafEntity extends Oaf implements Serializable {
 
         pid = mergeLists(pid, e.getPid());
 
-        dateofcollection = e.getDateofcollection();
+        if (e.getDateofcollection() != null && compareTrust(this, e) < 0)
+            dateofcollection = e.getDateofcollection();
 
-        dateoftransformation = e.getDateoftransformation();
+        if (e.getDateoftransformation() != null && compareTrust(this, e) < 0)
+            dateoftransformation = e.getDateoftransformation();
 
         extraInfo = mergeLists(extraInfo, e.getExtraInfo());
 
-        oaiprovenance = e.getOaiprovenance();
+        if (e.getOaiprovenance() != null && compareTrust(this, e) < 0)
+            oaiprovenance = e.getOaiprovenance();
 
     }
 

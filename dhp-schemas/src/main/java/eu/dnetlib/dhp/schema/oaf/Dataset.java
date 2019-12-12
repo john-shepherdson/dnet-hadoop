@@ -19,7 +19,7 @@ public class Dataset extends Result implements Serializable {
 
     private List<GeoLocation> geolocation;
 
-    public Field<String> getStoragedate() {
+    public  Field<String> getStoragedate() {
         return storagedate;
     }
 
@@ -73,5 +73,27 @@ public class Dataset extends Result implements Serializable {
 
     public void setGeolocation(List<GeoLocation> geolocation) {
         this.geolocation = geolocation;
+    }
+
+    @Override
+    public void mergeFrom(OafEntity e) {
+        super.mergeFrom(e);
+        final Dataset d = (Dataset) e;
+
+        storagedate = d.getStoragedate() != null && compareTrust(this, e)<0? d.getStoragedate() : storagedate;
+
+        device= d.getDevice() != null && compareTrust(this, e)<0? d.getDevice() : device;
+
+        size= d.getSize() != null && compareTrust(this, e)<0? d.getSize() : size;
+
+        version= d.getVersion() != null && compareTrust(this, e)<0? d.getVersion() : version;
+
+        lastmetadataupdate= d.getLastmetadataupdate() != null && compareTrust(this, e)<0? d.getLastmetadataupdate() :lastmetadataupdate;
+
+        metadataversionnumber= d.getMetadataversionnumber() != null && compareTrust(this, e)<0? d.getMetadataversionnumber() : metadataversionnumber;
+
+        geolocation = mergeLists(geolocation, d.getGeolocation());
+
+        mergeOAFDataInfo(d);
     }
 }

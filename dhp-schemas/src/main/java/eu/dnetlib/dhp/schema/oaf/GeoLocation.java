@@ -33,4 +33,29 @@ public class GeoLocation implements Serializable {
     public void setPlace(String place) {
         this.place = place;
     }
+
+
+    public String toComparableString() {
+        return String.format("%s::%s%s", point != null ? point.toLowerCase() : "", box != null ? box.toLowerCase() : "",place != null ? place.toLowerCase() : "");
+    }
+
+    @Override
+    public int hashCode() {
+        return toComparableString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        GeoLocation other = (GeoLocation) obj;
+
+        return toComparableString()
+                .equals(other.toComparableString());
+    }
 }

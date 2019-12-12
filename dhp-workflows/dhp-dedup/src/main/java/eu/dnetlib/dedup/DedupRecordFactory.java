@@ -24,6 +24,8 @@ public class DedupRecordFactory {
 
     public static JavaRDD<OafEntity> createDedupRecord(final JavaSparkContext sc, final SparkSession spark, final String mergeRelsInputPath, final String entitiesInputPath, final OafEntityType entityType, final DedupConfig dedupConf) {
 
+
+        long ts = System.currentTimeMillis();
         //<id, json_entity>
         final JavaPairRDD<String, String> inputJsonEntities = sc.textFile(entitiesInputPath)
                 .mapToPair((PairFunction<String, String, String>) it ->
@@ -43,57 +45,31 @@ public class DedupRecordFactory {
         //<dedup_id, json_entity_merged>
         final JavaPairRDD<String, String> joinResult = mergeRels.join(inputJsonEntities).mapToPair((PairFunction<Tuple2<String, Tuple2<String, String>>, String, String>) Tuple2::_2);
 
-        JavaPairRDD<OafKey, String> keyJson = joinResult.mapToPair((PairFunction<Tuple2<String, String>, OafKey, String>) json -> {
-
-            String idValue = json._1();
-
-            String trust = "";
-            try {
-                trust = MapDocumentUtil.getJPathString("$.dataInfo.trust", json._2());
-            } catch (Throwable e) {
-
-            }
-
-            //TODO remember to replace this with the actual trust retrieving
-            if (StringUtils.isBlank(trust)) {
-                Random generator = new Random();
-                int number = generator.nextInt(20);
-                double result = (number / 100.0) + 0.80;
-                trust = "" + result;
-            }
-
-            return new Tuple2<OafKey, String>(new OafKey(idValue, trust), json._2());
-        });
-
-        OafComparator c = new OafComparator();
-        //<dedup_id, mergedRecordsSortedByTrust>
-        JavaPairRDD<String, Iterable<String>> sortedJoinResult = keyJson.repartitionAndSortWithinPartitions(new OafPartitioner(keyJson.getNumPartitions()), c)
-                .mapToPair((PairFunction<Tuple2<OafKey, String>, String, String>) t -> new Tuple2<String, String>(t._1().getDedupId(), t._2()))
-                .groupByKey();
-
+        JavaPairRDD<String, Iterable<String>> sortedJoinResult = joinResult.groupByKey();
 
         switch (entityType) {
             case publication:
-                return sortedJoinResult.map(DedupRecordFactory::publicationMerger);
+
+                return sortedJoinResult.map(p->DedupRecordFactory.publicationMerger(p, ts));
             case dataset:
-                return sortedJoinResult.map(DedupRecordFactory::datasetMerger);
+                return sortedJoinResult.map(d->DedupRecordFactory.datasetMerger(d,ts));
             case project:
-                return sortedJoinResult.map(DedupRecordFactory::projectMerger);
+                return sortedJoinResult.map(p->DedupRecordFactory.projectMerger(p,ts));
             case software:
-                return sortedJoinResult.map(DedupRecordFactory::softwareMerger);
+                return sortedJoinResult.map(s->DedupRecordFactory.softwareMerger(s,ts));
             case datasource:
-                return sortedJoinResult.map(DedupRecordFactory::datasourceMerger);
+                return sortedJoinResult.map(d->DedupRecordFactory.datasourceMerger(d,ts));
             case organization:
-                return sortedJoinResult.map(DedupRecordFactory::organizationMerger);
+                return sortedJoinResult.map(o->DedupRecordFactory.organizationMerger(o,ts));
             case otherresearchproduct:
-                return sortedJoinResult.map(DedupRecordFactory::otherresearchproductMerger);
+                return sortedJoinResult.map(o->DedupRecordFactory.otherresearchproductMerger(o,ts));
             default:
                 return null;
         }
 
     }
 
-    private static Publication publicationMerger(Tuple2<String, Iterable<String>> e) {
+    private static Publication publicationMerger(Tuple2<String, Iterable<String>> e, final long ts) {
 
         Publication p = new Publication(); //the result of the merge, to be returned at the end
 
@@ -103,19 +79,11 @@ public class DedupRecordFactory {
 
         final Collection<String> dateofacceptance = Lists.newArrayList();
 
-
-        StringBuilder trust = new StringBuilder("0.0");
-
         if (e._2() != null)
             e._2().forEach(pub -> {
                 try {
                     Publication publication = mapper.readValue(pub, Publication.class);
 
-                    final String currentTrust = publication.getDataInfo().getTrust();
-                    if (!"1.0".equals(currentTrust)) {
-                        trust.setLength(0);
-                        trust.append(currentTrust);
-                    }
                     p.mergeFrom(publication);
                     p.setAuthor(DedupUtility.mergeAuthor(p.getAuthor(), publication.getAuthor()));
                     //add to the list if they are not null
@@ -126,30 +94,74 @@ public class DedupRecordFactory {
                 }
             });
         p.setDateofacceptance(DatePicker.pick(dateofacceptance));
+        p.getDataInfo().setTrust("0.9");
+        p.setLastupdatetimestamp(ts);
         return p;
     }
 
-    private static Dataset datasetMerger(Tuple2<String, Iterable<String>> e) {
+    private static Dataset datasetMerger(Tuple2<String, Iterable<String>> e, final long ts) {
+
+        Dataset d = new Dataset(); //the result of the merge, to be returned at the end
+
+        d.setId(e._1());
+
+        final ObjectMapper mapper = new ObjectMapper();
+
+        final Collection<String> dateofacceptance = Lists.newArrayList();
+
+        if (e._2() != null)
+            e._2().forEach(dat -> {
+                try {
+                    Dataset dataset = mapper.readValue(dat, Dataset.class);
+
+                    d.mergeFrom(dataset);
+                    d.setAuthor(DedupUtility.mergeAuthor(d.getAuthor(), dataset.getAuthor()));
+                    //add to the list if they are not null
+                    if (dataset.getDateofacceptance() != null)
+                        dateofacceptance.add(dataset.getDateofacceptance().getValue());
+                } catch (Exception exc) {
+                    throw new RuntimeException(exc);
+                }
+            });
+        d.setDateofacceptance(DatePicker.pick(dateofacceptance));
+        d.getDataInfo().setTrust("0.9");
+        d.setLastupdatetimestamp(ts);
+        return d;
+    }
+
+    private static Project projectMerger(Tuple2<String, Iterable<String>> e, final long ts) {
+
+        Project p = new Project(); //the result of the merge, to be returned at the end
+
+        p.setId(e._1());
+
+        final ObjectMapper mapper = new ObjectMapper();
+        if (e._2() != null)
+            e._2().forEach(proj -> {
+                try {
+                    Project project = mapper.readValue(proj, Project.class);
+
+                    p.mergeFrom(project);
+                } catch (Exception exc) {
+                    throw new RuntimeException(exc);
+                }
+            });
+        p.getDataInfo().setTrust("0.9");
+        p.setLastupdatetimestamp(ts);
+        return p;
+    }
+
+    private static Software softwareMerger(Tuple2<String, Iterable<String>> e, final long ts) {
 
         throw new NotImplementedException();
     }
 
-    private static Project projectMerger(Tuple2<String, Iterable<String>> e) {
+    private static Datasource datasourceMerger(Tuple2<String, Iterable<String>> e, final long ts) {
 
         throw new NotImplementedException();
     }
 
-    private static Software softwareMerger(Tuple2<String, Iterable<String>> e) {
-
-        throw new NotImplementedException();
-    }
-
-    private static Datasource datasourceMerger(Tuple2<String, Iterable<String>> e) {
-
-        throw new NotImplementedException();
-    }
-
-    private static Organization organizationMerger(Tuple2<String, Iterable<String>> e) {
+    private static Organization organizationMerger(Tuple2<String, Iterable<String>> e, final long ts) {
 
         Organization o = new Organization(); //the result of the merge, to be returned at the end
 
@@ -180,7 +192,7 @@ public class DedupRecordFactory {
         return o;
     }
 
-    private static OtherResearchProduct otherresearchproductMerger(Tuple2<String, Iterable<String>> e) {
+    private static OtherResearchProduct otherresearchproductMerger(Tuple2<String, Iterable<String>> e, final long ts) {
 
         throw new NotImplementedException();
     }

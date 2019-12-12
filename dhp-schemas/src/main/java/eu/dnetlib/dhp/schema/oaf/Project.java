@@ -264,4 +264,39 @@ public class Project extends OafEntity implements Serializable {
     public void setFundedamount(Float fundedamount) {
         this.fundedamount = fundedamount;
     }
+
+
+    @Override
+    public void mergeFrom(OafEntity e) {
+        super.mergeFrom(e);
+        Project p = (Project)e;
+
+            websiteurl= p.getWebsiteurl()!= null && compareTrust(this,e)<0?p.getWebsiteurl():websiteurl;
+            code= p.getCode()!=null && compareTrust(this,e)<0?p.getCode():code;
+            acronym= p.getAcronym()!= null && compareTrust(this,e)<0?p.getAcronym():acronym;
+            title= p.getTitle()!= null && compareTrust(this,e)<0?p.getTitle():title;
+            startdate= p.getStartdate()!=null && compareTrust(this,e)<0?p.getStartdate():startdate;
+            enddate= p.getEnddate()!=null && compareTrust(this,e)<0?p.getEnddate():enddate;
+            callidentifier= p.getCallidentifier()!=null && compareTrust(this,e)<0?p.getCallidentifier():callidentifier;
+            keywords= p.getKeywords()!=null && compareTrust(this,e)<0?p.getKeywords():keywords;
+            duration= p.getDuration()!=null && compareTrust(this,e)<0?p.getDuration():duration;
+            ecsc39= p.getEcsc39()!=null && compareTrust(this,e)<0?p.getEcsc39():ecsc39;
+            oamandatepublications= p.getOamandatepublications()!=null && compareTrust(this,e)<0?p.getOamandatepublications():oamandatepublications;
+            ecarticle29_3= p.getEcarticle29_3()!=null && compareTrust(this,e)<0?p.getEcarticle29_3():ecarticle29_3;
+            subjects= mergeLists(subjects, p.getSubjects());
+            fundingtree= mergeLists(fundingtree, p.getFundingtree());
+            contracttype= p.getContracttype()!=null && compareTrust(this,e)<0?p.getContracttype():contracttype;
+            optional1= p.getOptional1()!=null && compareTrust(this,e)<0?p.getOptional1():optional1;
+            optional2= p.getOptional2()!=null && compareTrust(this,e)<0?p.getOptional2():optional2;
+            jsonextrainfo= p.getJsonextrainfo()!=null && compareTrust(this,e)<0?p.getJsonextrainfo():jsonextrainfo;
+            contactfullname= p.getContactfullname()!=null && compareTrust(this,e)<0?p.getContactfullname():contactfullname;
+            contactfax= p.getContactfax()!=null && compareTrust(this,e)<0?p.getContactfax():contactfax;
+            contactphone= p.getContactphone()!=null && compareTrust(this,e)<0?p.getContactphone():contactphone;
+            contactemail= p.getContactemail()!=null && compareTrust(this,e)<0?p.getContactemail():contactemail;
+            summary= p.getSummary()!=null && compareTrust(this,e)<0?p.getSummary():summary;
+            currency= p.getCurrency()!=null && compareTrust(this,e)<0?p.getCurrency():currency;
+            totalcost= p.getTotalcost()!=null && compareTrust(this,e)<0?p.getTotalcost():totalcost;
+            fundedamount= p.getFundedamount()!= null && compareTrust(this,e)<0?p.getFundedamount():fundedamount;
+            mergeOAFDataInfo(e);
+    }
 }

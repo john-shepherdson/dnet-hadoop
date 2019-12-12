@@ -30,7 +30,7 @@
         </property>
     </parameters>
 
-    <start to="CreateSimRels"/>
+    <start to="CreateDedupRecord"/>
 
 
     <kill name="Kill">
