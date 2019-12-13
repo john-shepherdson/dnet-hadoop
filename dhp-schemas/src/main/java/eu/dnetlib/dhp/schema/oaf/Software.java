@@ -44,4 +44,19 @@ public class Software extends Result implements Serializable {
     public void setProgrammingLanguage(Qualifier programmingLanguage) {
         this.programmingLanguage = programmingLanguage;
     }
+
+    @Override
+    public void mergeFrom(OafEntity e) {
+        super.mergeFrom(e);
+        final Software s = (Software) e;
+        documentationUrl = mergeLists(documentationUrl, s.getDocumentationUrl());
+
+        license = mergeLists(license, s.getLicense());
+
+        codeRepositoryUrl = s.getCodeRepositoryUrl()!= null && compareTrust(this, s)<0?s.getCodeRepositoryUrl():codeRepositoryUrl;
+
+        programmingLanguage= s.getProgrammingLanguage()!= null && compareTrust(this, s)<0?s.getProgrammingLanguage():programmingLanguage;
+
+        mergeOAFDataInfo(e);
+    }
 }

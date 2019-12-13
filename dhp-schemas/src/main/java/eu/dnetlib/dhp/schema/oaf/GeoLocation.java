@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 
 public class GeoLocation implements Serializable {
@@ -35,8 +37,14 @@ public class GeoLocation implements Serializable {
     }
 
 
+    public boolean isBlank() {
+        return StringUtils.isBlank(point) &&
+                StringUtils.isBlank(box) &&
+                StringUtils.isBlank(place);
+    }
+
     public String toComparableString() {
-        return String.format("%s::%s%s", point != null ? point.toLowerCase() : "", box != null ? box.toLowerCase() : "",place != null ? place.toLowerCase() : "");
+        return isBlank()?"":String.format("%s::%s%s", point != null ? point.toLowerCase() : "", box != null ? box.toLowerCase() : "", place != null ? place.toLowerCase() : "");
     }
 
     @Override

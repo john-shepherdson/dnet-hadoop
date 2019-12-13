@@ -252,10 +252,10 @@ public abstract class Result extends OafEntity implements Serializable {
 
         instance = mergeLists(instance, r.getInstance());
 
-        if (r.getResulttype() != null && compareTrust(this, r)<0)
+        if (r.getResulttype() != null && compareTrust(this, r) < 0)
             resulttype = r.getResulttype();
 
-        if (r.getLanguage() != null && compareTrust(this, r)<0)
+        if (r.getLanguage() != null && compareTrust(this, r) < 0)
             language = r.getLanguage();
 
         country = mergeLists(country, r.getCountry());
@@ -268,10 +268,10 @@ public abstract class Result extends OafEntity implements Serializable {
 
         description = longestLists(description, r.getDescription());
 
-        if (r.getPublisher() != null && compareTrust(this, r)<0)
+        if (r.getPublisher() != null && compareTrust(this, r) < 0)
             publisher = r.getPublisher();
 
-        if (r.getEmbargoenddate() != null && compareTrust(this, r)<0)
+        if (r.getEmbargoenddate() != null && compareTrust(this, r) < 0)
             embargoenddate = r.getEmbargoenddate();
 
         source = mergeLists(source, r.getSource());
@@ -287,15 +287,15 @@ public abstract class Result extends OafEntity implements Serializable {
 
         coverage = mergeLists(coverage, r.getCoverage());
 
-        if (r.getRefereed() != null && compareTrust(this, r)<0)
+        if (r.getRefereed() != null && compareTrust(this, r) < 0)
             refereed = r.getRefereed();
 
         context = mergeLists(context, r.getContext());
 
-        if (r.getProcessingchargeamount() != null && compareTrust(this, r)<0)
+        if (r.getProcessingchargeamount() != null && compareTrust(this, r) < 0)
             processingchargeamount = r.getProcessingchargeamount();
 
-        if (r.getProcessingchargecurrency() != null && compareTrust(this, r)<0)
+        if (r.getProcessingchargecurrency() != null && compareTrust(this, r) < 0)
             processingchargecurrency = r.getProcessingchargecurrency();
 
         externalReference = mergeLists(externalReference, r.getExternalReference());
@@ -303,16 +303,15 @@ public abstract class Result extends OafEntity implements Serializable {
     }
 
 
-
     private List<Field<String>> longestLists(List<Field<String>> a, List<Field<String>> b) {
-        if(a == null || b == null)
-            return a==null?b:a;
-        if (a.size()== b.size()) {
+        if (a == null || b == null)
+            return a == null ? b : a;
+        if (a.size() == b.size()) {
             int msa = a.stream().filter(i -> i.getValue() != null).map(i -> i.getValue().length()).max(Comparator.naturalOrder()).orElse(0);
             int msb = b.stream().filter(i -> i.getValue() != null).map(i -> i.getValue().length()).max(Comparator.naturalOrder()).orElse(0);
-            return  msa>msb?a:b;
+            return msa > msb ? a : b;
         }
-        return a.size()> b.size()?a:b;
+        return a.size() > b.size() ? a : b;
     }
 
 

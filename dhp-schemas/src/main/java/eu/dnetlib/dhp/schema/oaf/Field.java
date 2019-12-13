@@ -25,8 +25,8 @@ public class Field<T> implements Serializable {
     }
 
     @Override
-    public int hashCode(){
-        return getValue().hashCode();
+    public int hashCode() {
+        return getValue() == null ? 0 : getValue().hashCode();
     }
 
     @Override
@@ -37,11 +37,7 @@ public class Field<T> implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-
         Field<T> other = (Field<T>) obj;
-
         return getValue().equals(other.getValue());
     }
-
-
 }

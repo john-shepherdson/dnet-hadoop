@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 
 public class Qualifier implements Serializable {
@@ -42,13 +44,18 @@ public class Qualifier implements Serializable {
     }
 
     public String toComparableString() {
-        return String.format("%s::%s::%s::%s",
+        return isBlank()?"": String.format("%s::%s::%s::%s",
                 classid != null ? classid : "",
                 classname != null ? classname : "",
                 schemeid != null ? schemeid : "",
                 schemename != null ? schemename : "");
     }
-
+    public boolean isBlank() {
+        return StringUtils.isBlank(classid) &&
+                StringUtils.isBlank(classname) &&
+                StringUtils.isBlank(schemeid) &&
+                StringUtils.isBlank(schemename);
+    }
     @Override
     public int hashCode() {
         return toComparableString().hashCode();

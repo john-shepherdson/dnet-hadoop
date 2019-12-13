@@ -84,6 +84,9 @@ public class Instance implements Serializable {
     public void setDateofacceptance(Field<String> dateofacceptance) {
         this.dateofacceptance = dateofacceptance;
     }
+
+
+
     public String toComparableString(){
         return String.format("%s::%s::%s::%s",
                 hostedby != null && hostedby.getKey()!= null  ? hostedby.getKey().toLowerCase() : "",

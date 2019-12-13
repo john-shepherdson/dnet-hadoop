@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 
 public class KeyValue implements Serializable {
@@ -35,7 +37,11 @@ public class KeyValue implements Serializable {
     }
 
     public String toComparableString() {
-        return String.format("%s::%s", key != null ? key.toLowerCase() : "", value != null ? value.toLowerCase() : "");
+        return isBlank()?"":String.format("%s::%s", key != null ? key.toLowerCase() : "", value != null ? value.toLowerCase() : "");
+    }
+
+    public boolean isBlank() {
+        return StringUtils.isBlank(key) && StringUtils.isBlank(value);
     }
 
     @Override
