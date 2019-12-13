@@ -16,11 +16,11 @@ import java.util.List;
 public class SparkCreateDedupTest {
 
     String configuration;
-    String entity = "organization";
+    String entity = "publication";
 
     @Before
     public void setUp() throws IOException {
-        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org.curr.conf.json"));
+        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/pub_dt.curr.conf.json"));
 
     }
 

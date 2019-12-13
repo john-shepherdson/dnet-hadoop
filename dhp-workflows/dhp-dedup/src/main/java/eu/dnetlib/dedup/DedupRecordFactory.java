@@ -221,6 +221,11 @@ public class DedupRecordFactory {
                     throw new RuntimeException(exc);
                 }
             });
+
+        if (o.getDataInfo() == null)
+        {
+            o.setDataInfo(new DataInfo());
+        }
         o.getDataInfo().setTrust("0.9");
         o.setLastupdatetimestamp(ts);
 
