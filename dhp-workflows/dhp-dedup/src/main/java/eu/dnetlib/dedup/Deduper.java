@@ -119,7 +119,7 @@ public class Deduper implements Serializable {
                 .reduceByKey((Function2<List<MapDocument>, List<MapDocument>, List<MapDocument>>) (v1, v2) -> {
                     v1.addAll(v2);
                     v1.sort(Comparator.comparing(a -> a.getFieldMap().get(of).stringValue()));
-                    if (v1.size()> maxQueueSize)
+                    if (v1.size() > maxQueueSize)
                         return new ArrayList<>(v1.subList(0, maxQueueSize));
                     return v1;
                 });
@@ -146,10 +146,13 @@ public class Deduper implements Serializable {
         Map<String, LongAccumulator> accumulators = DedupUtility.constructAccumulator(config, context.sc());
 
         return blocks.flatMapToPair((PairFlatMapFunction<Tuple2<String, List<MapDocument>>, String, String>) it -> {
-            final SparkReporter reporter = new SparkReporter(accumulators);
-            new BlockProcessor(config).processSortedBlock(it._1(), it._2(), reporter);
-            return reporter.getRelations().iterator();
-
+            try {
+                final SparkReporter reporter = new SparkReporter(accumulators);
+                new BlockProcessor(config).processSortedBlock(it._1(), it._2(), reporter);
+                return reporter.getRelations().iterator();
+            } catch (Exception e) {
+                throw new RuntimeException(it._2().get(0).getIdentifier(), e);
+            }
         }).mapToPair(
                 (PairFunction<Tuple2<String, String>, String, Tuple2<String, String>>) item ->
                         new Tuple2<String, Tuple2<String, String>>(item._1() + item._2(), item))

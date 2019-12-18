@@ -91,6 +91,8 @@ public class DedupRecordFactory {
                 }
             });
         p.setDateofacceptance(DatePicker.pick(dateofacceptance));
+        if (p.getDataInfo() == null)
+            p.setDataInfo(new DataInfo());
         p.getDataInfo().setTrust("0.9");
         p.setLastupdatetimestamp(ts);
         return p;
@@ -121,6 +123,8 @@ public class DedupRecordFactory {
                 }
             });
         d.setDateofacceptance(DatePicker.pick(dateofacceptance));
+        if (d.getDataInfo() == null)
+            d.setDataInfo(new DataInfo());
         d.getDataInfo().setTrust("0.9");
         d.setLastupdatetimestamp(ts);
         return d;
@@ -143,6 +147,8 @@ public class DedupRecordFactory {
                     throw new RuntimeException(exc);
                 }
             });
+        if (p.getDataInfo() == null)
+            p.setDataInfo(new DataInfo());
         p.getDataInfo().setTrust("0.9");
         p.setLastupdatetimestamp(ts);
         return p;
@@ -170,6 +176,8 @@ public class DedupRecordFactory {
                 }
             });
         s.setDateofacceptance(DatePicker.pick(dateofacceptance));
+        if (s.getDataInfo() == null)
+            s.setDataInfo(new DataInfo());
         s.getDataInfo().setTrust("0.9");
         s.setLastupdatetimestamp(ts);
         return s;
@@ -189,6 +197,8 @@ public class DedupRecordFactory {
                     throw new RuntimeException(exc);
                 }
             });
+        if (d.getDataInfo() == null)
+            d.setDataInfo(new DataInfo());
         d.getDataInfo().setTrust("0.9");
         d.setLastupdatetimestamp(ts);
         return d;
@@ -226,6 +236,8 @@ public class DedupRecordFactory {
         {
             o.setDataInfo(new DataInfo());
         }
+        if (o.getDataInfo() == null)
+            o.setDataInfo(new DataInfo());
         o.getDataInfo().setTrust("0.9");
         o.setLastupdatetimestamp(ts);
 
@@ -256,6 +268,8 @@ public class DedupRecordFactory {
                     throw new RuntimeException(exc);
                 }
             });
+        if (o.getDataInfo() == null)
+            o.setDataInfo(new DataInfo());
         o.setDateofacceptance(DatePicker.pick(dateofacceptance));
         o.getDataInfo().setTrust("0.9");
         o.setLastupdatetimestamp(ts);

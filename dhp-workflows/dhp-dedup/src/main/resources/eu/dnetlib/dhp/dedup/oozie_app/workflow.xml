@@ -30,7 +30,7 @@
         </property>
     </parameters>
 
-    <start to="CreateDedupRecord"/>
+    <start to="CreateSimRels"/>
 
 
     <kill name="Kill">
@@ -103,7 +103,7 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>Create Connected Components</name>
+            <name>Create Dedup Record</name>
             <class>eu.dnetlib.dedup.SparkCreateDedupRecord</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
