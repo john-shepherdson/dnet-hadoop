@@ -525,6 +525,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven.failsave.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>default-integration-test</id>
