@@ -186,16 +186,6 @@
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${dhp.jackson.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-
-
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${dhp.jackson.version}</version>
                 <scope>provided</scope>
@@ -268,7 +258,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>${maven.compiler.plugin.version}</version>
                     <configuration>
                         <source>1.8</source>
                         <target>1.8</target>
@@ -422,14 +412,15 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
+        <maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
+	<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
         <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
         <dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
         <dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
         <dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
         <dhp.jackson.version>2.9.6</dhp.jackson.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.11.12</scala.version>
     </properties>
 </project>
 
