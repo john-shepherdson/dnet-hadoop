@@ -66,14 +66,13 @@
             "weight": 1.0,
             "countIfUndefined": "false",
             "params": {
-              "threshold": "0.5",
               "jpath_value": "$.value",
               "jpath_classid": "$.qualifier.classid"
             }
           }
         ],
-        "threshold": 1.0,
-        "aggregation": "MAX",
+        "threshold": 0.5,
+        "aggregation": "AVG",
         "positive": "MATCH",
         "negative": "layer2",
         "undefined": "layer2",
@@ -97,7 +96,7 @@
           }
         ],
         "threshold": 1.0,
-        "aggregation": "NC",
+        "aggregation": "AND",
         "positive": "layer3",
         "negative": "NO_MATCH",
         "undefined": "layer3",
@@ -114,7 +113,7 @@
           }
         ],
         "threshold": 0.99,
-        "aggregation": "SUM",
+        "aggregation": "AVG",
         "positive": "MATCH",
         "negative": "NO_MATCH",
         "undefined": "NO_MATCH",

@@ -7,9 +7,9 @@
     "queueMaxSize" : "2000",
     "groupMaxSize" : "50",
     "slidingWindowSize" : "200",
+    "idPath":"$.id",
     "rootBuilder" : [ "organization", "projectOrganization_participation_isParticipant", "datasourceOrganization_provision_isProvidedBy" ],
     "includeChildren" : "true",
-    "idPath": "$.id",
     "maxIterations": "20"
   },
   "pace" : {
@@ -31,7 +31,7 @@
           }
         ],
         "threshold": 1,
-        "aggregation": "SC",
+        "aggregation": "AVG",
         "positive": "MATCH",
         "negative": "NO_MATCH",
         "undefined": "layer2",
@@ -52,10 +52,24 @@
             "weight": 1,
             "countIfUndefined": "true",
             "params": {}
+          },
+          {
+            "field": "legalname",
+            "comparator": "numbersMatch",
+            "weight": 1,
+            "countIfUndefined": "true",
+            "params": {}
+          },
+          {
+            "field": "legalname",
+            "comparator": "romansMatch",
+            "weight": 1,
+            "countIfUndefined": "true",
+            "params": {}
           }
         ],
         "threshold": 1,
-        "aggregation": "NC",
+        "aggregation": "AND",
         "positive": "layer3",
         "negative": "NO_MATCH",
         "undefined": "layer3",
@@ -69,12 +83,11 @@
             "weight": 1.0,
             "countIfUndefined": "true",
             "params": {
-              "windowSize": "4",
-              "threshold": "0.0"
+              "windowSize": "4"
             }
           }
         ],
-        "threshold": 1.0,
+        "threshold": 0.7,
         "aggregation": "W_MEAN",
         "positive": "layer4",
         "negative": "NO_MATCH",
@@ -87,19 +100,18 @@
             "field": "legalname",
             "comparator": "keywordMatch",
             "weight": 1.0,
-            "countIfUndefined": "false",
+            "countIfUndefined": "true",
             "params": {
-              "windowSize": "4",
-              "threshold": "0.7"
+              "windowSize": "4"
             }
           }
         ],
-        "threshold": 1.0,
-        "aggregation": "W_MEAN",
+        "threshold": 0.9,
+        "aggregation": "AVG",
         "positive": "layer5",
         "negative": "NO_MATCH",
         "undefined": "layer5",
-        "ignoreUndefined": "false"
+        "ignoreUndefined": "true"
       },
       "layer5": {
         "fields": [
@@ -133,19 +145,20 @@
       { "name" : "legalshortname", "type" : "String", "path" : "$.legalshortname.value"},
       { "name" : "legalname", "type" : "String", "path" : "$.legalname.value" },
       { "name" : "websiteurl", "type" : "URL", "path" : "$.websiteurl.value" },
-      { "name" : "gridid", "type" : "String", "path" : "$.pid[?(@.qualifier.classid ==\"grid\")].value"}
+      { "name" : "gridid", "type" : "String", "path" : "$.pid[?(@.qualifier.classid =='grid.ac')].value"},
+      { "name" : "originalId", "type" : "String", "path" : "$.id" }
     ],
     "blacklists" : {
       "legalname" : []
     },
     "synonyms": {
-      "key::1": ["university","università","università studi","universitario","universitaria","université","universitaire","universitaires","universidad","universitade","Universität","universitaet","Uniwersytet","университет","universiteit","πανεπιστήμιο","universitesi","universiteti", "universiti"],
+      "key::1": ["university","università","università studi","universitario","universitaria","université", "universite", "universitaire","universitaires","universidad","universitade","Universität","universitaet","Uniwersytet","университет","universiteit","πανεπιστήμιο","universitesi","universiteti", "universiti"],
       "key::2": ["studies","studi","études","estudios","estudos","Studien","studia","исследования","studies","σπουδές"],
       "key::3": ["advanced","superiore","supérieur","supérieure","supérieurs","supérieures","avancado","avancados","fortgeschrittene","fortgeschritten","zaawansowany","передовой","gevorderd","gevorderde","προχωρημένος","προχωρημένη","προχωρημένο","προχωρημένες","προχωρημένα","wyzsza"],
       "key::4": ["institute","istituto","institut","instituto","instituto","Institut","instytut","институт","instituut","ινστιτούτο"],
       "key::5": ["hospital","ospedale","hôpital","hospital","hospital","Krankenhaus","szpital","больница","ziekenhuis","νοσοκομείο"],
       "key::6": ["research","ricerca","recherche","investigacion","pesquisa","Forschung","badania","исследования","onderzoek","έρευνα","erevna","erevnas"],
-      "key::7": ["college","collegio","université","colegio","faculdade","Hochschule","Szkoła Wyższa","Высшая школа","universiteit","κολλέγιο"],
+      "key::7": ["college","collegio","colegio","faculdade","Hochschule","Szkoła Wyższa","Высшая школа","κολλέγιο"],
       "key::8": ["foundation","fondazione","fondation","fundación","fundação","Stiftung","Fundacja","фонд","stichting","ίδρυμα","idryma"],
       "key::9": ["center","centro","centre","centro","centro","zentrum","centrum","центр","centrum","κέντρο"],
       "key::10": ["national","nazionale","national","nationale","nationaux","nationales","nacional","nacional","national","krajowy","национальный","nationaal","nationale","εθνικό"],
@@ -233,7 +246,7 @@
       "key::92": ["automation","automazione","automatización","automação","Automatisierung","automatisering","αυτοματοποίηση","otomasyon","automatizálás","avtomatizacija","automatiseeritud",""],
       "key::93": ["pediatric","pediatria","pediatriche","pediatrico","pediátrico","pediatría","pediátrico","pediatria","pädiatrisch","pediatrische","παιδιατρική","pediatrik","gyermekgyógyászat","pediatrija","pediaatria",""],
       "key::94": ["photonics","fotonica","fotoniche","fotónica","fotônica","Photonik","fotonica","φωτονική","fotonik","fotonika","fotonika","fotoonika",""],
-      "key::95": ["mechanics","meccanica","meccaniche","mecánica","mecânica","Mechanik","Maschinenbau","mechanica","werktuigkunde","μηχανικής","mekanik","gépészet","mehanika","mehaanika",""],
+      "key::95": ["mechanics", "mechanical", "meccanica","meccaniche","mecánica","mecânica","Mechanik","Maschinenbau","mechanica","werktuigkunde","μηχανικής","mekanik","gépészet","mehanika","mehaanika",""],
       "key::96": ["psychiatrics","psichiatria","psichiatrica","psichiatriche","psiquiatría","psiquiatria","Psychiatrie","psychiatrie","ψυχιατρική","psikiyatrik","pszihiátria","psihiatrija","psühhaatria",""],
       "key::97": ["psychology","fisiologia","psicología","psicologia","Psychologie","psychologie","ψυχολογία","psikoloji","pszihológia","psihologija","psühholoogia",""],
       "key::98": ["automotive","industriaautomobilistica","industriadelautomóvil","automotriz","industriaautomotriz","automotivo","Automobilindustrie","autoindustrie","αυτοκίνητος","αυτοκίνητη","αυτοκίνητο","αυτοκινούμενος","αυτοκινούμενη","αυτοκινούμενο","αυτοκινητιστικός","αυτοκινητιστική","αυτοκινητιστικό","otomotiv","autóipari","samogiben","avtomobilskaindustrija","auto-",""],
@@ -243,7 +256,11 @@
       "key::102": ["informatics","informatica","informática","informática","informatica",""],
       "key::103": ["forschungsgemeinschaft","comunita ricerca","research community","research foundation","research association"],
       "key::104": ["commerce","ticaret","ticarət","commercio","trade","handel","comercio"],
-      "key::105" : ["state", "stato", "etade", "statale", "etat", "zustand", "estado"]
+      "key::105" : ["state", "stato", "etade", "estado", "statale", "etat", "zustand", "estado"],
+      "key::106" : ["seminary", "seminario", "seminaire", "seminar"],
+      "key::107" : ["agricultural forestry", "af", "a f"],
+      "key::108" : ["agricultural mechanical", "am", "a m"],
+      "key::109" : ["catholic", "catholique", "katholische", "catolica", "cattolica", "catolico"]
     }
   }
 }
