@@ -1,5 +1,8 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.Serializable;
 
 public abstract class Oaf implements Serializable {
@@ -23,4 +26,14 @@ public abstract class Oaf implements Serializable {
     public void setLastupdatetimestamp(Long lastupdatetimestamp) {
         this.lastupdatetimestamp = lastupdatetimestamp;
     }
+
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

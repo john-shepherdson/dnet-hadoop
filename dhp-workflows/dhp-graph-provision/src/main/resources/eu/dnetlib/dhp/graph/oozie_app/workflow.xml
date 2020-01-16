@@ -33,8 +33,9 @@
             <name>GraphIndexing</name>
             <class>eu.dnetlib.dhp.graph.SparkGraphIndexingJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse" --conf spark.yarn.executor.memoryOverhead=${sparkExecutorMemoryOverhead}</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
         </spark>
