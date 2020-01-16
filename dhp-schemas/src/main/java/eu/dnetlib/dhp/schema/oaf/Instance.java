@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Instance implements Serializable {
 
@@ -12,7 +13,7 @@ public class Instance implements Serializable {
 
     private KeyValue hostedby;
 
-    private String url;
+    private List<String> url;
 
     // other research products specifc
     private  String distributionlocation;
@@ -53,11 +54,11 @@ public class Instance implements Serializable {
         this.hostedby = hostedby;
     }
 
-    public String getUrl() {
+    public List<String> getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(List<String> url) {
         this.url = url;
     }
 
