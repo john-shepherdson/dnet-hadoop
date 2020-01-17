@@ -17,6 +17,7 @@
         <module>dhp-aggregation</module>
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
+        <module>dhp-dedup</module>
     </modules>
 
     <pluginRepositories>
@@ -310,6 +311,7 @@
                         </executions>
                     </plugin>
 
+
                     <plugin>
                         <!-- this plugin prepares oozie installer package-->
 
@@ -523,6 +525,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven.failsave.plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>default-integration-test</id>

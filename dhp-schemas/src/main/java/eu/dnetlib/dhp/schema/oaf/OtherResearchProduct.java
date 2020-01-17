@@ -34,4 +34,16 @@ public class OtherResearchProduct extends Result implements Serializable {
     public void setTool(List<Field<String>> tool) {
         this.tool = tool;
     }
+
+    @Override
+    public void mergeFrom(OafEntity e) {
+        super.mergeFrom(e);
+
+        OtherResearchProduct o = (OtherResearchProduct)e;
+
+        contactperson = mergeLists(contactperson, o.getContactperson());
+        contactgroup = mergeLists(contactgroup, o.getContactgroup());
+        tool = mergeLists(tool, o.getTool());
+        mergeOAFDataInfo(e);
+    }
 }

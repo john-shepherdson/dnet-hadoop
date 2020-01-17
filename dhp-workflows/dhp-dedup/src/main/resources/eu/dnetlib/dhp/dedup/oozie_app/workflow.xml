@@ -1,0 +1,126 @@
+<workflow-app name="Dedup Entities" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>entity</name>
+            <description>the entity that should be processed</description>
+        </property>
+        <property>
+            <name>dedupConf</name>
+            <description>the dedup Configuration</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the target path</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
+    </parameters>
+
+    <start to="CreateSimRels"/>
+
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+<!--    <action name="DeleteTargetPath">-->
+<!--        <fs>-->
+<!--            <delete path='${targetPath}/${entity}_simrel'/>-->
+<!--            <delete path='${targetPath}/${entity}_mergeRels'/>-->
+<!--        </fs>-->
+<!--        <ok to="CreateSimRels"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
+
+    <action name="CreateSimRels">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Similarity Relations</name>
+            <class>eu.dnetlib.dedup.SparkCreateSimRels</class>
+            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory} --conf
+                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
+                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
+                spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--dedupConf</arg><arg>${dedupConf}</arg>
+        </spark>
+        <ok to="CreateConnectedComponents"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="CreateConnectedComponents">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Connected Components</name>
+            <class>eu.dnetlib.dedup.SparkCreateConnectedComponent</class>
+            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory} --conf
+                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
+                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
+                spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--dedupConf</arg><arg>${dedupConf}</arg>
+        </spark>
+        <ok to="CreateDedupRecord"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateDedupRecord">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Dedup Record</name>
+            <class>eu.dnetlib.dedup.SparkCreateDedupRecord</class>
+            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory} --conf
+                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
+                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
+                spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--dedupPath</arg><arg>${dedupPath}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--dedupConf</arg><arg>${dedupConf}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

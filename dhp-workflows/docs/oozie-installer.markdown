@@ -73,7 +73,7 @@ Workflow definition requirements
 
 This property can be set using maven `-D` switch.
 
-`[oozie_app]` is the default directory name however it can be set to any value as soon as `oozieAppDir` property is provided with directory name as value. 
+`[oozie_app]` is the default directory name however it can be set to any value as soon as `oozieAppDir` property is provided with directory name as value.
 
 Subworkflows are supported as well and subworkflow directories should be nested within `[oozie_app]` directory. 
 

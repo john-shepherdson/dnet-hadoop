@@ -164,4 +164,28 @@ public class Organization extends OafEntity implements Serializable {
     public void setCountry(Qualifier country) {
         this.country = country;
     }
+
+
+    @Override
+    public void mergeFrom(OafEntity e) {
+        super.mergeFrom(e);
+        final Organization o = (Organization) e;
+        legalshortname = o.getLegalshortname() != null && compareTrust(this, e)<0? o.getLegalshortname() : legalshortname;
+        legalname = o.getLegalname() != null && compareTrust(this, e)<0 ? o.getLegalname() : legalname;
+        alternativeNames = mergeLists(o.getAlternativeNames(), alternativeNames);
+        websiteurl = o.getWebsiteurl() != null && compareTrust(this, e)<0? o.getWebsiteurl() : websiteurl;
+        logourl = o.getLogourl() != null && compareTrust(this, e)<0? o.getLogourl() : logourl;
+        eclegalbody = o.getEclegalbody() != null && compareTrust(this, e)<0? o.getEclegalbody() : eclegalbody;
+        eclegalperson = o.getEclegalperson() != null && compareTrust(this, e)<0? o.getEclegalperson() : eclegalperson;
+        ecnonprofit = o.getEcnonprofit() != null && compareTrust(this, e)<0? o.getEcnonprofit() : ecnonprofit;
+        ecresearchorganization = o.getEcresearchorganization() != null && compareTrust(this, e)<0? o.getEcresearchorganization() : ecresearchorganization;
+        echighereducation = o.getEchighereducation() != null && compareTrust(this, e)<0? o.getEchighereducation() : echighereducation;
+        ecinternationalorganizationeurinterests = o.getEcinternationalorganizationeurinterests() != null && compareTrust(this, e)<0? o.getEcinternationalorganizationeurinterests() : ecinternationalorganizationeurinterests;
+        ecinternationalorganization = o.getEcinternationalorganization() != null && compareTrust(this, e)<0? o.getEcinternationalorganization() : ecinternationalorganization;
+        ecenterprise = o.getEcenterprise() != null && compareTrust(this, e)<0? o.getEcenterprise() :ecenterprise;
+        ecsmevalidated = o.getEcsmevalidated() != null && compareTrust(this, e)<0? o.getEcsmevalidated() :ecsmevalidated;
+        ecnutscode = o.getEcnutscode() != null && compareTrust(this, e)<0? o.getEcnutscode() :ecnutscode;
+        country = o.getCountry() != null && compareTrust(this, e)<0 ? o.getCountry() :country;
+        mergeOAFDataInfo(o);
+    }
 }

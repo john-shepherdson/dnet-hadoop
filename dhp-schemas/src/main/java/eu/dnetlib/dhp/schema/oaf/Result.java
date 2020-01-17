@@ -1,7 +1,10 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class Result extends OafEntity implements Serializable {
 
@@ -12,35 +15,35 @@ public abstract class Result extends OafEntity implements Serializable {
 
     // common fields
     private Qualifier language;
-    
+
     private List<Qualifier> country;
 
     private List<StructuredProperty> subject;
-    
+
     private List<StructuredProperty> title;
-    
+
     private List<StructuredProperty> relevantdate;
 
     private List<Field<String>> description;
-    
+
     private Field<String> dateofacceptance;
-        
+
     private Field<String> publisher;
-    
+
     private Field<String> embargoenddate;
-    
+
     private List<Field<String>> source;
-    
+
     private List<Field<String>> fulltext; // remove candidate
-    
+
     private List<Field<String>> format;
-    
+
     private List<Field<String>> contributor;
-    
+
     private Qualifier resourcetype;
-    
+
     private List<Field<String>> coverage;
-    
+
     private Field<String> refereed; //peer-review status
 
     private List<Context> context;
@@ -240,4 +243,76 @@ public abstract class Result extends OafEntity implements Serializable {
         this.processingchargecurrency = processingchargecurrency;
         return this;
     }
+
+    @Override
+    public void mergeFrom(OafEntity e) {
+        super.mergeFrom(e);
+
+        Result r = (Result) e;
+
+        instance = mergeLists(instance, r.getInstance());
+
+        if (r.getResulttype() != null && compareTrust(this, r) < 0)
+            resulttype = r.getResulttype();
+
+        if (r.getLanguage() != null && compareTrust(this, r) < 0)
+            language = r.getLanguage();
+
+        country = mergeLists(country, r.getCountry());
+
+        subject = mergeLists(subject, r.getSubject());
+
+        title = mergeLists(title, r.getTitle());
+
+        relevantdate = mergeLists(relevantdate, r.getRelevantdate());
+
+        description = longestLists(description, r.getDescription());
+
+        if (r.getPublisher() != null && compareTrust(this, r) < 0)
+            publisher = r.getPublisher();
+
+        if (r.getEmbargoenddate() != null && compareTrust(this, r) < 0)
+            embargoenddate = r.getEmbargoenddate();
+
+        source = mergeLists(source, r.getSource());
+
+        fulltext = mergeLists(fulltext, r.getFulltext());
+
+        format = mergeLists(format, r.getFormat());
+
+        contributor = mergeLists(contributor, r.getContributor());
+
+        if (r.getResourcetype() != null)
+            resourcetype = r.getResourcetype();
+
+        coverage = mergeLists(coverage, r.getCoverage());
+
+        if (r.getRefereed() != null && compareTrust(this, r) < 0)
+            refereed = r.getRefereed();
+
+        context = mergeLists(context, r.getContext());
+
+        if (r.getProcessingchargeamount() != null && compareTrust(this, r) < 0)
+            processingchargeamount = r.getProcessingchargeamount();
+
+        if (r.getProcessingchargecurrency() != null && compareTrust(this, r) < 0)
+            processingchargecurrency = r.getProcessingchargecurrency();
+
+        externalReference = mergeLists(externalReference, r.getExternalReference());
+
+    }
+
+
+    private List<Field<String>> longestLists(List<Field<String>> a, List<Field<String>> b) {
+        if (a == null || b == null)
+            return a == null ? b : a;
+        if (a.size() == b.size()) {
+            int msa = a.stream().filter(i -> i.getValue() != null).map(i -> i.getValue().length()).max(Comparator.naturalOrder()).orElse(0);
+            int msb = b.stream().filter(i -> i.getValue() != null).map(i -> i.getValue().length()).max(Comparator.naturalOrder()).orElse(0);
+            return msa > msb ? a : b;
+        }
+        return a.size() > b.size() ? a : b;
+    }
+
+
 }

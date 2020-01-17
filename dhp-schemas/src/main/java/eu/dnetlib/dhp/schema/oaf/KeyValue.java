@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 
 public class KeyValue implements Serializable {
@@ -32,5 +34,32 @@ public class KeyValue implements Serializable {
 
     public void setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
+    }
+
+    public String toComparableString() {
+        return isBlank()?"":String.format("%s::%s", key != null ? key.toLowerCase() : "", value != null ? value.toLowerCase() : "");
+    }
+
+    public boolean isBlank() {
+        return StringUtils.isBlank(key) && StringUtils.isBlank(value);
+    }
+
+    @Override
+    public int hashCode() {
+        return toComparableString().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        KeyValue other = (KeyValue) obj;
+
+        return toComparableString().equals(other.toComparableString());
     }
 }

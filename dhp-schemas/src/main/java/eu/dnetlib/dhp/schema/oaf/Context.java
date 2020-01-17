@@ -23,4 +23,23 @@ public class Context implements Serializable {
     public void setDataInfo(List<DataInfo> dataInfo) {
         this.dataInfo = dataInfo;
     }
+
+    @Override
+    public int hashCode() {
+        return id ==null? 0 : id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        Context other = (Context) obj;
+
+        return id.equals(other.getId());
+    }
 }

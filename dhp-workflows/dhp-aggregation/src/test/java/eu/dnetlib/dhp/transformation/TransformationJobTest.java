@@ -89,6 +89,8 @@ public class TransformationJobTest {
                 "-rh",  "",
                 "-ro",  "",
                 "-rr",  ""});
+
+
     }
 
     @Test
@@ -96,7 +98,7 @@ public class TransformationJobTest {
         final String path = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
         System.out.println("path = " + path);
 
-        Path tempDirWithPrefix = Files.createTempDirectory("mdsotre_output");
+        Path tempDirWithPrefix = Files.createTempDirectory("mdstore_output");
 
         System.out.println(tempDirWithPrefix.toFile().getAbsolutePath());
 
