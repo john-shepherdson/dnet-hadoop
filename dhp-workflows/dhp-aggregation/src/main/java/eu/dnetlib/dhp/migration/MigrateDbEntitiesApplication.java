@@ -2,11 +2,17 @@ package eu.dnetlib.dhp.migration;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,13 +21,20 @@ import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrateApplication implements Closeable {
+
+	private static final Qualifier ENTITYREGISTRY_PROVENANCE_ACTION = MigrationUtils
+			.qualifier("sysimport:crosswalk:entityregistry", "sysimport:crosswalk:entityregistry", "dnet:provenance_actions", "dnet:provenance_actions");
 
 	private static final Log log = LogFactory.getLog(MigrateDbEntitiesApplication.class);
 
 	private final DbClient dbClient;
+
+	private final long lastUpdateTimestamp;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -51,6 +64,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			final String dbPassword) throws Exception {
 		super(hdfsPath, hdfsNameNode, hdfsUser);
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
+		this.lastUpdateTimestamp = new Date().getTime();
 	}
 
 	public void execute(final String sqlFile, final Consumer<ResultSet> consumer) throws Exception {
@@ -61,7 +75,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 	public void processDatasource(final ResultSet rs) {
 		try {
 
-			final DataInfo info = MigrationUtils.dataInfo(null, null, null, null, null, null); // TODO
+			final DataInfo info = prepareDataInfo(rs);
 
 			final Datasource ds = new Datasource();
 
@@ -74,8 +88,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			ds.setExtraInfo(null); // TODO
 			ds.setOaiprovenance(null); // TODO
 
-			ds.setDatasourcetype(null); // Qualifier datasourcetype) {
-			ds.setOpenairecompatibility(null); // Qualifier openairecompatibility) {
+			ds.setDatasourcetype(prepareQualifierSplitting(rs.getString("datasourcetype")));
+			ds.setOpenairecompatibility(prepareQualifierSplitting(rs.getString("openairecompatibility")));
 			ds.setOfficialname(MigrationUtils.field(rs.getString("officialname"), info));
 			ds.setEnglishname(MigrationUtils.field(rs.getString("englishname"), info));
 			ds.setWebsiteurl(MigrationUtils.field(rs.getString("websiteurl"), info));
@@ -86,7 +100,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			ds.setLongitude(MigrationUtils.field(Double.toString(rs.getDouble("longitude")), info));
 			ds.setDateofvalidation(MigrationUtils.field(rs.getDate("dateofvalidation").toString(), info));
 			ds.setDescription(MigrationUtils.field(rs.getString("description"), info));
-			ds.setSubjects(null); // List<StructuredProperty> subjects) {
+			ds.setSubjects(prepareListOfStructProps(rs.getArray("subjects"), info));
 			ds.setOdnumberofitems(MigrationUtils.field(Double.toString(rs.getInt("odnumberofitems")), info));
 			ds.setOdnumberofitemsdate(MigrationUtils.field(rs.getDate("odnumberofitemsdate").toString(), info));
 			ds.setOdpolicies(MigrationUtils.field(rs.getString("odpolicies"), info));
@@ -110,12 +124,15 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			ds.setPolicies(null); // List<KeyValue> // TODO
 			ds.setJournal(null); // Journal // TODO
 
+			ds.setDataInfo(info);
+			ds.setLastupdatetimestamp(lastUpdateTimestamp);
+
 			// rs.getString("datasourceid");
 			rs.getArray("identities");
 			// rs.getString("officialname");
 			// rs.getString("englishname");
 			// rs.getString("contactemail");
-			rs.getString("openairecompatibility");  // COMPLEX ...@@@...
+			// rs.getString("openairecompatibility"); // COMPLEX ...@@@...
 			// rs.getString("websiteurl");
 			// rs.getString("logourl");
 			// rs.getArray("accessinfopackage");
@@ -124,15 +141,15 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			// rs.getString("namespaceprefix");
 			// rs.getInt("odnumberofitems"); // NULL
 			// rs.getDate("odnumberofitemsdate"); // NULL
-			rs.getArray("subjects");
+			// rs.getArray("subjects");
 			// rs.getString("description");
 			// rs.getString("odpolicies"); // NULL
 			// rs.getArray("odlanguages");
 			// rs.getArray("odcontenttypes");
-			rs.getBoolean("inferred");  // false
-			rs.getBoolean("deletedbyinference");// false
-			rs.getDouble("trust");  // 0.9
-			rs.getString("inferenceprovenance"); // NULL
+			// rs.getBoolean("inferred"); // false
+			// rs.getBoolean("deletedbyinference");// false
+			// rs.getDouble("trust"); // 0.9
+			// rs.getString("inferenceprovenance"); // NULL
 			// rs.getDate("dateofcollection");
 			// rs.getDate("dateofvalidation");
 			// rs.getDate("releasestartdate");
@@ -152,21 +169,22 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			rs.getArray("policies");
 			// rs.getString("collectedfromid");
 			// rs.getString("collectedfromname");
-			rs.getString("datasourcetype");  // COMPLEX XXX@@@@....
-			rs.getString("provenanceaction"); // 'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions'
-												 // AS provenanceaction,
+			// rs.getString("datasourcetype"); // COMPLEX XXX@@@@....
+			// rs.getString("provenanceaction"); //
+			// 'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions'
+			// AS provenanceaction,
 			rs.getString("journal");  // CONCAT(d.issn, '@@@', d.eissn, '@@@', d.lissn) AS journal
 
 			emitOaf(ds);
 		} catch (final Exception e) {
-			// TODO: handle exception
+			throw new RuntimeException(e);
 		}
 	}
 
 	public void processProject(final ResultSet rs) {
 		try {
 
-			final DataInfo info = MigrationUtils.dataInfo(null, null, null, null, null, null); // TODO
+			final DataInfo info = prepareDataInfo(rs);
 
 			final Project p = new Project();
 
@@ -192,9 +210,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			p.setEcsc39(MigrationUtils.field(Boolean.toString(rs.getBoolean("ecsc39")), info));
 			p.setOamandatepublications(MigrationUtils.field(Boolean.toString(rs.getBoolean("oamandatepublications")), info));
 			p.setEcarticle29_3(MigrationUtils.field(Boolean.toString(rs.getBoolean("ecarticle29_3")), info));
-			p.setSubjects(null); // List<StructuredProperty> //TODO
+			p.setSubjects(prepareListOfStructProps(rs.getArray("subjects"), info));
 			p.setFundingtree(null); // List<Field<String>> //TODO
-			p.setContracttype(null); // Qualifier //TODO
+			p.setContracttype(prepareQualifierSplitting(rs.getString("contracttype")));
 			p.setOptional1(MigrationUtils.field(rs.getString("optional1"), info));
 			p.setOptional2(MigrationUtils.field(rs.getString("optional2"), info));
 			p.setJsonextrainfo(MigrationUtils.field(rs.getString("jsonextrainfo"), info));
@@ -206,6 +224,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			p.setCurrency(MigrationUtils.field(rs.getString("currency"), info));
 			p.setTotalcost(new Float(rs.getDouble("totalcost")));
 			p.setFundedamount(new Float(rs.getDouble("fundedamount")));
+
+			p.setDataInfo(info);
+			p.setLastupdatetimestamp(lastUpdateTimestamp);
 
 			// rs.getString("projectid");
 			// rs.getString("code");
@@ -222,13 +243,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			// rs.getBoolean("ecarticle29_3");
 			// rs.getDate("dateofcollection");
 			// rs.getDate("dateoftransformation");
-			rs.getBoolean("inferred");
-			rs.getBoolean("deletedbyinference");
-			rs.getDouble("trust");
-			rs.getString("inferenceprovenance");
+			// rs.getBoolean("inferred");
+			// rs.getBoolean("deletedbyinference");
+			// rs.getDouble("trust");
+			// rs.getString("inferenceprovenance");
 			// rs.getString("optional1");
 			// rs.getString("optional2");
-			rs.getString("jsonextrainfo");
+			// rs.getString("jsonextrainfo");
 			// rs.getString("contactfullname");
 			// rs.getString("contactfax");
 			// rs.getString("contactphone");
@@ -248,14 +269,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			emitOaf(p);
 
 		} catch (final Exception e) {
-			// TODO: handle exception
+			throw new RuntimeException(e);
 		}
 	}
 
 	public void processOrganization(final ResultSet rs) {
 		try {
 
-			final DataInfo info = MigrationUtils.dataInfo(null, null, null, null, null, null); // TODO
+			final DataInfo info = prepareDataInfo(rs);
 
 			final Organization o = new Organization();
 
@@ -269,7 +290,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			o.setOaiprovenance(null); // OAIProvenance // TODO
 			o.setLegalshortname(MigrationUtils.field("legalshortname", info));
 			o.setLegalname(MigrationUtils.field("legalname", info));
-			o.setAlternativeNames(null); // List<Field<String>> //TODO
+			o.setAlternativeNames(new ArrayList<>());
 			o.setWebsiteurl(MigrationUtils.field("websiteurl", info));
 			o.setLogourl(MigrationUtils.field("logourl", info));
 			o.setEclegalbody(MigrationUtils.field(Boolean.toString(rs.getBoolean("eclegalbody")), info));
@@ -283,7 +304,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			o.setEcenterprise(MigrationUtils.field(Boolean.toString(rs.getBoolean("ecenterprise")), info));
 			o.setEcsmevalidated(MigrationUtils.field(Boolean.toString(rs.getBoolean("ecsmevalidated")), info));
 			o.setEcnutscode(MigrationUtils.field(Boolean.toString(rs.getBoolean("ecnutscode")), info));
-			o.setCountry(null); // Qualifier country) {
+			o.setCountry(prepareQualifierSplitting(rs.getString("country")));
+
+			o.setDataInfo(info);
+			o.setLastupdatetimestamp(lastUpdateTimestamp);
 
 			// rs.getString("organizationid");
 			// rs.getString("legalshortname");
@@ -300,85 +324,158 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			// rs.getBoolean("ecenterprise");
 			// rs.getBoolean("ecsmevalidated");
 			// rs.getBoolean("ecnutscode");
-			rs.getDate("dateofcollection");
-			rs.getDate("dateoftransformation");
-			rs.getBoolean("inferred");
-			rs.getBoolean("deletedbyinference");
-			rs.getDouble("trust");
-			rs.getString("inferenceprovenance");
+			// rs.getDate("dateofcollection");
+			// rs.getDate("dateoftransformation");
+			// rs.getBoolean("inferred");
+			// rs.getBoolean("deletedbyinference");
+			// rs.getDouble("trust");
+			// rs.getString("inferenceprovenance");
 			// rs.getString("collectedfromid");
 			// rs.getString("collectedfromname");
-			rs.getString("country");
+			// rs.getString("country");
 			rs.getString("provenanceaction");
 			rs.getArray("pid");
 
 			emitOaf(o);
 		} catch (final Exception e) {
-			// TODO: handle exception
+			throw new RuntimeException(e);
 		}
 	}
 
 	public void processDatasourceOrganization(final ResultSet rs) {
 
 		try {
-			final Relation r = new Relation();
+			final DataInfo info = prepareDataInfo(rs);
+			final String orgId = MigrationUtils.createOpenaireId("20", rs.getString("organization"));
+			final String dsId = MigrationUtils.createOpenaireId("10", rs.getString("datasource"));
 
-			r.setRelType(null); // TODO
-			r.setSubRelType(null); // TODO
-			r.setRelClass(null); // TODO
-			r.setSource(null); // TODO
-			r.setTarget(null); // TODO
-			r.setCollectedFrom(MigrationUtils.listKeyValues("", ""));
+			final Relation r1 = new Relation();
+			r1.setRelType("datasourceOrganization");
+			r1.setSubRelType("provision");
+			r1.setRelClass("isProvidedBy");
+			r1.setSource(dsId);
+			r1.setTarget(orgId);
+			r1.setCollectedFrom(null);// TODO
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			emitOaf(r1);
 
-			rs.getString("datasource");
-			rs.getString("organization");
-			rs.getDate("startdate");  // NULL
-			rs.getDate("enddate");    // NULL
-			rs.getBoolean("inferred"); // false
-			rs.getBoolean("deletedbyinference"); // false
-			rs.getDouble("trust");                // 0.9
-			rs.getString("inferenceprovenance"); // NULL
-			rs.getString("semantics");  // 'providedBy@@@provided
-										  // by@@@dnet:datasources_organizations_typologies@@@dnet:datasources_organizations_typologies' AS
-										  // semantics,
-			rs.getString("provenanceaction"); // d.provenanceaction || '@@@' || d.provenanceaction ||
-												 // '@@@dnet:provenanceActions@@@dnet:provenanceActions' AS provenanceaction
+			final Relation r2 = new Relation();
+			r2.setRelType("datasourceOrganization");
+			r2.setSubRelType("provision");
+			r2.setRelClass("provides");
+			r2.setSource(orgId);
+			r2.setTarget(dsId);
+			r2.setCollectedFrom(null);  // TODO
+			r2.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			emitOaf(r2);
 
-			emitOaf(r);
+			// rs.getString("datasource");
+			// rs.getString("organization");
+			// rs.getDate("startdate"); // NULL
+			// rs.getDate("enddate"); // NULL
+			// rs.getBoolean("inferred"); // false
+			// rs.getBoolean("deletedbyinference"); // false
+			// rs.getDouble("trust"); // 0.9
+			// rs.getString("inferenceprovenance"); // NULL
+			// rs.getString("semantics"); // 'providedBy@@@provided
+			// by@@@dnet:datasources_organizations_typologies@@@dnet:datasources_organizations_typologies' AS
+			// semantics,
+			// rs.getString("provenanceaction"); // d.provenanceaction || '@@@' || d.provenanceaction ||
+			// '@@@dnet:provenanceActions@@@dnet:provenanceActions' AS provenanceaction
+
 		} catch (final Exception e) {
-			// TODO: handle exception
+			throw new RuntimeException(e);
 		}
 	}
 
 	public void processProjectOrganization(final ResultSet rs) {
 		try {
-			final Relation r = new Relation();
+			final DataInfo info = prepareDataInfo(rs);
+			final String orgId = MigrationUtils.createOpenaireId("20", rs.getString("resporganization"));
+			final String projectId = MigrationUtils.createOpenaireId("40", rs.getString("project"));
 
-			r.setRelType(null); // TODO
-			r.setSubRelType(null); // TODO
-			r.setRelClass(null); // TODO
-			r.setSource(null); // TODO
-			r.setTarget(null); // TODO
-			r.setCollectedFrom(null);
+			final Relation r1 = new Relation();
+			r1.setRelType("projectOrganization");
+			r1.setSubRelType("participation");
+			r1.setRelClass("isParticipant");
+			r1.setSource(projectId);
+			r1.setTarget(orgId);
+			r1.setCollectedFrom(null);// TODO
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			emitOaf(r1);
 
-			rs.getString("project");
-			rs.getString("resporganization");
-			rs.getInt("participantnumber");
-			rs.getDouble("contribution");
-			rs.getDate("startdate");// null
-			rs.getDate("enddate");// null
-			rs.getBoolean("inferred");// false
-			rs.getBoolean("deletedbyinference"); // false
-			rs.getDouble("trust");
-			rs.getString("inferenceprovenance"); // NULL
-			rs.getString("semantics"); // po.semanticclass || '@@@' || po.semanticclass ||
-										 // '@@@dnet:project_organization_relations@@@dnet:project_organization_relations' AS semantics,
-			rs.getString("provenanceaction"); // 'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions'
-												 // AS provenanceaction
-			emitOaf(r);
+			final Relation r2 = new Relation();
+			r2.setRelType("projectOrganization");
+			r2.setSubRelType("participation");
+			r2.setRelClass("hasParticipant");
+			r2.setSource(orgId);
+			r2.setTarget(projectId);
+			r2.setCollectedFrom(null);  // TODO
+			r2.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			emitOaf(r2);
+
+			// rs.getString("project");
+			// rs.getString("resporganization");
+			// rs.getInt("participantnumber");
+			// rs.getDouble("contribution");
+			// rs.getDate("startdate");// null
+			// rs.getDate("enddate");// null
+			// rs.getBoolean("inferred");// false
+			// rs.getBoolean("deletedbyinference"); // false
+			// rs.getDouble("trust");
+			// rs.getString("inferenceprovenance"); // NULL
+			// rs.getString("semantics"); // po.semanticclass || '@@@' || po.semanticclass ||
+			// '@@@dnet:project_organization_relations@@@dnet:project_organization_relations' AS semantics,
+			// rs.getString("provenanceaction"); //
+			// 'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions'
+			// AS provenanceaction
+
 		} catch (final Exception e) {
-			// TODO: handle exception
+			throw new RuntimeException(e);
 		}
+	}
+
+	private DataInfo prepareDataInfo(final ResultSet rs) throws SQLException {
+		final Boolean deletedbyinference = rs.getBoolean("deletedbyinference");
+		final String inferenceprovenance = rs.getString("inferenceprovenance");
+		final Boolean inferred = rs.getBoolean("inferred");
+		final String trust = rs.getString("trust");
+		return MigrationUtils.dataInfo(deletedbyinference, inferenceprovenance, inferred, false, ENTITYREGISTRY_PROVENANCE_ACTION, trust);
+	}
+
+	private Qualifier prepareQualifierSplitting(final String s) {
+		if (StringUtils.isBlank(s)) { return null; }
+		final String[] arr = s.split("@@@");
+		return arr.length == 4 ? MigrationUtils.qualifier(arr[0], arr[1], arr[2], arr[3]) : null;
+	}
+
+	private StructuredProperty prepareStructProp(final String s, final DataInfo dataInfo) {
+		if (StringUtils.isBlank(s)) { return null; }
+		final String[] parts = s.split("###");
+		if (parts.length == 2) {
+			final String value = parts[0];
+			final String[] arr = parts[1].split("@@@");
+			if (arr.length == 4) { return MigrationUtils.structuredProperty(value, arr[0], arr[1], arr[2], arr[3], dataInfo); }
+		}
+		return null;
+	}
+
+	private List<StructuredProperty> prepareListOfStructProps(final Array array, final DataInfo dataInfo) throws SQLException {
+		final List<StructuredProperty> res = new ArrayList<>();
+		if (array != null) {
+			for (final String s : (String[]) array.getArray()) {
+				final StructuredProperty sp = prepareStructProp(s, dataInfo);
+				if (sp != null) {
+					res.add(sp);
+				}
+			}
+		}
+
+		return res;
 	}
 
 	@Override

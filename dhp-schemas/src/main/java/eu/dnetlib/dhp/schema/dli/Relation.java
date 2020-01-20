@@ -5,43 +5,48 @@ import java.util.List;
 
 public class Relation implements Serializable {
 
-    private String source;
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -9103706796710618813L;
 
-    private String target;
+	private String source;
 
-    private List<Provenance> provenance;
+	private String target;
 
-    private RelationSemantic semantic;
+	private List<Provenance> provenance;
 
-    public String getSource() {
-        return source;
-    }
+	private RelationSemantic semantic;
 
-    public void setSource(String source) {
-        this.source = source;
-    }
+	public String getSource() {
+		return source;
+	}
 
-    public String getTarget() {
-        return target;
-    }
+	public void setSource(final String source) {
+		this.source = source;
+	}
 
-    public void setTarget(String target) {
-        this.target = target;
-    }
+	public String getTarget() {
+		return target;
+	}
 
-    public List<Provenance> getProvenance() {
-        return provenance;
-    }
+	public void setTarget(final String target) {
+		this.target = target;
+	}
 
-    public void setProvenance(List<Provenance> provenance) {
-        this.provenance = provenance;
-    }
+	public List<Provenance> getProvenance() {
+		return provenance;
+	}
 
-    public RelationSemantic getSemantic() {
-        return semantic;
-    }
+	public void setProvenance(final List<Provenance> provenance) {
+		this.provenance = provenance;
+	}
 
-    public void setSemantic(RelationSemantic semantic) {
-        this.semantic = semantic;
-    }
+	public RelationSemantic getSemantic() {
+		return semantic;
+	}
+
+	public void setSemantic(final RelationSemantic semantic) {
+		this.semantic = semantic;
+	}
 }
