@@ -23,4 +23,12 @@
         <name>hive_db_name</name>
         <value>openaire</value>
     </property>
+    <property>
+        <name>spark2YarnHistoryServerAddress</name>
+        <value>http://iis-cdh5-test-gw.ocean.icm.edu.pl:18088</value>
+    </property>
+    <property>
+        <name>spark2EventLogDir</name>
+        <value>/user/spark/applicationHistory</value>
+    </property>
 </configuration>

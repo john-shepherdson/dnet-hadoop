@@ -1,18 +1,44 @@
 package eu.dnetlib.dhp.graph;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-
 import java.io.Serializable;
 
 public class TypedRow implements Serializable {
-    private String type;
-    private Oaf oaf;
 
-    public TypedRow(String type, Oaf oaf) {
+    private String source;
+    private String target;
+    private String type;
+    private String oaf;
+
+    public TypedRow() {
+    }
+
+    public TypedRow(String source, String type, String oaf) {
+        this.source = source;
         this.type = type;
         this.oaf = oaf;
+    }
+
+    public TypedRow(String source, String target, String type, String oaf) {
+        this(source, type, oaf);
+        this.target = target;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public TypedRow setSource(String source) {
+        this.source = source;
+        return this;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public TypedRow setTarget(String target) {
+        this.target = target;
+        return this;
     }
 
     public String getType() {
@@ -24,21 +50,13 @@ public class TypedRow implements Serializable {
         return this;
     }
 
-    public Oaf getOaf() {
+    public String getOaf() {
         return oaf;
     }
 
-    public TypedRow setOaf(Oaf oaf) {
+    public TypedRow setOaf(String oaf) {
         this.oaf = oaf;
         return this;
     }
 
-    @Override
-    public String toString() {
-        try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

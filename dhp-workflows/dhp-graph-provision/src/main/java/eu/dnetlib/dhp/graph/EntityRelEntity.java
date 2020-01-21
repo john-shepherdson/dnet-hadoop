@@ -1,19 +1,29 @@
 package eu.dnetlib.dhp.graph;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-
 import java.io.Serializable;
 
 public class EntityRelEntity implements Serializable {
     private TypedRow source;
-    private Relation relation;
+    private TypedRow relation;
     private TypedRow target;
+
+    public EntityRelEntity() {
+    }
 
     public EntityRelEntity(TypedRow source) {
         this.source = source;
     }
+
+
+    //helpers
+    public Boolean hasMainEntity() {
+        return getSource() != null & getRelation() == null & getTarget() == null;
+    }
+
+    public Boolean hasRelatedEntity() {
+        return getSource() == null & getRelation() != null & getTarget() != null;
+    }
+
 
     public TypedRow getSource() {
         return source;
@@ -24,11 +34,11 @@ public class EntityRelEntity implements Serializable {
         return this;
     }
 
-    public Relation getRelation() {
+    public TypedRow getRelation() {
         return relation;
     }
 
-    public EntityRelEntity setRelation(Relation relation) {
+    public EntityRelEntity setRelation(TypedRow relation) {
         this.relation = relation;
         return this;
     }
@@ -42,12 +52,4 @@ public class EntityRelEntity implements Serializable {
         return this;
     }
 
-    @Override
-    public String toString() {
-        try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
