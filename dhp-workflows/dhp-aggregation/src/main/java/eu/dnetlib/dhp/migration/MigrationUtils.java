@@ -1,7 +1,5 @@
 package eu.dnetlib.dhp.migration;
 
-import java.sql.Array;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,14 +46,6 @@ public class MigrationUtils {
 
 	public static List<Field<String>> listFields(final DataInfo info, final String... values) {
 		return Arrays.stream(values).map(v -> field(v, info)).collect(Collectors.toList());
-	}
-
-	public static List<Field<String>> listFields(final DataInfo info, final Array array) {
-		try {
-			return listFields(info, (String[]) array.getArray());
-		} catch (final SQLException e) {
-			throw new RuntimeException("Invalid SQL array", e);
-		}
 	}
 
 	public static Qualifier qualifier(final String classid, final String classname, final String schemeid, final String schemename) {

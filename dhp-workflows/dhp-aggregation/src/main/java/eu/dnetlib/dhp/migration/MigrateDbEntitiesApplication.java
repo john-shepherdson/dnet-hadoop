@@ -19,6 +19,9 @@ import org.apache.commons.logging.LogFactory;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.Journal;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
@@ -84,10 +87,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			ds.setCollectedfrom(MigrationUtils.listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
 			ds.setPid(null); // List<StructuredProperty> // TODO
 			ds.setDateofcollection(rs.getDate("dateofcollection").toString());
-			ds.setDateoftransformation(null);  // TODO
+			ds.setDateoftransformation(null);   // Value not returned by the SQL query
 			ds.setExtraInfo(null); // TODO
-			ds.setOaiprovenance(null); // TODO
-
+			ds.setOaiprovenance(null); // Values not present in the DB
 			ds.setDatasourcetype(prepareQualifierSplitting(rs.getString("datasourcetype")));
 			ds.setOpenairecompatibility(prepareQualifierSplitting(rs.getString("openairecompatibility")));
 			ds.setOfficialname(MigrationUtils.field(rs.getString("officialname"), info));
@@ -104,9 +106,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			ds.setOdnumberofitems(MigrationUtils.field(Double.toString(rs.getInt("odnumberofitems")), info));
 			ds.setOdnumberofitemsdate(MigrationUtils.field(rs.getDate("odnumberofitemsdate").toString(), info));
 			ds.setOdpolicies(MigrationUtils.field(rs.getString("odpolicies"), info));
-			ds.setOdlanguages(MigrationUtils.listFields(info, rs.getArray("odlanguages")));
-			ds.setOdcontenttypes(MigrationUtils.listFields(info, rs.getArray("odcontenttypes")));
-			ds.setAccessinfopackage(MigrationUtils.listFields(info, rs.getArray("accessinfopackage")));
+			ds.setOdlanguages(prepareListFields(rs.getArray("odlanguages"), info));
+			ds.setOdcontenttypes(prepareListFields(rs.getArray("odcontenttypes"), info));
+			ds.setAccessinfopackage(prepareListFields(rs.getArray("accessinfopackage"), info));
 			ds.setReleasestartdate(MigrationUtils.field(rs.getDate("releasestartdate").toString(), info));
 			ds.setReleaseenddate(MigrationUtils.field(rs.getDate("releaseenddate").toString(), info));
 			ds.setMissionstatementurl(MigrationUtils.field(rs.getString("missionstatementurl"), info));
@@ -121,14 +123,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			ds.setQualitymanagementkind(MigrationUtils.field(rs.getString("qualitymanagementkind"), info));
 			ds.setPidsystems(MigrationUtils.field(rs.getString("pidsystems"), info));
 			ds.setCertificates(MigrationUtils.field(rs.getString("certificates"), info));
-			ds.setPolicies(null); // List<KeyValue> // TODO
-			ds.setJournal(null); // Journal // TODO
-
+			ds.setPolicies(new ArrayList<>()); // The sql query returns an empty array
+			ds.setJournal(prepareJournal(rs.getString("officialname"), rs.getString("journal"), info)); // Journal
 			ds.setDataInfo(info);
 			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
 			// rs.getString("datasourceid");
-			rs.getArray("identities");
+			// rs.getArray("identities");
 			// rs.getString("officialname");
 			// rs.getString("englishname");
 			// rs.getString("contactemail");
@@ -166,14 +167,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			// rs.getString("qualitymanagementkind");
 			// rs.getString("pidsystems");
 			// rs.getString("certificates");
-			rs.getArray("policies");
+			// rs.getArray("policies");
 			// rs.getString("collectedfromid");
 			// rs.getString("collectedfromname");
-			// rs.getString("datasourcetype"); // COMPLEX XXX@@@@....
+			// rs.getString("datasourcetype"); // COMPLEX
 			// rs.getString("provenanceaction"); //
 			// 'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions'
 			// AS provenanceaction,
-			rs.getString("journal");  // CONCAT(d.issn, '@@@', d.eissn, '@@@', d.lissn) AS journal
+			// rs.getString("journal"); // CONCAT(d.issn, '@@@', d.eissn, '@@@', d.lissn) AS journal
 
 			emitOaf(ds);
 		} catch (final Exception e) {
@@ -192,12 +193,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			p.setOriginalId(Arrays.asList(rs.getString("projectid")));
 			p.setCollectedfrom(MigrationUtils.listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
 			p.setPid(null); // List<StructuredProperty> // TODO
-
 			p.setDateofcollection(rs.getDate("dateofcollection").toString());
 			p.setDateoftransformation(rs.getDate("dateoftransformation").toString());
 			p.setExtraInfo(null); // List<ExtraInfo> //TODO
-			p.setOaiprovenance(null); // OAIProvenance /TODO
-
+			p.setOaiprovenance(null); // Values not present in the DB
 			p.setWebsiteurl(MigrationUtils.field(rs.getString("websiteurl"), info));
 			p.setCode(MigrationUtils.field(rs.getString("code"), info));
 			p.setAcronym(MigrationUtils.field(rs.getString("acronym"), info));
@@ -211,7 +210,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			p.setOamandatepublications(MigrationUtils.field(Boolean.toString(rs.getBoolean("oamandatepublications")), info));
 			p.setEcarticle29_3(MigrationUtils.field(Boolean.toString(rs.getBoolean("ecarticle29_3")), info));
 			p.setSubjects(prepareListOfStructProps(rs.getArray("subjects"), info));
-			p.setFundingtree(null); // List<Field<String>> //TODO
+			p.setFundingtree(prepareListFields(rs.getArray("fundingtree"), info));
 			p.setContracttype(prepareQualifierSplitting(rs.getString("contracttype")));
 			p.setOptional1(MigrationUtils.field(rs.getString("optional1"), info));
 			p.setOptional2(MigrationUtils.field(rs.getString("optional2"), info));
@@ -224,7 +223,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			p.setCurrency(MigrationUtils.field(rs.getString("currency"), info));
 			p.setTotalcost(new Float(rs.getDouble("totalcost")));
 			p.setFundedamount(new Float(rs.getDouble("fundedamount")));
-
 			p.setDataInfo(info);
 			p.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -260,11 +258,11 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			// rs.getDouble("fundedamount");
 			// rs.getString("collectedfromid");
 			// rs.getString("collectedfromname");
-			rs.getString("contracttype");     // COMPLEX
-			rs.getString("provenanceaction"); // COMPLEX
-			rs.getArray("pid");
-			rs.getArray("subjects");
-			rs.getArray("fundingtree");
+			// rs.getString("contracttype"); // COMPLEX
+			// rs.getString("provenanceaction"); // COMPLEX
+			// rs.getArray("pid");
+			// rs.getArray("subjects");
+			// rs.getArray("fundingtree");
 
 			emitOaf(p);
 
@@ -287,10 +285,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			o.setDateofcollection(rs.getDate("dateofcollection").toString());
 			o.setDateoftransformation(rs.getDate("dateoftransformation").toString());
 			o.setExtraInfo(null); // List<ExtraInfo> // TODO
-			o.setOaiprovenance(null); // OAIProvenance // TODO
+			o.setOaiprovenance(null); // Values not present in the DB
 			o.setLegalshortname(MigrationUtils.field("legalshortname", info));
 			o.setLegalname(MigrationUtils.field("legalname", info));
-			o.setAlternativeNames(new ArrayList<>());
+			o.setAlternativeNames(new ArrayList<>());  // Values not returned by the SQL query
 			o.setWebsiteurl(MigrationUtils.field("websiteurl", info));
 			o.setLogourl(MigrationUtils.field("logourl", info));
 			o.setEclegalbody(MigrationUtils.field(Boolean.toString(rs.getBoolean("eclegalbody")), info));
@@ -305,7 +303,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			o.setEcsmevalidated(MigrationUtils.field(Boolean.toString(rs.getBoolean("ecsmevalidated")), info));
 			o.setEcnutscode(MigrationUtils.field(Boolean.toString(rs.getBoolean("ecnutscode")), info));
 			o.setCountry(prepareQualifierSplitting(rs.getString("country")));
-
 			o.setDataInfo(info);
 			o.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -333,8 +330,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			// rs.getString("collectedfromid");
 			// rs.getString("collectedfromname");
 			// rs.getString("country");
-			rs.getString("provenanceaction");
-			rs.getArray("pid");
+			// rs.getString("provenanceaction");
+			// rs.getArray("pid");
 
 			emitOaf(o);
 		} catch (final Exception e) {
@@ -348,6 +345,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			final DataInfo info = prepareDataInfo(rs);
 			final String orgId = MigrationUtils.createOpenaireId("20", rs.getString("organization"));
 			final String dsId = MigrationUtils.createOpenaireId("10", rs.getString("datasource"));
+			final List<KeyValue> collectedFrom = MigrationUtils.listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
 			r1.setRelType("datasourceOrganization");
@@ -355,7 +353,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			r1.setRelClass("isProvidedBy");
 			r1.setSource(dsId);
 			r1.setTarget(orgId);
-			r1.setCollectedFrom(null);// TODO
+			r1.setCollectedFrom(collectedFrom);
 			r1.setDataInfo(info);
 			r1.setLastupdatetimestamp(lastUpdateTimestamp);
 			emitOaf(r1);
@@ -366,7 +364,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			r2.setRelClass("provides");
 			r2.setSource(orgId);
 			r2.setTarget(dsId);
-			r2.setCollectedFrom(null);  // TODO
+			r2.setCollectedFrom(collectedFrom);
 			r2.setDataInfo(info);
 			r1.setLastupdatetimestamp(lastUpdateTimestamp);
 			emitOaf(r2);
@@ -395,6 +393,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			final DataInfo info = prepareDataInfo(rs);
 			final String orgId = MigrationUtils.createOpenaireId("20", rs.getString("resporganization"));
 			final String projectId = MigrationUtils.createOpenaireId("40", rs.getString("project"));
+			final List<KeyValue> collectedFrom = MigrationUtils.listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
 			r1.setRelType("projectOrganization");
@@ -402,7 +401,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			r1.setRelClass("isParticipant");
 			r1.setSource(projectId);
 			r1.setTarget(orgId);
-			r1.setCollectedFrom(null);// TODO
+			r1.setCollectedFrom(collectedFrom);
 			r1.setDataInfo(info);
 			r1.setLastupdatetimestamp(lastUpdateTimestamp);
 			emitOaf(r1);
@@ -413,7 +412,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			r2.setRelClass("hasParticipant");
 			r2.setSource(orgId);
 			r2.setTarget(projectId);
-			r2.setCollectedFrom(null);  // TODO
+			r2.setCollectedFrom(collectedFrom);
 			r2.setDataInfo(info);
 			r1.setLastupdatetimestamp(lastUpdateTimestamp);
 			emitOaf(r2);
@@ -453,6 +452,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 		return arr.length == 4 ? MigrationUtils.qualifier(arr[0], arr[1], arr[2], arr[3]) : null;
 	}
 
+	public static List<Field<String>> prepareListFields(final Array array, final DataInfo info) {
+		try {
+			return MigrationUtils.listFields(info, (String[]) array.getArray());
+		} catch (final SQLException e) {
+			throw new RuntimeException("Invalid SQL array", e);
+		}
+	}
+
 	private StructuredProperty prepareStructProp(final String s, final DataInfo dataInfo) {
 		if (StringUtils.isBlank(s)) { return null; }
 		final String[] parts = s.split("###");
@@ -476,6 +483,20 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 		}
 
 		return res;
+	}
+
+	private Journal prepareJournal(final String name, final String sj, final DataInfo info) {
+		if (StringUtils.isNotBlank(sj)) {
+			final String[] arr = sj.split("@@@");
+			if (arr.length == 3) {
+				final String issn = StringUtils.isNotBlank(arr[0]) ? arr[0] : null;
+				final String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1] : null;;
+				final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2] : null;;
+				if (issn != null || eissn != null || lissn != null) { return MigrationUtils
+						.journal(name, issn, eissn, eissn, null, null, null, null, null, null, null, info); }
+			}
+		}
+		return null;
 	}
 
 	@Override
