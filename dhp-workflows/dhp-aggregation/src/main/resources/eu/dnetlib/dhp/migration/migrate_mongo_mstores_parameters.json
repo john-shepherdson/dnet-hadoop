@@ -46,5 +46,23 @@
 		"paramLongName": "mdInterpretation",
 		"paramDescription": "metadata interpretation",
 		"paramRequired": true
+	},
+	{
+		"paramName": "postgresUrl",
+		"paramLongName": "postgresUrl",
+		"paramDescription": "postgres url, example: jdbc:postgresql://localhost:5432/testdb",
+		"paramRequired": true
+	},
+	{
+		"paramName": "postgresUser",
+		"paramLongName": "postgresUser",
+		"paramDescription": "postgres user",
+		"paramRequired": true
+	},
+	{
+		"paramName": "postgresPassword",
+		"paramLongName": "postgresPassword",
+		"paramDescription": "postgres password",
+		"paramRequired": true
 	}
 ]

@@ -116,9 +116,13 @@ public class AbstractMigrateApplication implements Closeable {
 			final String schemeid,
 			final String schemename,
 			final DataInfo dataInfo) {
+		return structuredProperty(value, qualifier(classid, classname, schemeid, schemename), dataInfo);
+	}
+
+	public static StructuredProperty structuredProperty(final String value, final Qualifier qualifier, final DataInfo dataInfo) {
 		final StructuredProperty sp = new StructuredProperty();
 		sp.setValue(value);
-		sp.setQualifier(qualifier(classid, classname, schemeid, schemename));
+		sp.setQualifier(qualifier);
 		sp.setDataInfo(dataInfo);
 		return sp;
 	}
@@ -198,7 +202,7 @@ public class AbstractMigrateApplication implements Closeable {
 		return d;
 	}
 
-	public static String createOpenaireId(final String prefix, final String originalId) {
+	public static String createOpenaireId(final int prefix, final String originalId) {
 		final String nsPrefix = StringUtils.substringBefore(originalId, "::");
 		final String rest = StringUtils.substringAfter(originalId, "::");
 		return String.format("%s|%s::%s", prefix, nsPrefix, DHPUtils.md5(rest));

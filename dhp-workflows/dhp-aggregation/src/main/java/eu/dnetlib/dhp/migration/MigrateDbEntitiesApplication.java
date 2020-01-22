@@ -60,7 +60,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 			smdbe.execute("queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization);
 			smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization);
 		}
-
 	}
 
 	public MigrateDbEntitiesApplication(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String dbUrl, final String dbUser,
@@ -82,13 +81,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 
 			final Datasource ds = new Datasource();
 
-			ds.setId(createOpenaireId("10", rs.getString("datasourceid")));
+			ds.setId(createOpenaireId(10, rs.getString("datasourceid")));
 			ds.setOriginalId(Arrays.asList(rs.getString("datasourceid")));
 			ds.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
-			ds.setPid(null); // List<StructuredProperty> // TODO
+			ds.setPid(new ArrayList<>());
 			ds.setDateofcollection(rs.getDate("dateofcollection").toString());
 			ds.setDateoftransformation(null);   // Value not returned by the SQL query
-			ds.setExtraInfo(null); // TODO
+			ds.setExtraInfo(new ArrayList<>());  // Values not present in the DB
 			ds.setOaiprovenance(null); // Values not present in the DB
 			ds.setDatasourcetype(prepareQualifierSplitting(rs.getString("datasourcetype")));
 			ds.setOpenairecompatibility(prepareQualifierSplitting(rs.getString("openairecompatibility")));
@@ -189,13 +188,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 
 			final Project p = new Project();
 
-			p.setId(createOpenaireId("40", rs.getString("projectid")));
+			p.setId(createOpenaireId(40, rs.getString("projectid")));
 			p.setOriginalId(Arrays.asList(rs.getString("projectid")));
 			p.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
-			p.setPid(null); // List<StructuredProperty> // TODO
+			p.setPid(new ArrayList<>());
 			p.setDateofcollection(rs.getDate("dateofcollection").toString());
 			p.setDateoftransformation(rs.getDate("dateoftransformation").toString());
-			p.setExtraInfo(null); // List<ExtraInfo> //TODO
+			p.setExtraInfo(new ArrayList<>());  // Values not present in the DB
 			p.setOaiprovenance(null); // Values not present in the DB
 			p.setWebsiteurl(field(rs.getString("websiteurl"), info));
 			p.setCode(field(rs.getString("code"), info));
@@ -278,13 +277,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 
 			final Organization o = new Organization();
 
-			o.setId(createOpenaireId("20", rs.getString("organizationid"))); // String id) {
+			o.setId(createOpenaireId(20, rs.getString("organizationid")));
 			o.setOriginalId(Arrays.asList(rs.getString("organizationid")));
 			o.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
-			o.setPid(null); // List<StructuredProperty> // TODO
+			o.setPid(new ArrayList<>());
 			o.setDateofcollection(rs.getDate("dateofcollection").toString());
 			o.setDateoftransformation(rs.getDate("dateoftransformation").toString());
-			o.setExtraInfo(null); // List<ExtraInfo> // TODO
+			o.setExtraInfo(new ArrayList<>());  // Values not present in the DB
 			o.setOaiprovenance(null); // Values not present in the DB
 			o.setLegalshortname(field("legalshortname", info));
 			o.setLegalname(field("legalname", info));
@@ -342,8 +341,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 
 		try {
 			final DataInfo info = prepareDataInfo(rs);
-			final String orgId = createOpenaireId("20", rs.getString("organization"));
-			final String dsId = createOpenaireId("10", rs.getString("datasource"));
+			final String orgId = createOpenaireId(20, rs.getString("organization"));
+			final String dsId = createOpenaireId(10, rs.getString("datasource"));
 			final List<KeyValue> collectedFrom = listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
@@ -390,8 +389,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 	public void processProjectOrganization(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs);
-			final String orgId = createOpenaireId("20", rs.getString("resporganization"));
-			final String projectId = createOpenaireId("40", rs.getString("project"));
+			final String orgId = createOpenaireId(20, rs.getString("resporganization"));
+			final String projectId = createOpenaireId(40, rs.getString("project"));
 			final List<KeyValue> collectedFrom = listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
@@ -451,7 +450,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrateApplication imp
 		return arr.length == 4 ? qualifier(arr[0], arr[1], arr[2], arr[3]) : null;
 	}
 
-	private static List<Field<String>> prepareListFields(final Array array, final DataInfo info) {
+	private List<Field<String>> prepareListFields(final Array array, final DataInfo info) {
 		try {
 			return listFields(info, (String[]) array.getArray());
 		} catch (final SQLException e) {
