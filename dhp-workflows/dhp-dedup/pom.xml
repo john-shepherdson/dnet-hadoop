@@ -31,10 +31,6 @@
             <artifactId>dhp-schemas</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.arakelian</groupId>
-            <artifactId>java-jq</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>eu.dnetlib</groupId>

@@ -1,9 +1,12 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-
+@JsonIgnoreProperties({"blank"})
 public class KeyValue implements Serializable {
 
     private String key;
@@ -36,10 +39,12 @@ public class KeyValue implements Serializable {
         this.dataInfo = dataInfo;
     }
 
+    @JsonIgnore
     public String toComparableString() {
         return isBlank()?"":String.format("%s::%s", key != null ? key.toLowerCase() : "", value != null ? value.toLowerCase() : "");
     }
 
+    @JsonIgnore
     public boolean isBlank() {
         return StringUtils.isBlank(key) && StringUtils.isBlank(value);
     }

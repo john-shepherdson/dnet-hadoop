@@ -231,6 +231,11 @@
                 <artifactId>secondstring</artifactId>
                 <version>1.0.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.ximpleware</groupId>
+                <artifactId>vtd-xml</artifactId>
+                <version>${vtd.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.oozie</groupId>
@@ -421,6 +426,7 @@
         <dhp.jackson.version>2.9.6</dhp.jackson.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <scala.version>2.11.12</scala.version>
+        <vtd.version>[2.12,3.0)</vtd.version>
     </properties>
 </project>
 
