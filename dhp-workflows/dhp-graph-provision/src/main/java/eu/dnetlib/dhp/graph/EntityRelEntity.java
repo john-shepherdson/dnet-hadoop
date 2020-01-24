@@ -51,5 +51,4 @@ public class EntityRelEntity implements Serializable {
         this.target = target;
         return this;
     }
-
 }

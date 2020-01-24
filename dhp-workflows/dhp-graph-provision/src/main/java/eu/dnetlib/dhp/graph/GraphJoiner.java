@@ -3,7 +3,9 @@ package eu.dnetlib.dhp.graph;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -24,15 +26,13 @@ public class GraphJoiner implements Serializable {
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-        final String entityIdPath = "$.id";
-
-        JavaPairRDD<String, TypedRow> datasource = readPathEntity(sc, entityIdPath, inputPath, "datasource");
-        JavaPairRDD<String, TypedRow> organization = readPathEntity(sc, entityIdPath, inputPath, "organization");
-        JavaPairRDD<String, TypedRow> project = readPathEntity(sc, entityIdPath, inputPath, "project");
-        JavaPairRDD<String, TypedRow> dataset = readPathEntity(sc, entityIdPath, inputPath, "dataset");
-        JavaPairRDD<String, TypedRow> otherresearchproduct = readPathEntity(sc, entityIdPath, inputPath, "otherresearchproduct");
-        JavaPairRDD<String, TypedRow> software = readPathEntity(sc, entityIdPath, inputPath, "software");
-        JavaPairRDD<String, TypedRow> publication = readPathEntity(sc, entityIdPath, inputPath, "publication");
+        JavaPairRDD<String, TypedRow> datasource = readPathEntity(sc, inputPath, "datasource");
+        JavaPairRDD<String, TypedRow> organization = readPathEntity(sc, inputPath, "organization");
+        JavaPairRDD<String, TypedRow> project = readPathEntity(sc, inputPath, "project");
+        JavaPairRDD<String, TypedRow> dataset = readPathEntity(sc, inputPath, "dataset");
+        JavaPairRDD<String, TypedRow> otherresearchproduct = readPathEntity(sc, inputPath, "otherresearchproduct");
+        JavaPairRDD<String, TypedRow> software = readPathEntity(sc, inputPath, "software");
+        JavaPairRDD<String, TypedRow> publication = readPathEntity(sc, inputPath, "publication");
 
         final String entitiesPath = outPath + "/entities";
         datasource
@@ -48,28 +48,31 @@ public class GraphJoiner implements Serializable {
 
         JavaPairRDD<String, EntityRelEntity> entities = sc.textFile(entitiesPath)
                 .map(t -> new ObjectMapper().readValue(t, EntityRelEntity.class))
-                .mapToPair(t -> new Tuple2<>(t.getSource().getSource(), t));
+                .mapToPair(t -> new Tuple2<>(t.getSource().getSourceId(), t));
 
         final JavaPairRDD<String, EntityRelEntity> relation = readPathRelation(sc, inputPath)
+                .filter(r -> !r.getDeleted())
                 .map(p -> new EntityRelEntity().setRelation(p))
-                .mapToPair(p -> new Tuple2<>(p.getRelation().getSource(), p))
+                .mapToPair(p -> new Tuple2<>(p.getRelation().getSourceId(), p))
                 .groupByKey()
                 .map(p -> Iterables.limit(p._2(), MAX_RELS))
                 .flatMap(p -> p.iterator())
-                .mapToPair(p -> new Tuple2<>(p.getRelation().getTarget(), p));
+                .mapToPair(p -> new Tuple2<>(p.getRelation().getTargetId(), p));
 
         final String joinByTargetPath = outPath + "/join_by_target";
-        relation.join(entities)
+        relation
+                .join(entities
+                        .filter(e -> !e._2().getSource().getDeleted())
+                        /*.mapToPair(e -> new Tuple2<>(e._1(), new MappingUtils().pruneModel(e._2())))*/)
                 .map(s -> new EntityRelEntity()
                         .setRelation(s._2()._1().getRelation())
                         .setTarget(s._2()._2().getSource()))
                 .map(e -> new ObjectMapper().writeValueAsString(e))
                 .saveAsTextFile(joinByTargetPath, GzipCodec.class);
 
-
         JavaPairRDD<String, EntityRelEntity> bySource = sc.textFile(joinByTargetPath)
                 .map(t -> new ObjectMapper().readValue(t, EntityRelEntity.class))
-                .mapToPair(t -> new Tuple2<>(t.getRelation().getSource(), t));
+                .mapToPair(t -> new Tuple2<>(t.getRelation().getSourceId(), t));
 
         entities
                 .union(bySource)
@@ -97,12 +100,17 @@ public class GraphJoiner implements Serializable {
                 .saveAsTextFile(outPath + "/linked_entities", GzipCodec.class);
      }
 
-    private JavaPairRDD<String, TypedRow> readPathEntity(final JavaSparkContext sc, final String idPath, final String inputPath, final String type) {
+    private JavaPairRDD<String, TypedRow> readPathEntity(final JavaSparkContext sc, final String inputPath, final String type) {
         return sc.sequenceFile(inputPath + "/" + type, Text.class, Text.class)
                 .mapToPair((PairFunction<Tuple2<Text, Text>, String, TypedRow>) item -> {
+
                     final String json = item._2().toString();
-                    final String id = JsonPath.read(json, idPath);
-                    return new Tuple2<>(id, new TypedRow(id, type, json));
+                    final String id = JsonPath.read(json, "$.id");
+                    return new Tuple2<>(id, new TypedRow()
+                        .setSourceId(id)
+                        .setDeleted(JsonPath.read(json, "$.dataInfo.deletedbyinference"))
+                        .setType(type)
+                        .setOaf(json));
                 });
     }
 
@@ -110,9 +118,12 @@ public class GraphJoiner implements Serializable {
         return sc.sequenceFile(inputPath + "/relation", Text.class, Text.class)
                 .map(item -> {
                     final String json = item._2().toString();
-                    final String source = JsonPath.read(json, "$.source");
-                    final String target = JsonPath.read(json, "$.target");
-                    return new TypedRow(source, target, "relation", json);
+                    return new TypedRow()
+                            .setSourceId(JsonPath.read(json, "$.source"))
+                            .setTargetId(JsonPath.read(json, "$.target"))
+                            .setDeleted(JsonPath.read(json, "$.dataInfo.deletedbyinference"))
+                            .setType("relation")
+                            .setOaf(json);
                 });
     }
 

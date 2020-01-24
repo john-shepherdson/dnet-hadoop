@@ -4,40 +4,40 @@ import java.io.Serializable;
 
 public class TypedRow implements Serializable {
 
-    private String source;
-    private String target;
+    private String sourceId;
+
+    private String targetId;
+
+    private Boolean deleted;
+
     private String type;
+
     private String oaf;
 
-    public TypedRow() {
+    public String getSourceId() {
+        return sourceId;
     }
 
-    public TypedRow(String source, String type, String oaf) {
-        this.source = source;
-        this.type = type;
-        this.oaf = oaf;
-    }
-
-    public TypedRow(String source, String target, String type, String oaf) {
-        this(source, type, oaf);
-        this.target = target;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public TypedRow setSource(String source) {
-        this.source = source;
+    public TypedRow setSourceId(String sourceId) {
+        this.sourceId = sourceId;
         return this;
     }
 
-    public String getTarget() {
-        return target;
+    public String getTargetId() {
+        return targetId;
     }
 
-    public TypedRow setTarget(String target) {
-        this.target = target;
+    public TypedRow setTargetId(String targetId) {
+        this.targetId = targetId;
+        return this;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public TypedRow setDeleted(Boolean deleted) {
+        this.deleted = deleted;
         return this;
     }
 
@@ -58,5 +58,4 @@ public class TypedRow implements Serializable {
         this.oaf = oaf;
         return this;
     }
-
 }

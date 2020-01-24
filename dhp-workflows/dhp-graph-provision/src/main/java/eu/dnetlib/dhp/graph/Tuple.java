@@ -1,8 +1,5 @@
 package eu.dnetlib.dhp.graph;
 
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-
 import java.io.Serializable;
 
 public class Tuple implements Serializable {
@@ -10,6 +7,7 @@ public class Tuple implements Serializable {
     private TypedRow relation;
 
     private TypedRow target;
+
 
     public TypedRow getRelation() {
         return relation;
