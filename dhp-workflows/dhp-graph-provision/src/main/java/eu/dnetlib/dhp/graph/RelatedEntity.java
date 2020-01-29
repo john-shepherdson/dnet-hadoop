@@ -3,14 +3,22 @@ package eu.dnetlib.dhp.graph;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import org.codehaus.jackson.map.ObjectMapper;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
 public class RelatedEntity implements Serializable {
 
+    private String id;
+    private String type;
+
+    // common fields
+    private StructuredProperty title;
+    private String websiteurl; // datasource, organizations, projects
+
     // results
-    private StructuredProperty title; // also for projects
     private String dateofacceptance;
     private String publisher;
     private List<StructuredProperty> pid;
@@ -20,11 +28,10 @@ public class RelatedEntity implements Serializable {
 
     // datasource
     private String officialname;
-    private String websiteurl; // also for organizations, projects
     private Qualifier datasourcetype;
     private Qualifier datasourcetypeui;
-    //private String aggregatortype;
     private Qualifier openairecompatibility;
+    //private String aggregatortype;
 
     // organization
     private String legalname;
@@ -32,10 +39,28 @@ public class RelatedEntity implements Serializable {
     private Qualifier country;
 
     // project
+    private String projectTitle;
     private String code;
     private String acronym;
     private Qualifier contracttype;
-    private String fundingtree;
+    private List<String> fundingtree;
+
+    public static RelatedEntity parse(final String json) {
+        try {
+            return new ObjectMapper().readValue(json, RelatedEntity.class);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("invalid RelatedEntity, cannot parse: " + json);
+        }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public RelatedEntity setId(String id) {
+        this.id = id;
+        return this;
+    }
 
     public StructuredProperty getTitle() {
         return title;
@@ -199,12 +224,30 @@ public class RelatedEntity implements Serializable {
         return this;
     }
 
-    public String getFundingtree() {
+    public List<String> getFundingtree() {
         return fundingtree;
     }
 
-    public RelatedEntity setFundingtree(String fundingtree) {
+    public RelatedEntity setFundingtree(List<String> fundingtree) {
         this.fundingtree = fundingtree;
+        return this;
+    }
+
+    public String getProjectTitle() {
+        return projectTitle;
+    }
+
+    public RelatedEntity setProjectTitle(String projectTitle) {
+        this.projectTitle = projectTitle;
+        return this;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public RelatedEntity setType(String type) {
+        this.type = type;
         return this;
     }
 }

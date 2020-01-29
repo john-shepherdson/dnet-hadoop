@@ -1,11 +1,14 @@
 package eu.dnetlib.dhp.graph;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.*;
+import net.minidev.json.JSONArray;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -15,8 +18,10 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects.
@@ -38,7 +43,7 @@ import java.util.List;
  */
 public class GraphJoiner implements Serializable {
 
-    public static final int MAX_RELS = 10;
+    public static final int MAX_RELS = 100;
 
     public void join(final SparkSession spark, final String inputPath, final String hiveDbName, final String outPath) {
 
@@ -63,7 +68,7 @@ public class GraphJoiner implements Serializable {
                 .union(software)
                 .union(publication)
                 .map(e -> new EntityRelEntity().setSource(e._2()))
-                .map(e -> new ObjectMapper().writeValueAsString(e))
+                .map(MappingUtils::serialize)
                 .saveAsTextFile(entitiesPath, GzipCodec.class);
 
         JavaPairRDD<String, EntityRelEntity> entities = sc.textFile(entitiesPath)
@@ -84,41 +89,24 @@ public class GraphJoiner implements Serializable {
         relation
                 .join(entities
                         .filter(e -> !e._2().getSource().getDeleted())
-                        /*.mapToPair(e -> new Tuple2<>(e._1(), new MappingUtils().pruneModel(e._2())))*/)
+                        .mapToPair(e -> new Tuple2<>(e._1(), MappingUtils.pruneModel(e._2()))))
                 .map(s -> new EntityRelEntity()
                         .setRelation(s._2()._1().getRelation())
                         .setTarget(s._2()._2().getSource()))
-                .map(e -> new ObjectMapper().writeValueAsString(e))
+                .map(MappingUtils::serialize)
                 .saveAsTextFile(joinByTargetPath, GzipCodec.class);
 
         JavaPairRDD<String, EntityRelEntity> bySource = sc.textFile(joinByTargetPath)
                 .map(t -> new ObjectMapper().readValue(t, EntityRelEntity.class))
                 .mapToPair(t -> new Tuple2<>(t.getRelation().getSourceId(), t));
 
+        final String linkedEntitiesPath = outPath + "/linked_entities";
         entities
                 .union(bySource)
                 .groupByKey()   // by source id
-                .map(p -> {
-                    final LinkedEntity e = new LinkedEntity();
-                    final List<Tuple> links = Lists.newArrayList();
-                    for(EntityRelEntity rel : p._2()) {
-                        if (rel.hasMainEntity() & e.getEntity() == null) {
-                            e.setEntity(rel.getSource());
-                        }
-                        if (rel.hasRelatedEntity()) {
-                            links.add(new Tuple()
-                                    .setRelation(rel.getRelation())
-                                    .setTarget(rel.getTarget()));
-                        }
-                    }
-                    e.setLinks(links);
-                    if (e.getEntity() == null) {
-                        throw new IllegalStateException("missing main entity on '" + p._1() + "'");
-                    }
-                    return e;
-                })
-                .map(e -> new ObjectMapper().writeValueAsString(e))
-                .saveAsTextFile(outPath + "/linked_entities", GzipCodec.class);
+                .map(GraphJoiner::asLinkedEntityWrapper)
+                .map(MappingUtils::serialize)
+                .saveAsTextFile(linkedEntitiesPath, GzipCodec.class);
     }
 
     /**
@@ -153,14 +141,35 @@ public class GraphJoiner implements Serializable {
     private JavaRDD<TypedRow> readPathRelation(final JavaSparkContext sc, final String inputPath) {
         return sc.sequenceFile(inputPath + "/relation", Text.class, Text.class)
                 .map(item -> {
-                    final String json = item._2().toString();
+                    final String s = item._2().toString();
+                    final DocumentContext json = JsonPath.parse(s);
                     return new TypedRow()
-                            .setSourceId(JsonPath.read(json, "$.source"))
-                            .setTargetId(JsonPath.read(json, "$.target"))
-                            .setDeleted(JsonPath.read(json, "$.dataInfo.deletedbyinference"))
+                            .setSourceId(json.read("$.source"))
+                            .setTargetId(json.read("$.target"))
+                            .setDeleted(json.read("$.dataInfo.deletedbyinference"))
                             .setType("relation")
-                            .setOaf(json);
+                            .setOaf(s);
                 });
+    }
+
+    private static LinkedEntityWrapper asLinkedEntityWrapper(Tuple2<String, Iterable<EntityRelEntity>> p) {
+        final LinkedEntityWrapper e = new LinkedEntityWrapper();
+        final List<TupleWrapper> links = Lists.newArrayList();
+        for (EntityRelEntity rel : p._2()) {
+            if (rel.hasMainEntity() & e.getEntity() == null) {
+                e.setEntity(rel.getSource());
+            }
+            if (rel.hasRelatedEntity()) {
+                links.add(new TupleWrapper()
+                        .setRelation(rel.getRelation())
+                        .setTarget(rel.getTarget()));
+            }
+        }
+        e.setLinks(links);
+        if (e.getEntity() == null) {
+            throw new IllegalStateException("missing main entity on '" + p._1() + "'");
+        }
+        return e;
     }
 
 }

@@ -38,6 +38,7 @@ public class SparkGraphIndexingJob {
         }
 
         new GraphJoiner().join(spark, inputPath, hiveDbName, OUTPUT_BASE_PATH);
+        new GraphMapper().map(spark, OUTPUT_BASE_PATH);
     }
 
 }

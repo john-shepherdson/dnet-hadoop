@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.graph;
 
 import java.io.Serializable;
 
-public class Tuple implements Serializable {
+public class TupleWrapper implements Serializable {
 
     private TypedRow relation;
 
@@ -13,7 +13,7 @@ public class Tuple implements Serializable {
         return relation;
     }
 
-    public Tuple setRelation(TypedRow relation) {
+    public TupleWrapper setRelation(TypedRow relation) {
         this.relation = relation;
         return this;
     }
@@ -22,7 +22,7 @@ public class Tuple implements Serializable {
         return target;
     }
 
-    public Tuple setTarget(TypedRow target) {
+    public TupleWrapper setTarget(TypedRow target) {
         this.target = target;
         return this;
     }
