@@ -1,41 +1,28 @@
 package eu.dnetlib.dhp.graph;
 
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-
 import java.io.Serializable;
 import java.util.List;
 
 public class LinkedEntity implements Serializable {
 
-    private String type;
+    private TypedRow entity;
 
-    private OafEntity entity;
+    private List<Tuple> links;
 
-    private List<Link> links;
-
-    public String getType() {
-        return type;
-    }
-
-    public LinkedEntity setType(String type) {
-        this.type = type;
-        return this;
-    }
-
-    public OafEntity getEntity() {
+    public TypedRow getEntity() {
         return entity;
     }
 
-    public LinkedEntity setEntity(OafEntity entity) {
+    public LinkedEntity setEntity(TypedRow entity) {
         this.entity = entity;
         return this;
     }
 
-    public List<Link> getLinks() {
+    public List<Tuple> getLinks() {
         return links;
     }
 
-    public LinkedEntity setLinks(List<Link> links) {
+    public LinkedEntity setLinks(List<Tuple> links) {
         this.links = links;
         return this;
     }

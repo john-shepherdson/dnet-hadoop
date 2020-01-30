@@ -34,7 +34,8 @@ public class SparkXmlRecordBuilderJob {
         }
 
         new GraphJoiner(spark, inputPath, outputPath)
-                .adjacencyLists();
+                .adjacencyLists()
+                .asXML();
     }
 
 }
