@@ -9,11 +9,11 @@ import java.io.InputStreamReader;
 
 public class MappingUtilsTest {
 
-    private MappingUtils utils;
+    private GraphMappingUtils utils;
 
     @Before
     public void setUp() {
-        utils = new MappingUtils();
+        utils = new GraphMappingUtils();
     }
 
     @Test

@@ -26,20 +26,20 @@
         </property>
     </parameters>
 
-    <start to="GraphJoinEntities"/>
+    <start to="adjancency_lists"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="GraphJoinEntities">
+    <action name="adjancency_lists">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>GraphIndexing</name>
-            <class>eu.dnetlib.dhp.graph.SparkGraphIndexingJob</class>
+            <name>build_adjacency_lists</name>
+            <class>eu.dnetlib.dhp.graph.SparkXmlRecordBuilderJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
@@ -53,8 +53,7 @@
             </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

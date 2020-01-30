@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.graph;
 import java.io.Serializable;
 
 public class EntityRelEntity implements Serializable {
+
     private TypedRow source;
     private TypedRow relation;
     private TypedRow target;
