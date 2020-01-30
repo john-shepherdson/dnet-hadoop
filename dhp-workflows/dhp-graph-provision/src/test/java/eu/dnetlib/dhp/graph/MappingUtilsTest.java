@@ -39,4 +39,14 @@ public class MappingUtilsTest {
         System.out.println(out);
 
     }
+
+    @Test
+    public void testParseRelatedEntity() throws IOException {
+
+        final InputStreamReader in = new InputStreamReader(getClass().getResourceAsStream("related_entity.json"));
+        final RelatedEntity e = new ObjectMapper().readValue(in, RelatedEntity.class);
+
+        System.out.println(e);
+
+    }
 }
