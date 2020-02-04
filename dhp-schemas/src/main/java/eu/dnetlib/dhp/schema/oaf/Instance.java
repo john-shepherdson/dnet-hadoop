@@ -26,72 +26,64 @@ public class Instance implements Serializable {
         return license;
     }
 
-    public Instance setLicense(Field<String> license) {
+    public void setLicense(Field<String> license) {
         this.license = license;
-        return this;
     }
 
     public Qualifier getAccessright() {
         return accessright;
     }
 
-    public Instance setAccessright(Qualifier accessright) {
+    public void setAccessright(Qualifier accessright) {
         this.accessright = accessright;
-        return this;
     }
 
     public Qualifier getInstancetype() {
         return instancetype;
     }
 
-    public Instance setInstancetype(Qualifier instancetype) {
+    public void setInstancetype(Qualifier instancetype) {
         this.instancetype = instancetype;
-        return this;
     }
 
     public KeyValue getHostedby() {
         return hostedby;
     }
 
-    public Instance setHostedby(KeyValue hostedby) {
+    public void setHostedby(KeyValue hostedby) {
         this.hostedby = hostedby;
-        return this;
     }
 
     public List<String> getUrl() {
         return url;
     }
 
-    public Instance setUrl(List<String> url) {
+    public void setUrl(List<String> url) {
         this.url = url;
-        return this;
     }
 
     public String getDistributionlocation() {
         return distributionlocation;
     }
 
-    public Instance setDistributionlocation(String distributionlocation) {
+    public void setDistributionlocation(String distributionlocation) {
         this.distributionlocation = distributionlocation;
-        return this;
     }
 
     public KeyValue getCollectedfrom() {
         return collectedfrom;
     }
 
-    public Instance setCollectedfrom(KeyValue collectedfrom) {
+    public void setCollectedfrom(KeyValue collectedfrom) {
         this.collectedfrom = collectedfrom;
-        return this;
     }
 
     public Field<String> getDateofacceptance() {
         return dateofacceptance;
     }
 
-    public Instance setDateofacceptance(Field<String> dateofacceptance) {
+    public void setDateofacceptance(Field<String> dateofacceptance) {
         this.dateofacceptance = dateofacceptance;
-        return this;
     }
 
     public String toComparableString(){

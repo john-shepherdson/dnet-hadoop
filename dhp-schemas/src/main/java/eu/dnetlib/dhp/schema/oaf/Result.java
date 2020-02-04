@@ -210,6 +210,22 @@ public abstract class Result extends OafEntity implements Serializable {
         this.context = context;
     }
 
+    public Field<String> getProcessingchargeamount() {
+        return processingchargeamount;
+    }
+
+    public void setProcessingchargeamount(Field<String> processingchargeamount) {
+        this.processingchargeamount = processingchargeamount;
+    }
+
+    public Field<String> getProcessingchargecurrency() {
+        return processingchargecurrency;
+    }
+
+    public void setProcessingchargecurrency(Field<String> processingchargecurrency) {
+        this.processingchargecurrency = processingchargecurrency;
+    }
+
     public List<ExternalReference> getExternalReference() {
         return externalReference;
     }
@@ -224,24 +240,6 @@ public abstract class Result extends OafEntity implements Serializable {
 
     public void setInstance(List<Instance> instance) {
         this.instance = instance;
-    }
-
-    public Field<String> getProcessingchargeamount() {
-        return processingchargeamount;
-    }
-
-    public Result setProcessingchargeamount(Field<String> processingchargeamount) {
-        this.processingchargeamount = processingchargeamount;
-        return this;
-    }
-
-    public Field<String> getProcessingchargecurrency() {
-        return processingchargecurrency;
-    }
-
-    public Result setProcessingchargecurrency(Field<String> processingchargecurrency) {
-        this.processingchargecurrency = processingchargecurrency;
-        return this;
     }
 
     @Override
