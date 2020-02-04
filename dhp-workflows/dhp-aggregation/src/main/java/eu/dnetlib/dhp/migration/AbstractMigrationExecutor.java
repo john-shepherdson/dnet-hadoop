@@ -30,7 +30,7 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
-public class AbstractMigrateApplication implements Closeable {
+public class AbstractMigrationExecutor implements Closeable {
 
 	private final AtomicInteger counter = new AtomicInteger(0);
 
@@ -42,7 +42,7 @@ public class AbstractMigrateApplication implements Closeable {
 
 	private final SequenceFile.Writer writer;
 
-	public AbstractMigrateApplication(final String hdfsPath, final String hdfsNameNode, final String hdfsUser) throws Exception {
+	public AbstractMigrationExecutor(final String hdfsPath, final String hdfsNameNode, final String hdfsUser) throws Exception {
 		this.writer = SequenceFile.createWriter(getConf(hdfsNameNode, hdfsUser), SequenceFile.Writer.file(new Path(hdfsPath)), SequenceFile.Writer
 				.keyClass(IntWritable.class), SequenceFile.Writer.valueClass(Text.class));
 	}

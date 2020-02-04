@@ -28,7 +28,7 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class MigrateDbEntitiesApplication extends AbstractMigrateApplication implements Closeable {
+public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor implements Closeable {
 
 	private static final Qualifier ENTITYREGISTRY_PROVENANCE_ACTION =
 			qualifier("sysimport:crosswalk:entityregistry", "sysimport:crosswalk:entityregistry", "dnet:provenance_actions", "dnet:provenance_actions");
