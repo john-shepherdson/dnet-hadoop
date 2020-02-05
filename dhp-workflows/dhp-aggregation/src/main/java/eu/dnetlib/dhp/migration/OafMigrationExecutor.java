@@ -23,13 +23,13 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OafMigrationExecutor extends AbstractMongoExecutor {
 
+	private static final Log log = LogFactory.getLog(OafMigrationExecutor.class);
+
 	public OafMigrationExecutor(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String mongoBaseUrl, final String mongoDb,
 			final String dbUrl, final String dbUser,
 			final String dbPassword) throws Exception {
 		super(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb, dbUrl, dbUser, dbPassword);
 	}
-
-	private static final Log log = LogFactory.getLog(MigrateMongoMdstoresApplication.class);
 
 	@Override
 	protected void registerNamespaces(final Map<String, String> nsContext) {
@@ -73,6 +73,7 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 			final Author author = new Author();
 			author.setFullname(n.getText());
 			author.setRank(pos++);
+			res.add(author);
 		}
 		return res;
 	}
@@ -118,9 +119,24 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 	}
 
 	@Override
-	protected List<Instance> prepareInstances(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+	protected List<Instance> prepareInstances(final Document doc, final DataInfo info, final KeyValue collectedfrom, final KeyValue hostedby) {
+		final List<Instance> res = new ArrayList<>();
+		for (final Object o : doc.selectNodes("//dc:identifier")) {
+			final String url = ((Node) o).getText().trim();
+			if (url.startsWith("http")) {
+				final Instance instance = new Instance();
+				instance.setUrl(url);
+				instance.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", "dnet:publication_resource", "dnet:publication_resource"));
+				instance.setCollectedfrom(collectedfrom);
+				instance.setHostedby(hostedby);
+				instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
+				instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
+				instance.setAccessright(prepareQualifier(doc, "//oaf:accessrights", "dnet:access_modes", "dnet:access_modes"));
+				instance.setLicense(field(doc.valueOf("//oaf:license"), info));
+				res.add(instance);
+			}
+		}
+		return res;
 	}
 
 	@Override
@@ -140,23 +156,7 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 		return null;
 	}
 
-	@Override
-	protected List<Field<String>> prepareOtherResearchProductTools(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected List<Field<String>> prepareOtherResearchProductContactGroups(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected List<Field<String>> prepareOtherResearchProductContactPersons(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	// SOFTWARES
 
 	@Override
 	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
@@ -182,6 +182,7 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 		return null;
 	}
 
+	// DATASETS
 	@Override
 	protected List<GeoLocation> prepareDatasetGeoLocations(final Document doc, final DataInfo info) {
 		// TODO Auto-generated method stub
@@ -224,23 +225,24 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 		return null;
 	}
 
-	/*
-	 * private StructuredProperty prepareStructProp(final Document doc, final String xpath, final DataInfo dataInfo) { if
-	 * (StringUtils.isBlank(s)) { return null; } final String[] parts = s.split("###"); if (parts.length == 2) { final String value =
-	 * parts[0]; final String[] arr = parts[1].split("@@@"); if (arr.length == 4) { return structuredProperty(value, arr[0], arr[1], arr[2],
-	 * arr[3], dataInfo); } } return null; }
-	 *
-	 * private List<StructuredProperty> prepareListOfStructProps(final Document doc, final String xpath, final DataInfo dataInfo) { final
-	 * List<StructuredProperty> res = new ArrayList<>(); if (array != null) { for (final String s : (String[]) array.getArray()) { final
-	 * StructuredProperty sp = prepareStructProp(s, dataInfo); if (sp != null) { res.add(sp); } } }
-	 *
-	 * return res; }
-	 *
-	 * private Journal prepareJournal(final Document doc, final String xpath, final DataInfo info) { if (StringUtils.isNotBlank(sj)) { final
-	 * String[] arr = sj.split("@@@"); if (arr.length == 3) { final String issn = StringUtils.isNotBlank(arr[0]) ? arr[0] : null; final
-	 * String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1] : null;; final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2] : null;;
-	 * if (issn != null || eissn != null || lissn != null) { return journal(name, issn, eissn, eissn, null, null, null, null, null, null,
-	 * null, info); } } } return null; }
-	 */
+	// OTHER PRODUCTS
+
+	@Override
+	protected List<Field<String>> prepareOtherResearchProductTools(final Document doc, final DataInfo info) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected List<Field<String>> prepareOtherResearchProductContactGroups(final Document doc, final DataInfo info) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected List<Field<String>> prepareOtherResearchProductContactPersons(final Document doc, final DataInfo info) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

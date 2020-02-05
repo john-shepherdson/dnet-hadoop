@@ -94,10 +94,13 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 
 				final String type = doc.valueOf("//dr:CobjCategory/@type");
 				final KeyValue collectedFrom = keyValue(doc.valueOf("//oaf:collectedFrom/@id"), doc.valueOf("//oaf:collectedFrom/@name"));
+				final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id")) ? collectedFrom
+						: keyValue(doc.valueOf("//oaf:hostedBy/@id"), doc.valueOf("//oaf:hostedBy/@name"));
+
 				final DataInfo info = prepareDataInfo(doc);
 				final long lastUpdateTimestamp = new Date().getTime();
 
-				for (final Oaf oaf : createOafs(doc, type, collectedFrom, info, lastUpdateTimestamp)) {
+				for (final Oaf oaf : createOafs(doc, type, collectedFrom, hostedBy, info, lastUpdateTimestamp)) {
 					emitOaf(oaf);
 				}
 			}
@@ -106,7 +109,12 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 
 	protected abstract void registerNamespaces(Map<String, String> nsContext);
 
-	protected List<Oaf> createOafs(final Document doc, final String type, final KeyValue collectedFrom, final DataInfo info, final long lastUpdateTimestamp) {
+	protected List<Oaf> createOafs(final Document doc,
+			final String type,
+			final KeyValue collectedFrom,
+			final KeyValue hostedBy,
+			final DataInfo info,
+			final long lastUpdateTimestamp) {
 
 		final List<Oaf> oafs = new ArrayList<>();
 
@@ -114,14 +122,14 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		case "":
 		case "publication":
 			final Publication p = new Publication();
-			populateResultFields(p, doc, collectedFrom, info, lastUpdateTimestamp);
+			populateResultFields(p, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
 			p.setResulttype(PUBLICATION_RESULTTYPE_QUALIFIER);
 			p.setJournal(prepareJournal(doc, info));
 			oafs.add(p);
 			break;
 		case "dataset":
 			final Dataset d = new Dataset();
-			populateResultFields(d, doc, collectedFrom, info, lastUpdateTimestamp);
+			populateResultFields(d, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
 			d.setResulttype(DATASET_RESULTTYPE_QUALIFIER);
 			d.setStoragedate(prepareDatasetStorageDate(doc, info));
 			d.setDevice(prepareDatasetDevice(doc, info));
@@ -134,7 +142,7 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 			break;
 		case "software":
 			final Software s = new Software();
-			populateResultFields(s, doc, collectedFrom, info, lastUpdateTimestamp);
+			populateResultFields(s, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
 			s.setResulttype(SOFTWARE_RESULTTYPE_QUALIFIER);
 			s.setDocumentationUrl(prepareSoftwareDocumentationUrls(doc, info));
 			s.setLicense(prepareSoftwareLicenses(doc, info));
@@ -145,7 +153,7 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		case "otherresearchproducts":
 		default:
 			final OtherResearchProduct o = new OtherResearchProduct();
-			populateResultFields(o, doc, collectedFrom, info, lastUpdateTimestamp);
+			populateResultFields(o, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
 			o.setResulttype(OTHER_RESULTTYPE_QUALIFIER);
 			o.setContactperson(prepareOtherResearchProductContactPersons(doc, info));
 			o.setContactgroup(prepareOtherResearchProductContactGroups(doc, info));
@@ -163,7 +171,12 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		return oafs;
 	}
 
-	private void populateResultFields(final Result r, final Document doc, final KeyValue collectedFrom, final DataInfo info, final long lastUpdateTimestamp) {
+	private void populateResultFields(final Result r,
+			final Document doc,
+			final KeyValue collectedFrom,
+			final KeyValue hostedBy,
+			final DataInfo info,
+			final long lastUpdateTimestamp) {
 		r.setDataInfo(info);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier")));
@@ -193,12 +206,12 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		r.setRefereed(null); // TODO
 		r.setContext(null); // TODO
 		r.setExternalReference(null); // TODO
-		r.setInstance(prepareInstances(doc, info));
+		r.setInstance(prepareInstances(doc, info, collectedFrom, hostedBy));
 		r.setProcessingchargeamount(null); // TODO
 		r.setProcessingchargecurrency(null); // TODO
 	}
 
-	protected abstract List<Instance> prepareInstances(Document doc, DataInfo info);
+	protected abstract List<Instance> prepareInstances(Document doc, DataInfo info, KeyValue collectedfrom, KeyValue hostedby);
 
 	protected abstract List<Field<String>> prepareSources(Document doc, DataInfo info);
 
@@ -266,7 +279,12 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 			final String issnPrinted = n.valueOf("@issn");
 			final String issnOnline = n.valueOf("@eissn");
 			final String issnLinking = n.valueOf("@lissn");
-			if (StringUtils.isNotBlank(name)) { return journal(name, issnPrinted, issnOnline, issnLinking, null, null, null, null, null, null, null, info); }
+			final String ep = n.valueOf("@ep");
+			final String iss = n.valueOf("@iss");
+			final String sp = n.valueOf("@sp");
+			final String vol = n.valueOf("@vol");
+			final String edition = n.valueOf("@edition");
+			if (StringUtils.isNotBlank(name)) { return journal(name, issnPrinted, issnOnline, issnLinking, ep, iss, sp, vol, edition, null, null, info); }
 		}
 		return null;
 	}
