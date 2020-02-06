@@ -1,0 +1,20 @@
+[
+  {
+    "paramName": "mt",
+    "paramLongName": "master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "input",
+    "paramDescription": "the path of the input sequential file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "o",
+    "paramLongName": "output",
+    "paramDescription": "the path of the result DataFrame on HDFS",
+    "paramRequired": true
+  }
+]

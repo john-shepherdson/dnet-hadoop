@@ -18,6 +18,7 @@
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup</module>
+        <module>dhp-actionmanager</module>
     </modules>
 
     <pluginRepositories>
