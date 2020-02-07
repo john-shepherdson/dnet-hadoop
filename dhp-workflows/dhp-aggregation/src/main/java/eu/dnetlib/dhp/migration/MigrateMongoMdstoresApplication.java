@@ -31,8 +31,11 @@ public class MigrateMongoMdstoresApplication {
 					new OafMigrationExecutor(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb, dbUrl, dbUser, dbPassword)) {
 				mig.processMdRecords(mdFormat, mdLayout, mdInterpretation);
 			}
-		} else if (mdFormat.equalsIgnoreCase("oaf")) {
-
+		} else if (mdFormat.equalsIgnoreCase("odf")) {
+			try (final OdfMigrationExecutor mig =
+					new OdfMigrationExecutor(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb, dbUrl, dbUser, dbPassword)) {
+				mig.processMdRecords(mdFormat, mdLayout, mdInterpretation);
+			}
 		} else {
 			throw new RuntimeException("Format not supported: " + mdFormat);
 		}

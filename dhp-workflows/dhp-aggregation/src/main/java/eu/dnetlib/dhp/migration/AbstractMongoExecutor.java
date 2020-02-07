@@ -60,12 +60,7 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		final Map<String, String> nsContext = new HashMap<>();
 
 		registerNamespaces(nsContext);
-		nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
-		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
-		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
-		nsContext.put("oaf", "http://namespace.openaire.eu/oaf");
-		nsContext.put("oai", "http://www.openarchives.org/OAI/2.0/");
-		nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
+
 		DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 	}
 
@@ -107,7 +102,13 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		}
 	}
 
-	protected abstract void registerNamespaces(Map<String, String> nsContext);
+	protected void registerNamespaces(final Map<String, String> nsContext) {
+		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
+		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
+		nsContext.put("oaf", "http://namespace.openaire.eu/oaf");
+		nsContext.put("oai", "http://www.openarchives.org/OAI/2.0/");
+		nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
+	}
 
 	protected List<Oaf> createOafs(final Document doc,
 			final String type,
@@ -196,7 +197,7 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		r.setDescription(prepareDescriptions(doc, info));
 		r.setDateofacceptance(prepareField(doc, "//oaf:dateAccepted", info));
 		r.setPublisher(preparePublisher(doc, info));
-		r.setEmbargoenddate(prepareEmbargoEndDate(doc, info));
+		r.setEmbargoenddate(prepareField(doc, "//oaf:embargoenddate", info));
 		r.setSource(prepareSources(doc, info));
 		r.setFulltext(null); // NOT PRESENT IN MDSTORES
 		r.setFormat(prepareFormats(doc, info));
@@ -214,8 +215,6 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 	protected abstract List<Instance> prepareInstances(Document doc, DataInfo info, KeyValue collectedfrom, KeyValue hostedby);
 
 	protected abstract List<Field<String>> prepareSources(Document doc, DataInfo info);
-
-	protected abstract Field<String> prepareEmbargoEndDate(Document doc, DataInfo info);
 
 	protected abstract List<StructuredProperty> prepareRelevantDates(Document doc, DataInfo info);
 
@@ -289,20 +288,20 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		return null;
 	}
 
-	protected Qualifier prepareQualifier(final Document doc, final String xpath, final String schemeId, final String schemeName) {
-		final String classId = doc.valueOf(xpath);
+	protected Qualifier prepareQualifier(final Node node, final String xpath, final String schemeId, final String schemeName) {
+		final String classId = node.valueOf(xpath);
 		final String className = code2name.get(classId);
 		return qualifier(classId, className, schemeId, schemeName);
 	}
 
-	protected List<StructuredProperty> prepareListStructProps(final Document doc,
+	protected List<StructuredProperty> prepareListStructProps(final Node node,
 			final String xpath,
 			final String xpathClassId,
 			final String schemeId,
 			final String schemeName,
 			final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes(xpath)) {
+		for (final Object o : node.selectNodes(xpath)) {
 			final Node n = (Node) o;
 			final String classId = n.valueOf(xpathClassId);
 			final String className = code2name.get(classId);
@@ -311,18 +310,18 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		return res;
 	}
 
-	protected List<StructuredProperty> prepareListStructProps(final Document doc, final String xpath, final Qualifier qualifier, final DataInfo info) {
+	protected List<StructuredProperty> prepareListStructProps(final Node node, final String xpath, final Qualifier qualifier, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes(xpath)) {
+		for (final Object o : node.selectNodes(xpath)) {
 			final Node n = (Node) o;
 			res.add(structuredProperty(n.getText(), qualifier, info));
 		}
 		return res;
 	}
 
-	protected List<StructuredProperty> prepareListStructProps(final Document doc, final String xpath, final DataInfo info) {
+	protected List<StructuredProperty> prepareListStructProps(final Node node, final String xpath, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes(xpath)) {
+		for (final Object o : node.selectNodes(xpath)) {
 			final Node n = (Node) o;
 			res.add(structuredProperty(n.getText(), n.valueOf("@classid"), n.valueOf("@classname"), n.valueOf("@schemeid"), n
 					.valueOf("@schemename"), info));
@@ -359,17 +358,17 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		return dataInfo(deletedbyinference, inferenceprovenance, inferred, false, qualifier(paClassId, paClassName, paSchemeId, paSchemeName), trust);
 	}
 
-	protected Field<String> prepareField(final Document doc, final String xpath, final DataInfo info) {
-		return field(doc.valueOf(xpath), info);
+	protected Field<String> prepareField(final Node node, final String xpath, final DataInfo info) {
+		return field(node.valueOf(xpath), info);
 	}
 
-	protected List<Field<String>> prepareListFields(final Document doc, final String xpath, final DataInfo info) {
-		return listFields(info, (String[]) prepareListString(doc, xpath).toArray());
+	protected List<Field<String>> prepareListFields(final Node node, final String xpath, final DataInfo info) {
+		return listFields(info, (String[]) prepareListString(node, xpath).toArray());
 	}
 
-	protected List<String> prepareListString(final Document doc, final String xpath) {
+	protected List<String> prepareListString(final Node node, final String xpath) {
 		final List<String> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes(xpath)) {
+		for (final Object o : node.selectNodes(xpath)) {
 			final String s = ((Node) o).getText().trim();
 			if (StringUtils.isNotBlank(s)) {
 				res.add(s);

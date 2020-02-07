@@ -33,12 +33,8 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected void registerNamespaces(final Map<String, String> nsContext) {
+		super.registerNamespaces(nsContext);
 		nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
-		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
-		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
-		nsContext.put("oaf", "http://namespace.openaire.eu/oaf");
-		nsContext.put("oai", "http://www.openarchives.org/OAI/2.0/");
-		nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
 	}
 
 	@Override
@@ -142,12 +138,6 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 	@Override
 	protected List<Field<String>> prepareSources(final Document doc, final DataInfo info) {
 		return prepareListFields(doc, "//dc:source", info);
-	}
-
-	@Override
-	protected Field<String> prepareEmbargoEndDate(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
