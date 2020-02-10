@@ -30,6 +30,7 @@ import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
@@ -164,13 +165,55 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		}
 
 		if (!oafs.isEmpty()) {
-			addRelations(oafs, doc, "TYPE", collectedFrom, info, lastUpdateTimestamp); // TODO
-			addRelations(oafs, doc, "TYPE", collectedFrom, info, lastUpdateTimestamp); // TODO
-			addRelations(oafs, doc, "TYPE", collectedFrom, info, lastUpdateTimestamp); // TODO
+			oafs.addAll(addProjectRels(doc, collectedFrom, info, lastUpdateTimestamp));
+			oafs.addAll(addOtherResultRels(doc, collectedFrom, info, lastUpdateTimestamp));
 		}
 
 		return oafs;
 	}
+
+	private List<Oaf> addProjectRels(final Document doc,
+			final KeyValue collectedFrom,
+			final DataInfo info,
+			final long lastUpdateTimestamp) {
+
+		final List<Oaf> res = new ArrayList<>();
+
+		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"));
+
+		for (final Object o : doc.selectNodes("//oaf:projectid")) {
+			final String projectId = createOpenaireId(40, ((Node) o).getText());
+
+			final Relation r1 = new Relation();
+			r1.setRelType("resultProject");
+			r1.setSubRelType("outcome");
+			r1.setRelClass("isProducedBy");
+			r1.setSource(docId);
+			r1.setTarget(projectId);
+			r1.setCollectedFrom(Arrays.asList(collectedFrom));
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			res.add(r1);
+
+			final Relation r2 = new Relation();
+			r2.setRelType("resultProject");
+			r2.setSubRelType("outcome");
+			r2.setRelClass("produces");
+			r2.setSource(projectId);
+			r2.setTarget(docId);
+			r2.setCollectedFrom(Arrays.asList(collectedFrom));
+			r2.setDataInfo(info);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+			res.add(r2);
+		}
+
+		return res;
+	}
+
+	protected abstract List<Oaf> addOtherResultRels(final Document doc,
+			final KeyValue collectedFrom,
+			final DataInfo info,
+			final long lastUpdateTimestamp);
 
 	private void populateResultFields(final Result r,
 			final Document doc,
@@ -199,18 +242,20 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		r.setPublisher(preparePublisher(doc, info));
 		r.setEmbargoenddate(prepareField(doc, "//oaf:embargoenddate", info));
 		r.setSource(prepareSources(doc, info));
-		r.setFulltext(null); // NOT PRESENT IN MDSTORES
+		r.setFulltext(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 		r.setFormat(prepareFormats(doc, info));
 		r.setContributor(prepareContributors(doc, info));
-		r.setResourcetype(null); // TODO
+		r.setResourcetype(prepareResourceType(doc, info));
 		r.setCoverage(prepareCoverages(doc, info));
-		r.setRefereed(null); // TODO
-		r.setContext(null); // TODO
-		r.setExternalReference(null); // TODO
+		r.setRefereed(null); // NOT PRESENT IN MDSTORES
+		r.setContext(new ArrayList<>()); // NOT PRESENT IN MDSTORES
+		r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 		r.setInstance(prepareInstances(doc, info, collectedFrom, hostedBy));
-		r.setProcessingchargeamount(null); // TODO
-		r.setProcessingchargecurrency(null); // TODO
+		r.setProcessingchargeamount(null); // NOT PRESENT IN MDSTORES
+		r.setProcessingchargecurrency(null); // NOT PRESENT IN MDSTORES
 	}
+
+	protected abstract Qualifier prepareResourceType(Document doc, DataInfo info);
 
 	protected abstract List<Instance> prepareInstances(Document doc, DataInfo info, KeyValue collectedfrom, KeyValue hostedby);
 
@@ -263,13 +308,6 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 	protected abstract Field<String> prepareDatasetDevice(Document doc, DataInfo info);
 
 	protected abstract Field<String> prepareDatasetStorageDate(Document doc, DataInfo info);
-
-	abstract protected void addRelations(final List<Oaf> oafs,
-			final Document doc,
-			final String type,
-			final KeyValue collectedFrom,
-			final DataInfo info,
-			final long lastUpdateTimestamp);
 
 	private Journal prepareJournal(final Document doc, final DataInfo info) {
 		final Node n = doc.selectSingleNode("//oaf:journal");

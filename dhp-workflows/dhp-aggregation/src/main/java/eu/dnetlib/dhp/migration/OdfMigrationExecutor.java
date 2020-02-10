@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.migration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OdfMigrationExecutor extends AbstractMongoExecutor {
@@ -190,8 +192,7 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected Field<String> prepareDatasetMetadataVersionNumber(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null;		// Not present in ODF ???
 	}
 
 	@Override
@@ -220,14 +221,49 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 	}
 
 	@Override
-	protected void addRelations(final List<Oaf> oafs,
-			final Document doc,
-			final String type,
-			final KeyValue collectedFrom,
-			final DataInfo info,
-			final long lastUpdateTimestamp) {
-		// TODO Auto-generated method stub
+	protected List<Oaf> addOtherResultRels(final Document doc, final KeyValue collectedFrom, final DataInfo info, final long lastUpdateTimestamp) {
 
+		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"));
+
+		final List<Oaf> res = new ArrayList<>();
+
+		for (final Object o : doc.selectNodes("//*[local-name() = 'resource']//*[local-name()='relatedIdentifier' and ./@relatedIdentifierType='OPENAIRE']")) {
+			final String otherId = createOpenaireId(50, ((Node) o).getText());
+			final String type = ((Node) o).valueOf("@relationType");
+
+			if (type.equals("IsSupplementTo")) {
+				res.add(prepareOtherResultRel(collectedFrom, info, lastUpdateTimestamp, docId, otherId, "supplement", "isSupplementTo"));
+				res.add(prepareOtherResultRel(collectedFrom, info, lastUpdateTimestamp, otherId, docId, "supplement", "isSupplementedBy"));
+			} else if (type.equals("IsPartOf")) {
+				res.add(prepareOtherResultRel(collectedFrom, info, lastUpdateTimestamp, docId, otherId, "part", "IsPartOf"));
+				res.add(prepareOtherResultRel(collectedFrom, info, lastUpdateTimestamp, otherId, docId, "part", "HasParts"));
+			} else {}
+		}
+		return res;
+	}
+
+	private Relation prepareOtherResultRel(final KeyValue collectedFrom,
+			final DataInfo info,
+			final long lastUpdateTimestamp,
+			final String source,
+			final String target,
+			final String subRelType,
+			final String relClass) {
+		final Relation r = new Relation();
+		r.setRelType("resultResult");
+		r.setSubRelType(subRelType);
+		r.setRelClass(relClass);
+		r.setSource(source);
+		r.setTarget(target);
+		r.setCollectedFrom(Arrays.asList(collectedFrom));
+		r.setDataInfo(info);
+		r.setLastupdatetimestamp(lastUpdateTimestamp);
+		return r;
+	}
+
+	@Override
+	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
+		return prepareQualifier(doc, "//*[local-name() = 'resource']//*[local-name() = 'resourceType']", "dnet:dataCite_resource", "dnet:dataCite_resource");
 	}
 
 }

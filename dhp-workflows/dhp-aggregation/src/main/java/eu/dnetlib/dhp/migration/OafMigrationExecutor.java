@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
+import eu.dnetlib.dhp.migration.pace.PacePerson;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -38,29 +39,6 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 	}
 
 	@Override
-	protected void addRelations(final List<Oaf> oafs,
-			final Document doc,
-			final String type,
-			final KeyValue collectedFrom,
-			final DataInfo info,
-			final long lastUpdateTimestamp) {
-		for (final Object o : doc.selectNodes("//")) { // TODO
-			final Node n = (Node) o;
-			final Relation r = new Relation();
-			r.setRelType(null); // TODO
-			r.setSubRelType(null); // TODO
-			r.setRelClass(null); // TODO
-			r.setSource(null); // TODO
-			r.setTarget(null); // TODO
-			r.setCollectedFrom(Arrays.asList(collectedFrom));
-			r.setDataInfo(info);
-			r.setLastupdatetimestamp(lastUpdateTimestamp);
-			oafs.add(r);
-		}
-
-	}
-
-	@Override
 	protected List<Author> prepareAuthors(final Document doc, final DataInfo info) {
 		final List<Author> res = new ArrayList<>();
 		int pos = 1;
@@ -69,6 +47,11 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 			final Author author = new Author();
 			author.setFullname(n.getText());
 			author.setRank(pos++);
+			final PacePerson p = new PacePerson(n.getText(), false);
+			if (p.isAccurate()) {
+				author.setName(p.getNormalisedFirstName());
+				author.setSurname(p.getNormalisedSurname());
+			}
 			res.add(author);
 		}
 		return res;
@@ -142,97 +125,124 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected List<StructuredProperty> prepareRelevantDates(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	// SOFTWARES
 
 	@Override
 	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected Field<String> prepareSoftwareCodeRepositoryUrl(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<StructuredProperty> prepareSoftwareLicenses(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<Field<String>> prepareSoftwareDocumentationUrls(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	// DATASETS
 	@Override
 	protected List<GeoLocation> prepareDatasetGeoLocations(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected Field<String> prepareDatasetMetadataVersionNumber(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected Field<String> prepareDatasetLastMetadataUpdate(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected Field<String> prepareDatasetVersion(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected Field<String> prepareDatasetSize(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected Field<String> prepareDatasetDevice(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected Field<String> prepareDatasetStorageDate(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // NOT PRESENT IN OAF
 	}
 
 	// OTHER PRODUCTS
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductTools(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactGroups(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactPersons(final Document doc, final DataInfo info) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<>(); // NOT PRESENT IN OAF
+	}
+
+	@Override
+	protected List<Oaf> addOtherResultRels(final Document doc,
+			final KeyValue collectedFrom,
+			final DataInfo info,
+			final long lastUpdateTimestamp) {
+		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"));
+
+		final List<Oaf> res = new ArrayList<>();
+
+		for (final Object o : doc.selectNodes("//*[local-name()='relatedDataset']")) {
+			final String otherId = createOpenaireId(50, ((Node) o).getText());
+
+			final Relation r1 = new Relation();
+			r1.setRelType("resultResult");
+			r1.setSubRelType("publicationDataset");
+			r1.setRelClass("isRelatedTo");
+			r1.setSource(docId);
+			r1.setTarget(otherId);
+			r1.setCollectedFrom(Arrays.asList(collectedFrom));
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			res.add(r1);
+
+			final Relation r2 = new Relation();
+			r2.setRelType("resultResult");
+			r2.setSubRelType("publicationDataset");
+			r2.setRelClass("isRelatedTo");
+			r2.setSource(otherId);
+			r2.setTarget(docId);
+			r2.setCollectedFrom(Arrays.asList(collectedFrom));
+			r2.setDataInfo(info);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+			res.add(r2);
+		}
+		return res;
+	}
+
+	@Override
+	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
+		return null; // NOT PRESENT IN OAF
 	}
 
 }
