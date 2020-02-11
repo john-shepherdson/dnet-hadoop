@@ -31,7 +31,7 @@ SELECT
         p.fundedamount                                                                                             AS fundedamount,
                 dc.id                                                                                                      AS collectedfromid,
                 dc.officialname                                                                                            AS collectedfromname,
-                p.contracttype || '@@@' || p.contracttypename || '@@@' || p.contracttypescheme || '@@@' || p.contracttypescheme     AS contracttype,
+                ctc.code || '@@@' || ctc.name || '@@@' || cts.code || '@@@' || cts.name                                    AS contracttype,
                 pac.code || '@@@' || pac.name || '@@@' || pas.code || '@@@' || pas.name                                    AS provenanceaction,
                 array_agg(DISTINCT i.pid || '###' || i.issuertype)                                                         AS pid,
                 array_agg(DISTINCT s.name || '###' || sc.code || '@@@' || sc.name || '@@@' || ss.code || '@@@' || ss.name) AS subjects,
@@ -53,6 +53,9 @@ SELECT
 
                 LEFT OUTER JOIN class sc ON (sc.code = s.semanticclass)
                 LEFT OUTER JOIN scheme ss ON (ss.code = s.semanticscheme)
+
+                LEFT OUTER JOIN class ctc ON (ctc.code = p.contracttypeclass)
+                LEFT OUTER JOIN scheme cts ON (cts.code = p.contracttypescheme)
 
         GROUP BY
                 p.id,
@@ -77,11 +80,11 @@ SELECT
                 p.contactfax,
                 p.contactphone,
                 p.contactemail,
-                p.contracttype,
                 p.summary,
                 p.currency,
                 p.totalcost,
                 p.fundedamount,
                 dc.id,
                 dc.officialname,
-                pac.code, pac.name, pas.code, pas.name;
+                pac.code, pac.name, pas.code, pas.name,
+                ctc.code, ctc.name, cts.code, cts.name;

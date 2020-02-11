@@ -37,6 +37,8 @@ public class DbClient implements Closeable {
 	public void processResults(final String sql, final Consumer<ResultSet> consumer) {
 
 		try (final Statement stmt = connection.createStatement()) {
+			stmt.setFetchSize(100);
+
 			try (final ResultSet rs = stmt.executeQuery(sql)) {
 				while (rs.next()) {
 					consumer.accept(rs);

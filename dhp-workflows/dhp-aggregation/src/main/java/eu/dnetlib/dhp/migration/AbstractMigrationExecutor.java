@@ -71,12 +71,13 @@ public class AbstractMigrationExecutor implements Closeable {
 			value.set(objectMapper.writeValueAsString(oaf));
 			writer.append(key, value);
 		} catch (final Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
 	public void close() throws IOException {
+		writer.hflush();
 		writer.close();
 	}
 
@@ -216,4 +217,7 @@ public class AbstractMigrationExecutor implements Closeable {
 
 	}
 
+	public static String asString(final Object o) {
+		return o == null ? "" : o.toString();
+	}
 }
