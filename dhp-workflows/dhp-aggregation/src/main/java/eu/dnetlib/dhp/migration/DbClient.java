@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,7 +23,9 @@ public class DbClient implements Closeable {
 
 		try {
 			Class.forName("org.postgresql.Driver");
-			this.connection = DriverManager.getConnection(address, login, password);
+
+			this.connection =
+					StringUtils.isNoneBlank(login, password) ? DriverManager.getConnection(address, login, password) : DriverManager.getConnection(address);
 			this.connection.setAutoCommit(false);
 		} catch (final Exception e) {
 			log.error(e.getClass().getName() + ": " + e.getMessage());
@@ -34,7 +37,7 @@ public class DbClient implements Closeable {
 	public void processResults(final String sql, final Consumer<ResultSet> consumer) {
 
 		try (final Statement stmt = connection.createStatement()) {
-			try (final ResultSet rs = stmt.executeQuery("SELECT * FROM COMPANY;")) {
+			try (final ResultSet rs = stmt.executeQuery(sql)) {
 				while (rs.next()) {
 					consumer.accept(rs);
 				}

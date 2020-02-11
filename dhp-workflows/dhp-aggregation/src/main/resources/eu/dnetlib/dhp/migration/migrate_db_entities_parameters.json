@@ -27,12 +27,12 @@
 		"paramName": "dbuser",
 		"paramLongName": "postgresUser",
 		"paramDescription": "postgres user",
-		"paramRequired": true
+		"paramRequired": false
 	},
 	{
 		"paramName": "dbpasswd",
 		"paramLongName": "postgresPassword",
 		"paramDescription": "postgres password",
-		"paramRequired": true
+		"paramRequired": false
 	}
 ]
