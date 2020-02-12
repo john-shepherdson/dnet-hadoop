@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
@@ -49,6 +51,8 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 	protected static final Qualifier SOFTWARE_RESULTTYPE_QUALIFIER = qualifier("software", "software", "dnet:result_typologies", "dnet:result_typologies");
 	protected static final Qualifier OTHER_RESULTTYPE_QUALIFIER = qualifier("other", "other", "dnet:result_typologies", "dnet:result_typologies");
 
+	private static final Log log = LogFactory.getLog(AbstractMongoExecutor.class);
+
 	public AbstractMongoExecutor(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String mongoBaseUrl,
 			final String mongoDb, final String dbUrl, final String dbUser,
 			final String dbPassword) throws Exception {
@@ -66,6 +70,9 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 	}
 
 	private void loadClassNames(final String dbUrl, final String dbUser, final String dbPassword) throws IOException {
+
+		log.info("Loading vocabulary terms from db...");
+
 		try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
 			code2name.clear();
 			dbClient.processResults("select code, name from class", rs -> {
@@ -77,12 +84,19 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 			});
 		}
 
+		log.info("Found " + code2name.size() + " terms.");
+
 	}
 
 	public void processMdRecords(final String mdFormat, final String mdLayout, final String mdInterpretation) throws DocumentException {
 
-		for (final Entry<String, String> entry : mdstoreClient.validCollections(mdFormat, mdLayout, mdInterpretation).entrySet()) {
-			// final String mdId = entry.getKey();
+		log.info(String.format("Searching mdstores (format: %s, layout: %s, interpretation: %s)", mdFormat, mdLayout, mdInterpretation));
+
+		final Map<String, String> colls = mdstoreClient.validCollections(mdFormat, mdLayout, mdInterpretation);
+		log.info("Found " + colls.size() + " mdstores");
+
+		for (final Entry<String, String> entry : colls.entrySet()) {
+			log.info("Processing mdstore " + entry.getKey() + " (collection: " + entry.getValue() + ")");
 			final String currentColl = entry.getValue();
 
 			for (final String xml : mdstoreClient.listRecords(currentColl)) {
@@ -101,6 +115,7 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 				}
 			}
 		}
+		log.info("All Done.");
 	}
 
 	protected void registerNamespaces(final Map<String, String> nsContext) {

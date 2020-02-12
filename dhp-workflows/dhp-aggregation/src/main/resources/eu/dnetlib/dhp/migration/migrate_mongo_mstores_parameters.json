@@ -48,21 +48,21 @@
 		"paramRequired": true
 	},
 	{
-		"paramName": "postgresUrl",
+		"paramName": "pgurl",
 		"paramLongName": "postgresUrl",
 		"paramDescription": "postgres url, example: jdbc:postgresql://localhost:5432/testdb",
 		"paramRequired": true
 	},
 	{
-		"paramName": "postgresUser",
+		"paramName": "pguser",
 		"paramLongName": "postgresUser",
 		"paramDescription": "postgres user",
-		"paramRequired": true
+		"paramRequired": false
 	},
 	{
-		"paramName": "postgresPassword",
+		"paramName": "pgpasswd",
 		"paramLongName": "postgresPassword",
 		"paramDescription": "postgres password",
-		"paramRequired": true
+		"paramRequired": false
 	}
 ]
