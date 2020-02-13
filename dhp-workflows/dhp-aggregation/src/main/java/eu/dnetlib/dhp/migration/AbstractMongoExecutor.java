@@ -385,6 +385,8 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 	protected OAIProvenance prepareOAIprovenance(final Document doc) {
 		final Node n = doc.selectSingleNode("//*[local-name()='provenance']/*[local-name()='originDescription']");
 
+		if (n == null) { return null; }
+
 		final String identifier = n.valueOf("./*[local-name()='identifier']");
 		final String baseURL = n.valueOf("./*[local-name()='baseURL']");;
 		final String metadataNamespace = n.valueOf("./*[local-name()='metadataNamespace']");;
@@ -393,6 +395,7 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		final String harvestDate = n.valueOf("@harvestDate");;
 
 		return oaiIProvenance(identifier, baseURL, metadataNamespace, altered, datestamp, harvestDate);
+
 	}
 
 	protected DataInfo prepareDataInfo(final Document doc) {
@@ -416,7 +419,7 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 	}
 
 	protected List<Field<String>> prepareListFields(final Node node, final String xpath, final DataInfo info) {
-		return listFields(info, (String[]) prepareListString(node, xpath).toArray());
+		return listFields(info, prepareListString(node, xpath));
 	}
 
 	protected List<String> prepareListString(final Node node, final String xpath) {

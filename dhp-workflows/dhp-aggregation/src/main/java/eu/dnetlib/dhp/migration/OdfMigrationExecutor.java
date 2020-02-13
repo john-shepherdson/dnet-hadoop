@@ -34,6 +34,7 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected void registerNamespaces(final Map<String, String> nsContext) {
+		super.registerNamespaces(nsContext);
 		nsContext.put("dc", "http://datacite.org/schema/kernel-3");
 	}
 

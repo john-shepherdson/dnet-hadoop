@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.migration;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.StreamSupport;
@@ -35,7 +36,7 @@ public class MdstoreClient implements Closeable {
 	public Map<String, String> validCollections(final String mdFormat, final String mdLayout, final String mdInterpretation) {
 
 		final Map<String, String> transactions = new HashMap<>();
-		for (final Document entry : getColl(db, COLL_METADATA_MANAGER).find()) {
+		for (final Document entry : getColl(db, COLL_METADATA_MANAGER, true).find()) {
 			final String mdId = entry.getString("mdId");
 			final String currentId = entry.getString("currentId");
 			if (StringUtils.isNoneBlank(mdId, currentId)) {
@@ -44,7 +45,7 @@ public class MdstoreClient implements Closeable {
 		}
 
 		final Map<String, String> res = new HashMap<>();
-		for (final Document entry : getColl(db, COLL_METADATA).find()) {
+		for (final Document entry : getColl(db, COLL_METADATA, true).find()) {
 			if (entry.getString("format").equals(mdFormat) && entry.getString("layout").equals(mdLayout)
 					&& entry.getString("interpretation").equals(mdInterpretation) && transactions.containsKey(entry.getString("mdId"))) {
 				res.put(entry.getString("mdId"), transactions.get(entry.getString("mdId")));
@@ -63,20 +64,26 @@ public class MdstoreClient implements Closeable {
 		return client.getDatabase(dbName);
 	}
 
-	private MongoCollection<Document> getColl(final MongoDatabase db, final String collName) {
+	private MongoCollection<Document> getColl(final MongoDatabase db, final String collName, final boolean abortIfMissing) {
 		if (!Iterables.contains(db.listCollectionNames(), collName)) {
 			final String err = String.format(String.format("Missing collection '%s' in database '%s'", collName, db.getName()));
 			log.warn(err);
-			throw new RuntimeException(err);
+			if (abortIfMissing) {
+				throw new RuntimeException(err);
+			} else {
+				return null;
+			}
 		}
 		return db.getCollection(collName);
 	}
 
-	public Iterable<String> listRecords(final String coll) {
-		return () -> StreamSupport.stream(getColl(db, coll).find().spliterator(), false)
-				.filter(e -> e.containsKey("body"))
-				.map(e -> e.getString("body"))
-				.iterator();
+	public Iterable<String> listRecords(final String collName) {
+		final MongoCollection<Document> coll = getColl(db, collName, false);
+		return coll == null ? new ArrayList<>()
+				: () -> StreamSupport.stream(coll.find().spliterator(), false)
+						.filter(e -> e.containsKey("body"))
+						.map(e -> e.getString("body"))
+						.iterator();
 	}
 
 	@Override

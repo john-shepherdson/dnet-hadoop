@@ -111,6 +111,10 @@ public class AbstractMigrationExecutor implements Closeable {
 		return Arrays.stream(values).map(v -> field(v, info)).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
+	public static List<Field<String>> listFields(final DataInfo info, final List<String> values) {
+		return values.stream().map(v -> field(v, info)).filter(Objects::nonNull).collect(Collectors.toList());
+	}
+
 	public static Qualifier qualifier(final String classid, final String classname, final String schemeid, final String schemename) {
 		final Qualifier q = new Qualifier();
 		q.setClassid(classid);
