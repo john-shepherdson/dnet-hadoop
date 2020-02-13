@@ -1,5 +1,6 @@
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.graph.model;
 
+import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
@@ -25,6 +26,7 @@ public class RelatedEntity implements Serializable {
     private String codeRepositoryUrl;
     private Qualifier resulttype;
     private List<KeyValue> collectedfrom;
+    private List<Instance> instances;
 
     // datasource
     private String officialname;
@@ -44,14 +46,6 @@ public class RelatedEntity implements Serializable {
     private String acronym;
     private Qualifier contracttype;
     private List<String> fundingtree;
-
-    public static RelatedEntity parse(final String json) {
-        try {
-            return new ObjectMapper().readValue(json, RelatedEntity.class);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("invalid RelatedEntity, cannot parse: " + json);
-        }
-    }
 
     public String getId() {
         return id;
@@ -122,6 +116,15 @@ public class RelatedEntity implements Serializable {
 
     public RelatedEntity setCollectedfrom(List<KeyValue> collectedfrom) {
         this.collectedfrom = collectedfrom;
+        return this;
+    }
+
+    public List<Instance> getInstances() {
+        return instances;
+    }
+
+    public RelatedEntity setInstances(List<Instance> instances) {
+        this.instances = instances;
         return this;
     }
 
@@ -250,4 +253,5 @@ public class RelatedEntity implements Serializable {
         this.type = type;
         return this;
     }
+
 }

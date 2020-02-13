@@ -6,9 +6,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import eu.dnetlib.dhp.graph.model.*;
+import eu.dnetlib.dhp.graph.utils.ContextMapper;
+import eu.dnetlib.dhp.graph.utils.GraphMappingUtils;
+import eu.dnetlib.dhp.graph.utils.XmlRecordFactory;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -18,8 +23,11 @@ import scala.Tuple2;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static eu.dnetlib.dhp.graph.utils.GraphMappingUtils.asRelatedEntity;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects.
@@ -41,16 +49,21 @@ import java.util.stream.Collectors;
  */
 public class GraphJoiner implements Serializable {
 
-    public static final int MAX_RELS = 10;
+    public static final int MAX_RELS = 100;
+
+    public static final String schemaLocation = "https://www.openaire.eu/schema/1.0/oaf-1.0.xsd";
 
     private SparkSession spark;
+
+    private ContextMapper contextMapper;
 
     private String inputPath;
 
     private String outPath;
 
-    public GraphJoiner(SparkSession spark, String inputPath, String outPath) {
+    public GraphJoiner(SparkSession spark, ContextMapper contextMapper, String inputPath, String outPath) {
         this.spark = spark;
+        this.contextMapper = contextMapper;
         this.inputPath = inputPath;
         this.outPath = outPath;
     }
@@ -68,7 +81,7 @@ public class GraphJoiner implements Serializable {
         JavaPairRDD<String, TypedRow> publication = readPathEntity(sc, getInputPath(), "publication");
 
         // create the union between all the entities
-        final String entitiesPath = getOutPath() + "/0_entities";
+        final String entitiesPath = getOutPath() + "/entities";
         datasource
                 .union(organization)
                 .union(project)
@@ -94,81 +107,53 @@ public class GraphJoiner implements Serializable {
                 .flatMap(p -> p.iterator())
                 .mapToPair(p -> new Tuple2<>(p.getRelation().getTargetId(), p));
 
-        final String joinByTargetPath = getOutPath() + "/1_join_by_target";
-        relation
+        //final String bySource = getOutPath() + "/1_join_by_target";
+        JavaPairRDD<String, EntityRelEntity> bySource = relation
                 .join(entities
                         .filter(e -> !e._2().getSource().getDeleted())
-                        .mapToPair(e -> new Tuple2<>(e._1(), new GraphMappingUtils().pruneModel(e._2()))))
+                        .mapToPair(e -> new Tuple2<>(e._1(), asRelatedEntity(e._2()))))
                 .map(s -> new EntityRelEntity()
                         .setRelation(s._2()._1().getRelation())
                         .setTarget(s._2()._2().getSource()))
-                .map(GraphMappingUtils::serialize)
-                .saveAsTextFile(joinByTargetPath, GzipCodec.class);
-
-        JavaPairRDD<String, EntityRelEntity> bySource = sc.textFile(joinByTargetPath)
-                .map(t -> new ObjectMapper().readValue(t, EntityRelEntity.class))
                 .mapToPair(t -> new Tuple2<>(t.getRelation().getSourceId(), t));
 
-        final String linkedEntityPath = getOutPath() + "/2_linked_entities";
+        final XmlRecordFactory recordFactory = new XmlRecordFactory(contextMapper, false, schemaLocation, new HashSet<>());
         entities
                 .union(bySource)
                 .groupByKey()   // by source id
-                .map(p -> toLinkedEntity(p))
-                .map(e -> new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(e))
-                .saveAsTextFile(linkedEntityPath, GzipCodec.class);
-
-        final String joinedEntitiesPath = getOutPath() + "/3_joined_entities";
-        sc.textFile(linkedEntityPath)
-                .map(s -> new ObjectMapper().readValue(s, LinkedEntity.class))
                 .map(l -> toJoinedEntity(l))
-                .map(j -> new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(j))
-                .saveAsTextFile(joinedEntitiesPath);
+                .mapToPair(je -> new Tuple2<>(
+                        new Text(je.getEntity().getId()),
+                        new Text(recordFactory.build(je))))
+                .saveAsHadoopFile(getOutPath() + "/xml", Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 
         return this;
     }
 
     public GraphJoiner asXML() {
         final JavaSparkContext sc = new JavaSparkContext(getSpark().sparkContext());
+        final XmlRecordFactory recordFactory = new XmlRecordFactory(contextMapper, true, "", new HashSet<>());
+        final ObjectMapper mapper = new ObjectMapper();
 
-        final String joinedEntitiesPath = getOutPath() + "/3_joined_entities";
+        final String joinedEntitiesPath = getOutPath() + "/1_joined_entities";
         sc.textFile(joinedEntitiesPath)
-                .map(s -> new ObjectMapper().readValue(s, LinkedEntity.class))
-                .map(l -> toXML(l))
-                .saveAsTextFile(getOutPath() + "/4_xml");
+                .map(s -> mapper.readValue(s, JoinedEntity.class))
+                .mapToPair(je -> new Tuple2<>(new Text(je.getEntity().getId()), new Text(recordFactory.build(je))))
+                .saveAsHadoopFile(getOutPath() + "/2_xml", Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 
         return this;
-    }
-
-    private String toXML(LinkedEntity l) {
-
-        return null;
     }
 
     public SparkSession getSpark() {
         return spark;
     }
 
-    public GraphJoiner setSpark(SparkSession spark) {
-        this.spark = spark;
-        return this;
-    }
-
     public String getInputPath() {
         return inputPath;
     }
 
-    public GraphJoiner setInputPath(String inputPath) {
-        this.inputPath = inputPath;
-        return this;
-    }
-
     public String getOutPath() {
         return outPath;
-    }
-
-    public GraphJoiner setOutPath(String outPath) {
-        this.outPath = outPath;
-        return this;
     }
 
     // HELPERS
@@ -176,20 +161,20 @@ public class GraphJoiner implements Serializable {
     private OafEntity parseOaf(final String json, final String type) {
         final ObjectMapper o = new ObjectMapper();
         try {
-            switch (type) {
-                case "publication":
+            switch (GraphMappingUtils.EntityType.valueOf(type)) {
+                case publication:
                     return o.readValue(json, Publication.class);
-                case "dataset":
+                case dataset:
                     return o.readValue(json, Dataset.class);
-                case "otherresearchproduct":
+                case otherresearchproduct:
                     return o.readValue(json, OtherResearchProduct.class);
-                case "software":
+                case software:
                     return o.readValue(json, Software.class);
-                case "datasource":
+                case datasource:
                     return o.readValue(json, Datasource.class);
-                case "organization":
+                case organization:
                     return o.readValue(json, Organization.class);
-                case "project":
+                case project:
                     return o.readValue(json, Project.class);
                 default:
                     throw new IllegalArgumentException("invalid type: " + type);
@@ -199,56 +184,36 @@ public class GraphJoiner implements Serializable {
         }
     }
 
-    /**
-     * Converts the result of grouping <rel, target> pairs and the entities by source id to LinkedEntity
-     * @param p
-     * @return
-     */
-    private LinkedEntity toLinkedEntity(Tuple2<String, Iterable<EntityRelEntity>> p) {
-        final LinkedEntity e = new LinkedEntity();
-        final List<Tuple> links = Lists.newArrayList();
+    private JoinedEntity toJoinedEntity(Tuple2<String, Iterable<EntityRelEntity>> p) {
+        final ObjectMapper o = new ObjectMapper();
+        final JoinedEntity j = new JoinedEntity();
+        final Links links2 = new Links();
         for(EntityRelEntity rel : p._2()) {
-            if (rel.hasMainEntity() & e.getEntity() == null) {
-                e.setEntity(rel.getSource());
+            if (rel.hasMainEntity() & j.getEntity() == null) {
+                j.setType(rel.getSource().getType());
+                j.setEntity(parseOaf(rel.getSource().getOaf(), rel.getSource().getType()));
             }
             if (rel.hasRelatedEntity()) {
-                links.add(new Tuple()
-                        .setRelation(rel.getRelation())
-                        .setTarget(rel.getTarget()));
+                try {
+                    links2.add(
+                            new eu.dnetlib.dhp.graph.model.Tuple2()
+                                    .setRelation(o.readValue(rel.getRelation().getOaf(), Relation.class))
+                                    .setRelatedEntity(o.readValue(rel.getTarget().getOaf(), RelatedEntity.class)));
+                } catch (IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
             }
         }
-        e.setLinks(links);
-        if (e.getEntity() == null) {
+        j.setLinks(links2);
+        if (j.getEntity() == null) {
             throw new IllegalStateException("missing main entity on '" + p._1() + "'");
         }
-        return e;
-    }
-
-    /**
-     * Converts a LinkedEntity to a JoinedEntity
-     * @param l
-     * @return
-     */
-    private JoinedEntity toJoinedEntity(LinkedEntity l) {
-        return new JoinedEntity().setType(l.getEntity().getType())
-                .setEntity(parseOaf(l.getEntity().getOaf(), l.getEntity().getType()))
-                .setLinks(l.getLinks()
-                        .stream()
-                        .map(t -> {
-                            final ObjectMapper o = new ObjectMapper();
-                            try {
-                                return new Tuple2<>(
-                                        o.readValue(t.getRelation().getOaf(), Relation.class),
-                                        o.readValue(t.getTarget().getOaf(), RelatedEntity.class));
-                            } catch (IOException e) {
-                                throw new IllegalArgumentException(e);
-                            }
-                        }).collect(Collectors.toList()));
+        return j;
     }
 
     /**
      * Reads a set of eu.dnetlib.dhp.schema.oaf.OafEntity objects from a sequence file <className, entity json serialization>,
-     * extracts necessary information using json path, wraps the oaf object in a eu.dnetlib.dhp.graph.TypedRow
+     * extracts necessary information using json path, wraps the oaf object in a eu.dnetlib.dhp.graph.model.TypedRow
      * @param sc
      * @param inputPath
      * @param type
@@ -270,7 +235,7 @@ public class GraphJoiner implements Serializable {
 
     /**
      * Reads a set of eu.dnetlib.dhp.schema.oaf.Relation objects from a sequence file <className, relation json serialization>,
-     * extracts necessary information using json path, wraps the oaf object in a eu.dnetlib.dhp.graph.TypedRow
+     * extracts necessary information using json path, wraps the oaf object in a eu.dnetlib.dhp.graph.model.TypedRow
      * @param sc
      * @param inputPath
      * @return the JavaRDD<TypedRow> containing all the relationships

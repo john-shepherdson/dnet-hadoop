@@ -1,11 +1,8 @@
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.graph.model;
 
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import scala.Tuple2;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class JoinedEntity implements Serializable {
 
@@ -13,7 +10,7 @@ public class JoinedEntity implements Serializable {
 
     private OafEntity entity;
 
-    private List<Tuple2<Relation, RelatedEntity>> links;
+    private Links links;
 
     public String getType() {
         return type;
@@ -33,11 +30,11 @@ public class JoinedEntity implements Serializable {
         return this;
     }
 
-    public List<Tuple2<Relation, RelatedEntity>> getLinks() {
+    public Links getLinks() {
         return links;
     }
 
-    public JoinedEntity setLinks(List<Tuple2<Relation, RelatedEntity>> links) {
+    public JoinedEntity setLinks(Links links) {
         this.links = links;
         return this;
     }

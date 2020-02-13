@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.graph.model;
 
 import java.io.Serializable;
 
@@ -14,7 +14,6 @@ public class EntityRelEntity implements Serializable {
     public EntityRelEntity(TypedRow source) {
         this.source = source;
     }
-
 
     //helpers
     public Boolean hasMainEntity() {

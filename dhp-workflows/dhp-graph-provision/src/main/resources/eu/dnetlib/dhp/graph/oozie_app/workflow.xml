@@ -26,7 +26,15 @@
         </property>
     </parameters>
 
-    <start to="adjancency_lists"/>
+    <start to="reuse_records"/>
+
+    <decision name="reuse_records">
+        <switch>
+            <case to="adjancency_lists">${wf:conf('reuseRecords') eq false}</case>
+            <case to="to_solr_index">${wf:conf('reuseRecords') eq true}</case>
+            <default to="adjancency_lists"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -36,7 +44,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>build_adjacency_lists</name>
             <class>eu.dnetlib.dhp.graph.SparkXmlRecordBuilderJob</class>
@@ -47,13 +55,42 @@
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
-                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>-mt</arg> <arg>yarn</arg>
+            <arg>-is</arg> <arg>${isLookupUrl}</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
+        </spark>
+        <ok to="to_solr_index"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="to_solr_index">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>to_solr_index</name>
+            <class>eu.dnetlib.dhp.graph.SparkXmlIndexingJob</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCoresForIndexing}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.instances=${sparkExecutorInstances}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>-mt</arg> <arg>yarn</arg>
+            <arg>-is</arg> <arg>${isLookupUrl}</arg>
+            <arg>--sourcePath</arg><arg>${outputPath}/xml</arg>
+            <arg>--format</arg><arg>${format}</arg>
+            <arg>--batchSize</arg><arg>${batchSize}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
