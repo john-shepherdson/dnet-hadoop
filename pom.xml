@@ -211,6 +211,11 @@
                 <version>4.5.3</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.5.3</version>
+            </dependency>
+            <dependency>
                 <groupId>org.noggit</groupId>
                 <artifactId>noggit</artifactId>
                 <version>0.8</version>

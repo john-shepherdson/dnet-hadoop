@@ -45,7 +45,7 @@ public class SparkXmlIndexingJob {
         final String inputPath = parser.get("sourcePath");
         final String isLookupUrl = parser.get("isLookupUrl");
         final String format = parser.get("format");
-        final Integer batchSize = parser.getObjectMap().containsKey("batckSize") ? Integer.valueOf(parser.get("batchSize")) : DEFAULT_BATCH_SIZE;
+        final Integer batchSize = parser.getObjectMap().containsKey("batchSize") ? Integer.valueOf(parser.get("batchSize")) : DEFAULT_BATCH_SIZE;
 
         final ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
         final String fields = getLayoutSource(isLookup, format);

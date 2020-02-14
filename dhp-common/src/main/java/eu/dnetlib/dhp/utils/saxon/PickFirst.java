@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.utils.saxon;
 
 import net.sf.saxon.expr.XPathContext;
+import net.sf.saxon.om.Item;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.value.SequenceType;
@@ -19,15 +20,21 @@ public class PickFirst extends AbstractExtensionFunction {
         if (arguments == null | arguments.length == 0) {
             return new StringValue("");
         }
-        String s1 = arguments[0].head().getStringValue();
 
-        if (arguments.length > 1) {
-            String s2 = arguments[1].head().getStringValue();
+        final String s1 = getValue(arguments[0]);
+        final String s2 = getValue(arguments[1]);
 
-            return new StringValue(StringUtils.isNotBlank(s1) ? s1 : StringUtils.isNotBlank(s2) ? s2 : "");
-        } else {
-            return new StringValue(StringUtils.isNotBlank(s1) ? s1 : "");
+        return new StringValue(StringUtils.isNotBlank(s1) ? s1 : StringUtils.isNotBlank(s2) ? s2 : "");
+    }
+
+    private String getValue(final Sequence arg) throws XPathException {
+        if (arg != null) {
+            final Item item = arg.head();
+            if (item != null) {
+                return item.getStringValue();
+            }
         }
+        return "";
     }
 
     @Override

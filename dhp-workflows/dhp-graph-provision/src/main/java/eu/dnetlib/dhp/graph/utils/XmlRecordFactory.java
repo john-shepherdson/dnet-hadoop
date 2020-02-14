@@ -129,6 +129,9 @@ public class XmlRecordFactory implements Serializable {
                     .map(t -> mapStructuredProperty("title", t))
                     .collect(Collectors.toList()));
             }
+            if (r.getBestaccessright() != null) {
+                metadata.add(mapQualifier("bestaccessright", r.getBestaccessright()));
+            }
             if (r.getAuthor() != null) {
                 metadata.addAll(r.getAuthor()
                     .stream()
@@ -229,15 +232,6 @@ public class XmlRecordFactory implements Serializable {
             }
             if (r.getResourcetype() != null) {
                 metadata.add(mapQualifier("resourcetype", r.getResourcetype()));
-            }
-            if (r.getRefereed() != null) {
-                metadata.add(asXmlElement("refereed", r.getRefereed().getValue()));
-            }
-            if (r.getProcessingchargeamount() != null) {
-                metadata.add(asXmlElement("processingchargeamount", r.getProcessingchargeamount().getValue()));
-            }
-            if (r.getProcessingchargecurrency() != null) {
-                metadata.add(asXmlElement("processingchargecurrency", r.getProcessingchargecurrency().getValue()));
             }
 
             metadata.add(mapQualifier("bestaccessright", getBestAccessright(r)));
@@ -544,9 +538,6 @@ public class XmlRecordFactory implements Serializable {
                 if (p.getDuration() != null) {
                     metadata.add(asXmlElement("duration", p.getDuration().getValue()));
                 }
-                if (p.getEcsc39() != null) {
-                    metadata.add(asXmlElement("ecsc39", p.getEcsc39().getValue()));
-                }
                 if (p.getEcarticle29_3() != null) {
                     metadata.add(asXmlElement("ecarticle29_3", p.getEcarticle29_3().getValue()));
                 }
@@ -758,6 +749,15 @@ public class XmlRecordFactory implements Serializable {
                     }
                     if (isNotBlank(instance.getDistributionlocation())) {
                         fields.add(asXmlElement("distributionlocation", instance.getDistributionlocation()));
+                    }
+                    if (instance.getRefereed() != null && isNotBlank(instance.getRefereed().getValue())) {
+                        fields.add(asXmlElement("refereed", instance.getRefereed().getValue()));
+                    }
+                    if (instance.getProcessingchargeamount() != null && isNotBlank(instance.getProcessingchargeamount().getValue())) {
+                        fields.add(asXmlElement("processingchargeamount", instance.getProcessingchargeamount().getValue()));
+                    }
+                    if (instance.getProcessingchargecurrency() != null && isNotBlank(instance.getProcessingchargecurrency().getValue())) {
+                        fields.add(asXmlElement("processingchargecurrency", instance.getProcessingchargecurrency().getValue()));
                     }
 
                     children.add(templateFactory.getInstance(instance.getHostedby().getKey(), fields, instance.getUrl()));
