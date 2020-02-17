@@ -42,30 +42,11 @@ public class SparkCountryPropagationJob {
             directory.mkdirs();
         }
 
-        List<String> whitelist = new ArrayList<>();
-        List<String> allowedtypes = new ArrayList<>();
+        //TODO: add as Job Parameters
+        List<String> whitelist = Arrays.asList("10|opendoar____::300891a62162b960cf02ce3827bb363c");
+        List<String> allowedtypes = Arrays.asList("pubsrepository::institutional");
 
 
-
- //       JavaPairRDD<String, TypedRow> results = getResults(sc, inputPath);
-//                sc.sequenceFile(inputPath + "/dataset", Text.class, Text.class)
-//                    .map(item -> new ObjectMapper().readValue(item._2().toString(), Dataset.class))
-//                    .map(oaf -> new TypedRow().setType("dataset").setDeleted(oaf.getDataInfo().getDeletedbyinference()).setOaf(oaf.toString()).setSourceId(oaf.getId()))
-//                    .mapToPair(toPair())
-//                .union(sc.sequenceFile(inputPath + "/otherresearchproduct", Text.class, Text.class)
-//                        .map(item -> new ObjectMapper().readValue(item._2().toString(), OtherResearchProduct.class))
-//                        .map(oaf -> new TypedRow().setType("otherresearchproduct").setDeleted(oaf.getDataInfo().getDeletedbyinference()).setOaf(oaf.toString()).setSourceId(oaf.getId()))
-//                        .mapToPair(toPair()))
-//                .union(sc.sequenceFile(inputPath + "/software", Text.class, Text.class)
-//                        .map(item -> new ObjectMapper().readValue(item._2().toString(), Software.class))
-//                        .map(oaf -> new TypedRow().setType("software").setDeleted(oaf.getDataInfo().getDeletedbyinference()).setOaf(oaf.toString()).setSourceId(oaf.getId()))
-//                        .mapToPair(toPair()))
-//                .union(sc.sequenceFile(inputPath + "/publication", Text.class, Text.class)
-//                                .map(item -> new ObjectMapper().readValue(item._2().toString(), Publication.class))
-//                                .map(oaf -> new TypedRow().setType("publication").setDeleted(oaf.getDataInfo().getDeletedbyinference()).setOaf(oaf.toString()).setSourceId(oaf.getId()))
-//                                .mapToPair(toPair()));
-//
-//
         JavaPairRDD<String, TypedRow> organizations = sc.sequenceFile(inputPath + "/organization", Text.class, Text.class)
                 .map(item -> new ObjectMapper().readValue(item._2().toString(), Organization.class))
                 .filter(org -> !org.getDataInfo().getDeletedbyinference())
