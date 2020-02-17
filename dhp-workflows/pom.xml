@@ -18,6 +18,8 @@
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup</module>
+        <module>dhp-bulktag</module>
+        <module>dhp-propagation</module>
     </modules>
 
     <pluginRepositories>
