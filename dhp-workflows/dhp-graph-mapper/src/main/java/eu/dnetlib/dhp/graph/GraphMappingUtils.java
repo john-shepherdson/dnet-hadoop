@@ -18,13 +18,13 @@ public class GraphMappingUtils {
 	public final static Map<String, Class> types = Maps.newHashMap();
 
 	static {
-		types.put("datasource", Datasource.class);
-		types.put("organization", Organization.class);
+			types.put("datasource", Datasource.class);
+			types.put("organization", Organization.class);
 		types.put("project", Project.class);
-		types.put("dataset", Dataset.class);
-		types.put("otherresearchproduct", OtherResearchProduct.class);
-		types.put("software", Software.class);
-		types.put("publication", Publication.class);
+			types.put("dataset", Dataset.class);
+			types.put("otherresearchproduct", OtherResearchProduct.class);
+			types.put("software", Software.class);
+			types.put("publication", Publication.class);
 		types.put("relation", Relation.class);
 	}
 
