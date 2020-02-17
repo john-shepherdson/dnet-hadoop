@@ -45,7 +45,6 @@
                 --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
