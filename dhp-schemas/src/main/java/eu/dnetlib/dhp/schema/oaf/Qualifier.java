@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -50,6 +51,8 @@ public class Qualifier implements Serializable {
                 schemeid != null ? schemeid : "",
                 schemename != null ? schemename : "");
     }
+
+    @JsonIgnore
     public boolean isBlank() {
         return StringUtils.isBlank(classid) &&
                 StringUtils.isBlank(classname) &&

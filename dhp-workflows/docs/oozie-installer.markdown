@@ -10,9 +10,8 @@ This module is automatically executed when running:
 on module having set:
 
 	<parent>
-            <groupId>eu.dnetlib</groupId>
-            <artifactId>dhp-wf</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-workflows</artifactId>
 	</parent>
 
 in `pom.xml` file. `oozie-package` profile initializes oozie workflow packaging, `workflow.source.dir` property points to a workflow (notice: this is not a relative path but a classpath to directory usually holding `oozie_app` subdirectory). 

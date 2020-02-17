@@ -1,0 +1,38 @@
+[
+	{
+		"paramName": "p",
+		"paramLongName": "hdfsPath",
+		"paramDescription": "the path where storing the sequential file",
+		"paramRequired": true
+	},
+	{
+		"paramName": "n",
+		"paramLongName": "namenode",
+		"paramDescription": "the Name Node URI",
+		"paramRequired": true
+	},
+	{
+		"paramName": "u",
+		"paramLongName": "hdfsUser",
+		"paramDescription": "the user wich create the hdfs seq file",
+		"paramRequired": true
+	},
+	{
+		"paramName": "dburl",
+		"paramLongName": "postgresUrl",
+		"paramDescription": "postgres url, example: jdbc:postgresql://localhost:5432/testdb",
+		"paramRequired": true
+	},
+	{
+		"paramName": "dbuser",
+		"paramLongName": "postgresUser",
+		"paramDescription": "postgres user",
+		"paramRequired": false
+	},
+	{
+		"paramName": "dbpasswd",
+		"paramLongName": "postgresPassword",
+		"paramDescription": "postgres password",
+		"paramRequired": false
+	}
+]

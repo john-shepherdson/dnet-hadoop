@@ -1,0 +1,7 @@
+[
+  {"paramName":"mt",  "paramLongName":"master",             "paramDescription": "should be local or yarn",                                  "paramRequired": true},
+  {"paramName":"is",  "paramLongName":"isLookupUrl",        "paramDescription": "URL of the isLookUp Service",                              "paramRequired": true},
+  {"paramName":"s",   "paramLongName":"sourcePath",         "paramDescription": "the path of the sequence file to read the XML records",    "paramRequired": true},
+  {"paramName":"f",   "paramLongName":"format",             "paramDescription": "MDFormat name found in the IS profile",                    "paramRequired": true},
+  {"paramName":"b",   "paramLongName":"batchSize",          "paramDescription": "size of the batch of documents sent to solr",              "paramRequired": false}
+]

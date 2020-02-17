@@ -1,0 +1,34 @@
+<configuration>
+    <property>
+        <name>jobTracker</name>
+        <value>yarnRM</value>
+    </property>
+    <property>
+        <name>nameNode</name>
+        <value>hdfs://nameservice1</value>
+    </property>
+    <property>
+        <name>oozie.use.system.libpath</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>oozie.action.sharelib.for.spark</name>
+        <value>spark2</value>
+    </property>
+    <property>
+        <name>hive_metastore_uris</name>
+        <value>thrift://iis-cdh5-test-m3.ocean.icm.edu.pl:9083</value>
+    </property>
+    <property>
+        <name>hive_db_name</name>
+        <value>openaire</value>
+    </property>
+    <property>
+        <name>spark2YarnHistoryServerAddress</name>
+        <value>http://iis-cdh5-test-gw.ocean.icm.edu.pl:18088</value>
+    </property>
+    <property>
+        <name>spark2EventLogDir</name>
+        <value>/user/spark/applicationHistory</value>
+    </property>
+</configuration>

@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -40,6 +41,7 @@ public class KeyValue implements Serializable {
         return isBlank()?"":String.format("%s::%s", key != null ? key.toLowerCase() : "", value != null ? value.toLowerCase() : "");
     }
 
+    @JsonIgnore
     public boolean isBlank() {
         return StringUtils.isBlank(key) && StringUtils.isBlank(value);
     }

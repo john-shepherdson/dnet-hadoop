@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import scala.Tuple2;
 
 public class SparkGraphImporterJob {
 
@@ -33,17 +31,12 @@ public class SparkGraphImporterJob {
 
         // Read the input file and convert it into RDD of serializable object
         GraphMappingUtils.types.forEach((name, clazz) -> {
-            final JavaRDD<Tuple2<String, String>> inputRDD = sc.sequenceFile(inputPath + "/" + name, Text.class, Text.class)
-                    .map(item -> new Tuple2<>(item._1.toString(), item._2.toString()));
-
-            spark.createDataset(inputRDD
-                    .filter(s -> s._1().equals(clazz.getName()))
-                    .map(Tuple2::_2)
-                    .map(s -> new ObjectMapper().readValue(s, clazz))
+            spark.createDataset(sc.sequenceFile(inputPath + "/" + name, Text.class, Text.class)
+                    .map(s -> new ObjectMapper().readValue(s._2().toString(), clazz))
                     .rdd(), Encoders.bean(clazz))
-                    .write()
-                    .mode(SaveMode.Overwrite)
-                    .saveAsTable(hiveDbName + "." + name);
+                .write()
+                .mode(SaveMode.Overwrite)
+                .saveAsTable(hiveDbName + "." + name);
         });
 
     }

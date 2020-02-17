@@ -5,7 +5,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.1.6-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -24,6 +24,11 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <dependency>
