@@ -113,7 +113,7 @@
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
         </java>
-        <ok to="End"/>
+        <ok to="ExtractPublication"/>
         <error to="Kill"/>
     </action>
 
