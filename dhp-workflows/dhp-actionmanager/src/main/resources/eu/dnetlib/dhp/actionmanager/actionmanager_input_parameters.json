@@ -6,15 +6,21 @@
     "paramRequired": true
   },
   {
-    "paramName": "i",
-    "paramLongName": "input",
-    "paramDescription": "the path of the input sequential file to read",
+    "paramName": "ig",
+    "paramLongName": "inputGraphPath",
+    "paramDescription": "#TODO: input graph path",
     "paramRequired": true
   },
   {
-    "paramName": "o",
-    "paramLongName": "output",
-    "paramDescription": "the path of the result DataFrame on HDFS",
+    "paramName": "ia",
+    "paramLongName": "inputActionSetPaths",
+    "paramDescription": "#TODO: comma separated list of paths to input action sets",
+    "paramRequired": true
+  },
+  {
+    "paramName": "og",
+    "paramLongName": "outputGraphPath",
+    "paramDescription": "#TODO: the path of the result DataFrame on HDFS",
     "paramRequired": true
   }
 ]
