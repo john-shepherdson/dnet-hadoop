@@ -4,7 +4,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp-workflows</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.1.6-SNAPSHOT</version>
     </parent>
     <artifactId>dhp-aggregation</artifactId>
     
@@ -25,6 +25,12 @@
             <artifactId>dhp-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+         <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-schemas</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>net.sf.saxon</groupId>
@@ -43,6 +49,17 @@
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
+        </dependency>
+        
+        <dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.10</version>
         </dependency>
 
         <dependency>

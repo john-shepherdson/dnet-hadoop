@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.1.6-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -18,6 +18,7 @@
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup</module>
+        <module>dhp-graph-provision</module>
         <module>dhp-actionmanager</module>
     </modules>
 
