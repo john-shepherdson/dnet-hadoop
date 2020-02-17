@@ -104,7 +104,7 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 			final String url = ((Node) o).getText().trim();
 			if (url.startsWith("http")) {
 				final Instance instance = new Instance();
-				instance.setUrl(url);
+				instance.setUrl(Arrays.asList(url));
 				instance.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", "dnet:publication_resource", "dnet:publication_resource"));
 				instance.setCollectedfrom(collectedfrom);
 				instance.setHostedby(hostedby);
@@ -112,6 +112,9 @@ public class OafMigrationExecutor extends AbstractMongoExecutor {
 				instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 				instance.setAccessright(prepareQualifier(doc, "//oaf:accessrights", "dnet:access_modes", "dnet:access_modes"));
 				instance.setLicense(field(doc.valueOf("//oaf:license"), info));
+				instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
+				instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
+				instance.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 				res.add(instance);
 			}
 		}

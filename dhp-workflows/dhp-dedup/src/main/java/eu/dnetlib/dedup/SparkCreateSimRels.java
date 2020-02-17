@@ -1,7 +1,6 @@
 package eu.dnetlib.dedup;
 
-import eu.dnetlib.dedup.graph.ConnectedComponent;
-import eu.dnetlib.dedup.graph.GraphProcessor;
+import com.google.common.hash.Hashing;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.pace.config.DedupConfig;
@@ -12,8 +11,6 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.graphx.Edge;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
@@ -44,30 +41,23 @@ public class SparkCreateSimRels {
         final String inputPath = parser.get("sourcePath");
         final String entity = parser.get("entity");
         final String targetPath = parser.get("targetPath");
-//        final DedupConfig dedupConf = DedupConfig.load(IOUtils.toString(SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf2.json")));
+//        final DedupConfig dedupConf = DedupConfig.load(IOUtils.toString(SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
         final DedupConfig dedupConf = DedupConfig.load(parser.get("dedupConf"));
-
 
         final long total = sc.textFile(inputPath + "/" + entity).count();
 
-        JavaPairRDD<Object, MapDocument> vertexes = sc.textFile(inputPath + "/" + entity)
-                .map(s->{
+        JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(inputPath + "/" + entity)
+                .mapToPair(s->{
                     MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf,s);
-                    return new Tuple2<>(d.getIdentifier(), d);})
-                .mapToPair((PairFunction<Tuple2<String, MapDocument>, Object, MapDocument>) t -> new Tuple2<Object, MapDocument>((long) t._1().hashCode(), t._2()));
-
-
-
-
-        JavaPairRDD<String, MapDocument> mapDocument = vertexes.mapToPair((PairFunction<Tuple2<Object, MapDocument>, String, MapDocument>) item -> new Tuple2<String, MapDocument>(item._2().getIdentifier(), item._2()));
+                    return new Tuple2<>(d.getIdentifier(), d);});
 
         //create blocks for deduplication
-        JavaPairRDD<String, List<MapDocument>> blocks = Deduper.createsortedBlocks(sc,mapDocument, dedupConf);
-
+        JavaPairRDD<String, List<MapDocument>> blocks = Deduper.createsortedBlocks(sc, mapDocument, dedupConf);
+//        JavaPairRDD<String, Iterable<MapDocument>> blocks = Deduper.createBlocks(sc, mapDocument, dedupConf);
 
         //create relations by comparing only elements in the same group
         final JavaPairRDD<String,String> dedupRels = Deduper.computeRelations2(sc, blocks, dedupConf);
-
+//        final JavaPairRDD<String,String> dedupRels = Deduper.computeRelations(sc, blocks, dedupConf);
 
         final JavaRDD<Relation> isSimilarToRDD = dedupRels.map(simRel -> {
             final Relation r = new Relation();
@@ -79,17 +69,5 @@ public class SparkCreateSimRels {
 
         spark.createDataset(isSimilarToRDD.rdd(), Encoders.bean(Relation.class)).write().mode("overwrite").save( DedupUtility.createSimRelPath(targetPath,entity));
 
-
-
-
-
-
-
-
-
-
     }
-
-
-
 }

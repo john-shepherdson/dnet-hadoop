@@ -262,12 +262,9 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 		r.setContributor(prepareContributors(doc, info));
 		r.setResourcetype(prepareResourceType(doc, info));
 		r.setCoverage(prepareCoverages(doc, info));
-		r.setRefereed(null); // NOT PRESENT IN MDSTORES
 		r.setContext(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 		r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 		r.setInstance(prepareInstances(doc, info, collectedFrom, hostedBy));
-		r.setProcessingchargeamount(null); // NOT PRESENT IN MDSTORES
-		r.setProcessingchargecurrency(null); // NOT PRESENT IN MDSTORES
 	}
 
 	protected abstract Qualifier prepareResourceType(Document doc, DataInfo info);

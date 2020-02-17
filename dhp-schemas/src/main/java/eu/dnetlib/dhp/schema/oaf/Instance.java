@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Instance implements Serializable {
 
@@ -12,7 +13,7 @@ public class Instance implements Serializable {
 
     private KeyValue hostedby;
 
-    private String url;
+    private List<String> url;
 
     // other research products specifc
     private  String distributionlocation;
@@ -20,6 +21,14 @@ public class Instance implements Serializable {
     private KeyValue collectedfrom;
 
     private Field<String> dateofacceptance;
+
+    // ( article | book ) processing charges. Defined here to cope with possible wrongly typed results
+    private Field<String> processingchargeamount;
+
+    // currency - alphabetic code describe in ISO-4217. Defined here to cope with possible wrongly typed results
+    private Field<String> processingchargecurrency;
+
+    private Field<String> refereed; //peer-review status
 
     public Field<String> getLicense() {
         return license;
@@ -53,11 +62,11 @@ public class Instance implements Serializable {
         this.hostedby = hostedby;
     }
 
-    public String getUrl() {
+    public List<String> getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(List<String> url) {
         this.url = url;
     }
 
@@ -85,7 +94,29 @@ public class Instance implements Serializable {
         this.dateofacceptance = dateofacceptance;
     }
 
+    public Field<String> getProcessingchargeamount() {
+        return processingchargeamount;
+    }
 
+    public void setProcessingchargeamount(Field<String> processingchargeamount) {
+        this.processingchargeamount = processingchargeamount;
+    }
+
+    public Field<String> getProcessingchargecurrency() {
+        return processingchargecurrency;
+    }
+
+    public void setProcessingchargecurrency(Field<String> processingchargecurrency) {
+        this.processingchargecurrency = processingchargecurrency;
+    }
+
+    public Field<String> getRefereed() {
+        return refereed;
+    }
+
+    public void setRefereed(Field<String> refereed) {
+        this.refereed = refereed;
+    }
 
     public String toComparableString(){
         return String.format("%s::%s::%s::%s",
