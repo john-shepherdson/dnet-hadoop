@@ -31,7 +31,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
     }
     }
 /*
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.countrypropagation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -56,7 +56,7 @@ import java.util.stream.Stream;
 public class SparkCountryPropagationJob {
     public static void main(String[] args) throws Exception {
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkCountryPropagationJob.class.getResourceAsStream("/eu/dnetlib/dhp/graph/input_countrypropagation_parameters.json")));
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkCountryPropagationJob.class.getResourceAsStream("/eu/dnetlib/dhp/countrypropagation/input_countrypropagation_parameters.json")));
         parser.parseArgument(args);
         final SparkSession spark = SparkSession
                 .builder()
