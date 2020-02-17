@@ -1,0 +1,26 @@
+[
+  {
+    "paramName":"mt",
+    "paramLongName":"master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true,
+  },
+  {
+    "paramName":"s",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the path of the sequencial file to read",
+    "paramRequired": true,
+  },
+  {
+    "paramName":"wl",
+    "paramLongName":"whitelist",
+    "paramDescription": "datasource id that will be considered even if not in the allowed typology list. Split by ;",
+    "paramRequired": true
+  },
+  {
+    "paramName":"at",
+    "paramLongName":"allowedtypes",
+    "paramDescription": "the types of the allowed datasources. Split by ;",
+    "paramRequired": true
+  }
+]

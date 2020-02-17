@@ -9,16 +9,12 @@ import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.Optional;
-import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.*;
 import scala.Tuple2;
 
 import java.io.File;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class SparkCountryPropagationJob {
     public static void main(String[] args) throws Exception {
@@ -42,9 +38,8 @@ public class SparkCountryPropagationJob {
             directory.mkdirs();
         }
 
-        //TODO: add as Job Parameters
-        List<String> whitelist = Arrays.asList("10|opendoar____::300891a62162b960cf02ce3827bb363c");
-        List<String> allowedtypes = Arrays.asList("pubsrepository::institutional");
+        List<String> whitelist = Arrays.asList(parser.get("whitelist").split(";"));
+        List<String> allowedtypes = Arrays.asList(parser.get("allowedtypes").split(";"));
 
 
         JavaPairRDD<String, TypedRow> organizations = sc.sequenceFile(inputPath + "/organization", Text.class, Text.class)

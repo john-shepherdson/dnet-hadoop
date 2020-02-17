@@ -1,12 +1,16 @@
-<workflow-app name="import_infospace_graph" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="country_propagation" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
         <property>
-            <name>outputPath</name>
-            <description>the output path</description>
+            <name>whitelist</name>
+            <description>the white list</description>
+        </property>
+        <property>
+            <name>allowedtypes</name>
+            <description>the allowed types</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -22,7 +26,7 @@
         </property>
     </parameters>
 
-    <start to="MapGraphIntoDataFrame"/>
+    <start to="CountryPropagation"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -36,15 +40,17 @@
             <mode>cluster</mode>
             <name>CountryPropagation</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
-            <jar>dhp-graph-countrypropagation-${projectVersion}.jar</jar>
+            <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory}
                 --executor-cores ${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
-                --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+            </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--withelist</arg><arg>${whitelist}</arg>
+            <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
