@@ -16,6 +16,7 @@ import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.*;
 import scala.Tuple2;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -33,8 +34,13 @@ public class SparkCountryPropagationJob {
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
         final String inputPath = parser.get("sourcePath");
-        final String outputPath = parser.get("outputPath");
+        final String outputPath = "/tmp/provision/propagation/countrytoresultfrominstitutionalrepositories";
 
+        File directory = new File(outputPath);
+
+        if(!directory.exists()){
+            directory.mkdirs();
+        }
 
         List<String> whitelist = new ArrayList<>();
         List<String> allowedtypes = new ArrayList<>();
