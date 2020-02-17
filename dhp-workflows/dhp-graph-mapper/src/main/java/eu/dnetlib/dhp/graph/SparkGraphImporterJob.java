@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import scala.Tuple2;
 
 public class SparkGraphImporterJob {
 
