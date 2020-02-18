@@ -1,16 +1,8 @@
-<workflow-app name="country_propagation" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="affiliation_from_instrepo_propagation" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sourcePath</name>
             <description>the source path</description>
-        </property>
-        <property>
-            <name>whitelist</name>
-            <description>the white list</description>
-        </property>
-        <property>
-            <name>allowedtypes</name>
-            <description>the allowed types</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -26,20 +18,20 @@
         </property>
     </parameters>
 
-    <start to="CountryPropagation"/>
+    <start to="AffiliationPropagation"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="CountryPropagation">
+    <action name="AffiliationPropagation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>CountryPropagation</name>
-            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
+            <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory}
                 --executor-cores ${sparkExecutorCores}
@@ -49,8 +41,6 @@
             </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--whitelist</arg><arg>${whitelist}</arg>
-            <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
