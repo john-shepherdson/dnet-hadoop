@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.countrypropagation;
+package eu.dnetlib.dhp;
 
 
 import java.io.Serializable;
