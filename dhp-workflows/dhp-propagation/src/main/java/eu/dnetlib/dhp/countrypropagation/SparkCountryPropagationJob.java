@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.countrypropagation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.TypedRow;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -9,12 +10,13 @@ import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.*;
 import scala.Tuple2;
 
 import java.io.File;
 import java.util.*;
+
+import static eu.dnetlib.dhp.PropagationConstant.*;
 
 public class SparkCountryPropagationJob {
     public static void main(String[] args) throws Exception {
@@ -51,9 +53,10 @@ public class SparkCountryPropagationJob {
         JavaPairRDD<String, TypedRow> organization_datasource = sc.sequenceFile(inputPath + "/relation", Text.class, Text.class)
                 .map(item -> new ObjectMapper().readValue(item._2().toString(), Relation.class))
                 .filter(r -> !r.getDataInfo().getDeletedbyinference())
-                .filter(r -> "datasourceOrganization".equals(r.getRelClass()) && "isProvidedBy".equals(r.getRelType()))
+                .filter(r -> RELATION_DATASOURCEORGANIZATION_REL_TYPE.equals(r.getRelClass()) && RELATION_ORGANIZATION_DATASOURCE_REL_CLASS.equals(r.getRelType()))
                 .map(r -> new TypedRow().setSourceId(r.getSource()).setTargetId(r.getTarget()))
-                .mapToPair(toPair());
+                .mapToPair(toPair()); //id is the organization identifier
+
 
         JavaPairRDD<String, TypedRow> datasources = sc.sequenceFile(inputPath + "/datasource", Text.class, Text.class)
                 .map(item -> new ObjectMapper().readValue(item._2().toString(), Datasource.class))
@@ -72,7 +75,7 @@ public class SparkCountryPropagationJob {
                 .map(item -> new ObjectMapper().readValue(item._2().toString(), OtherResearchProduct.class));
 
         JavaPairRDD<String, TypedRow> datasource_results = publications
-                .map(oaf -> getTypedRows(oaf))
+                .map(oaf -> getTypedRowsDatasourceResult(oaf))
                 .flatMapToPair(f -> {
                     ArrayList<Tuple2<String, TypedRow>> ret = new ArrayList<>();
                     for (TypedRow t : f) {
@@ -81,7 +84,7 @@ public class SparkCountryPropagationJob {
                     return ret.iterator();
                 })
                 .union(datasets
-                        .map(oaf -> getTypedRows(oaf))
+                        .map(oaf -> getTypedRowsDatasourceResult(oaf))
                         .flatMapToPair(f -> {
                             ArrayList<Tuple2<String, TypedRow>> ret = new ArrayList<>();
                             for (TypedRow t : f) {
@@ -90,7 +93,7 @@ public class SparkCountryPropagationJob {
                             return ret.iterator();
                         }))
                 .union(software
-                .map(oaf -> getTypedRows(oaf))
+                .map(oaf -> getTypedRowsDatasourceResult(oaf))
                 .flatMapToPair(f -> {
                     ArrayList<Tuple2<String, TypedRow>> ret = new ArrayList<>();
                     for (TypedRow t : f) {
@@ -99,7 +102,7 @@ public class SparkCountryPropagationJob {
                     return ret.iterator();
                 }))
                 .union(other
-                        .map(oaf -> getTypedRows(oaf))
+                        .map(oaf -> getTypedRowsDatasourceResult(oaf))
                         .flatMapToPair(f -> {
                             ArrayList<Tuple2<String, TypedRow>> ret = new ArrayList<>();
                             for (TypedRow t : f) {
@@ -155,55 +158,53 @@ public class SparkCountryPropagationJob {
         results.leftOuterJoin(toupdateresult)
                 .map(c -> {
                     OafEntity oaf = c._2()._1();
-                    List<Qualifier> qualifierList = null;
+                    List<Country> countryList = null;
                     if (oaf.getClass() == Publication.class) {
-                        qualifierList = ((Publication) oaf).getCountry();
+                        countryList = ((Publication) oaf).getCountry();
 
                     }
                     if (oaf.getClass() == Dataset.class){
-                        qualifierList = ((Dataset) oaf).getCountry();
+                        countryList = ((Dataset) oaf).getCountry();
                     }
 
                     if (oaf.getClass() == Software.class){
-                        qualifierList = ((Software) oaf).getCountry();
+                        countryList = ((Software) oaf).getCountry();
                     }
 
                     if (oaf.getClass() == OtherResearchProduct.class){
-                        qualifierList = ((OtherResearchProduct) oaf).getCountry();
+                        countryList = ((OtherResearchProduct) oaf).getCountry();
                     }
 
                     if (c._2()._2().isPresent()) {
                         HashSet<String> countries = new HashSet<>();
-                        for (Qualifier country : qualifierList) {
+                        for (Qualifier country : countryList) {
                             countries.add(country.getClassid());
                         }
                         TypedRow t = c._2()._2().get();
 
                         for (String country : t.getCountry().split(";")) {
                             if (!countries.contains(country)) {
-                                Qualifier q = new Qualifier();
-                                q.setClassid(country);
-                                qualifierList.add(q);
+                                countryList.add(getCountry(country));
                             }
 
                         }
                         if (oaf.getClass() == Publication.class) {
-                            ((Publication) oaf).setCountry(qualifierList);
+                            ((Publication) oaf).setCountry(countryList);
                             return (Publication) oaf;
 
                         }
                         if (oaf.getClass() == Dataset.class){
-                            ((Dataset) oaf).setCountry(qualifierList);
+                            ((Dataset) oaf).setCountry(countryList);
                             return (Dataset) oaf;
                         }
 
                         if (oaf.getClass() == Software.class){
-                          ((Software) oaf).setCountry(qualifierList);
+                          ((Software) oaf).setCountry(countryList);
                             return (Software) oaf;
                         }
 
                         if (oaf.getClass() == OtherResearchProduct.class){
-                           ((OtherResearchProduct) oaf).setCountry(qualifierList);
+                           ((OtherResearchProduct) oaf).setCountry(countryList);
                             return (OtherResearchProduct) oaf;
                         }
                     }
@@ -215,40 +216,7 @@ public class SparkCountryPropagationJob {
                 .saveAsTextFile(outputPath+"/"+type);
     }
 
-    private static List<TypedRow> getTypedRows(OafEntity oaf) {
-        List<TypedRow> lst = new ArrayList<>();
-        Set<String> datasources_provenance = new HashSet<>();
-        List<Instance> instanceList = null;
-        String type = "";
-        if (oaf.getClass() == Publication.class) {
-            instanceList = ((Publication) oaf).getInstance();
-            type = "publication";
-        }
-        if (oaf.getClass() == Dataset.class){
-            instanceList = ((Dataset)oaf).getInstance();
-            type = "dataset";
-        }
 
-        if (oaf.getClass() == Software.class){
-            instanceList = ((Software)oaf).getInstance();
-            type = "software";
-        }
-
-        if (oaf.getClass() == OtherResearchProduct.class){
-            instanceList = ((OtherResearchProduct)oaf).getInstance();
-            type = "otherresearchproduct";
-        }
-
-
-        for (Instance i : instanceList) {
-            datasources_provenance.add(i.getCollectedfrom().getKey());
-            datasources_provenance.add(i.getHostedby().getKey());
-        }
-        for (String dsId : datasources_provenance) {
-            lst.add(new TypedRow().setSourceId(dsId).setTargetId(oaf.getId()).setType(type));
-        }
-        return lst;
-    }
 
 
     private static JavaPairRDD<String, TypedRow> getResults(JavaSparkContext sc , String inputPath){
@@ -280,10 +248,6 @@ public class SparkCountryPropagationJob {
 
 
 
-    private static PairFunction<TypedRow, String, TypedRow> toPair() {
-        return e -> new Tuple2<>( e.getSourceId(), e);
-
-        };
 
 
 }
