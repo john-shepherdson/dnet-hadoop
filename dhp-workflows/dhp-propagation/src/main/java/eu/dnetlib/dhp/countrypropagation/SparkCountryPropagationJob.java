@@ -47,7 +47,7 @@ public class SparkCountryPropagationJob {
         JavaPairRDD<String, TypedRow> organizations = sc.sequenceFile(inputPath + "/organization", Text.class, Text.class)
                 .map(item -> new ObjectMapper().readValue(item._2().toString(), Organization.class))
                 .filter(org -> !org.getDataInfo().getDeletedbyinference())
-                .map(org -> new TypedRow().setSourceId(org.getId()).setCountry(org.getCountry().getClassid()))
+                .map(org -> new TypedRow().setSourceId(org.getId()).setValue(org.getCountry().getClassid()))
                 .mapToPair(toPair());
 
         JavaPairRDD<String, TypedRow> organization_datasource = sc.sequenceFile(inputPath + "/relation", Text.class, Text.class)
@@ -126,7 +126,7 @@ public class SparkCountryPropagationJob {
 
 
         JavaPairRDD<String,TypedRow> toupdateresult = alloweddatasources_country.join(datasource_results)
-                .map(u -> u._2()._2().setCountry(u._2()._1().getCountry()))
+                .map(u -> u._2()._2().setValue(u._2()._1().getValue()))
                 .mapToPair(toPair())
                 .reduceByKey((a, p) -> {
                     if (a == null) {
@@ -135,15 +135,8 @@ public class SparkCountryPropagationJob {
                     if (p == null) {
                         return a;
                     }
-                    HashSet<String> countries = new HashSet();
-                    countries.addAll(Arrays.asList(a.getCountry().split(";")));
-                    countries.addAll(Arrays.asList(p.getCountry().split(";")));
-                    String country = new String();
-                    for (String c : countries) {
-                        country += c + ";";
-                    }
-
-                    return a.setCountry(country);
+                    a.addAll(p.getAccumulator());
+                    return a;
                 });
 
         updateResult(pubs, toupdateresult, outputPath, "publication");
@@ -182,7 +175,7 @@ public class SparkCountryPropagationJob {
                         }
                         TypedRow t = c._2()._2().get();
 
-                        for (String country : t.getCountry().split(";")) {
+                        for (String country : t.getAccumulator()) {
                             if (!countries.contains(country)) {
                                 countryList.add(getCountry(country));
                             }

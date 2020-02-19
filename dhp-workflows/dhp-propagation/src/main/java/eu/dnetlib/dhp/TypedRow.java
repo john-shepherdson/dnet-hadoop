@@ -2,31 +2,33 @@ package eu.dnetlib.dhp;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class TypedRow implements Serializable {
     private String sourceId;
     private String targetId;
     private String type;
-    private String country;
+    private String value;
+    private Set<String> accumulator;
 
-    public List<String> getAccumulator() {
+    public Set<String> getAccumulator() {
         return accumulator;
     }
 
-    public TypedRow setAccumulator(List<String> accumulator) {
+    public TypedRow setAccumulator(Set<String> accumulator) {
         this.accumulator = accumulator;
         return this;
     }
 
-    private List<String> accumulator;
+
+    public void addAll(Set<String> toadd){
+        this.accumulator.addAll(toadd);
+    }
 
 
     public void add(String a){
         if (accumulator == null){
-            accumulator = new ArrayList<>();
+            accumulator = new HashSet<>();
         }
         accumulator.add(a);
     }
@@ -35,12 +37,12 @@ public class TypedRow implements Serializable {
         return accumulator.iterator();
     }
 
-    public String getCountry() {
-        return country;
+    public String getValue() {
+        return value;
     }
 
-    public TypedRow setCountry(String country) {
-        this.country = country;
+    public TypedRow setValue(String value) {
+        this.value = value;
         return this;
     }
 
