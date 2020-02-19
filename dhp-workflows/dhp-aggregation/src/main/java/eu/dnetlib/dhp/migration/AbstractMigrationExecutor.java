@@ -227,7 +227,21 @@ public class AbstractMigrationExecutor implements Closeable {
 		final String nsPrefix = StringUtils.substringBefore(originalId, "::");
 		final String rest = StringUtils.substringAfter(originalId, "::");
 		return String.format("%s|%s::%s", prefix, nsPrefix, DHPUtils.md5(rest));
+	}
 
+	public static String createOpenaireId(final String type, final String originalId) {
+		switch (type) {
+		case "datasource":
+			return createOpenaireId(10, originalId);
+		case "organization":
+			return createOpenaireId(20, originalId);
+		case "person":
+			return createOpenaireId(30, originalId);
+		case "project":
+			return createOpenaireId(40, originalId);
+		default:
+			return createOpenaireId(50, originalId);
+		}
 	}
 
 	public static String asString(final Object o) {
