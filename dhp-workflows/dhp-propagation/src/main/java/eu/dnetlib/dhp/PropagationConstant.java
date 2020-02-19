@@ -23,6 +23,9 @@ public class PropagationConstant {
     public final static String PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME = "Propagation of country to result collected from datasources of type institutional repositories";
     public final static String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID = "result:organization:instrepo";
     public final static String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME = "Propagation of affiliation to result collected from datasources of type institutional repository";
+    public final static String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID = "result:project:semrel";
+    public final static String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME = "Propagation of result to project through semantic relation";
+
 
     public final static String RELATION_DATASOURCEORGANIZATION_REL_TYPE = "datasourceOrganization";
     public final static String RELATION_DATASOURCEORGANIZATION_SUBREL_TYPE = "provision";
@@ -33,6 +36,14 @@ public class PropagationConstant {
     public final static String RELATION_RESULTORGANIZATION_SUBREL_TYPE = "affiliation";
     public final static String RELATION_ORGANIZATION_RESULT_REL_CLASS = "isAuthorInstitutionOf";
     public final static String RELATION_RESULT_ORGANIZATION_REL_CLASS = "hasAuthorInstitution";
+
+    public static final String RELATION_RESULTRESULT_REL_TYPE = "resultResult";
+    public static final String RELATION_RESULTRESULT_SUBREL_TYPE = "supplement";
+
+    public static final String RELATION_RESULTPROJECT_REL_TYPE = "resultProject";
+    public static final String RELATION_RESULTPROJECT_SUBREL_TYPE = "outcome";
+    public static final String RELATION_RESULT_PROJECT_REL_CLASS = "isProducedBy";
+    public static final String RELATION_PROJECT_RESULT_REL_CLASS = "produces";
 
 
     public static Country getCountry(String country){
