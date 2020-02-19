@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.communitytoresultthroughsemrel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.QueryInformationSystem;
 import eu.dnetlib.dhp.TypedRow;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob;
@@ -39,7 +40,7 @@ public class SparkResultToCommunityThroughSemRelJob {
         final String outputPath = "/tmp/provision/propagation/communitytoresultthroughsemrel";
 
         final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrel").split(";"));
-        final List<String> communityIdList = Arrays.asList(parser.get("communityidlist").split(";"));
+        final List<String> communityIdList = QueryInformationSystem.getCommunityList(parser.get("isLookupUrl"));
 
         File directory = new File(outputPath);
 
@@ -47,12 +48,7 @@ public class SparkResultToCommunityThroughSemRelJob {
             directory.mkdirs();
         }
 /*
-        //get the institutional repositories
-        JavaPairRDD<String, TypedRow> datasources = sc.sequenceFile(inputPath + "/datasource", Text.class, Text.class)
-                .map(item -> new ObjectMapper().readValue(item._2().toString(), Datasource.class))
-                .filter(ds -> INSTITUTIONAL_REPO_TYPE.equals(ds.getDatasourcetype().getClassid()))
-                .map(ds -> new TypedRow().setSourceId(ds.getId()))
-                .mapToPair(toPair());
+    
 
 
         JavaPairRDD<String, TypedRow> rel_datasource_organization = sc.sequenceFile(inputPath + "/relation", Text.class, Text.class)
