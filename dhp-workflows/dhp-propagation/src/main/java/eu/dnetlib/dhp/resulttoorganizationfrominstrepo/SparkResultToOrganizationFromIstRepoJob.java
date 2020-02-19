@@ -110,10 +110,12 @@ public class SparkResultToOrganizationFromIstRepoJob {
         JavaRDD<Relation> newRels = instdatasource_organization.join(datasource_results)
                 .flatMap(c -> {
                     List<Relation> rels = new ArrayList();
-                    rels.add(getRelation(c._2()._1().getTargetId(), c._2()._2().getTargetId(), RELATION_ORGANIZATION_RESULT_REL_CLASS,
+                    String orgId = c._2()._1().getTargetId();
+                    String resId = c._2()._2().getTargetId();
+                    rels.add(getRelation(orgId, resId, RELATION_ORGANIZATION_RESULT_REL_CLASS,
                             RELATION_RESULTORGANIZATION_REL_TYPE, RELATION_RESULTORGANIZATION_SUBREL_TYPE, PROPAGATION_DATA_INFO_TYPE,
                             PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID, PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));
-                    rels.add(getRelation(c._2()._2().getTargetId(), c._2()._1().getTargetId(), RELATION_ORGANIZATION_RESULT_REL_CLASS,
+                    rels.add(getRelation(resId, orgId, RELATION_RESULT_ORGANIZATION_REL_CLASS,
                             RELATION_RESULTORGANIZATION_REL_TYPE, RELATION_RESULTORGANIZATION_SUBREL_TYPE, PROPAGATION_DATA_INFO_TYPE,
                             PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID, PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));
                     return rels.iterator();
