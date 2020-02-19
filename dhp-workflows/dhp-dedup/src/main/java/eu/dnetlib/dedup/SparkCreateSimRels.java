@@ -44,7 +44,7 @@ public class SparkCreateSimRels {
 //        final DedupConfig dedupConf = DedupConfig.load(IOUtils.toString(SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
         final DedupConfig dedupConf = DedupConfig.load(parser.get("dedupConf"));
 
-        final long total = sc.textFile(inputPath + "/" + entity).count();
+
 
         JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(inputPath + "/" + entity)
                 .mapToPair(s->{

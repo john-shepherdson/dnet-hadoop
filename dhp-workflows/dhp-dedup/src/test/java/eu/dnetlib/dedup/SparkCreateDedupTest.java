@@ -1,19 +1,14 @@
 package eu.dnetlib.dedup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class SparkCreateDedupTest {
 
@@ -22,7 +17,7 @@ public class SparkCreateDedupTest {
 
     @Before
     public void setUp() throws IOException {
-        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org.curr.conf.json"));
+        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/pub_scholix.conf.json"));
 
     }
 
@@ -35,6 +30,14 @@ public class SparkCreateDedupTest {
                 "-e", entity,
                 "-c", ArgumentApplicationParser.compressArgument(configuration),
                 "-t", "/tmp/dedup",
+        });
+    }
+
+
+    @Test
+    public void createDeletedByInference() throws Exception {
+        SparkUpdateEntityJob.main(new String[] {
+                "-mt", "local[*]"
         });
     }
 

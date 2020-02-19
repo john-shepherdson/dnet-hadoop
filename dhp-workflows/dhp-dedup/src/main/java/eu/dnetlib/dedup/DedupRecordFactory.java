@@ -1,24 +1,20 @@
 package eu.dnetlib.dedup;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.util.MapDocumentUtil;
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import scala.Tuple2;
 
 import java.util.Collection;
-import java.util.Random;
-
-import static java.util.stream.Collectors.toMap;
 
 public class DedupRecordFactory {
 
@@ -73,6 +69,8 @@ public class DedupRecordFactory {
         p.setId(e._1());
 
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
 
         final Collection<String> dateofacceptance = Lists.newArrayList();
 
@@ -105,6 +103,7 @@ public class DedupRecordFactory {
         d.setId(e._1());
 
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final Collection<String> dateofacceptance = Lists.newArrayList();
 
@@ -137,6 +136,7 @@ public class DedupRecordFactory {
         p.setId(e._1());
 
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         if (e._2() != null)
             e._2().forEach(proj -> {
                 try {
@@ -160,6 +160,7 @@ public class DedupRecordFactory {
 
         s.setId(e._1());
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         final Collection<String> dateofacceptance = Lists.newArrayList();
         if (e._2() != null)
             e._2().forEach(soft -> {
@@ -187,6 +188,7 @@ public class DedupRecordFactory {
         Datasource d = new Datasource(); //the result of the merge, to be returned at the end
         d.setId(e._1());
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         if (e._2() != null)
             e._2().forEach(dat -> {
                 try {
@@ -211,6 +213,7 @@ public class DedupRecordFactory {
         o.setId(e._1());
 
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 
         StringBuilder trust = new StringBuilder("0.0");
@@ -251,6 +254,7 @@ public class DedupRecordFactory {
         o.setId(e._1());
 
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         final Collection<String> dateofacceptance = Lists.newArrayList();
 

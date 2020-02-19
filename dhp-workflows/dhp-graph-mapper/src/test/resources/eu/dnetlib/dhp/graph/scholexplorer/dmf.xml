@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oai:record xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+            xmlns:oaf="http://namespace.openaire.eu/oaf"
+            xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <oai:header>
+      <dri:repositoryId>aaadf8b3-01a8-4cc2-9964-63cfb19df3b4_UmVwb3NpdG9yeVNlcnZpY2VSZXNvdXJjZXMvUmVwb3NpdG9yeVNlcnZpY2VSZXNvdXJjZVR5cGU=</dri:repositoryId>
+      <dri:recordIdentifier>oai:pangaea.de:doi:10.1594/PANGAEA.821876</dri:recordIdentifier>
+      <dri:datasourceprefix>r3d100010134</dri:datasourceprefix>
+      <dri:objIdentifier>r3d100010134::000083be706192d2d839915694ecfd47</dri:objIdentifier>
+<dri:resolvedDate>2020-01-08T04:12:12.287</dri:resolvedDate>
+      <dri:dateOfCollection>2020-01-08T03:24:10.865Z</dri:dateOfCollection>
+      <oaf:datasourceprefix/>
+      <identifier>oai:pangaea.de:doi:10.1594/PANGAEA.821876</identifier>
+      <setSpec>citable</setSpec>
+   </oai:header>
+   <metadata>
+	<resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+		<identifier identifierType="doi">10.1594/pangaea.821876</identifier>
+		<creators> <creator><creatorName>Macke, Andreas</creatorName></creator><creator><creatorName>Kalisch, John</creatorName></creator> </creators>
+		<titles> <title>Total Sky Imager observations during POLARSTERN cruise ANT-XXVI/4 on 2010-05-14 with links to images</title>  </titles>
+
+<publisher>PANGAEA - Data Publisher for Earth &amp; Environmental Science</publisher>
+		<dates>
+			<date dateType="Collected">2010-05-14T00:13:47/2010-05-14T23:55:47</date>
+		</dates>
+		<subjects>
+
+	        <subject subjectScheme="Parameter">DATE/TIME</subject>
+
+	        <subject subjectScheme="Parameter">LATITUDE</subject>
+
+	        <subject subjectScheme="Parameter">LONGITUDE</subject>
+
+	        <subject subjectScheme="Parameter">Uniform resource locator/link to image</subject>
+
+	        <subject subjectScheme="Method">Total Sky Imager</subject>
+
+	        <subject subjectScheme="Campaign">ANT-XXVI/4</subject>
+
+	        <subject subjectScheme="Basis">Polarstern</subject>
+
+		</subjects>
+		<resourceType resourceTypeGeneral="dataset">dataset</resourceType>
+		<relatedIdentifiers>
+
+	            <relatedIdentifier relatedIdentifierType="dnet" relationType="isPartOf" inverseRelationType="hasPart" entityType="dataset">dli_resolver::cf447a378b0b6603593f8b0e57242695</relatedIdentifier>
+
+	            <relatedIdentifier relatedIdentifierType="URL" relationType="references" inverseRelationType="isReferencedBy" entityType="unknown">http://hs.pangaea.de/images/airphoto/ps/ps75/2010-05-14/ant-xxvi_4_2010-05-14_tsi-images-links.zip</relatedIdentifier>
+
+	            <relatedIdentifier relatedIdentifierType="dnet" relationType="references" inverseRelationType="isReferencedBy" entityType="publication">dli_resolver::f0f5975d20991cffd222c6002ddd5821</relatedIdentifier>
+
+	    </relatedIdentifiers>
+	</resource>
+</metadata>
+<oaf:about xmlns:oaf="http://namespace.dnet.eu/oaf">
+	<oaf:datainfo >
+		<oaf:completionStatus>complete</oaf:completionStatus>
+
+  <oaf:collectedFrom id="dli_________::r3d100010134" name="Pangaea" completionStatus="complete"/>
+
+	</oaf:datainfo>
+</oaf:about>
+
+
+</oai:record>

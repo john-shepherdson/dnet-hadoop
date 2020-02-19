@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.utils;
 
+import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONArray;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.codec.binary.Hex;
@@ -54,6 +56,19 @@ public class DHPUtils {
             return null;
         }
 
+    }
+
+    public static String getJPathString(final String jsonPath, final String json) {
+        try {
+            Object o = JsonPath.read(json, jsonPath);
+            if (o instanceof String)
+                return (String) o;
+            if (o instanceof JSONArray && ((JSONArray) o).size() > 0)
+                return (String) ((JSONArray) o).get(0);
+            return "";
+        } catch (Exception e) {
+            return "";
+        }
     }
 
 }

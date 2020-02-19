@@ -11,6 +11,7 @@ import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
 
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser.Node;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,10 +37,6 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
             di.setDeletedbyinference(false);
             di.setInvisible(false);
             parsedObject.setDataInfo(di);
-
-
-            final String objIdentifier = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='objIdentifier']");
-            parsedObject.setId("60|" + StringUtils.substringAfter(objIdentifier, "::"));
 
             parsedObject.setOriginalId(Collections.singletonList(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='recordIdentifier']")));
 
@@ -112,10 +109,14 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
             final List<Node> identifierType =
                     VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='resource']/*[local-name()='identifier']", Collections.singletonList("identifierType"));
 
-            StructuredProperty currentPid = extractIdentifier(identifierType, "type");
+            StructuredProperty currentPid = extractIdentifier(identifierType, "identifierType");
             if (currentPid == null) return null;
             inferPid(currentPid);
             parsedObject.setPid(Collections.singletonList(currentPid));
+
+
+            final String sourceId = generateId(currentPid.getValue(), currentPid.getQualifier().getClassid(), "dataset");
+            parsedObject.setId(sourceId);
 
 
             List<String> descs = VtdUtilityParser.getTextValue(ap, vn, "//*[local-name()='description']");
@@ -149,15 +150,20 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
                             final String targetId = generateId(relatedPid, relatedPidType, relatedType);
                             r.setTarget(targetId);
                             r.setRelType(relationSemantic);
+                            r.setRelClass("datacite");
                             r.setCollectedFrom(parsedObject.getCollectedfrom());
+                            r.setDataInfo(di);
                             rels.add(r);
                             r = new Relation();
+                            r.setDataInfo(di);
                             r.setSource(targetId);
                             r.setTarget(parsedObject.getId());
                             r.setRelType(inverseRelation);
+                            r.setRelClass("datacite");
                             r.setCollectedFrom(parsedObject.getCollectedfrom());
                             rels.add(r);
-                            result.add(createUnknownObject(relatedPid, relatedPidType, parsedObject.getCollectedfrom().get(0), di));
+                            if("unknown".equalsIgnoreCase(relatedType))
+                                result.add(createUnknownObject(relatedPid, relatedPidType, parsedObject.getCollectedfrom().get(0), di));
                             return rels.stream();
                         }).collect(Collectors.toList()));
             }
@@ -184,6 +190,13 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
             List<StructuredProperty> subjects = extractSubject(VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='resource']//*[local-name()='subject']", Arrays.asList("subjectScheme")));
 
             parsedObject.setSubject(subjects);
+
+            Qualifier q = new Qualifier();
+            q.setClassname("dataset");
+            q.setClassid("dataset");
+            q.setSchemename("dataset");
+            q.setSchemeid("dataset");
+            parsedObject.setResulttype(q);
 
             parsedObject.setCompletionStatus(completionStatus);
 

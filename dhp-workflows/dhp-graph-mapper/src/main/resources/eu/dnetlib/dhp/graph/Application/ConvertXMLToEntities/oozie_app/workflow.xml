@@ -5,8 +5,8 @@
             <description>the source path</description>
         </property>
         <property>
-            <name>hive_db_name</name>
-            <description>the target hive database name</description>
+            <name>targetPath</name>
+            <description>the source path</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -20,13 +20,24 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
+        <property>
+            <name>entity</name>
+            <description>the entity type</description>
+        </property>
     </parameters>
 
-    <start to="MapGraphIntoDataFrame"/>
+    <start to="DeleteTargetPath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+    <action name="DeleteTargetPath">
+        <fs>
+            <delete path='${targetPath}'/>
+        </fs>
+        <ok to="MapGraphIntoDataFrame"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="MapGraphIntoDataFrame">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -34,14 +45,14 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>MapGraphIntoDataFrame</name>
-            <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
+            <name>Import ${entity} and related entities</name>
+            <class>eu.dnetlib.dhp.graph.scholexplorer.SparkScholexplorerGraphImporter</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

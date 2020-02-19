@@ -82,7 +82,7 @@ public abstract class AbstractScholexplorerParser {
     }
 
     protected String generateId(final String pid, final String pidType, final String entityType) {
-        String type = "50|";
+        String type;
         switch (entityType){
             case "publication":
                 type = "50|";
@@ -100,7 +100,7 @@ public abstract class AbstractScholexplorerParser {
         if ("dnet".equalsIgnoreCase(pidType))
             return type+StringUtils.substringAfter(pid, "::");
 
-        return type+ DHPUtils.md5(String.format("%s::%s", pid, pidType));
+        return type+ DHPUtils.md5(String.format("%s::%s", pid.toLowerCase().trim(), pidType.toLowerCase().trim()));
     }
 
 

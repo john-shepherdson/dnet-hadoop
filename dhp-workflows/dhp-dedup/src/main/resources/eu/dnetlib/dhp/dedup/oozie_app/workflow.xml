@@ -24,27 +24,24 @@
             <name>sparkExecutorMemory</name>
             <description>memory for individual executor</description>
         </property>
-        <property>
-            <name>sparkExecutorCores</name>
-            <description>number of cores used by single executor</description>
-        </property>
     </parameters>
 
-    <start to="CreateSimRels"/>
+    <start to="DeleteWorkingPath"/>
 
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-<!--    <action name="DeleteTargetPath">-->
-<!--        <fs>-->
-<!--            <delete path='${targetPath}/${entity}_simrel'/>-->
-<!--            <delete path='${targetPath}/${entity}_mergeRels'/>-->
-<!--        </fs>-->
-<!--        <ok to="CreateSimRels"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
+    <action name="DeleteWorkingPath">
+        <fs>
+            <delete path='${targetPath}/${entity}'/>
+            <mkdir path="${targetPath}"/>  
+            <mkdir path="${targetPath}/${entity}"/>              
+        </fs>
+        <ok to="CreateSimRels"/>
+       <error to="Kill"/>
+    </action>
 
     <action name="CreateSimRels">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -55,11 +52,11 @@
             <name>Create Similarity Relations</name>
             <class>eu.dnetlib.dedup.SparkCreateSimRels</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory} --conf
-                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
-                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
-                spark.sql.warehouse.dir="/user/hive/warehouse"
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --num-executors 100
+                --conf spark.yarn.jars="hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2"
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
@@ -71,7 +68,6 @@
         <error to="Kill"/>
     </action>
 
-
     <action name="CreateConnectedComponents">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -81,11 +77,11 @@
             <name>Create Connected Components</name>
             <class>eu.dnetlib.dedup.SparkCreateConnectedComponent</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory} --conf
-                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
-                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
-                spark.sql.warehouse.dir="/user/hive/warehouse"
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --num-executors 100
+                --conf spark.yarn.jars="hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2"
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
@@ -106,21 +102,46 @@
             <name>Create Dedup Record</name>
             <class>eu.dnetlib.dedup.SparkCreateDedupRecord</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory} --conf
-                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
-                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
-                spark.sql.warehouse.dir="/user/hive/warehouse"
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --num-executors 100
+                --conf spark.yarn.jars="hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2"
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--dedupPath</arg><arg>${dedupPath}</arg>
+            <arg>--dedupPath</arg><arg>${targetPath}</arg>
             <arg>--entity</arg><arg>${entity}</arg>
             <arg>--dedupConf</arg><arg>${dedupConf}</arg>
+        </spark>
+        <ok to="fixRelation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="fixRelation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Propagate Dedup Relations</name>
+            <class>eu.dnetlib.dedup.SparkPropagateRelationsJob</class>
+            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --num-executors 100
+                --conf spark.yarn.jars="hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+           <arg>--mergeRelPath</arg><arg>${targetPath}/${entity}/mergeRel</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--targetRelPath</arg><arg>${targetPath}/${entity}/relation_updated</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
 
     <end name="End"/>
 </workflow-app>

@@ -36,9 +36,6 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             di.setDeletedbyinference(false);
             di.setInvisible(false);
 
-            final String objIdentifier = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='objIdentifier']");
-            parsedObject.setId("50|" + StringUtils.substringAfter(objIdentifier, "::"));
-
             parsedObject.setDateofcollection(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='dateOfCollection']"));
 
             final String resolvedDate = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='resolvedDate']");
@@ -63,6 +60,8 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             if (currentPid == null) return null;
             inferPid(currentPid);
             parsedObject.setPid(Collections.singletonList(currentPid));
+            final String sourceId = generateId(currentPid.getValue(), currentPid.getQualifier().getClassid(), "publication");
+            parsedObject.setId(sourceId);
 
             String provisionMode = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='provisionMode']");
 
@@ -136,12 +135,12 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
                             r.setDataInfo(di);
                             rels.add(r);
                             r = new Relation();
+                            r.setDataInfo(di);
                             r.setSource(targetId);
                             r.setTarget(parsedObject.getId());
                             r.setRelType(inverseRelation);
-                            r.setCollectedFrom(parsedObject.getCollectedfrom());
-                            r.setDataInfo(di);
                             r.setRelClass("datacite");
+                            r.setCollectedFrom(parsedObject.getCollectedfrom());
                             rels.add(r);
 
                             return rels.stream();
@@ -217,7 +216,13 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
 
             parsedObject.setDataInfo(di);
 
-
+            parsedObject.setSubject(subjects);
+            Qualifier q = new Qualifier();
+            q.setClassname("publication");
+            q.setClassid("publication");
+            q.setSchemename("publication");
+            q.setSchemeid("publication");
+            parsedObject.setResulttype(q);
             result.add(parsedObject);
             return result;
 

@@ -151,11 +151,11 @@ public class DedupUtility {
     }
 
     public static String createSimRelPath(final String basePath, final String entityType) {
-        return String.format("%s/%s_simRel", basePath, entityType);
+        return String.format("%s/%s/simRel", basePath, entityType);
     }
 
     public static String createMergeRelPath(final String basePath, final String entityType) {
-        return String.format("%s/%s_mergeRel", basePath, entityType);
+        return String.format("%s/%s/mergeRel", basePath, entityType);
     }
 
     private static Double sim(Author a, Author b) {
