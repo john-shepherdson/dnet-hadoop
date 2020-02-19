@@ -1,6 +1,11 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import org.junit.Assert;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Relation extends Oaf {
 
@@ -14,7 +19,7 @@ public class Relation extends Oaf {
 
     private String target;
 
-    private List<KeyValue> collectedFrom;
+    private List<KeyValue> collectedFrom = new ArrayList<>();
 
     public String getRelType() {
         return relType;
@@ -63,4 +68,19 @@ public class Relation extends Oaf {
     public void setCollectedFrom(List<KeyValue> collectedFrom) {
         this.collectedFrom = collectedFrom;
     }
+
+    public void mergeFrom(final Relation r) {
+        Assert.assertEquals("source ids must be equal", getSource(), r.getSource());
+        Assert.assertEquals("target ids must be equal", getTarget(), r.getTarget());
+        Assert.assertEquals("relType(s) must be equal", getRelType(), r.getRelType());
+        Assert.assertEquals("subRelType(s) must be equal", getSubRelType(), r.getSubRelType());
+        Assert.assertEquals("relClass(es) must be equal", getRelClass(), r.getRelClass());
+        setCollectedFrom(
+            Stream.concat(
+                    getCollectedFrom().stream(),
+                    r.getCollectedFrom().stream())
+                .distinct() // relies on KeyValue.equals
+                .collect(Collectors.toList()));
+    }
+
 }
