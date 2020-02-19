@@ -20,5 +20,5 @@
 /*/build
 /build
 spark-warehouse
-/*/*/job-override.properties
+/**/job-override.properties
 

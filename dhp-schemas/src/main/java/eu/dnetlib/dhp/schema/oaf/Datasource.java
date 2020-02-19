@@ -40,9 +40,9 @@ public class Datasource extends OafEntity implements Serializable {
 
     private List<Field<String>> odlanguages;
 
-    private List< Field<String>> odcontenttypes;
+    private List<Field<String>> odcontenttypes;
 
-    private List< Field<String>> accessinfopackage;
+    private List<Field<String>> accessinfopackage;
 
     // re3data fields
     private Field<String> releasestartdate;

@@ -100,7 +100,13 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
-				<artifactId>hadoop-client</artifactId>
+				<artifactId>hadoop-common</artifactId>
+                <version>${dhp.hadoop.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
 				<version>${dhp.hadoop.version}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -148,11 +154,11 @@
 				<scope>provided</scope>
 			</dependency>
 
-			<dependency>
-				<groupId>net.sf.saxon</groupId>
-				<artifactId>Saxon-HE</artifactId>
-				<version>9.5.1-5</version>
-			</dependency>
+            <dependency>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>Saxon-HE</artifactId>
+                <version>9.9.1-6</version>
+            </dependency>
 
 			<dependency>
 				<groupId>dom4j</groupId>
@@ -173,6 +179,56 @@
 			</dependency>
 
 			<dependency>
+                <groupId>com.mycila.xmltool</groupId>
+                <artifactId>xmltool</artifactId>
+                <version>3.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj</artifactId>
+                <version>7.5.0</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>*</artifactId>
+                        <groupId>*</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.lucidworks.spark</groupId>
+                <artifactId>spark-solr</artifactId>
+                <version>3.6.0</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>*</artifactId>
+                        <groupId>*</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.5.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.noggit</groupId>
+                <artifactId>noggit</artifactId>
+                <version>0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.4.11</version>
+            </dependency>
+
+            <dependency>
 				<groupId>net.schmizz</groupId>
 				<artifactId>sshj</artifactId>
 				<version>0.10.0</version>
@@ -204,8 +260,17 @@
 				<artifactId>dnet-pace-core</artifactId>
 				<version>4.0.0</version>
 			</dependency>
+            <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>cnr-rmi-api</artifactId>
+                <version>[2.0.0,3.0.0)</version>
+            </dependency>
 
-
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http</artifactId>
+                <version>3.1.5</version>
+            </dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
 				<artifactId>javax.persistence-api</artifactId>
@@ -213,32 +278,36 @@
 				<scope>provided</scope>
 			</dependency>
 
-			<dependency>
-				<groupId>com.rabbitmq</groupId>
-				<artifactId>amqp-client</artifactId>
-				<version>5.6.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.jayway.jsonpath</groupId>
-				<artifactId>json-path</artifactId>
-				<version>2.4.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.arakelian</groupId>
-				<artifactId>java-jq</artifactId>
-				<version>0.10.1</version>
-			</dependency>
-			<dependency>
-				<groupId>edu.cmu</groupId>
-				<artifactId>secondstring</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.mongodb</groupId>
-				<artifactId>mongo-java-driver</artifactId>
-				<version>${mongodb.driver.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>com.rabbitmq</groupId>
+                <artifactId>amqp-client</artifactId>
+                <version>5.6.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>2.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.arakelian</groupId>
+                <artifactId>java-jq</artifactId>
+                <version>0.10.1</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.cmu</groupId>
+                <artifactId>secondstring</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongodb.driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>stringtemplate</artifactId>
+                <version>4.0</version>
+            </dependency>
 
 			<dependency>
 				<groupId>org.apache.oozie</groupId>
