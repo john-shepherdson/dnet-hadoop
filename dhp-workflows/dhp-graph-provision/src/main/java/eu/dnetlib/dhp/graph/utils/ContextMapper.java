@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.graph.utils;
 
 import com.google.common.base.Joiner;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.dom4j.Document;

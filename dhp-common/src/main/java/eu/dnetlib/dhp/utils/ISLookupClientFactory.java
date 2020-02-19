@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph.utils;
+package eu.dnetlib.dhp.utils;
 
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.logging.Log;

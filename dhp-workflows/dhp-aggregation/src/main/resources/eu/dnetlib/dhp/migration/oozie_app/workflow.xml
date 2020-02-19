@@ -43,7 +43,7 @@
         </property>
     </parameters>
 
-    <start to="ResetWorkingPath"/>
+    <start to="ImportODFEntitiesFromMongoDB"/>
 
 
     <kill name="Kill">

@@ -2,8 +2,8 @@ package eu.dnetlib.dhp.graph;
 
 import com.lucidworks.spark.util.SolrSupport;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.graph.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.graph.utils.StreamingInputDocumentFactory;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpDocumentNotFoundException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
