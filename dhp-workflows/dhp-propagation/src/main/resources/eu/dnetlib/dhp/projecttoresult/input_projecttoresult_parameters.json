@@ -1,0 +1,21 @@
+[
+  {
+    "paramName":"mt",
+    "paramLongName":"master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName":"s",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the path of the sequencial file to read",
+    "paramRequired": true
+  },
+
+  {
+    "paramName":"asr",
+    "paramLongName":"allowedsemrels",
+    "paramDescription": "the types of the allowed datasources. Split by ;",
+    "paramRequired": true
+  }
+]
