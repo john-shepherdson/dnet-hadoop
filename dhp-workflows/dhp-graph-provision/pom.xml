@@ -66,14 +66,6 @@
             <artifactId>zookeeper</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>eu.dnetlib</groupId>
-            <artifactId>cnr-rmi-api</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
