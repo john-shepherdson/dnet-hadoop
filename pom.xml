@@ -244,6 +244,14 @@
             </dependency>
 
             <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch-hadoop</artifactId>
+                <version>7.6.0</version>
+            </dependency>
+
+
+
+            <dependency>
                 <groupId>org.apache.oozie</groupId>
                 <artifactId>oozie-client</artifactId>
                 <version>${dhp.oozie.version}</version>

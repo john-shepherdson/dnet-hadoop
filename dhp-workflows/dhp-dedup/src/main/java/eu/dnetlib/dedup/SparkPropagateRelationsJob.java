@@ -27,7 +27,6 @@ public class SparkPropagateRelationsJob {
         SOURCE,
         TARGET
     }
-    final static String IDJSONPATH = "$.id";
     final static String SOURCEJSONPATH = "$.source";
     final static String TARGETJSONPATH = "$.target";
 

@@ -22,10 +22,17 @@
     "paramLongName": "dedupRecordPath",
     "paramDescription": "the inputPath of dedup record",
     "paramRequired": true
-  },  {
-  "paramName": "e",
-  "paramLongName": "entity",
-  "paramDescription": "the type of entity",
-  "paramRequired": true
-}
+  },
+  {
+    "paramName": "e",
+    "paramLongName": "entity",
+    "paramDescription": "the type of entity",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetPath",
+    "paramDescription": "the targetPath",
+    "paramRequired": true
+  }
 ]

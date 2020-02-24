@@ -1,0 +1,20 @@
+[
+  {
+    "paramName": "mt",
+    "paramLongName": "master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "the working path where generated files",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "index",
+    "paramDescription": "the index name",
+    "paramRequired": true
+  }
+]

@@ -44,6 +44,7 @@ public class SparkUpdateEntityJob {
         final String mergeRelPath = parser.get("mergeRelPath");
         final String dedupRecordPath = parser.get("dedupRecordPath");
         final String entity = parser.get("entity");
+        final String destination = parser.get("targetPath");
 
         final Dataset<Relation> df = spark.read().load(mergeRelPath).as(Encoders.bean(Relation.class));
         final JavaPairRDD<String, String> mergedIds = df
@@ -63,7 +64,7 @@ public class SparkUpdateEntityJob {
                     .mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(DHPUtils.getJPathString(TARGETJSONPATH, s), s))
                     .leftOuterJoin(mergedIds)
                     .map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), Relation.class) : k._2()._1())
-                            .saveAsTextFile(entityPath + "_new", GzipCodec.class);
+                            .saveAsTextFile(destination, GzipCodec.class);
         } else {
             final JavaRDD<String> dedupEntity = sc.textFile(dedupRecordPath);
             JavaPairRDD<String, String> entitiesWithId = sourceEntity.mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(DHPUtils.getJPathString(IDJSONPATH, s), s));
@@ -86,7 +87,7 @@ public class SparkUpdateEntityJob {
             JavaRDD<String> map = entitiesWithId.leftOuterJoin(mergedIds).map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), mainClass) : k._2()._1());
 
 
-            map.union(dedupEntity).saveAsTextFile(entityPath + "_new", GzipCodec.class);
+            map.union(dedupEntity).saveAsTextFile(destination, GzipCodec.class);
         }
 
 

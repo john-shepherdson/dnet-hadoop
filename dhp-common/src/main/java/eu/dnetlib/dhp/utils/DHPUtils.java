@@ -65,7 +65,7 @@ public class DHPUtils {
                 return (String) o;
             if (o instanceof JSONArray && ((JSONArray) o).size() > 0)
                 return (String) ((JSONArray) o).get(0);
-            return "";
+            return o.toString();
         } catch (Exception e) {
             return "";
         }
