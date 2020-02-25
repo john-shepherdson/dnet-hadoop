@@ -43,8 +43,6 @@ public class XmlRecordFactory implements Serializable {
 
     private String schemaLocation;
 
-    private Set<String> contextes = Sets.newHashSet();
-
     private boolean indent = false;
 
     public XmlRecordFactory(
@@ -59,15 +57,18 @@ public class XmlRecordFactory implements Serializable {
     }
 
     public String build(final JoinedEntity je) {
+
+        final Set<String> contexts = Sets.newHashSet();
+
         final OafEntity entity = je.getEntity();
         TemplateFactory templateFactory = new TemplateFactory();
         try {
-            final List<String> metadata = metadata(je.getType(), entity);
+            final List<String> metadata = metadata(je.getType(), entity, contexts);
 
             // rels has to be processed before the contexts because they enrich the contextMap with the funding info.
-            final List<String> relations = listRelations(je, templateFactory);
+            final List<String> relations = listRelations(je, templateFactory, contexts);
 
-            metadata.addAll(buildContexts(getMainType(je.getType())));
+            metadata.addAll(buildContexts(getMainType(je.getType()), contexts));
             metadata.add(parseDataInfo(entity.getDataInfo()));
 
             final String body = templateFactory.buildBody(
@@ -97,9 +98,10 @@ public class XmlRecordFactory implements Serializable {
         }
     }
 
-    private List<String> metadata(final String type, final OafEntity entity) {
+    private List<String> metadata(final String type, final OafEntity entity, final Set<String> contexts) {
 
         final List<String> metadata = Lists.newArrayList();
+
 
         if (entity.getCollectedfrom() != null) {
             metadata.addAll(entity.getCollectedfrom()
@@ -122,6 +124,17 @@ public class XmlRecordFactory implements Serializable {
 
         if (GraphMappingUtils.isResult(type)) {
             final Result r = (Result) entity;
+
+            if (r.getContext() != null) {
+                contexts.addAll(r.getContext()
+                        .stream()
+                        .map(c -> c.getId())
+                        .collect(Collectors.toList()));
+                /* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */
+                if (contexts.contains("dh-ch::subcommunity::2")) {
+                    contexts.add("clarin");
+                }
+            }
 
             if (r.getTitle() != null) {
                 metadata.addAll(r.getTitle()
@@ -235,16 +248,6 @@ public class XmlRecordFactory implements Serializable {
             }
 
             metadata.add(mapQualifier("bestaccessright", getBestAccessright(r)));
-
-            if (r.getContext() != null) {
-                contextes.addAll(r.getContext()
-                    .stream()
-                    .map(c -> c.getId())
-                    .collect(Collectors.toList()));
-                if (contextes.contains("dh-ch::subcommunity::2")) {
-                    contextes.add("clarin");
-                }
-            }
         }
 
         switch (EntityType.valueOf(type)) {
@@ -618,7 +621,7 @@ public class XmlRecordFactory implements Serializable {
         return bestAccessRight;
     }
 
-    private List<String> listRelations(final JoinedEntity je, TemplateFactory templateFactory) {
+    private List<String> listRelations(final JoinedEntity je, TemplateFactory templateFactory, final Set<String> contexts) {
         final List<String> rels = Lists.newArrayList();
 
         for (final Tuple2 link : je.getLinks()) {
@@ -699,7 +702,7 @@ public class XmlRecordFactory implements Serializable {
                     if (re.getFundingtree() != null) {
                         metadata.addAll(re.getFundingtree()
                                 .stream()
-                                .peek(ft -> fillContextMap(ft))
+                                .peek(ft -> fillContextMap(ft, contexts))
                                 .map(ft -> getRelFundingTree(ft))
                                 .collect(Collectors.toList()));
                     }
@@ -807,14 +810,14 @@ public class XmlRecordFactory implements Serializable {
                 .collect(Collectors.toList()) : Lists.newArrayList();
     }
 
-    private List<String> buildContexts(final String type) {
+    private List<String> buildContexts(final String type, final Set<String> contexts) {
         final List<String> res = Lists.newArrayList();
 
         if ((contextMapper != null) && !contextMapper.isEmpty() && MainEntityType.result.toString().equals(type)) {
 
             XMLTag document = XMLDoc.newDocument(true).addRoot("contextRoot");
 
-            for (final String context : contextes) {
+            for (final String context : contexts) {
 
                 String id = "";
                 for (final String token : Splitter.on("::").split(context)) {
@@ -882,7 +885,7 @@ public class XmlRecordFactory implements Serializable {
         return buffer.toString();
     }
 
-    private void fillContextMap(final String xmlTree) {
+    private void fillContextMap(final String xmlTree, final Set<String> contexts) {
 
         Document fundingPath;
         try {
@@ -896,7 +899,7 @@ public class XmlRecordFactory implements Serializable {
             if (funder != null) {
 
                 final String funderShortName = funder.valueOf("./shortname");
-                contextes.add(funderShortName);
+                contexts.add(funderShortName);
 
                 contextMapper.put(funderShortName, new ContextDef(funderShortName, funder.valueOf("./name"), "context", "funding"));
                 final Node level0 = fundingPath.selectSingleNode("//funding_level_0");
@@ -905,17 +908,17 @@ public class XmlRecordFactory implements Serializable {
                     contextMapper.put(level0Id, new ContextDef(level0Id, level0.valueOf("./description"), "category", ""));
                     final Node level1 = fundingPath.selectSingleNode("//funding_level_1");
                     if (level1 == null) {
-                        contextes.add(level0Id);
+                        contexts.add(level0Id);
                     } else {
                         final String level1Id = Joiner.on("::").join(level0Id, level1.valueOf("./name"));
                         contextMapper.put(level1Id, new ContextDef(level1Id, level1.valueOf("./description"), "concept", ""));
                         final Node level2 = fundingPath.selectSingleNode("//funding_level_2");
                         if (level2 == null) {
-                            contextes.add(level1Id);
+                            contexts.add(level1Id);
                         } else {
                             final String level2Id = Joiner.on("::").join(level1Id, level2.valueOf("./name"));
                             contextMapper.put(level2Id, new ContextDef(level2Id, level2.valueOf("./description"), "concept", ""));
-                            contextes.add(level2Id);
+                            contexts.add(level2Id);
                         }
                     }
                 }
