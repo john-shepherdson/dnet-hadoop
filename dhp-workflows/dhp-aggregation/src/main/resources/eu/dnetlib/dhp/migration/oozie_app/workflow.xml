@@ -43,7 +43,7 @@
         </property>
     </parameters>
 
-    <start to="ResetWorkingPath"/>
+	<start to="ResetWorkingPath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -87,7 +87,7 @@
             <arg>-dbpasswd</arg><arg>${postgresPassword}</arg>
             <arg>-a</arg><arg>claims</arg>
         </java>
-        <ok to="ImportODFEntitiesFromMongoDB"/>
+		<ok to="ImportODFEntitiesFromMongoDB"/>
         <error to="Kill"/>
     </action>
 
@@ -171,11 +171,20 @@
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
         </java>
-        <ok to="ExtractEntities"/>
+        <ok to="ResetGraphRawPath"/>
         <error to="Kill"/>
     </action>
 
-    <action name="ExtractEntities">
+	<action name="ResetGraphRawPath">
+        <fs>
+            <delete path='${graphRawPath}'/>
+            <mkdir path='${graphRawPath}'/>
+        </fs>
+        <ok to="ExtractEntitiesInGraphRawPath"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ExtractEntitiesInGraphRawPath">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
