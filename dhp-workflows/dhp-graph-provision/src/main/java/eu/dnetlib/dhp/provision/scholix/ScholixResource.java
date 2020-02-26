@@ -1,26 +1,70 @@
 package eu.dnetlib.dhp.provision.scholix;
 
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
+
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ScholixResource implements Serializable {
 
-    private ScholixIdentifier identifier ;
-    private String dnetIdentifier ;
-    private String objectType ;
-    private String objectSubType ;
-    private String title ;
-    private List<ScholixEntityId> creator ;
-    private String publicationDate ;
-    private List<ScholixEntityId> publisher ;
-    private List<ScholixCollectedFrom> collectedFrom ;
+    private List<ScholixIdentifier> identifier;
+    private String dnetIdentifier;
+    private String objectType;
+    private String objectSubType;
+    private String title;
+    private List<ScholixEntityId> creator;
+    private String publicationDate;
+    private List<ScholixEntityId> publisher;
+    private List<ScholixCollectedFrom> collectedFrom;
 
 
-    public ScholixIdentifier getIdentifier() {
+    public static ScholixResource fromSummary(ScholixSummary summary) {
+
+        final ScholixResource resource = new ScholixResource();
+
+        resource.setDnetIdentifier(summary.getId());
+
+        resource.setIdentifier(summary.getLocalIdentifier().stream()
+                .map(i ->
+                        new ScholixIdentifier(i.getId(), i.getType()))
+                .collect(Collectors.toList()));
+
+        resource.setObjectType(summary.getTypology().toString());
+
+        resource.setTitle(summary.getTitle().stream().findAny().orElse(null));
+
+        if (summary.getAuthor() != null)
+            resource.setCreator(summary.getAuthor().stream()
+                    .map(c -> new ScholixEntityId(c, null))
+                    .collect(Collectors.toList())
+            );
+
+        if (summary.getDate() != null)
+            resource.setPublicationDate(summary.getDate().stream().findAny().orElse(null));
+        if (summary.getPublisher() != null)
+            resource.setPublisher(summary.getPublisher().stream()
+                    .map(p -> new ScholixEntityId(p, null))
+                    .collect(Collectors.toList())
+            );
+        if (summary.getDatasources() != null)
+            resource.setCollectedFrom(summary.getDatasources().stream()
+                    .map(d ->
+                            new ScholixCollectedFrom(new ScholixEntityId(d.getDatasourceName(),
+                            Collections.singletonList(new ScholixIdentifier(d.getDatasourceId(), "dnet_identifier"))
+                    ), "collected", d.getCompletionStatus()))
+                    .collect(Collectors.toList()));
+        return resource;
+
+    }
+
+    public List<ScholixIdentifier> getIdentifier() {
         return identifier;
     }
 
-    public ScholixResource setIdentifier(ScholixIdentifier identifier) {
+    public ScholixResource setIdentifier(List<ScholixIdentifier> identifier) {
         this.identifier = identifier;
         return this;
     }

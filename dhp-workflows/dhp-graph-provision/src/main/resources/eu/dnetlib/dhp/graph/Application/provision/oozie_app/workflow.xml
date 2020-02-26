@@ -27,7 +27,7 @@
 
     </parameters>
 
-    <start to="indexSummary"/>
+    <start to="generateScholix"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -91,10 +91,29 @@
             <arg>--sourcePath</arg><arg>${workingDirPath}/summary</arg>
             <arg>--index</arg><arg>${index}_object</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="generateScholix"/>
         <error to="Kill"/>
     </action>
+
+
+
+    <action name="generateScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>generate Summary</name>
+            <class>eu.dnetlib.dhp.provision.SparkGenerateScholix</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
+            <arg>--graphPath</arg><arg>${graphPath}</arg>
+        </spark>
+        <ok to="indexSummary"/>
+        <error to="Kill"/>
+    </action>
+
     <end name="End"/>
-
-
 </workflow-app>

@@ -39,19 +39,14 @@ public class SparkGenerateScholix {
 
         final JavaRDD<String> relationToExport = sc.textFile(graphPath + "/relation").filter(ProvisionUtil::isNotDeleted);
         final JavaPairRDD<String,String> scholixSummary = sc.textFile(workingDirPath + "/summary").mapToPair((PairFunction<String, String, String>) i -> new Tuple2<>(DHPUtils.getJPathString(jsonIDPath, i), i));
-
-
-        PairFunction<Tuple2<String, String>, String, Scholix> k =
-                summaryRelation ->
-                        new Tuple2<>(
-                                DHPUtils.getJPathString(targetIDPath,summaryRelation._2()),
-                                Scholix.generateScholixWithSource(summaryRelation._1(), summaryRelation._2()));
-
         scholixSummary.join(
                 relationToExport
                         .mapToPair((PairFunction<String, String, String>) i -> new Tuple2<>(DHPUtils.getJPathString(sourceIDPath, i), i)))
                 .map(Tuple2::_2)
-                .mapToPair(k)
+                .mapToPair(summaryRelation ->
+                        new Tuple2<>(
+                                DHPUtils.getJPathString(targetIDPath,summaryRelation._2()),
+                                Scholix.generateScholixWithSource(summaryRelation._1(), summaryRelation._2())))
                 .join(scholixSummary)
                 .map(Tuple2::_2)
                 .map(i -> i._1().addTarget(i._2()))

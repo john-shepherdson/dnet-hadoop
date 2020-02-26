@@ -3,10 +3,8 @@ package eu.dnetlib.dhp.provision.scholix;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-
+import eu.dnetlib.dhp.utils.DHPUtils;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,25 +30,39 @@ public class Scholix implements Serializable {
 
         try {
             ScholixSummary scholixSummary = mapper.readValue(sourceSummaryJson, ScholixSummary.class);
-            Relation rel = mapper.readValue(sourceSummaryJson, Relation.class);
+            Relation rel = mapper.readValue(relation, Relation.class);
             final Scholix s = new Scholix();
             if (scholixSummary.getDate() != null)
                 s.setPublicationDate(scholixSummary.getDate().stream().findFirst().orElse(null));
-
-
             s.setLinkprovider(rel.getCollectedFrom().stream().map(cf ->
                     new ScholixEntityId(cf.getValue(), Collections.singletonList(
                             new ScholixIdentifier(cf.getKey(), "dnet_identifier")
                     ))).collect(Collectors.toList()));
-
-
+            s.setRelationship(new ScholixRelationship(rel.getRelType(),rel.getRelClass(),null ));
+            s.setSource(ScholixResource.fromSummary(scholixSummary));
+            return s;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
+
+    private void generateIdentifier( ) {
+        setIdentifier(DHPUtils.md5(String.format("%s::%s::%s",source.getDnetIdentifier(),relationship.getName(), target.getDnetIdentifier())));
+
+    }
+
     public Scholix addTarget(final String targetSummaryJson) {
-        return this;
+        final ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            ScholixSummary targetSummary = mapper.readValue(targetSummaryJson, ScholixSummary.class);
+            setTarget(ScholixResource.fromSummary(targetSummary));
+            generateIdentifier();
+            return this;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
