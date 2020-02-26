@@ -1,9 +1,7 @@
 package eu.dnetlib.dhp.provision;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.provision.scholix.ScholixSummary;
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;

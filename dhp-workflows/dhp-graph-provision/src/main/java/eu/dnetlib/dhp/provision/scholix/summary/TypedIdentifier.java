@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.provision.scholix;
+package eu.dnetlib.dhp.provision.scholix.summary;
 
 import java.io.Serializable;
 

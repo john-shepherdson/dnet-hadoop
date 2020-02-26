@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.provision;
 
-import eu.dnetlib.dhp.provision.scholix.Typology;
+import eu.dnetlib.dhp.provision.scholix.summary.Typology;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.lang3.StringUtils;
 

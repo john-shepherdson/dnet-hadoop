@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.provision.scholix;
+package eu.dnetlib.dhp.provision.scholix.summary;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;

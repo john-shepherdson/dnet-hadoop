@@ -1,7 +1,7 @@
 package eu.dnetlib.dhp.provision;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.provision.scholix.ScholixSummary;
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
