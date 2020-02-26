@@ -33,7 +33,7 @@ public class Scholix implements Serializable {
             Relation rel = mapper.readValue(relation, Relation.class);
             final Scholix s = new Scholix();
             if (scholixSummary.getDate() != null)
-                s.setPublicationDate(scholixSummary.getDate().stream().findFirst().orElse(null));
+                s.setPublicationDate(scholixSummary.getDate().stream().findAny().orElse(null));
             s.setLinkprovider(rel.getCollectedFrom().stream().map(cf ->
                     new ScholixEntityId(cf.getValue(), Collections.singletonList(
                             new ScholixIdentifier(cf.getKey(), "dnet_identifier")
