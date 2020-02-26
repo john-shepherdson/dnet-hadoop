@@ -43,8 +43,7 @@
         </property>
     </parameters>
 
-    <start to="ResetWorkingPath"/>
-
+	<start to="ResetWorkingPath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -71,7 +70,24 @@
             <arg>-dbuser</arg><arg>${postgresUser}</arg>
             <arg>-dbpasswd</arg><arg>${postgresPassword}</arg>
         </java>
-        <ok to="ImportODFEntitiesFromMongoDB"/>
+        <ok to="ImportClaimsFromPostgres"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="ImportClaimsFromPostgres">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.migration.MigrateDbEntitiesApplication</main-class>
+            <arg>-p</arg><arg>${workingPath}/db_claims</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-u</arg><arg>${hdfsUser}</arg>
+            <arg>-dburl</arg><arg>${postgresURL}</arg>
+            <arg>-dbuser</arg><arg>${postgresUser}</arg>
+            <arg>-dbpasswd</arg><arg>${postgresPassword}</arg>
+            <arg>-a</arg><arg>claims</arg>
+        </java>
+		<ok to="ImportODFEntitiesFromMongoDB"/>
         <error to="Kill"/>
     </action>
 
@@ -113,170 +129,78 @@
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
         </java>
-        <ok to="End"/>
+        <ok to="ImportODFClaimsFromMongoDB"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="ImportODFClaimsFromMongoDB">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.migration.MigrateMongoMdstoresApplication</main-class>
+            <arg>-p</arg><arg>${workingPath}/odf_claims</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-u</arg><arg>${hdfsUser}</arg>
+            <arg>-mongourl</arg><arg>${mongourl}</arg>
+            <arg>-db</arg><arg>${mongoDb}</arg>
+            <arg>-f</arg><arg>ODF</arg>
+            <arg>-l</arg><arg>store</arg>
+            <arg>-i</arg><arg>claim</arg>
+            <arg>-pgurl</arg><arg>${postgresURL}</arg>
+            <arg>-pguser</arg><arg>${postgresUser}</arg>
+            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+        </java>
+        <ok to="ImportOAFClaimsFromMongoDB"/>
         <error to="Kill"/>
     </action>
 
+    <action name="ImportOAFClaimsFromMongoDB">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.migration.MigrateMongoMdstoresApplication</main-class>
+            <arg>-p</arg><arg>${workingPath}/oaf_claims</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-u</arg><arg>${hdfsUser}</arg>
+            <arg>-mongourl</arg><arg>${mongourl}</arg>
+            <arg>-db</arg><arg>${mongoDb}</arg>
+            <arg>-f</arg><arg>OAF</arg>
+            <arg>-l</arg><arg>store</arg>
+            <arg>-i</arg><arg>claim</arg>
+            <arg>-pgurl</arg><arg>${postgresURL}</arg>
+            <arg>-pguser</arg><arg>${postgresUser}</arg>
+            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+        </java>
+        <ok to="ResetGraphRawPath"/>
+        <error to="Kill"/>
+    </action>
 
-    <action name="ExtractPublication">
+	<action name="ResetGraphRawPath">
+        <fs>
+            <delete path='${graphRawPath}'/>
+            <mkdir path='${graphRawPath}'/>
+        </fs>
+        <ok to="ExtractEntitiesInGraphRawPath"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ExtractEntitiesInGraphRawPath">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>ExtractEntities: publication</name>
+            <name>ExtractEntities</name>
             <class>eu.dnetlib.dhp.migration.ExtractEntitiesFromHDFSJob</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingPath}</arg>
-            <arg>-g</arg><arg>${graphRawPath}/publication</arg>
-            <arg>-e</arg><arg>publication</arg>
-        </spark>
-        <ok to="ExtractDataset"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ExtractDataset">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>ExtractEntities: dataset</name>
-            <class>eu.dnetlib.dhp.migration.ExtractEntitiesFromHDFSJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingPath}</arg>
-            <arg>-g</arg><arg>${graphRawPath}/dataset</arg>
-            <arg>-e</arg><arg>dataset</arg>
-        </spark>
-        <ok to="ExtractSoftware"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ExtractSoftware">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>ExtractEntities: software</name>
-            <class>eu.dnetlib.dhp.migration.ExtractEntitiesFromHDFSJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingPath}</arg>
-            <arg>-g</arg><arg>${graphRawPath}/software</arg>
-            <arg>-e</arg><arg>software</arg>
-        </spark>
-        <ok to="ExtractORP"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ExtractORP">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>ExtractEntities: otherresearchproduct</name>
-            <class>eu.dnetlib.dhp.migration.ExtractEntitiesFromHDFSJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingPath}</arg>
-            <arg>-g</arg><arg>${graphRawPath}/otherresearchproduct</arg>
-            <arg>-e</arg><arg>otherresearchproduct</arg>
-        </spark>
-        <ok to="ExtractDatasource"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ExtractDatasource">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>ExtractEntities: datasource</name>
-            <class>eu.dnetlib.dhp.migration.ExtractEntitiesFromHDFSJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingPath}</arg>
-            <arg>-g</arg><arg>${graphRawPath}/datasource</arg>
-            <arg>-e</arg><arg>datasource</arg>
-        </spark>
-        <ok to="ExtractOrganization"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ExtractOrganization">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>ExtractEntities: organization</name>
-            <class>eu.dnetlib.dhp.migration.ExtractEntitiesFromHDFSJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingPath}</arg>
-            <arg>-g</arg><arg>${graphRawPath}/organization</arg>
-            <arg>-e</arg><arg>organization</arg>
-        </spark>
-        <ok to="ExtractProject"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ExtractProject">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>ExtractEntities: project</name>
-            <class>eu.dnetlib.dhp.migration.ExtractEntitiesFromHDFSJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingPath}</arg>
-            <arg>-g</arg><arg>${graphRawPath}/project</arg>
-            <arg>-e</arg><arg>project</arg>
-        </spark>
-        <ok to="ExtractRelation"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ExtractRelation">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>ExtractEntities: relation</name>
-            <class>eu.dnetlib.dhp.migration.ExtractEntitiesFromHDFSJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingPath}</arg>
-            <arg>-g</arg><arg>${graphRawPath}/relation</arg>
-            <arg>-e</arg><arg>relation</arg>
+            <arg>-s</arg><arg>${workingPath}/db_entities,${workingPath}/oaf_entities,${workingPath}/odf_entities</arg>
+            <arg>-g</arg><arg>${graphRawPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
-    </action>
-
+    </action>  
 
     <end name="End"/>
 </workflow-app>

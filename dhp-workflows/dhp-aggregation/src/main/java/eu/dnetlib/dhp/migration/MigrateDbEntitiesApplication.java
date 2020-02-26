@@ -17,15 +17,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor implements Closeable {
@@ -53,22 +59,28 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 		final String hdfsNameNode = parser.get("namenode");
 		final String hdfsUser = parser.get("hdfsUser");
 
+		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
+
 		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, hdfsNameNode, hdfsUser, dbUrl, dbUser, dbPassword)) {
-			log.info("Processing datasources...");
-			smdbe.execute("queryDatasources.sql", smdbe::processDatasource);
+			if (processClaims) {
+				log.info("Processing claims...");
+				smdbe.execute("queryClaims.sql", smdbe::processClaims);
+			} else {
+				log.info("Processing datasources...");
+				smdbe.execute("queryDatasources.sql", smdbe::processDatasource);
 
-			log.info("Processing projects...");
-			smdbe.execute("queryProjects.sql", smdbe::processProject);
+				log.info("Processing projects...");
+				smdbe.execute("queryProjects.sql", smdbe::processProject);
 
-			log.info("Processing orgs...");
-			smdbe.execute("queryOrganizations.sql", smdbe::processOrganization);
+				log.info("Processing orgs...");
+				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization);
 
-			log.info("Processing relations ds <-> orgs ...");
-			smdbe.execute("queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization);
+				log.info("Processing relations ds <-> orgs ...");
+				smdbe.execute("queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization);
 
-			log.info("Processing projects <-> orgs ...");
-			smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization);
-
+				log.info("Processing projects <-> orgs ...");
+				smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization);
+			}
 			log.info("All done.");
 		}
 	}
@@ -377,7 +389,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 			r2.setTarget(dsId);
 			r2.setCollectedFrom(collectedFrom);
 			r2.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
 			emitOaf(r2);
 
 			// rs.getString("datasource");
@@ -426,7 +438,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 			r2.setTarget(projectId);
 			r2.setCollectedFrom(collectedFrom);
 			r2.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
 			emitOaf(r2);
 
 			// rs.getString("project");
@@ -448,6 +460,81 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void processClaims(final ResultSet rs) {
+
+		final DataInfo info =
+				dataInfo(false, null, false, false, qualifier("user:claim", "user:claim", "dnet:provenanceActions", "dnet:provenanceActions"), "0.9");
+
+		try {
+
+			if (rs.getString("source_type").equals("context")) {
+				final Result r;
+
+				if (rs.getString("target_type").equals("dataset")) {
+					r = new Dataset();
+				} else if (rs.getString("target_type").equals("software")) {
+					r = new Software();
+				} else if (rs.getString("target_type").equals("other")) {
+					r = new OtherResearchProduct();
+				} else {
+					r = new Publication();
+				}
+				r.setId(createOpenaireId(50, rs.getString("target_id")));
+				r.setLastupdatetimestamp(lastUpdateTimestamp);
+				r.setContext(prepareContext(rs.getString("source_id"), info));
+				r.setDataInfo(info);
+				emitOaf(r);
+			} else {
+				final String sourceId = createOpenaireId(rs.getString("source_type"), rs.getString("source_id"));
+				final String targetId = createOpenaireId(rs.getString("target_type"), rs.getString("target_id"));
+
+				final Relation r1 = new Relation();
+				final Relation r2 = new Relation();
+
+				if (rs.getString("source_type").equals("project")) {
+					r1.setRelType("resultProject");
+					r1.setSubRelType("outcome");
+					r1.setRelClass("produces");
+
+					r2.setRelType("resultProject");
+					r2.setSubRelType("outcome");
+					r2.setRelClass("isProducedBy");
+				} else {
+					r1.setRelType("resultResult");
+					r1.setSubRelType("relationship");
+					r1.setRelClass("isRelatedTo");
+
+					r2.setRelType("resultResult");
+					r2.setSubRelType("relationship");
+					r2.setRelClass("isRelatedTo");
+				}
+
+				r1.setSource(sourceId);
+				r1.setTarget(targetId);
+				r1.setDataInfo(info);
+				r1.setLastupdatetimestamp(lastUpdateTimestamp);
+				emitOaf(r1);
+
+				r2.setSource(targetId);
+				r2.setTarget(sourceId);
+				r2.setDataInfo(info);
+				r2.setLastupdatetimestamp(lastUpdateTimestamp);
+				emitOaf(r2);
+
+			}
+
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private List<Context> prepareContext(final String id, final DataInfo dataInfo) {
+		final Context context = new Context();
+		context.setId(id);
+		context.setDataInfo(Arrays.asList(dataInfo));
+		return Arrays.asList(context);
 	}
 
 	private DataInfo prepareDataInfo(final ResultSet rs) throws SQLException {

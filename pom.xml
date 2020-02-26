@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -126,6 +126,13 @@
 				<groupId>org.apache.spark</groupId>
 				<artifactId>spark-graphx_2.11</artifactId>
 				<version>${dhp.spark.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>1.7.25</version>
 				<scope>provided</scope>
 			</dependency>
 
@@ -474,6 +481,7 @@
 		<dhp.jackson.version>2.9.6</dhp.jackson.version>
 		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
 		<scala.version>2.11.12</scala.version>
+		<junit.version>4.12</junit.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 	</properties>
 </project>

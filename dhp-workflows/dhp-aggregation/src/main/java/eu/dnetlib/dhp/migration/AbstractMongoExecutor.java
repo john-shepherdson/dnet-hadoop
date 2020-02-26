@@ -398,6 +398,8 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 	protected DataInfo prepareDataInfo(final Document doc) {
 		final Node n = doc.selectSingleNode("//oaf:datainfo");
 
+		if (n == null) { return null; }
+
 		final String paClassId = n.valueOf("./oaf:provenanceaction/@classid");
 		final String paClassName = n.valueOf("./oaf:provenanceaction/@classname");
 		final String paSchemeId = n.valueOf("./oaf:provenanceaction/@schemeid");
