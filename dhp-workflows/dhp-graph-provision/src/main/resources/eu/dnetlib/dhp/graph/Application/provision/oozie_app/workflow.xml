@@ -27,7 +27,7 @@
 
     </parameters>
 
-    <start to="generateSummary"/>
+    <start to="generateScholix"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -73,7 +73,7 @@
             <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
             <arg>--graphPath</arg><arg>${graphPath}</arg>
         </spark>
-        <ok to="generateScholix"/>
+        <ok to="indexSummary"/>
         <error to="Kill"/>
     </action>
 
