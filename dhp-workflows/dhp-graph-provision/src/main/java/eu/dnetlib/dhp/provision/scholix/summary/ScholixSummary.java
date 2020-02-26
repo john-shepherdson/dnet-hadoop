@@ -223,7 +223,7 @@ public class ScholixSummary implements Serializable {
                     .collect(Collectors.toList())
             );
 
-        summary.setTypology(Typology.dataset);
+        summary.setTypology(Typology.publication);
         if (item.getTitle() != null)
             summary.setTitle(item.getTitle().stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
 
@@ -276,14 +276,12 @@ public class ScholixSummary implements Serializable {
         summary.setRelatedDatasets(relatedItemInfo.getRelatedDataset());
         summary.setRelatedPublications(relatedItemInfo.getRelatedPublication());
         summary.setRelatedUnknown(relatedItemInfo.getRelatedUnknown());
-
+        summary.setTypology(Typology.unknown);
         if (item.getDlicollectedfrom() != null)
             summary.setDatasources(item.getDlicollectedfrom().stream()
                     .map(
                             c -> new CollectedFromType(c.getName(), c.getId(), c.getCompletionStatus())
                     ).collect(Collectors.toList()));
-
-
         return summary;
     }
 }
