@@ -35,8 +35,8 @@ public class ScholixResource implements Serializable {
         resource.setObjectType(summary.getTypology().toString());
 
 
-        if (summary.getTitle() != null)
-            resource.setTitle(summary.getTitle().stream().findAny().orElse(null));
+        if (summary.getTitle() != null && summary.getTitle().size()>0)
+            resource.setTitle(summary.getTitle().get(0));
 
         if (summary.getAuthor() != null)
             resource.setCreator(summary.getAuthor().stream()
@@ -44,8 +44,8 @@ public class ScholixResource implements Serializable {
                     .collect(Collectors.toList())
             );
 
-        if (summary.getDate() != null)
-            resource.setPublicationDate(summary.getDate().stream().findAny().orElse(null));
+        if (summary.getDate() != null && summary.getDate().size()>0)
+            resource.setPublicationDate(summary.getDate().get(0));
         if (summary.getPublisher() != null)
             resource.setPublisher(summary.getPublisher().stream()
                     .map(p -> new ScholixEntityId(p, null))
