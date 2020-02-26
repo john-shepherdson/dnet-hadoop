@@ -42,7 +42,7 @@ public class Scholix implements Serializable {
             s.setSource(ScholixResource.fromSummary(scholixSummary));
             return s;
         } catch (Throwable e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(String.format("Summary: %s \n relation:%s",sourceSummaryJson, relation), e);
         }
     }
 
