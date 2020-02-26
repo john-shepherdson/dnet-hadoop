@@ -37,7 +37,7 @@ public class SparkGenerateScholix {
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 
-        final JavaRDD<String> relationToExport = sc.textFile(graphPath + "/relation").filter(ProvisionUtil::isNotDeleted);
+        final JavaRDD<String> relationToExport = sc.textFile(graphPath + "/relation").filter(ProvisionUtil::isNotDeleted).repartition(4000);
         final JavaPairRDD<String,String> scholixSummary = sc.textFile(workingDirPath + "/summary").mapToPair((PairFunction<String, String, String>) i -> new Tuple2<>(DHPUtils.getJPathString(jsonIDPath, i), i));
         scholixSummary.join(
                 relationToExport
