@@ -111,7 +111,7 @@
             <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
             <arg>--graphPath</arg><arg>${graphPath}</arg>
         </spark>
-        <ok to="end"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
