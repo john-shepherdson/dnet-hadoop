@@ -45,11 +45,11 @@ public class SparkGenerateScholix {
                 .map(Tuple2::_2)
                 .mapToPair(summaryRelation ->
                         new Tuple2<>(
-                                DHPUtils.getJPathString(targetIDPath,summaryRelation._2()),
+                                DHPUtils.getJPathString(targetIDPath, summaryRelation._2()),
                                 Scholix.generateScholixWithSource(summaryRelation._1(), summaryRelation._2())))
-                .join(scholixSummary)
-                .map(Tuple2::_2)
-                .map(i -> i._1().addTarget(i._2()))
+//                .join(scholixSummary)
+//                .map(Tuple2::_2)
+//                .map(i -> i._1().addTarget(i._2()))
                 .map(s-> {
                     ObjectMapper mapper = new ObjectMapper();
                     return mapper.writeValueAsString(s);
@@ -57,7 +57,7 @@ public class SparkGenerateScholix {
         .saveAsTextFile(workingDirPath + "/scholix", GzipCodec.class);
 
 
-        ;
+                ;
 
 
     }
