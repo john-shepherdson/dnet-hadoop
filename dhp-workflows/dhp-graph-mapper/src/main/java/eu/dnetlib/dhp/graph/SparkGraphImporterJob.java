@@ -27,6 +27,7 @@ public class SparkGraphImporterJob {
         final String inputPath = parser.get("sourcePath");
         final String hiveDbName = parser.get("hive_db_name");
 
+        spark.sql(String.format("DROP DATABASE IF EXISTS %s CASCADE", hiveDbName));
         spark.sql(String.format("CREATE DATABASE IF NOT EXISTS %s", hiveDbName));
 
         // Read the input file and convert it into RDD of serializable object
