@@ -1,6 +1,8 @@
 package eu.dnetlib.dhp;
 
 
+import eu.dnetlib.dhp.schema.oaf.Author;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -10,6 +12,23 @@ public class TypedRow implements Serializable {
     private String type;
     private String value;
     private Set<String> accumulator;
+    private List<Author> authors;
+
+    public List<Author> getAuthors() {
+        return authors;
+    }
+
+    public TypedRow  setAuthors(List<Author> authors) {
+        this.authors = authors;
+        return this;
+    }
+
+    public void addAuthor(Author a){
+        if(authors == null){
+            authors = new ArrayList<>();
+        }
+        authors.add(a);
+    }
 
     public Set<String> getAccumulator() {
         return accumulator;
