@@ -48,11 +48,7 @@ public class SparkResultToProjectThroughSemRelJob {
         JavaRDD<Relation> relations = sc.sequenceFile(inputPath + "/relation", Text.class, Text.class)
                 .map(item -> new ObjectMapper().readValue(item._2().toString(), Relation.class)).cache();
 
-        JavaPairRDD<String, TypedRow> result_result = relations
-                .filter(r -> !r.getDataInfo().getDeletedbyinference())
-                .filter(r -> allowedsemrel.contains(r.getRelClass()) && RELATION_RESULTRESULT_REL_TYPE.equals(r.getRelType()))
-                .map(r -> new TypedRow().setSourceId(r.getSource()).setTargetId(r.getTarget()))
-                .mapToPair(toPair());
+        JavaPairRDD<String, TypedRow> result_result = getResultResultSemRel(allowedsemrel, relations);
 
         JavaPairRDD<String, TypedRow> result_project = relations
                 .filter(r -> !r.getDataInfo().getDeletedbyinference())
@@ -115,6 +111,8 @@ public class SparkResultToProjectThroughSemRelJob {
                 .saveAsTextFile(outputPath + "/relation");
 
     }
+
+
 
 
 }
