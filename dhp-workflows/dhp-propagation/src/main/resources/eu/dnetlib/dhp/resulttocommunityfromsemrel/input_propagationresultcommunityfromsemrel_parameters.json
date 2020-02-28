@@ -1,0 +1,20 @@
+[
+  {
+    "paramName":"mt",
+    "paramLongName":"master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName":"s",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the path of the sequencial file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName":"as",
+    "paramLongName":"allowedsemrels",
+    "paramDescription": "the allowed sematinc relations for propagation",
+    "paramRequired": true
+  }
+]
