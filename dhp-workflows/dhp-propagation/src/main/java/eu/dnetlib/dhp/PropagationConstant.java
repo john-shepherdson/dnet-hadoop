@@ -1,6 +1,10 @@
 package eu.dnetlib.dhp;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.hadoop.io.Text;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
@@ -21,11 +25,18 @@ public class PropagationConstant {
 
     public final static String PROPAGATION_COUNTRY_INSTREPO_CLASS_ID = "country:instrepos";
     public final static String PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME = "Propagation of country to result collected from datasources of type institutional repositories";
+
     public final static String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID = "result:organization:instrepo";
     public final static String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME = "Propagation of affiliation to result collected from datasources of type institutional repository";
+
     public final static String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID = "result:project:semrel";
     public final static String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME = "Propagation of result to project through semantic relation";
 
+    public final static String PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID = "propagation:community:productsthroughsemrel";
+    public final static String PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME = " Propagation of result belonging to community through semantic relation";
+
+    public final static String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID = "propagation:orcid:result";
+    public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME = "Propagation of ORCID through result linked by isSupplementedBy or isSupplementTo semantic relations";
 
     public final static String RELATION_DATASOURCEORGANIZATION_REL_TYPE = "datasourceOrganization";
     public final static String RELATION_DATASOURCEORGANIZATION_SUBREL_TYPE = "provision";
@@ -45,6 +56,7 @@ public class PropagationConstant {
     public static final String RELATION_RESULT_PROJECT_REL_CLASS = "isProducedBy";
     public static final String RELATION_PROJECT_RESULT_REL_CLASS = "produces";
 
+    public static final String PROPAGATION_AUTHOR_PID = "ORCID";
 
     public static Country getCountry(String country){
         Country nc = new Country();
@@ -89,6 +101,16 @@ public class PropagationConstant {
         return e -> new Tuple2<>( e.getSourceId(), e);
 
     }
+
+    public static JavaPairRDD<String, TypedRow> getResultResultSemRel(List<String> allowedsemrel, JavaRDD<Relation> relations) {
+        return relations
+                .filter(r -> !r.getDataInfo().getDeletedbyinference())
+                .filter(r -> allowedsemrel.contains(r.getRelClass()) && RELATION_RESULTRESULT_REL_TYPE.equals(r.getRelType()))
+                .map(r -> new TypedRow().setSourceId(r.getSource()).setTargetId(r.getTarget()))
+                .mapToPair(toPair());
+    }
+
+
 
     public static List<TypedRow> getTypedRowsDatasourceResult(OafEntity oaf) {
         List<TypedRow> lst = new ArrayList<>();
