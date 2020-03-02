@@ -40,7 +40,10 @@ public class TypedRow implements Serializable {
     }
 
 
-    public void addAll(Set<String> toadd){
+    public void addAll(Collection<String> toadd){
+        if(accumulator == null){
+            accumulator = new HashSet<>();
+        }
         this.accumulator.addAll(toadd);
     }
 
