@@ -1,0 +1,21 @@
+[
+  {
+    "paramName":"mt",
+    "paramLongName":"master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName":"s",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the path of the sequencial file to read",
+    "paramRequired": true
+  },
+
+  {
+    "paramName":"ocm",
+    "paramLongName":"organizationtoresultcommunitymap",
+    "paramDescription": "the map in json format assocaition the organization original id with the list of communities",
+    "paramRequired": true
+  }
+]
