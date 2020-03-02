@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.migration;
+package eu.dnetlib.dhp.migration.utils;
 
 import java.io.Closeable;
 import java.io.IOException;

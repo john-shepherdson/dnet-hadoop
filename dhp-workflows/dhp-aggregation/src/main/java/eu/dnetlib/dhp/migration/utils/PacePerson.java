@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.migration.pace;
+package eu.dnetlib.dhp.migration.utils;
 
 import java.nio.charset.Charset;
 import java.text.Normalizer;

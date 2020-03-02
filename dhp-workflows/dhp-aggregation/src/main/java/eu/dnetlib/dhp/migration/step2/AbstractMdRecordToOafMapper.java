@@ -1,20 +1,24 @@
-package eu.dnetlib.dhp.migration;
+package eu.dnetlib.dhp.migration.step2;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.field;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.keyValue;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.oaiIProvenance;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.structuredProperty;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
@@ -37,11 +41,9 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
+public abstract class AbstractMdRecordToOafMapper {
 
-	protected final Map<String, String> code2name = new HashMap<>();
-
-	protected final MdstoreClient mdstoreClient;
+	protected final Map<String, String> code2name;
 
 	protected static final Qualifier MAIN_TITLE_QUALIFIER = qualifier("main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
 
@@ -51,79 +53,36 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 	protected static final Qualifier SOFTWARE_RESULTTYPE_QUALIFIER = qualifier("software", "software", "dnet:result_typologies", "dnet:result_typologies");
 	protected static final Qualifier OTHER_RESULTTYPE_QUALIFIER = qualifier("other", "other", "dnet:result_typologies", "dnet:result_typologies");
 
-	private static final Log log = LogFactory.getLog(AbstractMongoExecutor.class);
-
-	public AbstractMongoExecutor(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String mongoBaseUrl,
-			final String mongoDb, final String dbUrl, final String dbUser,
-			final String dbPassword) throws Exception {
-
-		super(hdfsPath, hdfsNameNode, hdfsUser);
-
-		this.mdstoreClient = new MdstoreClient(mongoBaseUrl, mongoDb);
-		loadClassNames(dbUrl, dbUser, dbPassword);
-
-		final Map<String, String> nsContext = new HashMap<>();
-
-		registerNamespaces(nsContext);
-
-		DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
+	protected AbstractMdRecordToOafMapper(final Map<String, String> code2name) {
+		this.code2name = code2name;
 	}
 
-	private void loadClassNames(final String dbUrl, final String dbUser, final String dbPassword) throws IOException {
+	public List<Oaf> processMdRecord(final String xml) {
+		try {
+			final Map<String, String> nsContext = new HashMap<>();
+			nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
+			nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
+			nsContext.put("oaf", "http://namespace.openaire.eu/oaf");
+			nsContext.put("oai", "http://www.openarchives.org/OAI/2.0/");
+			nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
+			nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
+			nsContext.put("datacite", "http://datacite.org/schema/kernel-3");
+			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
-		log.info("Loading vocabulary terms from db...");
+			final Document doc = DocumentHelper.parseText(xml);
 
-		try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
-			code2name.clear();
-			dbClient.processResults("select code, name from class", rs -> {
-				try {
-					code2name.put(rs.getString("code"), rs.getString("name"));
-				} catch (final SQLException e) {
-					e.printStackTrace();
-				}
-			});
+			final String type = doc.valueOf("//dr:CobjCategory/@type");
+			final KeyValue collectedFrom = keyValue(doc.valueOf("//oaf:collectedFrom/@id"), doc.valueOf("//oaf:collectedFrom/@name"));
+			final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id")) ? collectedFrom
+					: keyValue(doc.valueOf("//oaf:hostedBy/@id"), doc.valueOf("//oaf:hostedBy/@name"));
+
+			final DataInfo info = prepareDataInfo(doc);
+			final long lastUpdateTimestamp = new Date().getTime();
+
+			return createOafs(doc, type, collectedFrom, hostedBy, info, lastUpdateTimestamp);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
 		}
-
-		log.info("Found " + code2name.size() + " terms.");
-
-	}
-
-	public void processMdRecords(final String mdFormat, final String mdLayout, final String mdInterpretation) throws DocumentException {
-
-		log.info(String.format("Searching mdstores (format: %s, layout: %s, interpretation: %s)", mdFormat, mdLayout, mdInterpretation));
-
-		final Map<String, String> colls = mdstoreClient.validCollections(mdFormat, mdLayout, mdInterpretation);
-		log.info("Found " + colls.size() + " mdstores");
-
-		for (final Entry<String, String> entry : colls.entrySet()) {
-			log.info("Processing mdstore " + entry.getKey() + " (collection: " + entry.getValue() + ")");
-			final String currentColl = entry.getValue();
-
-			for (final String xml : mdstoreClient.listRecords(currentColl)) {
-				final Document doc = DocumentHelper.parseText(xml);
-
-				final String type = doc.valueOf("//dr:CobjCategory/@type");
-				final KeyValue collectedFrom = keyValue(doc.valueOf("//oaf:collectedFrom/@id"), doc.valueOf("//oaf:collectedFrom/@name"));
-				final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id")) ? collectedFrom
-						: keyValue(doc.valueOf("//oaf:hostedBy/@id"), doc.valueOf("//oaf:hostedBy/@name"));
-
-				final DataInfo info = prepareDataInfo(doc);
-				final long lastUpdateTimestamp = new Date().getTime();
-
-				for (final Oaf oaf : createOafs(doc, type, collectedFrom, hostedBy, info, lastUpdateTimestamp)) {
-					emitOaf(oaf);
-				}
-			}
-		}
-		log.info("All Done.");
-	}
-
-	protected void registerNamespaces(final Map<String, String> nsContext) {
-		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
-		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
-		nsContext.put("oaf", "http://namespace.openaire.eu/oaf");
-		nsContext.put("oai", "http://www.openarchives.org/OAI/2.0/");
-		nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
 	}
 
 	protected List<Oaf> createOafs(final Document doc,
@@ -430,12 +389,6 @@ public abstract class AbstractMongoExecutor extends AbstractMigrationExecutor {
 			}
 		}
 		return res;
-	}
-
-	@Override
-	public void close() throws IOException {
-		super.close();
-		mdstoreClient.close();
 	}
 
 }

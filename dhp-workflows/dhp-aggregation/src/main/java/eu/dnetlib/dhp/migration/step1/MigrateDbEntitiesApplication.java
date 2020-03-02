@@ -1,4 +1,14 @@
-package eu.dnetlib.dhp.migration;
+package eu.dnetlib.dhp.migration.step1;
+
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.asString;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.field;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.listKeyValues;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.structuredProperty;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -17,6 +27,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.migration.utils.AbstractMigrationApplication;
+import eu.dnetlib.dhp.migration.utils.DbClient;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -34,7 +46,7 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor implements Closeable {
+public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
 	private static final Qualifier ENTITYREGISTRY_PROVENANCE_ACTION =
 			qualifier("sysimport:crosswalk:entityregistry", "sysimport:crosswalk:entityregistry", "dnet:provenance_actions", "dnet:provenance_actions");
