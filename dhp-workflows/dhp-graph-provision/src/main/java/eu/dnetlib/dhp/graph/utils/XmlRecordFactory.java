@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.graph.utils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mycila.xmltool.XMLDoc;
 import com.mycila.xmltool.XMLTag;
@@ -11,6 +12,8 @@ import eu.dnetlib.dhp.graph.model.RelatedEntity;
 import eu.dnetlib.dhp.graph.model.Tuple2;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -27,6 +30,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +40,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 public class XmlRecordFactory implements Serializable {
+
+    private  Map<String, LongAccumulator> accumulators;
 
     private Set<String> specialDatasourceTypes;
 
@@ -47,11 +53,20 @@ public class XmlRecordFactory implements Serializable {
 
     public XmlRecordFactory(
             final ContextMapper contextMapper, final boolean indent,
-            final String schemaLocation, final Set<String> otherDatasourceTypesUForUI) {
+            final String schemaLocation, final String otherDatasourceTypesUForUI) {
 
+        this(Maps.newHashMap(), contextMapper, indent, schemaLocation, otherDatasourceTypesUForUI);
+    }
+
+    public XmlRecordFactory(
+            final  Map<String, LongAccumulator> accumulators,
+            final ContextMapper contextMapper, final boolean indent,
+            final String schemaLocation, final String otherDatasourceTypesUForUI) {
+
+        this.accumulators = accumulators;
         this.contextMapper = contextMapper;
         this.schemaLocation = schemaLocation;
-        this.specialDatasourceTypes = otherDatasourceTypesUForUI;
+        this.specialDatasourceTypes = Sets.newHashSet(Splitter.on(",").trimResults().split(otherDatasourceTypesUForUI));
 
         this.indent = indent;
     }
@@ -583,7 +598,7 @@ public class XmlRecordFactory implements Serializable {
                 if (p.getFundingtree() != null) {
                     metadata.addAll(p.getFundingtree()
                             .stream()
-                            .map(ft -> asXmlElement("fundingtree", ft.getValue()))
+                            .map(ft -> ft.getValue())
                             .collect(Collectors.toList()));
                 }
 
@@ -713,12 +728,27 @@ public class XmlRecordFactory implements Serializable {
             }
             final DataInfo info = rel.getDataInfo();
 
+            final String inverseRelClass = getInverseRelClass(rel.getRelClass());
+            final String scheme = getScheme(re.getType(), targetType);
+
+            if (StringUtils.isBlank(inverseRelClass)) {
+                throw new IllegalArgumentException("missing inverse for: " + rel.getRelClass());
+            }
+            if (StringUtils.isBlank(scheme)) {
+                throw new IllegalArgumentException(String.format("missing scheme for: <%s - %s>", re.getType(), targetType));
+            }
+
+            final String accumulatorName = getRelDescriptor(rel.getRelType(), rel.getSubRelType(), rel.getRelClass());
+            if (accumulators.containsKey(accumulatorName)) {
+                accumulators.get(accumulatorName).add(1);
+            }
+
             rels.add(templateFactory.getRel(
                     targetType,
                     rel.getTarget(),
                     Sets.newHashSet(metadata),
-                    getInverseRelClass(rel.getRelClass()),
-                    getScheme(targetType, re.getType()),
+                    inverseRelClass,
+                    scheme,
                     info));
         }
         return rels;

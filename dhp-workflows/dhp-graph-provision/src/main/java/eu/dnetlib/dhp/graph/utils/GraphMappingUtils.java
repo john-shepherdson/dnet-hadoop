@@ -26,6 +26,8 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 public class GraphMappingUtils {
 
+    public static final String SEPARATOR = "_";
+
     public enum EntityType {
         publication, dataset, otherresearchproduct, software, datasource, organization, project
     }
@@ -250,5 +252,8 @@ public class GraphMappingUtils {
         return s;
     }
 
+    public static String getRelDescriptor(String relType, String subRelType, String relClass) {
+        return relType + SEPARATOR + subRelType + SEPARATOR + relClass;
+    }
 
 }
