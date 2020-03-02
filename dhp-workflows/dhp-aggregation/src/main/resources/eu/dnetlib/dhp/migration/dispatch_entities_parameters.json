@@ -1,8 +1,8 @@
 [
 	{
 		"paramName": "s",
-		"paramLongName": "sourcePaths",
-		"paramDescription": "the HDFS  source paths which contains the sequential file (comma separated)",
+		"paramLongName": "sourcePath",
+		"paramDescription": "the source path",
 		"paramRequired": true
 	},
 	{

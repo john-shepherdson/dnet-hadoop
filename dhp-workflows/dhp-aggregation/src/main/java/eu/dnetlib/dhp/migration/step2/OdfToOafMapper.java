@@ -1,4 +1,8 @@
-package eu.dnetlib.dhp.migration;
+package eu.dnetlib.dhp.migration.step2;
+
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.field;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.structuredProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
@@ -22,38 +24,28 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class OdfMigrationExecutor extends AbstractMongoExecutor {
+public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
-	private static final Log log = LogFactory.getLog(OdfMigrationExecutor.class);
-
-	public OdfMigrationExecutor(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String mongoBaseUrl, final String mongoDb,
-			final String dbUrl, final String dbUser,
-			final String dbPassword) throws Exception {
-		super(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb, dbUrl, dbUser, dbPassword);
-	}
-
-	@Override
-	protected void registerNamespaces(final Map<String, String> nsContext) {
-		super.registerNamespaces(nsContext);
-		nsContext.put("dc", "http://datacite.org/schema/kernel-3");
+	public OdfToOafMapper(final Map<String, String> code2name) {
+		super(code2name);
 	}
 
 	@Override
 	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//dc:title", MAIN_TITLE_QUALIFIER, info);
+		return prepareListStructProps(doc, "//datacite:title", MAIN_TITLE_QUALIFIER, info);
 	}
 
 	@Override
 	protected List<Author> prepareAuthors(final Document doc, final DataInfo info) {
 		final List<Author> res = new ArrayList<>();
 		int pos = 1;
-		for (final Object o : doc.selectNodes("//dc:creator")) {
+		for (final Object o : doc.selectNodes("//datacite:creator")) {
 			final Node n = (Node) o;
 			final Author author = new Author();
-			author.setFullname(n.valueOf("./dc:creatorName"));
-			author.setName(n.valueOf("./dc:givenName"));
-			author.setSurname(n.valueOf("./dc:familyName"));
-			author.setAffiliation(prepareListFields(doc, "./dc:affiliation", info));
+			author.setFullname(n.valueOf("./datacite:creatorName"));
+			author.setName(n.valueOf("./datacite:givenName"));
+			author.setSurname(n.valueOf("./datacite:familyName"));
+			author.setAffiliation(prepareListFields(doc, "./datacite:affiliation", info));
 			author.setPid(preparePids(doc, info));
 			author.setRank(pos++);
 			res.add(author);
@@ -63,7 +55,7 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 
 	private List<StructuredProperty> preparePids(final Document doc, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes("./dc:nameIdentifier")) {
+		for (final Object o : doc.selectNodes("./datacite:nameIdentifier")) {
 			res.add(structuredProperty(((Node) o).getText(), prepareQualifier((Node) o, "./@nameIdentifierScheme", "dnet:pid_types", "dnet:pid_types"), info));
 		}
 		return res;
@@ -72,7 +64,7 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 	@Override
 	protected List<Instance> prepareInstances(final Document doc, final DataInfo info, final KeyValue collectedfrom, final KeyValue hostedby) {
 		final List<Instance> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes("//dc:alternateIdentifier[@alternateIdentifierType='URL']")) {
+		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
 			final Instance instance = new Instance();
 			instance.setUrl(Arrays.asList(((Node) o).getText().trim()));
 			instance.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", "dnet:publication_resource", "dnet:publication_resource"));
@@ -98,7 +90,7 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 	@Override
 	protected List<StructuredProperty> prepareRelevantDates(final Document doc, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes("//dc:date")) {
+		for (final Object o : doc.selectNodes("//datacite:date")) {
 			final String dateType = ((Node) o).valueOf("@dateType");
 			if (StringUtils.isBlank(dateType) && !dateType.equalsIgnoreCase("Accepted") && !dateType.equalsIgnoreCase("Issued")
 					&& !dateType.equalsIgnoreCase("Updated") && !dateType.equalsIgnoreCase("Available")) {
@@ -115,32 +107,32 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected List<Field<String>> prepareContributors(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:contributorName", info);
+		return prepareListFields(doc, "//datacite:contributorName", info);
 	}
 
 	@Override
 	protected List<Field<String>> prepareFormats(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:format", info);
+		return prepareListFields(doc, "//datacite:format", info);
 	}
 
 	@Override
 	protected Field<String> preparePublisher(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//dc:publisher", info);
+		return prepareField(doc, "//datacite:publisher", info);
 	}
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:description[@descriptionType='Abstract']", info);
+		return prepareListFields(doc, "//datacite:description[@descriptionType='Abstract']", info);
 	}
 
 	@Override
 	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//dc:subject", info);
+		return prepareListStructProps(doc, "//datacite:subject", info);
 	}
 
 	@Override
 	protected Qualifier prepareLanguages(final Document doc) {
-		return prepareQualifier(doc, "//dc:language", "dnet:languages", "dnet:languages");
+		return prepareQualifier(doc, "//datacite:language", "dnet:languages", "dnet:languages");
 	}
 
 	@Override
@@ -150,17 +142,17 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactGroups(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:contributor[@contributorType='ContactGroup']/dc:contributorName", info);
+		return prepareListFields(doc, "//datacite:contributor[@contributorType='ContactGroup']/datacite:contributorName", info);
 	}
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactPersons(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:contributor[@contributorType='ContactPerson']/dc:contributorName", info);
+		return prepareListFields(doc, "//datacite:contributor[@contributorType='ContactPerson']/datacite:contributorName", info);
 	}
 
 	@Override
 	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
-		return prepareQualifier(doc, "//dc:format", "dnet:programming_languages", "dnet:programming_languages");
+		return prepareQualifier(doc, "//datacite:format", "dnet:programming_languages", "dnet:programming_languages");
 	}
 
 	@Override
@@ -175,7 +167,7 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected List<Field<String>> prepareSoftwareDocumentationUrls(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']", info);
+		return prepareListFields(doc, "//datacite:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']", info);
 	}
 
 	// DATASETS
@@ -184,11 +176,11 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 	protected List<GeoLocation> prepareDatasetGeoLocations(final Document doc, final DataInfo info) {
 		final List<GeoLocation> res = new ArrayList<>();
 
-		for (final Object o : doc.selectNodes("//dc:geoLocation")) {
+		for (final Object o : doc.selectNodes("//datacite:geoLocation")) {
 			final GeoLocation loc = new GeoLocation();
-			loc.setBox(((Node) o).valueOf("./dc:geoLocationBox"));
-			loc.setPlace(((Node) o).valueOf("./dc:geoLocationPlace"));
-			loc.setPoint(((Node) o).valueOf("./dc:geoLocationPoint"));
+			loc.setBox(((Node) o).valueOf("./datacite:geoLocationBox"));
+			loc.setPlace(((Node) o).valueOf("./datacite:geoLocationPlace"));
+			loc.setPoint(((Node) o).valueOf("./datacite:geoLocationPoint"));
 			res.add(loc);
 		}
 		return res;
@@ -201,17 +193,17 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected Field<String> prepareDatasetLastMetadataUpdate(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//dc:date[@dateType='Updated']", info);
+		return prepareField(doc, "//datacite:date[@dateType='Updated']", info);
 	}
 
 	@Override
 	protected Field<String> prepareDatasetVersion(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//dc:version", info);
+		return prepareField(doc, "//datacite:version", info);
 	}
 
 	@Override
 	protected Field<String> prepareDatasetSize(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//dc:size", info);
+		return prepareField(doc, "//datacite:size", info);
 	}
 
 	@Override
@@ -221,7 +213,7 @@ public class OdfMigrationExecutor extends AbstractMongoExecutor {
 
 	@Override
 	protected Field<String> prepareDatasetStorageDate(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//dc:date[@dateType='Issued']", info);
+		return prepareField(doc, "//datacite:date[@dateType='Issued']", info);
 	}
 
 	@Override

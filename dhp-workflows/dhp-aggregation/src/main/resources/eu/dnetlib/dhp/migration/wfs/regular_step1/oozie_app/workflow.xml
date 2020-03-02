@@ -1,16 +1,8 @@
-<workflow-app name="import regular entities as Graph (all steps)" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="import regular entities as Graph (step 1)" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>migrationPathStep1</name>
             <description>the base path to store hdfs file</description>
-        </property>
-        <property>
-            <name>migrationPathStep2</name>
-            <description>the temporary path to store entities before dispatching</description>
-        </property>
-        <property>
-            <name>migrationPathStep3</name>
-            <description>the graph Raw base path</description>
         </property>
         <property>
             <name>postgresURL</name>
@@ -109,66 +101,9 @@
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>cleaned</arg>
         </java>
-        <ok to="ResetEntities"/>
-        <error to="Kill"/>
-    </action>
-    
-	<action name="ResetEntities">
-        <fs>
-            <delete path='${migrationPathStep2}'/>
-            <mkdir path='${migrationPathStep2}'/>
-        </fs>
-        <ok to="GenerateEntities"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="GenerateEntities">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>GenerateEntities</name>
-            <class>eu.dnetlib.dhp.migration.step2.GenerateEntitiesApplication</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>-s</arg><arg>${migrationPathStep1}/db_records,${migrationPathStep1}/oaf_records,${migrationPathStep1}/odf_records</arg>
-            <arg>-t</arg><arg>${migrationPathStep2}/all_entities</arg>
-            <arg>-pgurl</arg><arg>${postgresURL}</arg>
-            <arg>-pguser</arg><arg>${postgresUser}</arg>
-            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
-        </spark>
-        <ok to="ResetGraph"/>
-        <error to="Kill"/>
-    </action>
-
-	<action name="ResetGraph">
-        <fs>
-            <delete path='${migrationPathStep3}'/>
-            <mkdir path='${migrationPathStep3}'/>
-        </fs>
-        <ok to="GenerateGraph"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="GenerateGraph">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>GenerateGraph</name>
-            <class>eu.dnetlib.dhp.migration.step3.DispatchEntitiesApplication</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>-s</arg><arg>${migrationPathStep2}/all_entities</arg>
-            <arg>-g</arg><arg>${migrationPathStep3}</arg>
-        </spark>
         <ok to="End"/>
         <error to="Kill"/>
-    </action>  
-
+    </action>
+    	
     <end name="End"/>
 </workflow-app>

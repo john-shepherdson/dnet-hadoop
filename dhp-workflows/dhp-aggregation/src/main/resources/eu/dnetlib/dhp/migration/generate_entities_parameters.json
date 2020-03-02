@@ -1,20 +1,20 @@
 [
 	{
-		"paramName": "p",
-		"paramLongName": "hdfsPath",
-		"paramDescription": "the path where storing the sequential file",
+		"paramName": "s",
+		"paramLongName": "sourcePaths",
+		"paramDescription": "the HDFS source paths which contains the sequential file (comma separated)",
 		"paramRequired": true
 	},
 	{
-		"paramName": "n",
-		"paramLongName": "namenode",
-		"paramDescription": "the Name Node URI",
+		"paramName": "mt",
+		"paramLongName": "master",
+		"paramDescription": "should be local or yarn",
 		"paramRequired": true
 	},
 	{
-		"paramName": "u",
-		"paramLongName": "hdfsUser",
-		"paramDescription": "the user wich create the hdfs seq file",
+		"paramName": "t",
+		"paramLongName": "targetPath",
+		"paramDescription": "the path of the target file",
 		"paramRequired": true
 	},
 	{
@@ -34,11 +34,6 @@
 		"paramLongName": "postgresPassword",
 		"paramDescription": "postgres password",
 		"paramRequired": false
-	},
-	{
-		"paramName": "a",
-		"paramLongName": "action",
-		"paramDescription": "process claims",
-		"paramRequired": false
 	}
+
 ]

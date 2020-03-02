@@ -1,10 +1,23 @@
-package eu.dnetlib.dhp.migration;
+package eu.dnetlib.dhp.migration.step1;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.migration.utils.AbstractMigrationApplication;
+import eu.dnetlib.dhp.migration.utils.MdstoreClient;
 
-public class MigrateMongoMdstoresApplication {
+public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication implements Closeable {
+
+	private static final Log log = LogFactory.getLog(MigrateMongoMdstoresApplication.class);
+
+	private final MdstoreClient mdstoreClient;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -22,24 +35,36 @@ public class MigrateMongoMdstoresApplication {
 		final String hdfsNameNode = parser.get("namenode");
 		final String hdfsUser = parser.get("hdfsUser");
 
-		final String dbUrl = parser.get("postgresUrl");
-		final String dbUser = parser.get("postgresUser");
-		final String dbPassword = parser.get("postgresPassword");
-
-		if (mdFormat.equalsIgnoreCase("oaf")) {
-			try (final OafMigrationExecutor mig =
-					new OafMigrationExecutor(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb, dbUrl, dbUser, dbPassword)) {
-				mig.processMdRecords(mdFormat, mdLayout, mdInterpretation);
-			}
-		} else if (mdFormat.equalsIgnoreCase("odf")) {
-			try (final OdfMigrationExecutor mig =
-					new OdfMigrationExecutor(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb, dbUrl, dbUser, dbPassword)) {
-				mig.processMdRecords(mdFormat, mdLayout, mdInterpretation);
-			}
-		} else {
-			throw new RuntimeException("Format not supported: " + mdFormat);
+		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb)) {
+			app.execute(mdFormat, mdLayout, mdInterpretation);
 		}
 
+	}
+
+	public MigrateMongoMdstoresApplication(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String mongoBaseUrl,
+			final String mongoDb) throws Exception {
+		super(hdfsPath, hdfsNameNode, hdfsUser);
+		this.mdstoreClient = new MdstoreClient(mongoBaseUrl, mongoDb);
+	}
+
+	public void execute(final String format, final String layout, final String interpretation) {
+		final Map<String, String> colls = mdstoreClient.validCollections(format, layout, interpretation);
+		log.info("Found " + colls.size() + " mdstores");
+
+		for (final Entry<String, String> entry : colls.entrySet()) {
+			log.info("Processing mdstore " + entry.getKey() + " (collection: " + entry.getValue() + ")");
+			final String currentColl = entry.getValue();
+
+			for (final String xml : mdstoreClient.listRecords(currentColl)) {
+				emit(xml, "native_" + format);
+			}
+		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		super.close();
+		mdstoreClient.close();
 	}
 
 }

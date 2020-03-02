@@ -1,16 +1,17 @@
-package eu.dnetlib.dhp.migration;
+package eu.dnetlib.dhp.migration.step2;
+
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.field;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
-import eu.dnetlib.dhp.migration.pace.PacePerson;
+import eu.dnetlib.dhp.migration.utils.PacePerson;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -22,20 +23,10 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class OafMigrationExecutor extends AbstractMongoExecutor {
+public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
-	private static final Log log = LogFactory.getLog(OafMigrationExecutor.class);
-
-	public OafMigrationExecutor(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String mongoBaseUrl, final String mongoDb,
-			final String dbUrl, final String dbUser,
-			final String dbPassword) throws Exception {
-		super(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb, dbUrl, dbUser, dbPassword);
-	}
-
-	@Override
-	protected void registerNamespaces(final Map<String, String> nsContext) {
-		super.registerNamespaces(nsContext);
-		nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
+	public OafToOafMapper(final Map<String, String> code2name) {
+		super(code2name);
 	}
 
 	@Override

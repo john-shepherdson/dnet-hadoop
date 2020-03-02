@@ -1,15 +1,15 @@
-<workflow-app name="import regular entities as Graph (all steps)" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="import Claims as Graph" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>migrationPathStep1</name>
+            <name>migrationClaimsPathStep1</name>
             <description>the base path to store hdfs file</description>
         </property>
         <property>
-            <name>migrationPathStep2</name>
+            <name>migrationClaimsPathStep2</name>
             <description>the temporary path to store entities before dispatching</description>
         </property>
         <property>
-            <name>migrationPathStep3</name>
+            <name>migrationClaimsPathStep3</name>
             <description>the graph Raw base path</description>
         </property>
         <property>
@@ -54,117 +54,118 @@
 
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${migrationPathStep1}'/>
-            <mkdir path='${migrationPathStep1}'/>
+            <delete path='${migrationClaimsPathStep1}'/>
+            <mkdir path='${migrationClaimsPathStep1}'/>
         </fs>
-        <ok to="ImportDB"/>
+        <ok to="ImportDBClaims"/>
         <error to="Kill"/>
     </action>
-
-    <action name="ImportDB">
+   
+    <action name="ImportDBClaims">
         <java>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateDbEntitiesApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/db_records</arg>
+            <arg>-p</arg><arg>${migrationClaimsPathStep1}/db_claims</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-u</arg><arg>${hdfsUser}</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+            <arg>-a</arg><arg>claims</arg>
         </java>
-        <ok to="ImportODF"/>
+		<ok to="ImportODFClaims"/>
         <error to="Kill"/>
     </action>
     
-    <action name="ImportODF">
+    <action name="ImportODFClaims">
         <java>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/odf_records</arg>
+            <arg>-p</arg><arg>${migrationClaimsPathStep1}/odf_claims</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-u</arg><arg>${hdfsUser}</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>ODF</arg>
             <arg>-l</arg><arg>store</arg>
-            <arg>-i</arg><arg>cleaned</arg>
+            <arg>-i</arg><arg>claim</arg>
         </java>
-        <ok to="ImportOAF"/>
+        <ok to="ImportOAFClaims"/>
         <error to="Kill"/>
     </action>
 
-    <action name="ImportOAF">
+    <action name="ImportOAFClaims">
         <java>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/oaf_records</arg>
+            <arg>-p</arg><arg>${migrationClaimsPathStep1}/oaf_claims</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-u</arg><arg>${hdfsUser}</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>OAF</arg>
             <arg>-l</arg><arg>store</arg>
-            <arg>-i</arg><arg>cleaned</arg>
+            <arg>-i</arg><arg>claim</arg>
         </java>
-        <ok to="ResetEntities"/>
-        <error to="Kill"/>
-    </action>
-    
-	<action name="ResetEntities">
-        <fs>
-            <delete path='${migrationPathStep2}'/>
-            <mkdir path='${migrationPathStep2}'/>
-        </fs>
-        <ok to="GenerateEntities"/>
+        <ok to="ResetClaimEntities"/>
         <error to="Kill"/>
     </action>
 
-    <action name="GenerateEntities">
+	<action name="ResetClaimEntities">
+        <fs>
+            <delete path='${migrationClaimsPathStep2}'/>
+            <mkdir path='${migrationClaimsPathStep2}'/>
+        </fs>
+        <ok to="GenerateClaimEntities"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="GenerateClaimEntities">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>GenerateEntities</name>
+            <name>GenerateClaimEntities</name>
             <class>eu.dnetlib.dhp.migration.step2.GenerateEntitiesApplication</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>-s</arg><arg>${migrationPathStep1}/db_records,${migrationPathStep1}/oaf_records,${migrationPathStep1}/odf_records</arg>
-            <arg>-t</arg><arg>${migrationPathStep2}/all_entities</arg>
+            <arg>-s</arg><arg>${migrationClaimsPathStep1}/db_claims,${migrationClaimsPathStep1}/oaf_claims,${migrationClaimsPathStep1}/odf_claims</arg>
+            <arg>-t</arg><arg>${migrationClaimsPathStep2}/claim_entities</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
         </spark>
-        <ok to="ResetGraph"/>
+        <ok to="ResetClaimGraph"/>
         <error to="Kill"/>
     </action>
 
-	<action name="ResetGraph">
+	<action name="ResetClaimGraph">
         <fs>
-            <delete path='${migrationPathStep3}'/>
-            <mkdir path='${migrationPathStep3}'/>
+            <delete path='${migrationClaimsPathStep3}'/>
+            <mkdir path='${migrationClaimsPathStep3}'/>
         </fs>
-        <ok to="GenerateGraph"/>
+        <ok to="GenerateClaimGraph"/>
         <error to="Kill"/>
     </action>
 
-    <action name="GenerateGraph">
+    <action name="GenerateClaimGraph">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>GenerateGraph</name>
+            <name>GenerateClaimGraph</name>
             <class>eu.dnetlib.dhp.migration.step3.DispatchEntitiesApplication</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>-s</arg><arg>${migrationPathStep2}/all_entities</arg>
-            <arg>-g</arg><arg>${migrationPathStep3}</arg>
+            <arg>-s</arg><arg>${migrationClaimsPathStep2}/claim_entities</arg>
+            <arg>-g</arg><arg>${migrationClaimsPathStep3}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
