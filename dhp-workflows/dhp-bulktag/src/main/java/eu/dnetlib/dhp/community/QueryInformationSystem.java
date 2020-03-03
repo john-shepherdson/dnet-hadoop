@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp;
+package eu.dnetlib.dhp.community;
 
 import com.google.common.base.Joiner;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;

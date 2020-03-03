@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp;
+package eu.dnetlib.dhp.community;
 
 import com.google.gson.Gson;
 import org.dom4j.Node;

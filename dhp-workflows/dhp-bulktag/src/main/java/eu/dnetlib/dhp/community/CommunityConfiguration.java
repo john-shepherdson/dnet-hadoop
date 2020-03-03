@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp;
+package eu.dnetlib.dhp.community;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -8,7 +8,6 @@ import com.google.gson.GsonBuilder;
 
 import eu.dnetlib.dhp.selectioncriteria.InterfaceAdapter;
 import eu.dnetlib.dhp.selectioncriteria.Selection;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by miriam on 02/08/2018.

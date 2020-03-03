@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp;
+package eu.dnetlib.dhp.community;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static eu.dnetlib.dhp.TagginConstants.*;
+import static eu.dnetlib.dhp.community.TagginConstants.*;
 
 
 /**

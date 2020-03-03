@@ -1,12 +1,14 @@
 package eu.dnetlib.dhp;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.community.CommunityConfiguration;
+import eu.dnetlib.dhp.community.ProtoMap;
+import eu.dnetlib.dhp.community.QueryInformationSystem;
+import eu.dnetlib.dhp.community.ResultTagger;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;

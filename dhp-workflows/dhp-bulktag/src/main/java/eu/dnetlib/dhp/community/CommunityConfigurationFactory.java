@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp;
+package eu.dnetlib.dhp.community;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
