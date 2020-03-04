@@ -163,24 +163,28 @@ public class OafMapperUtils {
 		return d;
 	}
 
-	public static String createOpenaireId(final int prefix, final String originalId) {
-		final String nsPrefix = StringUtils.substringBefore(originalId, "::");
-		final String rest = StringUtils.substringAfter(originalId, "::");
-		return String.format("%s|%s::%s", prefix, nsPrefix, DHPUtils.md5(rest));
+	public static String createOpenaireId(final int prefix, final String originalId, final boolean to_md5) {
+		if (to_md5) {
+			final String nsPrefix = StringUtils.substringBefore(originalId, "::");
+			final String rest = StringUtils.substringAfter(originalId, "::");
+			return String.format("%s|%s::%s", prefix, nsPrefix, DHPUtils.md5(rest));
+		} else {
+			return String.format("%s|%s", prefix, originalId);
+		}
 	}
 
-	public static String createOpenaireId(final String type, final String originalId) {
+	public static String createOpenaireId(final String type, final String originalId, final boolean to_md5) {
 		switch (type) {
 		case "datasource":
-			return createOpenaireId(10, originalId);
+			return createOpenaireId(10, originalId, to_md5);
 		case "organization":
-			return createOpenaireId(20, originalId);
+			return createOpenaireId(20, originalId, to_md5);
 		case "person":
-			return createOpenaireId(30, originalId);
+			return createOpenaireId(30, originalId, to_md5);
 		case "project":
-			return createOpenaireId(40, originalId);
+			return createOpenaireId(40, originalId, to_md5);
 		default:
-			return createOpenaireId(50, originalId);
+			return createOpenaireId(50, originalId, to_md5);
 		}
 	}
 

@@ -153,10 +153,10 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		final List<Oaf> res = new ArrayList<>();
 
-		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"));
+		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
 
 		for (final Object o : doc.selectNodes("//oaf:projectid")) {
-			final String projectId = createOpenaireId(40, ((Node) o).getText());
+			final String projectId = createOpenaireId(40, ((Node) o).getText(), true);
 
 			final Relation r1 = new Relation();
 			r1.setRelType("resultProject");
@@ -197,7 +197,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			final long lastUpdateTimestamp) {
 		r.setDataInfo(info);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
-		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier")));
+		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
 		r.setOriginalId(Arrays.asList(doc.valueOf("//dri:objIdentifier")));
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
 		r.setPid(prepareListStructProps(doc, "//oaf:identifier", "@identifierType", "dnet:pid_types", "dnet:pid_types", info));

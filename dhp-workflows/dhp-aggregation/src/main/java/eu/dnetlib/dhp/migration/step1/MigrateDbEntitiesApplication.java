@@ -117,7 +117,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			final Datasource ds = new Datasource();
 
-			ds.setId(createOpenaireId(10, rs.getString("datasourceid")));
+			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
 			ds.setOriginalId(Arrays.asList(rs.getString("datasourceid")));
 			ds.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
 			ds.setPid(new ArrayList<>());
@@ -224,7 +224,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			final Project p = new Project();
 
-			p.setId(createOpenaireId(40, rs.getString("projectid")));
+			p.setId(createOpenaireId(40, rs.getString("projectid"), true));
 			p.setOriginalId(Arrays.asList(rs.getString("projectid")));
 			p.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
 			p.setPid(new ArrayList<>());
@@ -314,7 +314,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			final Organization o = new Organization();
 
-			o.setId(createOpenaireId(20, rs.getString("organizationid")));
+			o.setId(createOpenaireId(20, rs.getString("organizationid"), true));
 			o.setOriginalId(Arrays.asList(rs.getString("organizationid")));
 			o.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
 			o.setPid(new ArrayList<>());
@@ -378,8 +378,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 		try {
 			final DataInfo info = prepareDataInfo(rs);
-			final String orgId = createOpenaireId(20, rs.getString("organization"));
-			final String dsId = createOpenaireId(10, rs.getString("datasource"));
+			final String orgId = createOpenaireId(20, rs.getString("organization"), true);
+			final String dsId = createOpenaireId(10, rs.getString("datasource"), true);
 			final List<KeyValue> collectedFrom = listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
@@ -427,8 +427,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 		try {
 			final DataInfo info = prepareDataInfo(rs);
-			final String orgId = createOpenaireId(20, rs.getString("resporganization"));
-			final String projectId = createOpenaireId(40, rs.getString("project"));
+			final String orgId = createOpenaireId(20, rs.getString("resporganization"), true);
+			final String projectId = createOpenaireId(40, rs.getString("project"), true);
 			final List<KeyValue> collectedFrom = listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
@@ -493,14 +493,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				} else {
 					r = new Publication();
 				}
-				r.setId(createOpenaireId(50, rs.getString("target_id")));
+				r.setId(createOpenaireId(50, rs.getString("target_id"), false));
 				r.setLastupdatetimestamp(lastUpdateTimestamp);
 				r.setContext(prepareContext(rs.getString("source_id"), info));
 				r.setDataInfo(info);
 				emitOaf(r);
 			} else {
-				final String sourceId = createOpenaireId(rs.getString("source_type"), rs.getString("source_id"));
-				final String targetId = createOpenaireId(rs.getString("target_type"), rs.getString("target_id"));
+				final String sourceId = createOpenaireId(rs.getString("source_type"), rs.getString("source_id"), false);
+				final String targetId = createOpenaireId(rs.getString("target_type"), rs.getString("target_id"), false);
 
 				final Relation r1 = new Relation();
 				final Relation r2 = new Relation();
