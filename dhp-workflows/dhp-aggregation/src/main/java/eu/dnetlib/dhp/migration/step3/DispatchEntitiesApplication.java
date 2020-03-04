@@ -28,13 +28,7 @@ public class DispatchEntitiesApplication {
 						.getResourceAsStream("/eu/dnetlib/dhp/migration/dispatch_entities_parameters.json")));
 		parser.parseArgument(args);
 
-		final SparkSession spark = SparkSession
-				.builder()
-				.appName(DispatchEntitiesApplication.class.getSimpleName())
-				.master(parser.get("master"))
-				.getOrCreate();
-
-		try (final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext())) {
+		try (final SparkSession spark = newSparkSession(parser); final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext())) {
 
 			final String sourcePath = parser.get("sourcePath");
 			final String targetPath = parser.get("graphRawPath");
@@ -48,6 +42,14 @@ public class DispatchEntitiesApplication {
 			processEntity(sc, Project.class, sourcePath, targetPath);
 			processEntity(sc, Relation.class, sourcePath, targetPath);
 		}
+	}
+
+	private static SparkSession newSparkSession(final ArgumentApplicationParser parser) {
+		return SparkSession
+				.builder()
+				.appName(DispatchEntitiesApplication.class.getSimpleName())
+				.master(parser.get("master"))
+				.getOrCreate();
 	}
 
 	private static void processEntity(final JavaSparkContext sc, final Class<?> clazz, final String sourcePath, final String targetPath) {

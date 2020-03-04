@@ -28,8 +28,8 @@ public class DbClient implements Closeable {
 					StringUtils.isNoneBlank(login, password) ? DriverManager.getConnection(address, login, password) : DriverManager.getConnection(address);
 			this.connection.setAutoCommit(false);
 		} catch (final Exception e) {
-			log.error(e.getClass().getName() + ": " + e.getMessage());
-			throw new RuntimeException(e);
+			log.error("Connection to postgresDB failed");
+			throw new RuntimeException("Connection to postgresDB failed", e);
 		}
 		log.info("Opened database successfully");
 	}
@@ -44,10 +44,12 @@ public class DbClient implements Closeable {
 					consumer.accept(rs);
 				}
 			} catch (final SQLException e) {
-				throw new RuntimeException(e);
+				log.error("Error executing sql query: " + sql, e);
+				throw new RuntimeException("Error executing sql query", e);
 			}
 		} catch (final SQLException e1) {
-			throw new RuntimeException(e1);
+			log.error("Error preparing sql statement", e1);
+			throw new RuntimeException("Error preparing sql statement", e1);
 		}
 	}
 

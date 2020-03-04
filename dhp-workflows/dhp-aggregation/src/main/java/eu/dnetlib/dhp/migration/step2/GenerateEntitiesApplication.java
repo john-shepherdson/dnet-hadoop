@@ -53,18 +53,20 @@ public class GenerateEntitiesApplication {
 		final String dbUser = parser.get("postgresUser");
 		final String dbPassword = parser.get("postgresPassword");
 
-		final SparkSession spark = SparkSession
+		final Map<String, String> code2name = loadClassNames(dbUrl, dbUser, dbPassword);
+
+		try (final SparkSession spark = newSparkSession(parser); final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext())) {
+			final List<String> existingSourcePaths = Arrays.stream(sourcePaths.split(",")).filter(p -> exists(sc, p)).collect(Collectors.toList());
+			generateEntities(sc, code2name, existingSourcePaths, targetPath);
+		}
+	}
+
+	private static SparkSession newSparkSession(final ArgumentApplicationParser parser) {
+		return SparkSession
 				.builder()
 				.appName(GenerateEntitiesApplication.class.getSimpleName())
 				.master(parser.get("master"))
 				.getOrCreate();
-
-		final Map<String, String> code2name = loadClassNames(dbUrl, dbUser, dbPassword);
-
-		try (final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext())) {
-			final List<String> existingSourcePaths = Arrays.stream(sourcePaths.split(",")).filter(p -> exists(sc, p)).collect(Collectors.toList());
-			generateEntities(sc, code2name, existingSourcePaths, targetPath);
-		}
 	}
 
 	private static void generateEntities(final JavaSparkContext sc,
@@ -96,7 +98,7 @@ public class GenerateEntitiesApplication {
 		case "native_oaf":
 			return new OafToOafMapper(code2name).processMdRecord(s);
 		case "native_odf":
-			return new OafToOafMapper(code2name).processMdRecord(s);
+			return new OdfToOafMapper(code2name).processMdRecord(s);
 		case "datasource":
 			return Arrays.asList(convertFromJson(s, Datasource.class));
 		case "organization":
