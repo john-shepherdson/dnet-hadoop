@@ -96,7 +96,7 @@ public class GenerateEntitiesApplication {
 		case "native_oaf":
 			return new OafToOafMapper(code2name).processMdRecord(s);
 		case "native_odf":
-			return new OafToOafMapper(code2name).processMdRecord(s);
+			return new OdfToOafMapper(code2name).processMdRecord(s);
 		case "datasource":
 			return Arrays.asList(convertFromJson(s, Datasource.class));
 		case "organization":
