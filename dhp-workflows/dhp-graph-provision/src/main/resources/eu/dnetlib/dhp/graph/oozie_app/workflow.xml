@@ -50,9 +50,9 @@
             <class>eu.dnetlib.dhp.graph.SparkXmlRecordBuilderJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
-                --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                --executor-cores ${sparkExecutorCoresForJoining}
+                --executor-memory ${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.dynamicAllocation.maxExecutors=${sparkExecutorCoresForJoining}
                 --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
@@ -79,8 +79,9 @@
             <class>eu.dnetlib.dhp.graph.SparkXmlIndexingJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
+                --executor-cores ${sparkExecutorCoresForIndexing}
+                --executor-memory ${sparkExecutorMemoryForIndexing}
+                --driver-memory=${sparkDriverMemoryForIndexing}
                 --conf spark.dynamicAllocation.maxExecutors=${sparkExecutorCoresForIndexing}
                 --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
