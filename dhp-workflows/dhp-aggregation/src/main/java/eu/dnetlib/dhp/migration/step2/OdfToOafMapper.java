@@ -219,12 +219,12 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Oaf> addOtherResultRels(final Document doc, final KeyValue collectedFrom, final DataInfo info, final long lastUpdateTimestamp) {
 
-		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"));
+		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
 
 		final List<Oaf> res = new ArrayList<>();
 
-		for (final Object o : doc.selectNodes("//*[local-name() = 'resource']//*[local-name()='relatedIdentifier' and ./@relatedIdentifierType='OPENAIRE']")) {
-			final String otherId = createOpenaireId(50, ((Node) o).getText());
+		for (final Object o : doc.selectNodes("//datacite:relatedIdentifier[@relatedIdentifierType='OPENAIRE']")) {
+			final String otherId = createOpenaireId(50, ((Node) o).getText(), false);
 			final String type = ((Node) o).valueOf("@relationType");
 
 			if (type.equals("IsSupplementTo")) {

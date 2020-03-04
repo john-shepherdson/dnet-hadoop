@@ -202,12 +202,12 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			final KeyValue collectedFrom,
 			final DataInfo info,
 			final long lastUpdateTimestamp) {
-		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"));
+		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
 
 		final List<Oaf> res = new ArrayList<>();
 
 		for (final Object o : doc.selectNodes("//*[local-name()='relatedDataset']")) {
-			final String otherId = createOpenaireId(50, ((Node) o).getText());
+			final String otherId = createOpenaireId(50, ((Node) o).getText(), false);
 
 			final Relation r1 = new Relation();
 			r1.setRelType("resultResult");
