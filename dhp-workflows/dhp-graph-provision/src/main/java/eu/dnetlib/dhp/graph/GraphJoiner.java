@@ -46,7 +46,7 @@ import static eu.dnetlib.dhp.graph.utils.GraphMappingUtils.asRelatedEntity;
  * 3) we only need a subset of fields from the related entities, so we introduce a distinction between E_source = S
  *      and E_target = T. Objects in T are heavily pruned by all the unnecessary information
  *
- * 4) perform the join as (((T join R) union S) groupby S.id) yield S -> [ <T, R> ]
+ * 4) perform the join as (((T.id join R.target) union S) groupby S.id) yield S -> [ <T, R> ]
  */
 public class GraphJoiner implements Serializable {
 
