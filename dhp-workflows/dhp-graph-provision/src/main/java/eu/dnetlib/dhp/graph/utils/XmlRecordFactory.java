@@ -727,13 +727,8 @@ public class XmlRecordFactory implements Serializable {
 
             }
             final DataInfo info = rel.getDataInfo();
-
-            final String inverseRelClass = getInverseRelClass(rel.getRelClass());
             final String scheme = getScheme(re.getType(), targetType);
 
-            if (StringUtils.isBlank(inverseRelClass)) {
-                throw new IllegalArgumentException("missing inverse for: " + rel.getRelClass());
-            }
             if (StringUtils.isBlank(scheme)) {
                 throw new IllegalArgumentException(String.format("missing scheme for: <%s - %s>", re.getType(), targetType));
             }
@@ -747,7 +742,7 @@ public class XmlRecordFactory implements Serializable {
                     targetType,
                     rel.getTarget(),
                     Sets.newHashSet(metadata),
-                    inverseRelClass,
+                    rel.getRelClass(),
                     scheme,
                     info));
         }
@@ -961,7 +956,7 @@ public class XmlRecordFactory implements Serializable {
 
 
     @SuppressWarnings("unchecked")
-    private String getRelFundingTree(final String xmlTree) {
+    protected static String getRelFundingTree(final String xmlTree) {
         String funding = "<funding>";
         try {
             final Document ftree = new SAXReader().read(new StringReader(xmlTree));
@@ -982,11 +977,11 @@ public class XmlRecordFactory implements Serializable {
         return funding;
     }
 
-    private String getFunderElement(final Document ftree) {
-        final String funderId = ftree.valueOf("//fundingtree/funder/id/text()");
-        final String funderShortName = ftree.valueOf("//fundingtree/funder/shortname/text()");
-        final String funderName = ftree.valueOf("//fundingtree/funder/name/text()");
-        final String funderJurisdiction = ftree.valueOf("//fundingtree/funder/jurisdiction/text()");
+    private static String getFunderElement(final Document ftree) {
+        final String funderId = ftree.valueOf("//fundingtree/funder/id");
+        final String funderShortName = ftree.valueOf("//fundingtree/funder/shortname");
+        final String funderName = ftree.valueOf("//fundingtree/funder/name");
+        final String funderJurisdiction = ftree.valueOf("//fundingtree/funder/jurisdiction");
 
         return "<funder id=\"" + escapeXml(funderId) + "\" shortname=\"" + escapeXml(funderShortName) + "\" name=\"" + escapeXml(funderName)
                 + "\" jurisdiction=\"" + escapeXml(funderJurisdiction) + "\" />";

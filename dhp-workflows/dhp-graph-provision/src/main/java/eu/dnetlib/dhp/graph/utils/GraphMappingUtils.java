@@ -40,34 +40,6 @@ public class GraphMappingUtils {
 
     public static Set<String> instanceFieldFilter = Sets.newHashSet("instancetype", "hostedby", "license", "accessright", "collectedfrom", "dateofacceptance", "distributionlocation");
 
-    private static BiMap<String, String> relClassMapping = HashBiMap.create();
-
-    static {
-        relClassMapping.put("isAuthorInstitutionOf", "hasAuthorInstitution");
-        relClassMapping.put("isMergedIn", "merges");
-        relClassMapping.put("isProducedBy", "produces");
-        relClassMapping.put("hasParticipant", "isParticipant");
-        relClassMapping.put("isProvidedBy", "provides");
-        relClassMapping.put("isRelatedTo", "isRelatedTo");
-        relClassMapping.put("isAmongTopNSimilarDocuments", "hasAmongTopNSimilarDocuments");
-        relClassMapping.put("isRelatedTo", "isRelatedTo");
-        relClassMapping.put("isSupplementTo", "isSupplementedBy");
-    }
-
-    public static String getInverseRelClass(final String relClass) {
-        String res = relClassMapping.get(relClass);
-        if (isNotBlank(res)) {
-            return res;
-        }
-        res = relClassMapping.inverse().get(relClass);
-
-        if (isNotBlank(res)) {
-            return res;
-        }
-
-        throw new IllegalArgumentException("unable to find an inverse relationship class for term: " + relClass);
-    }
-
     private static final String schemeTemplate = "dnet:%s_%s_relations";
 
     private static Map<EntityType, MainEntityType> entityMapping = Maps.newHashMap();
