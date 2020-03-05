@@ -68,12 +68,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final String dbPassword = parser.get("postgresPassword");
 
 		final String hdfsPath = parser.get("hdfsPath");
-		final String hdfsNameNode = parser.get("namenode");
-		final String hdfsUser = parser.get("hdfsUser");
 
 		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
 
-		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, hdfsNameNode, hdfsUser, dbUrl, dbUser, dbPassword)) {
+		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, dbUrl, dbUser, dbPassword)) {
 			if (processClaims) {
 				log.info("Processing claims...");
 				smdbe.execute("queryClaims.sql", smdbe::processClaims);
@@ -97,9 +95,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		}
 	}
 
-	public MigrateDbEntitiesApplication(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String dbUrl, final String dbUser,
+	public MigrateDbEntitiesApplication(final String hdfsPath, final String dbUrl, final String dbUser,
 			final String dbPassword) throws Exception {
-		super(hdfsPath, hdfsNameNode, hdfsUser);
+		super(hdfsPath);
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.lastUpdateTimestamp = new Date().getTime();
 	}
