@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.provision;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.provision.scholix.Scholix;
 import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
@@ -7,14 +8,13 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import scala.Tuple2;
+
 public class ExtractInfoTest {
 
     @Test
     public void test() throws Exception {
-
         final String json = IOUtils.toString(getClass().getResourceAsStream("record.json"));
-
-
         ProvisionUtil.getItemType(json,ProvisionUtil.TARGETJSONPATH);
 
     }
@@ -41,6 +41,7 @@ public class ExtractInfoTest {
 
 
     }
+
 
 
     @Test

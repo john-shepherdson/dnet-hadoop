@@ -16,5 +16,11 @@
     "paramLongName": "index",
     "paramDescription": "the index name",
     "paramRequired": true
+  },
+  {
+    "paramName": "id",
+    "paramLongName": "idPath",
+    "paramDescription": "the identifier field name",
+    "paramRequired": true
   }
 ]

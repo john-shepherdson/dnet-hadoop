@@ -25,9 +25,19 @@
             <description>number of cores used by single executor</description>
         </property>
 
+        <property>
+            <name>idScholix</name>
+            <description>the </description>
+        </property>
+        <property>
+            <name>idSummary</name>
+            <description>number of cores used by single executor</description>
+        </property>
+
+
     </parameters>
 
-    <start to="generateScholix"/>
+    <start to="indexScholix"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -103,7 +113,7 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>generate Summary</name>
+            <name>generate Scholix</name>
             <class>eu.dnetlib.dhp.provision.SparkGenerateScholix</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
@@ -111,9 +121,29 @@
             <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
             <arg>--graphPath</arg><arg>${graphPath}</arg>
         </spark>
+        <ok to="indexScholix"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="indexScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>index scholix</name>
+            <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --num-executors 20 --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="32" </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${workingDirPath}/scholix_index</arg>
+            <arg>--index</arg><arg>${index}_scholix</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
 
     <end name="End"/>
 </workflow-app>

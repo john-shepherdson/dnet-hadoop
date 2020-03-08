@@ -47,7 +47,7 @@ public class Scholix implements Serializable {
     }
 
 
-    private void generateIdentifier( ) {
+    public void generateIdentifier( ) {
         setIdentifier(DHPUtils.md5(String.format("%s::%s::%s",source.getDnetIdentifier(),relationship.getName(), target.getDnetIdentifier())));
 
     }

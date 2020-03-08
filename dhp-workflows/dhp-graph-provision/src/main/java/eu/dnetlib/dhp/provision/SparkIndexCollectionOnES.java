@@ -24,6 +24,7 @@ public class SparkIndexCollectionOnES {
 
         final String sourcePath = parser.get("sourcePath");
         final String index = parser.get("index");
+        final String idPath = parser.get("idPath");
 
         final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
@@ -34,7 +35,7 @@ public class SparkIndexCollectionOnES {
 
         Map<String, String> esCfg = new HashMap<>();
         esCfg.put("es.nodes", "10.19.65.51, 10.19.65.52, 10.19.65.53, 10.19.65.54");
-        esCfg.put("es.mapping.id", "id");
+        esCfg.put("es.mapping.id", idPath);
         esCfg.put("es.batch.write.retry.count", "8");
         esCfg.put("es.batch.write.retry.wait", "60s");
         esCfg.put("es.batch.size.entries", "200");
