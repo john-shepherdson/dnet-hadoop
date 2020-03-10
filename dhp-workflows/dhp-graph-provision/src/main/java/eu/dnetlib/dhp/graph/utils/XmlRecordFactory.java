@@ -463,7 +463,7 @@ public class XmlRecordFactory implements Serializable {
                 if (ds.getSubjects() != null) {
                     metadata.addAll(ds.getSubjects()
                             .stream()
-                            .map(sp -> mapStructuredProperty("subject", sp))
+                            .map(sp -> mapStructuredProperty("subjects", sp))
                             .collect(Collectors.toList()));
                 }
 
