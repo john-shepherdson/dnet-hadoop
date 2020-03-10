@@ -132,7 +132,7 @@ public class GraphMappingUtils {
                 re.setLegalname(j.read("$.legalname.value"));
                 re.setLegalshortname(j.read("$.legalshortname.value"));
                 re.setCountry(asQualifier(j.read("$.country")));
-
+                re.setWebsiteurl(j.read("$.websiteurl.value"));
                 break;
             case project:
                 re.setProjectTitle(j.read("$.title.value"));
