@@ -32,18 +32,15 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 		final String mdInterpretation = parser.get("mdInterpretation");
 
 		final String hdfsPath = parser.get("hdfsPath");
-		final String hdfsNameNode = parser.get("namenode");
-		final String hdfsUser = parser.get("hdfsUser");
 
-		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(hdfsPath, hdfsNameNode, hdfsUser, mongoBaseUrl, mongoDb)) {
+		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(hdfsPath, mongoBaseUrl, mongoDb)) {
 			app.execute(mdFormat, mdLayout, mdInterpretation);
 		}
 
 	}
 
-	public MigrateMongoMdstoresApplication(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String mongoBaseUrl,
-			final String mongoDb) throws Exception {
-		super(hdfsPath, hdfsNameNode, hdfsUser);
+	public MigrateMongoMdstoresApplication(final String hdfsPath, final String mongoBaseUrl, final String mongoDb) throws Exception {
+		super(hdfsPath);
 		this.mdstoreClient = new MdstoreClient(mongoBaseUrl, mongoDb);
 	}
 

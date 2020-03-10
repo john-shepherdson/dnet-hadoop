@@ -6,18 +6,6 @@
 		"paramRequired": true
 	},
 	{
-		"paramName": "n",
-		"paramLongName": "namenode",
-		"paramDescription": "the Name Node URI",
-		"paramRequired": true
-	},
-	{
-		"paramName": "u",
-		"paramLongName": "hdfsUser",
-		"paramDescription": "the user wich create the hdfs seq file",
-		"paramRequired": true
-	},
-	{
 		"paramName": "pgurl",
 		"paramLongName": "postgresUrl",
 		"paramDescription": "postgres url, example: jdbc:postgresql://localhost:5432/testdb",

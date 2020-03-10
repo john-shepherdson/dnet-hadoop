@@ -67,8 +67,6 @@
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateDbEntitiesApplication</main-class>
             <arg>-p</arg><arg>${migrationClaimsPathStep1}/db_claims</arg>
-            <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-u</arg><arg>${hdfsUser}</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
@@ -84,8 +82,6 @@
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
             <arg>-p</arg><arg>${migrationClaimsPathStep1}/odf_claims</arg>
-            <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-u</arg><arg>${hdfsUser}</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>ODF</arg>
@@ -102,8 +98,6 @@
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
             <arg>-p</arg><arg>${migrationClaimsPathStep1}/oaf_claims</arg>
-            <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-u</arg><arg>${hdfsUser}</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>OAF</arg>

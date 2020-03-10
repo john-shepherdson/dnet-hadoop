@@ -2,13 +2,11 @@ package eu.dnetlib.dhp.migration.utils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.URI;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
@@ -30,22 +28,21 @@ public class AbstractMigrationApplication implements Closeable {
 
 	private static final Log log = LogFactory.getLog(AbstractMigrationApplication.class);
 
-	public AbstractMigrationApplication(final String hdfsPath, final String hdfsNameNode, final String hdfsUser) throws Exception {
+	public AbstractMigrationApplication(final String hdfsPath) throws Exception {
 
-		log.info(String.format("Creating SequenceFile Writer, hdfsPath=%s, nameNode=%s, user=%s", hdfsPath, hdfsNameNode, hdfsUser));
+		log.info(String.format("Creating SequenceFile Writer, hdfsPath=%s", hdfsPath));
 
-		this.writer = SequenceFile.createWriter(getConf(hdfsNameNode, hdfsUser), SequenceFile.Writer.file(new Path(hdfsPath)), SequenceFile.Writer
+		this.writer = SequenceFile.createWriter(getConf(), SequenceFile.Writer.file(new Path(hdfsPath)), SequenceFile.Writer
 				.keyClass(Text.class), SequenceFile.Writer.valueClass(Text.class));
 	}
 
-	private Configuration getConf(final String hdfsNameNode, final String hdfsUser) throws IOException {
+	private Configuration getConf() throws IOException {
 		final Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsNameNode);
-		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-		conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-		System.setProperty("HADOOP_USER_NAME", hdfsUser);
-		System.setProperty("hadoop.home.dir", "/");
-		FileSystem.get(URI.create(hdfsNameNode), conf);
+		/*
+		 * conf.set("fs.defaultFS", hdfsNameNode); conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+		 * conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName()); System.setProperty("HADOOP_USER_NAME", hdfsUser);
+		 * System.setProperty("hadoop.home.dir", "/"); FileSystem.get(URI.create(hdfsNameNode), conf);
+		 */
 		return conf;
 	}
 
