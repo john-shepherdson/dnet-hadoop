@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Publication extends Result implements Serializable {
 
@@ -26,5 +27,17 @@ public class Publication extends Result implements Serializable {
         mergeOAFDataInfo(e);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Publication that = (Publication) o;
+        return Objects.equals(journal, that.journal);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), journal);
+    }
 }

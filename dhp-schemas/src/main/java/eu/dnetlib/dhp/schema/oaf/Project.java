@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class Project extends OafEntity implements Serializable {
 
@@ -298,5 +299,44 @@ public class Project extends OafEntity implements Serializable {
             totalcost= p.getTotalcost()!=null && compareTrust(this,e)<0?p.getTotalcost():totalcost;
             fundedamount= p.getFundedamount()!= null && compareTrust(this,e)<0?p.getFundedamount():fundedamount;
             mergeOAFDataInfo(e);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Project project = (Project) o;
+        return Objects.equals(websiteurl, project.websiteurl) &&
+                Objects.equals(code, project.code) &&
+                Objects.equals(acronym, project.acronym) &&
+                Objects.equals(title, project.title) &&
+                Objects.equals(startdate, project.startdate) &&
+                Objects.equals(enddate, project.enddate) &&
+                Objects.equals(callidentifier, project.callidentifier) &&
+                Objects.equals(keywords, project.keywords) &&
+                Objects.equals(duration, project.duration) &&
+                Objects.equals(ecsc39, project.ecsc39) &&
+                Objects.equals(oamandatepublications, project.oamandatepublications) &&
+                Objects.equals(ecarticle29_3, project.ecarticle29_3) &&
+                Objects.equals(subjects, project.subjects) &&
+                Objects.equals(fundingtree, project.fundingtree) &&
+                Objects.equals(contracttype, project.contracttype) &&
+                Objects.equals(optional1, project.optional1) &&
+                Objects.equals(optional2, project.optional2) &&
+                Objects.equals(jsonextrainfo, project.jsonextrainfo) &&
+                Objects.equals(contactfullname, project.contactfullname) &&
+                Objects.equals(contactfax, project.contactfax) &&
+                Objects.equals(contactphone, project.contactphone) &&
+                Objects.equals(contactemail, project.contactemail) &&
+                Objects.equals(summary, project.summary) &&
+                Objects.equals(currency, project.currency) &&
+                Objects.equals(totalcost, project.totalcost) &&
+                Objects.equals(fundedamount, project.fundedamount);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), websiteurl, code, acronym, title, startdate, enddate, callidentifier, keywords, duration, ecsc39, oamandatepublications, ecarticle29_3, subjects, fundingtree, contracttype, optional1, optional2, jsonextrainfo, contactfullname, contactfax, contactphone, contactemail, summary, currency, totalcost, fundedamount);
     }
 }

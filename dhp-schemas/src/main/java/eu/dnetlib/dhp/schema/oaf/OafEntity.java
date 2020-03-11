@@ -116,5 +116,24 @@ public abstract class OafEntity extends Oaf implements Serializable {
         return Arrays.stream(lists).filter(Objects::nonNull).flatMap(List::stream).distinct().collect(Collectors.toList());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        OafEntity oafEntity = (OafEntity) o;
+        return Objects.equals(id, oafEntity.id) &&
+                Objects.equals(originalId, oafEntity.originalId) &&
+                Objects.equals(collectedfrom, oafEntity.collectedfrom) &&
+                Objects.equals(pid, oafEntity.pid) &&
+                Objects.equals(dateofcollection, oafEntity.dateofcollection) &&
+                Objects.equals(dateoftransformation, oafEntity.dateoftransformation) &&
+                Objects.equals(extraInfo, oafEntity.extraInfo) &&
+                Objects.equals(oaiprovenance, oafEntity.oaiprovenance);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id, originalId, collectedfrom, pid, dateofcollection, dateoftransformation, extraInfo, oaiprovenance);
+    }
 }
