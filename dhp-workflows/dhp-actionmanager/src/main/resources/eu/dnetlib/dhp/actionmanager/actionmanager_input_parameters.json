@@ -1,26 +1,38 @@
 [
   {
-    "paramName": "mt",
-    "paramLongName": "master",
-    "paramDescription": "should be local or yarn",
-    "paramRequired": true
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "TODO",
+    "paramRequired": false
   },
   {
-    "paramName": "ig",
+    "paramName": "igp",
     "paramLongName": "inputGraphPath",
-    "paramDescription": "#TODO: input graph path",
+    "paramDescription": "TODO: input graph path",
     "paramRequired": true
   },
   {
-    "paramName": "ia",
+    "paramName": "iasp",
     "paramLongName": "inputActionSetPaths",
-    "paramDescription": "#TODO: comma separated list of paths to input action sets",
+    "paramDescription": "TODO: comma separated list of paths to input action sets",
     "paramRequired": true
   },
   {
-    "paramName": "og",
+    "paramName": "gtn",
+    "paramLongName": "graphTableName",
+    "paramDescription": "TODO",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ogp",
     "paramLongName": "outputGraphPath",
-    "paramDescription": "#TODO: the path of the result DataFrame on HDFS",
+    "paramDescription": "TODO: the path of the result DataFrame on HDFS",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mags",
+    "paramLongName": "mergeAndGetStrategy",
+    "paramDescription": "TODO",
     "paramRequired": true
   }
 ]
