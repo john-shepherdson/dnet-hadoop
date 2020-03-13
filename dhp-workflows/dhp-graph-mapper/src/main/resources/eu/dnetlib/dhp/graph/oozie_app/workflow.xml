@@ -43,7 +43,8 @@
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
-                --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
