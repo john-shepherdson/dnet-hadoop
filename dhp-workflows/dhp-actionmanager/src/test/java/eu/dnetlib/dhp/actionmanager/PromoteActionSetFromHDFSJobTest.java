@@ -109,67 +109,67 @@ public class PromoteActionSetFromHDFSJobTest {
 
     @Test
     public void shouldReadActionsFromHDFSAndPromoteThemForDatasetsUsingMergeFromStrategy() throws Exception {
-        readActionsFromHDFSAndPromoteThemFor("dataset",
+        readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName.DATASET,
                 OafMergeAndGet.Strategy.MERGE_FROM_AND_GET,
                 eu.dnetlib.dhp.schema.oaf.Dataset.class);
     }
 
     @Test
     public void shouldReadActionsFromHDFSAndPromoteThemForDatasourcesUsingMergeFromStrategy() throws Exception {
-        readActionsFromHDFSAndPromoteThemFor("datasource",
+        readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName.DATASOURCE,
                 OafMergeAndGet.Strategy.MERGE_FROM_AND_GET,
                 Datasource.class);
     }
 
     @Test
-    public void shouldReadActionsFromHDFSAndPromoteThemForOrganizationUsingMergeFromStrategy() throws Exception {
-        readActionsFromHDFSAndPromoteThemFor("organization",
+    public void shouldReadActionsFromHDFSAndPromoteThemForOrganizationsUsingMergeFromStrategy() throws Exception {
+        readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName.ORGANIZATION,
                 OafMergeAndGet.Strategy.MERGE_FROM_AND_GET,
                 Organization.class);
     }
 
     @Test
-    public void shouldReadActionsFromHDFSAndPromoteThemForOtherResearchProductUsingMergeFromStrategy() throws Exception {
-        readActionsFromHDFSAndPromoteThemFor("otherresearchproduct",
+    public void shouldReadActionsFromHDFSAndPromoteThemForOtherResearchProductsUsingMergeFromStrategy() throws Exception {
+        readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName.OTHERRESEARCHPRODUCT,
                 OafMergeAndGet.Strategy.MERGE_FROM_AND_GET,
                 OtherResearchProduct.class);
     }
 
     @Test
-    public void shouldReadActionsFromHDFSAndPromoteThemForProjectUsingMergeFromStrategy() throws Exception {
-        readActionsFromHDFSAndPromoteThemFor("project",
+    public void shouldReadActionsFromHDFSAndPromoteThemForProjectsUsingMergeFromStrategy() throws Exception {
+        readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName.PROJECT,
                 OafMergeAndGet.Strategy.MERGE_FROM_AND_GET,
                 Project.class);
     }
 
     @Test
-    public void shouldReadActionsFromHDFSAndPromoteThemForPublicationUsingMergeFromStrategy() throws Exception {
-        readActionsFromHDFSAndPromoteThemFor("publication",
+    public void shouldReadActionsFromHDFSAndPromoteThemForPublicationsUsingMergeFromStrategy() throws Exception {
+        readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName.PUBLICATION,
                 OafMergeAndGet.Strategy.MERGE_FROM_AND_GET,
                 Publication.class);
     }
 
     @Test
-    public void shouldReadActionsFromHDFSAndPromoteThemForRelationUsingMergeFromStrategy() throws Exception {
-        readActionsFromHDFSAndPromoteThemFor("relation",
+    public void shouldReadActionsFromHDFSAndPromoteThemForRelationsUsingMergeFromStrategy() throws Exception {
+        readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName.RELATION,
                 OafMergeAndGet.Strategy.MERGE_FROM_AND_GET,
                 Relation.class);
     }
 
     @Test
-    public void shouldReadActionsFromHDFSAndPromoteThemForSoftwareUsingMergeFromStrategy() throws Exception {
-        readActionsFromHDFSAndPromoteThemFor("software",
+    public void shouldReadActionsFromHDFSAndPromoteThemForSoftwaresUsingMergeFromStrategy() throws Exception {
+        readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName.SOFTWARE,
                 OafMergeAndGet.Strategy.MERGE_FROM_AND_GET,
                 Software.class);
     }
 
-    private <T extends Oaf> void readActionsFromHDFSAndPromoteThemFor(String graphTableName,
+    private <T extends Oaf> void readActionsFromHDFSAndPromoteThemFor(PromoteActionSetFromHDFSJob.GraphTableName graphTableName,
                                                                       OafMergeAndGet.Strategy strategy,
                                                                       Class<T> clazz) throws Exception {
         // given
         String inputGraphTableJsonDumpPath =
-                String.format("%s/%s.json", "eu/dnetlib/dhp/actionmanager/input/graph", graphTableName);
-        createGraphTableFor(inputGraphTableJsonDumpPath, graphTableName, clazz);
+                String.format("%s/%s.json", "eu/dnetlib/dhp/actionmanager/input/graph", graphTableName.name().toLowerCase());
+        createGraphTableFor(inputGraphTableJsonDumpPath, graphTableName.name().toLowerCase(), clazz);
         String inputActionSetPaths = createActionSets();
         Path outputGraphDir = outputDir.resolve("graph");
 
@@ -178,13 +178,13 @@ public class PromoteActionSetFromHDFSJobTest {
                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
                 "-inputGraphPath", inputGraphDir.toString(),
                 "-inputActionSetPaths", inputActionSetPaths,
-                "-graphTableName", graphTableName,
+                "-graphTableName", graphTableName.name(),
                 "-outputGraphPath", outputGraphDir.toString(),
-                "mergeAndGetStrategy", strategy.name()
+                "-mergeAndGetStrategy", strategy.name()
         });
 
         // then
-        Path outputGraphTableDir = outputGraphDir.resolve(graphTableName);
+        Path outputGraphTableDir = outputGraphDir.resolve(graphTableName.name().toLowerCase());
         assertTrue(Files.exists(outputGraphDir));
 
         List<T> outputGraphTableRows = readGraphTableFromParquet(outputGraphTableDir.toString(), clazz).collectAsList();
@@ -193,7 +193,7 @@ public class PromoteActionSetFromHDFSJobTest {
         assertEquals(10, outputGraphTableRows.size());
 
         String expectedOutputGraphTableJsonDumpPath =
-                String.format("%s/%s/%s.json", "eu/dnetlib/dhp/actionmanager/output/graph", strategy.name().toLowerCase(), graphTableName);
+                String.format("%s/%s/%s.json", "eu/dnetlib/dhp/actionmanager/output/graph", strategy.name().toLowerCase(), graphTableName.name().toLowerCase());
         Path expectedOutputGraphTableJsonDumpFile = Paths
                 .get(Objects.requireNonNull(cl.getResource(expectedOutputGraphTableJsonDumpPath)).getFile());
         List<T> expectedOutputGraphTableRows = readGraphTableFromJSON(
