@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Relation extends Oaf {
 
@@ -62,5 +63,23 @@ public class Relation extends Oaf {
 
     public void setCollectedFrom(List<KeyValue> collectedFrom) {
         this.collectedFrom = collectedFrom;
+    }
+
+    public void mergeFrom(Relation other) {
+        this.mergeOAFDataInfo(other);
+        if (other.getCollectedFrom() == null || other.getCollectedFrom().size() == 0)
+            return;
+        if (collectedFrom == null && other.getCollectedFrom() != null) {
+            collectedFrom = other.getCollectedFrom();
+            return;
+        }
+        if (other.getCollectedFrom() != null) {
+            collectedFrom.addAll(other.getCollectedFrom());
+
+            collectedFrom = new ArrayList<>(collectedFrom
+                    .stream()
+                    .collect(Collectors.toMap(KeyValue::toComparableString, x -> x, (x1, x2) -> x1))
+                    .values());
+        }
     }
 }

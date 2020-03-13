@@ -10,6 +10,8 @@ import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
 import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
 
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser.Node;
+import eu.dnetlib.scholexplorer.relation.RelInfo;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
     @Override
-    public List<Oaf> parseObject(String record) {
+    public List<Oaf> parseObject(String record, final RelationMapper relationMapper) {
         try {
             final DLIDataset parsedObject = new DLIDataset();
             final VTDGen vg = new VTDGen();
@@ -40,7 +42,7 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
 
             parsedObject.setOriginalId(Collections.singletonList(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='recordIdentifier']")));
 
-
+            parsedObject.setOriginalObjIdentifier(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='objIdentifier']"));
             parsedObject.setDateofcollection(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='dateOfCollection']"));
 
             final String resolvedDate = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='resolvedDate']");
@@ -145,9 +147,20 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
                             final String relatedPid = n.getTextValue();
                             final String relatedPidType = n.getAttributes().get("relatedIdentifierType");
                             final String relatedType = n.getAttributes().getOrDefault("entityType", "unknown");
-                            final String relationSemantic = n.getAttributes().get("relationType");
-                            final String inverseRelation = n.getAttributes().get("inverseRelationType");
+                            String relationSemantic = n.getAttributes().get("relationType");
+                            String inverseRelation = n.getAttributes().get("inverseRelationType");
                             final String targetId = generateId(relatedPid, relatedPidType, relatedType);
+
+                            if (relationMapper.containsKey(relationSemantic.toLowerCase()))
+                            {
+                                RelInfo relInfo = relationMapper.get(relationSemantic.toLowerCase());
+                                relationSemantic = relInfo.getOriginal();
+                                inverseRelation = relInfo.getInverse();
+                            }
+                            else {
+                                relationSemantic = "Unknown";
+                                inverseRelation = "Unknown";
+                            }
                             r.setTarget(targetId);
                             r.setRelType(relationSemantic);
                             r.setRelClass("datacite");

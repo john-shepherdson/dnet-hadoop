@@ -13,11 +13,9 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.Optional;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import scala.Tuple2;
 
 import java.io.IOException;
@@ -45,42 +43,31 @@ public class SparkPropagateRelationsJob {
         final String targetRelPath = parser.get("targetRelPath");
 
 
-        final Dataset<Relation> df = spark.read().load(mergeRelPath).as(Encoders.bean(Relation.class));
+        final Dataset<Relation> merge = spark.read().load(mergeRelPath).as(Encoders.bean(Relation.class)).where("relClass == 'merges'");
+
+        final Dataset<Relation> rels= spark.read().load(relationPath).as(Encoders.bean(Relation.class));
 
 
+        final Dataset<Relation> firstJoin = rels.joinWith(merge, merge.col("target").equalTo(rels.col("source")), "left_outer")
+                .map((MapFunction<Tuple2<Relation, Relation>, Relation>) r -> {
+                    final Relation mergeRelation = r._2();
+                    final Relation relation = r._1();
 
-        final JavaPairRDD<String, String> mergedIds = df
-                .where("relClass == 'merges'")
-                .select(df.col("source"),df.col("target"))
-                .distinct()
-                .toJavaRDD()
-                .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(1), r.getString(0)));
+                    if(mergeRelation!= null)
+                        relation.setSource(mergeRelation.getSource());
+                    return relation;
+                }, Encoders.bean(Relation.class));
 
+        final Dataset<Relation> secondJoin = firstJoin.joinWith(merge, merge.col("target").equalTo(firstJoin.col("target")), "left_outer")
+                .map((MapFunction<Tuple2<Relation, Relation>, Relation>) r -> {
+                    final Relation mergeRelation = r._2();
+                    final Relation relation = r._1();
+                    if (mergeRelation != null )
+                        relation.setTarget(mergeRelation.getSource());
+                    return relation;
+                }, Encoders.bean(Relation.class));
 
-        final JavaRDD<String> sourceEntity = sc.textFile(relationPath);
-        JavaRDD<String> newRels = sourceEntity.mapToPair(
-                (PairFunction<String, String, String>) s ->
-                        new Tuple2<>(DHPUtils.getJPathString(SOURCEJSONPATH, s), s))
-                .leftOuterJoin(mergedIds)
-                .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
-                    if (v1._2()._2().isPresent()) {
-                        return replaceField(v1._2()._1(), v1._2()._2().get(), FieldType.SOURCE);
-                    }
-                    return v1._2()._1();
-                })
-                .mapToPair(
-                        (PairFunction<String, String, String>) s ->
-                                new Tuple2<>(DHPUtils.getJPathString(TARGETJSONPATH, s), s))
-                .leftOuterJoin(mergedIds)
-                .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
-                    if (v1._2()._2().isPresent()) {
-                        return replaceField(v1._2()._1(), v1._2()._2().get(), FieldType.TARGET);
-                    }
-                    return v1._2()._1();
-                }).filter(SparkPropagateRelationsJob::containsDedup)
-                .repartition(500);
-
-        newRels.union(sourceEntity).repartition(1000).saveAsTextFile(targetRelPath, GzipCodec.class);
+        secondJoin.write().mode(SaveMode.Overwrite).save(targetRelPath);
     }
 
     private static boolean containsDedup(final String json) {

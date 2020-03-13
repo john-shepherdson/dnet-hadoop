@@ -15,11 +15,9 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import scala.Tuple2;
 
 import java.io.IOException;
@@ -55,18 +53,7 @@ public class SparkUpdateEntityJob {
                 .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "d"));
         final JavaRDD<String> sourceEntity = sc.textFile(entityPath);
 
-        if ("relation".equalsIgnoreCase(entity)) {
-            sourceEntity.mapToPair(
-                    (PairFunction<String, String, String>) s ->
-                            new Tuple2<>(DHPUtils.getJPathString(SOURCEJSONPATH, s), s))
-                    .leftOuterJoin(mergedIds)
-                    .map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), Relation.class) : k._2()._1())
-                    .mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(DHPUtils.getJPathString(TARGETJSONPATH, s), s))
-                    .leftOuterJoin(mergedIds)
-                    .map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), Relation.class) : k._2()._1())
-                            .saveAsTextFile(destination, GzipCodec.class);
-        } else {
-            final JavaRDD<String> dedupEntity = sc.textFile(dedupRecordPath);
+        final JavaRDD<String> dedupEntity = sc.textFile(dedupRecordPath);
             JavaPairRDD<String, String> entitiesWithId = sourceEntity.mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(DHPUtils.getJPathString(IDJSONPATH, s), s));
             Class<? extends Oaf> mainClass;
             switch (entity) {
@@ -83,19 +70,12 @@ public class SparkUpdateEntityJob {
                     throw new IllegalArgumentException("Illegal type " + entity);
 
             }
-
             JavaRDD<String> map = entitiesWithId.leftOuterJoin(mergedIds).map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), mainClass) : k._2()._1());
-
-
             map.union(dedupEntity).saveAsTextFile(destination, GzipCodec.class);
-        }
-
 
     }
 
-
     private static <T extends Oaf> String updateDeletedByInference(final String json, final Class<T> clazz) {
-
         final ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {

@@ -6,6 +6,7 @@ import eu.dnetlib.dhp.graph.SparkGraphImporterJob;
 import eu.dnetlib.dhp.graph.scholexplorer.parser.DatasetScholexplorerParser;
 import eu.dnetlib.dhp.graph.scholexplorer.parser.PublicationScholexplorerParser;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -29,15 +30,17 @@ public class SparkScholexplorerGraphImporter {
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
         final String inputPath = parser.get("sourcePath");
 
+        RelationMapper relationMapper = RelationMapper.load();
+
         sc.sequenceFile(inputPath, IntWritable.class, Text.class).map(Tuple2::_2).map(Text::toString).repartition(500)
                 .flatMap((FlatMapFunction<String, Oaf>) record -> {
                     switch (parser.get("entity")) {
                         case "dataset":
                             final DatasetScholexplorerParser d = new DatasetScholexplorerParser();
-                            return d.parseObject(record).iterator();
+                            return d.parseObject(record,relationMapper).iterator();
                         case "publication":
                             final PublicationScholexplorerParser p = new PublicationScholexplorerParser();
-                            return p.parseObject(record).iterator();
+                            return p.parseObject(record,relationMapper).iterator();
                         default:
                             throw new IllegalArgumentException("wrong values of entities");
                     }

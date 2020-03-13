@@ -6,6 +6,7 @@ import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +22,7 @@ public abstract class AbstractScholexplorerParser {
     final static Pattern pattern = Pattern.compile("10\\.\\d{4,9}/[-._;()/:A-Z0-9]+$", Pattern.CASE_INSENSITIVE);
     private List<String> datasetSubTypes = Arrays.asList("dataset", "software", "film", "sound", "physicalobject", "audiovisual", "collection", "other", "study", "metadata");
 
-    public abstract List<Oaf> parseObject(final String record);
+    public abstract List<Oaf> parseObject(final String record, final RelationMapper relMapper);
 
     protected Map<String, String> getAttributes(final XMLStreamReader parser) {
         final Map<String, String> attributesMap = new HashMap<>();

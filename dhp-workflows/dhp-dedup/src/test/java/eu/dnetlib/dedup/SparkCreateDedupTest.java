@@ -21,15 +21,19 @@ public class SparkCreateDedupTest {
 
     }
 
+
+
+
     @Test
-    @Ignore
-    public void createSimRelsTest() throws Exception {
-        SparkCreateSimRels.main(new String[] {
+    public void PropagateRelationsTest() throws Exception {
+        SparkPropagateRelationsJob.main(new String[] {
                 "-mt", "local[*]",
-                "-s", "/Users/miconis/dumps",
-                "-e", entity,
-                "-c", ArgumentApplicationParser.compressArgument(configuration),
-                "-t", "/tmp/dedup",
+
+
+                "-ep", "/Users/sandro/Downloads/scholix/graph/relation",
+                "-mr", "/Users/sandro/Downloads/scholix/dedupGraphWD/publication/mergeRel",
+                "-mt", "local[*]",
+                "-t", "/Users/sandro/Downloads/scholix/dedupGraphWD/publication/rel_fixed",
         });
     }
 

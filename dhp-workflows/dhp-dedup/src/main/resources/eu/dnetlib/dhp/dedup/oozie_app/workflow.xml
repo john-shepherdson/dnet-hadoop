@@ -26,7 +26,7 @@
         </property>
     </parameters>
 
-    <start to="updateDeletedByInferenceRelation"/>
+    <start to="DeleteWorkingPath"/>
 
 
     <kill name="Kill">
@@ -132,7 +132,7 @@
             <arg>-mt</arg><arg>yarn-cluster</arg>
            <arg>--mergeRelPath</arg><arg>${targetPath}/${entity}/mergeRel</arg>
             <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
-            <arg>--targetRelPath</arg><arg>${targetPath}/${entity}/relation_propagated</arg>
+            <arg>--targetRelPath</arg><arg>${targetPath}/${entity}/updated_relation</arg>
         </spark>
         <ok to="updateDeletedByInferenceEntity"/>
         <error to="Kill"/>
@@ -160,34 +160,34 @@
             <arg>--dedupRecordPath</arg><arg>${targetPath}/${entity}/dedup_records</arg>
             <arg>--targetPath</arg><arg>${targetPath}/${entity}/updated_record</arg>
         </spark>
-        <ok to="updateDeletedByInferenceRelation"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="updateDeletedByInferenceRelation">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>Update ${entity} set deleted by Inference</name>
-            <class>eu.dnetlib.dedup.SparkUpdateEntityJob</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                ${sparkExtraOPT}
-            </spark-opts>
-            <arg>-mt</arg><arg>yarn-cluster</arg>
-            <arg>--entityPath</arg><arg>${targetPath}/${entity}/relation_propagated</arg>
-            <arg>--mergeRelPath</arg><arg>${targetPath}/${entity}/mergeRel</arg>
-            <arg>--entity</arg><arg>relation</arg>
-            <arg>--dedupRecordPath</arg><arg>${targetPath}/${entity}/dedup_records</arg>
-            <arg>--targetPath</arg><arg>${targetPath}/${entity}/updated_relation</arg>
-        </spark>
         <ok to="replaceEntity"/>
         <error to="Kill"/>
     </action>
+
+<!--    <action name="updateDeletedByInferenceRelation">-->
+<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
+<!--            <job-tracker>${jobTracker}</job-tracker>-->
+<!--            <name-node>${nameNode}</name-node>-->
+<!--            <master>yarn-cluster</master>-->
+<!--            <mode>cluster</mode>-->
+<!--            <name>Update ${entity} set deleted by Inference</name>-->
+<!--            <class>eu.dnetlib.dedup.SparkUpdateEntityJob</class>-->
+<!--            <jar>dhp-dedup-${projectVersion}.jar</jar>-->
+<!--            <spark-opts>-->
+<!--                &#45;&#45;executor-memory ${sparkExecutorMemory}-->
+<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
+<!--                ${sparkExtraOPT}-->
+<!--            </spark-opts>-->
+<!--            <arg>-mt</arg><arg>yarn-cluster</arg>-->
+<!--            <arg>&#45;&#45;entityPath</arg><arg>${targetPath}/${entity}/relation_propagated</arg>-->
+<!--            <arg>&#45;&#45;mergeRelPath</arg><arg>${targetPath}/${entity}/mergeRel</arg>-->
+<!--            <arg>&#45;&#45;entity</arg><arg>relation</arg>-->
+<!--            <arg>&#45;&#45;dedupRecordPath</arg><arg>${targetPath}/${entity}/dedup_records</arg>-->
+<!--            <arg>&#45;&#45;targetPath</arg><arg>${targetPath}/${entity}/updated_relation</arg>-->
+<!--        </spark>-->
+<!--        <ok to="End"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
 
 
     <action name="replaceEntity">

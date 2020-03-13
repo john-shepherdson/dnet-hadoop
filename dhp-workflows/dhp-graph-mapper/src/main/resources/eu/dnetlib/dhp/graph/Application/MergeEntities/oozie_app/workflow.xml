@@ -1,4 +1,4 @@
-<workflow-app name="import_infospace_graph" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Infospace Merge Entities" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sourcePath</name>

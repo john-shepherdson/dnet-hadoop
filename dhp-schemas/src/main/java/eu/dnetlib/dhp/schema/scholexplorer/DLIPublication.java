@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.util.*;
 
 public class DLIPublication extends Publication implements Serializable {
+
+    private String originalObjIdentifier;
+
     private List<ProvenaceInfo> dlicollectedfrom;
 
     private String completionStatus;
@@ -25,6 +28,14 @@ public class DLIPublication extends Publication implements Serializable {
 
     public void setDlicollectedfrom(List<ProvenaceInfo> dlicollectedfrom) {
         this.dlicollectedfrom = dlicollectedfrom;
+    }
+
+    public String getOriginalObjIdentifier() {
+        return originalObjIdentifier;
+    }
+
+    public void setOriginalObjIdentifier(String originalObjIdentifier) {
+        this.originalObjIdentifier = originalObjIdentifier;
     }
 
     @Override

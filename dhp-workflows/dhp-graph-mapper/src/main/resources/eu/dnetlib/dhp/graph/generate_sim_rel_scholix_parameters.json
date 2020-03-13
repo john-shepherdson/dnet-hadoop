@@ -1,0 +1,5 @@
+[
+  {"paramName":"mt",  "paramLongName":"master",             "paramDescription": "should be local or yarn",                                  "paramRequired": true},
+  {"paramName":"s",   "paramLongName":"sourcePath",         "paramDescription": "the path of the sequencial file to read",                  "paramRequired": true},
+  {"paramName":"t",   "paramLongName":"targetPath",         "paramDescription": "the path of the result data",                              "paramRequired": true}
+]

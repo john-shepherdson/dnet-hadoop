@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class DLIDataset extends Dataset {
 
+    private String originalObjIdentifier;
+
     private List<ProvenaceInfo> dlicollectedfrom;
 
     private String completionStatus;
@@ -29,6 +31,14 @@ public class DLIDataset extends Dataset {
 
     public void setDlicollectedfrom(List<ProvenaceInfo> dlicollectedfrom) {
         this.dlicollectedfrom = dlicollectedfrom;
+    }
+
+    public String getOriginalObjIdentifier() {
+        return originalObjIdentifier;
+    }
+
+    public void setOriginalObjIdentifier(String originalObjIdentifier) {
+        this.originalObjIdentifier = originalObjIdentifier;
     }
 
     @Override

@@ -8,6 +8,8 @@ import eu.dnetlib.dhp.parser.utility.VtdUtilityParser.Node;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
 import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
+import eu.dnetlib.scholexplorer.relation.RelInfo;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 public class PublicationScholexplorerParser extends AbstractScholexplorerParser {
 
     @Override
-    public List<Oaf> parseObject(final String record) {
+    public List<Oaf> parseObject(final String record, final RelationMapper relationMapper) {
         try {
             final List<Oaf> result = new ArrayList<>();
             final DLIPublication parsedObject = new DLIPublication();
@@ -62,6 +64,8 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             parsedObject.setPid(Collections.singletonList(currentPid));
             final String sourceId = generateId(currentPid.getValue(), currentPid.getQualifier().getClassid(), "publication");
             parsedObject.setId(sourceId);
+
+            parsedObject.setOriginalObjIdentifier(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='objIdentifier']"));
 
             String provisionMode = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='provisionMode']");
 
@@ -125,9 +129,19 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
                             final String relatedPid = n.getTextValue();
                             final String relatedPidType = n.getAttributes().get("relatedIdentifierType");
                             final String relatedType = n.getAttributes().getOrDefault("entityType", "unknown");
-                            final String relationSemantic = n.getAttributes().get("relationType");
-                            final String inverseRelation = n.getAttributes().get("inverseRelationType");
+                            String relationSemantic = n.getAttributes().get("relationType");
+                            String inverseRelation = "Unknown";
                             final String targetId = generateId(relatedPid, relatedPidType, relatedType);
+
+                            if (relationMapper.containsKey(relationSemantic.toLowerCase()))
+                            {
+                                RelInfo relInfo = relationMapper.get(relationSemantic.toLowerCase());
+                                relationSemantic = relInfo.getOriginal();
+                                inverseRelation = relInfo.getInverse();
+                            }
+                            else {
+                                relationSemantic = "Unknown";
+                            }
                             r.setTarget(targetId);
                             r.setRelType(relationSemantic);
                             r.setCollectedFrom(parsedObject.getCollectedfrom());

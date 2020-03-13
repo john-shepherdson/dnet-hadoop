@@ -12,16 +12,23 @@ import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import net.minidev.json.JSONArray;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.*;
 import scala.Tuple2;
+import scala.collection.JavaConverters;
+import sun.rmi.log.ReliableLog;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +48,8 @@ public class SparkScholexplorerMergeEntitiesJob {
         parser.parseArgument(args);
         final SparkSession spark = SparkSession
                 .builder()
+                .config(new SparkConf()
+                        .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer"))
                 .appName(SparkGraphImporterJob.class.getSimpleName())
                 .master(parser.get("master"))
                 .getOrCreate();
@@ -102,21 +111,54 @@ public class SparkScholexplorerMergeEntitiesJob {
                 }).saveAsTextFile(targetPath, GzipCodec.class);
                 break;
             case "relation":
-                union.mapToPair((PairFunction<String, String, Relation>) f -> {
+
+                SparkScholexplorerGenerateSimRel.generateDataFrame(spark, sc, inputPath.replace("/relation",""),targetPath.replace("/relation","") );
+                RDD<Relation> rdd = union.mapToPair((PairFunction<String, String, Relation>) f -> {
                     final String source = getJPathString(SOURCEJSONPATH, f);
                     final String target = getJPathString(TARGETJSONPATH, f);
                     final String reltype = getJPathString(RELJSONPATH, f);
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    return new Tuple2<>(DHPUtils.md5(String.format("%s::%s::%s", source, reltype, target)), mapper.readValue(f, Relation.class));
+                    return new Tuple2<>(DHPUtils.md5(String.format("%s::%s::%s", source.toLowerCase(), reltype.toLowerCase(), target.toLowerCase())), mapper.readValue(f, Relation.class));
                 }).reduceByKey((a, b) -> {
-                    a.mergeOAFDataInfo(b);
+                    a.mergeFrom(b);
                     return a;
-                }).map(item -> {
-                    ObjectMapper mapper = new ObjectMapper();
-                    return mapper.writeValueAsString(item._2());
-                }).saveAsTextFile(targetPath, GzipCodec.class);
-                break;
+                }).map(Tuple2::_2).rdd();
+
+                spark.createDataset(rdd, Encoders.bean(Relation.class)).write().mode(SaveMode.Overwrite).save(targetPath);
+                Dataset<Relation> rel_ds =spark.read().load(targetPath).as(Encoders.bean(Relation.class));
+
+                System.out.println("LOADING PATH :"+targetPath.replace("/relation","")+"/pid_simRel");
+                Dataset<Relation>sim_ds  =spark.read().load(targetPath.replace("/relation","")+"/pid_simRel").as(Encoders.bean(Relation.class));
+
+                TargetFunction tf = new TargetFunction();
+
+                Dataset<Relation> ids = sim_ds.map(tf, Encoders.bean(Relation.class));
+
+
+                final Dataset<Relation> firstJoin = rel_ds
+                        .joinWith(ids, ids.col("target")
+                                .equalTo(rel_ds.col("source")), "left_outer")
+                        .map((MapFunction<Tuple2<Relation, Relation>, Relation>) s ->
+                                {
+                                    if (s._2() != null) {
+                                        s._1().setSource(s._2().getSource());
+                                    }
+                                    return s._1();
+                                }
+                                , Encoders.bean(Relation.class));
+
+
+                Dataset<Relation> secondJoin = firstJoin.joinWith(ids, ids.col("target").equalTo(firstJoin.col("target")),"left_outer")
+                        .map((MapFunction<Tuple2<Relation, Relation>, Relation>) s ->
+                                {
+                                    if (s._2() != null) {
+                                        s._1().setTarget(s._2().getSource());
+                                    }
+                                    return s._1();
+                                }
+                                , Encoders.bean(Relation.class));
+                    secondJoin.write().mode(SaveMode.Overwrite).save(targetPath+"_fixed");
         }
     }
 

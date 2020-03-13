@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import eu.dnetlib.dhp.graph.scholexplorer.parser.DatasetScholexplorerParser;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
@@ -15,11 +16,11 @@ public class ScholexplorerParserTest {
 
 
     @Test
-    public void testDataciteParser() throws IOException {
+    public void testDataciteParser() throws Exception {
         String xml = IOUtils.toString(this.getClass().getResourceAsStream("dmf.xml"));
 
         DatasetScholexplorerParser p = new DatasetScholexplorerParser();
-        List<Oaf> oaves = p.parseObject(xml);
+        List<Oaf> oaves = p.parseObject(xml, RelationMapper.load());
 
         ObjectMapper m = new ObjectMapper();
         m.enable(SerializationFeature.INDENT_OUTPUT);
