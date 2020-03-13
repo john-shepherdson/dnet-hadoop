@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.actionmanager;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.ReduceFunction;
 import org.apache.spark.sql.Dataset;
@@ -21,20 +20,12 @@ import java.util.function.Function;
 public class PromoteActionSetFromHDFSFunctions {
 
     public static <T extends Oaf> Dataset<T> joinOafEntityWithActionPayloadAndMerge(Dataset<T> oafDS,
-                                                                                    Dataset<String> actionPayloadDS,
+                                                                                    Dataset<T> actionPayloadOafDS,
                                                                                     SerializableSupplier<Function<T, String>> oafIdFn,
-                                                                                    SerializableSupplier<BiFunction<String, Class<T>, T>> actionPayloadToOafFn,
                                                                                     SerializableSupplier<BiFunction<T, T, T>> mergeAndGetFn,
                                                                                     Class<T> clazz) {
-        Dataset<Tuple2<String, T>> oafWithIdDS = oafDS
-                .map((MapFunction<T, Tuple2<String, T>>) value -> new Tuple2<>(oafIdFn.get().apply(value), value),
-                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
-
-        Dataset<Tuple2<String, T>> actionPayloadWithIdDS = actionPayloadDS
-                .map((MapFunction<String, T>) value -> actionPayloadToOafFn.get().apply(value, clazz), Encoders.kryo(clazz))
-                .filter((FilterFunction<T>) Objects::nonNull)
-                .map((MapFunction<T, Tuple2<String, T>>) value -> new Tuple2<>(oafIdFn.get().apply(value), value),
-                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
+        Dataset<Tuple2<String, T>> oafWithIdDS = mapToTupleWithId(oafDS, oafIdFn, clazz);
+        Dataset<Tuple2<String, T>> actionPayloadWithIdDS = mapToTupleWithId(actionPayloadOafDS, oafIdFn, clazz);
 
         return oafWithIdDS
                 .joinWith(actionPayloadWithIdDS, oafWithIdDS.col("_1").equalTo(actionPayloadWithIdDS.col("_1")), "left_outer")
@@ -46,6 +37,14 @@ public class PromoteActionSetFromHDFSFunctions {
                             .map(x -> mergeAndGetFn.get().apply(left, x))
                             .orElse(left);
                 }, Encoders.kryo(clazz));
+    }
+
+    private static <T extends Oaf> Dataset<Tuple2<String, T>> mapToTupleWithId(Dataset<T> ds,
+                                                                               SerializableSupplier<Function<T, String>> idFn,
+                                                                               Class<T> clazz) {
+        return ds
+                .map((MapFunction<T, Tuple2<String, T>>) value -> new Tuple2<>(idFn.get().apply(value), value),
+                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
     }
 
     public static <T extends Oaf> Dataset<T> groupOafByIdAndMerge(Dataset<T> oafDS,
