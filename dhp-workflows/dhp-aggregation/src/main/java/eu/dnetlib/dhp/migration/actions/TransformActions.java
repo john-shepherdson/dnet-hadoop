@@ -8,7 +8,10 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import eu.dnetlib.actionmanager.actions.AtomicAction;
 import eu.dnetlib.data.proto.OafProtos;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -82,19 +85,55 @@ public class TransformActions implements Serializable {
 
                 sc.sequenceFile(sourcePath, Text.class, Text.class)
                     .mapToPair(a -> new Tuple2<>(a._1(), AtomicAction.fromJSON(a._2().toString())))
-                    .mapToPair(a -> new Tuple2<>(a._1(), transformAction(a._2())))
+                    .mapToPair(a -> new Tuple2<>(a._1(), transformAction(a._1().toString(), a._2())))
 
                     .saveAsHadoopFile(targetDirectory.toString(), Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
             }
         }
     }
 
-    private Text transformAction(AtomicAction aa) throws InvalidProtocolBufferException, JsonProcessingException {
+    private Text transformAction(String atomicaActionId, AtomicAction aa) throws InvalidProtocolBufferException, JsonProcessingException {
 
         final ObjectMapper mapper = new ObjectMapper();
         if (aa.getTargetValue() != null && aa.getTargetValue().length > 0) {
             Oaf oaf = ProtoConverter.convert(OafProtos.Oaf.parseFrom(aa.getTargetValue()));
             aa.setTargetValue(mapper.writeValueAsString(oaf).getBytes());
+        } else {
+
+            if (atomicaActionId.contains("dedupSimilarity")) {
+
+                final String[] splitId = atomicaActionId.split("@");
+
+                String source = splitId[0];
+                String target = splitId[2];
+
+                String[] relSemantic = splitId[1].split("_");
+
+                Relation rel = new Relation();
+                rel.setSource(source);
+                rel.setTarget(target);
+                rel.setRelType(relSemantic[0]);
+                rel.setSubRelType(relSemantic[1]);
+                rel.setRelClass(relSemantic[2]);
+
+                DataInfo d = new DataInfo();
+                d.setDeletedbyinference(false);
+                d.setInferenceprovenance("deduplication");
+                d.setInferred(true);
+                d.setInvisible(false);
+                Qualifier provenanceaction = new Qualifier();
+
+                provenanceaction.setClassid("deduplication");
+                provenanceaction.setClassname("deduplication");
+                provenanceaction.setSchemeid("dnet:provenanceActions");
+                provenanceaction.setSchemename("dnet:provenanceActions");
+
+                d.setProvenanceaction(provenanceaction);
+
+                rel.setDataInfo(d);
+
+                aa.setTargetValue(mapper.writeValueAsString(rel).getBytes());
+            }
         }
 
         return new Text(mapper.writeValueAsString(aa));
