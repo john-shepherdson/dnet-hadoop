@@ -2,7 +2,7 @@
 	{
 		"paramName": "s",
 		"paramLongName": "sourcePath",
-		"paramDescription": "the HDFS  source path which contains the sequential file",
+		"paramDescription": "the source path",
 		"paramRequired": true
 	},
 	{
@@ -15,12 +15,6 @@
 		"paramName": "g",
 		"paramLongName": "graphRawPath",
 		"paramDescription": "the path of the graph Raw in hdfs",
-		"paramRequired": true
-	},
-	{
-		"paramName": "e",
-		"paramLongName": "entity",
-		"paramDescription": "The entity to extract",
 		"paramRequired": true
 	}
 ]

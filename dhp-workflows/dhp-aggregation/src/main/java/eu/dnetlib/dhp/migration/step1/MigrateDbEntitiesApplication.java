@@ -1,4 +1,14 @@
-package eu.dnetlib.dhp.migration;
+package eu.dnetlib.dhp.migration.step1;
+
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.asString;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.field;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.listKeyValues;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.structuredProperty;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -17,18 +27,26 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.migration.utils.AbstractMigrationApplication;
+import eu.dnetlib.dhp.migration.utils.DbClient;
+import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor implements Closeable {
+public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
 	private static final Qualifier ENTITYREGISTRY_PROVENANCE_ACTION =
 			qualifier("sysimport:crosswalk:entityregistry", "sysimport:crosswalk:entityregistry", "dnet:provenance_actions", "dnet:provenance_actions");
@@ -50,32 +68,36 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 		final String dbPassword = parser.get("postgresPassword");
 
 		final String hdfsPath = parser.get("hdfsPath");
-		final String hdfsNameNode = parser.get("namenode");
-		final String hdfsUser = parser.get("hdfsUser");
 
-		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, hdfsNameNode, hdfsUser, dbUrl, dbUser, dbPassword)) {
-			log.info("Processing datasources...");
-			smdbe.execute("queryDatasources.sql", smdbe::processDatasource);
+		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
 
-			log.info("Processing projects...");
-			smdbe.execute("queryProjects.sql", smdbe::processProject);
+		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, dbUrl, dbUser, dbPassword)) {
+			if (processClaims) {
+				log.info("Processing claims...");
+				smdbe.execute("queryClaims.sql", smdbe::processClaims);
+			} else {
+				log.info("Processing datasources...");
+				smdbe.execute("queryDatasources.sql", smdbe::processDatasource);
 
-			log.info("Processing orgs...");
-			smdbe.execute("queryOrganizations.sql", smdbe::processOrganization);
+				log.info("Processing projects...");
+				smdbe.execute("queryProjects.sql", smdbe::processProject);
 
-			log.info("Processing relations ds <-> orgs ...");
-			smdbe.execute("queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization);
+				log.info("Processing orgs...");
+				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization);
 
-			log.info("Processing projects <-> orgs ...");
-			smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization);
+				log.info("Processing relations ds <-> orgs ...");
+				smdbe.execute("queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization);
 
+				log.info("Processing projects <-> orgs ...");
+				smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization);
+			}
 			log.info("All done.");
 		}
 	}
 
-	public MigrateDbEntitiesApplication(final String hdfsPath, final String hdfsNameNode, final String hdfsUser, final String dbUrl, final String dbUser,
+	public MigrateDbEntitiesApplication(final String hdfsPath, final String dbUrl, final String dbUser,
 			final String dbPassword) throws Exception {
-		super(hdfsPath, hdfsNameNode, hdfsUser);
+		super(hdfsPath);
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.lastUpdateTimestamp = new Date().getTime();
 	}
@@ -93,7 +115,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 
 			final Datasource ds = new Datasource();
 
-			ds.setId(createOpenaireId(10, rs.getString("datasourceid")));
+			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
 			ds.setOriginalId(Arrays.asList(rs.getString("datasourceid")));
 			ds.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
 			ds.setPid(new ArrayList<>());
@@ -200,7 +222,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 
 			final Project p = new Project();
 
-			p.setId(createOpenaireId(40, rs.getString("projectid")));
+			p.setId(createOpenaireId(40, rs.getString("projectid"), true));
 			p.setOriginalId(Arrays.asList(rs.getString("projectid")));
 			p.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
 			p.setPid(new ArrayList<>());
@@ -290,7 +312,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 
 			final Organization o = new Organization();
 
-			o.setId(createOpenaireId(20, rs.getString("organizationid")));
+			o.setId(createOpenaireId(20, rs.getString("organizationid"), true));
 			o.setOriginalId(Arrays.asList(rs.getString("organizationid")));
 			o.setCollectedfrom(listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname")));
 			o.setPid(new ArrayList<>());
@@ -354,8 +376,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 
 		try {
 			final DataInfo info = prepareDataInfo(rs);
-			final String orgId = createOpenaireId(20, rs.getString("organization"));
-			final String dsId = createOpenaireId(10, rs.getString("datasource"));
+			final String orgId = createOpenaireId(20, rs.getString("organization"), true);
+			final String dsId = createOpenaireId(10, rs.getString("datasource"), true);
 			final List<KeyValue> collectedFrom = listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
@@ -377,7 +399,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 			r2.setTarget(dsId);
 			r2.setCollectedFrom(collectedFrom);
 			r2.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
 			emitOaf(r2);
 
 			// rs.getString("datasource");
@@ -403,8 +425,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 
 		try {
 			final DataInfo info = prepareDataInfo(rs);
-			final String orgId = createOpenaireId(20, rs.getString("resporganization"));
-			final String projectId = createOpenaireId(40, rs.getString("project"));
+			final String orgId = createOpenaireId(20, rs.getString("resporganization"), true);
+			final String projectId = createOpenaireId(40, rs.getString("project"), true);
 			final List<KeyValue> collectedFrom = listKeyValues(rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
@@ -426,7 +448,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 			r2.setTarget(projectId);
 			r2.setCollectedFrom(collectedFrom);
 			r2.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
 			emitOaf(r2);
 
 			// rs.getString("project");
@@ -448,6 +470,81 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationExecutor impl
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void processClaims(final ResultSet rs) {
+
+		final DataInfo info =
+				dataInfo(false, null, false, false, qualifier("user:claim", "user:claim", "dnet:provenanceActions", "dnet:provenanceActions"), "0.9");
+
+		try {
+
+			if (rs.getString("source_type").equals("context")) {
+				final Result r;
+
+				if (rs.getString("target_type").equals("dataset")) {
+					r = new Dataset();
+				} else if (rs.getString("target_type").equals("software")) {
+					r = new Software();
+				} else if (rs.getString("target_type").equals("other")) {
+					r = new OtherResearchProduct();
+				} else {
+					r = new Publication();
+				}
+				r.setId(createOpenaireId(50, rs.getString("target_id"), false));
+				r.setLastupdatetimestamp(lastUpdateTimestamp);
+				r.setContext(prepareContext(rs.getString("source_id"), info));
+				r.setDataInfo(info);
+				emitOaf(r);
+			} else {
+				final String sourceId = createOpenaireId(rs.getString("source_type"), rs.getString("source_id"), false);
+				final String targetId = createOpenaireId(rs.getString("target_type"), rs.getString("target_id"), false);
+
+				final Relation r1 = new Relation();
+				final Relation r2 = new Relation();
+
+				if (rs.getString("source_type").equals("project")) {
+					r1.setRelType("resultProject");
+					r1.setSubRelType("outcome");
+					r1.setRelClass("produces");
+
+					r2.setRelType("resultProject");
+					r2.setSubRelType("outcome");
+					r2.setRelClass("isProducedBy");
+				} else {
+					r1.setRelType("resultResult");
+					r1.setSubRelType("relationship");
+					r1.setRelClass("isRelatedTo");
+
+					r2.setRelType("resultResult");
+					r2.setSubRelType("relationship");
+					r2.setRelClass("isRelatedTo");
+				}
+
+				r1.setSource(sourceId);
+				r1.setTarget(targetId);
+				r1.setDataInfo(info);
+				r1.setLastupdatetimestamp(lastUpdateTimestamp);
+				emitOaf(r1);
+
+				r2.setSource(targetId);
+				r2.setTarget(sourceId);
+				r2.setDataInfo(info);
+				r2.setLastupdatetimestamp(lastUpdateTimestamp);
+				emitOaf(r2);
+
+			}
+
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private List<Context> prepareContext(final String id, final DataInfo dataInfo) {
+		final Context context = new Context();
+		context.setId(id);
+		context.setDataInfo(Arrays.asList(dataInfo));
+		return Arrays.asList(context);
 	}
 
 	private DataInfo prepareDataInfo(final ResultSet rs) throws SQLException {

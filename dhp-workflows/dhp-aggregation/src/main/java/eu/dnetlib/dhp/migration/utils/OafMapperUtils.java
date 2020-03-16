@@ -1,24 +1,12 @@
-package eu.dnetlib.dhp.migration;
+package eu.dnetlib.dhp.migration.utils;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.SequenceFile;
-import org.apache.hadoop.io.Text;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
@@ -26,60 +14,12 @@ import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OriginDescription;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
-public class AbstractMigrationExecutor implements Closeable {
-
-	private final AtomicInteger counter = new AtomicInteger(0);
-
-	private final Text key = new Text();
-
-	private final Text value = new Text();
-
-	private final ObjectMapper objectMapper = new ObjectMapper();
-
-	private final SequenceFile.Writer writer;
-
-	private static final Log log = LogFactory.getLog(AbstractMigrationExecutor.class);
-
-	public AbstractMigrationExecutor(final String hdfsPath, final String hdfsNameNode, final String hdfsUser) throws Exception {
-
-		log.info(String.format("Creating SequenceFile Writer, hdfsPath=%s, nameNode=%s, user=%s", hdfsPath, hdfsNameNode, hdfsUser));
-
-		this.writer = SequenceFile.createWriter(getConf(hdfsNameNode, hdfsUser), SequenceFile.Writer.file(new Path(hdfsPath)), SequenceFile.Writer
-				.keyClass(Text.class), SequenceFile.Writer.valueClass(Text.class));
-	}
-
-	private Configuration getConf(final String hdfsNameNode, final String hdfsUser) throws IOException {
-		final Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsNameNode);
-		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-		conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-		System.setProperty("HADOOP_USER_NAME", hdfsUser);
-		System.setProperty("hadoop.home.dir", "/");
-		FileSystem.get(URI.create(hdfsNameNode), conf);
-		return conf;
-	}
-
-	protected void emitOaf(final Oaf oaf) {
-		try {
-			key.set(counter.getAndIncrement() + ":" + oaf.getClass().getSimpleName().toLowerCase());
-			value.set(objectMapper.writeValueAsString(oaf));
-			writer.append(key, value);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public void close() throws IOException {
-		writer.hflush();
-		writer.close();
-	}
+public class OafMapperUtils {
 
 	public static KeyValue keyValue(final String k, final String v) {
 		final KeyValue kv = new KeyValue();
@@ -223,14 +163,33 @@ public class AbstractMigrationExecutor implements Closeable {
 		return d;
 	}
 
-	public static String createOpenaireId(final int prefix, final String originalId) {
-		final String nsPrefix = StringUtils.substringBefore(originalId, "::");
-		final String rest = StringUtils.substringAfter(originalId, "::");
-		return String.format("%s|%s::%s", prefix, nsPrefix, DHPUtils.md5(rest));
+	public static String createOpenaireId(final int prefix, final String originalId, final boolean to_md5) {
+		if (to_md5) {
+			final String nsPrefix = StringUtils.substringBefore(originalId, "::");
+			final String rest = StringUtils.substringAfter(originalId, "::");
+			return String.format("%s|%s::%s", prefix, nsPrefix, DHPUtils.md5(rest));
+		} else {
+			return String.format("%s|%s", prefix, originalId);
+		}
+	}
 
+	public static String createOpenaireId(final String type, final String originalId, final boolean to_md5) {
+		switch (type) {
+		case "datasource":
+			return createOpenaireId(10, originalId, to_md5);
+		case "organization":
+			return createOpenaireId(20, originalId, to_md5);
+		case "person":
+			return createOpenaireId(30, originalId, to_md5);
+		case "project":
+			return createOpenaireId(40, originalId, to_md5);
+		default:
+			return createOpenaireId(50, originalId, to_md5);
+		}
 	}
 
 	public static String asString(final Object o) {
 		return o == null ? "" : o.toString();
 	}
+
 }

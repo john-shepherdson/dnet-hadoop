@@ -37,12 +37,30 @@
             <name>MapGraphIntoDataFrame</name>
             <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
         </spark>
+        <ok to="PostProcessing"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="PostProcessing">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <script>/eu/dnetlib/dhp/graph/hive/postprocessing.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+        </hive>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

@@ -1,0 +1,1 @@
+SELECT source_type, source_id, target_type, target_id, semantics FROM claim WHERE approved=TRUE;
