@@ -1,16 +1,13 @@
 <workflow-app name="import regular entities as Graph (all steps)" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>migrationPathStep1</name>
-            <description>the base path to store hdfs file</description>
+            <name>workingPath</name>
+            <value>/tmp/dhp_migration</value>
+            <description>the base path to store temporary intermediate data</description>
         </property>
         <property>
-            <name>migrationPathStep2</name>
-            <description>the temporary path to store entities before dispatching</description>
-        </property>
-        <property>
-            <name>migrationPathStep3</name>
-            <description>the graph Raw base path</description>
+            <name>graphBasePath</name>
+            <description>the target path to store raw graph</description>
         </property>
         <property>
             <name>postgresURL</name>
@@ -54,8 +51,10 @@
 
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${migrationPathStep1}'/>
-            <mkdir path='${migrationPathStep1}'/>
+            <delete path='${workingPath}'/>
+            <mkdir path='${workingPath}'/>
+            <delete path="'${graphBasePath}/graph_raw'"/>
+            <mkdir path="'${graphBasePath}/graph_raw'"/>
         </fs>
         <ok to="ImportDB"/>
         <error to="Kill"/>
@@ -66,7 +65,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateDbEntitiesApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/db_records</arg>
+            <arg>-p</arg><arg>${workingPath}/db_records</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
@@ -80,7 +79,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/odf_records</arg>
+            <arg>-p</arg><arg>${workingPath}/odf_records</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>ODF</arg>
@@ -96,7 +95,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/oaf_records</arg>
+            <arg>-p</arg><arg>${workingPath}/oaf_records</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>OAF</arg>
@@ -125,10 +124,17 @@
             <name>GenerateEntities</name>
             <class>eu.dnetlib.dhp.migration.step2.GenerateEntitiesApplication</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>-s</arg><arg>${migrationPathStep1}/db_records,${migrationPathStep1}/oaf_records,${migrationPathStep1}/odf_records</arg>
-            <arg>-t</arg><arg>${migrationPathStep2}/all_entities</arg>
+            <arg>-s</arg><arg>${workingPath}/db_records,${workingPath}/oaf_records,${workingPath}/odf_records</arg>
+            <arg>-t</arg><arg>${workingPath}/all_entities</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
@@ -155,10 +161,17 @@
             <name>GenerateGraph</name>
             <class>eu.dnetlib.dhp.migration.step3.DispatchEntitiesApplication</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>-s</arg><arg>${migrationPathStep2}/all_entities</arg>
-            <arg>-g</arg><arg>${migrationPathStep3}</arg>
+            <arg>-s</arg><arg>${workingPath}/all_entities</arg>
+            <arg>-g</arg><arg>${graphBasePath}/graph_raw</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
