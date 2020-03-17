@@ -2,12 +2,15 @@ package eu.dnetlib.dhp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -186,6 +189,13 @@ public class PropagationConstant {
                 })
                 .map(p -> new ObjectMapper().writeValueAsString(p))
                 .saveAsTextFile(outputPath+"/"+type);
+    }
+
+    public static void createOutputDirs(String outputPath, FileSystem fs) throws IOException {
+        if (fs.exists(new Path(outputPath))) {
+            fs.delete(new Path(outputPath), true);
+            fs.mkdirs(new Path(outputPath));
+        }
     }
 
 }
