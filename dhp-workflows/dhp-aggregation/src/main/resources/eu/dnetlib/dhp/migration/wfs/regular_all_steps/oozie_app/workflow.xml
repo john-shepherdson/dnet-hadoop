@@ -102,15 +102,6 @@
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>cleaned</arg>
         </java>
-        <ok to="ResetEntities"/>
-        <error to="Kill"/>
-    </action>
-    
-	<action name="ResetEntities">
-        <fs>
-            <delete path='${migrationPathStep2}'/>
-            <mkdir path='${migrationPathStep2}'/>
-        </fs>
         <ok to="GenerateEntities"/>
         <error to="Kill"/>
     </action>
@@ -139,15 +130,6 @@
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
         </spark>
-        <ok to="ResetGraph"/>
-        <error to="Kill"/>
-    </action>
-
-	<action name="ResetGraph">
-        <fs>
-            <delete path='${migrationPathStep3}'/>
-            <mkdir path='${migrationPathStep3}'/>
-        </fs>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>
     </action>
