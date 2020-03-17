@@ -120,7 +120,6 @@
     <action name="ResetAllEntitiesPath">
         <fs>
             <delete path="'${workingPath}/all_entities'"/>
-            <mkdir path="'${workingPath}/all_entities'"/>
         </fs>
         <ok to="GenerateEntities"/>
         <error to="Kill"/>
