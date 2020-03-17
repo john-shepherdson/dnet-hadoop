@@ -48,25 +48,16 @@
         </property>
     </parameters>
 
-	<start to="ResetGraphPath"/>
+	<start to="ReuseContent"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="ResetGraphPath">
-        <fs>
-            <delete path="'${graphBasePath}/graph_raw'"/>
-            <mkdir path="'${graphBasePath}/graph_raw'"/>
-        </fs>
-        <ok to="ReuseContent"/>
-        <error to="Kill"/>
-    </action>
-
     <decision name="ReuseContent">
         <switch>
             <case to="ResetWorkingPath">${wf:conf('reuseContent') eq false}</case>
-            <case to="GenerateEntities">${wf:conf('reuseContent') eq true}</case>
+            <case to="ResetAllEntitiesPath">${wf:conf('reuseContent') eq true}</case>
             <default to="ResetWorkingPath"/>
         </switch>
     </decision>
@@ -122,6 +113,15 @@
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>cleaned</arg>
         </java>
+        <ok to="ResetAllEntitiesPath"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ResetAllEntitiesPath">
+        <fs>
+            <delete path="'${workingPath}/all_entities'"/>
+            <mkdir path="'${workingPath}/all_entities'"/>
+        </fs>
         <ok to="GenerateEntities"/>
         <error to="Kill"/>
     </action>
@@ -150,6 +150,15 @@
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
         </spark>
+        <ok to="ResetGraphPath"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ResetGraphPath">
+        <fs>
+            <delete path="'${graphBasePath}/graph_raw'"/>
+            <mkdir path="'${graphBasePath}/graph_raw'"/>
+        </fs>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>
     </action>
