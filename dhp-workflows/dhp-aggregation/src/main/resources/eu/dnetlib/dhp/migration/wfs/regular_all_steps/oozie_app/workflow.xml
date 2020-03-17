@@ -10,6 +10,11 @@
             <description>the target path to store raw graph</description>
         </property>
         <property>
+            <name>reuseContent</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
             <name>postgresURL</name>
             <description>the postgres URL to access to the database</description>
         </property>
@@ -43,18 +48,33 @@
         </property>
     </parameters>
 
-	<start to="ResetWorkingPath"/>
+	<start to="ResetGraphPath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="ResetWorkingPath">
+    <action name="ResetGraphPath">
         <fs>
-            <delete path='${workingPath}'/>
-            <mkdir path='${workingPath}'/>
             <delete path="'${graphBasePath}/graph_raw'"/>
             <mkdir path="'${graphBasePath}/graph_raw'"/>
+        </fs>
+        <ok to="ReuseContent"/>
+        <error to="Kill"/>
+    </action>
+
+    <decision name="ReuseContent">
+        <switch>
+            <case to="ResetWorkingPath">${wf:conf('reuseContent') eq false}</case>
+            <case to="GenerateEntities">${wf:conf('reuseContent') eq true}</case>
+            <default to="ResetWorkingPath"/>
+        </switch>
+    </decision>
+
+    <action name="ResetWorkingPath">
+        <fs>
+            <delete path="'${workingPath}'"/>
+            <mkdir path="'${workingPath}'"/>
         </fs>
         <ok to="ImportDB"/>
         <error to="Kill"/>
