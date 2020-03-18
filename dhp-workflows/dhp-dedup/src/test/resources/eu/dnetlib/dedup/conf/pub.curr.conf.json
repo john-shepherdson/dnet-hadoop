@@ -1,42 +1,134 @@
 {
-  "wf" : {
-    "threshold" : "0.99",
-    "dedupRun" : "001",
-    "entityType" : "result",
-    "subEntityType" : "resulttype",
-    "subEntityValue" : "publication",
-    "orderField" : "title",
-    "queueMaxSize" : "2000",
-    "groupMaxSize" : "100",
-    "maxChildren" : "100",
-    "idPath": "$.id",
-    "slidingWindowSize" : "200",
-    "rootBuilder" : [ "result", "resultProject_outcome_isProducedBy", "resultResult_publicationDataset_isRelatedTo", "resultResult_similarity_isAmongTopNSimilarDocuments", "resultResult_similarity_hasAmongTopNSimilarDocuments", "resultOrganization_affiliation_isAffiliatedWith", "resultResult_part_hasPart", "resultResult_part_isPartOf", "resultResult_supplement_isSupplementTo", "resultResult_supplement_isSupplementedBy", "resultResult_version_isVersionOf" ],
-    "includeChildren" : "true"
+  "wf": {
+    "threshold": "0.99",
+    "dedupRun": "001",
+    "entityType": "result",
+    "subEntityType": "resulttype",
+    "subEntityValue": "publication",
+    "orderField": "title",
+    "queueMaxSize": "2000",
+    "groupMaxSize": "100",
+    "maxChildren": "100",
+    "slidingWindowSize": "200",
+    "rootBuilder": [
+      "result",
+      "resultProject_outcome_isProducedBy",
+      "resultResult_publicationDataset_isRelatedTo",
+      "resultResult_similarity_isAmongTopNSimilarDocuments",
+      "resultResult_similarity_hasAmongTopNSimilarDocuments",
+      "resultOrganization_affiliation_isAffiliatedWith",
+      "resultResult_part_hasPart",
+      "resultResult_part_isPartOf",
+      "resultResult_supplement_isSupplementTo",
+      "resultResult_supplement_isSupplementedBy",
+      "resultResult_version_isVersionOf"
+    ],
+    "includeChildren": "true",
+    "maxIterations": 20,
+    "idPath": "$.id"
   },
-  "pace" : {
+  "pace": {
     "clustering" : [
       { "name" : "ngrampairs", "fields" : [ "title" ], "params" : { "max" : "1", "ngramLen" : "3"} },
       { "name" : "suffixprefix", "fields" : [ "title" ], "params" : { "max" : "1", "len" : "3" } },
       { "name" : "lowercase", "fields" : [ "doi" ], "params" : { } }
     ],
-    "strictConditions" : [
-      { "name" : "pidMatch", "fields" : [ "pid" ] }
+    "decisionTree": {
+      "start": {
+        "fields": [
+          {
+            "field": "pid",
+            "comparator": "jsonListMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {
+              "jpath_value": "$.value",
+              "jpath_classid": "$.qualifier.classid"
+            }
+          }
+        ],
+        "threshold": 0.5,
+        "aggregation": "AVG",
+        "positive": "MATCH",
+        "negative": "layer2",
+        "undefined": "layer2",
+        "ignoreUndefined": "true"
+      },
+      "layer2": {
+        "fields": [
+          {
+            "field": "title",
+            "comparator": "titleVersionMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {}
+          },
+          {
+            "field": "authors",
+            "comparator": "sizeMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {}
+          }
+        ],
+        "threshold": 1.0,
+        "aggregation": "AND",
+        "positive": "layer3",
+        "negative": "NO_MATCH",
+        "undefined": "layer3",
+        "ignoreUndefined": "false"
+      },
+      "layer3": {
+        "fields": [
+          {
+            "field": "title",
+            "comparator": "levensteinTitle",
+            "weight": 1.0,
+            "countIfUndefined": "true",
+            "params": {}
+          }
+        ],
+        "threshold": 0.99,
+        "aggregation": "AVG",
+        "positive": "MATCH",
+        "negative": "NO_MATCH",
+        "undefined": "NO_MATCH",
+        "ignoreUndefined": "true"
+      }
+    },
+    "model": [
+      {
+        "name": "doi",
+        "type": "String",
+        "path": "$.pid[?(@.qualifier.classid == 'doi')].value"
+      },
+      {
+        "name": "pid",
+        "type": "JSON",
+        "path": "$.pid",
+        "overrideMatch": "true"
+      },
+      {
+        "name": "title",
+        "type": "String",
+        "path": "$.title[?(@.qualifier.classid == 'main title')].value",
+        "length": 250,
+        "size": 5
+      },
+      {
+        "name": "authors",
+        "type": "List",
+        "path": "$.author[*].fullname",
+        "size": 200
+      },
+      {
+        "name": "resulttype",
+        "type": "String",
+        "path": "$.resulttype.classid"
+      }
     ],
-    "conditions" : [
-      { "name" : "titleVersionMatch", "fields" : [ "title" ] },
-      { "name" : "sizeMatch", "fields" : [ "authors" ] }
-    ],
-    "model" : [
-      { "name" : "doi", "algo" : "Null", "type" : "String", "weight" : "0.0", "ignoreMissing" : "true", "path" : "$.pid[?(@.qualifier.classid ==\"doi\")].value" },
-      { "name" : "pid", "algo" : "Null", "type" : "JSON", "weight" : "0.0", "ignoreMissing" : "true", "path" : "$.pid", "overrideMatch" : "true" },
-      { "name" : "title", "algo" : "LevensteinTitle", "type" : "String", "weight" : "1.0", "ignoreMissing" : "false", "path" : "$.title[?(@.qualifier.classid ==\"main title\")].value", "length" : 250, "size" : 5 },
-      { "name" : "authors", "algo" : "Null", "type" : "List", "weight" : "0.0", "ignoreMissing" : "true", "path" : "$.author[*].fullname", "size" : 200 },
-      { "name" : "resulttype", "algo" : "Null", "type" : "String", "weight" : "0.0", "ignoreMissing" : "false", "path" : "$.resulttype.classid" }
-    ],
-    "synonyms": {},
-    "blacklists" : {
-      "title" : [
+    "blacklists": {
+      "title": [
         "^Inside Front Cover$",
         "(?i)^Poster presentations$",
         "^THE ASSOCIATION AND THE GENERAL MEDICAL COUNCIL$",
@@ -48,7 +140,6 @@
         "^Cartas? ao editor Letters? to the Editor$",
         "^Note from the Editor$",
         "^Anesthesia Abstract$",
-
         "^Annual report$",
         "(?i)^“?THE RADICAL PREVENTION OF VENEREAL DISEASE\\.?”?$",
         "(?i)^Graph and Table of Infectious Diseases?$",
@@ -68,14 +159,12 @@
         "^Cálculo de concentraciones en disoluciones acuosas. Ejercicio interactivo\\..*\\.$",
         "(?i)^Genetic and functional analyses of SHANK2 mutations suggest a multiple hit model of Autism spectrum disorders?\\.?$",
         "^Gushi hakubutsugaku$",
-
         "^Starobosanski nadpisi u Bosni i Hercegovini \\(.*\\)$",
         "^Intestinal spirocha?etosis$",
         "^Treatment of Rodent Ulcer$",
         "(?i)^\\W*Cloud Computing\\W*$",
         "^Compendio mathematico : en que se contienen todas las materias mas principales de las Ciencias que tratan de la cantidad$",
         "^Free Communications, Poster Presentations: Session [A-F]$",
-
         "^“The Historical Aspects? of Quackery\\.?”$",
         "^A designated centre for people with disabilities operated by St John of God Community Services (Limited|Ltd), Louth$",
         "^P(er|re)-Mile Premiums for Auto Insurance\\.?$",
@@ -96,10 +185,8 @@
         "(?i)^Measurement of the pseudorapidity and centrality dependence of the transverse energy density in Pb(-?)Pb collisions at.*tev(\\.?)$",
         "(?i)^Search for resonances decaying into top-quark pairs using fully hadronic decays in pp collisions with ATLAS at.*TeV$",
         "(?i)^Search for neutral minimal supersymmetric standard model Higgs bosons decaying to tau pairs in pp collisions at.*tev$",
-
         "(?i)^Relatório de Estágio (de|em) Angiologia e Cirurgia Vascular$",
         "^Aus der AGMB$",
-
         "^Znanstveno-stručni prilozi$",
         "(?i)^Zhodnocení finanční situace podniku a návrhy na zlepšení$",
         "(?i)^Evaluation of the Financial Situation in the Firm and Proposals to its Improvement$",
@@ -136,7 +223,6 @@
         "(?i)^RUBRIKA UREDNIKA$",
         "^A Matching Model of the Academic Publication Market$",
         "^Yōgaku kōyō$",
-
         "^Internetový marketing$",
         "^Internet marketing$",
         "^Chūtō kokugo dokuhon$",
@@ -169,21 +255,17 @@
         "^Information System Assessment and Proposal for ICT Modification$",
         "^Stresové zatížení pracovníků ve vybrané profesi$",
         "^Stress load in a specific job$",
-
         "^Sunday: Poster Sessions, Pt.*$",
         "^Monday: Poster Sessions, Pt.*$",
         "^Wednesday: Poster Sessions, Pt.*",
         "^Tuesday: Poster Sessions, Pt.*$",
-
         "^Analýza reklamy$",
         "^Analysis of advertising$",
-
         "^Shōgaku shūshinsho$",
         "^Shōgaku sansū$",
         "^Shintei joshi kokubun$",
         "^Taishō joshi kokubun dokuhon$",
         "^Joshi kokubun$",
-
         "^Účetní uzávěrka a účetní závěrka v ČR$",
         "(?i)^The \"?Causes\"? of Cancer$",
         "^Normas para la publicación de artículos$",
@@ -202,7 +284,6 @@
         "^Abdominal [Aa]ortic [Aa]neurysms.*$",
         "^Pseudomyxoma peritonei$",
         "^Kazalo autora$",
-
         "(?i)^uvodna riječ$",
         "^Motivace jako způsob vedení lidí$",
         "^Motivation as a leadership$",
@@ -275,6 +356,7 @@
         "(?i)^.*authors['’′]? reply\\.?$",
         "(?i)^.*authors['’′]? response\\.?$"
       ]
-    }
+    },
+    "synonyms": {}
   }
 }

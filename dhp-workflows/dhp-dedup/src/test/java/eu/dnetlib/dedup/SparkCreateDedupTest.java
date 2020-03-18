@@ -13,17 +13,20 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SparkCreateDedupTest {
 
     String configuration;
-    String entity = "organization";
+    String configuration2;
+    String entity = "publication";
 
     @Before
     public void setUp() throws IOException {
-        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org.curr.conf.json"));
-
+        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org1.curr.conf.json"));
+        configuration2 = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org2.curr.conf.json"));
     }
 
     @Test
@@ -35,6 +38,21 @@ public class SparkCreateDedupTest {
                 "-e", entity,
                 "-c", ArgumentApplicationParser.compressArgument(configuration),
                 "-t", "/tmp/dedup",
+        });
+    }
+
+    @Test
+    @Ignore
+    public void createSimRelsTest2() throws Exception {
+        SparkCreateSimRels2.main(new String[] {
+                "-mt", "local[*]",
+                "-s", "/Users/miconis/dumps",
+                "-e", entity,
+                "-c", ArgumentApplicationParser.compressArgument(configuration) + "@@@" + ArgumentApplicationParser.compressArgument(configuration2),
+                "-t", "/tmp/dedup",
+                "-rs", "rawset_test",
+                "-ai", "agentId",
+                "-an", "agentName"
         });
     }
 
@@ -79,8 +97,6 @@ public class SparkCreateDedupTest {
         System.out.println(hashFunction.hashUnencodedChars(s1).asLong());
         System.out.println( s2.hashCode());
         System.out.println(hashFunction.hashUnencodedChars(s2).asLong());
-
     }
-
 
 }

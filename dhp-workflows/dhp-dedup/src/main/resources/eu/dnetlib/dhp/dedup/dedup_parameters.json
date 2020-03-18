@@ -8,26 +8,43 @@
   {
     "paramName": "s",
     "paramLongName": "sourcePath",
-    "paramDescription": "the path of the sequential file to read",
+    "paramDescription": "the base path of the raw graph",
     "paramRequired": true
   },
   {
     "paramName": "e",
     "paramLongName": "entity",
-    "paramDescription": "the type of entity to be deduped",
+    "paramDescription": "the type of entity to be deduped (directory in the sourcePath)",
     "paramRequired": true
   },
   {
     "paramName": "c",
     "paramLongName": "dedupConf",
-    "paramDescription": "dedup configuration to be used",
-    "compressed": true,
+    "paramDescription": "list of dedup configuration to be used",
     "paramRequired": true
   },
   {
     "paramName": "t",
     "paramLongName": "targetPath",
-    "paramDescription": "target path to save dedup result",
+    "paramDescription": "target base path to save dedup result (actions)",
+    "paramRequired": true
+  },
+  {
+    "paramName": "rs",
+    "paramLongName": "rawSet",
+    "paramDescription": "the raw set to be saved (directory in the targetPath)",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ai",
+    "paramLongName": "agentId",
+    "paramDescription": "the agent identifier",
+    "paramRequired": true
+  },
+  {
+    "paramName": "an",
+    "paramLongName": "agentName",
+    "paramDescription": "the agent name",
     "paramRequired": true
   }
 ]

@@ -87,8 +87,8 @@
             }
           }
         ],
-        "threshold": 0.7,
-        "aggregation": "W_MEAN",
+        "threshold": 0.1,
+        "aggregation": "AVG",
         "positive": "layer4",
         "negative": "NO_MATCH",
         "undefined": "NO_MATCH",
@@ -106,7 +106,7 @@
             }
           }
         ],
-        "threshold": 0.9,
+        "threshold": 0.7,
         "aggregation": "AVG",
         "positive": "layer5",
         "negative": "NO_MATCH",
@@ -129,7 +129,9 @@
             "comparator": "jaroWinklerNormalizedName",
             "weight": 0.1,
             "countIfUndefined": "false",
-            "params": {}
+            "params": {
+              "windowSize": 4
+            }
           }
         ],
         "threshold": 0.9,
@@ -145,14 +147,14 @@
       { "name" : "legalshortname", "type" : "String", "path" : "$.legalshortname.value"},
       { "name" : "legalname", "type" : "String", "path" : "$.legalname.value" },
       { "name" : "websiteurl", "type" : "URL", "path" : "$.websiteurl.value" },
-      { "name" : "gridid", "type" : "String", "path" : "$.pid[?(@.qualifier.classid =='grid.ac')].value"},
+      { "name" : "gridid", "type" : "String", "path" : "$.pid[?(@.qualifier.classid =='grid')].value"},
       { "name" : "originalId", "type" : "String", "path" : "$.id" }
     ],
     "blacklists" : {
       "legalname" : []
     },
     "synonyms": {
-      "key::1": ["university","università","università studi","universitario","universitaria","université", "universite", "universitaire","universitaires","universidad","universitade","Universität","universitaet","Uniwersytet","университет","universiteit","πανεπιστήμιο","universitesi","universiteti", "universiti"],
+      "key::1": ["university","università", "universitas", "università studi","universitario","universitaria","université", "universite", "universitaire","universitaires","universidad","universitade","Universität","universitaet","Uniwersytet","университет","universiteit","πανεπιστήμιο","universitesi","universiteti", "universiti"],
       "key::2": ["studies","studi","études","estudios","estudos","Studien","studia","исследования","studies","σπουδές"],
       "key::3": ["advanced","superiore","supérieur","supérieure","supérieurs","supérieures","avancado","avancados","fortgeschrittene","fortgeschritten","zaawansowany","передовой","gevorderd","gevorderde","προχωρημένος","προχωρημένη","προχωρημένο","προχωρημένες","προχωρημένα","wyzsza"],
       "key::4": ["institute","istituto","institut","instituto","instituto","Institut","instytut","институт","instituut","ινστιτούτο"],

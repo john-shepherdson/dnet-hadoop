@@ -82,8 +82,10 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
-
-
+        <dependency>
+            <groupId>eu.dnetlib</groupId>
+            <artifactId>dnet-actionmanager-common</artifactId>
+        </dependency>
 
     </dependencies>
 
