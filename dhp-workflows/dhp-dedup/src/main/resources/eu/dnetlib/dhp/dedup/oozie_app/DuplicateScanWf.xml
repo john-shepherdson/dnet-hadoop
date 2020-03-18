@@ -1,19 +1,11 @@
 <workflow-app name="Create Similarity Relations" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>sourcePath</name>
+            <name>rawGraphBasePath</name>
             <description>the raw graph base path</description>
         </property>
         <property>
-            <name>entity</name>
-            <description>the entity that should be processed</description>
-        </property>
-        <property>
-            <name>dedupConf</name>
-            <description>the (list of) dedup Configuration(s)</description>
-        </property>
-        <property>
-            <name>targetPath</name>
+            <name>actionSetBasePath</name>
             <description>the output base path</description>
         </property>
         <property>
@@ -27,6 +19,14 @@
         <property>
             <name>agentName</name>
             <description>the agent name</description>
+        </property>
+        <property>
+            <name>isLookUpUrl</name>
+            <description>the address of the lookUp service</description>
+        </property>
+        <property>
+            <name>actionSetId</name>
+            <description>id of the actionSet</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -72,13 +72,12 @@
                 spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
-            <arg>--entity</arg><arg>${entity}</arg>
-            <arg>--dedupConf</arg><arg>${dedupConf}</arg>
-            <arg>--rawSet</arg><arg>${rawSet}</arg>
-            <arg>--agentId</arg><arg>${agentId}</arg>
-            <arg>--agentName</arg><arg>${agentName}</arg>
+            <arg>--i</arg><arg>${rawGraphBasePath}</arg>
+            <arg>--o</arg><arg>${rawSet}</arg>
+            <arg>--ai</arg><arg>${agentId}</arg>
+            <arg>--an</arg><arg>${agentName}</arg>
+            <arg>--la</arg><arg>${isLookUpUrl}</arg>
+            <arg>--asi</arg><arg>${actionSetId}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

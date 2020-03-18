@@ -6,33 +6,27 @@
     "paramRequired": true
   },
   {
-    "paramName": "s",
-    "paramLongName": "sourcePath",
+    "paramName": "la",
+    "paramLongName": "isLookUpUrl",
+    "paramDescription": "address for the LookUp",
+    "paramRequired": true
+  },
+  {
+    "paramName": "asi",
+    "paramLongName": "actionSetId",
+    "paramDescription": "action set identifier (name of the orchestrator)",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "rawGraphBasePath",
     "paramDescription": "the base path of the raw graph",
     "paramRequired": true
   },
   {
-    "paramName": "e",
-    "paramLongName": "entity",
-    "paramDescription": "the type of entity to be deduped (directory in the sourcePath)",
-    "paramRequired": true
-  },
-  {
-    "paramName": "c",
-    "paramLongName": "dedupConf",
-    "paramDescription": "list of dedup configuration to be used",
-    "paramRequired": true
-  },
-  {
-    "paramName": "t",
-    "paramLongName": "targetPath",
-    "paramDescription": "target base path to save dedup result (actions)",
-    "paramRequired": true
-  },
-  {
-    "paramName": "rs",
+    "paramName": "o",
     "paramLongName": "rawSet",
-    "paramDescription": "the raw set to be saved (directory in the targetPath)",
+    "paramDescription": "the raw set to be saved (full path)",
     "paramRequired": true
   },
   {

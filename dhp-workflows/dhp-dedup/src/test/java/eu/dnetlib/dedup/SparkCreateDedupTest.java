@@ -20,13 +20,11 @@ import java.util.Set;
 public class SparkCreateDedupTest {
 
     String configuration;
-    String configuration2;
-    String entity = "publication";
+    String entity = "organization";
 
     @Before
     public void setUp() throws IOException {
-        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org1.curr.conf.json"));
-        configuration2 = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org2.curr.conf.json"));
+        configuration = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dedup/conf/org.curr.conf.json"));
     }
 
     @Test
@@ -48,11 +46,12 @@ public class SparkCreateDedupTest {
                 "-mt", "local[*]",
                 "-s", "/Users/miconis/dumps",
                 "-e", entity,
-                "-c", ArgumentApplicationParser.compressArgument(configuration) + "@@@" + ArgumentApplicationParser.compressArgument(configuration2),
-                "-t", "/tmp/dedup",
-                "-rs", "rawset_test",
+                "-c", ArgumentApplicationParser.compressArgument(configuration),
+                "-rs", "/tmp/dedup/rawset_test",
                 "-ai", "agentId",
-                "-an", "agentName"
+                "-an", "agentName",
+                "-asi", "dedup-similarity-result-levenstein",
+                "-la", "lookupurl",
         });
     }
 

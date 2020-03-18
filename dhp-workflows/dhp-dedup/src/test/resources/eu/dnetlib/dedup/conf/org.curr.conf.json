@@ -3,6 +3,7 @@
     "threshold" : "0.99",
     "dedupRun" : "001",
     "entityType" : "organization",
+    "subEntityValue": "organization",
     "orderField" : "legalname",
     "queueMaxSize" : "2000",
     "groupMaxSize" : "50",
