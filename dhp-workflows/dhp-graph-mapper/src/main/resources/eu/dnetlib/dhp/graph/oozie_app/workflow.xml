@@ -1,4 +1,5 @@
 <workflow-app name="import_infospace_graph" xmlns="uri:oozie:workflow:0.5">
+
     <parameters>
         <property>
             <name>sourcePath</name>
@@ -22,6 +23,21 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to="MapGraphIntoDataFrame"/>
 
     <kill name="Kill">
@@ -30,9 +46,7 @@
 
     <action name="MapGraphIntoDataFrame">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>MapGraphIntoDataFrame</name>
             <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
@@ -56,9 +70,13 @@
 
     <action name="PostProcessing">
         <hive xmlns="uri:oozie:hive-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <script>/eu/dnetlib/dhp/graph/hive/postprocessing.sql</script>
+            <configuration>
+                <property>
+                    <name>oozie.hive.defaults</name>
+                    <value>hive-site.xml</value>
+                </property>
+            </configuration>
+            <script>lib/scripts/postprocessing.sql</script>
             <param>hive_db_name=${hive_db_name}</param>
         </hive>
         <ok to="End"/>
