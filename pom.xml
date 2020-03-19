@@ -503,7 +503,7 @@
 		<dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
 		<dhp.jackson.version>2.9.6</dhp.jackson.version>
 		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
-		<dhp.guava.version>28.2-jre</dhp.guava.version>
+		<dhp.guava.version>11.0.2</dhp.guava.version>
 		<scala.version>2.11.12</scala.version>
 		<junit.version>4.12</junit.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
