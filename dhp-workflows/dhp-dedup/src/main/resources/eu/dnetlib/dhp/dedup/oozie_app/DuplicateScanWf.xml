@@ -1,24 +1,12 @@
 <workflow-app name="Create Similarity Relations" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>rawGraphBasePath</name>
+            <name>graphBasePath</name>
             <description>the raw graph base path</description>
-        </property>
-        <property>
-            <name>actionSetBasePath</name>
-            <description>the output base path</description>
         </property>
         <property>
             <name>rawSet</name>
             <description>the output directory in the targetPath</description>
-        </property>
-        <property>
-            <name>agentId</name>
-            <description>the agent identifier</description>
-        </property>
-        <property>
-            <name>agentName</name>
-            <description>the agent name</description>
         </property>
         <property>
             <name>isLookUpUrl</name>
@@ -27,6 +15,10 @@
         <property>
             <name>actionSetId</name>
             <description>id of the actionSet</description>
+        </property>
+        <property>
+            <name>workingPath</name>
+            <description>path for the working directory</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -42,15 +34,15 @@
         </property>
     </parameters>
 
-    <start to="DeleteTargetPath"/>
+    <start to="DeleteWorkingPath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="DeleteTargetPath">
+    <action name="DeleteWorkingPath">
         <fs>
-            <delete path='${targetPath}/${rawSet}'/>
+            <delete path='${workingPath}/${actionSetId}/*_simrel'/>
         </fs>
         <ok to="DuplicateScan"/>
         <error to="Kill"/>
@@ -74,8 +66,6 @@
             <arg>-mt</arg><arg>yarn-cluster</arg>
             <arg>--i</arg><arg>${rawGraphBasePath}</arg>
             <arg>--o</arg><arg>${rawSet}</arg>
-            <arg>--ai</arg><arg>${agentId}</arg>
-            <arg>--an</arg><arg>${agentName}</arg>
             <arg>--la</arg><arg>${isLookUpUrl}</arg>
             <arg>--asi</arg><arg>${actionSetId}</arg>
         </spark>

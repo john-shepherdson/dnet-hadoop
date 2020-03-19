@@ -4,6 +4,9 @@ import com.google.common.collect.Sets;
 import com.wcohen.ss.JaroWinkler;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
 import eu.dnetlib.pace.config.DedupConfig;
 
@@ -20,9 +23,14 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.util.LongAccumulator;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import scala.Tuple2;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -52,38 +60,6 @@ public class DedupUtility {
         accumulators.put(acc6, context.longAccumulator(acc6));
 
         return accumulators;
-    }
-
-    public static JavaRDD<String> loadDataFromHDFS(String path, JavaSparkContext context) {
-        return context.textFile(path);
-    }
-
-    public static void deleteIfExists(String path) throws IOException {
-        Configuration conf = new Configuration();
-        FileSystem fileSystem = FileSystem.get(conf);
-        if (fileSystem.exists(new Path(path))) {
-            fileSystem.delete(new Path(path), true);
-        }
-    }
-
-    public static DedupConfig loadConfigFromHDFS(String path) throws IOException {
-
-        Configuration conf = new Configuration();
-        FileSystem fileSystem = FileSystem.get(conf);
-        FSDataInputStream inputStream = new FSDataInputStream(fileSystem.open(new Path(path)));
-
-        return DedupConfig.load(IOUtils.toString(inputStream, StandardCharsets.UTF_8.name()));
-
-    }
-
-    static <T> String readFromClasspath(final String filename, final Class<T> clazz) {
-        final StringWriter sw = new StringWriter();
-        try {
-            IOUtils.copy(clazz.getResourceAsStream(filename), sw);
-            return sw.toString();
-        } catch (final IOException e) {
-            throw new RuntimeException("cannot load resource from classpath: " + filename);
-        }
     }
 
     static Set<String> getGroupingKeys(DedupConfig conf, MapDocument doc) {
@@ -150,12 +126,12 @@ public class DedupUtility {
         return String.format("%s/%s", basePath, entityType);
     }
 
-    public static String createSimRelPath(final String basePath, final String entityType) {
-        return String.format("%s/%s_simRel", basePath, entityType);
+    public static String createSimRelPath(final String basePath, final String actionSetId,final String entityType) {
+        return String.format("%s/%s/%s_simrel", basePath, actionSetId, entityType);
     }
 
-    public static String createMergeRelPath(final String basePath, final String entityType) {
-        return String.format("%s/%s_mergeRel", basePath, entityType);
+    public static String createMergeRelPath(final String basePath, final String actionSetId, final String entityType) {
+        return String.format("%s/%s/%s_mergerel", basePath, actionSetId, entityType);
     }
 
     private static Double sim(Author a, Author b) {
@@ -215,5 +191,38 @@ public class DedupUtility {
         if (a == null || a.getPid() == null || a.getPid().size() == 0)
             return false;
         return a.getPid().stream().anyMatch(p -> p != null && StringUtils.isNotBlank(p.getValue()));
+    }
+
+    public static List<DedupConfig> getConfigurations(String isLookUpUrl, String orchestrator) throws ISLookUpException, DocumentException {
+        final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookUpUrl);
+
+        final String xquery = String.format("/RESOURCE_PROFILE[.//DEDUPLICATION/ACTION_SET/@id = '%s']", orchestrator);
+
+        String orchestratorProfile = isLookUpService.getResourceProfileByQuery(xquery);
+
+        final Document doc = new SAXReader().read(new StringReader(orchestratorProfile));
+
+        final String actionSetId = doc.valueOf("//DEDUPLICATION/ACTION_SET/@id");
+        final List<DedupConfig> configurations = new ArrayList<>();
+
+        for (final Object o : doc.selectNodes("//SCAN_SEQUENCE/SCAN")) {
+            configurations.add(loadConfig(isLookUpService, actionSetId, o));
+        }
+
+        return configurations;
+
+    }
+
+    private static DedupConfig loadConfig(final ISLookUpService isLookUpService, final String actionSetId, final Object o)
+            throws ISLookUpException {
+        final Element s = (Element) o;
+        final String configProfileId = s.attributeValue("id");
+        final String conf =
+                isLookUpService.getResourceProfileByQuery(String.format(
+                        "for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
+                        configProfileId));
+        final DedupConfig dedupConfig = DedupConfig.load(conf);
+        dedupConfig.getWf().setConfigurationId(actionSetId);
+        return dedupConfig;
     }
 }

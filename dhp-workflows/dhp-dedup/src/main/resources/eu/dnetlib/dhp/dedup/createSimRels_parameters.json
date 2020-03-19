@@ -30,15 +30,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "ai",
-    "paramLongName": "agentId",
-    "paramDescription": "the agent identifier",
-    "paramRequired": true
-  },
-  {
-    "paramName": "an",
-    "paramLongName": "agentName",
-    "paramDescription": "the agent name",
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "path of the working directory",
     "paramRequired": true
   }
 ]

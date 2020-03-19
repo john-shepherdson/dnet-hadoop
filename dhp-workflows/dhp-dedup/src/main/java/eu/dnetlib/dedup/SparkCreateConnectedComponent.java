@@ -1,8 +1,5 @@
 package eu.dnetlib.dedup;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import eu.dnetlib.dedup.graph.ConnectedComponent;
 import eu.dnetlib.dedup.graph.GraphProcessor;
@@ -29,7 +26,7 @@ import java.util.List;
 public class SparkCreateConnectedComponent {
 
     public static void main(String[] args) throws Exception {
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkCreateConnectedComponent.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/dedup_parameters.json")));
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkCreateConnectedComponent.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/createSimRels_parameters.json")));
         parser.parseArgument(args);
         final SparkSession spark = SparkSession
                 .builder()
@@ -50,7 +47,7 @@ public class SparkCreateConnectedComponent {
                         s -> new Tuple2<Object, String>(getHashcode(s), s)
                 );
 
-        final Dataset<Relation> similarityRelations = spark.read().load(DedupUtility.createSimRelPath(targetPath,entity)).as(Encoders.bean(Relation.class));
+        final Dataset<Relation> similarityRelations = spark.read().load(DedupUtility.createSimRelPath(targetPath, "",entity)).as(Encoders.bean(Relation.class));
         final RDD<Edge<String>> edgeRdd = similarityRelations.javaRDD().map(it -> new Edge<>(getHashcode(it.getSource()), getHashcode(it.getTarget()), it.getRelClass())).rdd();
         final JavaRDD<ConnectedComponent> cc = GraphProcessor.findCCs(vertexes.rdd(), edgeRdd, dedupConf.getWf().getMaxIterations()).toJavaRDD();
         final Dataset<Relation> mergeRelation = spark.createDataset(cc.filter(k->k.getDocIds().size()>1).flatMap((FlatMapFunction<ConnectedComponent, Relation>) c ->
@@ -70,7 +67,7 @@ public class SparkCreateConnectedComponent {
                             tmp.add(r);
                             return tmp.stream();
                         }).iterator()).rdd(), Encoders.bean(Relation.class));
-        mergeRelation.write().mode("overwrite").save(DedupUtility.createMergeRelPath(targetPath,entity));
+        mergeRelation.write().mode("overwrite").save(DedupUtility.createMergeRelPath(targetPath,"",entity));
     }
 
     public  static long getHashcode(final String id) {

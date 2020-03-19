@@ -22,6 +22,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -39,7 +40,7 @@ public class SparkCreateSimRels2 implements Serializable {
     private static final Log log = LogFactory.getLog(SparkCreateSimRels2.class);
 
     public static void main(String[] args) throws Exception {
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/dedup_parameters.json")));
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/createSimRels_parameters.json")));
         parser.parseArgument(args);
 
         new SparkCreateSimRels2().run(parser);
@@ -48,12 +49,11 @@ public class SparkCreateSimRels2 implements Serializable {
     private void run(ArgumentApplicationParser parser) throws ISLookUpException, DocumentException {
 
         //read oozie parameters
-        final String rawGraphBasePath = parser.get("rawGraphBasePath");
+        final String graphBasePath = parser.get("graphBasePath");
         final String rawSet = parser.get("rawSet");
-        final String agentId = parser.get("agentId");
-        final String agentName = parser.get("agentName");
         final String isLookUpUrl = parser.get("isLookUpUrl");
         final String actionSetId = parser.get("actionSetId");
+        final String workingPath = parser.get("workingPath");
 
         try (SparkSession spark = getSparkSession(parser)) {
             final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -62,11 +62,11 @@ public class SparkCreateSimRels2 implements Serializable {
             JavaRDD<Tuple2<Text,Text>> simRel = sc.emptyRDD();
 
             //for each dedup configuration
-            for (DedupConfig dedupConf: getConfigurations(isLookUpUrl, actionSetId)) {
+            for (DedupConfig dedupConf: DedupUtility.getConfigurations(isLookUpUrl, actionSetId)) {
                 final String entity = dedupConf.getWf().getEntityType();
                 final String subEntity = dedupConf.getWf().getSubEntityValue();
 
-                JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(rawGraphBasePath + "/" + subEntity)
+                JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(graphBasePath + "/" + subEntity)
                         .mapToPair(s -> {
                             MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
                             return new Tuple2<>(d.getIdentifier(), d);
@@ -78,59 +78,54 @@ public class SparkCreateSimRels2 implements Serializable {
                 //create relations by comparing only elements in the same group
                 final JavaPairRDD<String, String> dedupRels = Deduper.computeRelations2(sc, blocks, dedupConf);
 
-                JavaRDD<Relation> relationsRDD = dedupRels.map(r -> createSimRel(r._1(), r._2()));
+                JavaRDD<Relation> relationsRDD = dedupRels.map(r -> createSimRel(r._1(), r._2(), entity));
+
+                //save the simrel in the workingdir
+                spark.createDataset(relationsRDD.rdd(), Encoders.bean(Relation.class)).write().mode("overwrite").save( DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity));
 
                 //create atomic actions
                 JavaRDD<Tuple2<Text, Text>> newSimRels = relationsRDD
-                        .mapToPair(rel ->
-                                new Tuple2<>(
-                                        createActionId(rel.getSource(), rel.getTarget(), entity), //TODO update the type, maybe take it from the configuration?
-                                        new AtomicAction(rawSet, new Agent(agentId, agentName, Agent.AGENT_TYPE.service), rel.getSource(), "isSimilarTo", rel.getTarget(), new ObjectMapper().writeValueAsString(rel).getBytes())))
-                        .map(aa -> new Tuple2<>(aa._1(), transformAction(aa._2())));
+                        .map(this::createSequenceFileRow);
 
                 simRel = simRel.union(newSimRels);
-
             }
 
             simRel.mapToPair(r -> r)
                     .saveAsHadoopFile(rawSet, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
-
         }
 
     }
 
-    public Text createActionId(String source, String target, String entity) {
-
-        String type = "";
-
-        switch(entity){
-            case "result":
-                type = "resultResult_dedupSimilarity_isSimilarTo";
-                break;
-            case "organization":
-                type = "organizationOrganization_dedupSimilarity_isSimilarTo";
-                break;
-            default:
-                break;
-        }
-
-        String id = source + "@" + type + "@" + target;
-
-        return new Text(id);
-    }
-
-    public Text transformAction(AtomicAction aa) throws JsonProcessingException {
+    public Tuple2<Text, Text> createSequenceFileRow(Relation relation) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        return new Text(mapper.writeValueAsString(aa));
+        String id = relation.getSource() + "@" + relation.getRelClass() + "@" + relation.getTarget();
+        //TODO do be replaced by the new implementation of AtomicAction
+        AtomicAction aa = new AtomicAction("rawSet", new Agent("agentId", "agentName", Agent.AGENT_TYPE.service), relation.getSource(), relation.getRelClass(), relation.getTarget(), new ObjectMapper().writeValueAsString(relation).getBytes());
+
+        return new Tuple2<>(
+                new Text(id),
+                new Text(mapper.writeValueAsString(aa))
+        );
     }
 
-    public Relation createSimRel(String source, String target){
+    public Relation createSimRel(String source, String target, String entity){
         final Relation r = new Relation();
         r.setSource(source);
         r.setTarget(target);
-        r.setRelClass("isSimilarTo");
+
+        switch(entity){
+            case "result":
+                r.setRelClass("resultResult_dedupSimilarity_isSimilarTo");
+                break;
+            case "organization":
+                r.setRelClass("organizationOrganization_dedupSimilarity_isSimilarTo");
+                break;
+            default:
+                r.setRelClass("isSimilarTo");
+                break;
+        }
         return r;
     }
 
@@ -144,41 +139,6 @@ public class SparkCreateSimRels2 implements Serializable {
                 .config(conf)
                 .enableHiveSupport()
                 .getOrCreate();
-    }
-
-    public List<DedupConfig> getConfigurations(String isLookUpUrl, String orchestrator) throws ISLookUpException, DocumentException {
-        final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookUpUrl);
-
-        final String xquery = String.format("/RESOURCE_PROFILE[.//DEDUPLICATION/ACTION_SET/@id = '%s']", orchestrator);
-        log.info("loading dedup orchestration: " + xquery);
-
-        String orchestratorProfile = isLookUpService.getResourceProfileByQuery(xquery);
-
-        final Document doc = new SAXReader().read(new StringReader(orchestratorProfile));
-
-        final String actionSetId = doc.valueOf("//DEDUPLICATION/ACTION_SET/@id");
-        final List<DedupConfig> configurations = new ArrayList<>();
-
-        for (final Object o : doc.selectNodes("//SCAN_SEQUENCE/SCAN")) {
-            configurations.add(loadConfig(isLookUpService, actionSetId, o));
-        }
-
-        return configurations;
-
-    }
-
-    private DedupConfig loadConfig(final ISLookUpService isLookUpService, final String actionSetId, final Object o)
-            throws ISLookUpException {
-        final Element s = (Element) o;
-        final String configProfileId = s.attributeValue("id");
-        final String conf =
-                isLookUpService.getResourceProfileByQuery(String.format(
-                        "for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
-                        configProfileId));
-        log.debug("loaded dedup configuration from IS profile: " + conf);
-        final DedupConfig dedupConfig = DedupConfig.load(conf);
-        dedupConfig.getWf().setConfigurationId(actionSetId);
-        return dedupConfig;
     }
 
 }
