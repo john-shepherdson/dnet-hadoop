@@ -21,26 +21,23 @@ public class ScholixCollectedFrom implements Serializable {
         return provider;
     }
 
-    public ScholixCollectedFrom setProvider(ScholixEntityId provider) {
+    public void setProvider(ScholixEntityId provider) {
         this.provider = provider;
-        return this;
     }
 
     public String getProvisionMode() {
         return provisionMode;
     }
 
-    public ScholixCollectedFrom setProvisionMode(String provisionMode) {
+    public void setProvisionMode(String provisionMode) {
         this.provisionMode = provisionMode;
-        return this;
     }
 
     public String getCompletionStatus() {
         return completionStatus;
     }
 
-    public ScholixCollectedFrom setCompletionStatus(String completionStatus) {
+    public void setCompletionStatus(String completionStatus) {
         this.completionStatus = completionStatus;
-        return this;
     }
 }

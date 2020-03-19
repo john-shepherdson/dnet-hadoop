@@ -1,18 +1,21 @@
 package eu.dnetlib.dhp.provision;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.DHPUtils;
-import net.minidev.json.JSONArray;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.catalyst.expressions.Expression;
 import scala.Tuple2;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -42,27 +45,34 @@ public class SparkExtractRelationCount {
 
         final String relationPath = parser.get("relationPath");
 
-        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-        sc.textFile(relationPath)
-                // We start to Filter the relation not deleted by Inference
-                .filter(ProvisionUtil::isNotDeleted)
-                // Then we create a PairRDD<String, RelatedItem>
-                .mapToPair((PairFunction<String, String, RelatedItemInfo>) f
-                        -> new Tuple2<>(DHPUtils.getJPathString(ProvisionUtil.SOURCEJSONPATH, f), ProvisionUtil.getItemType(f, ProvisionUtil.TARGETJSONPATH)))
-                //We reduce and sum the number of Relations
-                .reduceByKey((Function2<RelatedItemInfo, RelatedItemInfo, RelatedItemInfo>) (v1, v2) -> {
-                    if (v1 == null && v2 == null)
-                        return new RelatedItemInfo();
-                    return v1 != null ? v1.add(v2) : v2;
-                })
-                //Set the source Id in RelatedItem object
-                .map(k -> k._2().setId(k._1()))
-                // Convert to JSON and save as TextFile
-                .map(k -> {
-                    ObjectMapper mapper = new ObjectMapper();
-                    return mapper.writeValueAsString(k);
-                }).saveAsTextFile(workingDirPath + "/relatedItemCount", GzipCodec.class);
+
+
+
+        DatasetJoiner.startJoin(spark, relationPath,workingDirPath + "/relatedItemCount");
+
+
+
+
+//        sc.textFile(relationPath)
+//                // We start to Filter the relation not deleted by Inference
+//                .filter(ProvisionUtil::isNotDeleted)
+//                // Then we create a PairRDD<String, RelatedItem>
+//                .mapToPair((PairFunction<String, String, RelatedItemInfo>) f
+//                        -> new Tuple2<>(DHPUtils.getJPathString(ProvisionUtil.SOURCEJSONPATH, f), ProvisionUtil.getItemType(f, ProvisionUtil.TARGETJSONPATH)))
+//                //We reduce and sum the number of Relations
+//                .reduceByKey((Function2<RelatedItemInfo, RelatedItemInfo, RelatedItemInfo>) (v1, v2) -> {
+//                    if (v1 == null && v2 == null)
+//                        return new RelatedItemInfo();
+//                    return v1 != null ? v1.add(v2) : v2;
+//                })
+//                //Set the source Id in RelatedItem object
+//                .map(k -> k._2().setId(k._1()))
+//                // Convert to JSON and save as TextFile
+//                .map(k -> {
+//                    ObjectMapper mapper = new ObjectMapper();
+//                    return mapper.writeValueAsString(k);
+//                }).saveAsTextFile(workingDirPath + "/relatedItemCount", GzipCodec.class);
     }
 
 

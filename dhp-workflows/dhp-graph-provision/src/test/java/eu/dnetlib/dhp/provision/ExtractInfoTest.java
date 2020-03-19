@@ -12,12 +12,10 @@ import scala.Tuple2;
 
 public class ExtractInfoTest {
 
-    @Test
-    public void test() throws Exception {
-        final String json = IOUtils.toString(getClass().getResourceAsStream("record.json"));
-        ProvisionUtil.getItemType(json,ProvisionUtil.TARGETJSONPATH);
 
-    }
+
+
+
 
 
     @Test
@@ -36,23 +34,20 @@ public class ExtractInfoTest {
     public void testScholix() throws Exception {
         final String jsonSummary = IOUtils.toString(getClass().getResourceAsStream("summary.json"));
         final String jsonRelation = IOUtils.toString(getClass().getResourceAsStream("relation.json"));
-
         Scholix.generateScholixWithSource(jsonSummary, jsonRelation);
-
-
     }
 
 
 
     @Test
-    @Ignore
+
     public void testIndex() throws Exception {
-        SparkIndexCollectionOnES.main(
+        SparkGenerateScholix.main(
 
                 new String[] {
                         "-mt", "local[*]",
-                        "-s", "/home/sandro/dli",
-                        "-i", "dli_object"
+                        "-w", "/Users/sandro/Downloads/scholix/provision",
+                        "-g", "/Users/sandro/Downloads/scholix/graph"
                 }
         );
     }

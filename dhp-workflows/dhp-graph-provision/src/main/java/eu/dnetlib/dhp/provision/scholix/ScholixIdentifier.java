@@ -18,17 +18,15 @@ public class ScholixIdentifier implements Serializable {
         return identifier;
     }
 
-    public ScholixIdentifier setIdentifier(String identifier) {
+    public void setIdentifier(String identifier) {
         this.identifier = identifier;
-        return this;
     }
 
     public String getSchema() {
         return schema;
     }
 
-    public ScholixIdentifier setSchema(String schema) {
+    public void setSchema(String schema) {
         this.schema = schema;
-        return this;
     }
 }

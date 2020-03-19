@@ -19,17 +19,15 @@ public class ScholixEntityId implements Serializable {
         return name;
     }
 
-    public ScholixEntityId setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public List<ScholixIdentifier> getIdentifiers() {
         return identifiers;
     }
 
-    public ScholixEntityId setIdentifiers(List<ScholixIdentifier> identifiers) {
+    public void setIdentifiers(List<ScholixIdentifier> identifiers) {
         this.identifiers = identifiers;
-        return this;
     }
 }

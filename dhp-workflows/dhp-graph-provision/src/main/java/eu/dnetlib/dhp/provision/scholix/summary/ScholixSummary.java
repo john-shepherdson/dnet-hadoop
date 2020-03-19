@@ -11,6 +11,7 @@ import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,9 +25,9 @@ public class ScholixSummary implements Serializable {
     private String description;
     private List<SchemeValue> subject;
     private List<String> publisher;
-    private int relatedPublications;
-    private int relatedDatasets;
-    private int relatedUnknown;
+    private long relatedPublications;
+    private long relatedDatasets;
+    private long relatedUnknown;
     private List<CollectedFromType> datasources;
 
 
@@ -104,27 +105,27 @@ public class ScholixSummary implements Serializable {
         this.publisher = publisher;
     }
 
-    public int getRelatedPublications() {
+    public long getRelatedPublications() {
         return relatedPublications;
     }
 
-    public void setRelatedPublications(int relatedPublications) {
+    public void setRelatedPublications(long relatedPublications) {
         this.relatedPublications = relatedPublications;
     }
 
-    public int getRelatedDatasets() {
+    public long getRelatedDatasets() {
         return relatedDatasets;
     }
 
-    public void setRelatedDatasets(int relatedDatasets) {
+    public void setRelatedDatasets(long relatedDatasets) {
         this.relatedDatasets = relatedDatasets;
     }
 
-    public int getRelatedUnknown() {
+    public long getRelatedUnknown() {
         return relatedUnknown;
     }
 
-    public void setRelatedUnknown(int relatedUnknown) {
+    public void setRelatedUnknown(long relatedUnknown) {
         this.relatedUnknown = relatedUnknown;
     }
 
@@ -136,6 +137,25 @@ public class ScholixSummary implements Serializable {
         this.datasources = datasources;
     }
 
+
+    public static ScholixSummary fromJsonOAF(final Typology oafType, final String oafJson) {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            final RelatedItemInfo relatedItemInfo = new RelatedItemInfo();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            switch (oafType) {
+                case dataset:
+                    return summaryFromDataset(mapper.readValue(oafJson, DLIDataset.class), relatedItemInfo);
+                case publication:
+                    return summaryFromPublication(mapper.readValue(oafJson, DLIPublication.class), relatedItemInfo);
+                case unknown:
+                    return summaryFromUnknown(mapper.readValue(oafJson, DLIUnknown.class), relatedItemInfo);
+            }
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 
     public static String fromJsonOAF(final Typology oafType, final String oafJson, final String relEntityJson) {
         try {
@@ -197,7 +217,8 @@ public class ScholixSummary implements Serializable {
                     .collect(Collectors.toList())
             );
         }
-
+        if (item.getPublisher()!= null)
+            summary.setPublisher(Collections.singletonList(item.getPublisher().getValue()));
 
         summary.setRelatedDatasets(relatedItemInfo.getRelatedDataset());
         summary.setRelatedPublications(relatedItemInfo.getRelatedPublication());
@@ -208,12 +229,10 @@ public class ScholixSummary implements Serializable {
                     .map(
                             c -> new CollectedFromType(c.getName(), c.getId(), c.getCompletionStatus())
                     ).collect(Collectors.toList()));
-
-
         return summary;
     }
 
-    private static ScholixSummary summaryFromPublication(final DLIPublication item, final RelatedItemInfo relatedItemInfo)  {
+    private static ScholixSummary summaryFromPublication(final DLIPublication item, final RelatedItemInfo relatedItemInfo) {
         ScholixSummary summary = new ScholixSummary();
         summary.setId(item.getId());
 
@@ -249,6 +268,9 @@ public class ScholixSummary implements Serializable {
             );
         }
 
+        if (item.getPublisher()!= null)
+            summary.setPublisher(Collections.singletonList(item.getPublisher().getValue()));
+
 
         summary.setRelatedDatasets(relatedItemInfo.getRelatedDataset());
         summary.setRelatedPublications(relatedItemInfo.getRelatedPublication());
@@ -264,7 +286,7 @@ public class ScholixSummary implements Serializable {
         return summary;
     }
 
-    private static ScholixSummary summaryFromUnknown(final DLIUnknown item, final RelatedItemInfo relatedItemInfo)  {
+    private static ScholixSummary summaryFromUnknown(final DLIUnknown item, final RelatedItemInfo relatedItemInfo) {
         ScholixSummary summary = new ScholixSummary();
         summary.setId(item.getId());
         if (item.getPid() != null)

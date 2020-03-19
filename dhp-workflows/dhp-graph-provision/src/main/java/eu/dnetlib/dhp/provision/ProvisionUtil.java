@@ -10,21 +10,21 @@ public class ProvisionUtil {
     public final static String TARGETJSONPATH = "$.target";
     public final static String SOURCEJSONPATH = "$.source";
 
-    public static RelatedItemInfo getItemType(final String item, final String idPath) {
-        String targetId = DHPUtils.getJPathString(idPath, item);
-        switch (StringUtils.substringBefore(targetId, "|")) {
-            case "50":
-                return new RelatedItemInfo().setRelatedPublication(1);
-            case "60":
-                return new RelatedItemInfo().setRelatedDataset(1);
-            case "70":
-                return new RelatedItemInfo().setRelatedUnknown(1);
-            default:
-                throw new RuntimeException("Unknonw target ID");
-
-        }
-
-    }
+//    public static RelatedItemInfo getItemType(final String item, final String idPath) {
+//        String targetId = DHPUtils.getJPathString(idPath, item);
+//        switch (StringUtils.substringBefore(targetId, "|")) {
+//            case "50":
+//                return new RelatedItemInfo(null,0,1,0);
+//            case "60":
+//                return new RelatedItemInfo(null,1,0,0);
+//            case "70":
+//                return new RelatedItemInfo(null,0,0,1);
+//            default:
+//                throw new RuntimeException("Unknonw target ID");
+//
+//        }
+//
+//    }
 
     public static Boolean isNotDeleted(final String item) {
         return !"true".equalsIgnoreCase(DHPUtils.getJPathString(deletedByInferenceJPATH, item));

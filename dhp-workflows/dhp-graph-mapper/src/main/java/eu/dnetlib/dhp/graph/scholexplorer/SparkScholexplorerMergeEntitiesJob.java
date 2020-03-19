@@ -159,6 +159,14 @@ public class SparkScholexplorerMergeEntitiesJob {
                                 }
                                 , Encoders.bean(Relation.class));
                     secondJoin.write().mode(SaveMode.Overwrite).save(targetPath+"_fixed");
+
+
+                FileSystem fileSystem = FileSystem.get(sc.hadoopConfiguration());
+
+
+                fileSystem.delete(new Path(targetPath), true);
+                fileSystem.rename(new Path(targetPath+"_fixed"),new Path(targetPath));
+
         }
     }
 

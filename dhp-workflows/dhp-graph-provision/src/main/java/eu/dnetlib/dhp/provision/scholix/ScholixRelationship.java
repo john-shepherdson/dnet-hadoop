@@ -20,26 +20,23 @@ public class ScholixRelationship implements Serializable {
         return name;
     }
 
-    public ScholixRelationship setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getSchema() {
         return schema;
     }
 
-    public ScholixRelationship setSchema(String schema) {
+    public void setSchema(String schema) {
         this.schema = schema;
-        return this;
     }
 
     public String getInverse() {
         return inverse;
     }
 
-    public ScholixRelationship setInverse(String inverse) {
+    public void setInverse(String inverse) {
         this.inverse = inverse;
-        return this;
     }
 }

@@ -21,6 +21,9 @@ public class ScholixResource implements Serializable {
     private List<ScholixCollectedFrom> collectedFrom;
 
 
+
+
+
     public static ScholixResource fromSummary(ScholixSummary summary) {
 
         final ScholixResource resource = new ScholixResource();
@@ -66,80 +69,71 @@ public class ScholixResource implements Serializable {
         return identifier;
     }
 
-    public ScholixResource setIdentifier(List<ScholixIdentifier> identifier) {
+    public void setIdentifier(List<ScholixIdentifier> identifier) {
         this.identifier = identifier;
-        return this;
     }
 
     public String getDnetIdentifier() {
         return dnetIdentifier;
     }
 
-    public ScholixResource setDnetIdentifier(String dnetIdentifier) {
+    public void setDnetIdentifier(String dnetIdentifier) {
         this.dnetIdentifier = dnetIdentifier;
-        return this;
     }
 
     public String getObjectType() {
         return objectType;
     }
 
-    public ScholixResource setObjectType(String objectType) {
+    public void setObjectType(String objectType) {
         this.objectType = objectType;
-        return this;
     }
 
     public String getObjectSubType() {
         return objectSubType;
     }
 
-    public ScholixResource setObjectSubType(String objectSubType) {
+    public void setObjectSubType(String objectSubType) {
         this.objectSubType = objectSubType;
-        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public ScholixResource setTitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
-        return this;
     }
 
     public List<ScholixEntityId> getCreator() {
         return creator;
     }
 
-    public ScholixResource setCreator(List<ScholixEntityId> creator) {
+    public void setCreator(List<ScholixEntityId> creator) {
         this.creator = creator;
-        return this;
     }
 
     public String getPublicationDate() {
         return publicationDate;
     }
 
-    public ScholixResource setPublicationDate(String publicationDate) {
+    public void setPublicationDate(String publicationDate) {
         this.publicationDate = publicationDate;
-        return this;
     }
 
     public List<ScholixEntityId> getPublisher() {
         return publisher;
     }
 
-    public ScholixResource setPublisher(List<ScholixEntityId> publisher) {
+    public void setPublisher(List<ScholixEntityId> publisher) {
         this.publisher = publisher;
-        return this;
     }
 
     public List<ScholixCollectedFrom> getCollectedFrom() {
         return collectedFrom;
     }
 
-    public ScholixResource setCollectedFrom(List<ScholixCollectedFrom> collectedFrom) {
+    public void setCollectedFrom(List<ScholixCollectedFrom> collectedFrom) {
         this.collectedFrom = collectedFrom;
-        return this;
     }
 }

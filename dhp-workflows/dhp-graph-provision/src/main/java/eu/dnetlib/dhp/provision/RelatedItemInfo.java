@@ -8,57 +8,53 @@ import java.io.Serializable;
 
 public class RelatedItemInfo implements Serializable {
 
-    private String id;
+    private String source;
 
-    private int relatedDataset = 0;
+    private long relatedDataset = 0;
 
-    private int relatedPublication = 0;
+    private long relatedPublication = 0;
 
-    private int relatedUnknown = 0;
+    private long relatedUnknown = 0;
 
-
-    public String getId() {
-        return id;
+    public RelatedItemInfo() {
     }
 
-    public RelatedItemInfo setId(String id) {
-        this.id = id;
-        return this;
+    public RelatedItemInfo(String source, long relatedDataset, long relatedPublication, long relatedUnknown) {
+        this.source = source;
+        this.relatedDataset = relatedDataset;
+        this.relatedPublication = relatedPublication;
+        this.relatedUnknown = relatedUnknown;
     }
 
-    public RelatedItemInfo add(RelatedItemInfo other) {
-        if (other != null) {
-            relatedDataset += other.getRelatedDataset();
-            relatedPublication += other.getRelatedPublication();
-            relatedUnknown += other.getRelatedUnknown();
-        }
-        return this;
+    public String getSource() {
+        return source;
     }
 
-    public int getRelatedDataset() {
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public long getRelatedDataset() {
         return relatedDataset;
     }
 
-    public RelatedItemInfo setRelatedDataset(int relatedDataset) {
+    public void setRelatedDataset(long relatedDataset) {
         this.relatedDataset = relatedDataset;
-        return this;
     }
 
-    public int getRelatedPublication() {
+    public long getRelatedPublication() {
         return relatedPublication;
     }
 
-    public RelatedItemInfo setRelatedPublication(int relatedPublication) {
+    public void setRelatedPublication(long relatedPublication) {
         this.relatedPublication = relatedPublication;
-        return this;
     }
 
-    public int getRelatedUnknown() {
+    public long getRelatedUnknown() {
         return relatedUnknown;
     }
 
-    public RelatedItemInfo setRelatedUnknown(int relatedUnknown) {
+    public void setRelatedUnknown(int relatedUnknown) {
         this.relatedUnknown = relatedUnknown;
-        return this;
     }
 }

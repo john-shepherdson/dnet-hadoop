@@ -25,8 +25,6 @@ import java.io.IOException;
 public class SparkUpdateEntityJob {
 
     final static String IDJSONPATH = "$.id";
-    final static String SOURCEJSONPATH = "$.source";
-    final static String TARGETJSONPATH = "$.target";
 
     public static void main(String[] args) throws Exception {
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkUpdateEntityJob.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/dedup_delete_by_inference_parameters.json")));

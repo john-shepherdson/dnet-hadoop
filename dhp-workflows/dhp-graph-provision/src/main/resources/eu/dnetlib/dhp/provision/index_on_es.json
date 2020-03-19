@@ -17,6 +17,13 @@
     "paramDescription": "the index name",
     "paramRequired": true
   },
+
+  {
+    "paramName": "t",
+    "paramLongName": "type",
+    "paramDescription": "should be scholix or summary",
+    "paramRequired": true
+  },
   {
     "paramName": "id",
     "paramLongName": "idPath",
