@@ -74,6 +74,6 @@ public class SparkCreateConnectedComponent {
     }
 
     public  static long getHashcode(final String id) {
-        return Hashing.murmur3_128().hashUnencodedChars(id).asLong();
+        return Hashing.murmur3_128().hashString(id).asLong();
     }
 }

@@ -1,4 +1,5 @@
 <workflow-app name="index_infospace_graph" xmlns="uri:oozie:workflow:0.5">
+
     <parameters>
         <property>
             <name>hive_db_name</name>
@@ -26,6 +27,21 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to="reuse_records"/>
 
     <decision name="reuse_records">
@@ -42,17 +58,16 @@
 
     <action name="adjancency_lists">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>build_adjacency_lists</name>
             <class>eu.dnetlib.dhp.graph.SparkXmlRecordBuilderJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
-                --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                --executor-cores ${sparkExecutorCoresForJoining}
+                --executor-memory ${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.dynamicAllocation.maxExecutors=${sparkExecutorCoresForJoining}
                 --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -60,6 +75,7 @@
             </spark-opts>
             <arg>-mt</arg> <arg>yarn</arg>
             <arg>-is</arg> <arg>${isLookupUrl}</arg>
+            <arg>-t</arg> <arg>${otherDsTypeId}</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
@@ -69,16 +85,15 @@
 
     <action name="to_solr_index">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>to_solr_index</name>
             <class>eu.dnetlib.dhp.graph.SparkXmlIndexingJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
+                --executor-cores ${sparkExecutorCoresForIndexing}
+                --executor-memory ${sparkExecutorMemoryForIndexing}
+                --driver-memory=${sparkDriverMemoryForIndexing}
                 --conf spark.dynamicAllocation.maxExecutors=${sparkExecutorCoresForIndexing}
                 --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"

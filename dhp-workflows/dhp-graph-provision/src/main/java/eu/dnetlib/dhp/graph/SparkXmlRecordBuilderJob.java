@@ -24,6 +24,7 @@ public class SparkXmlRecordBuilderJob {
             final String inputPath = parser.get("sourcePath");
             final String outputPath = parser.get("outputPath");
             final String isLookupUrl = parser.get("isLookupUrl");
+            final String otherDsTypeId = parser.get("otherDsTypeId");
 
             final FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
             if (fs.exists(new Path(outputPath))) {
@@ -31,8 +32,9 @@ public class SparkXmlRecordBuilderJob {
                 fs.mkdirs(new Path(outputPath));
             }
 
-            new GraphJoiner(spark, ContextMapper.fromIS(isLookupUrl), inputPath, outputPath)
+            new GraphJoiner(spark, ContextMapper.fromIS(isLookupUrl), otherDsTypeId, inputPath, outputPath)
                     .adjacencyLists();
+                    //.asXML();
         }
     }
 

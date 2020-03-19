@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Result extends OafEntity implements Serializable {
+public class Result extends OafEntity implements Serializable {
 
     private List<Author> author;
 

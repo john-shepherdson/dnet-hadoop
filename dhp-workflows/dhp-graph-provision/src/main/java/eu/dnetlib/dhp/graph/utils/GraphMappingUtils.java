@@ -26,6 +26,8 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 public class GraphMappingUtils {
 
+    public static final String SEPARATOR = "_";
+
     public enum EntityType {
         publication, dataset, otherresearchproduct, software, datasource, organization, project
     }
@@ -37,34 +39,6 @@ public class GraphMappingUtils {
     public static Set<String> authorPidTypes = Sets.newHashSet("orcid", "magidentifier");
 
     public static Set<String> instanceFieldFilter = Sets.newHashSet("instancetype", "hostedby", "license", "accessright", "collectedfrom", "dateofacceptance", "distributionlocation");
-
-    private static BiMap<String, String> relClassMapping = HashBiMap.create();
-
-    static {
-        relClassMapping.put("isAuthorInstitutionOf", "hasAuthorInstitution");
-        relClassMapping.put("isMergedIn", "merges");
-        relClassMapping.put("isProducedBy", "produces");
-        relClassMapping.put("hasParticipant", "isParticipant");
-        relClassMapping.put("isProvidedBy", "provides");
-        relClassMapping.put("isRelatedTo", "isRelatedTo");
-        relClassMapping.put("isAmongTopNSimilarDocuments", "hasAmongTopNSimilarDocuments");
-        relClassMapping.put("isRelatedTo", "isRelatedTo");
-        relClassMapping.put("isSupplementTo", "isSupplementedBy");
-    }
-
-    public static String getInverseRelClass(final String relClass) {
-        String res = relClassMapping.get(relClass);
-        if (isNotBlank(res)) {
-            return res;
-        }
-        res = relClassMapping.inverse().get(relClass);
-
-        if (isNotBlank(res)) {
-            return res;
-        }
-
-        throw new IllegalArgumentException("unable to find an inverse relationship class for term: " + relClass);
-    }
 
     private static final String schemeTemplate = "dnet:%s_%s_relations";
 
@@ -158,7 +132,7 @@ public class GraphMappingUtils {
                 re.setLegalname(j.read("$.legalname.value"));
                 re.setLegalshortname(j.read("$.legalshortname.value"));
                 re.setCountry(asQualifier(j.read("$.country")));
-
+                re.setWebsiteurl(j.read("$.websiteurl.value"));
                 break;
             case project:
                 re.setProjectTitle(j.read("$.title.value"));
@@ -250,5 +224,8 @@ public class GraphMappingUtils {
         return s;
     }
 
+    public static String getRelDescriptor(String relType, String subRelType, String relClass) {
+        return relType + SEPARATOR + subRelType + SEPARATOR + relClass;
+    }
 
 }

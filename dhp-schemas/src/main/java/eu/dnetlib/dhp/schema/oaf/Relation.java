@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class Relation extends Oaf {
 
@@ -71,11 +71,13 @@ public class Relation extends Oaf {
 	}
 
 	public void mergeFrom(final Relation r) {
-		Assert.assertEquals("source ids must be equal", getSource(), r.getSource());
-		Assert.assertEquals("target ids must be equal", getTarget(), r.getTarget());
-		Assert.assertEquals("relType(s) must be equal", getRelType(), r.getRelType());
-		Assert.assertEquals("subRelType(s) must be equal", getSubRelType(), r.getSubRelType());
-		Assert.assertEquals("relClass(es) must be equal", getRelClass(), r.getRelClass());
+
+		checkArgument(Objects.equals(getSource(), r.getSource()),"source ids must be equal");
+		checkArgument(Objects.equals(getTarget(), r.getTarget()),"target ids must be equal");
+		checkArgument(Objects.equals(getRelType(), r.getRelType()),"relType(s) must be equal");
+		checkArgument(Objects.equals(getSubRelType(), r.getSubRelType()),"subRelType(s) must be equal");
+		checkArgument(Objects.equals(getRelClass(), r.getRelClass()),"relClass(es) must be equal");
+
 		setCollectedFrom(Stream.concat(getCollectedFrom().stream(), r.getCollectedFrom().stream())
 				.distinct() // relies on KeyValue.equals
 				.collect(Collectors.toList()));
@@ -85,18 +87,18 @@ public class Relation extends Oaf {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		if (!super.equals(o)) return false;
 		Relation relation = (Relation) o;
-		return Objects.equals(relType, relation.relType) &&
-				Objects.equals(subRelType, relation.subRelType) &&
-				Objects.equals(relClass, relation.relClass) &&
-				Objects.equals(source, relation.source) &&
-				Objects.equals(target, relation.target) &&
+		return relType.equals(relation.relType) &&
+				subRelType.equals(relation.subRelType) &&
+				relClass.equals(relation.relClass) &&
+				source.equals(relation.source) &&
+				target.equals(relation.target) &&
 				Objects.equals(collectedFrom, relation.collectedFrom);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(super.hashCode(), relType, subRelType, relClass, source, target, collectedFrom);
+		return Objects.hash(relType, subRelType, relClass, source, target, collectedFrom);
 	}
+
 }
