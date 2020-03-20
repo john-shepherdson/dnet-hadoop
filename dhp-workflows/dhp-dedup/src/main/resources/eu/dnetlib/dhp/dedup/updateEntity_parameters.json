@@ -1,0 +1,38 @@
+[
+{
+  "paramName": "mt",
+  "paramLongName": "master",
+  "paramDescription": "should be local or yarn",
+  "paramRequired": true
+},
+{
+  "paramName": "i",
+  "paramLongName": "graphBasePath",
+  "paramDescription": "the base path of raw graph",
+  "paramRequired": true
+},
+{
+  "paramName": "w",
+  "paramLongName": "workingPath",
+  "paramDescription": "the working directory path",
+  "paramRequired": true
+},
+{
+  "paramName": "la",
+  "paramLongName": "isLookUpUrl",
+  "paramDescriptions": "the url of the lookup service",
+  "paramRequired": true
+},
+{
+  "paramName": "asi",
+  "paramLongName": "actionSetId",
+  "paramDescriptions": "the id of the actionset (orchestrator)",
+  "paramRequired": true
+},
+  {
+    "paramName": "o",
+    "paramLongName": "dedupGraphPath",
+    "paramDescription": "the path of the dedup graph",
+    "paramRequired": true
+  }
+]

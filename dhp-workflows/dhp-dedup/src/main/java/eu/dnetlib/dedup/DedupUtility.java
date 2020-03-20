@@ -122,6 +122,10 @@ public class DedupUtility {
         });
     }
 
+    public static String createDedupRecordPath(final String basePath, final String actionSetId, final String entityType) {
+        return String.format("%s/%s/%s_deduprecord", basePath, actionSetId, entityType);
+    }
+
     public static String createEntityPath(final String basePath, final String entityType) {
         return String.format("%s/%s", basePath, entityType);
     }

@@ -1,21 +1,14 @@
 package eu.dnetlib.dedup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class SparkCreateDedupTest {
 
@@ -29,20 +22,8 @@ public class SparkCreateDedupTest {
 
     @Test
     @Ignore
-    public void createSimRelsTest() throws Exception {
-        SparkCreateSimRels.main(new String[] {
-                "-mt", "local[*]",
-                "-s", "/Users/miconis/dumps",
-                "-e", entity,
-                "-c", ArgumentApplicationParser.compressArgument(configuration),
-                "-t", "/tmp/dedup",
-        });
-    }
-
-    @Test
-    @Ignore
     public void createSimRelsTest2() throws Exception {
-        SparkCreateSimRels2.main(new String[] {
+        SparkCreateSimRels.main(new String[] {
                 "-mt", "local[*]",
                 "-s", "/Users/miconis/dumps",
                 "-e", entity,
@@ -96,6 +77,16 @@ public class SparkCreateDedupTest {
         System.out.println(hashFunction.hashUnencodedChars(s1).asLong());
         System.out.println( s2.hashCode());
         System.out.println(hashFunction.hashUnencodedChars(s2).asLong());
+    }
+
+    @Test
+    public void testJoinEntities() throws Exception{
+        SparkJoinEntities.main(new String[] {
+                "-mt", "local[*]",
+                "-i", "/tmp/dedup",
+                "-w", "/tmp/dedup",
+                "-o", "/tmp/dedup",
+        });
     }
 
 }
