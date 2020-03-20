@@ -15,8 +15,6 @@ import scala.Tuple2;
 
 import java.util.Collection;
 
-import static java.util.stream.Collectors.toMap;
-
 public class DedupRecordFactory {
 
     public static JavaRDD<OafEntity> createDedupRecord(final JavaSparkContext sc, final SparkSession spark, final String mergeRelsInputPath, final String entitiesInputPath, final OafEntityType entityType, final DedupConfig dedupConf) {

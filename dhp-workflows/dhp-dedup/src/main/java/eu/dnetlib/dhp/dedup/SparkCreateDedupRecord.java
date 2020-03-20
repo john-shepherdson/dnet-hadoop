@@ -34,8 +34,11 @@ public class SparkCreateDedupRecord {
             for (DedupConfig dedupConf: DedupUtility.getConfigurations(isLookUpUrl, actionSetId)) {
                 String subEntity = dedupConf.getWf().getSubEntityValue();
 
+                final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
+                final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
+                final OafEntityType entityType = OafEntityType.valueOf(subEntity);
                 final JavaRDD<OafEntity> dedupRecord =
-                        DedupRecordFactory.createDedupRecord(sc, spark, DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity), DedupUtility.createEntityPath(graphBasePath, subEntity), OafEntityType.valueOf(subEntity), dedupConf);
+                        DedupRecordFactory.createDedupRecord(sc, spark, mergeRelPath, entityPath, entityType, dedupConf);
                 dedupRecord.map(r -> {
                     ObjectMapper mapper = new ObjectMapper();
                     return mapper.writeValueAsString(r);

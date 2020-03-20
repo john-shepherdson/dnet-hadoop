@@ -47,6 +47,12 @@ public class SparkCreateSimRels implements Serializable {
         final String actionSetId = parser.get("actionSetId");
         final String workingPath = parser.get("workingPath");
 
+        System.out.println(String.format("graphBasePath: '%s'", graphBasePath));
+        System.out.println(String.format("rawSet: '%s'", rawSet));
+        System.out.println(String.format("isLookUpUrl: '%s'", isLookUpUrl));
+        System.out.println(String.format("actionSetId: '%s'", actionSetId));
+        System.out.println(String.format("workingPath: '%s'", workingPath));
+
         try (SparkSession spark = getSparkSession(parser)) {
             final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
@@ -58,7 +64,7 @@ public class SparkCreateSimRels implements Serializable {
                 final String entity = dedupConf.getWf().getEntityType();
                 final String subEntity = dedupConf.getWf().getSubEntityValue();
 
-                JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(graphBasePath + "/" + subEntity)
+                JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
                         .mapToPair(s -> {
                             MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
                             return new Tuple2<>(d.getIdentifier(), d);

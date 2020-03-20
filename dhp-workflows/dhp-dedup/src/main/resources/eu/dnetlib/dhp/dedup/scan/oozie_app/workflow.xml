@@ -65,6 +65,10 @@
 
     <action name="DuplicateScan">
         <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path="${rawSet}"/>
+                <delete path="${workingPath}/${actionSetId}/*_simrel"/>
+            </prepare>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Create Similarity Relations</name>

@@ -19,7 +19,7 @@
   },
   {
     "paramName": "i",
-    "paramLongName": "rawGraphBasePath",
+    "paramLongName": "graphBasePath",
     "paramDescription": "the base path of the raw graph",
     "paramRequired": true
   },
