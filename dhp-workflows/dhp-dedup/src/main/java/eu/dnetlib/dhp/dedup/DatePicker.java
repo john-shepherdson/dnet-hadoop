@@ -1,4 +1,4 @@
-package eu.dnetlib.dedup;
+package eu.dnetlib.dhp.dedup;
 
 import eu.dnetlib.dhp.schema.oaf.Field;
 import org.apache.commons.lang.StringUtils;

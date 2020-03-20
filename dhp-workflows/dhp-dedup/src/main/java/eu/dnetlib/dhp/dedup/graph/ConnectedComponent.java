@@ -1,7 +1,7 @@
-package eu.dnetlib.dedup.graph;
+package eu.dnetlib.dhp.dedup.graph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dedup.DedupUtility;
+import eu.dnetlib.dhp.dedup.DedupUtility;
 import eu.dnetlib.pace.util.PaceException;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;

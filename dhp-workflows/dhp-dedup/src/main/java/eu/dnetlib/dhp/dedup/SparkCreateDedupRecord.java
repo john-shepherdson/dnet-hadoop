@@ -1,4 +1,4 @@
-package eu.dnetlib.dedup;
+package eu.dnetlib.dhp.dedup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;

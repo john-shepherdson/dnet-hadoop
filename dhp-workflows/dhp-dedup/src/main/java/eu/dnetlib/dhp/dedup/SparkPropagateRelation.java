@@ -1,4 +1,4 @@
-package eu.dnetlib.dedup;
+package eu.dnetlib.dhp.dedup;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

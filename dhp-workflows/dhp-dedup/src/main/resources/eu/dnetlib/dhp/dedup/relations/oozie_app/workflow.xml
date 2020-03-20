@@ -47,7 +47,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Update Relations</name>
-            <class>eu.dnetlib.dedup.SparkPropagateRelation</class>
+            <class>eu.dnetlib.dhp.dedup.SparkPropagateRelation</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory} --conf

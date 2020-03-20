@@ -1,4 +1,4 @@
-package eu.dnetlib.dedup.jpath;
+package eu.dnetlib.dhp.dedup.jpath;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

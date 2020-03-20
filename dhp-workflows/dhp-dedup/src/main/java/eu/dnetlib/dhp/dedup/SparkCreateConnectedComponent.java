@@ -1,8 +1,8 @@
-package eu.dnetlib.dedup;
+package eu.dnetlib.dhp.dedup;
 
 import com.google.common.hash.Hashing;
-import eu.dnetlib.dedup.graph.ConnectedComponent;
-import eu.dnetlib.dedup.graph.GraphProcessor;
+import eu.dnetlib.dhp.dedup.graph.ConnectedComponent;
+import eu.dnetlib.dhp.dedup.graph.GraphProcessor;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -83,7 +83,7 @@ public class SparkCreateConnectedComponent {
     }
 
     public  static long getHashcode(final String id) {
-        return Hashing.murmur3_128().hashUnencodedChars(id).asLong();
+        return Hashing.murmur3_128().hashString(id).asLong();
     }
 
     private static SparkSession getSparkSession(ArgumentApplicationParser parser) {

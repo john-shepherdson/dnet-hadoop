@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.dnetlib.dhp</groupId>
@@ -101,12 +101,12 @@
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
 				<artifactId>hadoop-common</artifactId>
-                <version>${dhp.hadoop.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hadoop</groupId>
-                <artifactId>hadoop-client</artifactId>
+				<version>${dhp.hadoop.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.hadoop</groupId>
+				<artifactId>hadoop-client</artifactId>
 				<version>${dhp.hadoop.version}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -149,6 +149,13 @@
 			</dependency>
 
 			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${dhp.guava.version}</version>
+			</dependency>
+
+
+			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
 				<version>1.9</version>
@@ -167,11 +174,11 @@
 				<scope>provided</scope>
 			</dependency>
 
-            <dependency>
-                <groupId>net.sf.saxon</groupId>
-                <artifactId>Saxon-HE</artifactId>
-                <version>9.9.1-6</version>
-            </dependency>
+			<dependency>
+				<groupId>net.sf.saxon</groupId>
+				<artifactId>Saxon-HE</artifactId>
+				<version>9.9.1-6</version>
+			</dependency>
 
 			<dependency>
 				<groupId>dom4j</groupId>
@@ -192,56 +199,56 @@
 			</dependency>
 
 			<dependency>
-                <groupId>com.mycila.xmltool</groupId>
-                <artifactId>xmltool</artifactId>
-                <version>3.3</version>
-            </dependency>
+				<groupId>com.mycila.xmltool</groupId>
+				<artifactId>xmltool</artifactId>
+				<version>3.3</version>
+			</dependency>
 
-            <dependency>
-                <groupId>org.apache.solr</groupId>
-                <artifactId>solr-solrj</artifactId>
-                <version>7.5.0</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>*</artifactId>
-                        <groupId>*</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.lucidworks.spark</groupId>
-                <artifactId>spark-solr</artifactId>
-                <version>3.6.0</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>*</artifactId>
-                        <groupId>*</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+			<dependency>
+				<groupId>org.apache.solr</groupId>
+				<artifactId>solr-solrj</artifactId>
+				<version>7.5.0</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>*</artifactId>
+						<groupId>*</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.lucidworks.spark</groupId>
+				<artifactId>spark-solr</artifactId>
+				<version>3.6.0</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>*</artifactId>
+						<groupId>*</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>4.5.3</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpmime</artifactId>
-                <version>4.5.3</version>
-            </dependency>
-            <dependency>
-                <groupId>org.noggit</groupId>
-                <artifactId>noggit</artifactId>
-                <version>0.8</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.zookeeper</groupId>
-                <artifactId>zookeeper</artifactId>
-                <version>3.4.11</version>
-            </dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.5.3</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpmime</artifactId>
+				<version>4.5.3</version>
+			</dependency>
+			<dependency>
+				<groupId>org.noggit</groupId>
+				<artifactId>noggit</artifactId>
+				<version>0.8</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.zookeeper</groupId>
+				<artifactId>zookeeper</artifactId>
+				<version>3.4.11</version>
+			</dependency>
 
-            <dependency>
+			<dependency>
 				<groupId>net.schmizz</groupId>
 				<artifactId>sshj</artifactId>
 				<version>0.10.0</version>
@@ -283,17 +290,17 @@
 				<artifactId>dnet-pace-core</artifactId>
 				<version>4.0.0</version>
 			</dependency>
-            <dependency>
-                <groupId>eu.dnetlib</groupId>
-                <artifactId>cnr-rmi-api</artifactId>
-                <version>[2.0.0,3.0.0)</version>
-            </dependency>
+			<dependency>
+				<groupId>eu.dnetlib</groupId>
+				<artifactId>cnr-rmi-api</artifactId>
+				<version>[2.0.0,3.0.0)</version>
+			</dependency>
 
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http</artifactId>
-                <version>3.1.5</version>
-            </dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-transports-http</artifactId>
+				<version>3.1.5</version>
+			</dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
 				<artifactId>javax.persistence-api</artifactId>
@@ -301,36 +308,36 @@
 				<scope>provided</scope>
 			</dependency>
 
-            <dependency>
-                <groupId>com.rabbitmq</groupId>
-                <artifactId>amqp-client</artifactId>
-                <version>5.6.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
-                <artifactId>json-path</artifactId>
-                <version>2.4.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.arakelian</groupId>
-                <artifactId>java-jq</artifactId>
-                <version>0.10.1</version>
-            </dependency>
-            <dependency>
-                <groupId>edu.cmu</groupId>
-                <artifactId>secondstring</artifactId>
-                <version>1.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mongodb</groupId>
-                <artifactId>mongo-java-driver</artifactId>
-                <version>${mongodb.driver.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>stringtemplate</artifactId>
-                <version>4.0</version>
-            </dependency>
+			<dependency>
+				<groupId>com.rabbitmq</groupId>
+				<artifactId>amqp-client</artifactId>
+				<version>5.6.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.jayway.jsonpath</groupId>
+				<artifactId>json-path</artifactId>
+				<version>2.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.arakelian</groupId>
+				<artifactId>java-jq</artifactId>
+				<version>0.10.1</version>
+			</dependency>
+			<dependency>
+				<groupId>edu.cmu</groupId>
+				<artifactId>secondstring</artifactId>
+				<version>1.0.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>${mongodb.driver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>stringtemplate</artifactId>
+				<version>4.0</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.apache.oozie</groupId>
@@ -342,22 +349,6 @@
 					<exclusion>
 						<artifactId>slf4j-simple</artifactId>
 						<groupId>org.slf4j</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-
-			<dependency>
-				<groupId>eu.dnetlib</groupId>
-				<artifactId>dnet-actionmanager-common</artifactId>
-				<version>[6.0.0,7.0.0)</version>
-				<exclusions>
-					<exclusion>
-						<groupId>commons-httpclient</groupId>
-						<artifactId>commons-httpclient</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>eu.dnetlib</groupId>
-						<artifactId>dnet-openaireplus-mapping-utils</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -512,9 +503,9 @@
 		<dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
 		<dhp.jackson.version>2.9.6</dhp.jackson.version>
 		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
+		<dhp.guava.version>11.0.2</dhp.guava.version>
 		<scala.version>2.11.12</scala.version>
 		<junit.version>4.12</junit.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 	</properties>
 </project>
-

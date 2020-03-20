@@ -56,7 +56,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Create Merge Relations</name>
-            <class>eu.dnetlib.dedup.SparkCreateConnectedComponent</class>
+            <class>eu.dnetlib.dhp.dedup.SparkCreateConnectedComponent</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory} --conf
@@ -81,7 +81,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Create Dedup Record</name>
-            <class>eu.dnetlib.dedup.SparkCreateDedupRecord</class>
+            <class>eu.dnetlib.dhp.dedup.SparkCreateDedupRecord</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory} --conf
@@ -106,7 +106,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Create Dedup Record</name>
-            <class>eu.dnetlib.dedup.SparkUpdateEntity</class>
+            <class>eu.dnetlib.dhp.dedup.SparkUpdateEntity</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory} --conf

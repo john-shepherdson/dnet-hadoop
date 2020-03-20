@@ -1,7 +1,6 @@
-package eu.dnetlib.dedup;
+package eu.dnetlib.dhp.dedup;
 
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.BlockProcessor;
 import eu.dnetlib.pace.util.MapDocumentUtil;

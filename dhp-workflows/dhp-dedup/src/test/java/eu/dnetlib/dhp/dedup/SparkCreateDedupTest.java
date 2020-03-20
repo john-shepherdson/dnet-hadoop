@@ -1,4 +1,4 @@
-package eu.dnetlib.dedup;
+package eu.dnetlib.dhp.dedup;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
@@ -74,19 +74,9 @@ public class SparkCreateDedupTest {
         final HashFunction hashFunction = Hashing.murmur3_128();
 
         System.out.println( s1.hashCode());
-        System.out.println(hashFunction.hashUnencodedChars(s1).asLong());
+        System.out.println(hashFunction.hashString(s1).asLong());
         System.out.println( s2.hashCode());
-        System.out.println(hashFunction.hashUnencodedChars(s2).asLong());
-    }
-
-    @Test
-    public void testJoinEntities() throws Exception{
-        SparkJoinEntities.main(new String[] {
-                "-mt", "local[*]",
-                "-i", "/tmp/dedup",
-                "-w", "/tmp/dedup",
-                "-o", "/tmp/dedup",
-        });
+        System.out.println(hashFunction.hashString(s2).asLong());
     }
 
 }

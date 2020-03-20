@@ -1,4 +1,4 @@
-package eu.dnetlib.dedup;
+package eu.dnetlib.dhp.dedup;
 
 import eu.dnetlib.pace.util.Reporter;
 import org.apache.commons.logging.Log;

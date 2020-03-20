@@ -1,4 +1,4 @@
-package eu.dnetlib.dedup;
+package eu.dnetlib.dhp.dedup;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,7 +73,10 @@ public class SparkCreateSimRels implements Serializable {
                 JavaRDD<Relation> relationsRDD = dedupRels.map(r -> createSimRel(r._1(), r._2(), entity));
 
                 //save the simrel in the workingdir
-                spark.createDataset(relationsRDD.rdd(), Encoders.bean(Relation.class)).write().mode("overwrite").save( DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity));
+                spark.createDataset(relationsRDD.rdd(), Encoders.bean(Relation.class))
+                        .write()
+                        .mode("overwrite")
+                        .save(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity));
 
                 //create atomic actions
                 JavaRDD<Tuple2<Text, Text>> newSimRels = relationsRDD
@@ -128,7 +131,6 @@ public class SparkCreateSimRels implements Serializable {
                 .appName(SparkCreateSimRels.class.getSimpleName())
                 .master(parser.get("master"))
                 .config(conf)
-                .enableHiveSupport()
                 .getOrCreate();
     }
 

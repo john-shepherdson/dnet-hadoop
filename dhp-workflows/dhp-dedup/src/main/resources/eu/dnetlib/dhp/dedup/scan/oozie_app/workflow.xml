@@ -34,6 +34,21 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to="DeleteWorkingPath"/>
 
     <kill name="Kill">
@@ -50,20 +65,19 @@
 
     <action name="DuplicateScan">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>Create Similarity Relations</name>
-            <class>eu.dnetlib.dedup.SparkCreateSimRels</class>
+            <class>eu.dnetlib.dhp.dedup.SparkCreateSimRels</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory} --conf
-                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
-                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
-                spark.sql.warehouse.dir="/user/hive/warehouse"
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
             </spark-opts>
-            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--o</arg><arg>${rawSet}</arg>
             <arg>--la</arg><arg>${isLookUpUrl}</arg>

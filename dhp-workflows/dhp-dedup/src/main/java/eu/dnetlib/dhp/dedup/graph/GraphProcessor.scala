@@ -1,4 +1,4 @@
-package eu.dnetlib.dedup.graph
+package eu.dnetlib.dhp.dedup.graph
 
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
