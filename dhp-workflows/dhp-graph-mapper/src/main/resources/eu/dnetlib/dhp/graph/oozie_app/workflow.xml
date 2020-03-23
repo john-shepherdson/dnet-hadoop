@@ -69,16 +69,19 @@
     </action>
 
     <action name="PostProcessing">
-        <hive xmlns="uri:oozie:hive-action:0.2">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
             <configuration>
                 <property>
                     <name>oozie.hive.defaults</name>
                     <value>hive-site.xml</value>
                 </property>
             </configuration>
+            <jdbc-url>jdbc:hive2://iis-cdh5-test-gw.ocean.icm.edu.pl:21050/${hive_db_name}</jdbc-url>
             <script>lib/scripts/postprocessing.sql</script>
             <param>hive_db_name=${hive_db_name}</param>
-        </hive>
+        </hive2>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
