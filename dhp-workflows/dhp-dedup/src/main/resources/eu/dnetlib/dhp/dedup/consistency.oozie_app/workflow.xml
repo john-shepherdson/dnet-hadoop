@@ -1,12 +1,20 @@
-<workflow-app name="Create Similarity Relations" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Build Root Records" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>graphBasePath</name>
             <description>the raw graph base path</description>
         </property>
         <property>
+            <name>isLookUpUrl</name>
+            <description>the address of the lookUp service</description>
+        </property>
+        <property>
+            <name>actionSetId</name>
+            <description>id of the actionSet</description>
+        </property>
+        <property>
             <name>workingPath</name>
-            <description>path for the working directory</description>
+            <description>path of the working directory</description>
         </property>
         <property>
             <name>dedupGraphPath</name>
@@ -26,11 +34,40 @@
         </property>
     </parameters>
 
-    <start to="PropagateRelation"/>
+    <start to="UpdateEntity"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="UpdateEntity">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path='${dedupGraphPath}'/>
+            </prepare>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Dedup Record</name>
+            <class>eu.dnetlib.dhp.dedup.SparkUpdateEntity</class>
+            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--i</arg><arg>${graphBasePath}</arg>
+            <arg>--w</arg><arg>${workingPath}</arg>
+            <arg>--o</arg><arg>${dedupGraphPath}</arg>
+        </spark>
+        <ok to="PropagateRelation"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="PropagateRelation">
         <spark xmlns="uri:oozie:spark-action:0.2">

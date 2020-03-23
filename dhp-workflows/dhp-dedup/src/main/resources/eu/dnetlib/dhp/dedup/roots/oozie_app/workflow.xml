@@ -82,43 +82,19 @@
             <name>Create Dedup Record</name>
             <class>eu.dnetlib.dhp.dedup.SparkCreateDedupRecord</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory} --conf
-                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
-                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
-                spark.sql.warehouse.dir="/user/hive/warehouse"
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>
             <arg>--la</arg><arg>${isLookUpUrl}</arg>
             <arg>--asi</arg><arg>${actionSetId}</arg>
-        </spark>
-        <ok to="UpdateEntity"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="UpdateEntity">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>Create Dedup Record</name>
-            <class>eu.dnetlib.dhp.dedup.SparkUpdateEntity</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory} --conf
-                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
-                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
-                spark.sql.warehouse.dir="/user/hive/warehouse"
-            </spark-opts>
-            <arg>-mt</arg><arg>yarn-cluster</arg>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
-            <arg>--la</arg><arg>${isLookUpUrl}</arg>
-            <arg>--asi</arg><arg>${actionSetId}</arg>
-            <arg>--o</arg><arg>${dedupGraphPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

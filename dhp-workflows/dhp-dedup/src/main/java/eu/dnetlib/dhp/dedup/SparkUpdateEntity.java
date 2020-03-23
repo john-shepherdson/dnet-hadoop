@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -18,12 +18,13 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.DocumentException;
 import scala.Tuple2;
 
 import java.io.IOException;
 
 public class SparkUpdateEntity {
+
+    final String IDJSONPATH = "$.id";
 
     public static void main(String[] args) throws Exception {
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkUpdateEntity.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/updateEntity_parameters.json")));
@@ -32,65 +33,82 @@ public class SparkUpdateEntity {
         new SparkUpdateEntity().run(parser);
     }
 
-    public void run(ArgumentApplicationParser parser) throws ISLookUpException, DocumentException {
+    public boolean mergeRelExists(String basePath, String entity) throws IOException {
+
+        boolean result = false;
+
+        FileSystem fileSystem = FileSystem.get(new Configuration());
+
+        FileStatus[] fileStatuses = fileSystem.listStatus(new Path(basePath));
+
+        for (FileStatus fs : fileStatuses) {
+            if (fs.isDirectory())
+                if (fileSystem.exists(new Path(DedupUtility.createMergeRelPath(basePath, fs.getPath().getName(), entity))))
+                    result = true;
+        }
+
+        return result;
+    }
+
+    public void run(ArgumentApplicationParser parser) throws IOException {
 
         final String graphBasePath = parser.get("graphBasePath");
         final String workingPath = parser.get("workingPath");
         final String dedupGraphPath = parser.get("dedupGraphPath");
-        final String isLookUpUrl = parser.get("isLookUpUrl");
-        final String actionSetId = parser.get("actionSetId");
 
         try (SparkSession spark = getSparkSession(parser)) {
 
             final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-            for (DedupConfig dedupConf : DedupUtility.getConfigurations(isLookUpUrl, actionSetId)) {
+            //for each entity
+            for (OafEntityType entity: OafEntityType.values()) {
 
-                String subEntity = dedupConf.getWf().getSubEntityValue();
+                JavaRDD<String> sourceEntity = sc.textFile(DedupUtility.createEntityPath(graphBasePath, entity.toString()));
 
-                final Dataset<Relation> df = spark.read().load(DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity)).as(Encoders.bean(Relation.class));
-                final JavaPairRDD<String, String> mergedIds = df
-                        .where("relClass == 'merges'")
-                        .select(df.col("target"))
-                        .distinct()
-                        .toJavaRDD()
-                        .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "d"));
+                if (mergeRelExists(workingPath, entity.toString())) {
 
-                final JavaRDD<String> sourceEntity = sc.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity));
+                    final Dataset<Relation> rel = spark.read().load(DedupUtility.createMergeRelPath(workingPath, "*", entity.toString())).as(Encoders.bean(Relation.class));
 
-                final JavaRDD<String> dedupEntity = sc.textFile(DedupUtility.createDedupRecordPath(workingPath, actionSetId, subEntity));
+                    final JavaPairRDD<String, String> mergedIds = rel
+                            .where("relClass == 'merges'")
+                            .select(rel.col("target"))
+                            .distinct()
+                            .toJavaRDD()
+                            .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "d"));
 
-                JavaPairRDD<String, String> entitiesWithId = sourceEntity.mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), s), s));
+                    final JavaRDD<String> dedupEntity = sc.textFile(DedupUtility.createDedupRecordPath(workingPath, "*", entity.toString()));
 
-                Class<? extends Oaf> mainClass;
-                switch (subEntity) {
-                    case "publication":
-                        mainClass = Publication.class;
-                        break;
-                    case "dataset":
-                        mainClass = eu.dnetlib.dhp.schema.oaf.Dataset.class;
-                        break;
-                    case "datasource":
-                        mainClass = Datasource.class;
-                        break;
-                    case "software":
-                        mainClass = Software.class;
-                        break;
-                    case "organization":
-                        mainClass = Organization.class;
-                        break;
-                    case "otherresearchproduct":
-                        mainClass = OtherResearchProduct.class;
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Illegal type " + subEntity);
+                    JavaPairRDD<String, String> entitiesWithId = sourceEntity.mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
+
+                    JavaRDD<String> map = entitiesWithId.leftOuterJoin(mergedIds).map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), getOafClass(entity)) : k._2()._1());
+                    sourceEntity = map.union(dedupEntity);
                 }
 
-                JavaRDD<String> map = entitiesWithId.leftOuterJoin(mergedIds).map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), mainClass) : k._2()._1());
-                map.union(dedupEntity).saveAsTextFile(dedupGraphPath + "/" + subEntity, GzipCodec.class);
+                sourceEntity.saveAsTextFile(dedupGraphPath + "/" + entity, GzipCodec.class);
+
             }
         }
+    }
 
+    public Class<? extends Oaf> getOafClass(OafEntityType className) {
+        switch (className.toString()) {
+            case "publication":
+                return Publication.class;
+            case "dataset":
+                return eu.dnetlib.dhp.schema.oaf.Dataset.class;
+            case "datasource":
+                return Datasource.class;
+            case "software":
+                return Software.class;
+            case "organization":
+                return Organization.class;
+            case "otherresearchproduct":
+                return OtherResearchProduct.class;
+            case "project":
+                return Project.class;
+            default:
+                throw new IllegalArgumentException("Illegal type " + className);
+        }
     }
 
     private static <T extends Oaf> String updateDeletedByInference(final String json, final Class<T> clazz) {

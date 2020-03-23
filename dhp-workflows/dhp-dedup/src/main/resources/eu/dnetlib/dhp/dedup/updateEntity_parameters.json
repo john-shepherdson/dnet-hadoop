@@ -18,18 +18,6 @@
   "paramRequired": true
 },
 {
-  "paramName": "la",
-  "paramLongName": "isLookUpUrl",
-  "paramDescriptions": "the url of the lookup service",
-  "paramRequired": true
-},
-{
-  "paramName": "asi",
-  "paramLongName": "actionSetId",
-  "paramDescriptions": "the id of the actionset (orchestrator)",
-  "paramRequired": true
-},
-  {
     "paramName": "o",
     "paramLongName": "dedupGraphPath",
     "paramDescription": "the path of the dedup graph",
