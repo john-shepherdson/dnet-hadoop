@@ -88,7 +88,7 @@ public class SparkCountryPropagationJob {
         final JavaRDD<Row> toupdateresultdataset = propagateOnResult(spark, "openaire.dataset");
         final JavaRDD<Row> toupdateresultother = propagateOnResult(spark, "openaire.otherresearchproduct");
         final JavaRDD<Row> toupdateresultpublication = propagateOnResult(spark, "openaire.publication");
-        
+
         writeUpdates(toupdateresultsoftware, toupdateresultdataset, toupdateresultother, toupdateresultpublication, outputPath);
 
         createUpdateForSoftwareDataset(toupdateresultsoftware, inputPath, spark)
