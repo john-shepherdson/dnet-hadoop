@@ -1,4 +1,4 @@
-<workflow-app name="Build Root Records" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Update Graph" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>graphBasePath</name>
