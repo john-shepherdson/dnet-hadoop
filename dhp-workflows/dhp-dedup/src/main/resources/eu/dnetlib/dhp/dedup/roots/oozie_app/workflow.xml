@@ -34,23 +34,17 @@
         </property>
     </parameters>
 
-    <start to="DeleteWorkingPath"/>
+    <start to="CreateMergeRel"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="DeleteWorkingPath">
-        <fs>
-            <delete path='${workingPath}/${actionSetId}/*_mergerel'/>
-            <delete path='${workingPath}/${actionSetId}/*_deduprecord'/>
-        </fs>
-        <ok to="CreateMergeRel"/>
-        <error to="Kill"/>
-    </action>
-
     <action name="CreateMergeRel">
         <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path='${workingPath}/${actionSetId}/*_mergerel'/>
+            </prepare>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
@@ -58,11 +52,13 @@
             <name>Create Merge Relations</name>
             <class>eu.dnetlib.dhp.dedup.SparkCreateConnectedComponent</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory} --conf
-                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
-                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
-                spark.sql.warehouse.dir="/user/hive/warehouse"
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
@@ -76,6 +72,9 @@
 
     <action name="CreateDedupRecord">
         <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path='${workingPath}/${actionSetId}/*_deduprecord'/>
+            </prepare>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>

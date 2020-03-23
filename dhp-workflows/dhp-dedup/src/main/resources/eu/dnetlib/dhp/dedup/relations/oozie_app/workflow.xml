@@ -26,22 +26,17 @@
         </property>
     </parameters>
 
-    <start to="DeleteWorkingPath"/>
+    <start to="PropagateRelation"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="DeleteWorkingPath">
-        <fs>
-            <delete path='${dedupGraphPath}/relation'/>
-        </fs>
-        <ok to="DuplicateScan"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="DuplicateScan">
+    <action name="PropagateRelation">
         <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path='${dedupGraphPath}/relation'/>
+            </prepare>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
@@ -49,11 +44,13 @@
             <name>Update Relations</name>
             <class>eu.dnetlib.dhp.dedup.SparkPropagateRelation</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory} --conf
-                spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf
-                spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf
-                spark.sql.warehouse.dir="/user/hive/warehouse"
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>

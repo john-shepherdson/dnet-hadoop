@@ -49,19 +49,11 @@
         </configuration>
     </global>
 
-    <start to="DeleteWorkingPath"/>
+    <start to="DuplicateScan"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-
-    <action name="DeleteWorkingPath">
-        <fs>
-            <delete path='${workingPath}/${actionSetId}/*_simrel'/>
-        </fs>
-        <ok to="DuplicateScan"/>
-        <error to="Kill"/>
-    </action>
 
     <action name="DuplicateScan">
         <spark xmlns="uri:oozie:spark-action:0.2">
