@@ -22,5 +22,11 @@
     "paramLongName":"allowedtypes",
     "paramDescription": "the types of the allowed datasources. Split by ;",
     "paramRequired": true
+  },
+  {
+    "paramName":"h",
+    "paramLongName":"hive_metastore_uris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
   }
 ]

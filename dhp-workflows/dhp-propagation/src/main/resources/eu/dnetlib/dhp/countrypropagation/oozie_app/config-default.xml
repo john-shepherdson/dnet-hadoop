@@ -15,4 +15,12 @@
         <name>oozie.action.sharelib.for.spark</name>
         <value>spark2</value>
     </property>
+    <property>
+        <name>hive_metastore_uris</name>
+        <value>thrift://iis-cdh5-test-m3.ocean.icm.edu.pl:9083</value>
+    </property>
+    <property>
+        <name>hive_db_name</name>
+        <value>openaire</value>
+    </property>
 </configuration>
