@@ -34,6 +34,21 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to="CreateMergeRel"/>
 
     <kill name="Kill">
@@ -45,8 +60,6 @@
             <prepare>
                 <delete path='${workingPath}/${actionSetId}/*_mergerel'/>
             </prepare>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Create Merge Relations</name>
@@ -75,8 +88,6 @@
             <prepare>
                 <delete path='${workingPath}/${actionSetId}/*_deduprecord'/>
             </prepare>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Create Dedup Record</name>
