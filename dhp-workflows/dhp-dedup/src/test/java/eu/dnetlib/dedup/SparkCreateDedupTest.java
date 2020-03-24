@@ -76,9 +76,9 @@ public class SparkCreateDedupTest {
         final HashFunction hashFunction = Hashing.murmur3_128();
 
         System.out.println( s1.hashCode());
-        System.out.println(hashFunction.hashUnencodedChars(s1).asLong());
+        System.out.println(hashFunction.hashString(s1).asLong());
         System.out.println( s2.hashCode());
-        System.out.println(hashFunction.hashUnencodedChars(s2).asLong());
+        System.out.println(hashFunction.hashString(s2).asLong());
 
     }
 
