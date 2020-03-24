@@ -101,7 +101,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
         final JavaRDD<Row> toupdateresultpublication = propagateOnResult(spark, "publication");
 
         writeUpdates(toupdateresultsoftware, toupdateresultdataset, toupdateresultother, toupdateresultpublication, outputPath);
-        
+
     }
 
     private static void writeUpdates(JavaRDD<Row> toupdateresultsoftware, JavaRDD<Row> toupdateresultdataset, JavaRDD<Row> toupdateresultother, JavaRDD<Row> toupdateresultpublication, String outputPath) {
