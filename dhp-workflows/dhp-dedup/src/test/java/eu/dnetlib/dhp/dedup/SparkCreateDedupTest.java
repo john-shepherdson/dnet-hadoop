@@ -80,24 +80,4 @@ public class SparkCreateDedupTest {
         System.out.println(s2.hashCode());
         System.out.println(hashFunction.hashString(s2).asLong());
     }
-
-    @Test
-    public void fileExistsTest() throws IOException {
-
-        boolean result = false;
-
-        FileSystem fileSystem = FileSystem.get(new Configuration());
-
-        FileStatus[] fileStatuses = fileSystem.listStatus(new Path("/tmp"));
-
-        for (FileStatus fs : fileStatuses) {
-            if (fs.isDirectory()) {
-                if (fileSystem.exists(new Path(DedupUtility.createMergeRelPath("/tmp", fs.getPath().getName(), "cicciopasticcio")))) {
-                    System.out.println("fs = " + DedupUtility.createMergeRelPath("/tmp", fs.getPath().getName(), "cicciopasticcio"));
-                    result = true;
-                }
-            }
-        }
-
-    }
 }
