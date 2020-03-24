@@ -18,12 +18,6 @@
     "paramRequired": true
   },
   {
-    "paramName": "o",
-    "paramLongName": "rawSet",
-    "paramDescription": "the raw set to be saved (full path)",
-    "paramRequired": true
-  },
-  {
     "paramName": "la",
     "paramLongName": "isLookUpUrl",
     "paramDescription": "the url for the lookup service",

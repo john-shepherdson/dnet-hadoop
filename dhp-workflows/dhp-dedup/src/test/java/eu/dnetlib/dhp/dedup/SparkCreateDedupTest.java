@@ -25,17 +25,14 @@ public class SparkCreateDedupTest {
 
     @Test
     @Ignore
-    public void createSimRelsTest2() throws Exception {
+    public void createSimRelsTest() throws Exception {
         SparkCreateSimRels.main(new String[]{
                 "-mt", "local[*]",
-                "-s", "/Users/miconis/dumps",
-                "-e", entity,
-                "-c", ArgumentApplicationParser.compressArgument(configuration),
-                "-rs", "/tmp/dedup/rawset_test",
-                "-ai", "agentId",
-                "-an", "agentName",
+                "-i", "/Users/miconis/dumps",
+                "-o", "/tmp/dedup/rawset_test",
                 "-asi", "dedup-similarity-result-levenstein",
                 "-la", "lookupurl",
+                "-w", "workingPath"
         });
     }
 

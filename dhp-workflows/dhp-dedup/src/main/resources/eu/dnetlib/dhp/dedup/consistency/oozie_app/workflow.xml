@@ -5,14 +5,6 @@
             <description>the raw graph base path</description>
         </property>
         <property>
-            <name>isLookUpUrl</name>
-            <description>the address of the lookUp service</description>
-        </property>
-        <property>
-            <name>actionSetId</name>
-            <description>id of the actionSet</description>
-        </property>
-        <property>
             <name>workingPath</name>
             <description>path of the working directory</description>
         </property>
@@ -34,6 +26,21 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to="UpdateEntity"/>
 
     <kill name="Kill">
@@ -45,11 +52,9 @@
             <prepare>
                 <delete path='${dedupGraphPath}'/>
             </prepare>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>Create Dedup Record</name>
+            <name>Update Entity</name>
             <class>eu.dnetlib.dhp.dedup.SparkUpdateEntity</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
             <spark-opts>
@@ -74,8 +79,6 @@
             <prepare>
                 <delete path='${dedupGraphPath}/relation'/>
             </prepare>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Update Relations</name>

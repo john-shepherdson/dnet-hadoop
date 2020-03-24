@@ -21,8 +21,9 @@ import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
 import java.io.IOException;
+import java.io.Serializable;
 
-public class SparkUpdateEntity {
+public class SparkUpdateEntity implements Serializable {
 
     final String IDJSONPATH = "$.id";
 
@@ -82,6 +83,7 @@ public class SparkUpdateEntity {
 
                     JavaRDD<String> map = entitiesWithId.leftOuterJoin(mergedIds).map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), getOafClass(entity)) : k._2()._1());
                     sourceEntity = map.union(dedupEntity);
+
                 }
 
                 sourceEntity.saveAsTextFile(dedupGraphPath + "/" + entity, GzipCodec.class);

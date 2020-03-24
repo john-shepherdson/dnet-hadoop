@@ -42,14 +42,14 @@ public class SparkCreateSimRels implements Serializable {
 
         //read oozie parameters
         final String graphBasePath = parser.get("graphBasePath");
-        final String rawSet = parser.get("rawSet");
         final String isLookUpUrl = parser.get("isLookUpUrl");
+        final String rawSet = parser.get("rawSet");
         final String actionSetId = parser.get("actionSetId");
         final String workingPath = parser.get("workingPath");
 
         System.out.println(String.format("graphBasePath: '%s'", graphBasePath));
-        System.out.println(String.format("rawSet: '%s'", rawSet));
         System.out.println(String.format("isLookUpUrl: '%s'", isLookUpUrl));
+        System.out.println(String.format("rawSet: '%s'", rawSet));
         System.out.println(String.format("actionSetId: '%s'", actionSetId));
         System.out.println(String.format("workingPath: '%s'", workingPath));
 
@@ -84,14 +84,17 @@ public class SparkCreateSimRels implements Serializable {
                         .mode("overwrite")
                         .save(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity));
 
-                //create atomic actions
-                JavaRDD<Tuple2<Text, Text>> newSimRels = relationsRDD
-                        .map(this::createSequenceFileRow);
+                if (rawSet != null) {
+                    //create atomic actions
+                    JavaRDD<Tuple2<Text, Text>> newSimRels = relationsRDD
+                            .map(this::createSequenceFileRow);
 
-                simRel = simRel.union(newSimRels);
+                    simRel = simRel.union(newSimRels);
+                }
             }
 
-            simRel.mapToPair(r -> r)
+            if (rawSet != null)
+                simRel.mapToPair(r -> r)
                     .saveAsHadoopFile(rawSet, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
         }
 
