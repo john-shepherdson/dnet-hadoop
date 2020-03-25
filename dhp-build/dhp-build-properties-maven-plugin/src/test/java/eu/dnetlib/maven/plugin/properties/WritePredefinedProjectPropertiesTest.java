@@ -13,7 +13,7 @@ import java.io.*;
 import java.util.Properties;
 
 import static eu.dnetlib.maven.plugin.properties.WritePredefinedProjectProperties.PROPERTY_PREFIX_ENV;
-import static junit.framework.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 

@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static eu.dnetlib.maven.plugin.properties.GenerateOoziePropertiesMojo.PROPERTY_NAME_SANDBOX_NAME;
 import static eu.dnetlib.maven.plugin.properties.GenerateOoziePropertiesMojo.PROPERTY_NAME_WF_SOURCE_DIR;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author mhorst, claudio.atzori
