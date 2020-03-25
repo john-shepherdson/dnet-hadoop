@@ -10,6 +10,6 @@ public class MetadataRecordTest {
     public void getTimestamp() {
 
         MetadataRecord r = new MetadataRecord();
-        assertTrue(r.getDateOfCollection() >0);
+        assertTrue(r.getDateOfCollection() > 0);
     }
 }
