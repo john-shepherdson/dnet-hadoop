@@ -1,15 +1,9 @@
 package eu.dnetlib.dhp.dedup.jpath;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import java.util.List;
-import java.util.Map;
 
 public class JsonPathTest {
 
