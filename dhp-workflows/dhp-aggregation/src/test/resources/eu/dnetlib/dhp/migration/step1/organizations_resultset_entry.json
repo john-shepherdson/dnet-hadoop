@@ -7,7 +7,7 @@
 	{
 		"field": "legalshortname",
 		"type": "string",
-		"value": null
+		"value": "MSFTResearch"
 	},
 	{
 		"field": "legalname",
@@ -17,7 +17,7 @@
 	{
 		"field": "websiteurl",
 		"type": "string",
-		"value": null
+		"value": "https://www.microsoft.com/en-us/research/"
 	},
 	{
 		"field": "logourl",
@@ -107,12 +107,12 @@
 	{
 		"field": "collectedfromid",
 		"type": "string",
-		"value": null
+		"value": "openaire____::TEST"
 	},
 	{
 		"field": "collectedfromname",
 		"type": "string",
-		"value": null
+		"value": "TEST"
 	},
 	{
 		"field": "country",

@@ -21,7 +21,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MigrateDbEntitiesApplicationTest {
@@ -42,8 +46,17 @@ public class MigrateDbEntitiesApplicationTest {
 
 		final List<Oaf> list = app.processDatasource(rs);
 		assertEquals(1, list.size());
-
 		verifyMocks(fields);
+
+		final Datasource ds = (Datasource) list.get(0);
+		assertValidId(ds.getId());
+		assertEquals(ds.getOfficialname().getValue(), getValueAsString("officialname", fields));
+		assertEquals(ds.getEnglishname().getValue(), getValueAsString("englishname", fields));
+		assertEquals(ds.getContactemail().getValue(), getValueAsString("contactemail", fields));
+		assertEquals(ds.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
+		assertEquals(ds.getNamespaceprefix().getValue(), getValueAsString("namespaceprefix", fields));
+		assertEquals(ds.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
+		assertEquals(ds.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test
@@ -52,8 +65,14 @@ public class MigrateDbEntitiesApplicationTest {
 
 		final List<Oaf> list = app.processProject(rs);
 		assertEquals(1, list.size());
-
 		verifyMocks(fields);
+
+		final Project p = (Project) list.get(0);
+		assertValidId(p.getId());
+		assertEquals(p.getAcronym().getValue(), getValueAsString("acronym", fields));
+		assertEquals(p.getTitle().getValue(), getValueAsString("title", fields));
+		assertEquals(p.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
+		assertEquals(p.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test
@@ -65,6 +84,18 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(1, list.size());
 
 		verifyMocks(fields);
+
+		final Organization o = (Organization) list.get(0);
+		assertValidId(o.getId());
+		assertEquals(o.getLegalshortname().getValue(), getValueAsString("legalshortname", fields));
+		assertEquals(o.getLegalname().getValue(), getValueAsString("legalname", fields));
+		assertEquals(o.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
+		assertEquals(o.getCountry().getClassid(), getValueAsString("country", fields).split("@@@")[0]);
+		assertEquals(o.getCountry().getClassname(), getValueAsString("country", fields).split("@@@")[1]);
+		assertEquals(o.getCountry().getSchemeid(), getValueAsString("country", fields).split("@@@")[2]);
+		assertEquals(o.getCountry().getSchemename(), getValueAsString("country", fields).split("@@@")[3]);
+		assertEquals(o.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
+		assertEquals(o.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test
@@ -75,6 +106,13 @@ public class MigrateDbEntitiesApplicationTest {
 
 		assertEquals(2, list.size());
 		verifyMocks(fields);
+
+		final Relation r1 = (Relation) list.get(0);
+		final Relation r2 = (Relation) list.get(1);
+		assertValidId(r1.getSource());
+		assertValidId(r2.getSource());
+		assertEquals(r1.getSource(), r2.getTarget());
+		assertEquals(r2.getSource(), r1.getTarget());
 	}
 
 	@Test
@@ -85,6 +123,13 @@ public class MigrateDbEntitiesApplicationTest {
 
 		assertEquals(2, list.size());
 		verifyMocks(fields);
+
+		final Relation r1 = (Relation) list.get(0);
+		final Relation r2 = (Relation) list.get(1);
+		assertValidId(r1.getSource());
+		assertValidId(r2.getSource());
+		assertEquals(r1.getSource(), r2.getTarget());
+		assertEquals(r2.getSource(), r1.getTarget());
 	}
 
 	@Test
@@ -201,7 +246,23 @@ public class MigrateDbEntitiesApplicationTest {
 				break;
 			}
 		}
+	}
 
+	private void assertValidId(final String id) {
+		assertEquals(49, id.length());
+		assertEquals('|', id.charAt(2));
+		assertEquals(':', id.charAt(15));
+		assertEquals(':', id.charAt(16));
+	}
+
+	private String getValueAsString(final String name, final List<TypedField> fields) {
+		return fields.stream()
+				.filter(f -> f.getField().equals(name))
+				.map(TypedField::getValue)
+				.filter(Objects::nonNull)
+				.map(o -> o.toString())
+				.findFirst()
+				.get();
 	}
 }
 

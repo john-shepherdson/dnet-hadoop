@@ -25,7 +25,7 @@
 	{
 		"field": "contactemail",
 		"type": "string",
-		"value": null
+		"value": "test@test.it"
 	},
 	{
 		"field": "openairecompatibility",
@@ -230,10 +230,5 @@
 		"field": "journal",
 		"type": "string",
 		"value": "2579-5449@@@2597-6540@@@"
-	},
-	{
-		"field": "collectedfromid",
-		"type": "string",
-		"value": "openaire____::SnVybmFsIEZha3VsdGFzIFNhc3RyYSBVbml2ZXJzaXRhcyBFa2FzYWt0aQ=="
 	}
 ]
