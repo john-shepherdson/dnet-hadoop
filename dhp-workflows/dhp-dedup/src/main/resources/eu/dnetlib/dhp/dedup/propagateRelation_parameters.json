@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "mt",
+    "paramLongName": "master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "the base path of raw graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "the working directory path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "o",
+    "paramLongName": "dedupGraphPath",
+    "paramDescription": "the path of the dedup graph",
+    "paramRequired": true
+  }
+]
