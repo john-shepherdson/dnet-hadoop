@@ -24,12 +24,6 @@
     "paramRequired": true
   },
   {
-    "paramName": "o",
-    "paramLongName": "rawSet",
-    "paramDescription": "the raw set to be saved (full path)",
-    "paramRequired": false
-  },
-  {
     "paramName": "w",
     "paramLongName": "workingPath",
     "paramDescription": "path of the working directory",

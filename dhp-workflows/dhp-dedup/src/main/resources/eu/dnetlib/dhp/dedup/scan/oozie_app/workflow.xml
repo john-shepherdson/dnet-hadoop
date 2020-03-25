@@ -5,10 +5,6 @@
             <description>the raw graph base path</description>
         </property>
         <property>
-            <name>rawSet</name>
-            <description>the output directory in the targetPath</description>
-        </property>
-        <property>
             <name>isLookUpUrl</name>
             <description>the address of the lookUp service</description>
         </property>
@@ -58,7 +54,6 @@
     <action name="CreateSimRel">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <prepare>
-                <delete path="${rawSet}"/>
                 <delete path="${workingPath}/${actionSetId}/*_simrel"/>
             </prepare>
             <master>yarn</master>
@@ -101,7 +96,7 @@
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
                 --conf spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
-            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>
             <arg>--la</arg><arg>${isLookUpUrl}</arg>
@@ -129,7 +124,7 @@
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
                 --conf spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
-            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>
             <arg>--la</arg><arg>${isLookUpUrl}</arg>

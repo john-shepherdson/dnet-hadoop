@@ -43,21 +43,16 @@ public class SparkCreateSimRels implements Serializable {
         //read oozie parameters
         final String graphBasePath = parser.get("graphBasePath");
         final String isLookUpUrl = parser.get("isLookUpUrl");
-        final String rawSet = parser.get("rawSet");
         final String actionSetId = parser.get("actionSetId");
         final String workingPath = parser.get("workingPath");
 
         System.out.println(String.format("graphBasePath: '%s'", graphBasePath));
         System.out.println(String.format("isLookUpUrl: '%s'", isLookUpUrl));
-        System.out.println(String.format("rawSet: '%s'", rawSet));
         System.out.println(String.format("actionSetId: '%s'", actionSetId));
         System.out.println(String.format("workingPath: '%s'", workingPath));
 
         try (SparkSession spark = getSparkSession(parser)) {
             final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-
-            //create empty sequenceFile for the accumulation
-            JavaRDD<Tuple2<Text,Text>> simRel = sc.emptyRDD();
 
             //for each dedup configuration
             for (DedupConfig dedupConf: DedupUtility.getConfigurations(isLookUpUrl, actionSetId)) {
@@ -83,23 +78,16 @@ public class SparkCreateSimRels implements Serializable {
                         .write()
                         .mode("overwrite")
                         .save(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity));
-
-                if (rawSet != null) {
-                    //create atomic actions
-                    JavaRDD<Tuple2<Text, Text>> newSimRels = relationsRDD
-                            .map(this::createSequenceFileRow);
-
-                    simRel = simRel.union(newSimRels);
-                }
             }
-
-            if (rawSet != null)
-                simRel.mapToPair(r -> r)
-                    .saveAsHadoopFile(rawSet, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
         }
-
     }
 
+    /**
+     * Utility method used to create an atomic action from a Relation object
+     * @param relation input relation
+     * @return A tuple2 with [id, json serialization of the atomic action]
+     * @throws JsonProcessingException
+     */
     public Tuple2<Text, Text> createSequenceFileRow(Relation relation) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();

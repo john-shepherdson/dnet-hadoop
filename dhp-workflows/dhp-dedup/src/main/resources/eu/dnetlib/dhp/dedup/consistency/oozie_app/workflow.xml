@@ -65,7 +65,7 @@
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
                 --conf spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
-            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>
             <arg>--o</arg><arg>${dedupGraphPath}</arg>
@@ -92,7 +92,7 @@
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
                 --conf spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
-            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--o</arg><arg>${dedupGraphPath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>
