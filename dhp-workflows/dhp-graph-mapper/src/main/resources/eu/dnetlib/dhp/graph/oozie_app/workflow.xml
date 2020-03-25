@@ -1,4 +1,5 @@
 <workflow-app name="import_infospace_graph" xmlns="uri:oozie:workflow:0.5">
+
     <parameters>
         <property>
             <name>sourcePath</name>
@@ -22,19 +23,32 @@
         </property>
     </parameters>
 
-    <start to="MapGraphIntoDataFrame"/>
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="MapGraphAsHiveDB"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="MapGraphIntoDataFrame">
+    <action name="MapGraphAsHiveDB">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
-            <name>MapGraphIntoDataFrame</name>
+            <name>MapGraphAsHiveDB</name>
             <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -55,12 +69,19 @@
     </action>
 
     <action name="PostProcessing">
-        <hive xmlns="uri:oozie:hive-action:0.2">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <script>/eu/dnetlib/dhp/graph/hive/postprocessing.sql</script>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>lib/scripts/postprocessing.sql</script>
             <param>hive_db_name=${hive_db_name}</param>
-        </hive>
+        </hive2>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

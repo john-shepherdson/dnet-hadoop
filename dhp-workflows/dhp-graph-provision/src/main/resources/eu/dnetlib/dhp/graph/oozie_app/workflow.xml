@@ -1,4 +1,5 @@
 <workflow-app name="index_infospace_graph" xmlns="uri:oozie:workflow:0.5">
+
     <parameters>
         <property>
             <name>hive_db_name</name>
@@ -26,6 +27,21 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to="reuse_records"/>
 
     <decision name="reuse_records">
@@ -42,8 +58,6 @@
 
     <action name="adjancency_lists">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>build_adjacency_lists</name>
@@ -71,8 +85,6 @@
 
     <action name="to_solr_index">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>to_solr_index</name>

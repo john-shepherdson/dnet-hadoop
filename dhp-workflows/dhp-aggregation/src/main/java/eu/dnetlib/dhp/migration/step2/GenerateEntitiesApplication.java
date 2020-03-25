@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
@@ -87,7 +88,7 @@ public class GenerateEntitiesApplication {
 					.map(oaf -> oaf.getClass().getSimpleName().toLowerCase() + "|" + convertToJson(oaf)));
 		}
 
-		inputRdd.saveAsTextFile(targetPath);
+		inputRdd.saveAsTextFile(targetPath, GzipCodec.class);
 
 	}
 

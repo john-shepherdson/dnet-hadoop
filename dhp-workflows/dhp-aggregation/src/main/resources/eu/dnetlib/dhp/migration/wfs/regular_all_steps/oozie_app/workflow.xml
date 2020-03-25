@@ -1,4 +1,5 @@
 <workflow-app name="import regular entities as Graph (all steps)" xmlns="uri:oozie:workflow:0.5">
+
     <parameters>
         <property>
             <name>workingPath</name>
@@ -48,6 +49,21 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
 	<start to="ReuseContent"/>
 
     <kill name="Kill">
@@ -64,8 +80,8 @@
 
     <action name="ResetWorkingPath">
         <fs>
-            <delete path="'${workingPath}'"/>
-            <mkdir path="'${workingPath}'"/>
+            <delete path="${workingPath}"/>
+            <mkdir path="${workingPath}"/>
         </fs>
         <ok to="ImportDB"/>
         <error to="Kill"/>
@@ -73,8 +89,6 @@
 
     <action name="ImportDB">
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateDbEntitiesApplication</main-class>
             <arg>-p</arg><arg>${workingPath}/db_records</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
@@ -87,8 +101,6 @@
     
     <action name="ImportODF">
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
             <arg>-p</arg><arg>${workingPath}/odf_records</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
@@ -103,8 +115,6 @@
 
     <action name="ImportOAF">
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
             <arg>-p</arg><arg>${workingPath}/oaf_records</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
@@ -119,7 +129,7 @@
 
     <action name="ResetAllEntitiesPath">
         <fs>
-            <delete path="'${workingPath}/all_entities'"/>
+            <delete path="${workingPath}/all_entities"/>
         </fs>
         <ok to="GenerateEntities"/>
         <error to="Kill"/>
@@ -127,9 +137,7 @@
 
     <action name="GenerateEntities">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>GenerateEntities</name>
             <class>eu.dnetlib.dhp.migration.step2.GenerateEntitiesApplication</class>
@@ -155,8 +163,8 @@
 
     <action name="ResetGraphPath">
         <fs>
-            <delete path="'${graphBasePath}/graph_raw'"/>
-            <mkdir path="'${graphBasePath}/graph_raw'"/>
+            <delete path="${graphBasePath}/graph_raw"/>
+            <mkdir path="${graphBasePath}/graph_raw"/>
         </fs>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>
@@ -164,9 +172,7 @@
 
     <action name="GenerateGraph">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>GenerateGraph</name>
             <class>eu.dnetlib.dhp.migration.step3.DispatchEntitiesApplication</class>

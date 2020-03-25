@@ -54,12 +54,25 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to='migrate_actionsets' />
 
     <action name='migrate_actionsets'>
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.actions.MigrateActionSet</main-class>
             <java-opt>-Dmapred.task.timeout=${distcp_task_timeout}</java-opt>
             <arg>-is</arg><arg>${isLookupUrl}</arg>
@@ -78,8 +91,6 @@
 
     <action name="transform_actions">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>transform_actions</name>
