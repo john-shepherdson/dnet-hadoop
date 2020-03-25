@@ -1,6 +1,6 @@
 package eu.dnetlib.maven.plugin.properties;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static eu.dnetlib.maven.plugin.properties.GenerateOoziePropertiesMojo.PROPERTY_NAME_SANDBOX_NAME;
@@ -9,14 +9,14 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 
 /**
- * @author mhorst
+ * @author mhorst, claudio.atzori
  *
  */
 public class GenerateOoziePropertiesMojoTest {
 
     private GenerateOoziePropertiesMojo mojo = new GenerateOoziePropertiesMojo();
     
-    @BeforeAll
+    @BeforeEach
     public void clearSystemProperties() {
         System.clearProperty(PROPERTY_NAME_SANDBOX_NAME);
         System.clearProperty(PROPERTY_NAME_WF_SOURCE_DIR);
