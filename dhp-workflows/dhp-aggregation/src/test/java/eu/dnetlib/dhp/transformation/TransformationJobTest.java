@@ -6,47 +6,32 @@ import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
 import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import net.sf.saxon.s9api.*;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
-import org.junit.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ExtendWith(MockitoExtension.class)
 public class TransformationJobTest {
 
     @Mock
-    LongAccumulator accumulator;
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    private Path testDir;
-
-    @BeforeEach
-    public void setup() throws IOException {
-        testDir = Files.createTempDirectory("dhp-collection");
-    }
-
-    @AfterEach
-    public void tearDown() throws IOException {
-        FileUtils.deleteDirectory(testDir.toFile());
-    }
-
+    private LongAccumulator accumulator;
 
     @Test
     public void testTransformSaxonHE() throws Exception {
@@ -70,9 +55,9 @@ public class TransformationJobTest {
         System.out.println(output.toString());
     }
 
-
+    @DisplayName("Test TransformSparkJobNode.main")
     @Test
-    public void transformTest() throws Exception {
+    public void transformTest(@TempDir Path testDir) throws Exception {
         final String mdstore_input = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
         final String mdstore_output = testDir.toString()+"/version";
         final String xslt = DHPUtils.compressString(IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml")));
@@ -89,8 +74,6 @@ public class TransformationJobTest {
                 "-rh",  "",
                 "-ro",  "",
                 "-rr",  ""});
-
-
     }
 
     @Test
@@ -121,7 +104,7 @@ public class TransformationJobTest {
         record.setBody(IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input.xml")));
 
         final MetadataRecord result = tf.call(record);
-        Assert.assertNotNull(result.getBody());
+        assertNotNull(result.getBody());
 
         System.out.println(result.getBody());
     }

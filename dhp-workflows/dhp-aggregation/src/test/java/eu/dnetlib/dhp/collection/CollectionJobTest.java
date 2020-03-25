@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.Assert;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.model.mdstore.Provenance;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CollectionJobTest {
 
@@ -80,7 +82,7 @@ public class CollectionJobTest {
 		record.setBody("ciao");
 		assert record1 != null;
 		record1.setBody("mondo");
-		Assert.assertEquals(record, record1);
+		assertEquals(record, record1);
 
 	}
 
