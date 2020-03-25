@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.migration.step1;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.sql.Array;
@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -35,7 +35,7 @@ public class MigrateDbEntitiesApplicationTest {
 	@Mock
 	private ResultSet rs;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		this.app = new MigrateDbEntitiesApplication();
 	}

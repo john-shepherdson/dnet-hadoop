@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class MergeTest {
 
     OafEntity oaf;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         oaf = new Publication();
     }

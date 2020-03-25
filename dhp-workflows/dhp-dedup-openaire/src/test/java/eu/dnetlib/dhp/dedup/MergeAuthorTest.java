@@ -3,8 +3,8 @@ package eu.dnetlib.dhp.dedup;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ public class MergeAuthorTest {
     private List<Publication> publicationsToMerge;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final String json = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/dedup/json/authors_merge.json"));
 

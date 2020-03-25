@@ -1,9 +1,9 @@
 package eu.dnetlib.maven.plugin.properties;
 
 import static eu.dnetlib.maven.plugin.properties.WritePredefinedProjectProperties.PROPERTY_PREFIX_ENV;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
 import java.io.File;
@@ -16,9 +16,9 @@ import java.util.Properties;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -40,7 +40,7 @@ public class WritePredefinedProjectPropertiesTest {
     
     private WritePredefinedProjectProperties mojo;
 
-    @Before
+    @BeforeEach
     public void init() {
         mojo = new WritePredefinedProjectProperties();
         mojo.outputFile = getPropertiesFileLocation();
