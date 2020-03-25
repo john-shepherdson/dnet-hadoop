@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 public class MergeAuthorTest {
 
-    List<Publication> publicationsToMerge;
-    final ObjectMapper mapper = new ObjectMapper();
+    private List<Publication> publicationsToMerge;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void setUp() throws Exception {
-        final String json = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dedup/json/authors_merge.json"));
+        final String json = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/dedup/json/authors_merge.json"));
 
 
         publicationsToMerge = Arrays.asList(json.split("\n")).stream().map(s-> {
@@ -28,34 +28,18 @@ public class MergeAuthorTest {
                 throw new RuntimeException(e);
             }
         }).collect(Collectors.toList());
-
-
-
     }
-
 
     @Test
     public void test() throws  Exception {
         Publication dedup = new Publication();
-
 
         publicationsToMerge.forEach(p-> {
             dedup.mergeFrom(p);
             dedup.setAuthor(DedupUtility.mergeAuthor(dedup.getAuthor(),p.getAuthor()));
         });
 
-
-
-
-
-
-
-
         System.out.println(mapper.writeValueAsString(dedup));
-
-
     }
-
-
 
 }
