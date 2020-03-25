@@ -37,12 +37,12 @@ public class TransformationJobTest {
 
     private Path testDir;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         testDir = Files.createTempDirectory("dhp-collection");
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         FileUtils.deleteDirectory(testDir.toFile());
     }

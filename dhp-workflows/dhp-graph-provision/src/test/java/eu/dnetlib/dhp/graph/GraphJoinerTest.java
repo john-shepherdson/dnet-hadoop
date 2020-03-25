@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.graph;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +13,7 @@ public class GraphJoinerTest {
     private Path inputDir;
     private Path outputDir;
 
-    @Before
+    @BeforeEach
     public void before() throws IOException {
         workingDir = Files.createTempDirectory("promote_action_set");
         inputDir = workingDir.resolve("input");

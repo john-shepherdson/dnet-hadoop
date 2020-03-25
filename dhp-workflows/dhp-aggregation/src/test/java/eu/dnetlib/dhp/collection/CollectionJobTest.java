@@ -6,10 +6,10 @@ import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -20,12 +20,12 @@ public class CollectionJobTest {
 
 	private Path testDir;
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		testDir = Files.createTempDirectory("dhp-collection");
 	}
 
-	@After
+	@AfterEach
 	public void teadDown() throws IOException {
 		FileUtils.deleteDirectory(testDir.toFile());
 	}

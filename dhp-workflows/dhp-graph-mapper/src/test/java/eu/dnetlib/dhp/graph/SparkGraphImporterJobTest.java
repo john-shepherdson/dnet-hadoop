@@ -12,12 +12,12 @@ public class SparkGraphImporterJobTest {
     private static final long MAX = 1000L;
     private Path testDir;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         testDir = Files.createTempDirectory(getClass().getSimpleName());
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         FileUtils.deleteDirectory(testDir.toFile());
     }
