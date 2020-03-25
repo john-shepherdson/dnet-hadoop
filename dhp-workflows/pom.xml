@@ -17,7 +17,7 @@
         <module>dhp-aggregation</module>
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
-        <module>dhp-dedup</module>
+        <module>dhp-dedup-openaire</module>
         <module>dhp-graph-provision</module>
     </modules>
 

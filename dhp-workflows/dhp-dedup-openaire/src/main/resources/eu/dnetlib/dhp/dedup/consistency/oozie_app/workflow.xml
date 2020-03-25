@@ -1,20 +1,16 @@
-<workflow-app name="Duplicate Scan" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Update Graph" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>graphBasePath</name>
             <description>the raw graph base path</description>
         </property>
         <property>
-            <name>isLookUpUrl</name>
-            <description>the address of the lookUp service</description>
-        </property>
-        <property>
-            <name>actionSetId</name>
-            <description>id of the actionSet</description>
-        </property>
-        <property>
             <name>workingPath</name>
-            <description>path for the working directory</description>
+            <description>path of the working directory</description>
+        </property>
+        <property>
+            <name>dedupGraphPath</name>
+            <description>path of the dedup graph</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -45,49 +41,22 @@
         </configuration>
     </global>
 
-    <start to="CreateSimRel"/>
+    <start to="UpdateEntity"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="CreateSimRel">
+    <action name="UpdateEntity">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <prepare>
-                <delete path="${workingPath}/${actionSetId}/*_simrel"/>
+                <delete path='${dedupGraphPath}'/>
             </prepare>
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Create Similarity Relations</name>
-            <class>eu.dnetlib.dhp.dedup.SparkCreateSimRels</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
-                --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
-                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
-            </spark-opts>
-            <arg>-mt</arg><arg>yarn</arg>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--la</arg><arg>${isLookUpUrl}</arg>
-            <arg>--asi</arg><arg>${actionSetId}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
-        </spark>
-        <ok to="CreateMergeRel"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="CreateMergeRel">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <prepare>
-                <delete path='${workingPath}/${actionSetId}/*_mergerel'/>
-            </prepare>
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Create Merge Relations</name>
-            <class>eu.dnetlib.dhp.dedup.SparkCreateConnectedComponent</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <name>Update Entity</name>
+            <class>eu.dnetlib.dhp.dedup.SparkUpdateEntity</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --executor-cores ${sparkExecutorCores}
@@ -99,23 +68,22 @@
             <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>
-            <arg>--la</arg><arg>${isLookUpUrl}</arg>
-            <arg>--asi</arg><arg>${actionSetId}</arg>
+            <arg>--o</arg><arg>${dedupGraphPath}</arg>
         </spark>
-        <ok to="CreateDedupRecord"/>
+        <ok to="PropagateRelation"/>
         <error to="Kill"/>
     </action>
 
-    <action name="CreateDedupRecord">
+    <action name="PropagateRelation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <prepare>
-                <delete path='${workingPath}/${actionSetId}/*_deduprecord'/>
+                <delete path='${dedupGraphPath}/relation'/>
             </prepare>
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Create Dedup Record</name>
-            <class>eu.dnetlib.dhp.dedup.SparkCreateDedupRecord</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <name>Update Relations</name>
+            <class>eu.dnetlib.dhp.dedup.SparkPropagateRelation</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --executor-cores ${sparkExecutorCores}
@@ -126,9 +94,8 @@
             </spark-opts>
             <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
+            <arg>--o</arg><arg>${dedupGraphPath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>
-            <arg>--la</arg><arg>${isLookUpUrl}</arg>
-            <arg>--asi</arg><arg>${actionSetId}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
