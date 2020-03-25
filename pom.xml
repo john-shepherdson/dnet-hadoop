@@ -74,18 +74,27 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.7.22</version>
+			<version>${mockito-core.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>${mockito-core.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+
 
 
 	</dependencies>
@@ -397,7 +406,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.19.1</version>
+					<version>3.0.0-M4</version>
 					<configuration>
 						<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					</configuration>
@@ -505,7 +514,8 @@
 		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
 		<dhp.guava.version>11.0.2</dhp.guava.version>
 		<scala.version>2.11.12</scala.version>
-		<junit.version>4.12</junit.version>
+		<junit-jupiter.version>5.6.1</junit-jupiter.version>
+		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 	</properties>
 </project>
