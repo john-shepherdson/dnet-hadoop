@@ -52,7 +52,7 @@
             <prepare>
                 <delete path='${dedupGraphPath}'/>
             </prepare>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>Update Entity</name>
             <class>eu.dnetlib.dhp.dedup.SparkUpdateEntity</class>
@@ -79,7 +79,7 @@
             <prepare>
                 <delete path='${dedupGraphPath}/relation'/>
             </prepare>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>Update Relations</name>
             <class>eu.dnetlib.dhp.dedup.SparkPropagateRelation</class>

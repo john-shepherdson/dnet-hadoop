@@ -88,7 +88,7 @@
             <prepare>
                 <delete path='${workingPath}/${actionSetId}/*_mergerel'/>
             </prepare>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>Create Merge Relations</name>
             <class>eu.dnetlib.dhp.dedup.SparkCreateConnectedComponent</class>
@@ -116,7 +116,7 @@
             <prepare>
                 <delete path='${workingPath}/${actionSetId}/*_deduprecord'/>
             </prepare>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>Create Dedup Record</name>
             <class>eu.dnetlib.dhp.dedup.SparkCreateDedupRecord</class>
