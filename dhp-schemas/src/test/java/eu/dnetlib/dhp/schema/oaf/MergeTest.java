@@ -1,11 +1,9 @@
 package eu.dnetlib.dhp.schema.oaf;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,8 +42,8 @@ public class MergeTest {
 
         a.mergeFrom(b);
 
-        Assert.assertNotNull(a.getCollectedfrom());
-        Assert.assertEquals(3, a.getCollectedfrom().size());
+        assertNotNull(a.getCollectedfrom());
+        assertEquals(3, a.getCollectedfrom().size());
 
     }
 
@@ -60,8 +58,8 @@ public class MergeTest {
 
         a.mergeFrom(b);
 
-        Assert.assertNotNull(a.getSubject());
-        Assert.assertEquals(3, a.getSubject().size());
+        assertNotNull(a.getSubject());
+        assertEquals(3, a.getSubject().size());
 
     }
 
