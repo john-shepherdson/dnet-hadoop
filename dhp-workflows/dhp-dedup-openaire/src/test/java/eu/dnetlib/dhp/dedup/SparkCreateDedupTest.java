@@ -3,12 +3,8 @@ package eu.dnetlib.dhp.dedup;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.*;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Ignore;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 
 import java.io.IOException;
 
@@ -23,8 +19,7 @@ public class SparkCreateDedupTest {
         configuration = "";
     }
 
-    @Test
-    @Ignore
+    @Disabled("must be parametrized to run locally")
     public void createSimRelsTest() throws Exception {
         SparkCreateSimRels.main(new String[]{
                 "-mt", "local[*]",
@@ -36,8 +31,7 @@ public class SparkCreateDedupTest {
         });
     }
 
-    @Test
-    @Ignore
+    @Disabled("must be parametrized to run locally")
     public void createCCTest() throws Exception {
 
         SparkCreateConnectedComponent.main(new String[]{
@@ -49,8 +43,7 @@ public class SparkCreateDedupTest {
         });
     }
 
-    @Test
-    @Ignore
+    @Disabled("must be parametrized to run locally")
     public void dedupRecordTest() throws Exception {
         SparkCreateDedupRecord.main(new String[]{
                 "-mt", "local[*]",
@@ -61,14 +54,12 @@ public class SparkCreateDedupTest {
         });
     }
 
-    @Test
-    @Ignore
+    @Disabled("must be parametrized to run locally")
     public void printConfiguration() throws Exception {
         System.out.println(ArgumentApplicationParser.compressArgument(configuration));
     }
 
-    @Test
-    @Ignore
+    @Disabled("must be parametrized to run locally")
     public void testHashCode() {
         final String s1 = "20|grid________::6031f94bef015a37783268ec1e75f17f";
         final String s2 = "20|nsf_________::b12be9edf414df8ee66b4c52a2d8da46";
