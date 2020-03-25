@@ -1,4 +1,4 @@
-<workflow-app name="import regular entities as Graph (step 1)" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="import db entities (step 1)" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>migrationPathStep1</name>
