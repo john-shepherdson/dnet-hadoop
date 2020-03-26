@@ -21,7 +21,7 @@ public class SparkGraphImporterJobTest {
     public void testImport(@TempDir Path outPath) throws Exception {
         SparkGraphImporterJob.main(new String[] {
                 "-mt", "local[*]",
-                "-s", getClass().getResource("/eu/dnetlib/dhp/dhp-sample/publication_10001.json.gz").getPath(),
+                "-s", getClass().getResource("/eu/dnetlib/dhp/graph/sample").getPath(),
                 "-h", "",
                 "-db", "test"
         });
