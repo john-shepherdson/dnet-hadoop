@@ -1,0 +1,103 @@
+<workflow-app name="import regular entities as Graph (step 1)" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>migrationPathStep1</name>
+            <description>the base path to store hdfs file</description>
+        </property>
+        <property>
+            <name>postgresURL</name>
+            <description>the postgres URL to access to the database</description>
+        </property>
+        <property>
+            <name>postgresUser</name>
+            <description>the user postgres</description>
+        </property>
+        <property>
+            <name>postgresPassword</name>
+            <description>the password postgres</description>
+        </property>
+        <property>
+            <name>mongoURL</name>
+            <description>mongoDB url, example: mongodb://[username:password@]host[:port]</description>
+        </property>
+        <property>
+            <name>mongoDb</name>
+            <description>mongo database</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
+    </parameters>
+
+	<start to="ResetWorkingPath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="ResetWorkingPath">
+        <fs>
+            <delete path='${migrationPathStep1}'/>
+            <mkdir path='${migrationPathStep1}'/>
+        </fs>
+        <ok to="ImportDB"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ImportDB">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.migration.step1.MigrateDbEntitiesApplication</main-class>
+            <arg>-p</arg><arg>${migrationPathStep1}/db_records</arg>
+            <arg>-pgurl</arg><arg>${postgresURL}</arg>
+            <arg>-pguser</arg><arg>${postgresUser}</arg>
+            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+        </java>
+        <ok to="ImportODF"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="ImportODF">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
+            <arg>-p</arg><arg>${migrationPathStep1}/odf_records</arg>
+            <arg>-mongourl</arg><arg>${mongoURL}</arg>
+            <arg>-mongodb</arg><arg>${mongoDb}</arg>
+            <arg>-f</arg><arg>ODF</arg>
+            <arg>-l</arg><arg>store</arg>
+            <arg>-i</arg><arg>cleaned</arg>
+        </java>
+        <ok to="ImportOAF"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ImportOAF">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
+            <arg>-p</arg><arg>${migrationPathStep1}/oaf_records</arg>
+            <arg>-mongourl</arg><arg>${mongoURL}</arg>
+            <arg>-mongodb</arg><arg>${mongoDb}</arg>
+            <arg>-f</arg><arg>OAF</arg>
+            <arg>-l</arg><arg>store</arg>
+            <arg>-i</arg><arg>cleaned</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    	
+    <end name="End"/>
+</workflow-app>

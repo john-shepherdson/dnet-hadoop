@@ -1,0 +1,234 @@
+[
+	{
+		"field": "datasourceid",
+		"type": "string",
+		"value": "274269ac6f3b::2579-5449"
+	},
+	{
+		"field": "identities",
+		"type": "not_used",
+		"value": [
+			"274269ac6f3b::2579-5449",
+			null
+		]
+	},
+	{
+		"field": "officialname",
+		"type": "string",
+		"value": "Jurnal Ilmiah Pendidikan Scholastic"
+	},
+	{
+		"field": "englishname",
+		"type": "string",
+		"value": "Jurnal Ilmiah Pendidikan Scholastic"
+	},
+	{
+		"field": "contactemail",
+		"type": "string",
+		"value": "test@test.it"
+	},
+	{
+		"field": "openairecompatibility",
+		"type": "string",
+		"value": "hostedBy@@@collected from a compatible aggregator@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel"
+	},
+	{
+		"field": "websiteurl",
+		"type": "string",
+		"value": "http://e-journal.sastra-unes.com/index.php/JIPS/index"
+	},
+	{
+		"field": "logourl",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "accessinfopackage",
+		"type": "array",
+		"value": [
+			null
+		]
+	},
+	{
+		"field": "latitude",
+		"type": "double",
+		"value": 0
+	},
+	{
+		"field": "longitude",
+		"type": "double",
+		"value": 0
+	},
+	{
+		"field": "namespaceprefix",
+		"type": "string",
+		"value": "ojs_25795449"
+	},
+	{
+		"field": "odnumberofitems",
+		"type": "int",
+		"value": null
+	},
+	{
+		"field": "odnumberofitemsdate",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "subjects",
+		"type": "array",
+		"value": null
+	},
+	{
+		"field": "description",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "odpolicies",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "odlanguages",
+		"type": "array",
+		"value": []
+	},
+	{
+		"field": "odcontenttypes",
+		"type": "array",
+		"value": [
+			"Journal articles"
+		]
+	},
+	{
+		"field": "inferred",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "deletedbyinference",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "trust",
+		"type": "string",
+		"value": "0.9"
+	},
+	{
+		"field": "inferenceprovenance",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "dateofcollection",
+		"type": "date",
+		"value": "2020-01-21"
+	},
+	{
+		"field": "dateofvalidation",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "releasestartdate",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "releaseenddate",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "missionstatementurl",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "dataprovider",
+		"type": "boolean",
+		"value": null
+	},
+	{
+		"field": "serviceprovider",
+		"type": "boolean",
+		"value": null
+	},
+	{
+		"field": "databaseaccesstype",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "datauploadtype",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "databaseaccessrestriction",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "datauploadrestriction",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "versioning",
+		"type": "boolean",
+		"value": null
+	},
+	{
+		"field": "citationguidelineurl",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "qualitymanagementkind",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "pidsystems",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "certificates",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "policies",
+		"type": "not_used",
+		"value": []
+	},
+	{
+		"field": "collectedfromid",
+		"type": "string",
+		"value": "openaire____::SnVybmFsIEZha3VsdGFzIFNhc3RyYSBVbml2ZXJzaXRhcyBFa2FzYWt0aQ=="
+	},
+	{
+		"field": "collectedfromname",
+		"type": "string",
+		"value": "Jurnal Fakultas Sastra Universitas Ekasakti"
+	},
+	{
+		"field": "datasourcetype",
+		"type": "string",
+		"value": "pubsrepository::journal@@@Journal@@@dnet:datasource_typologies@@@dnet:datasource_typologies"
+	},
+	{
+		"field": "provenanceaction",
+		"type": "not_used",
+		"value": "sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions"
+	},
+	{
+		"field": "journal",
+		"type": "string",
+		"value": "2579-5449@@@2597-6540@@@"
+	}
+]

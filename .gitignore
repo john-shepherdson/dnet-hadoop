@@ -3,6 +3,8 @@
 *.iws
 *.ipr
 *.iml
+*.ipr
+*.iws
 *~
 .vscode
 .classpath
@@ -21,5 +23,5 @@
 /*/build
 /build
 spark-warehouse
-/*/*/job-override.properties
+/**/job-override.properties
 

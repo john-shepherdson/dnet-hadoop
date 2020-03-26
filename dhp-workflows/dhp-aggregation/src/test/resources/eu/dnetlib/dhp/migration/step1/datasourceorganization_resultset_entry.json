@@ -1,0 +1,62 @@
+[
+	{
+		"field": "datasource",
+		"type": "string",
+		"value": "openaire____::revistasunicauca"
+	},
+	{
+		"field": "organization",
+		"type": "string",
+		"value": "openaire____::openaire____::revistasunicauca"
+	},
+	{
+		"field": "startdate",
+		"type": "not_used",
+		"value": null
+	},
+	{
+		"field": "enddate",
+		"type": "not_used",
+		"value": null
+	},
+	{
+		"field": "inferred",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "deletedbyinference",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "trust",
+		"type": "string",
+		"value": "0.9"
+	},
+	{
+		"field": "inferenceprovenance",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "collectedfromid",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "collectedfromname",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "semantics",
+		"type": "not_used",
+		"value": "providedBy@@@provided by@@@dnet:datasources_organizations_typologies@@@dnet:datasources_organizations_typologies"
+	},
+	{
+		"field": "provenanceaction",
+		"type": "not_used",
+		"value": null
+	}
+]

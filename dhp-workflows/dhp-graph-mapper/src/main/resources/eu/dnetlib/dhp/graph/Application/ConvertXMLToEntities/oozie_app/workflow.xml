@@ -1,12 +1,13 @@
 <workflow-app name="import_infospace_graph" xmlns="uri:oozie:workflow:0.5">
+
     <parameters>
         <property>
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
         <property>
-            <name>targetPath</name>
-            <description>the source path</description>
+            <name>hive_db_name</name>
+            <description>the target hive database name</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -20,40 +21,67 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
-        <property>
-            <name>entity</name>
-            <description>the entity type</description>
-        </property>
     </parameters>
 
-    <start to="DeleteTargetPath"/>
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="MapGraphAsHiveDB"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-    <action name="DeleteTargetPath">
-        <fs>
-            <delete path='${targetPath}'/>
-        </fs>
-        <ok to="MapGraphIntoDataFrame"/>
+
+    <action name="MapGraphAsHiveDB">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>MapGraphAsHiveDB</name>
+            <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+        </spark>
+        <ok to="PostProcessing"/>
         <error to="Kill"/>
     </action>
 
-    <action name="MapGraphIntoDataFrame">
-        <spark xmlns="uri:oozie:spark-action:0.2">
+    <action name="PostProcessing">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>Import ${entity} and related entities</name>
-            <class>eu.dnetlib.dhp.graph.scholexplorer.SparkScholexplorerGraphImporter</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
-            <arg>--entity</arg><arg>${entity}</arg>
-        </spark>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>lib/scripts/postprocessing.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+        </hive2>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

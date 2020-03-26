@@ -1,0 +1,38 @@
+[
+	{
+		"paramName": "p",
+		"paramLongName": "hdfsPath",
+		"paramDescription": "the path where storing the sequential file",
+		"paramRequired": true
+	},
+	{
+		"paramName": "mongourl",
+		"paramLongName": "mongoBaseUrl",
+		"paramDescription": "mongoDB url, example: mongodb://[username:password@]host[:port]",
+		"paramRequired": true
+	},
+	{
+		"paramName": "mongodb",
+		"paramLongName": "mongoDb",
+		"paramDescription": "mongo database",
+		"paramRequired": true
+	},
+	{
+		"paramName": "f",
+		"paramLongName": "mdFormat",
+		"paramDescription": "metadata format",
+		"paramRequired": true
+	},
+	{
+		"paramName": "l",
+		"paramLongName": "mdLayout",
+		"paramDescription": "metadata layout",
+		"paramRequired": true
+	},
+	{
+		"paramName": "i",
+		"paramLongName": "mdInterpretation",
+		"paramDescription": "metadata interpretation",
+		"paramRequired": true
+	}
+]

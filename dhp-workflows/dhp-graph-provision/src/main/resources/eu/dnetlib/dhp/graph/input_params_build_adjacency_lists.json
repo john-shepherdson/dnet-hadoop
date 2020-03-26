@@ -1,0 +1,7 @@
+[
+  {"paramName":"mt",  "paramLongName":"master",          "paramDescription": "should be local or yarn",                                     "paramRequired": true},
+  {"paramName":"is",  "paramLongName":"isLookupUrl",     "paramDescription": "URL of the isLookUp Service",                                 "paramRequired": true},
+  {"paramName":"o",   "paramLongName":"outputPath",      "paramDescription": "the path used to store temporary output files",               "paramRequired": true},
+  {"paramName":"s",   "paramLongName":"sourcePath",      "paramDescription": "the path of the sequence file to read",                       "paramRequired": true},
+  {"paramName":"t",   "paramLongName":"otherDsTypeId",   "paramDescription": "list of datasource types to populate field datasourcetypeui", "paramRequired": true}
+]

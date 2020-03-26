@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>eu.dnetlib.dhp</groupId>
 		<artifactId>dhp</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
+		<version>1.1.6-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 
@@ -42,6 +42,23 @@
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>eu.dnetlib</groupId>
+			<artifactId>cnr-rmi-api</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.ximpleware</groupId>
 			<artifactId>vtd-xml</artifactId>

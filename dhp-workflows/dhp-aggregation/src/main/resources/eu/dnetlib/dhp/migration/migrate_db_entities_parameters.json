@@ -1,0 +1,32 @@
+[
+	{
+		"paramName": "p",
+		"paramLongName": "hdfsPath",
+		"paramDescription": "the path where storing the sequential file",
+		"paramRequired": true
+	},
+	{
+		"paramName": "pgurl",
+		"paramLongName": "postgresUrl",
+		"paramDescription": "postgres url, example: jdbc:postgresql://localhost:5432/testdb",
+		"paramRequired": true
+	},
+	{
+		"paramName": "pguser",
+		"paramLongName": "postgresUser",
+		"paramDescription": "postgres user",
+		"paramRequired": false
+	},
+	{
+		"paramName": "pgpasswd",
+		"paramLongName": "postgresPassword",
+		"paramDescription": "postgres password",
+		"paramRequired": false
+	},
+	{
+		"paramName": "a",
+		"paramLongName": "action",
+		"paramDescription": "process claims",
+		"paramRequired": false
+	}
+]

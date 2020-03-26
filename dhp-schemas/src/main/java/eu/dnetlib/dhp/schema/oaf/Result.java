@@ -1,12 +1,10 @@
 package eu.dnetlib.dhp.schema.oaf;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.util.List;
 
-public abstract class Result extends OafEntity implements Serializable {
+public class Result extends OafEntity implements Serializable {
 
     private List<Author> author;
 
@@ -16,7 +14,7 @@ public abstract class Result extends OafEntity implements Serializable {
     // common fields
     private Qualifier language;
 
-    private List<Qualifier> country;
+    private List<Country> country;
 
     private List<StructuredProperty> subject;
 
@@ -44,15 +42,9 @@ public abstract class Result extends OafEntity implements Serializable {
 
     private List<Field<String>> coverage;
 
-    private Field<String> refereed; //peer-review status
+    private Qualifier bestaccessright;
 
     private List<Context> context;
-
-    // ( article | book ) processing charges. Defined here to cope with possible wrongly typed results
-    private Field<String> processingchargeamount;
-
-    // currency - alphabetic code describe in ISO-4217. Defined here to cope with possible wrongly typed results
-    private Field<String> processingchargecurrency;
 
     private List<ExternalReference> externalReference;
 
@@ -82,11 +74,11 @@ public abstract class Result extends OafEntity implements Serializable {
         this.language = language;
     }
 
-    public List<Qualifier> getCountry() {
+    public List<Country> getCountry() {
         return country;
     }
 
-    public void setCountry(List<Qualifier> country) {
+    public void setCountry(List<Country> country) {
         this.country = country;
     }
 
@@ -194,12 +186,12 @@ public abstract class Result extends OafEntity implements Serializable {
         this.coverage = coverage;
     }
 
-    public Field<String> getRefereed() {
-        return refereed;
+    public Qualifier getBestaccessright() {
+        return bestaccessright;
     }
 
-    public void setRefereed(Field<String> refereed) {
-        this.refereed = refereed;
+    public void setBestaccessright(Qualifier bestaccessright) {
+        this.bestaccessright = bestaccessright;
     }
 
     public List<Context> getContext() {
@@ -224,24 +216,6 @@ public abstract class Result extends OafEntity implements Serializable {
 
     public void setInstance(List<Instance> instance) {
         this.instance = instance;
-    }
-
-    public Field<String> getProcessingchargeamount() {
-        return processingchargeamount;
-    }
-
-    public Result setProcessingchargeamount(Field<String> processingchargeamount) {
-        this.processingchargeamount = processingchargeamount;
-        return this;
-    }
-
-    public Field<String> getProcessingchargecurrency() {
-        return processingchargecurrency;
-    }
-
-    public Result setProcessingchargecurrency(Field<String> processingchargecurrency) {
-        this.processingchargecurrency = processingchargecurrency;
-        return this;
     }
 
     @Override
@@ -287,19 +261,9 @@ public abstract class Result extends OafEntity implements Serializable {
 
         coverage = mergeLists(coverage, r.getCoverage());
 
-        if (r.getRefereed() != null && compareTrust(this, r) < 0)
-            refereed = r.getRefereed();
-
         context = mergeLists(context, r.getContext());
 
-        if (r.getProcessingchargeamount() != null && compareTrust(this, r) < 0)
-            processingchargeamount = r.getProcessingchargeamount();
-
-        if (r.getProcessingchargecurrency() != null && compareTrust(this, r) < 0)
-            processingchargecurrency = r.getProcessingchargecurrency();
-
         externalReference = mergeLists(externalReference, r.getExternalReference());
-
     }
 
 
@@ -313,6 +277,5 @@ public abstract class Result extends OafEntity implements Serializable {
         }
         return a.size() > b.size() ? a : b;
     }
-
 
 }

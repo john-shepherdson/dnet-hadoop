@@ -7,9 +7,8 @@ import eu.dnetlib.dhp.graph.scholexplorer.parser.DatasetScholexplorerParser;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 public class ScholexplorerParserTest {

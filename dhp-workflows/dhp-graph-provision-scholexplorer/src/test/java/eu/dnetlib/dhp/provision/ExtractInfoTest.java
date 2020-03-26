@@ -1,23 +1,12 @@
 package eu.dnetlib.dhp.provision;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.provision.scholix.Scholix;
 import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import scala.Tuple2;
+import org.junit.jupiter.api.Test;
 
 public class ExtractInfoTest {
-
-
-
-
-
-
-
     @Test
     public void testSerialization() throws Exception {
 
@@ -29,7 +18,6 @@ public class ExtractInfoTest {
         System.out.println(mapper.readValue(json, ScholixSummary.class).getDescription());
     }
 
-
     @Test
     public void testScholix() throws Exception {
         final String jsonSummary = IOUtils.toString(getClass().getResourceAsStream("summary.json"));
@@ -37,18 +25,4 @@ public class ExtractInfoTest {
         Scholix.generateScholixWithSource(jsonSummary, jsonRelation);
     }
 
-
-
-    @Test
-
-    public void testIndex() throws Exception {
-        SparkGenerateScholix.main(
-
-                new String[] {
-                        "-mt", "local[*]",
-                        "-w", "/Users/sandro/Downloads/scholix/provision",
-                        "-g", "/Users/sandro/Downloads/scholix/graph"
-                }
-        );
-    }
 }

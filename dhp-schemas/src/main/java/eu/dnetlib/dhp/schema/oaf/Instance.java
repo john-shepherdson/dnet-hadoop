@@ -22,6 +22,14 @@ public class Instance implements Serializable {
 
     private Field<String> dateofacceptance;
 
+    // ( article | book ) processing charges. Defined here to cope with possible wrongly typed results
+    private Field<String> processingchargeamount;
+
+    // currency - alphabetic code describe in ISO-4217. Defined here to cope with possible wrongly typed results
+    private Field<String> processingchargecurrency;
+
+    private Field<String> refereed; //peer-review status
+
     public Field<String> getLicense() {
         return license;
     }
@@ -86,7 +94,29 @@ public class Instance implements Serializable {
         this.dateofacceptance = dateofacceptance;
     }
 
+    public Field<String> getProcessingchargeamount() {
+        return processingchargeamount;
+    }
 
+    public void setProcessingchargeamount(Field<String> processingchargeamount) {
+        this.processingchargeamount = processingchargeamount;
+    }
+
+    public Field<String> getProcessingchargecurrency() {
+        return processingchargecurrency;
+    }
+
+    public void setProcessingchargecurrency(Field<String> processingchargecurrency) {
+        this.processingchargecurrency = processingchargecurrency;
+    }
+
+    public Field<String> getRefereed() {
+        return refereed;
+    }
+
+    public void setRefereed(Field<String> refereed) {
+        this.refereed = refereed;
+    }
 
     public String toComparableString(){
         return String.format("%s::%s::%s::%s",

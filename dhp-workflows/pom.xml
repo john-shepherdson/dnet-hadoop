@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.1.6-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -17,6 +17,8 @@
         <module>dhp-aggregation</module>
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
+        <module>dhp-dedup-openaire</module>
+        <module>dhp-graph-provision</module>
         <module>dhp-dedup-scholexplorer</module>
         <module>dhp-graph-provision-scholexplorer</module>
     </modules>
