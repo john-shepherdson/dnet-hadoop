@@ -59,10 +59,10 @@
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
                 --conf spark.sql.warehouse.dir="/user/hive/warehouse"
             </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>-mt</arg> <arg>yarn</arg>
+            <arg>-s</arg><arg>${sourcePath}</arg>
+            <arg>-db</arg><arg>${hive_db_name}</arg>
+            <arg>-h</arg><arg>${hive_metastore_uris}</arg>
         </spark>
         <ok to="PostProcessing"/>
         <error to="Kill"/>

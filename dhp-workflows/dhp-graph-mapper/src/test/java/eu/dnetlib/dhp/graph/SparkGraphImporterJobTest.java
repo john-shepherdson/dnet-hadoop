@@ -1,52 +1,54 @@
 package eu.dnetlib.dhp.graph;
 
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Encoders;
+import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import scala.Tuple2;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class SparkGraphImporterJobTest {
 
-    private static final long MAX = 1000L;
+    private final static String TEST_DB_NAME = "test";
 
-    @Disabled("must be parametrized to run locally")
-    public void testImport(@TempDir Path outPath) throws Exception {
-        SparkGraphImporterJob.main(new String[] {
-                "-mt", "local[*]",
-                "-s", getClass().getResource("/eu/dnetlib/dhp/graph/sample").getPath(),
-                "-h", "",
-                "-db", "test"
-        });
+    @Test
+    public void testImport(@TempDir Path outPath) {
+        try(SparkSession spark = testSparkSession(outPath.toString())) {
 
-        countEntities(outPath.toString()).forEach(t -> {
-            System.out.println(t);
-            Assertions.assertEquals(MAX, t._2().longValue(), String.format("mapped %s must be %s", t._1(), MAX));
-        });
+            new SparkGraphImporterJob().runWith(
+                    spark,
+                    getClass().getResource("/eu/dnetlib/dhp/graph/sample").getPath(),
+                    TEST_DB_NAME);
+
+            GraphMappingUtils.types.forEach((name, clazz) -> {
+                final long count = spark.read().table(TEST_DB_NAME + "." + name).count();
+                if (name.equals("relation")) {
+                    Assertions.assertEquals(100, count, String.format("%s should be 100", name));
+                } else {
+                    Assertions.assertEquals(10, count, String.format("%s should be 10", name));
+                }
+            });
+        }
     }
 
-    public static List<Tuple2<String, Long>> countEntities(final String inputPath) {
+    private SparkSession testSparkSession(final String inputPath) {
+        SparkConf conf = new SparkConf();
 
-        final SparkSession spark = SparkSession
+        conf.set("spark.driver.host", "localhost");
+        conf.set("hive.metastore.local", "true");
+        conf.set("hive.metastore.warehouse.dir", inputPath + "/warehouse");
+        conf.set("spark.sql.warehouse.dir", inputPath);
+        conf.set("javax.jdo.option.ConnectionURL", String.format("jdbc:derby:;databaseName=%s/junit_metastore_db;create=true", inputPath));
+        conf.set("spark.ui.enabled", "false");
+
+        return SparkSession
                 .builder()
                 .appName(SparkGraphImporterJobTest.class.getSimpleName())
                 .master("local[*]")
+                .config(conf)
+                .enableHiveSupport()
                 .getOrCreate();
-        //final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-
-        return GraphMappingUtils.types.entrySet()
-                .stream()
-                .map(entry -> {
-                    final Long count = spark.read().load(inputPath + "/" + entry.getKey()).as(Encoders.bean(entry.getValue())).count();
-                    return new Tuple2<String, Long>(entry.getKey(), count);
-                })
-                .collect(Collectors.toList());
     }
+
 }
