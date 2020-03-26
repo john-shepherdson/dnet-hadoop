@@ -1,0 +1,20 @@
+[
+  {
+    "paramName": "mt",
+    "paramLongName": "master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingDirPath",
+    "paramDescription": "the working path where generated files",
+    "paramRequired": true
+  },
+  {
+    "paramName": "r",
+    "paramLongName": "relationPath",
+    "paramDescription": "the relationPath path ",
+    "paramRequired": true
+  }
+]

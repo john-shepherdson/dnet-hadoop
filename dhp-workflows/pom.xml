@@ -19,6 +19,8 @@
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup-openaire</module>
         <module>dhp-graph-provision</module>
+        <module>dhp-dedup-scholexplorer</module>
+        <module>dhp-graph-provision-scholexplorer</module>
     </modules>
 
     <pluginRepositories>

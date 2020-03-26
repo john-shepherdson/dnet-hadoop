@@ -1,0 +1,305 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="1dd10bf0-5c97-470c-9938-ae8e57a422fc_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2020-03-11T13:25:04+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME menuSection="InfoSpace Deduplication">InfoSpace Deduplication using Spark</WORKFLOW_NAME>
+        <WORKFLOW_DESCRIPTION>InfoSpace Deduplication using Spark</WORKFLOW_DESCRIPTION>
+        <WORKFLOW_INFO/>
+        <WORKFLOW_FAMILY>InfoSpace Deduplication</WORKFLOW_FAMILY>
+        <WORKFLOW_PRIORITY>35</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="MANUAL" status="EXECUTABLE">
+            <PARAMETERS>
+                <PARAM description="Oozie Job name" function="validValues(['executeOozieJobICM', 'executeOozieJobGARR'])" managedBy="user" name="oozieJobName" required="true" type="string">executeOozieJobICM</PARAM>
+                <PARAM description="working dir where generate all the intermediate verison of the graph" managedBy="user" name="workingDirPath" required="true" type="string">/user/sandro.labruzzo/scholix/</PARAM>
+                <PARAM description="Hadoop cluster logical name" function="validValues(['DM','IIS', 'GARR'])" managedBy="user" name="cluster" required="true" type="string">IIS</PARAM>
+                <PARAM description="reuse publications on HDFS?" managedBy="user" name="reusePublication" required="true" type="boolean">true</PARAM>
+                <PARAM description="reuse resolved publications on HDFS?" managedBy="user" name="reuseResolvedPublication" required="true" type="boolean">true</PARAM>
+                <PARAM description="reuse datasets on HDFS?" managedBy="user" name="reuseDataset" required="true" type="boolean">true</PARAM>
+                <PARAM description="reuse resolved datasets on HDFS?" managedBy="user" name="reuseResolvedDataset" required="true" type="boolean">true</PARAM>
+                <PARAM description="reuse unresolved objects on HDFS?" managedBy="user" name="reuseUnresolved" required="true" type="boolean">true</PARAM>
+                <PARAM description="dedup configuration orchestration name" function="obtainValues('dedupOrchestrations', {})" managedBy="user" name="dedupConfigDataset" required="true" type="string">dedup-dli-dataset</PARAM>
+                <PARAM description="dedup configuration orchestration name" function="listProfiles('DedupConfigurationDSResourceType', '//DESCRIPTION','')" managedBy="user" name="dedupConfigPublication" required="true" type="string">d1e24272-939d-4216-ad58-22abe90b7fb4_RGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZXMvRGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZVR5cGU=</PARAM>
+                <PARAM description="dedup configuration orchestration name" function="obtainValues('dedupOrchestrations', {})" managedBy="user" name="dedupConfigUnknown" required="true" type="string">dedup-dli-unknown</PARAM>
+            </PARAMETERS>
+            <WORKFLOW>
+                <NODE name="pmf2hdfs" type="LaunchWorkflowTemplate">
+                    <DESCRIPTION>import PMF Publications to HDFS DIR</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="wfTemplateId" value="ac3b5a94-dab6-4e47-9e71-12a77267ffec_V29ya2Zsb3dUZW1wbGF0ZURTUmVzb3VyY2VzL1dvcmtmbG93VGVtcGxhdGVEU1Jlc291cmNlVHlwZQ=="/>
+                        <PARAM name="wfTemplateParams">
+                            <MAP>
+                                <ENTRY key="cluster" ref="cluster"/>
+                                <ENTRY key="reuseMdRecords" ref="reusePublication"/>
+                                <ENTRY key="mdFormat" value="PMF"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/xml/pmf.dli.seq"/>
+                                <ENTRY key="workingPath" value="${workingDirPath}/xml"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/input/0"/>
+                                <ENTRY key="oozieJob" ref="oozieJobName"/>
+                                <ENTRY key="entity" value="publication"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="extractPublication"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="extractPublication" type="SubmitHadoopJob">
+                    <DESCRIPTION>Run M/R import Job</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="cluster" ref="cluster"/>
+                        <PARAM name="hadoopJob" ref="oozieJobName"/>
+                        <PARAM name="jobParams">
+                            <MAP>
+                                <ENTRY key="oozie.wf.application.path" value="/user/sandro.labruzzo/graph/Application/Extractentities/oozie_app"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/input/0"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/extracted"/>
+                                <ENTRY key="targetDir" value="0"/>
+                                <ENTRY key="entities" value="publication,unknown,relation"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="pmfResolved2hdfs"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="pmfResolved2hdfs" type="LaunchWorkflowTemplate">
+                    <DESCRIPTION>import PMF Publications to HDFS DIR</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="wfTemplateId" value="ac3b5a94-dab6-4e47-9e71-12a77267ffec_V29ya2Zsb3dUZW1wbGF0ZURTUmVzb3VyY2VzL1dvcmtmbG93VGVtcGxhdGVEU1Jlc291cmNlVHlwZQ=="/>
+                        <PARAM name="wfTemplateParams">
+                            <MAP>
+                                <ENTRY key="cluster" ref="cluster"/>
+                                <ENTRY key="reuseMdRecords" ref="reuseResolvedPublication"/>
+                                <ENTRY key="mdFormat" value="PMF"/>
+                                <ENTRY key="interpretation" value="resolved"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/xml/pmf.dli.resolved.seq"/>
+                                <ENTRY key="workingPath" value="${workingDirPath}/xml"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/input/1"/>
+                                <ENTRY key="entity" value="publication"/>
+                                <ENTRY key="oozieJob" ref="oozieJobName"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="extractPublicationResolved"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="extractPublicationResolved" type="SubmitHadoopJob">
+                    <DESCRIPTION>Run M/R import Job</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="cluster" ref="cluster"/>
+                        <PARAM name="hadoopJob" ref="oozieJobName"/>
+                        <PARAM name="jobParams">
+                            <MAP>
+                                <ENTRY key="oozie.wf.application.path" value="/user/sandro.labruzzo/graph/Application/Extractentities/oozie_app"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/input/1"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/extracted"/>
+                                <ENTRY key="targetDir" value="1"/>
+                                <ENTRY key="entities" value="publication"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="dmf2hdfs"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="dmf2hdfs" type="LaunchWorkflowTemplate">
+                    <DESCRIPTION>import PMF Publications to HDFS DIR</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="wfTemplateId" value="ac3b5a94-dab6-4e47-9e71-12a77267ffec_V29ya2Zsb3dUZW1wbGF0ZURTUmVzb3VyY2VzL1dvcmtmbG93VGVtcGxhdGVEU1Jlc291cmNlVHlwZQ=="/>
+                        <PARAM name="wfTemplateParams">
+                            <MAP>
+                                <ENTRY key="cluster" ref="cluster"/>
+                                <ENTRY key="reuseMdRecords" ref="reuseDataset"/>
+                                <ENTRY key="mdFormat" value="DMF"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/xml/dmf.dli.seq"/>
+                                <ENTRY key="workingPath" value="${workingDirPath}/xml"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/input/2"/>
+                                <ENTRY key="entity" value="dataset"/>
+                                <ENTRY key="oozieJob" ref="oozieJobName"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="extractDataset"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="extractDataset" type="SubmitHadoopJob">
+                    <DESCRIPTION>Run M/R import Job</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="cluster" ref="cluster"/>
+                        <PARAM name="hadoopJob" ref="oozieJobName"/>
+                        <PARAM name="jobParams">
+                            <MAP>
+                                <ENTRY key="oozie.wf.application.path" value="/user/sandro.labruzzo/graph/Application/Extractentities/oozie_app"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/input/2"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/extracted"/>
+                                <ENTRY key="workingDirPath" value="${workingDirPath}"/>
+                                <ENTRY key="targetDir" value="2"/>
+                                <ENTRY key="entities" value="dataset,unknown,relation"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="dmfResolved2hdfs"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="dmfResolved2hdfs" type="LaunchWorkflowTemplate">
+                    <DESCRIPTION>import PMF Publications to HDFS DIR</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="wfTemplateId" value="ac3b5a94-dab6-4e47-9e71-12a77267ffec_V29ya2Zsb3dUZW1wbGF0ZURTUmVzb3VyY2VzL1dvcmtmbG93VGVtcGxhdGVEU1Jlc291cmNlVHlwZQ=="/>
+                        <PARAM name="wfTemplateParams">
+                            <MAP>
+                                <ENTRY key="cluster" ref="cluster"/>
+                                <ENTRY key="reuseMdRecords" ref="reuseResolvedDataset"/>
+                                <ENTRY key="mdFormat" value="DMF"/>
+                                <ENTRY key="interpretation" value="resolved"/>
+                                <ENTRY key="workingPath" value="${workingDirPath}/xml"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/xml/dmf.dli.resolved.seq"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/input/3"/>
+                                <ENTRY key="entity" value="dataset"/>
+                                <ENTRY key="oozieJob" ref="oozieJobName"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="extractDatasetResolved"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="extractDatasetResolved" type="SubmitHadoopJob">
+                    <DESCRIPTION>Run M/R import Job</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="cluster" ref="cluster"/>
+                        <PARAM name="hadoopJob" ref="oozieJobName"/>
+                        <PARAM name="jobParams">
+                            <MAP>
+                                <ENTRY key="oozie.wf.application.path" value="/user/sandro.labruzzo/graph/Application/Extractentities/oozie_app"/>
+                                <ENTRY key="workingDirPath" value="${workingDirPath}"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/input/3"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/extracted"/>
+                                <ENTRY key="targetDir" value="3"/>
+                                <ENTRY key="entities" value="dataset"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="mergeDataset"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="mergeDataset" type="SubmitHadoopJob">
+                    <DESCRIPTION>Run M/R import Job</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="cluster" ref="cluster"/>
+                        <PARAM name="hadoopJob" ref="oozieJobName"/>
+                        <PARAM name="jobParams">
+                            <MAP>
+                                <ENTRY key="oozie.wf.application.path" value="/user/sandro.labruzzo/graph/Application/MergeEntities/oozie_app"/>
+                                <ENTRY key="workingDirPath" value="${workingDirPath}"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/extracted"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/graph"/>
+                                <ENTRY key="entity" value="dataset"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="mergePublication"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="mergePublication" type="SubmitHadoopJob">
+                    <DESCRIPTION>Run M/R import Job</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="cluster" ref="cluster"/>
+                        <PARAM name="hadoopJob" ref="oozieJobName"/>
+                        <PARAM name="jobParams">
+                            <MAP>
+                                <ENTRY key="oozie.wf.application.path" value="/user/sandro.labruzzo/graph/Application/MergeEntities/oozie_app"/>
+                                <ENTRY key="workingDirPath" value="${workingDirPath}"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/extracted"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/graph"/>
+                                <ENTRY key="entity" value="publication"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="mergeUnknown"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="mergeUnknown" type="SubmitHadoopJob">
+                    <DESCRIPTION>Run M/R import Job</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="cluster" ref="cluster"/>
+                        <PARAM name="hadoopJob" ref="oozieJobName"/>
+                        <PARAM name="jobParams">
+                            <MAP>
+                                <ENTRY key="oozie.wf.application.path" value="/user/sandro.labruzzo/graph/Application/MergeEntities/oozie_app"/>
+                                <ENTRY key="workingDirPath" value="${workingDirPath}"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/extracted"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/graph"/>
+                                <ENTRY key="entity" value="unknown"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="mergeRelation"/>
+                    </ARCS>
+                </NODE>
+                <NODE isStart="true"  name="mergeRelation" type="SubmitHadoopJob">
+                    <DESCRIPTION>Run M/R import Job</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="cluster" ref="cluster"/>
+                        <PARAM name="hadoopJob" ref="oozieJobName"/>
+                        <PARAM name="jobParams">
+                            <MAP>
+                                <ENTRY key="oozie.wf.application.path" value="/user/sandro.labruzzo/graph/Application/MergeEntities/oozie_app"/>
+                                <ENTRY key="workingDirPath" value="${workingDirPath}"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/extracted"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/graph"/>
+                                <ENTRY key="entity" value="relation"/>
+
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="success"/>
+                    </ARCS>
+                </NODE>
+                <NODE name="dedupPublication" type="LaunchWorkflowTemplate">
+                    <DESCRIPTION>import PMF Publications to HDFS DIR</DESCRIPTION>
+                    <PARAMETERS>
+                        <PARAM name="wfTemplateId" value="fcb2579d-27da-4eee-a76f-60249d8c1a96_V29ya2Zsb3dUZW1wbGF0ZURTUmVzb3VyY2VzL1dvcmtmbG93VGVtcGxhdGVEU1Jlc291cmNlVHlwZQ=="/>
+                        <PARAM name="wfTemplateParams">
+                            <MAP>
+                                <ENTRY key="cluster" ref="cluster"/>
+                                <ENTRY key="sourcePath" value="${workingDirPath}/graph"/>
+                                <ENTRY key="targetPath" value="${workingDirPath}/dedupGraphWD"/>
+                                <ENTRY key="entity" value="publication"/>
+                                <ENTRY key="dedup_conf" ref="dedupConfigPublication"/>
+                                <ENTRY key="oozieJob" ref="oozieJobName"/>
+                                <ENTRY key="sparkExecutorMemory" value="4G"/>
+                            </MAP>
+                        </PARAM>
+                    </PARAMETERS>
+                    <ARCS>
+                        <ARC to="success"/>
+                    </ARCS>
+                </NODE>
+            </WORKFLOW>
+        </CONFIGURATION>
+        <NOTIFICATIONS/>
+        <SCHEDULING enabled="false">
+            <CRON>29 5 22 ? * *</CRON>
+            <MININTERVAL>10080</MININTERVAL>
+        </SCHEDULING>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20200311_132512_626</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2020-03-11T13:50:54+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>FAILURE</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR>eu.dnetlib.rmi.data.hadoop.HadoopServiceException: hadoop job: 0004121-190920055838013-oozie-oozi-W failed with status: KILLED, oozie log:  2020-03-11 13:38:02,044 INFO org.apache.oozie.service.JPAService: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[] No results found 2020-03-11 13:38:02,095 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@:start:] Start action [0004121-190920055838013-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10] 2020-03-11 13:38:02,119 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@:start:] [***0004121-190920055838013-oozie-oozi-W@:start:***]Action status=DONE 2020-03-11 13:38:02,119 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@:start:] [***0004121-190920055838013-oozie-oozi-W@:start:***]Action updated in DB! 2020-03-11 13:38:02,241 INFO org.apache.oozie.service.JPAService: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@:start:] No results found 2020-03-11 13:38:02,307 INFO org.apache.oozie.command.wf.WorkflowNotificationXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[-] GROUP[-] TOKEN[-] APP[-] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@:start:] No Notification URL is defined. Therefore nothing to notify for job 0004121-190920055838013-oozie-oozi-W@:start: 2020-03-11 13:38:02,307 INFO org.apache.oozie.command.wf.WorkflowNotificationXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[-] GROUP[-] TOKEN[-] APP[-] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[] No Notification URL is defined. Therefore nothing to notify for job 0004121-190920055838013-oozie-oozi-W 2020-03-11 13:38:02,370 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@DeleteTargetPath] Start action [0004121-190920055838013-oozie-oozi-W@DeleteTargetPath] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10] 2020-03-11 13:38:02,444 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@DeleteTargetPath] [***0004121-190920055838013-oozie-oozi-W@DeleteTargetPath***]Action status=DONE 2020-03-11 13:38:02,474 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@DeleteTargetPath] [***0004121-190920055838013-oozie-oozi-W@DeleteTargetPath***]Action updated in DB! 2020-03-11 13:38:02,595 INFO org.apache.oozie.service.JPAService: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@DeleteTargetPath] No results found 2020-03-11 13:38:02,707 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] Start action [0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10] 2020-03-11 13:38:05,274 INFO org.apache.oozie.action.hadoop.SparkActionExecutor: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] checking action, hadoop job ID [job_1568959071843_15753] status [RUNNING] 2020-03-11 13:38:05,295 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] [***0004121-190920055838013-oozie-oozi-W@MergeDLIEntities***]Action status=RUNNING 2020-03-11 13:38:05,295 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] [***0004121-190920055838013-oozie-oozi-W@MergeDLIEntities***]Action updated in DB! 2020-03-11 13:38:05,344 INFO org.apache.oozie.command.wf.WorkflowNotificationXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[-] GROUP[-] TOKEN[-] APP[-] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] No Notification URL is defined. Therefore nothing to notify for job 0004121-190920055838013-oozie-oozi-W@MergeDLIEntities 2020-03-11 13:38:05,355 INFO org.apache.oozie.command.wf.WorkflowNotificationXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[-] GROUP[-] TOKEN[-] APP[-] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@DeleteTargetPath] No Notification URL is defined. Therefore nothing to notify for job 0004121-190920055838013-oozie-oozi-W@DeleteTargetPath 2020-03-11 13:48:07,901 INFO org.apache.oozie.action.hadoop.SparkActionExecutor: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] checking action, hadoop job ID [job_1568959071843_15753] status [RUNNING] 2020-03-11 13:50:50,514 INFO org.apache.oozie.servlet.CallbackServlet: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[-] GROUP[-] TOKEN[-] APP[-] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] callback for action [0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] 2020-03-11 13:50:50,922 INFO org.apache.oozie.action.hadoop.SparkActionExecutor: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] Hadoop Jobs launched : [job_1568959071843_15754] 2020-03-11 13:50:50,952 INFO org.apache.oozie.action.hadoop.SparkActionExecutor: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] action completed, external ID [job_1568959071843_15753] 2020-03-11 13:50:50,973 WARN org.apache.oozie.action.hadoop.SparkActionExecutor: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] Launcher ERROR, reason: Main class [org.apache.oozie.action.hadoop.SparkMain], main() threw exception, Application application_1568959071843_15754 finished with failed status 2020-03-11 13:50:50,995 WARN org.apache.oozie.action.hadoop.SparkActionExecutor: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] Launcher exception: Application application_1568959071843_15754 finished with failed status org.apache.spark.SparkException: Application application_1568959071843_15754 finished with failed status  at org.apache.spark.deploy.yarn.Client.run(Client.scala:1171)  at org.apache.spark.deploy.yarn.YarnClusterApplication.start(Client.scala:1608)  at org.apache.spark.deploy.SparkSubmit.org$apache$spark$deploy$SparkSubmit$$runMain(SparkSubmit.scala:849)  at org.apache.spark.deploy.SparkSubmit.doRunMain$1(SparkSubmit.scala:167)  at org.apache.spark.deploy.SparkSubmit.submit(SparkSubmit.scala:195)  at org.apache.spark.deploy.SparkSubmit.doSubmit(SparkSubmit.scala:86)  at org.apache.spark.deploy.SparkSubmit$$anon$2.doSubmit(SparkSubmit.scala:924)  at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:933)  at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)  at org.apache.oozie.action.hadoop.SparkMain.runSpark(SparkMain.java:178)  at org.apache.oozie.action.hadoop.SparkMain.run(SparkMain.java:90)  at org.apache.oozie.action.hadoop.LauncherMain.run(LauncherMain.java:81)  at org.apache.oozie.action.hadoop.SparkMain.main(SparkMain.java:57)  at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)  at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)  at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)  at java.lang.reflect.Method.invoke(Method.java:498)  at org.apache.oozie.action.hadoop.LauncherMapper.map(LauncherMapper.java:235)  at org.apache.hadoop.mapred.MapRunner.run(MapRunner.java:54)  at org.apache.hadoop.mapred.MapTask.runOldMapper(MapTask.java:459)  at org.apache.hadoop.mapred.MapTask.run(MapTask.java:343)  at org.apache.hadoop.mapred.YarnChild$2.run(YarnChild.java:164)  at java.security.AccessController.doPrivileged(Native Method)  at javax.security.auth.Subject.doAs(Subject.java:422)  at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1924)  at org.apache.hadoop.mapred.YarnChild.main(YarnChild.java:158)  2020-03-11 13:50:51,041 INFO org.apache.oozie.command.wf.ActionEndXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] ERROR is considered as FAILED for SLA 2020-03-11 13:50:51,094 INFO org.apache.oozie.service.JPAService: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] No results found 2020-03-11 13:50:51,115 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@Kill] Start action [0004121-190920055838013-oozie-oozi-W@Kill] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10] 2020-03-11 13:50:51,116 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@Kill] [***0004121-190920055838013-oozie-oozi-W@Kill***]Action status=DONE 2020-03-11 13:50:51,116 INFO org.apache.oozie.command.wf.ActionStartXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[sandro.labruzzo] GROUP[-] TOKEN[] APP[Infospace Merge Entities] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@Kill] [***0004121-190920055838013-oozie-oozi-W@Kill***]Action updated in DB! 2020-03-11 13:50:51,273 INFO org.apache.oozie.command.wf.WorkflowNotificationXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[-] GROUP[-] TOKEN[-] APP[-] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@Kill] No Notification URL is defined. Therefore nothing to notify for job 0004121-190920055838013-oozie-oozi-W@Kill 2020-03-11 13:50:51,303 INFO org.apache.oozie.command.wf.WorkflowNotificationXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[-] GROUP[-] TOKEN[-] APP[-] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[] No Notification URL is defined. Therefore nothing to notify for job 0004121-190920055838013-oozie-oozi-W 2020-03-11 13:50:51,277 INFO org.apache.oozie.command.wf.WorkflowNotificationXCommand: SERVER[iis-cdh5-test-m3.ocean.icm.edu.pl] USER[-] GROUP[-] TOKEN[-] APP[-] JOB[0004121-190920055838013-oozie-oozi-W] ACTION[0004121-190920055838013-oozie-oozi-W@MergeDLIEntities] No Notification URL is defined. Therefore nothing to notify for job 0004121-190920055838013-oozie-oozi-W@MergeDLIEntities   </LAST_EXECUTION_ERROR>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>
