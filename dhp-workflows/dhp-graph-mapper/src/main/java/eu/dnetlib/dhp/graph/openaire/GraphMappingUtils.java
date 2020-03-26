@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.graph.openaire;
 
 import java.util.Map;
 

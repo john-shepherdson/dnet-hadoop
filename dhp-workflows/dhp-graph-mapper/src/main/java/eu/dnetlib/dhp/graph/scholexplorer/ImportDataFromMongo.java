@@ -1,12 +1,11 @@
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.graph.scholexplorer;
 
 import com.mongodb.*;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.message.Message;
-import eu.dnetlib.message.MessageType;
+import eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;

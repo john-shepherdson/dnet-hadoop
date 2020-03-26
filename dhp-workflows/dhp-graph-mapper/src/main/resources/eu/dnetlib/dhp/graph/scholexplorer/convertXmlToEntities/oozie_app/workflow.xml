@@ -49,7 +49,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>MapGraphAsHiveDB</name>
-            <class>eu.dnetlib.dhp.graph.SparkGraphImporterJob</class>
+            <class>eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}

@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.graph;
 
+import eu.dnetlib.dhp.graph.openaire.GraphMappingUtils;
+import eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.Assertions;

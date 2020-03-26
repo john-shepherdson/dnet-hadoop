@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph;
+package eu.dnetlib.dhp.graph.openaire;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;

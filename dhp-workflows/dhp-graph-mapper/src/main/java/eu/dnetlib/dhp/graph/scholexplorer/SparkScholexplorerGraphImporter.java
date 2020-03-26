@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.graph.scholexplorer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.graph.SparkGraphImporterJob;
+import eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob;
 import eu.dnetlib.dhp.graph.scholexplorer.parser.DatasetScholexplorerParser;
 import eu.dnetlib.dhp.graph.scholexplorer.parser.PublicationScholexplorerParser;
 import eu.dnetlib.dhp.schema.oaf.Oaf;

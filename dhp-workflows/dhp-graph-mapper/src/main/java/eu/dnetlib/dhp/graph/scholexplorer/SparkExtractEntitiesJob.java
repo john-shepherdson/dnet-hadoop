@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.graph.scholexplorer;
 
 import com.jayway.jsonpath.JsonPath;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.graph.SparkGraphImporterJob;
+import eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
