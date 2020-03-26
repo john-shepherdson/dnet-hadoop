@@ -33,11 +33,9 @@
             <name>idSummary</name>
             <description>number of cores used by single executor</description>
         </property>
-
-
     </parameters>
 
-    <start to="indexScholix"/>
+    <start to="indexSummary"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -96,12 +94,12 @@
             <name>generate Scholix</name>
             <class>eu.dnetlib.dhp.provision.SparkGenerateScholix</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory 9G --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
+            <spark-opts>--executor-memory 6G --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
             <arg>--graphPath</arg><arg>${graphPath}</arg>
         </spark>
-        <ok to="indexScholix"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
@@ -111,7 +109,7 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>generate Summary</name>
+            <name>index Summary</name>
             <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="64" </spark-opts>
@@ -134,7 +132,7 @@
             <name>index scholix</name>
             <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory}  --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="16" </spark-opts>
+            <spark-opts>--executor-memory ${sparkExecutorMemory}  --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="8" </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${workingDirPath}/scholix_json</arg>
             <arg>--index</arg><arg>${index}_scholix</arg>

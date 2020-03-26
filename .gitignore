@@ -4,6 +4,7 @@
 *.ipr
 *.iml
 *~
+.vscode
 .classpath
 /*/.classpath
 /*/*/.classpath
