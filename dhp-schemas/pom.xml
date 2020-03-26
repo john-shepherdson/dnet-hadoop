@@ -36,13 +36,6 @@
             <artifactId>guava</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-
     </dependencies>
 
 
