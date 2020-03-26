@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dhp-graph-provision</artifactId>
+    <artifactId>dhp-graph-provision-scholexplorer</artifactId>
 
     <dependencies>
         <dependency>

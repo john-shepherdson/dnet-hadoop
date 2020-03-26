@@ -17,8 +17,8 @@
         <module>dhp-aggregation</module>
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
-        <module>dhp-dedup</module>
-        <module>dhp-graph-provision</module>
+        <module>dhp-dedup-scholexplorer</module>
+        <module>dhp-graph-provision-scholexplorer</module>
     </modules>
 
     <pluginRepositories>
