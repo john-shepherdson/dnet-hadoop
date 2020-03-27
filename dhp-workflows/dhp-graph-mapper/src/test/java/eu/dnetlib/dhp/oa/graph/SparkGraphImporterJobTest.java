@@ -18,7 +18,7 @@ public class SparkGraphImporterJobTest {
 
             new SparkGraphImporterJob().runWith(
                     spark,
-                    getClass().getResource("/eu/dnetlib/dhp/graph/sample").getPath(),
+                    getClass().getResource("/eu/dnetlib/dhp/oa/graph/sample").getPath(),
                     TEST_DB_NAME);
 
             GraphMappingUtils.types.forEach((name, clazz) -> {
