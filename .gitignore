@@ -14,7 +14,6 @@
 /*/.metadata
 /*/*/.metadata
 .project
-.log
 .settings
 /*/*/target
 /*/target
@@ -24,4 +23,5 @@
 /build
 spark-warehouse
 /**/job-override.properties
+/**/*.log
 
