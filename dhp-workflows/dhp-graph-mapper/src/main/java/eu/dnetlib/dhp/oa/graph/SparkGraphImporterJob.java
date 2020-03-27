@@ -31,8 +31,8 @@ public class SparkGraphImporterJob {
         }
     }
 
-    // public for testing
-    public void runWith(SparkSession spark, String inputPath, String hiveDbName) {
+    // protected for testing
+    protected void runWith(SparkSession spark, String inputPath, String hiveDbName) {
 
         spark.sql(String.format("DROP DATABASE IF EXISTS %s CASCADE", hiveDbName));
         spark.sql(String.format("CREATE DATABASE IF NOT EXISTS %s", hiveDbName));
