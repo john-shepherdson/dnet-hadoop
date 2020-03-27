@@ -1,11 +1,12 @@
 package eu.dnetlib.dhp.graph.scholexplorer;
 
-import com.mongodb.*;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.QueryBuilder;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -18,7 +19,9 @@ import org.bson.conversions.Bson;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -27,7 +30,10 @@ public class ImportDataFromMongo {
 
 
     public static void main(String[] args) throws Exception {
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkGraphImporterJob.class.getResourceAsStream("/eu/dnetlib/dhp/graph/import_from_mongo_parameters.json")));
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
+                IOUtils.toString(
+                        ImportDataFromMongo.class.getResourceAsStream(
+                                "/eu/dnetlib/dhp/graph/import_from_mongo_parameters.json")));
         parser.parseArgument(args);
         final int port = Integer.parseInt(parser.get("dbport"));
         final String host = parser.get("dbhost");

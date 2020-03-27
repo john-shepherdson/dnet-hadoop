@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.graph.scholexplorer;
 
 import com.jayway.jsonpath.JsonPath;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob;
+import eu.dnetlib.dhp.oa.graph.SparkGraphImporterJob;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
@@ -24,11 +24,14 @@ public class SparkExtractEntitiesJob {
 
     public static void main(String[] args) throws Exception {
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkExtractEntitiesJob.class.getResourceAsStream("/eu/dnetlib/dhp/graph/input_extract_entities_parameters.json")));
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
+                IOUtils.toString(
+                        SparkExtractEntitiesJob.class.getResourceAsStream(
+                                "/eu/dnetlib/dhp/graph/input_extract_entities_parameters.json")));
         parser.parseArgument(args);
         final SparkSession spark = SparkSession
                 .builder()
-                .appName(SparkGraphImporterJob.class.getSimpleName())
+                .appName(SparkExtractEntitiesJob.class.getSimpleName())
                 .master(parser.get("master"))
                 .getOrCreate();
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());

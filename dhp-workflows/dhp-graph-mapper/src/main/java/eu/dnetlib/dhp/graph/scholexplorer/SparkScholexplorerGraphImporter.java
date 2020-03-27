@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.graph.scholexplorer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob;
 import eu.dnetlib.dhp.graph.scholexplorer.parser.DatasetScholexplorerParser;
 import eu.dnetlib.dhp.graph.scholexplorer.parser.PublicationScholexplorerParser;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
@@ -20,11 +19,15 @@ public class SparkScholexplorerGraphImporter {
 
     public static void main(String[] args) throws Exception {
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkScholexplorerGraphImporter.class.getResourceAsStream("/eu/dnetlib/dhp/graph/input_graph_scholix_parameters.json")));
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
+                IOUtils.toString(
+                        SparkScholexplorerGraphImporter.class.getResourceAsStream(
+                                "/eu/dnetlib/dhp/graph/input_graph_scholix_parameters.json")));
+
         parser.parseArgument(args);
         final SparkSession spark = SparkSession
                 .builder()
-                .appName(SparkGraphImporterJob.class.getSimpleName())
+                .appName(SparkScholexplorerGraphImporter.class.getSimpleName())
                 .master(parser.get("master"))
                 .getOrCreate();
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());

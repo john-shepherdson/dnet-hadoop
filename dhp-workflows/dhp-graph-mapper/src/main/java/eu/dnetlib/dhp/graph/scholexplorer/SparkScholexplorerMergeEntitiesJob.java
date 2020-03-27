@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.graph.openaire.SparkGraphImporterJob;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
@@ -22,7 +21,10 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -40,13 +42,16 @@ public class SparkScholexplorerMergeEntitiesJob {
     public static void main(String[] args) throws Exception {
 
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkScholexplorerMergeEntitiesJob.class.getResourceAsStream("/eu/dnetlib/dhp/graph/merge_entities_scholix_parameters.json")));
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
+                IOUtils.toString(
+                        SparkScholexplorerMergeEntitiesJob.class.getResourceAsStream(
+                                "/eu/dnetlib/dhp/graph/merge_entities_scholix_parameters.json")));
         parser.parseArgument(args);
         final SparkSession spark = SparkSession
                 .builder()
                 .config(new SparkConf()
                         .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer"))
-                .appName(SparkGraphImporterJob.class.getSimpleName())
+                .appName(SparkScholexplorerMergeEntitiesJob.class.getSimpleName())
                 .master(parser.get("master"))
                 .getOrCreate();
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
