@@ -122,7 +122,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Propagate Dedup Relations</name>
-            <class>eu.dnetlib.dedup.SparkPropagateRelationsJob</class>
+            <class>eu.dnetlib.dedup.sx.SparkPropagateRelationsJob</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
@@ -146,7 +146,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Update ${entity} and add DedupRecord</name>
-            <class>eu.dnetlib.dedup.SparkUpdateEntityJob</class>
+            <class>eu.dnetlib.dedup.sx.SparkUpdateEntityJob</class>
             <jar>dhp-dedup-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
