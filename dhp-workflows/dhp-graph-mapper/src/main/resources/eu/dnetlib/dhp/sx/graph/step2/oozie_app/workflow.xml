@@ -54,7 +54,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Extract ${entities}</name>
-            <class>eu.dnetlib.dhp.graph.sx.SparkExtractEntitiesJob</class>
+            <class>eu.dnetlib.dhp.sx.graph.SparkExtractEntitiesJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}

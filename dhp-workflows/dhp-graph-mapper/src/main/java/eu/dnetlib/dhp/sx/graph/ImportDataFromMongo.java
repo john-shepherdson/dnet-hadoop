@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph.sx;
+package eu.dnetlib.dhp.sx.graph;
 
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;

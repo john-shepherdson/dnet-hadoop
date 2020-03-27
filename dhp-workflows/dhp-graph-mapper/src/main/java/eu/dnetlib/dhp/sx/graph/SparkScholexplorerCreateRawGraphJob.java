@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph.sx;
+package eu.dnetlib.dhp.sx.graph;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

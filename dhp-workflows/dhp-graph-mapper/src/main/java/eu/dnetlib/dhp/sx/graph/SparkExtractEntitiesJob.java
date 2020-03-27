@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph.sx;
+package eu.dnetlib.dhp.sx.graph;
 
 import com.jayway.jsonpath.JsonPath;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;

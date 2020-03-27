@@ -1,9 +1,9 @@
-package eu.dnetlib.dhp.graph.sx;
+package eu.dnetlib.dhp.sx.graph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.graph.sx.parser.DatasetScholexplorerParser;
-import eu.dnetlib.dhp.graph.sx.parser.PublicationScholexplorerParser;
+import eu.dnetlib.dhp.sx.graph.parser.DatasetScholexplorerParser;
+import eu.dnetlib.dhp.sx.graph.parser.PublicationScholexplorerParser;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.io.IOUtils;

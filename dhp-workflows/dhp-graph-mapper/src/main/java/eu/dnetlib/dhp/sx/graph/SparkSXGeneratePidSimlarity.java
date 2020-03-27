@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph.sx;
+package eu.dnetlib.dhp.sx.graph;
 
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.DHPUtils;

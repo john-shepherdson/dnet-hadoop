@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph.sx.parser;
+package eu.dnetlib.dhp.sx.graph.parser;
 
 
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;

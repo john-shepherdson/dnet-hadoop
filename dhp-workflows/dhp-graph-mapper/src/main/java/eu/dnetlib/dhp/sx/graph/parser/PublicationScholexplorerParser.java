@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.graph.sx.parser;
+package eu.dnetlib.dhp.sx.graph.parser;
 
 import com.ximpleware.AutoPilot;
 import com.ximpleware.VTDGen;

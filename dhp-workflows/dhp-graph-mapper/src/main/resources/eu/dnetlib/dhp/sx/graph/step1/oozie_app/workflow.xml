@@ -55,7 +55,7 @@
         <java>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <main-class>eu.dnetlib.dhp.graph.sx.ImportDataFromMongo</main-class>
+            <main-class>eu.dnetlib.dhp.sx.graph.ImportDataFromMongo</main-class>
             <arg>-t</arg><arg>${targetPath}</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-u</arg><arg>${user}</arg>

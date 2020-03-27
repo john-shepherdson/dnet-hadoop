@@ -45,7 +45,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Merge ${entity}</name>
-            <class>eu.dnetlib.dhp.graph.sx.SparkScholexplorerCreateRawGraphJob</class>
+            <class>eu.dnetlib.dhp.sx.graph.SparkScholexplorerCreateRawGraphJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>  --executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
