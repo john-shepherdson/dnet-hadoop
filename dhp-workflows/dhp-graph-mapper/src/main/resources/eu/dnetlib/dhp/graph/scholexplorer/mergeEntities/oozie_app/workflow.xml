@@ -1,0 +1,61 @@
+<workflow-app name="Infospace Merge Entities" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>entity</name>
+            <description>the entity to be merged</description>
+        </property>
+    </parameters>
+
+    <start to="DeleteTargetPath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="DeleteTargetPath">
+        <fs>
+            <mkdir path="${targetPath}"/>  
+                      
+            <delete path='${targetPath}/${entity}'/>            
+        </fs>
+        <ok to="MergeDLIEntities"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="MergeDLIEntities">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Merge ${entity}</name>
+            <class>eu.dnetlib.dhp.graph.scholexplorer.SparkScholexplorerMergeEntitiesJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>  --executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/${entity}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/${entity}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

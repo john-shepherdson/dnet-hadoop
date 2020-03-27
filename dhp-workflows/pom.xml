@@ -19,6 +19,8 @@
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup-openaire</module>
         <module>dhp-graph-provision</module>
+        <module>dhp-dedup-scholexplorer</module>
+        <module>dhp-graph-provision-scholexplorer</module>
     </modules>
 
     <pluginRepositories>
@@ -152,6 +154,7 @@
                     <plugin>
                         <groupId>eu.dnetlib.primer</groupId>
                         <artifactId>primer-maven-plugin</artifactId>
+                        <version>1.2.0</version>
                         <executions>
                             <execution>
                                 <id>priming</id>
@@ -231,6 +234,7 @@
                     <plugin>
                         <groupId>eu.dnetlib.dhp</groupId>
                         <artifactId>dhp-build-properties-maven-plugin</artifactId>
+                        <version>${project.version}</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>

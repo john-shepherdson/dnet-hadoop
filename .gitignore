@@ -1,9 +1,12 @@
 .DS_Store
 .idea
+*.iws
+*.ipr
 *.iml
 *.ipr
 *.iws
 *~
+.vscode
 .classpath
 /*/.classpath
 /*/*/.classpath
