@@ -1,5 +1,11 @@
 [
   {
+    "paramName":"is",
+    "paramLongName":"isLookupUrl",
+    "paramDescription": "URL of the isLookUp Service",
+    "paramRequired": true
+  },
+  {
     "paramName":"mt",
     "paramLongName":"master",
     "paramDescription": "should be local or yarn",
@@ -14,7 +20,14 @@
   {
     "paramName":"as",
     "paramLongName":"allowedsemrels",
-    "paramDescription": "the allowed sematinc relations for propagation",
+    "paramDescription": "the allowed semantic relations for propagation",
+    "paramRequired": true
+  },
+  {
+    "paramName":"h",
+    "paramLongName":"hive_metastore_uris",
+    "paramDescription": "the hive metastore uris",
     "paramRequired": true
   }
+
 ]
