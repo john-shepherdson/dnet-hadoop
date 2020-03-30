@@ -58,6 +58,10 @@
 
     <action name="adjancency_lists">
         <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path="${outputPath}"/>
+                <mkdir path="${outputPath}"/>
+            </prepare>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>build_adjacency_lists</name>
