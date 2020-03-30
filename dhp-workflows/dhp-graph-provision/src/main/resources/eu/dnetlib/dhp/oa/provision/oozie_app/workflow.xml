@@ -67,7 +67,6 @@
                 --executor-cores ${sparkExecutorCoresForJoining}
                 --executor-memory ${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
-                --conf spark.dynamicAllocation.maxExecutors=${sparkExecutorCoresForJoining}
                 --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
