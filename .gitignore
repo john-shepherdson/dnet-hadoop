@@ -1,9 +1,12 @@
 .DS_Store
 .idea
+*.iws
+*.ipr
 *.iml
 *.ipr
 *.iws
 *~
+.vscode
 .classpath
 /*/.classpath
 /*/*/.classpath
@@ -11,7 +14,6 @@
 /*/.metadata
 /*/*/.metadata
 .project
-.log
 .settings
 /*/*/target
 /*/target
@@ -21,4 +23,5 @@
 /build
 spark-warehouse
 /**/job-override.properties
+/**/*.log
 

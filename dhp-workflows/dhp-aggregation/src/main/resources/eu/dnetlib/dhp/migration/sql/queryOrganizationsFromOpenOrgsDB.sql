@@ -11,7 +11,7 @@ SELECT
 	''                                                                                                                            AS inferenceprovenance,
 	'openaire____::openorgs'                                                                                                      AS collectedfromid,
 	'OpenOrgs Database'                                                                                                           AS collectedfromname,
-	o.country || '@@@dnet:countries'                                                                                              AS country,
+	o.country || '@@@' || o.country || '@@@dnet:countries@@@dnet:countries'                                                       AS country,
 	'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions' AS provenanceaction,
 	array_agg(DISTINCT i.otherid || '###' || i.type || '@@@dnet:pid_types')                                                       AS pid
 FROM organizations o
@@ -40,7 +40,7 @@ SELECT
 	''                                                                                                                            AS inferenceprovenance,
 	'openaire____::openorgs'                                                                                                      AS collectedfromid,
 	'OpenOrgs Database'                                                                                                           AS collectedfromname,
-	o.country || '@@@dnet:countries'                                                                                              AS country,
+	o.country || '@@@' || o.country || '@@@dnet:countries@@@dnet:countries'                                                       AS country,
 	'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions' AS provenanceaction,
 	array_agg(DISTINCT i.otherid || '###' || i.type || '@@@dnet:pid_types')                                                       AS pid
 FROM other_names n

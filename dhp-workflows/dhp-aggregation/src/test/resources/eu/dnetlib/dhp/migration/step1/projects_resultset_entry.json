@@ -1,0 +1,193 @@
+[
+	{
+		"field": "projectid",
+		"type": "string",
+		"value": "aka_________::100469"
+	},
+	{
+		"field": "code",
+		"type": "string",
+		"value": "100469"
+	},
+	{
+		"field": "websiteurl",
+		"type": "string",
+		"value": "http://test"
+	},
+	{
+		"field": "acronym",
+		"type": "string",
+		"value": "RMCAG"
+	},
+	{
+		"field": "title",
+		"type": "string",
+		"value": "Regulation of melanoma cell autonomous growth"
+	},
+	{
+		"field": "startdate",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "enddate",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "callidentifier",
+		"type": "string",
+		"value": "Tutkijankoulutus ja työskentely ulkomailla/kevät TT"
+	},
+	{
+		"field": "keywords",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "duration",
+		"type": "int",
+		"value": null
+	},
+	{
+		"field": "ecsc39",
+		"type": "boolean",
+		"value": null
+	},
+	{
+		"field": "oamandatepublications",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "ecarticle29_3",
+		"type": "boolean",
+		"value": null
+	},
+	{
+		"field": "dateofcollection",
+		"type": "date",
+		"value": "2019-01-25"
+	},
+	{
+		"field": "dateoftransformation",
+		"type": "date",
+		"value": "2019-04-16"
+	},
+	{
+		"field": "inferred",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "deletedbyinference",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "trust",
+		"type": "string",
+		"value": "0.9"
+	},
+	{
+		"field": "inferenceprovenance",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "optional1",
+		"type": "string",
+		"value": "9,284 €"
+	},
+	{
+		"field": "optional2",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "jsonextrainfo",
+		"type": "string",
+		"value": "{}"
+	},
+	{
+		"field": "contactfullname",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "contactfax",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "contactphone",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "contactemail",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "summary",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "currency",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "totalcost",
+		"type": "double",
+		"value": null
+	},
+	{
+		"field": "fundedamount",
+		"type": "double",
+		"value": null
+	},
+	{
+		"field": "collectedfromid",
+		"type": "string",
+		"value": "openaire____::aka"
+	},
+	{
+		"field": "collectedfromname",
+		"type": "string",
+		"value": "Academy of Finland"
+	},
+	{
+		"field": "contracttype",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "provenanceaction",
+		"type": "not_used",
+		"value": "sysimport:crosswalk:entityregistry@@@Harvested@@@dnet:provenanceActions@@@dnet:provenanceActions"
+	},
+	{
+		"field": "pid",
+		"type": "not_used",
+		"value": [
+			null
+		]
+	},
+	{
+		"field": "subjects",
+		"type": "array",
+		"value": [
+			null
+		]
+	},
+	{
+		"field": "fundingtree",
+		"type": "array",
+		"value": [
+			"<fundingtree><funder>\n         <id>aka_________::AKA</id>\n         <shortname>AKA</shortname>\n         <name>Academy of Finland</name>\n         <originalname>Academy of Finland</originalname>\n         <jurisdiction>FI</jurisdiction>\n      </funder></fundingtree>"
+		]
+	}
+]

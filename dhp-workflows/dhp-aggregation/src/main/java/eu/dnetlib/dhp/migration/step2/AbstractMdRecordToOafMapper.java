@@ -69,7 +69,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			nsContext.put("datacite", "http://datacite.org/schema/kernel-3");
 			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
-			final Document doc = DocumentHelper.parseText(xml);
+			final Document doc = DocumentHelper.parseText(xml.replaceAll("http://datacite.org/schema/kernel-4", "http://datacite.org/schema/kernel-3"));
 
 			final String type = doc.valueOf("//dr:CobjCategory/@type");
 			final KeyValue collectedFrom = keyValue(doc.valueOf("//oaf:collectedFrom/@id"), doc.valueOf("//oaf:collectedFrom/@name"));

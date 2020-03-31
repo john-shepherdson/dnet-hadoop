@@ -1,0 +1,72 @@
+[
+	{
+		"field": "project",
+		"type": "string",
+		"value": "nsf_________::1700003"
+	},
+	{
+		"field": "resporganization",
+		"type": "string",
+		"value": "nsf_________::University_of_Notre_Dame"
+	},
+	{
+		"field": "participantnumber",
+		"type": "not_used",
+		"value": 1
+	},
+	{
+		"field": "contribution",
+		"type": "not_used",
+		"value": null
+	},
+	{
+		"field": "startdate",
+		"type": "not_used",
+		"value": null
+	},
+	{
+		"field": "enddate",
+		"type": "not_used",
+		"value": null
+	},
+	{
+		"field": "inferred",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "deletedbyinference",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "trust",
+		"type": "string",
+		"value": "0.9"
+	},
+	{
+		"field": "inferenceprovenance",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "collectedfromid",
+		"type": "string",
+		"value": "openaire____::nsf"
+	},
+	{
+		"field": "collectedfromname",
+		"type": "string",
+		"value": "NSF - National Science Foundation"
+	},
+	{
+		"field": "semantics",
+		"type": "not_used",
+		"value": "coordinator@@@coordinator@@@dnet:project_organization_relations@@@dnet:project_organization_relations"
+	},
+	{
+		"field": "provenanceaction",
+		"type": "not_used",
+		"value": "sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions"
+	}
+]

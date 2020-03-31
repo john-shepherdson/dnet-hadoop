@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>eu.dnetlib.dhp</groupId>
 		<artifactId>dhp</artifactId>
-		<version>1.1.6-SNAPSHOT</version>
+		<version>1.1.7-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 
@@ -57,6 +57,15 @@
 		<dependency>
 			<groupId>eu.dnetlib</groupId>
 			<artifactId>cnr-rmi-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ximpleware</groupId>
+			<artifactId>vtd-xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
 		</dependency>
 	</dependencies>
 

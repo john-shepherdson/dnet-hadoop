@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:datacite="http://datacite.org/schema/kernel-4"
+  xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+  xmlns:functx="http://www.functx.com"
+  xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <oai:header xmlns="http://namespace.openaire.eu/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+    xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+    xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dri:objIdentifier>__bioTools__::001321907fcc9f8d020f05230f9d3ddf</dri:objIdentifier>
+    <dri:recordIdentifier>chainy</dri:recordIdentifier>
+    <dri:dateOfCollection>2020-02-05T10:49:49.694Z</dri:dateOfCollection>
+    <oaf:datasourceprefix>__bioTools__</oaf:datasourceprefix>
+    <dr:dateOfTransformation>2020-02-05T10:56:28.875Z</dr:dateOfTransformation>
+  </oai:header>
+  <metadata>
+    <datacite:resource>
+      <datacite:resourceType resourceTypeGeneral="Software">Web application</datacite:resourceType>
+      <datacite:publisher>bio.tools</datacite:publisher>
+      <datacite:relatedIdentifiers>
+        <datacite:relatedIdentifier relatedIdentifierType="URL" relationType="IsDocumentedBy">http://maplab.imppc.org/chainy/</datacite:relatedIdentifier>
+        <datacite:relatedIdentifier relatedIdentifierType="DOI" relationType="isReferencedBy">10.1093/bioinformatics/btw839</datacite:relatedIdentifier>
+      </datacite:relatedIdentifiers>
+      <datacite:alternateIdentifiers>
+        <datacite:alternateIdentifier alternateIdentifierType="LandingPage">https://bio.tools/</datacite:alternateIdentifier>
+      </datacite:alternateIdentifiers>
+      <datacite:identifier identifierType="URL">https://bio.tools/</datacite:identifier>
+      <datacite:titles>
+        <datacite:title>Chainy</datacite:title>
+      </datacite:titles>
+      <datacite:creators>
+        <datacite:creator>
+          <datacite:creatorName>Mallona, Izaskun</datacite:creatorName>
+          <datacite:givenName>Izaskun</datacite:givenName>
+          <datacite:familyName>Mallona</datacite:familyName>
+        </datacite:creator>
+      </datacite:creators>
+      <datacite:contributors/>
+      <datacite:descriptions>
+        <datacite:description descriptionType="Abstract">Universal tool for standardized relative quantification in real-time PCR.</datacite:description>
+        <datacite:description descriptionType="TechnicalInfo">Linux</datacite:description>
+        <datacite:description descriptionType="TechnicalInfo">Windows</datacite:description>
+        <datacite:description descriptionType="TechnicalInfo">Mac</datacite:description>
+      </datacite:descriptions>
+      <datacite:subjects>
+        <datacite:subject schemeURI="http://edamontology.org"
+          subjectScheme="EDAM Ontology" valueURI="http://edamontology.org/topic_3519">PCR experiment</datacite:subject>
+        <datacite:subject schemeURI="http://edamontology.org"
+          subjectScheme="EDAM Ontology" valueURI="http://edamontology.org/topic_0203">Gene expression</datacite:subject>
+        <datacite:subject schemeURI="http://edamontology.org"
+          subjectScheme="EDAM Ontology" valueURI="http://edamontology.org/topic_3534">Protein binding sites</datacite:subject>
+      </datacite:subjects>
+    </datacite:resource>
+    <dr:CobjCategory type="software">0029</dr:CobjCategory>
+    <oaf:hostedBy id="rest________::bioTools" name="bio.tools"/>
+    <oaf:collectedFrom id="rest________::bioTools" name="bio.tools"/>
+    <oaf:dateAccepted>2018-06-06</oaf:dateAccepted>
+  </metadata>
+  <about xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+    xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+    xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+      <originDescription altered="true" harvestDate="2020-02-05T10:49:49.694Z">
+        <baseURL>https%3A%2F%2Fbio.tools%2Fapi%2Ftool</baseURL>
+        <identifier/>
+        <datestamp/>
+        <metadataNamespace/>
+      </originDescription>
+    </provenance>
+    <oaf:datainfo>
+      <oaf:inferred>false</oaf:inferred>
+      <oaf:deletedbyinference>false</oaf:deletedbyinference>
+      <oaf:trust>0.9</oaf:trust>
+      <oaf:inferenceprovenance/>
+      <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+        classname="sysimport:crosswalk:datasetarchive"
+        schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+    </oaf:datainfo>
+  </about>
+</record>
