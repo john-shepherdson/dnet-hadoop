@@ -49,7 +49,7 @@
             <mode>cluster</mode>
             <name>Create Similarity Relations</name>
             <class>eu.dnetlib.dedup.SparkCreateSimRels</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
@@ -73,7 +73,7 @@
             <mode>cluster</mode>
             <name>Create Connected Components</name>
             <class>eu.dnetlib.dedup.SparkCreateConnectedComponent</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
@@ -97,7 +97,7 @@
             <mode>cluster</mode>
             <name>Create Dedup Record</name>
             <class>eu.dnetlib.dedup.SparkCreateDedupRecord</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
@@ -121,7 +121,7 @@
             <mode>cluster</mode>
             <name>Propagate Dedup Relations</name>
             <class>eu.dnetlib.dedup.sx.SparkPropagateRelationsJob</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
@@ -145,7 +145,7 @@
             <mode>cluster</mode>
             <name>Update ${entity} and add DedupRecord</name>
             <class>eu.dnetlib.dedup.sx.SparkUpdateEntityJob</class>
-            <jar>dhp-dedup-${projectVersion}.jar</jar>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}

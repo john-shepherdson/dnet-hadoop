@@ -44,35 +44,8 @@ public class SparkExtractRelationCount {
         final String workingDirPath = parser.get("workingDirPath");
 
         final String relationPath = parser.get("relationPath");
-
-
-
-
-
         DatasetJoiner.startJoin(spark, relationPath,workingDirPath + "/relatedItemCount");
 
-
-
-
-//        sc.textFile(relationPath)
-//                // We start to Filter the relation not deleted by Inference
-//                .filter(ProvisionUtil::isNotDeleted)
-//                // Then we create a PairRDD<String, RelatedItem>
-//                .mapToPair((PairFunction<String, String, RelatedItemInfo>) f
-//                        -> new Tuple2<>(DHPUtils.getJPathString(ProvisionUtil.SOURCEJSONPATH, f), ProvisionUtil.getItemType(f, ProvisionUtil.TARGETJSONPATH)))
-//                //We reduce and sum the number of Relations
-//                .reduceByKey((Function2<RelatedItemInfo, RelatedItemInfo, RelatedItemInfo>) (v1, v2) -> {
-//                    if (v1 == null && v2 == null)
-//                        return new RelatedItemInfo();
-//                    return v1 != null ? v1.add(v2) : v2;
-//                })
-//                //Set the source Id in RelatedItem object
-//                .map(k -> k._2().setId(k._1()))
-//                // Convert to JSON and save as TextFile
-//                .map(k -> {
-//                    ObjectMapper mapper = new ObjectMapper();
-//                    return mapper.writeValueAsString(k);
-//                }).saveAsTextFile(workingDirPath + "/relatedItemCount", GzipCodec.class);
     }
 
 

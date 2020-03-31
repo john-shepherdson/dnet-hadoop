@@ -1,0 +1,33 @@
+[
+  {
+    "paramName": "mt",
+    "paramLongName": "master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "the path of the sequential file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "e",
+    "paramLongName": "entity",
+    "paramDescription": "the type of entity to be deduped",
+    "paramRequired": true
+  },
+  {
+    "paramName": "c",
+    "paramLongName": "dedupConf",
+    "paramDescription": "dedup configuration to be used",
+    "compressed": true,
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetPath",
+    "paramDescription": "target path to save dedup result",
+    "paramRequired": true
+  }
+]

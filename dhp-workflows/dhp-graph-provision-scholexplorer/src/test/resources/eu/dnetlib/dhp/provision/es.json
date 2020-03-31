@@ -1,0 +1,2191 @@
+{
+  "_scroll_id":"DnF1ZXJ5VGhlbkZldGNoBQAAAAAAAA3ZFjJyVjB4UWROUlV1NEZvcGFSNUFFNEEAAAAAAAAMKxZwaDlETnJ4alJDeUZYdGlLck9XQ3dBAAAAAAAADCkWRHhuQi1obllTOFdVYWtWeUN2SzdaUQAAAAAAAq-XFjNsWU1LeTlrVGhPZERWRW9iWEZ5QlEAAAAAAAAOQBY5R0Y2TXNyRFM3bUJkMHE4SkVQZmNR",
+  "took":16,
+  "timed_out":false,
+  "_shards":{
+    "total":5,
+    "successful":5,
+    "skipped":0,
+    "failed":0
+  },
+  "hits":{
+    "total":3281,
+    "max_score":1.0,
+    "hits":[
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.17605/osf.io/vkdyt",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"cos.osf"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"COVID-19-RAA"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+
+            },
+            "state":"findable",
+            "created":"2020-03-24T20:15:45.000Z",
+            "source":"mds",
+            "metadataVersion":20,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:36:41.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-24T20:15:47.000Z",
+            "published":"2020",
+            "dates":[
+              {
+                "date":"2020",
+                "dateType":"Issued"
+              }
+            ],
+            "relatedIdentifiers":[
+
+            ],
+            "reason":null,
+            "rightsList":[
+
+            ],
+            "schemaVersion":null,
+            "types":{
+              "resourceType":"Project",
+              "ris":"RPRT",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Open Science Framework",
+            "publicationYear":2020,
+            "doi":"10.17605/osf.io/vkdyt",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"https://osf.io/vkdyt/",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.17605/osf.io/vkdyt",
+                "identifierType":"DOI"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"Gjalt - Jorn",
+                "name":"Peters, Gjalt - Jorn",
+                "familyName":"Peters",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Sylvia",
+                "name":"Roozen, Sylvia",
+                "familyName":"Roozen",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Rik",
+                "name":"Crutzen, Rik",
+                "familyName":"Crutzen",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Gill",
+                "name":"Hoor, Gill",
+                "familyName":"Hoor",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Sander",
+                "name":"Hermsen, Sander",
+                "familyName":"Hermsen",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Lisa-Graham",
+                "name":"Wisener, Lisa-Graham",
+                "familyName":"Wisener",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Laura",
+                "name":"König, Laura",
+                "familyName":"König",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Alexis",
+                "name":"Ruffault, Alexis",
+                "familyName":"Ruffault",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Jennifer",
+                "name":"Inauen, Jennifer",
+                "familyName":"Inauen",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Marta",
+                "name":"Marques, Marta",
+                "familyName":"Marques",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Chris",
+                "name":"Noone, Chris",
+                "familyName":"Noone",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Lucy",
+                "name":"Porter, Lucy",
+                "familyName":"Porter",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Samantha",
+                "name":"van Beurden, Samantha",
+                "familyName":"van Beurden",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Ann",
+                "name":"DeSmet, Ann",
+                "familyName":"DeSmet",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Ratri",
+                "name":"Nurwanti, Ratri",
+                "familyName":"Nurwanti",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Yasinta",
+                "name":"Sokang, Yasinta",
+                "familyName":"Sokang",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Alexandra",
+                "name":"Dima, Alexandra",
+                "familyName":"Dima",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Gabriele",
+                "name":"Pierantoni, Gabriele",
+                "familyName":"Pierantoni",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Angelos",
+                "name":"Kassianos, Angelos",
+                "familyName":"Kassianos",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"James",
+                "name":"Green, James",
+                "familyName":"Green",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Daniel",
+                "name":"Powell, Daniel",
+                "familyName":"Powell",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Thomas",
+                "name":"Gültzow, Thomas",
+                "familyName":"Gültzow",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Stan",
+                "name":"Vluggen, Stan",
+                "familyName":"Vluggen",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Roel",
+                "name":"Hermans, Roel",
+                "familyName":"Hermans",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Laura",
+                "name":"Eito, Laura",
+                "familyName":"Eito",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Lisa",
+                "name":"Warner, Lisa",
+                "familyName":"Warner",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Lena",
+                "name":"Fleig, Lena",
+                "familyName":"Fleig",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Emma",
+                "name":"Berry, Emma",
+                "familyName":"Berry",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Daniela",
+                "name":"Lange, Daniela",
+                "familyName":"Lange",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Pierre",
+                "name":"Gérain, Pierre",
+                "familyName":"Gérain",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Annick",
+                "name":"De Paepe, Annick",
+                "familyName":"De Paepe",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Louise",
+                "name":"Poppe, Louise",
+                "familyName":"Poppe",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Eva",
+                "name":"Papakonstantinou, Eva",
+                "familyName":"Papakonstantinou",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Hanna",
+                "name":"de Paredes, Hanna",
+                "familyName":"de Paredes",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Jorge",
+                "name":"Encantado, Jorge",
+                "familyName":"Encantado",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Carolina",
+                "name":"Silva, Carolina",
+                "familyName":"Silva",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Tracy",
+                "name":"Epton, Tracy",
+                "familyName":"Epton",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Jenny",
+                "name":"Groarke, Jenny",
+                "familyName":"Groarke",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Sarah",
+                "name":"Denford, Sarah",
+                "familyName":"Denford",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Barbara",
+                "name":"Mullan, Barbara",
+                "familyName":"Mullan",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Rebecca",
+                "name":"Pedruzzi, Rebecca",
+                "familyName":"Pedruzzi",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.17605/osf.io/vkdyt",
+          "timestamp":1585226201
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.1080/13510340500378274",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"Meteoric trajectory: The Res Publica Party in Estonia"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"Democratization",
+              "type":"Journal",
+              "firstPage":"78",
+              "volume":"13",
+              "lastPage":"94",
+              "identifierType":"ISSN",
+              "identifier":"1743-890X",
+              "issue":"1"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:31:47.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:31:54.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:31:47.000Z",
+            "published":"2006",
+            "dates":[
+              {
+                "date":"2006-02",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2016-12-13T05:03:17Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"1743-890X",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Informa UK Limited",
+            "publicationYear":2006,
+            "doi":"10.1080/13510340500378274",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"http://www.tandfonline.com/doi/abs/10.1080/13510340500378274",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.1080/13510340500378274",
+                "identifierType":"DOI"
+              },
+              {
+                "identifier":"5",
+                "identifierType":"Publisher ID"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"Rein",
+                "name":"Taagepera, Rein",
+                "familyName":"Taagepera",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.1080/13510340500378274",
+          "timestamp":1585225914
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.1029/2001gl012966",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"Use of <sup>17</sup> O/ <sup>16</sup> O to trace atmospherically-deposited sulfate in surface waters: A case study in Alpine watersheds in the Rocky Mountains"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"Geophysical Research Letters",
+              "type":"Journal",
+              "firstPage":"4483",
+              "volume":"28",
+              "lastPage":"4486",
+              "identifierType":"ISSN",
+              "identifier":"0094-8276",
+              "issue":"23"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:31:52.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:31:53.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:31:53.000Z",
+            "published":"2001",
+            "dates":[
+              {
+                "date":"2001-12-01",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2018-04-17T02:49:52Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"0094-8276",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/s0016-7037(00)00490-7",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1007/978-1-4612-2788-5",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/95wr02037",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/0016-7037(63)90071-1",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/0012-821x(83)90066-3",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/91wr01243",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1126/science.217.4554.51",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/91jd01943",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1126/science.177.4048.514",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/97jd02075",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/2000jd900805",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/2000gl011826",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/s1352-2310(00)00507-0",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/1999wr900276",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/b978-0-444-81546-0.50022-7",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/s1352-2310(99)00122-3",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/2000jd900456",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/94gl00893",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1126/science.283.5400.341",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1007/978-1-4612-3616-0_6",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1130/0016-7606(1963)74[991:paotcm]2.0.co;2",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.2113/gsecongeo.87.2.225",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1029/90wr02774",
+                "relatedIdentifierType":"DOI"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+              {
+                "rightsUri":"http://doi.wiley.com/10.1002/tdm_license_1.1"
+              }
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"American Geophysical Union (AGU)",
+            "publicationYear":2001,
+            "doi":"10.1029/2001gl012966",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"http://doi.wiley.com/10.1029/2001GL012966",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.1029/2001gl012966",
+                "identifierType":"DOI"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"Craig A.",
+                "name":"Johnson, Craig A.",
+                "familyName":"Johnson",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"M. Alisa",
+                "name":"Mast, M. Alisa",
+                "familyName":"Mast",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Cynthia L.",
+                "name":"Kester, Cynthia L.",
+                "familyName":"Kester",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.1029/2001gl012966",
+          "timestamp":1585225913
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.4094/chnr.2014.20.4.294",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"Critical Thinking Disposition, Problem Solving Process, and Simulation-Based Assessment of Clinical Competence of Nursing Students in Pediatric Nursing"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"Child Health Nursing Research",
+              "type":"Journal",
+              "firstPage":"294",
+              "volume":"20",
+              "identifierType":"ISSN",
+              "identifier":"2287-9129",
+              "issue":"4"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:31:56.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:31:56.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:31:56.000Z",
+            "published":"2014",
+            "dates":[
+              {
+                "date":"2014",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2019-08-17T03:06:14Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"2287-9129",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/j.nedt.2010.10.013",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.3928/0148-4834-20001101-09",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.3310/hta13270",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.5977/jkasne.2013.19.2.228",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/j.teln.2008.07.004",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.4040/jkan.2011.41.2.245",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.4040/jkan.2006.36.6.950",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.5977/jkasne.2011.17.2.226",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.4040/jkan.2011.41.4.433",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.7748/ns2010.05.24.35.42.c7751",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1053/j.nainr.2009.03.006",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.5977/jkasne.2009.15.2.149",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.5124/jkma.2005.48.3.267",
+                "relatedIdentifierType":"DOI"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+              {
+                "rightsUri":"http://creativecommons.org/licenses/by-nc/3.0"
+              }
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Korean Academy of Child Health Nursing",
+            "publicationYear":2014,
+            "doi":"10.4094/chnr.2014.20.4.294",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"http://e-chnr.org/journal/view.php?id=10.4094/chnr.2014.20.4.294",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.4094/chnr.2014.20.4.294",
+                "identifierType":"DOI"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"Sunghee",
+                "name":"Kim, Sunghee",
+                "familyName":"Kim",
+                "affiliation":[
+                  "Red Cross College of Nursing, Chung-Ang University, Seoul, Korea."
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Hyuna",
+                "name":"Nam, Hyuna",
+                "familyName":"Nam",
+                "affiliation":[
+                  "Department of Nursing, Pyeongtaek University, Pyeongtaek, Korea."
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Miok",
+                "name":"Kim, Miok",
+                "familyName":"Kim",
+                "affiliation":[
+                  "Department of Nursing, Namseoul University, Cheonan, Korea."
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.4094/chnr.2014.20.4.294",
+          "timestamp":1585225916
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.1016/s0166-1280(96)04575-7",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"UV-visible spectroscopy in the interpretation of the tautomeric equilibrium of N,N′(bis-3,5-di-bromo-salicyliden)-1,2-diaminobenzene and the redox activity of its Co(II) complex. A quantum chemical approach."
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"Journal of Molecular Structure: THEOCHEM",
+              "firstPage":"97",
+              "volume":"367",
+              "lastPage":"110",
+              "identifierType":"ISSN",
+              "identifier":"0166-1280",
+              "type":"Journal"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:31:57.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:31:58.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:31:58.000Z",
+            "published":"1996",
+            "dates":[
+              {
+                "date":"1996-09",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2019-04-17T13:58:25Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"0166-1280",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+              {
+                "rightsUri":"https://www.elsevier.com/tdm/userlicense/1.0"
+              }
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Elsevier BV",
+            "publicationYear":1996,
+            "doi":"10.1016/s0166-1280(96)04575-7",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"https://linkinghub.elsevier.com/retrieve/pii/S0166128096045757",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.1016/s0166-1280(96)04575-7",
+                "identifierType":"DOI"
+              },
+              {
+                "identifier":"S0166128096045757",
+                "identifierType":"Publisher ID"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"G.L.",
+                "name":"Estiú, G.L.",
+                "familyName":"Estiú",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"A.H.",
+                "name":"Jubert, A.H.",
+                "familyName":"Jubert",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"J.",
+                "name":"Costamagna, J.",
+                "familyName":"Costamagna",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"J.",
+                "name":"Vargas, J.",
+                "familyName":"Vargas",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.1016/s0166-1280(96)04575-7",
+          "timestamp":1585225918
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.1016/j.jhin.2013.12.002",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"Consequences of incomplete measles vaccine uptake in healthcare workers during an outbreak in North East England"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"Journal of Hospital Infection",
+              "type":"Journal",
+              "firstPage":"144",
+              "volume":"86",
+              "lastPage":"146",
+              "identifierType":"ISSN",
+              "identifier":"0195-6701",
+              "issue":"2"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:31:58.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:31:58.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:31:58.000Z",
+            "published":"2014",
+            "dates":[
+              {
+                "date":"2014-02",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2018-10-07T23:20:19Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"0195-6701",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+              {
+                "rightsUri":"https://www.elsevier.com/tdm/userlicense/1.0"
+              }
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Elsevier BV",
+            "publicationYear":2014,
+            "doi":"10.1016/j.jhin.2013.12.002",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"https://linkinghub.elsevier.com/retrieve/pii/S0195670113004052",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.1016/j.jhin.2013.12.002",
+                "identifierType":"DOI"
+              },
+              {
+                "identifier":"S0195670113004052",
+                "identifierType":"Publisher ID"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"P.",
+                "name":"Bogowicz, P.",
+                "familyName":"Bogowicz",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"J.",
+                "name":"Waller, J.",
+                "familyName":"Waller",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"D.",
+                "name":"Wilson, D.",
+                "familyName":"Wilson",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"K.",
+                "name":"Foster, K.",
+                "familyName":"Foster",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.1016/j.jhin.2013.12.002",
+          "timestamp":1585225918
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.1186/s12871-015-0149-y",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"Normal values for pancreatic stone protein in different age groups"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"BMC Anesthesiology",
+              "type":"Journal",
+              "volume":"15",
+              "identifierType":"ISSN",
+              "identifier":"1471-2253",
+              "issue":"1"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:32:00.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:32:00.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:32:00.000Z",
+            "published":"2015",
+            "dates":[
+              {
+                "date":"2015-11-20",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2017-06-23T20:02:57Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"1471-2253",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1186/cc12588",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1038/tpj.2012.1",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1164/rccm.201201-0037oc",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1097/01.mop.0000193293.87022.4c",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/s1473-3099(04)01146-6",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1159/000241296",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1097/01.ccm.0000159089.16462.4a",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1378/chest.11-0018",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1097/ccm.0b013e31819da7d6",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1007/s00134-012-2798-3",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/j.jss.2005.09.030",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1186/1471-2431-10-89",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1210/jc.2014-2244",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/j.imbio.2012.06.001",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1111/j.1399-3038.2010.01104.x",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1186/cc11406",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1097/ccm.0b013e3182771193",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1016/j.cyto.2014.01.009",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1378/chest.12-0730",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1136/bmjopen-2014-004914",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1086/653531",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1210/endo.136.5.7720628",
+                "relatedIdentifierType":"DOI"
+              },
+              {
+                "relationType":"References",
+                "relatedIdentifier":"10.1111/j.1651-2227.2002.tb01645.x",
+                "relatedIdentifierType":"DOI"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+              {
+                "rightsUri":"http://www.springer.com/tdm"
+              }
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Springer Science and Business Media LLC",
+            "publicationYear":2015,
+            "doi":"10.1186/s12871-015-0149-y",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"http://bmcanesthesiol.biomedcentral.com/articles/10.1186/s12871-015-0149-y",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.1186/s12871-015-0149-y",
+                "identifierType":"DOI"
+              },
+              {
+                "identifier":"168",
+                "identifierType":"Publisher ID"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"Luregn J",
+                "name":"Schlapbach, Luregn J",
+                "familyName":"Schlapbach",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Eric",
+                "name":"Giannoni, Eric",
+                "familyName":"Giannoni",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Sven",
+                "name":"Wellmann, Sven",
+                "familyName":"Wellmann",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Martin",
+                "name":"Stocker, Martin",
+                "familyName":"Stocker",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Roland A",
+                "name":"Ammann, Roland A",
+                "familyName":"Ammann",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Rolf",
+                "name":"Graf, Rolf",
+                "familyName":"Graf",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.1186/s12871-015-0149-y",
+          "timestamp":1585225920
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.1097/fch.0000000000000237",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"Concordance and Discordance of the Knowledge, Understanding, and Description of Childrenʼs Experience of Food Insecurity Among Hispanic Adults and Children"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"Family & Community Health",
+              "type":"Journal",
+              "firstPage":"237",
+              "volume":"42",
+              "lastPage":"244",
+              "identifierType":"ISSN",
+              "identifier":"0160-6379",
+              "issue":"4"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:32:19.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:32:19.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:32:19.000Z",
+            "published":"2019",
+            "dates":[
+              {
+                "date":"2019",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2020-02-18T14:54:24Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"0160-6379",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Ovid Technologies (Wolters Kluwer Health)",
+            "publicationYear":2019,
+            "doi":"10.1097/fch.0000000000000237",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"http://journals.lww.com/00003727-201910000-00002",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.1097/fch.0000000000000237",
+                "identifierType":"DOI"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"Edward A.",
+                "name":"Frongillo, Edward A.",
+                "familyName":"Frongillo",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Maryah S.",
+                "name":"Fram, Maryah S.",
+                "familyName":"Fram",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Jessica L.",
+                "name":"Escobar-Alegría, Jessica L.",
+                "familyName":"Escobar-Alegría",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Melly",
+                "name":"Pérez-Garay, Melly",
+                "familyName":"Pérez-Garay",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Mark M.",
+                "name":"Macauda, Mark M.",
+                "familyName":"Macauda",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Deborah L.",
+                "name":"Billings, Deborah L.",
+                "familyName":"Billings",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.1097/fch.0000000000000237",
+          "timestamp":1585225939
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.1016/s0967-0637(97)00068-x",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"Characteristics of the South Atlantic subtropical frontal zone between 15°W and 5°E"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"Deep Sea Research Part I: Oceanographic Research Papers",
+              "type":"Journal",
+              "firstPage":"167",
+              "volume":"45",
+              "lastPage":"192",
+              "identifierType":"ISSN",
+              "identifier":"0967-0637",
+              "issue":"1"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:32:22.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:32:23.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:32:23.000Z",
+            "published":"1998",
+            "dates":[
+              {
+                "date":"1998-01",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2019-04-22T21:55:07Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"0967-0637",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+              {
+                "rightsUri":"https://www.elsevier.com/tdm/userlicense/1.0"
+              }
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Elsevier BV",
+            "publicationYear":1998,
+            "doi":"10.1016/s0967-0637(97)00068-x",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"https://linkinghub.elsevier.com/retrieve/pii/S096706379700068X",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.1016/s0967-0637(97)00068-x",
+                "identifierType":"DOI"
+              },
+              {
+                "identifier":"S096706379700068X",
+                "identifierType":"Publisher ID"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"D.",
+                "name":"Smythe-Wright, D.",
+                "familyName":"Smythe-Wright",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"P.",
+                "name":"Chapman, P.",
+                "familyName":"Chapman",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"C.Duncombe",
+                "name":"Rae, C.Duncombe",
+                "familyName":"Rae",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"L.V.",
+                "name":"Shannon, L.V.",
+                "familyName":"Shannon",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"S.M.",
+                "name":"Boswell, S.M.",
+                "familyName":"Boswell",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.1016/s0967-0637(97)00068-x",
+          "timestamp":1585225943
+        }
+      },
+      {
+        "_index":"datacite",
+        "_type":"dump",
+        "_id":"10.1016/j.elecom.2011.05.032",
+        "_score":1.0,
+        "_source":{
+          "relationships":{
+            "client":{
+              "data":{
+                "type":"clients",
+                "id":"crossref.citations"
+              }
+            }
+          },
+          "attributes":{
+            "contributors":[
+
+            ],
+            "titles":[
+              {
+                "title":"ZnO/NiO nanocomposite electrodes for low-temperature solid oxide fuel cells"
+              }
+            ],
+            "descriptions":[
+
+            ],
+            "referenceCount":0,
+            "subjects":[
+
+            ],
+            "container":{
+              "title":"Electrochemistry Communications",
+              "type":"Journal",
+              "firstPage":"917",
+              "volume":"13",
+              "lastPage":"920",
+              "identifierType":"ISSN",
+              "identifier":"1388-2481",
+              "issue":"9"
+            },
+            "state":"findable",
+            "created":"2020-03-26T13:32:40.000Z",
+            "source":"levriero",
+            "metadataVersion":0,
+            "version":null,
+            "isActive":true,
+            "contentUrl":null,
+            "geoLocations":[
+
+            ],
+            "updated":"2020-03-26T13:32:40.000Z",
+            "fundingReferences":[
+
+            ],
+            "viewCount":0,
+            "registered":"2020-03-26T13:32:40.000Z",
+            "published":"2011",
+            "dates":[
+              {
+                "date":"2011-09",
+                "dateType":"Issued"
+              },
+              {
+                "date":"2018-12-01T18:20:58Z",
+                "dateType":"Updated"
+              }
+            ],
+            "relatedIdentifiers":[
+              {
+                "relationType":"IsPartOf",
+                "relatedIdentifier":"1388-2481",
+                "relatedIdentifierType":"ISSN",
+                "resourceTypeGeneral":"Collection"
+              }
+            ],
+            "reason":null,
+            "rightsList":[
+              {
+                "rightsUri":"https://www.elsevier.com/tdm/userlicense/1.0"
+              }
+            ],
+            "schemaVersion":"http://datacite.org/schema/kernel-4",
+            "types":{
+              "resourceType":"JournalArticle",
+              "ris":"JOUR",
+              "resourceTypeGeneral":"Text",
+              "bibtex":"article",
+              "citeproc":"article-journal",
+              "schemaOrg":"ScholarlyArticle"
+            },
+            "publisher":"Elsevier BV",
+            "publicationYear":2011,
+            "doi":"10.1016/j.elecom.2011.05.032",
+            "language":null,
+            "sizes":[
+
+            ],
+            "url":"https://linkinghub.elsevier.com/retrieve/pii/S138824811100230X",
+            "identifiers":[
+              {
+                "identifier":"https://doi.org/10.1016/j.elecom.2011.05.032",
+                "identifierType":"DOI"
+              },
+              {
+                "identifier":"S138824811100230X",
+                "identifierType":"Publisher ID"
+              }
+            ],
+            "citationCount":0,
+            "formats":[
+
+            ],
+            "downloadCount":0,
+            "creators":[
+              {
+                "nameType":"Personal",
+                "givenName":"Rizwan",
+                "name":"Raza, Rizwan",
+                "familyName":"Raza",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Qinghua",
+                "name":"Liu, Qinghua",
+                "familyName":"Liu",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Jawad",
+                "name":"Nisar, Jawad",
+                "familyName":"Nisar",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Xiaodi",
+                "name":"Wang, Xiaodi",
+                "familyName":"Wang",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Ying",
+                "name":"Ma, Ying",
+                "familyName":"Ma",
+                "affiliation":[
+
+                ]
+              },
+              {
+                "nameType":"Personal",
+                "givenName":"Bin",
+                "name":"Zhu, Bin",
+                "familyName":"Zhu",
+                "affiliation":[
+
+                ]
+              }
+            ]
+          },
+          "type":"dois",
+          "id":"10.1016/j.elecom.2011.05.032",
+          "timestamp":1585225960
+        }
+      }
+    ]
+  }
+}
