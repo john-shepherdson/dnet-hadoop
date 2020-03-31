@@ -29,14 +29,9 @@ public class SparkXmlRecordBuilderJob {
             final String otherDsTypeId = parser.get("otherDsTypeId");
 
             final FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
-            if (fs.exists(new Path(outputPath))) {
-                fs.delete(new Path(outputPath), true);
-                fs.mkdirs(new Path(outputPath));
-            }
 
             new GraphJoiner(spark, ContextMapper.fromIS(isLookupUrl), otherDsTypeId, inputPath, outputPath)
                     .adjacencyLists();
-                    //.asXML();
         }
     }
 
