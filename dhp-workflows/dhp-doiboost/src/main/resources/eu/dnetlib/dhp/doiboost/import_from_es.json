@@ -1,0 +1,4 @@
+[
+  {"paramName":"t",   "paramLongName":"targetPath",         "paramDescription": "the path of the sequencial file to write",                  "paramRequired": true},
+  {"paramName":"n",   "paramLongName":"namenode",           "paramDescription": "the hive metastore uris",                                  "paramRequired": true}
+]

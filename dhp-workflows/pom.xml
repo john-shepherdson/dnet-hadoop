@@ -19,6 +19,7 @@
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup</module>
         <module>dhp-graph-provision</module>
+        <module>dhp-doiboost</module>
     </modules>
 
     <pluginRepositories>
