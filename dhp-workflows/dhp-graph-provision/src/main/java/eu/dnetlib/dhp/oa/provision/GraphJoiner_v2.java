@@ -58,26 +58,6 @@ public class GraphJoiner_v2 implements Serializable {
                     StructField$.MODULE$.apply("value", DataTypes.StringType, false, Metadata.empty())
             ));
 
-    private static final StructType TYPED_ROW_SCHEMA = StructType$.MODULE$.apply(
-        Arrays.asList(
-                StructField$.MODULE$.apply("sourceId",      DataTypes.StringType, false, Metadata.empty()),
-                StructField$.MODULE$.apply("targetId",      DataTypes.StringType, true, Metadata.empty()),
-                StructField$.MODULE$.apply("deleted",       DataTypes.BooleanType, false, Metadata.empty()),
-                StructField$.MODULE$.apply("type",          DataTypes.StringType, false, Metadata.empty()),
-                StructField$.MODULE$.apply("relType",       DataTypes.StringType, true, Metadata.empty()),
-                StructField$.MODULE$.apply("subRelType",    DataTypes.StringType, true, Metadata.empty()),
-                StructField$.MODULE$.apply("relClass",      DataTypes.StringType, true, Metadata.empty()),
-                StructField$.MODULE$.apply("oaf",           DataTypes.BinaryType, false, Metadata.empty())
-        ));
-
-    private static final StructType ENTITY_REL_ENTITY_SCHEMA = StructType$.MODULE$.apply(
-            Arrays.asList(
-                    StructField$.MODULE$.apply("source",    TYPED_ROW_SCHEMA, false, Metadata.empty()),
-                    StructField$.MODULE$.apply("relation",  TYPED_ROW_SCHEMA, true, Metadata.empty()),
-                    StructField$.MODULE$.apply("target",    TYPED_ROW_SCHEMA, false, Metadata.empty())
-            ));
-
-
     private SparkSession spark;
 
     private ContextMapper contextMapper;
