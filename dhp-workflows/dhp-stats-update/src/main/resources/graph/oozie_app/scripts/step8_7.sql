@@ -1,0 +1,1 @@
+CREATE OR REPLACE VIEW ${stats_db_name}.result_oids as SELECT * FROM ${stats_db_name}.publication_oids UNION ALL SELECT * FROM ${stats_db_name}.software_oids UNION ALL SELECT * FROM ${stats_db_name}.dataset_oids UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_oids;
