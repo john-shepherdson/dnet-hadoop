@@ -45,18 +45,11 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.asRelatedEntit
  */
 public class GraphJoiner_v2 implements Serializable {
 
-    public static final int LIMIT = 1000000;
     private Map<String, LongAccumulator> accumulators = Maps.newHashMap();
 
     public static final int MAX_RELS = 100;
 
     public static final String schemaLocation = "https://www.openaire.eu/schema/1.0/oaf-1.0.xsd";
-
-    private static final StructType KV_SCHEMA = StructType$.MODULE$.apply(
-            Arrays.asList(
-                    StructField$.MODULE$.apply("key", DataTypes.StringType, false, Metadata.empty()),
-                    StructField$.MODULE$.apply("value", DataTypes.StringType, false, Metadata.empty())
-            ));
 
     private SparkSession spark;
 
@@ -105,7 +98,6 @@ public class GraphJoiner_v2 implements Serializable {
                         value.getId(),
                         value),
                         Encoders.tuple(Encoders.STRING(), Encoders.kryo(TypedRow.class)))
-                .limit(LIMIT)
                 .cache();
 
         System.out.println("Entities schema:");
@@ -115,7 +107,6 @@ public class GraphJoiner_v2 implements Serializable {
         Dataset<Relation> rels = readPathRelation(jsc, getInputPath())
                 .groupByKey((MapFunction<Relation, SortableRelationKey>) t -> SortableRelationKey.from(t), Encoders.kryo(SortableRelationKey.class))
                 .flatMapGroups((FlatMapGroupsFunction<SortableRelationKey, Relation, Relation>) (key, values) -> Iterators.limit(values, MAX_RELS), Encoders.bean(Relation.class))
-                .limit(LIMIT)
                 .cache();
 
         System.out.println("Relation schema:");
@@ -169,7 +160,6 @@ public class GraphJoiner_v2 implements Serializable {
         final XmlRecordFactory recordFactory = new XmlRecordFactory(accumulators, contextMapper, false, schemaLocation, otherDsTypeId);
         grouped
                 .map((MapFunction<JoinedEntity, String>) value -> recordFactory.build(value), Encoders.STRING())
-                .limit(LIMIT)
                 .write()
                 .text(getOutPath() + "/xml");
         /*
@@ -245,13 +235,11 @@ public class GraphJoiner_v2 implements Serializable {
      * @return the JavaPairRDD<String, TypedRow> indexed by entity identifier
      */
     private Dataset<TypedRow> readPathEntity(final JavaSparkContext sc, final String inputPath, final String type) {
-        RDD<Row> rdd = sc.textFile(inputPath + "/" + type)
-                .map((Function<String, Row>) s -> RowFactory.create("", s))
+        RDD<String> rdd = sc.textFile(inputPath + "/" + type)
                 .rdd();
 
-        return getSpark().createDataFrame(rdd, KV_SCHEMA)
-                .map((MapFunction<Row, TypedRow>) row -> {
-                    final String s = row.getAs("value");
+        return getSpark().createDataset(rdd, Encoders.STRING())
+                .map((MapFunction<String, TypedRow>) s -> {
                     final DocumentContext json = JsonPath.parse(s);
                     final TypedRow t = new TypedRow();
                     t.setId(json.read("$.id"));
@@ -270,12 +258,11 @@ public class GraphJoiner_v2 implements Serializable {
      * @return the JavaRDD<TypedRow> containing all the relationships
      */
     private Dataset<Relation> readPathRelation(final JavaSparkContext sc, final String inputPath) {
-        final RDD<Row> rdd = sc.textFile(inputPath + "/relation")
-                .map((Function<String, Row>) s -> RowFactory.create("", s))
+        final RDD<String> rdd = sc.textFile(inputPath + "/relation")
                 .rdd();
 
-        return getSpark().createDataFrame(rdd, KV_SCHEMA)
-                .map((MapFunction<Row, Relation>) value -> new ObjectMapper().readValue(value.<String>getAs("value"), Relation.class), Encoders.bean(Relation.class));
+        return getSpark().createDataset(rdd, Encoders.STRING())
+                .map((MapFunction<String, Relation>) s -> new ObjectMapper().readValue(s, Relation.class), Encoders.bean(Relation.class));
     }
 
     private ObjectMapper getObjectMapper() {
