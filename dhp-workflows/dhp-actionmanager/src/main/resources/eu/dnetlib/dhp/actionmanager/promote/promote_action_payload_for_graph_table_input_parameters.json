@@ -1,0 +1,44 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "TODO",
+    "paramRequired": false
+  },
+  {
+    "paramName": "igtp",
+    "paramLongName": "inputGraphTablePath",
+    "paramDescription": "TODO",
+    "paramRequired": true
+  },
+  {
+    "paramName": "gtcn",
+    "paramLongName": "graphTableClassName",
+    "paramDescription": "TODO",
+    "paramRequired": true
+  },
+  {
+    "paramName": "iapp",
+    "paramLongName": "inputActionPayloadPath",
+    "paramDescription": "TODO",
+    "paramRequired": true
+  },
+  {
+    "paramName": "apcn",
+    "paramLongName": "actionPayloadClassName",
+    "paramDescription": "TODO",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ogtp",
+    "paramLongName": "outputGraphTablePath",
+    "paramDescription": "TODO",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mags",
+    "paramLongName": "mergeAndGetStrategy",
+    "paramDescription": "TODO",
+    "paramRequired": true
+  }
+]
