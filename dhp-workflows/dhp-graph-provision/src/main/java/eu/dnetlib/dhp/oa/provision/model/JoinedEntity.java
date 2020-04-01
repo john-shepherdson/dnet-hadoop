@@ -16,26 +16,23 @@ public class JoinedEntity implements Serializable {
         return type;
     }
 
-    public JoinedEntity setType(String type) {
+    public void setType(String type) {
         this.type = type;
-        return this;
     }
 
     public OafEntity getEntity() {
         return entity;
     }
 
-    public JoinedEntity setEntity(OafEntity entity) {
+    public void setEntity(OafEntity entity) {
         this.entity = entity;
-        return this;
     }
 
     public Links getLinks() {
         return links;
     }
 
-    public JoinedEntity setLinks(Links links) {
+    public void setLinks(Links links) {
         this.links = links;
-        return this;
     }
 }

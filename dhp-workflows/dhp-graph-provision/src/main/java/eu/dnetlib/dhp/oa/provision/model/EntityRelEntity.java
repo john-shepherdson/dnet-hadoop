@@ -1,54 +1,36 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
+import eu.dnetlib.dhp.schema.oaf.Relation;
+
 import java.io.Serializable;
 
 public class EntityRelEntity implements Serializable {
 
-    private TypedRow source;
-    private TypedRow relation;
-    private TypedRow target;
+    private TypedRow entity;
+    private Relation relation;
+    private RelatedEntity target;
 
-    public EntityRelEntity() {
+    public TypedRow getEntity() {
+        return entity;
     }
 
-    public EntityRelEntity(TypedRow source) {
-        this.source = source;
+    public void setEntity(TypedRow entity) {
+        this.entity = entity;
     }
 
-    //helpers
-    public Boolean hasMainEntity() {
-        return getSource() != null & getRelation() == null & getTarget() == null;
-    }
-
-    public Boolean hasRelatedEntity() {
-        return getSource() == null & getRelation() != null & getTarget() != null;
-    }
-
-
-    public TypedRow getSource() {
-        return source;
-    }
-
-    public EntityRelEntity setSource(TypedRow source) {
-        this.source = source;
-        return this;
-    }
-
-    public TypedRow getRelation() {
+    public Relation getRelation() {
         return relation;
     }
 
-    public EntityRelEntity setRelation(TypedRow relation) {
+    public void setRelation(Relation relation) {
         this.relation = relation;
-        return this;
     }
 
-    public TypedRow getTarget() {
+    public RelatedEntity getTarget() {
         return target;
     }
 
-    public EntityRelEntity setTarget(TypedRow target) {
+    public void setTarget(RelatedEntity target) {
         this.target = target;
-        return this;
     }
 }

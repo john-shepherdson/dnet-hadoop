@@ -3,14 +3,11 @@ package eu.dnetlib.dhp.oa.provision.utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
-import eu.dnetlib.dhp.oa.provision.model.TypedRow;
+import eu.dnetlib.dhp.oa.provision.model.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
@@ -66,14 +63,14 @@ public class GraphMappingUtils {
         return MainEntityType.result.name().equals(getMainType(type));
     }
 
-    public static Predicate<String> instanceFilter = s -> instanceFieldFilter.contains(s);
+    public static RelatedEntity asRelatedEntity(TypedRow e) {
 
-    public static EntityRelEntity asRelatedEntity(EntityRelEntity e) {
+        final DocumentContext j = JsonPath.parse(e.getOaf());
+        final RelatedEntity re = new RelatedEntity();
+        re.setId(j.read("$.id"));
+        re.setType(e.getType());
 
-        final DocumentContext j = JsonPath.parse(e.getSource().getOaf());
-        final RelatedEntity re = new RelatedEntity().setId(j.read("$.id")).setType(e.getSource().getType());
-
-        switch (EntityType.valueOf(e.getSource().getType())) {
+        switch (EntityType.valueOf(e.getType())) {
             case publication:
             case dataset:
             case otherresearchproduct:
@@ -147,13 +144,10 @@ public class GraphMappingUtils {
 
                 break;
         }
-        return new EntityRelEntity().setSource(
-                new TypedRow()
-                        .setSourceId(e.getSource().getSourceId())
-                        .setDeleted(e.getSource().getDeleted())
-                        .setType(e.getSource().getType())
-                        .setOaf(serialize(re)));
+
+        return re;
     }
+
 
     private static KeyValue asKV(LinkedHashMap<String, Object> j) {
         final KeyValue kv = new KeyValue();

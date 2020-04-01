@@ -84,7 +84,7 @@ public class SparkXmlIndexingJob {
         return SparkSession
                 .builder()
                 .config(conf)
-                .appName(SparkXmlRecordBuilderJob.class.getSimpleName())
+                .appName(SparkXmlIndexingJob.class.getSimpleName())
                 .master(master)
                 .getOrCreate();
     }

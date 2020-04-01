@@ -65,7 +65,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>build_adjacency_lists</name>
-            <class>eu.dnetlib.dhp.oa.provision.SparkXmlRecordBuilderJob</class>
+            <class>eu.dnetlib.dhp.oa.provision.SparkXmlRecordBuilderJob_v2</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores ${sparkExecutorCoresForJoining}
@@ -75,6 +75,7 @@
                 --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.network.timeout=10000000
             </spark-opts>
             <arg>-mt</arg> <arg>yarn</arg>
             <arg>-is</arg> <arg>${isLookupUrl}</arg>

@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.oa.provision.model;
 
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Maps;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -33,58 +34,54 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
         weights.put("dedup", 8);
     }
 
-    public static SortableRelationKey from(final EntityRelEntity e) {
-        return new SortableRelationKey()
-                .setSourceId(e.getRelation().getSourceId())
-                .setTargetId(e.getRelation().getTargetId())
-                .setRelType(e.getRelation().getRelType())
-                .setSubRelType(e.getRelation().getSubRelType())
-                .setRelClass(e.getRelation().getRelClass());
+    public static SortableRelationKey from(final Relation r) {
+        final SortableRelationKey s = new SortableRelationKey();
+        s.setSourceId(r.getSource());
+        s.setTargetId(r.getTarget());
+        s.setRelType(r.getRelType());
+        s.setSubRelType(r.getSubRelType());
+        s.setRelClass(r.getRelClass());
+        return s;
     }
 
     public String getSourceId() {
         return sourceId;
     }
 
-    public SortableRelationKey setSourceId(String sourceId) {
+    public void setSourceId(String sourceId) {
         this.sourceId = sourceId;
-        return this;
     }
 
     public String getTargetId() {
         return targetId;
     }
 
-    public SortableRelationKey setTargetId(String targetId) {
+    public void setTargetId(String targetId) {
         this.targetId = targetId;
-        return this;
     }
 
     public String getRelType() {
         return relType;
     }
 
-    public SortableRelationKey setRelType(String relType) {
+    public void setRelType(String relType) {
         this.relType = relType;
-        return this;
     }
 
     public String getSubRelType() {
         return subRelType;
     }
 
-    public SortableRelationKey setSubRelType(String subRelType) {
+    public void setSubRelType(String subRelType) {
         this.subRelType = subRelType;
-        return this;
     }
 
     public String getRelClass() {
         return relClass;
     }
 
-    public SortableRelationKey setRelClass(String relClass) {
+    public void setRelClass(String relClass) {
         this.relClass = relClass;
-        return this;
     }
 
     @Override
