@@ -170,6 +170,11 @@ public class Organization extends OafEntity implements Serializable {
     @Override
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
+
+        if (!Organization.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         final Organization o = (Organization) e;
         legalshortname = o.getLegalshortname() != null && compareTrust(this, e)<0? o.getLegalshortname() : legalshortname;
         legalname = o.getLegalname() != null && compareTrust(this, e)<0 ? o.getLegalname() : legalname;

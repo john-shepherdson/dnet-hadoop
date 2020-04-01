@@ -1,8 +1,6 @@
 package eu.dnetlib.dhp.schema.oaf;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -78,9 +76,12 @@ public class Relation extends Oaf {
 		checkArgument(Objects.equals(getSubRelType(), r.getSubRelType()),"subRelType(s) must be equal");
 		checkArgument(Objects.equals(getRelClass(), r.getRelClass()),"relClass(es) must be equal");
 
-		setCollectedFrom(Stream.concat(getCollectedFrom().stream(), r.getCollectedFrom().stream())
-				.distinct() // relies on KeyValue.equals
-				.collect(Collectors.toList()));
+		setCollectedFrom(
+				Stream
+						.concat(Optional.ofNullable(getCollectedFrom()).map(Collection::stream).orElse(Stream.empty()),
+								Optional.ofNullable(r.getCollectedFrom()).map(Collection::stream).orElse(Stream.empty()))
+						.distinct() // relies on KeyValue.equals
+						.collect(Collectors.toList()));
 	}
 
 	@Override

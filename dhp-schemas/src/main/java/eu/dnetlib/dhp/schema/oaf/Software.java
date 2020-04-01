@@ -49,6 +49,11 @@ public class Software extends Result implements Serializable {
     @Override
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
+
+        if (!Software.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         final Software s = (Software) e;
         documentationUrl = mergeLists(documentationUrl, s.getDocumentationUrl());
 

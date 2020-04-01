@@ -367,6 +367,10 @@ public class Datasource extends OafEntity implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
+        if (!Datasource.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         Datasource d = (Datasource)e;
 
         datasourcetype = d.getDatasourcetype() != null && compareTrust(this, e)<0? d.getDatasourcetype() : datasourcetype;

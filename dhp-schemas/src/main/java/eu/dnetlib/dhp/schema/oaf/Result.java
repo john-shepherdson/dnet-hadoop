@@ -223,6 +223,10 @@ public class Result extends OafEntity implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
+        if (!Result.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         Result r = (Result) e;
 
         instance = mergeLists(instance, r.getInstance());

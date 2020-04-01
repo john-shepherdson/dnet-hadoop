@@ -79,6 +79,11 @@ public class Dataset extends Result implements Serializable {
     @Override
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
+
+        if (!Dataset.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         final Dataset d = (Dataset) e;
 
         storagedate = d.getStoragedate() != null && compareTrust(this, e)<0? d.getStoragedate() : storagedate;

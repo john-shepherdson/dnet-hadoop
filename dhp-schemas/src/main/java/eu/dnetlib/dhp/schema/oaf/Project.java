@@ -270,6 +270,11 @@ public class Project extends OafEntity implements Serializable {
     @Override
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
+
+        if (!Project.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         Project p = (Project)e;
 
             websiteurl= p.getWebsiteurl()!= null && compareTrust(this,e)<0?p.getWebsiteurl():websiteurl;

@@ -40,6 +40,10 @@ public class OtherResearchProduct extends Result implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
+        if (!OtherResearchProduct.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         OtherResearchProduct o = (OtherResearchProduct)e;
 
         contactperson = mergeLists(contactperson, o.getContactperson());
