@@ -3,30 +3,25 @@ package eu.dnetlib.dhp.oa.dedup.dedup;
 import com.google.common.collect.Lists;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.dedup.SparkCreateConnectedComponent;
-import eu.dnetlib.dhp.oa.dedup.SparkCreateDedupRecord;
 import eu.dnetlib.dhp.oa.dedup.SparkCreateSimRels;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.pace.config.DedupConfig;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentException;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.util.List;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 public class SparkDedupTest {
 
     @Mock
@@ -40,7 +35,7 @@ public class SparkDedupTest {
         );
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, ISLookUpException, DocumentException {
 
         when(sparkCreateSimRels.getConfigurations(anyString(), anyString())).thenReturn(prepareConfigurations());
