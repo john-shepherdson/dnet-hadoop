@@ -2,27 +2,27 @@
     <parameters>
         <property>
             <name>activePromoteDatasetActionPayload</name>
-            <description>TODO</description>
+            <description>when true will promote actions with eu.dnetlib.dhp.schema.oaf.Dataset payload</description>
         </property>
         <property>
             <name>activePromoteResultActionPayload</name>
-            <description>TODO</description>
+            <description>when true will promote actions with eu.dnetlib.dhp.schema.oaf.Result payload</description>
         </property>
         <property>
-            <name>inputGraphPath</name>
-            <description>TODO</description>
+            <name>inputGraphRootPath</name>
+            <description>root location of input materialized graph</description>
         </property>
         <property>
             <name>inputActionPayloadRootPath</name>
-            <description>TODO</description>
+            <description>root location of action payloads to promote</description>
         </property>
         <property>
-            <name>outputGraphPath</name>
-            <description>TODO</description>
+            <name>outputGraphRootPath</name>
+            <description>root location for output materialized graph</description>
         </property>
         <property>
             <name>mergeAndGetStrategy</name>
-            <description>TODO</description>
+            <description>strategy for merging graph table objects with action payload instances, MERGE_FROM_AND_GET or SELECT_NEWER_AND_GET</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -81,7 +81,7 @@
         <switch>
             <case to="PromoteDatasetActionPayloadForDatasetTable">
                 ${(activePromoteDatasetActionPayload eq "true") and
-                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputGraphPath')),'/'),'dataset')) eq "true") and
+                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputGraphRootPath')),'/'),'dataset')) eq "true") and
                 (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputActionPayloadRootPath')),'/'),'clazz=eu.dnetlib.dhp.schema.oaf.Dataset')) eq "true")}
             </case>
             <default to="SkipPromoteDatasetActionPayloadForDatasetTable"/>
@@ -105,7 +105,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=2560
             </spark-opts>
-            <arg>--inputGraphTablePath</arg><arg>${inputGraphPath}/dataset</arg>
+            <arg>--inputGraphTablePath</arg><arg>${inputGraphRootPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--inputActionPayloadPath</arg><arg>${inputActionPayloadRootPath}/clazz=eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
@@ -119,7 +119,7 @@
     <action name="SkipPromoteDatasetActionPayloadForDatasetTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <arg>-pb</arg>
-            <arg>${inputGraphPath}/dataset</arg>
+            <arg>${inputGraphRootPath}/dataset</arg>
             <arg>${workingDir}/dataset</arg>
         </distcp>
         <ok to="DecisionPromoteResultActionPayloadForDatasetTable"/>
@@ -157,7 +157,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--inputActionPayloadPath</arg><arg>${inputActionPayloadRootPath}/clazz=eu.dnetlib.dhp.schema.oaf.Result</arg>
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Result</arg>
-            <arg>--outputGraphTablePath</arg><arg>${outputGraphPath}/dataset</arg>
+            <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/dataset</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
         </spark>
         <ok to="End"/>
@@ -168,7 +168,7 @@
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <arg>-pb</arg>
             <arg>${workingDir}/dataset</arg>
-            <arg>${outputGraphPath}/dataset</arg>
+            <arg>${outputGraphRootPath}/dataset</arg>
         </distcp>
         <ok to="End"/>
         <error to="Kill"/>

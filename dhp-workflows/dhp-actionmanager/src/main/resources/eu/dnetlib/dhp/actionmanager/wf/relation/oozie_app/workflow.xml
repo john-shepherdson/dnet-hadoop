@@ -2,23 +2,23 @@
     <parameters>
         <property>
             <name>activePromoteRelationActionPayload</name>
-            <description>TODO</description>
+            <description>when true will promote actions with eu.dnetlib.dhp.schema.oaf.Relation payload</description>
         </property>
         <property>
-            <name>inputGraphPath</name>
-            <description>TODO</description>
+            <name>inputGraphRootPath</name>
+            <description>root location of input materialized graph</description>
         </property>
         <property>
             <name>inputActionPayloadRootPath</name>
-            <description>TODO</description>
+            <description>root location of action payloads to promote</description>
         </property>
         <property>
-            <name>outputGraphPath</name>
-            <description>TODO</description>
+            <name>outputGraphRootPath</name>
+            <description>root location for output materialized graph</description>
         </property>
         <property>
             <name>mergeAndGetStrategy</name>
-            <description>TODO</description>
+            <description>strategy for merging graph table objects with action payload instances, MERGE_FROM_AND_GET or SELECT_NEWER_AND_GET</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -77,7 +77,7 @@
         <switch>
             <case to="PromoteRelationActionPayloadForRelationTable">
                 ${(activePromoteRelationActionPayload eq "true") and
-                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputGraphPath')),'/'),'relation')) eq "true") and
+                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputGraphRootPath')),'/'),'relation')) eq "true") and
                 (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputActionPayloadRootPath')),'/'),'clazz=eu.dnetlib.dhp.schema.oaf.Relation')) eq "true")}
             </case>
             <default to="SkipPromoteRelationActionPayloadForRelationTable"/>
@@ -101,11 +101,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=2560
             </spark-opts>
-            <arg>--inputGraphTablePath</arg><arg>${inputGraphPath}/relation</arg>
+            <arg>--inputGraphTablePath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--inputActionPayloadPath</arg><arg>${inputActionPayloadRootPath}/clazz=eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
-            <arg>--outputGraphTablePath</arg><arg>${outputGraphPath}/relation</arg>
+            <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/relation</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
         </spark>
         <ok to="End"/>
@@ -115,8 +115,8 @@
     <action name="SkipPromoteRelationActionPayloadForRelationTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <arg>-pb</arg>
-            <arg>${inputGraphPath}/relation</arg>
-            <arg>${outputGraphPath}/relation</arg>
+            <arg>${inputGraphRootPath}/relation</arg>
+            <arg>${outputGraphRootPath}/relation</arg>
         </distcp>
         <ok to="End"/>
         <error to="Kill"/>

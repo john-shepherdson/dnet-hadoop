@@ -37,8 +37,8 @@ public class PromoteActionPayloadFunctions {
      * @param rowClazz           Class of graph table
      * @param actionPayloadClazz Class of action payload
      * @param <G>                Type of graph table row
-     * @param <A>                Type of action payload
-     * @return Dataset of merged graph table rows and action payload
+     * @param <A>                Type of action payload instance
+     * @return Dataset of merged graph table rows and action payload instances
      */
     public static <G extends Oaf, A extends Oaf> Dataset<G> joinGraphTableWithActionPayloadAndMerge(Dataset<G> rowDS,
                                                                                                     Dataset<A> actionPayloadDS,
@@ -84,7 +84,7 @@ public class PromoteActionPayloadFunctions {
      *
      * @param rowDS         Dataset representing graph table
      * @param rowIdFn       Function used to get the id of graph table row
-     * @param mergeAndGetFn Function used to merge graph table row and action payload instance
+     * @param mergeAndGetFn Function used to merge graph table rows
      * @param zeroFn        Function to create a zero/empty instance of graph table row
      * @param isNotZeroFn   Function to check if graph table row is not zero/empty
      * @param rowClazz      Class of graph table

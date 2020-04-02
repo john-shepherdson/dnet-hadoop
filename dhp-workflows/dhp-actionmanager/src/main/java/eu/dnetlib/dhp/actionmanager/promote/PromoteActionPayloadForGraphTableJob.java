@@ -120,7 +120,8 @@ public class PromoteActionPayloadForGraphTableJob {
         }
     }
 
-    private static void removeOutputDir(SparkSession spark, String path) {
+    private static void removeOutputDir(SparkSession spark,
+                                        String path) {
         HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
     }
 

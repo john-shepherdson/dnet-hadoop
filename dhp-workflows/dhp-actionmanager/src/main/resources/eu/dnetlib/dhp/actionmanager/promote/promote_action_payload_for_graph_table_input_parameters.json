@@ -2,43 +2,43 @@
   {
     "paramName": "issm",
     "paramLongName": "isSparkSessionManaged",
-    "paramDescription": "TODO",
+    "paramDescription": "when true will stop SparkSession after job execution",
     "paramRequired": false
   },
   {
     "paramName": "igtp",
     "paramLongName": "inputGraphTablePath",
-    "paramDescription": "TODO",
+    "paramDescription": "location of graph table to promote",
     "paramRequired": true
   },
   {
     "paramName": "gtcn",
     "paramLongName": "graphTableClassName",
-    "paramDescription": "TODO",
+    "paramDescription": "canonical name of graph table row class",
     "paramRequired": true
   },
   {
     "paramName": "iapp",
     "paramLongName": "inputActionPayloadPath",
-    "paramDescription": "TODO",
+    "paramDescription": "location of action payload to promote",
     "paramRequired": true
   },
   {
     "paramName": "apcn",
     "paramLongName": "actionPayloadClassName",
-    "paramDescription": "TODO",
+    "paramDescription": "canonical name of action payload class",
     "paramRequired": true
   },
   {
     "paramName": "ogtp",
     "paramLongName": "outputGraphTablePath",
-    "paramDescription": "TODO",
+    "paramDescription": "location of promoted graph table",
     "paramRequired": true
   },
   {
     "paramName": "mags",
     "paramLongName": "mergeAndGetStrategy",
-    "paramDescription": "TODO",
+    "paramDescription": "strategy for merging graph table objects with action payload instances, MERGE_FROM_AND_GET or SELECT_NEWER_AND_GET",
     "paramRequired": true
   }
 ]
