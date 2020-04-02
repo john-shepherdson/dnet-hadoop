@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.oa.dedup.dedup;
+package eu.dnetlib.dhp.oa.dedup;
 
 import eu.dnetlib.dhp.oa.dedup.DedupUtility;
 import eu.dnetlib.dhp.schema.oaf.Publication;

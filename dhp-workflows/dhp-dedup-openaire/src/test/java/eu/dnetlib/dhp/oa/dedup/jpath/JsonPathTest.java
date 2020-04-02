@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.oa.dedup.dedup.jpath;
+package eu.dnetlib.dhp.oa.dedup.jpath;
 
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
