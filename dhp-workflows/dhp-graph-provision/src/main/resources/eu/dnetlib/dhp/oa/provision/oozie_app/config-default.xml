@@ -25,6 +25,6 @@
     </property>
     <property>
         <name>spark2EventLogDir</name>
-        <value>/user/spark/applicationHistory</value>
+        <value>/user/spark/spark2ApplicationHistory</value>
     </property>
 </configuration>

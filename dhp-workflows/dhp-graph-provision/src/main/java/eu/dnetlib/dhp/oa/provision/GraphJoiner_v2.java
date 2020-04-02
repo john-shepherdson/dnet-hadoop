@@ -86,24 +86,36 @@ public class GraphJoiner_v2 implements Serializable {
         Dataset<TypedRow> publication = readPathEntity(jsc, getInputPath(), "publication");
 
         // create the union between all the entities
-        Dataset<Tuple2<String, TypedRow>> entities =
-                datasource
-                        .union(organization)
-                        .union(project)
-                        .union(dataset)
-                        .union(otherresearchproduct)
-                        .union(software)
-                        .union(publication)
-                .map((MapFunction<TypedRow, Tuple2<String, TypedRow>>) value -> new Tuple2<>(
-                        value.getId(),
-                        value),
-                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(TypedRow.class)))
-                .cache();
+         datasource
+                .union(organization)
+                .union(project)
+                .union(dataset)
+                .union(otherresearchproduct)
+                .union(software)
+                .union(publication)
+        .repartition(20000)
+        .write()
+        .parquet(getOutPath() + "/entities");
 
+        Dataset<Tuple2<String, TypedRow>> entities = getSpark()
+                .read()
+                .load(getOutPath() + "/entities")
+                .map((MapFunction<Row, Tuple2<String, TypedRow>>) r -> {
+                    TypedRow t = new TypedRow();
+                    t.setId(r.getAs("id"));
+                    t.setDeleted(r.getAs("deleted"));
+                    t.setType(r.getAs("type"));
+                    t.setOaf(r.getAs("oaf"));
+
+                    return new Tuple2<>(t.getId(), t);
+                }, Encoders.tuple(Encoders.STRING(), Encoders.kryo(TypedRow.class)));
+
+        System.out.println("Entities, number of partitions: " + entities.rdd().getNumPartitions());
         System.out.println("Entities schema:");
         entities.printSchema();
-        // reads the relationships
 
+/*
+        // reads the relationships
         Dataset<Relation> rels = readPathRelation(jsc, getInputPath())
                 .groupByKey((MapFunction<Relation, SortableRelationKey>) t -> SortableRelationKey.from(t), Encoders.kryo(SortableRelationKey.class))
                 .flatMapGroups((FlatMapGroupsFunction<SortableRelationKey, Relation, Relation>) (key, values) -> Iterators.limit(values, MAX_RELS), Encoders.bean(Relation.class))
@@ -126,7 +138,7 @@ public class GraphJoiner_v2 implements Serializable {
                     e.setRelation(t._1()._2());
                     e.setTarget(asRelatedEntity(t._2()._2()));
                     return e;
-                }, Encoders.bean(EntityRelEntity.class))
+                }, Encoders.kryo(EntityRelEntity.class))
                 .map((MapFunction<EntityRelEntity, Tuple2<String, EntityRelEntity>>) e -> new Tuple2<>(e.getRelation().getSource(), e),
                         Encoders.tuple(Encoders.STRING(), Encoders.kryo(EntityRelEntity.class)));
 
@@ -160,14 +172,12 @@ public class GraphJoiner_v2 implements Serializable {
         final XmlRecordFactory recordFactory = new XmlRecordFactory(accumulators, contextMapper, false, schemaLocation, otherDsTypeId);
         grouped
                 .map((MapFunction<JoinedEntity, String>) value -> recordFactory.build(value), Encoders.STRING())
-                .write()
-                .text(getOutPath() + "/xml");
-        /*
                 .javaRDD()
                 .mapToPair((PairFunction<Tuple2<String, String>, String, String>) t -> new Tuple2<>(t._1(), t._2()))
                 .saveAsHadoopFile(getOutPath() + "/xml", Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 
-         */
+
+*/
 
         return this;
     }
