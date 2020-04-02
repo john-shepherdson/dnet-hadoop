@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import static org.apache.spark.sql.functions.*;
+
 import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.asRelatedEntity;
 
 /**
@@ -93,9 +95,10 @@ public class GraphJoiner_v2 implements Serializable {
                 .union(otherresearchproduct)
                 .union(software)
                 .union(publication)
-        .repartition(20000)
-        .write()
-        .parquet(getOutPath() + "/entities");
+                .repartition(7000)
+                .write()
+                .partitionBy("id")
+                .parquet(getOutPath() + "/entities");
 
         Dataset<Tuple2<String, TypedRow>> entities = getSpark()
                 .read()
@@ -108,29 +111,51 @@ public class GraphJoiner_v2 implements Serializable {
                     t.setOaf(r.getAs("oaf"));
 
                     return new Tuple2<>(t.getId(), t);
-                }, Encoders.tuple(Encoders.STRING(), Encoders.kryo(TypedRow.class)));
+                }, Encoders.tuple(Encoders.STRING(), Encoders.kryo(TypedRow.class)))
+                .cache();
 
         System.out.println("Entities, number of partitions: " + entities.rdd().getNumPartitions());
         System.out.println("Entities schema:");
         entities.printSchema();
+        System.out.println("Entities count:" + entities.count());
 
-/*
         // reads the relationships
-        Dataset<Relation> rels = readPathRelation(jsc, getInputPath())
+        readPathRelation(jsc, getInputPath())
                 .groupByKey((MapFunction<Relation, SortableRelationKey>) t -> SortableRelationKey.from(t), Encoders.kryo(SortableRelationKey.class))
-                .flatMapGroups((FlatMapGroupsFunction<SortableRelationKey, Relation, Relation>) (key, values) -> Iterators.limit(values, MAX_RELS), Encoders.bean(Relation.class))
+                .flatMapGroups((FlatMapGroupsFunction<SortableRelationKey, Relation, Relation>) (key, values) -> Iterators.limit(values, MAX_RELS), Encoders.kryo(Relation.class))
+                .repartition(3000)
+                .write()
+                .partitionBy("source", "target")
+                .parquet(getOutPath() + "/relations");
+
+        Dataset<Relation> rels = getSpark()
+                .read()
+                .load(getOutPath() + "/relations")
+                .map((MapFunction<Row, Relation>) r -> {
+                    Relation rel = new Relation();
+                    rel.setSource(r.getAs("source"));
+                    rel.setTarget(r.getAs("target"));
+                    rel.setRelType(r.getAs("relType"));
+                    rel.setSubRelType(r.getAs("subRelType"));
+                    rel.setRelClass(r.getAs("relClass"));
+                    rel.setDataInfo(r.getAs("dataInfo"));
+                    rel.setCollectedFrom(r.getList(r.fieldIndex("collectedFrom")));
+                    return rel;
+                }, Encoders.kryo(Relation.class))
                 .cache();
 
         System.out.println("Relation schema:");
-        rels.printSchema();
+        System.out.println("Relation, number of partitions: " + rels.rdd().getNumPartitions());
+        System.out.println("Relation schema:");
+        entities.printSchema();
+        System.out.println("Relation count:" + rels.count());
 
+                /*
         Dataset<Tuple2<String, Relation>> relsByTarget = rels
                 .map((MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(r.getTarget(), r), Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)));
 
-        System.out.println("Relation by target schema:");
-        relsByTarget.printSchema();
 
-        Dataset<Tuple2<String, EntityRelEntity>> bySource = relsByTarget
+        relsByTarget
                 .joinWith(entities, relsByTarget.col("_1").equalTo(entities.col("_1")), "inner")
                 .filter((FilterFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, TypedRow>>>) value -> value._2()._2().getDeleted() == false)
                 .map((MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, TypedRow>>, EntityRelEntity>) t -> {
@@ -139,11 +164,27 @@ public class GraphJoiner_v2 implements Serializable {
                     e.setTarget(asRelatedEntity(t._2()._2()));
                     return e;
                 }, Encoders.kryo(EntityRelEntity.class))
-                .map((MapFunction<EntityRelEntity, Tuple2<String, EntityRelEntity>>) e -> new Tuple2<>(e.getRelation().getSource(), e),
-                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(EntityRelEntity.class)));
+                .repartition(20000)
+                .write()
+                .parquet(getOutPath() + "/bySource");
 
-        System.out.println("bySource schema");
+        Dataset<Tuple2<String, EntityRelEntity>> bySource = getSpark()
+                .read()
+                .load(getOutPath() + "/bySource")
+                .map(new MapFunction<Row, EntityRelEntity>() {
+                    @Override
+                    public EntityRelEntity call(Row value) throws Exception {
+                        return null;
+                    }
+                }, Encoders.kryo(EntityRelEntity.class))
+                .map((MapFunction<EntityRelEntity, Tuple2<String, EntityRelEntity>>) e -> new Tuple2<>(e.getRelation().getSource(), e),
+                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(EntityRelEntity.class)))
+
+                System.out.println("bySource schema");
         bySource.printSchema();
+
+
+
 
         Dataset<EntityRelEntity> joined = entities
                 .joinWith(bySource, entities.col("_1").equalTo(bySource.col("_1")), "left")

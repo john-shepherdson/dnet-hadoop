@@ -26,6 +26,20 @@
             <description>number of cores used by single executor</description>
         </property>
         <property>
+            <name>oozieActionShareLibForSpark2</name>
+            <description>oozie action sharelib for spark 2.*</description>
+        </property>
+        <property>
+            <name>spark2ExtraListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
+            <description>spark 2.* extra listeners classname</description>
+        </property>
+        <property>
+            <name>spark2SqlQueryExecutionListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
+            <description>spark 2.* sql query execution listeners classname</description>
+        </property>
+        <property>
             <name>spark2YarnHistoryServerAddress</name>
             <description>spark 2.* yarn history server address</description>
         </property>
@@ -40,12 +54,8 @@
         <name-node>${nameNode}</name-node>
         <configuration>
             <property>
-                <name>mapreduce.job.queuename</name>
-                <value>${queueName}</value>
-            </property>
-            <property>
-                <name>oozie.launcher.mapred.job.queue.name</name>
-                <value>${oozieLauncherQueueName}</value>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
             </property>
         </configuration>
     </global>
@@ -76,11 +86,11 @@
             <class>eu.dnetlib.dhp.oa.provision.SparkXmlRecordBuilderJob_v2</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores ${sparkExecutorCoresForJoining}
-                --executor-memory ${sparkExecutorMemoryForJoining}
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
-                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
-                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
@@ -107,8 +117,8 @@
                 --executor-memory ${sparkExecutorMemoryForIndexing}
                 --driver-memory=${sparkDriverMemoryForIndexing}
                 --conf spark.dynamicAllocation.maxExecutors=${sparkExecutorCoresForIndexing}
-                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
-                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
