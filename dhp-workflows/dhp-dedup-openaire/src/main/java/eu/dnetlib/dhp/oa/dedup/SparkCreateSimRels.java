@@ -38,8 +38,8 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
     private static final Log log = LogFactory.getLog(SparkCreateSimRels.class);
 
-    public SparkCreateSimRels(ArgumentApplicationParser parser, ISLookUpService isLookUpService) throws Exception {
-        super(parser, isLookUpService);
+    public SparkCreateSimRels(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+        super(parser, spark);
     }
 
     public static void main(String[] args) throws Exception {
@@ -48,11 +48,11 @@ public class SparkCreateSimRels extends AbstractSparkAction {
                         SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createSimRels_parameters.json")));
         parser.parseArgument(args);
 
-        new SparkCreateSimRels(parser, ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl"))).run();
+        new SparkCreateSimRels(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
     @Override
-    public void run() throws DocumentException, IOException, ISLookUpException {
+    public void run(ISLookUpService isLookUpService) throws DocumentException, IOException, ISLookUpException {
 
         //read oozie parameters
         final String graphBasePath = parser.get("graphBasePath");
@@ -65,34 +65,32 @@ public class SparkCreateSimRels extends AbstractSparkAction {
         System.out.println(String.format("actionSetId: '%s'", actionSetId));
         System.out.println(String.format("workingPath: '%s'", workingPath));
 
-        try (SparkSession spark = getSparkSession(parser)) {
-            final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-            //for each dedup configuration
-            for (DedupConfig dedupConf: getConfigurations(actionSetId)) {
-                final String entity = dedupConf.getWf().getEntityType();
-                final String subEntity = dedupConf.getWf().getSubEntityValue();
+        //for each dedup configuration
+        for (DedupConfig dedupConf: getConfigurations(isLookUpService, actionSetId)) {
+            final String entity = dedupConf.getWf().getEntityType();
+            final String subEntity = dedupConf.getWf().getSubEntityValue();
 
-                JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-                        .mapToPair((PairFunction<String, String, MapDocument>)  s -> {
-                            MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
-                            return new Tuple2<String, MapDocument>(d.getIdentifier(), d);
-                        });
+            JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+                    .mapToPair((PairFunction<String, String, MapDocument>)  s -> {
+                        MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
+                        return new Tuple2<String, MapDocument>(d.getIdentifier(), d);
+                    });
 
-                //create blocks for deduplication
-                JavaPairRDD<String, List<MapDocument>> blocks = Deduper.createsortedBlocks(sc, mapDocument, dedupConf);
+            //create blocks for deduplication
+            JavaPairRDD<String, List<MapDocument>> blocks = Deduper.createsortedBlocks(sc, mapDocument, dedupConf);
 
-                //create relations by comparing only elements in the same group
-                final JavaPairRDD<String, String> dedupRels = Deduper.computeRelations2(sc, blocks, dedupConf);
+            //create relations by comparing only elements in the same group
+            final JavaPairRDD<String, String> dedupRels = Deduper.computeRelations2(sc, blocks, dedupConf);
 
-                JavaRDD<Relation> relationsRDD = dedupRels.map(r -> createSimRel(r._1(), r._2(), entity));
+            JavaRDD<Relation> relationsRDD = dedupRels.map(r -> createSimRel(r._1(), r._2(), entity));
 
-                //save the simrel in the workingdir
-                spark.createDataset(relationsRDD.rdd(), Encoders.bean(Relation.class))
-                        .write()
-                        .mode("overwrite")
-                        .save(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity));
-            }
+            //save the simrel in the workingdir
+            spark.createDataset(relationsRDD.rdd(), Encoders.bean(Relation.class))
+                    .write()
+                    .mode("overwrite")
+                    .save(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity));
         }
     }
 

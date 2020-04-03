@@ -2,18 +2,15 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
-import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import scala.xml.Elem;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -24,15 +21,15 @@ import java.util.List;
 abstract class AbstractSparkAction implements Serializable {
 
     public ArgumentApplicationParser parser;   //parameters for the spark action
-    public ISLookUpService isLookUpService;    //lookup service to take dedupconfig
+    public SparkSession spark; //the spark session
 
-    public AbstractSparkAction(ArgumentApplicationParser parser, ISLookUpService isLookUpService) throws Exception {
+    public AbstractSparkAction(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
 
         this.parser = parser;
-        this.isLookUpService = isLookUpService;
+        this.spark = spark;
     }
 
-    public List<DedupConfig> getConfigurations(String orchestrator) throws ISLookUpException, DocumentException, IOException {
+    public List<DedupConfig> getConfigurations(ISLookUpService isLookUpService, String orchestrator) throws ISLookUpException, DocumentException, IOException {
 
         final String xquery = String.format("/RESOURCE_PROFILE[.//DEDUPLICATION/ACTION_SET/@id = '%s']", orchestrator);
 
@@ -51,7 +48,7 @@ abstract class AbstractSparkAction implements Serializable {
         return configurations;
     }
 
-    public DedupConfig loadConfig(final ISLookUpService isLookUpService, final String actionSetId, final Object o)
+    private DedupConfig loadConfig(final ISLookUpService isLookUpService, final String actionSetId, final Object o)
             throws ISLookUpException, IOException {
         final Element s = (Element) o;
         final String configProfileId = s.attributeValue("id");
@@ -68,9 +65,9 @@ abstract class AbstractSparkAction implements Serializable {
         return dedupConfig;
     }
 
-    abstract void run() throws DocumentException, IOException, ISLookUpException;
+    abstract void run(ISLookUpService isLookUpService) throws DocumentException, IOException, ISLookUpException;
 
-    protected SparkSession getSparkSession(ArgumentApplicationParser parser) {
+    protected static SparkSession getSparkSession(ArgumentApplicationParser parser) {
         SparkConf conf = new SparkConf();
 
         return SparkSession
