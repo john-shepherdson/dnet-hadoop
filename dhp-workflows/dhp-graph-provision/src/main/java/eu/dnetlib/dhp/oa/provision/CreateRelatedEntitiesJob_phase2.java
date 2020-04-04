@@ -119,7 +119,7 @@ public class CreateRelatedEntitiesJob_phase2 {
                     return re;
                 }, Encoders.bean(EntityRelEntity.class))
                 .write()
-                .mode(SaveMode.Append)
+                .mode(SaveMode.Overwrite)
                 .parquet(outputPath);
     }
 
