@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "irp",
+    "paramLongName": "inputRelationsPath",
+    "paramDescription": "path to input relations from the graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "iep",
+    "paramLongName": "inputEntityPath",
+    "paramDescription": "path to input entity from the graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "clazz",
+    "paramLongName": "graphTableClassName",
+    "paramDescription": "class name associated to the input entity path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "op",
+    "paramLongName": "outputPath",
+    "paramDescription": "root output location for prepared relations",
+    "paramRequired": true
+  }
+]

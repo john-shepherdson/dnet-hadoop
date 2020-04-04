@@ -1,14 +1,25 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
-import eu.dnetlib.dhp.schema.oaf.Relation;
-
 import java.io.Serializable;
 
 public class EntityRelEntity implements Serializable {
 
     private TypedRow entity;
-    private Relation relation;
+    private SortableRelation relation;
     private RelatedEntity target;
+
+    public EntityRelEntity() {
+    }
+
+    public EntityRelEntity(SortableRelation relation, RelatedEntity target) {
+        this(null, relation, target);
+    }
+
+    public EntityRelEntity(TypedRow entity, SortableRelation relation, RelatedEntity target) {
+        this.entity = entity;
+        this.relation = relation;
+        this.target = target;
+    }
 
     public TypedRow getEntity() {
         return entity;
@@ -18,11 +29,11 @@ public class EntityRelEntity implements Serializable {
         this.entity = entity;
     }
 
-    public Relation getRelation() {
+    public SortableRelation getRelation() {
         return relation;
     }
 
-    public void setRelation(Relation relation) {
+    public void setRelation(SortableRelation relation) {
         this.relation = relation;
     }
 

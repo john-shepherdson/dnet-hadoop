@@ -92,8 +92,7 @@ public class Relation extends Oaf {
 				subRelType.equals(relation.subRelType) &&
 				relClass.equals(relation.relClass) &&
 				source.equals(relation.source) &&
-				target.equals(relation.target) &&
-				Objects.equals(collectedFrom, relation.collectedFrom);
+				target.equals(relation.target);
 	}
 
 	@Override

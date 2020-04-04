@@ -2,7 +2,10 @@ package eu.dnetlib.dhp.oa.provision.model;
 
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
-public class Tuple2 {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Tuple2 implements Serializable {
 
     private Relation relation;
 
@@ -28,4 +31,18 @@ public class Tuple2 {
     public void setRelatedEntity(RelatedEntity relatedEntity) {
         this.relatedEntity = relatedEntity;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tuple2 t2 = (Tuple2) o;
+        return getRelation().equals(t2.getRelation());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getRelation().hashCode());
+    }
+
 }

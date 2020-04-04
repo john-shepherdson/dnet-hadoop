@@ -1,22 +1,23 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
+import eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
 import java.io.Serializable;
 
 public class JoinedEntity implements Serializable {
 
-    private String type;
+    private GraphMappingUtils.EntityType type;
 
     private OafEntity entity;
 
     private Links links;
 
-    public String getType() {
+    public GraphMappingUtils.EntityType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(GraphMappingUtils.EntityType type) {
         this.type = type;
     }
 

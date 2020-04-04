@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
-public class Links extends ArrayList<Tuple2> {
+public class Links extends HashSet<Tuple2> {
 }
