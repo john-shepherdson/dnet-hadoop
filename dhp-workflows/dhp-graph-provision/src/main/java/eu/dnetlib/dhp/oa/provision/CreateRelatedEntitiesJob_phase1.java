@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
-import eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -37,22 +37,22 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
  *      only consider relationships that are not virtually deleted ($.dataInfo.deletedbyinference == false), each entity
  *      can be linked at most to 100 other objects
  *
- *  2) CreateRelatedEntitiesJob_phase1:
- *      prepare tuples [relation - target entity] (R - T):
+ *  2) JoinRelationEntityByTargetJob:
+ *     (phase 1): prepare tuples [relation - target entity] (R - T):
  *      for each entity type E_i
- *          join (R.target = E_i.id),
- *          map E_i as RelatedEntity T_i, extracting only the necessary information beforehand to produce [R - T_i]
+ *          map E_i as RelatedEntity T_i to simplify the model and extracting only the necessary information
+ *          join (R.target = T_i.id)
+ *          save the tuples (R_i, T_i)
+ *     (phase 2):
+ *          create the union of all the entity types E, hash by id
+ *          read the tuples (R, T), hash by R.source
+ *          join E.id = (R, T).source, where E becomes the Source Entity S
+ *          save the tuples (S, R, T)
  *
- *  3) CreateRelatedEntitiesJob_phase2:
- *      prepare tuples [source entity - relation - target entity] (S - R - T):
- *      create the union of the each entity type, hash by id (S)
- *      for each [R - T_i] produced in phase1
- *          join S.id = [R - T_i].source to produce (S_i - R - T_i)
- *
- *  4) AdjacencyListBuilderJob:
+ *  3) AdjacencyListBuilderJob:
  *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mapping the result as JoinedEntity
  *
- *  5) XmlConverterJob:
+ *  4) XmlConverterJob:
  *      convert the JoinedEntities as XML records
  */
 public class CreateRelatedEntitiesJob_phase1 {
@@ -103,20 +103,21 @@ public class CreateRelatedEntitiesJob_phase1 {
     private static <E extends OafEntity> void joinRelationEntity(SparkSession spark, String inputRelationsPath, String inputEntityPath, Class<E> entityClazz, String outputPath) {
 
         Dataset<Tuple2<String, SortableRelation>> relsByTarget = readPathRelation(spark, inputRelationsPath)
+                .filter((FilterFunction<SortableRelation>) value -> value.getDataInfo().getDeletedbyinference() == false)
                 .map((MapFunction<SortableRelation, Tuple2<String, SortableRelation>>) r -> new Tuple2<>(r.getTarget(), r),
-                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(SortableRelation.class)));
+                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(SortableRelation.class)))
+                .cache();
 
-        Dataset<Tuple2<String, E>> entities = readPathEntity(spark, inputEntityPath, entityClazz)
-                .map((MapFunction<E, Tuple2<String, E>>) e -> new Tuple2<>(e.getId(), e),
-                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(entityClazz)))
+        Dataset<Tuple2<String, RelatedEntity>> entities = readPathEntity(spark, inputEntityPath, entityClazz)
+                .map((MapFunction<E, RelatedEntity>) value -> asRelatedEntity(value, entityClazz), Encoders.bean(RelatedEntity.class))
+                .map((MapFunction<RelatedEntity, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), e),
+                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntity.class)))
                 .cache();
 
         relsByTarget
                 .joinWith(entities, entities.col("_1").equalTo(relsByTarget.col("_1")), "inner")
-                .filter((FilterFunction<Tuple2<Tuple2<String, SortableRelation>, Tuple2<String, E>>>)
-                        value -> value._2()._2().getDataInfo().getDeletedbyinference() == false)
-                .map((MapFunction<Tuple2<Tuple2<String, SortableRelation>, Tuple2<String, E>>, EntityRelEntity>)
-                        t -> new EntityRelEntity(t._1()._2(), GraphMappingUtils.asRelatedEntity(t._2()._2(), entityClazz)),
+                .map((MapFunction<Tuple2<Tuple2<String, SortableRelation>, Tuple2<String, RelatedEntity>>, EntityRelEntity>)
+                        t -> new EntityRelEntity(t._1()._2(), t._2()._2()),
                         Encoders.bean(EntityRelEntity.class))
                 .write()
                 .mode(SaveMode.Overwrite)

@@ -3,31 +3,25 @@ package eu.dnetlib.dhp.oa.provision;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.*;
-import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
-import eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
+import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
+import eu.dnetlib.dhp.oa.provision.model.Tuple2;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.*;
-import org.apache.spark.rdd.RDD;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.catalyst.expressions.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getKryoClasses;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects.
@@ -43,14 +37,19 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
  *      can be linked at most to 100 other objects
  *
  *  2) JoinRelationEntityByTargetJob:
- *      prepare tuples [source entity - relation - target entity] (S - R - T):
+ *     (phase 1): prepare tuples [relation - target entity] (R - T):
  *      for each entity type E_i
- *          join (R.target = E_i.id),
- *          map E_i as RelatedEntity T_i, extracting only the necessary information beforehand to produce [R - T_i]
- *          join (E_i.id = [R - T_i].source), where E_i becomes the source entity S
+ *          map E_i as RelatedEntity T_i to simplify the model and extracting only the necessary information
+ *          join (R.target = T_i.id)
+ *          save the tuples (R_i, T_i)
+ *     (phase 2):
+ *          create the union of all the entity types E, hash by id
+ *          read the tuples (R, T), hash by R.source
+ *          join E.id = (R, T).source, where E becomes the Source Entity S
+ *          save the tuples (S, R, T)
  *
  *  3) AdjacencyListBuilderJob:
- *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mappnig the result as JoinedEntity
+ *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mapping the result as JoinedEntity
  *
  *  4) XmlConverterJob:
  *      convert the JoinedEntities as XML records
@@ -59,7 +58,6 @@ public class AdjacencyListBuilderJob {
 
     private static final Logger log = LoggerFactory.getLogger(AdjacencyListBuilderJob.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     public static final int MAX_LINKS = 100;
 
     public static void main(String[] args) throws Exception {
@@ -91,7 +89,6 @@ public class AdjacencyListBuilderJob {
                     removeOutputDir(spark, outputPath);
                     createAdjacencyLists(spark, inputPath, outputPath);
                 });
-
     }
 
     private static void createAdjacencyLists(SparkSession spark, String inputPath, String outputPath) {
@@ -103,7 +100,7 @@ public class AdjacencyListBuilderJob {
                 .groupByKey((MapFunction<EntityRelEntity, String>) value -> value.getEntity().getId(), Encoders.STRING())
                 .mapGroups((MapGroupsFunction<String, EntityRelEntity, JoinedEntity>) (key, values) -> {
                     JoinedEntity j = new JoinedEntity();
-                    Links links = new Links();
+                    List<Tuple2> links = new ArrayList<>();
                     while (values.hasNext() && links.size() < MAX_LINKS) {
                         EntityRelEntity curr = values.next();
                         if (j.getEntity() == null) {

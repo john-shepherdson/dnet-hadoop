@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.oa.provision;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
@@ -27,8 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -37,23 +41,25 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
  * The operation considers all the entity types (publication, dataset, software, ORP, project, datasource, organization,
  * and all the possible relationships (similarity links produced by the Dedup process are excluded).
  *
- * The operation is implemented by sequentially joining one entity type at time (E) with the relationships (R), and again
- * by E, finally grouped by E.id;
- *
  * The workflow is organized in different parts aimed to to reduce the complexity of the operation
  *  1) PrepareRelationsJob:
  *      only consider relationships that are not virtually deleted ($.dataInfo.deletedbyinference == false), each entity
  *      can be linked at most to 100 other objects
  *
  *  2) JoinRelationEntityByTargetJob:
- *      prepare tuples [source entity - relation - target entity] (S - R - T):
+ *     (phase 1): prepare tuples [relation - target entity] (R - T):
  *      for each entity type E_i
- *          join (R.target = E_i.id),
- *          map E_i as RelatedEntity T_i, extracting only the necessary information beforehand to produce [R - T_i]
- *          join (E_i.id = [R - T_i].source), where E_i becomes the source entity S
+ *          map E_i as RelatedEntity T_i to simplify the model and extracting only the necessary information
+ *          join (R.target = T_i.id)
+ *          save the tuples (R_i, T_i)
+ *     (phase 2):
+ *          create the union of all the entity types E, hash by id
+ *          read the tuples (R, T), hash by R.source
+ *          join E.id = (R, T).source, where E becomes the Source Entity S
+ *          save the tuples (S, R, T)
  *
  *  3) AdjacencyListBuilderJob:
- *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mappnig the result as JoinedEntity
+ *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mapping the result as JoinedEntity
  *
  *  4) XmlConverterJob:
  *      convert the JoinedEntities as XML records
@@ -61,6 +67,8 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 public class XmlConverterJob {
 
     private static final Logger log = LoggerFactory.getLogger(XmlConverterJob.class);
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static final String schemaLocation = "https://www.openaire.eu/schema/1.0/oaf-1.0.xsd";
 
@@ -107,12 +115,31 @@ public class XmlConverterJob {
         spark.read()
                 .load(inputPath)
                 .as(Encoders.bean(JoinedEntity.class))
+ /*               .map((MapFunction<JoinedEntity, String>) value -> OBJECT_MAPPER.writeValueAsString(value), Encoders.STRING())
+                .write()
+                .option("codec", "org.apache.hadoop.io.compress.GzipCodec")
+                .text("/tmp/json");
+
+        spark.read()
+                .textFile("/tmp/json")
+                .map((MapFunction<String, JoinedEntity>) value -> OBJECT_MAPPER.readValue(value, JoinedEntity.class), Encoders.bean(JoinedEntity.class))
+                .map((MapFunction<JoinedEntity, JoinedEntity>) j -> {
+                    if (j.getLinks() != null) {
+                        j.setLinks(j.getLinks()
+                                .stream()
+                                .filter(t -> t.getRelation() != null & t.getRelatedEntity() != null)
+                                .collect(Collectors.toCollection(ArrayList::new)));
+                    }
+                    return j;
+                }, Encoders.bean(JoinedEntity.class))
+
+  */
                 .map((MapFunction<JoinedEntity, Tuple2<String, String>>) je -> new Tuple2<>(
                         je.getEntity().getId(),
                         recordFactory.build(je)
                 ), Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
                 .javaRDD()
-                .mapToPair((PairFunction<Tuple2<String, String>, String, String>) t -> t)
+                .mapToPair((PairFunction<Tuple2<String, String>, Text, Text>) t -> new Tuple2<>(new Text(t._1()), new Text(t._2())))
                 .saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
     }
 

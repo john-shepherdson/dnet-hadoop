@@ -6,11 +6,9 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
 import eu.dnetlib.dhp.oa.provision.model.TypedRow;
-import eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -25,12 +23,10 @@ import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getKryoClasses;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects.
@@ -45,24 +41,22 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
  *      only consider relationships that are not virtually deleted ($.dataInfo.deletedbyinference == false), each entity
  *      can be linked at most to 100 other objects
  *
- *  2) CreateRelatedEntitiesJob_phase1:
- *      prepare tuples [relation - target entity] (R - T):
+ *  2) JoinRelationEntityByTargetJob:
+ *     (phase 1): prepare tuples [relation - target entity] (R - T):
  *      for each entity type E_i
- *          join (R.target = E_i.id),
- *          map E_i as RelatedEntity T_i, extracting only the necessary information beforehand to produce [R - T_i]
- *          save the tuples [R - T_i] in append mode
+ *          map E_i as RelatedEntity T_i to simplify the model and extracting only the necessary information
+ *          join (R.target = T_i.id)
+ *          save the tuples (R_i, T_i)
+ *     (phase 2):
+ *          create the union of all the entity types E, hash by id
+ *          read the tuples (R, T), hash by R.source
+ *          join E.id = (R, T).source, where E becomes the Source Entity S
+ *          save the tuples (S, R, T)
  *
- *  3) CreateRelatedEntitiesJob_phase2:
- *      prepare tuples [source entity - relation - target entity] (S - R - T):
- *      create the union of the each entity type, hash by id (S)
- *      for each [R - T_i] produced in phase1
- *          join S.id = [R - T_i].source to produce (S_i - R - T_i)
- *          save in append mode
+ *  3) AdjacencyListBuilderJob:
+ *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mapping the result as JoinedEntity
  *
- *  4) AdjacencyListBuilderJob:
- *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mappnig the result as JoinedEntity
- *
- *  5) XmlConverterJob:
+ *  4) XmlConverterJob:
  *      convert the JoinedEntities as XML records
  */
 public class CreateRelatedEntitiesJob_phase2 {

@@ -114,7 +114,7 @@ public class GraphMappingUtils {
 
         final RelatedEntity re = new RelatedEntity();
         re.setId(entity.getId());
-        re.setType(clazz.getName());
+        re.setType(EntityType.fromClass(clazz).name());
 
         re.setPid(entity.getPid());
         re.setCollectedfrom(entity.getCollectedfrom());
@@ -125,16 +125,16 @@ public class GraphMappingUtils {
             case otherresearchproduct:
             case software:
 
-                Result r = (Result) entity;
+                Result result = (Result) entity;
 
-                if (r.getTitle() == null && !r.getTitle().isEmpty()) {
-                    re.setTitle(r.getTitle().stream().findFirst().get());
+                if (result.getTitle() == null && !result.getTitle().isEmpty()) {
+                    re.setTitle(result.getTitle().stream().findFirst().get());
                 }
 
-                re.setDateofacceptance(getValue(r.getDateofacceptance()));
-                re.setPublisher(getValue(r.getPublisher()));
-                re.setResulttype(re.getResulttype());
-                re.setInstances(re.getInstances());
+                re.setDateofacceptance(getValue(result.getDateofacceptance()));
+                re.setPublisher(getValue(result.getPublisher()));
+                re.setResulttype(result.getResulttype());
+                re.setInstances(result.getInstance());
 
                 //TODO still to be mapped
                 //re.setCodeRepositoryUrl(j.read("$.coderepositoryurl"));

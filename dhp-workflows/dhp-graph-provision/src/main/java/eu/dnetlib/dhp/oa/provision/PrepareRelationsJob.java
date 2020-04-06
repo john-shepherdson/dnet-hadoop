@@ -1,31 +1,22 @@
 package eu.dnetlib.dhp.oa.provision;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapGroupsFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
-import scala.math.Ordering;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -44,14 +35,19 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
  *      can be linked at most to 100 other objects
  *
  *  2) JoinRelationEntityByTargetJob:
- *      prepare tuples [source entity - relation - target entity] (S - R - T):
+ *     (phase 1): prepare tuples [relation - target entity] (R - T):
  *      for each entity type E_i
- *          join (R.target = E_i.id),
- *          map E_i as RelatedEntity T_i, extracting only the necessary information beforehand to produce [R - T_i]
- *          join (E_i.id = [R - T_i].source), where E_i becomes the source entity S
+ *          map E_i as RelatedEntity T_i to simplify the model and extracting only the necessary information
+ *          join (R.target = T_i.id)
+ *          save the tuples (R_i, T_i)
+ *     (phase 2):
+ *          create the union of all the entity types E, hash by id
+ *          read the tuples (R, T), hash by R.source
+ *          join E.id = (R, T).source, where E becomes the Source Entity S
+ *          save the tuples (S, R, T)
  *
  *  3) AdjacencyListBuilderJob:
- *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mappnig the result as JoinedEntity
+ *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mapping the result as JoinedEntity
  *
  *  4) XmlConverterJob:
  *      convert the JoinedEntities as XML records

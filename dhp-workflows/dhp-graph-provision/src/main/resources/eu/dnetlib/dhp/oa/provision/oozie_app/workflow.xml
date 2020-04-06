@@ -75,7 +75,7 @@
         <switch>
             <case to="prepare_relations">${wf:conf('reuseRecords') eq false}</case>
             <case to="to_solr_index">${wf:conf('reuseRecords') eq true}</case>
-            <default to="adjancency_lists"/>
+            <default to="prepare_relations"/>
         </switch>
     </decision>
 
@@ -132,7 +132,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -324,7 +324,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputGraphRootPath</arg><arg>${inputGraphRootPath}</arg>
@@ -351,7 +351,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg> <arg>${workingDir}/join_entities</arg>
@@ -365,7 +365,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>build_adjacency_lists</name>
+            <name>convert_to_xml</name>
             <class>eu.dnetlib.dhp.oa.provision.XmlConverterJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>

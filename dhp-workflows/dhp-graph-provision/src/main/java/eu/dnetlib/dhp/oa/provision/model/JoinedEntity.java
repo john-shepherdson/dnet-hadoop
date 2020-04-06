@@ -1,12 +1,13 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class JoinedEntity implements Serializable {
 
     private TypedRow entity;
 
-    private Links links;
+    private List<Tuple2> links;
 
     public JoinedEntity() {
     }
@@ -19,11 +20,11 @@ public class JoinedEntity implements Serializable {
         this.entity = entity;
     }
 
-    public Links getLinks() {
+    public List<Tuple2> getLinks() {
         return links;
     }
 
-    public void setLinks(Links links) {
+    public void setLinks(List<Tuple2> links) {
         this.links = links;
     }
 }

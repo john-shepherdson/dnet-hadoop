@@ -694,7 +694,7 @@ public class XmlRecordFactory implements Serializable {
                     if (isNotBlank(re.getCodeRepositoryUrl())) {
                         metadata.add(XmlSerializationUtils.asXmlElement("coderepositoryurl", re.getCodeRepositoryUrl()));
                     }
-                    if (re.getResulttype() != null & !re.getResulttype().isBlank()) {
+                    if (re.getResulttype() != null & re.getResulttype().isBlank()) {
                         metadata.add(XmlSerializationUtils.mapQualifier("resulttype", re.getResulttype()));
                     }
                     if (re.getCollectedfrom() != null) {
