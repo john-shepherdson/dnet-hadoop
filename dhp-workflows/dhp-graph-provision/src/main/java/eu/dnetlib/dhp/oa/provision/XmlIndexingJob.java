@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.oa.provision;
 
 import com.lucidworks.spark.util.SolrSupport;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
@@ -11,14 +10,11 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Text;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +31,9 @@ import java.util.Optional;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-public class SparkXmlIndexingJob {
+public class XmlIndexingJob {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkXmlIndexingJob.class);
+    private static final Logger log = LoggerFactory.getLogger(XmlIndexingJob.class);
 
     private static final Integer DEFAULT_BATCH_SIZE = 1000;
 
@@ -50,7 +46,7 @@ public class SparkXmlIndexingJob {
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils.toString(
-                        SparkXmlIndexingJob.class.getResourceAsStream(
+                        XmlIndexingJob.class.getResourceAsStream(
                                 "/eu/dnetlib/dhp/oa/provision/input_params_update_index.json")));
         parser.parseArgument(args);
 

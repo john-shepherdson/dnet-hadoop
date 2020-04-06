@@ -393,12 +393,12 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>to_solr_index</name>
-            <class>eu.dnetlib.dhp.oa.provision.SparkXmlIndexingJob</class>
+            <class>eu.dnetlib.dhp.oa.provision.XmlIndexingJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores ${sparkExecutorCoresForIndexing}
-                --executor-memory ${sparkExecutorMemoryForIndexing}
+                --executor-memory=${sparkExecutorMemoryForIndexing}
                 --driver-memory=${sparkDriverMemoryForIndexing}
+                --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${sparkExecutorCoresForIndexing}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
