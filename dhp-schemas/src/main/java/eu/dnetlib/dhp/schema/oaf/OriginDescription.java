@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class OriginDescription implements Serializable {
 
@@ -62,5 +63,23 @@ public class OriginDescription implements Serializable {
 
     public void setMetadataNamespace(String metadataNamespace) {
         this.metadataNamespace = metadataNamespace;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OriginDescription that = (OriginDescription) o;
+        return Objects.equals(harvestDate, that.harvestDate) &&
+                Objects.equals(altered, that.altered) &&
+                Objects.equals(baseURL, that.baseURL) &&
+                Objects.equals(identifier, that.identifier) &&
+                Objects.equals(datestamp, that.datestamp) &&
+                Objects.equals(metadataNamespace, that.metadataNamespace);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(harvestDate, altered, baseURL, identifier, datestamp, metadataNamespace);
     }
 }

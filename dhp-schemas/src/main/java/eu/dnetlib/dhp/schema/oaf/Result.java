@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class Result extends OafEntity implements Serializable {
 
@@ -222,6 +223,10 @@ public class Result extends OafEntity implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
+        if (!Result.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         Result r = (Result) e;
 
         instance = mergeLists(instance, r.getInstance());
@@ -278,4 +283,37 @@ public class Result extends OafEntity implements Serializable {
         return a.size() > b.size() ? a : b;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Result result = (Result) o;
+        return Objects.equals(author, result.author) &&
+                Objects.equals(resulttype, result.resulttype) &&
+                Objects.equals(language, result.language) &&
+                Objects.equals(country, result.country) &&
+                Objects.equals(subject, result.subject) &&
+                Objects.equals(title, result.title) &&
+                Objects.equals(relevantdate, result.relevantdate) &&
+                Objects.equals(description, result.description) &&
+                Objects.equals(dateofacceptance, result.dateofacceptance) &&
+                Objects.equals(publisher, result.publisher) &&
+                Objects.equals(embargoenddate, result.embargoenddate) &&
+                Objects.equals(source, result.source) &&
+                Objects.equals(fulltext, result.fulltext) &&
+                Objects.equals(format, result.format) &&
+                Objects.equals(contributor, result.contributor) &&
+                Objects.equals(resourcetype, result.resourcetype) &&
+                Objects.equals(coverage, result.coverage) &&
+                Objects.equals(bestaccessright, result.bestaccessright) &&
+                Objects.equals(context, result.context) &&
+                Objects.equals(externalReference, result.externalReference) &&
+                Objects.equals(instance, result.instance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), author, resulttype, language, country, subject, title, relevantdate, description, dateofacceptance, publisher, embargoenddate, source, fulltext, format, contributor, resourcetype, coverage, bestaccessright, context, externalReference, instance);
+    }
 }
