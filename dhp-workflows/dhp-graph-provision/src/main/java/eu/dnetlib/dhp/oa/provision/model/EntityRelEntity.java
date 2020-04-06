@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
+import com.google.common.base.Objects;
+
 import java.io.Serializable;
 
 public class EntityRelEntity implements Serializable {
@@ -43,5 +45,20 @@ public class EntityRelEntity implements Serializable {
 
     public void setTarget(RelatedEntity target) {
         this.target = target;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EntityRelEntity that = (EntityRelEntity) o;
+        return Objects.equal(entity, that.entity) &&
+                Objects.equal(relation, that.relation) &&
+                Objects.equal(target, that.target);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(entity, relation, target);
     }
 }

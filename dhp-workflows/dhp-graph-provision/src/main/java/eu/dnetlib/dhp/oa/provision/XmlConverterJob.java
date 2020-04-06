@@ -115,14 +115,6 @@ public class XmlConverterJob {
         spark.read()
                 .load(inputPath)
                 .as(Encoders.bean(JoinedEntity.class))
- /*               .map((MapFunction<JoinedEntity, String>) value -> OBJECT_MAPPER.writeValueAsString(value), Encoders.STRING())
-                .write()
-                .option("codec", "org.apache.hadoop.io.compress.GzipCodec")
-                .text("/tmp/json");
-
-        spark.read()
-                .textFile("/tmp/json")
-                .map((MapFunction<String, JoinedEntity>) value -> OBJECT_MAPPER.readValue(value, JoinedEntity.class), Encoders.bean(JoinedEntity.class))
                 .map((MapFunction<JoinedEntity, JoinedEntity>) j -> {
                     if (j.getLinks() != null) {
                         j.setLinks(j.getLinks()
@@ -132,8 +124,6 @@ public class XmlConverterJob {
                     }
                     return j;
                 }, Encoders.bean(JoinedEntity.class))
-
-  */
                 .map((MapFunction<JoinedEntity, Tuple2<String, String>>) je -> new Tuple2<>(
                         je.getEntity().getId(),
                         recordFactory.build(je)

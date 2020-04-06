@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
+import com.google.common.base.Objects;
 import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
@@ -227,5 +228,40 @@ public class RelatedEntity implements Serializable {
 
     public void setFundingtree(List<String> fundingtree) {
         this.fundingtree = fundingtree;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RelatedEntity that = (RelatedEntity) o;
+        return Objects.equal(id, that.id) &&
+                Objects.equal(type, that.type) &&
+                Objects.equal(title, that.title) &&
+                Objects.equal(websiteurl, that.websiteurl) &&
+                Objects.equal(dateofacceptance, that.dateofacceptance) &&
+                Objects.equal(publisher, that.publisher) &&
+                Objects.equal(pid, that.pid) &&
+                Objects.equal(codeRepositoryUrl, that.codeRepositoryUrl) &&
+                Objects.equal(resulttype, that.resulttype) &&
+                Objects.equal(collectedfrom, that.collectedfrom) &&
+                Objects.equal(instances, that.instances) &&
+                Objects.equal(officialname, that.officialname) &&
+                Objects.equal(datasourcetype, that.datasourcetype) &&
+                Objects.equal(datasourcetypeui, that.datasourcetypeui) &&
+                Objects.equal(openairecompatibility, that.openairecompatibility) &&
+                Objects.equal(legalname, that.legalname) &&
+                Objects.equal(legalshortname, that.legalshortname) &&
+                Objects.equal(country, that.country) &&
+                Objects.equal(projectTitle, that.projectTitle) &&
+                Objects.equal(code, that.code) &&
+                Objects.equal(acronym, that.acronym) &&
+                Objects.equal(contracttype, that.contracttype) &&
+                Objects.equal(fundingtree, that.fundingtree);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, type, title, websiteurl, dateofacceptance, publisher, pid, codeRepositoryUrl, resulttype, collectedfrom, instances, officialname, datasourcetype, datasourcetypeui, openairecompatibility, legalname, legalshortname, country, projectTitle, code, acronym, contracttype, fundingtree);
     }
 }

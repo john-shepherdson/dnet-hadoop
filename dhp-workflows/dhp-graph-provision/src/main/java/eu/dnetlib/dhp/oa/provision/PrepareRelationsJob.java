@@ -1,21 +1,26 @@
 package eu.dnetlib.dhp.oa.provision;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
+import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.FlatMapGroupsFunction;
-import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.*;
+import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Tuple2;
 
 import java.util.Optional;
 
@@ -87,7 +92,7 @@ public class PrepareRelationsJob {
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {
                     removeOutputDir(spark, outputPath);
-                    prepareRelationsFromPaths(spark, inputRelationsPath, outputPath, numPartitions);
+                    prepareRelationsRDDFromPaths(spark, inputRelationsPath, outputPath, numPartitions);
                 });
     }
 
@@ -113,6 +118,30 @@ public class PrepareRelationsJob {
         return spark.read()
                 .textFile(inputPath)
                 .map((MapFunction<String, SortableRelation>) value -> OBJECT_MAPPER.readValue(value, SortableRelation.class), Encoders.bean(SortableRelation.class));
+    }
+
+    private static void prepareRelationsRDDFromPaths(SparkSession spark, String inputRelationsPath, String outputPath, int numPartitions) {
+        JavaRDD<SortableRelation> rels = readPathRelationRDD(spark, inputRelationsPath)
+                .repartition(numPartitions);
+
+        RDD<SortableRelation> d = rels
+                .filter(rel -> !rel.getDataInfo().getDeletedbyinference()) //only consider those that are not virtually deleted
+                .mapToPair((PairFunction<SortableRelation, SortableRelation, SortableRelation>) rel -> new Tuple2<>(rel, rel))
+                .groupByKey(new RelationPartitioner(rels.getNumPartitions()))
+                .map(p -> Iterables.limit(p._2(), MAX_RELS))
+                .flatMap(p -> p.iterator())
+                .rdd();
+
+        spark.createDataset(d, Encoders.bean(SortableRelation.class))
+                .write()
+                .mode(SaveMode.Overwrite)
+                .parquet(outputPath);
+    }
+
+    private static JavaRDD<SortableRelation> readPathRelationRDD(SparkSession spark, final String inputPath) {
+        JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+        return sc.textFile(inputPath)
+                .map(s -> OBJECT_MAPPER.readValue(s, SortableRelation.class));
     }
 
     private static void removeOutputDir(SparkSession spark, String path) {
