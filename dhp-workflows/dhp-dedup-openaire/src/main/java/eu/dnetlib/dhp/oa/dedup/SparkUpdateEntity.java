@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.compress.GzipCodec;
@@ -23,17 +27,23 @@ import scala.Tuple2;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class SparkUpdateEntity implements Serializable {
+public class SparkUpdateEntity extends AbstractSparkAction {
 
     final String IDJSONPATH = "$.id";
 
+    private static final Log log = LogFactory.getLog(SparkUpdateEntity.class);
+
+    public SparkUpdateEntity(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+        super(parser, spark);
+    }
+
     public static void main(String[] args) throws Exception {
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
+        ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils.toString(
                         SparkUpdateEntity.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
         parser.parseArgument(args);
 
-        new SparkUpdateEntity().run(parser);
+        new SparkUpdateEntity(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
     public boolean mergeRelExists(String basePath, String entity) throws IOException {
@@ -53,45 +63,43 @@ public class SparkUpdateEntity implements Serializable {
         return result;
     }
 
-    public void run(ArgumentApplicationParser parser) throws IOException {
+    public void run(ISLookUpService isLookUpService) throws IOException {
 
         final String graphBasePath = parser.get("graphBasePath");
         final String workingPath = parser.get("workingPath");
         final String dedupGraphPath = parser.get("dedupGraphPath");
 
-        try (SparkSession spark = getSparkSession(parser)) {
+        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-            final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+        //for each entity
+        for (OafEntityType entity: OafEntityType.values()) {
 
-            //for each entity
-            for (OafEntityType entity: OafEntityType.values()) {
+            JavaRDD<String> sourceEntity = sc.textFile(DedupUtility.createEntityPath(graphBasePath, entity.toString()));
 
-                JavaRDD<String> sourceEntity = sc.textFile(DedupUtility.createEntityPath(graphBasePath, entity.toString()));
+            if (mergeRelExists(workingPath, entity.toString())) {
 
-                if (mergeRelExists(workingPath, entity.toString())) {
+                final Dataset<Relation> rel = spark.read().load(DedupUtility.createMergeRelPath(workingPath, "*", entity.toString())).as(Encoders.bean(Relation.class));
 
-                    final Dataset<Relation> rel = spark.read().load(DedupUtility.createMergeRelPath(workingPath, "*", entity.toString())).as(Encoders.bean(Relation.class));
+                final JavaPairRDD<String, String> mergedIds = rel
+                        .where("relClass == 'merges'")
+                        .select(rel.col("target"))
+                        .distinct()
+                        .toJavaRDD()
+                        .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<String, String>(r.getString(0), "d"));
 
-                    final JavaPairRDD<String, String> mergedIds = rel
-                            .where("relClass == 'merges'")
-                            .select(rel.col("target"))
-                            .distinct()
-                            .toJavaRDD()
-                            .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "d"));
+                final JavaRDD<String> dedupEntity = sc.textFile(DedupUtility.createDedupRecordPath(workingPath, "*", entity.toString()));
 
-                    final JavaRDD<String> dedupEntity = sc.textFile(DedupUtility.createDedupRecordPath(workingPath, "*", entity.toString()));
+                JavaPairRDD<String, String> entitiesWithId = sourceEntity.mapToPair((PairFunction<String, String, String>) s -> new Tuple2<String, String>(MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
 
-                    JavaPairRDD<String, String> entitiesWithId = sourceEntity.mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
-
-                    JavaRDD<String> map = entitiesWithId.leftOuterJoin(mergedIds).map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), getOafClass(entity)) : k._2()._1());
-                    sourceEntity = map.union(dedupEntity);
-
-                }
-
-                sourceEntity.saveAsTextFile(dedupGraphPath + "/" + entity, GzipCodec.class);
+                JavaRDD<String> map = entitiesWithId.leftOuterJoin(mergedIds).map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), getOafClass(entity)) : k._2()._1());
+                sourceEntity = map.union(dedupEntity);
 
             }
+
+            sourceEntity.saveAsTextFile(dedupGraphPath + "/" + entity, GzipCodec.class);
+
         }
+
     }
 
     public Class<? extends Oaf> getOafClass(OafEntityType className) {
@@ -127,17 +135,5 @@ public class SparkUpdateEntity implements Serializable {
         } catch (IOException e) {
             throw new RuntimeException("Unable to convert json", e);
         }
-    }
-
-    private static SparkSession getSparkSession(ArgumentApplicationParser parser) {
-        SparkConf conf = new SparkConf();
-
-        return SparkSession
-                .builder()
-                .appName(SparkUpdateEntity.class.getSimpleName())
-                .master(parser.get("master"))
-                .config(conf)
-                .enableHiveSupport()
-                .getOrCreate();
     }
 }

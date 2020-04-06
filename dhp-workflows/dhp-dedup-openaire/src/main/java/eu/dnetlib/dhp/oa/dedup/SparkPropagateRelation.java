@@ -6,8 +6,12 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -24,7 +28,7 @@ import scala.Tuple2;
 
 import java.io.IOException;
 
-public class SparkPropagateRelation {
+public class SparkPropagateRelation extends AbstractSparkAction {
 
     enum FieldType {
         SOURCE,
@@ -34,83 +38,88 @@ public class SparkPropagateRelation {
     final static String SOURCEJSONPATH = "$.source";
     final static String TARGETJSONPATH = "$.target";
 
-    public static void main(String[] args) throws Exception {
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils.toString(
-                        SparkPropagateRelation.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json")));
-        parser.parseArgument(args);
+    private static final Log log = LogFactory.getLog(SparkPropagateRelation.class);
 
-        new SparkPropagateRelation().run(parser);
+    public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+        super(parser, spark);
     }
 
-    public void run(ArgumentApplicationParser parser) {
+    public static void main(String[] args) throws Exception {
+        ArgumentApplicationParser parser = new ArgumentApplicationParser(
+                IOUtils.toString(
+                        SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json")));
+        parser.parseArgument(args);
+
+        new SparkPropagateRelation(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+    }
+
+    @Override
+    public void run(ISLookUpService isLookUpService) {
 
         final String graphBasePath = parser.get("graphBasePath");
         final String workingPath = parser.get("workingPath");
         final String dedupGraphPath = parser.get("dedupGraphPath");
 
-        try (SparkSession spark = getSparkSession(parser)) {
-            final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-            final Dataset<Relation> mergeRels = spark.read().load(DedupUtility.createMergeRelPath(workingPath, "*", "*")).as(Encoders.bean(Relation.class));
+        final Dataset<Relation> mergeRels = spark.read().load(DedupUtility.createMergeRelPath(workingPath, "*", "*")).as(Encoders.bean(Relation.class));
 
-            final JavaPairRDD<String, String> mergedIds = mergeRels
-                    .where("relClass == 'merges'")
-                    .select(mergeRels.col("source"), mergeRels.col("target"))
-                    .distinct()
-                    .toJavaRDD()
-                    .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(1), r.getString(0)));
+        final JavaPairRDD<String, String> mergedIds = mergeRels
+                .where("relClass == 'merges'")
+                .select(mergeRels.col("source"), mergeRels.col("target"))
+                .distinct()
+                .toJavaRDD()
+                .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<String, String>(r.getString(1), r.getString(0)));
 
-            JavaRDD<String> relations = sc.textFile(DedupUtility.createEntityPath(graphBasePath, "relation"));
+        JavaRDD<String> relations = sc.textFile(DedupUtility.createEntityPath(graphBasePath, "relation"));
 
-            JavaRDD<String> newRels = relations.mapToPair(
-                    (PairFunction<String, String, String>) s ->
-                            new Tuple2<>(MapDocumentUtil.getJPathString(SOURCEJSONPATH, s), s))
-                    .leftOuterJoin(mergedIds)
-                    .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
-                        if (v1._2()._2().isPresent()) {
-                            return replaceField(v1._2()._1(), v1._2()._2().get(), FieldType.SOURCE);
-                        }
-                        return v1._2()._1();
-                    })
-                    .mapToPair(
-                            (PairFunction<String, String, String>) s ->
-                                    new Tuple2<>(MapDocumentUtil.getJPathString(TARGETJSONPATH, s), s))
-                    .leftOuterJoin(mergedIds)
-                    .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
-                        if (v1._2()._2().isPresent()) {
-                            return replaceField(v1._2()._1(), v1._2()._2().get(), FieldType.TARGET);
-                        }
-                        return v1._2()._1();
-                    }).filter(SparkPropagateRelation::containsDedup)
-                    .repartition(500);
+        JavaRDD<String> newRels = relations.mapToPair(
+                (PairFunction<String, String, String>) s ->
+                        new Tuple2<String, String>(MapDocumentUtil.getJPathString(SOURCEJSONPATH, s), s))
+                .leftOuterJoin(mergedIds)
+                .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
+                    if (v1._2()._2().isPresent()) {
+                        return replaceField(v1._2()._1(), v1._2()._2().get(), FieldType.SOURCE);
+                    }
+                    return v1._2()._1();
+                })
+                .mapToPair(
+                        (PairFunction<String, String, String>) s ->
+                                new Tuple2<String, String>(MapDocumentUtil.getJPathString(TARGETJSONPATH, s), s))
+                .leftOuterJoin(mergedIds)
+                .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
+                    if (v1._2()._2().isPresent()) {
+                        return replaceField(v1._2()._1(), v1._2()._2().get(), FieldType.TARGET);
+                    }
+                    return v1._2()._1();
+                }).filter(SparkPropagateRelation::containsDedup)
+                .repartition(500);
 
-            //update deleted by inference
-            relations = relations.mapToPair(
-                    (PairFunction<String, String, String>) s ->
-                            new Tuple2<>(MapDocumentUtil.getJPathString(SOURCEJSONPATH, s), s))
-                    .leftOuterJoin(mergedIds)
-                    .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
-                        if (v1._2()._2().isPresent()) {
-                            return updateDeletedByInference(v1._2()._1(), Relation.class);
-                        }
-                        return v1._2()._1();
-                    })
-                    .mapToPair(
-                            (PairFunction<String, String, String>) s ->
-                                    new Tuple2<>(MapDocumentUtil.getJPathString(TARGETJSONPATH, s), s))
-                    .leftOuterJoin(mergedIds)
-                    .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
-                        if (v1._2()._2().isPresent()) {
-                            return updateDeletedByInference(v1._2()._1(), Relation.class);
-                        }
-                        return v1._2()._1();
-                    })
-                    .repartition(500);
+        //update deleted by inference
+        relations = relations.mapToPair(
+                (PairFunction<String, String, String>) s ->
+                        new Tuple2<String, String>(MapDocumentUtil.getJPathString(SOURCEJSONPATH, s), s))
+                .leftOuterJoin(mergedIds)
+                .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
+                    if (v1._2()._2().isPresent()) {
+                        return updateDeletedByInference(v1._2()._1(), Relation.class);
+                    }
+                    return v1._2()._1();
+                })
+                .mapToPair(
+                        (PairFunction<String, String, String>) s ->
+                                new Tuple2<String, String>(MapDocumentUtil.getJPathString(TARGETJSONPATH, s), s))
+                .leftOuterJoin(mergedIds)
+                .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
+                    if (v1._2()._2().isPresent()) {
+                        return updateDeletedByInference(v1._2()._1(), Relation.class);
+                    }
+                    return v1._2()._1();
+                })
+                .repartition(500);
 
-            newRels.union(relations).repartition(1000)
-                    .saveAsTextFile(DedupUtility.createEntityPath(dedupGraphPath, "relation"), GzipCodec.class);
-        }
+        newRels.union(relations).repartition(1000)
+                .saveAsTextFile(DedupUtility.createEntityPath(dedupGraphPath, "relation"), GzipCodec.class);
     }
 
     private static boolean containsDedup(final String json) {
@@ -141,18 +150,6 @@ public class SparkPropagateRelation {
         } catch (IOException e) {
             throw new RuntimeException("unable to deserialize json relation: " + json, e);
         }
-    }
-
-    private static SparkSession getSparkSession(ArgumentApplicationParser parser) {
-        SparkConf conf = new SparkConf();
-
-        return SparkSession
-                .builder()
-                .appName(SparkPropagateRelation.class.getSimpleName())
-                .master(parser.get("master"))
-                .config(conf)
-                .enableHiveSupport()
-                .getOrCreate();
     }
 
     private static <T extends Oaf> String updateDeletedByInference(final String json, final Class<T> clazz) {
