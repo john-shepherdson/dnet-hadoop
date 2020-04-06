@@ -42,17 +42,15 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
  *      for each entity type E_i
  *          join (R.target = E_i.id),
  *          map E_i as RelatedEntity T_i, extracting only the necessary information beforehand to produce [R - T_i]
- *          save the tuples [R - T_i] in append mode
  *
  *  3) CreateRelatedEntitiesJob_phase2:
  *      prepare tuples [source entity - relation - target entity] (S - R - T):
  *      create the union of the each entity type, hash by id (S)
  *      for each [R - T_i] produced in phase1
  *          join S.id = [R - T_i].source to produce (S_i - R - T_i)
- *          save in append mode
  *
  *  4) AdjacencyListBuilderJob:
- *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mappnig the result as JoinedEntity
+ *      given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mapping the result as JoinedEntity
  *
  *  5) XmlConverterJob:
  *      convert the JoinedEntities as XML records
@@ -121,8 +119,8 @@ public class CreateRelatedEntitiesJob_phase1 {
                         t -> new EntityRelEntity(t._1()._2(), GraphMappingUtils.asRelatedEntity(t._2()._2(), entityClazz)),
                         Encoders.bean(EntityRelEntity.class))
                 .write()
-                .mode(SaveMode.Append)
-                .parquet(outputPath);
+                .mode(SaveMode.Overwrite)
+                .parquet(outputPath + "/" + EntityType.fromClass(entityClazz));
     }
 
     private static <E extends OafEntity> Dataset<E> readPathEntity(SparkSession spark, String inputEntityPath, Class<E> entityClazz) {

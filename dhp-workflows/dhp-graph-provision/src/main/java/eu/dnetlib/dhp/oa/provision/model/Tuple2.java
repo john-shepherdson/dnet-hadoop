@@ -11,6 +11,9 @@ public class Tuple2 implements Serializable {
 
     private RelatedEntity relatedEntity;
 
+    public Tuple2() {
+    }
+
     public Tuple2(Relation relation, RelatedEntity relatedEntity) {
         this.relation = relation;
         this.relatedEntity = relatedEntity;

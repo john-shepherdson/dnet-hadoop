@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -48,6 +49,8 @@ public class XmlRecordFactory implements Serializable {
 
     private boolean indent = false;
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     public XmlRecordFactory(
             final ContextMapper contextMapper, final boolean indent,
             final String schemaLocation, final String otherDatasourceTypesUForUI) {
@@ -72,26 +75,57 @@ public class XmlRecordFactory implements Serializable {
 
         final Set<String> contexts = Sets.newHashSet();
 
-        final OafEntity entity = je.getEntity();
+        final OafEntity entity = toOafEntity(je.getEntity());
         TemplateFactory templateFactory = new TemplateFactory();
         try {
-            final List<String> metadata = metadata(je.getType(), entity, contexts);
+            final EntityType type = GraphMappingUtils.EntityType.valueOf(je.getEntity().getType());
+            final List<String> metadata = metadata(type, entity, contexts);
 
             // rels has to be processed before the contexts because they enrich the contextMap with the funding info.
             final List<String> relations = listRelations(je, templateFactory, contexts);
 
-            metadata.addAll(buildContexts(getMainType(je.getType()), contexts));
+            final String mainType = getMainType(type);
+            metadata.addAll(buildContexts(mainType, contexts));
             metadata.add(XmlSerializationUtils.parseDataInfo(entity.getDataInfo()));
 
             final String body = templateFactory.buildBody(
-                    getMainType(je.getType()),
+                    mainType,
                     metadata,
                     relations,
-                    listChildren(je, templateFactory), listExtraInfo(je));
+                    listChildren(entity, je.getEntity().getType(), templateFactory), listExtraInfo(entity));
 
             return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
         } catch (final Throwable e) {
             throw new RuntimeException(String.format("error building record '%s'", entity.getId()), e);
+        }
+    }
+
+    private static OafEntity toOafEntity(TypedRow typedRow) {
+        return parseOaf(typedRow.getOaf(), typedRow.getType());
+    }
+
+    private static OafEntity parseOaf(final String json, final String type) {
+        try {
+            switch (GraphMappingUtils.EntityType.valueOf(type)) {
+                case publication:
+                    return OBJECT_MAPPER.readValue(json, Publication.class);
+                case dataset:
+                    return OBJECT_MAPPER.readValue(json, Dataset.class);
+                case otherresearchproduct:
+                    return OBJECT_MAPPER.readValue(json, OtherResearchProduct.class);
+                case software:
+                    return OBJECT_MAPPER.readValue(json, Software.class);
+                case datasource:
+                    return OBJECT_MAPPER.readValue(json, Datasource.class);
+                case organization:
+                    return OBJECT_MAPPER.readValue(json, Organization.class);
+                case project:
+                    return OBJECT_MAPPER.readValue(json, Project.class);
+                default:
+                    throw new IllegalArgumentException("invalid type: " + type);
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -110,7 +144,7 @@ public class XmlRecordFactory implements Serializable {
         }
     }
 
-    private List<String> metadata(final String type, final OafEntity entity, final Set<String> contexts) {
+    private List<String> metadata(final EntityType type, final OafEntity entity, final Set<String> contexts) {
 
         final List<String> metadata = Lists.newArrayList();
 
@@ -262,7 +296,7 @@ public class XmlRecordFactory implements Serializable {
             metadata.add(XmlSerializationUtils.mapQualifier("bestaccessright", getBestAccessright(r)));
         }
 
-        switch (EntityType.valueOf(type)) {
+        switch (type) {
             case publication:
                 final Publication pub = (Publication) entity;
 
@@ -746,14 +780,14 @@ public class XmlRecordFactory implements Serializable {
         return rels;
     }
 
-    private List<String> listChildren(final JoinedEntity je, TemplateFactory templateFactory) {
+    private List<String> listChildren(final OafEntity entity, String type, TemplateFactory templateFactory) {
 
         final List<String> children = Lists.newArrayList();
-
-        if (MainEntityType.result.toString().equals(getMainType(je.getType()))) {
-            final List<Instance> instances = ((Result) je.getEntity()).getInstance();
+        EntityType entityType = EntityType.valueOf(type);
+        if (MainEntityType.result.toString().equals(getMainType(entityType))) {
+            final List<Instance> instances = ((Result) entity).getInstance();
             if (instances != null) {
-                for (final Instance instance : ((Result) je.getEntity()).getInstance()) {
+                for (final Instance instance : ((Result) entity).getInstance()) {
 
                     final List<String> fields = Lists.newArrayList();
 
@@ -788,9 +822,9 @@ public class XmlRecordFactory implements Serializable {
                     children.add(templateFactory.getInstance(instance.getHostedby().getKey(), fields, instance.getUrl()));
                 }
             }
-            final List<ExternalReference> ext = ((Result) je.getEntity()).getExternalReference();
+            final List<ExternalReference> ext = ((Result) entity).getExternalReference();
             if (ext != null) {
-                for (final ExternalReference er : ((Result) je.getEntity()).getExternalReference()) {
+                for (final ExternalReference er : ((Result) entity).getExternalReference()) {
 
                     final List<String> fields = Lists.newArrayList();
 
@@ -824,8 +858,8 @@ public class XmlRecordFactory implements Serializable {
         return children;
     }
 
-    private List<String> listExtraInfo(JoinedEntity je) {
-        final List<ExtraInfo> extraInfo = je.getEntity().getExtraInfo();
+    private List<String> listExtraInfo(OafEntity entity) {
+        final List<ExtraInfo> extraInfo = entity.getExtraInfo();
         return extraInfo != null ? extraInfo
                 .stream()
                 .map(e -> XmlSerializationUtils.mapExtraInfo(e))

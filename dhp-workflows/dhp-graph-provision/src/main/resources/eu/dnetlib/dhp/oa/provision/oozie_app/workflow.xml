@@ -5,6 +5,10 @@
             <name>inputGraphRootPath</name>
             <description>root location of input materialized graph</description>
         </property>
+        <property>
+            <name>isLookupUrl</name>
+            <description>URL for the isLookup service</description>
+        </property>
 
         <property>
             <name>sparkDriverMemoryForJoining</name>
@@ -97,6 +101,7 @@
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
+            <arg>--relPartitions</arg><arg>3000</arg>
         </spark>
         <ok to="fork_join_related_entities"/>
         <error to="Kill"/>
@@ -128,13 +133,14 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relations</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
         </spark>
-        <ok to="join_relation"/>
+        <ok to="wait_joins"/>
         <error to="Kill"/>
     </action>
 
@@ -154,13 +160,14 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relations</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
         </spark>
-        <ok to="join_relation"/>
+        <ok to="wait_joins"/>
         <error to="Kill"/>
     </action>
 
@@ -180,13 +187,14 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relations</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
         </spark>
-        <ok to="join_relation"/>
+        <ok to="wait_joins"/>
         <error to="Kill"/>
     </action>
 
@@ -206,13 +214,14 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relations</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
         </spark>
-        <ok to="join_relation"/>
+        <ok to="wait_joins"/>
         <error to="Kill"/>
     </action>
 
@@ -232,13 +241,14 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relations</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
         </spark>
-        <ok to="join_relation"/>
+        <ok to="wait_joins"/>
         <error to="Kill"/>
     </action>
 
@@ -258,13 +268,14 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relations</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
         </spark>
-        <ok to="join_relation"/>
+        <ok to="wait_joins"/>
         <error to="Kill"/>
     </action>
 
@@ -284,17 +295,19 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputRelationsPath</arg><arg>${workingDir}/relations</arg>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
         </spark>
-        <ok to="join_relation"/>
+        <ok to="wait_joins"/>
         <error to="Kill"/>
     </action>
 
-    <join name="join_relation" to="join_all_entities"/>
+    <join name="wait_joins" to="join_all_entities"/>
+
 
     <action name="join_all_entities">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -312,10 +325,12 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}</arg>
+            <arg>--inputGraphRootPath</arg><arg>${inputGraphRootPath}</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities</arg>
+            <arg>--numPartitions</arg><arg>12000</arg>
         </spark>
         <ok to="adjancency_lists"/>
         <error to="Kill"/>
@@ -337,6 +352,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg> <arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/joined</arg>
@@ -361,6 +377,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/joined</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml</arg>

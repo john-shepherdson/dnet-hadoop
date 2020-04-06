@@ -9,19 +9,22 @@ import eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.api.java.function.*;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.catalyst.expressions.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
@@ -57,6 +60,7 @@ public class AdjacencyListBuilderJob {
     private static final Logger log = LoggerFactory.getLogger(AdjacencyListBuilderJob.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public static final int MAX_LINKS = 100;
 
     public static void main(String[] args) throws Exception {
 
@@ -92,72 +96,27 @@ public class AdjacencyListBuilderJob {
 
     private static void createAdjacencyLists(SparkSession spark, String inputPath, String outputPath) {
 
-        RDD<JoinedEntity> joined = spark.read()
+        log.info("Reading joined entities from: {}", inputPath);
+        spark.read()
                 .load(inputPath)
-                .as(Encoders.kryo(EntityRelEntity.class))
-                .javaRDD()
-                .map(e -> getJoinedEntity(e))
-                .mapToPair(e -> new Tuple2<>(e.getEntity().getId(), e))
-                .reduceByKey((j1, j2) -> getJoinedEntity(j1, j2))
-                .map(Tuple2::_2)
-                .rdd();
-
-        spark.createDataset(joined, Encoders.bean(JoinedEntity.class))
+                .as(Encoders.bean(EntityRelEntity.class))
+                .groupByKey((MapFunction<EntityRelEntity, String>) value -> value.getEntity().getId(), Encoders.STRING())
+                .mapGroups((MapGroupsFunction<String, EntityRelEntity, JoinedEntity>) (key, values) -> {
+                    JoinedEntity j = new JoinedEntity();
+                    Links links = new Links();
+                    while (values.hasNext() && links.size() < MAX_LINKS) {
+                        EntityRelEntity curr = values.next();
+                        if (j.getEntity() == null) {
+                            j.setEntity(curr.getEntity());
+                        }
+                        links.add(new Tuple2(curr.getRelation(), curr.getTarget()));
+                    }
+                    j.setLinks(links);
+                    return j;
+                }, Encoders.bean(JoinedEntity.class))
                 .write()
                 .mode(SaveMode.Overwrite)
                 .parquet(outputPath);
-
-    }
-
-    private static JoinedEntity getJoinedEntity(JoinedEntity j1, JoinedEntity j2) {
-        JoinedEntity je = new JoinedEntity();
-        je.setEntity(je.getEntity());
-        je.setType(j1.getType());
-
-        Links links = new Links();
-        links.addAll(j1.getLinks());
-        links.addAll(j2.getLinks());
-
-        return je;
-    }
-
-    private static JoinedEntity getJoinedEntity(EntityRelEntity e) {
-        JoinedEntity j = new JoinedEntity();
-        j.setEntity(toOafEntity(e.getEntity()));
-        j.setType(EntityType.valueOf(e.getEntity().getType()));
-        Links links = new Links();
-        links.add(new eu.dnetlib.dhp.oa.provision.model.Tuple2(e.getRelation(), e.getTarget()));
-        j.setLinks(links);
-        return j;
-    }
-
-    private static OafEntity toOafEntity(TypedRow typedRow) {
-        return parseOaf(typedRow.getOaf(), typedRow.getType());
-    }
-
-    private static OafEntity parseOaf(final String json, final String type) {
-        try {
-            switch (GraphMappingUtils.EntityType.valueOf(type)) {
-                case publication:
-                    return OBJECT_MAPPER.readValue(json, Publication.class);
-                case dataset:
-                    return OBJECT_MAPPER.readValue(json, Dataset.class);
-                case otherresearchproduct:
-                    return OBJECT_MAPPER.readValue(json, OtherResearchProduct.class);
-                case software:
-                    return OBJECT_MAPPER.readValue(json, Software.class);
-                case datasource:
-                    return OBJECT_MAPPER.readValue(json, Datasource.class);
-                case organization:
-                    return OBJECT_MAPPER.readValue(json, Organization.class);
-                case project:
-                    return OBJECT_MAPPER.readValue(json, Project.class);
-                default:
-                    throw new IllegalArgumentException("invalid type: " + type);
-            }
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
     }
 
     private static void removeOutputDir(SparkSession spark, String path) {

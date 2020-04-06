@@ -102,11 +102,11 @@ public class GraphMappingUtils {
                 entityMapping.get(EntityType.valueOf(targetType)).name());
     }
 
-    public static String getMainType(final String type) {
-        return entityMapping.get(EntityType.valueOf(type)).name();
+    public static String getMainType(final EntityType type) {
+        return entityMapping.get(type).name();
     }
 
-    public static boolean isResult(String type) {
+    public static boolean isResult(EntityType type) {
         return MainEntityType.result.name().equals(getMainType(type));
     }
 
