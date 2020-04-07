@@ -120,6 +120,7 @@ public class PrepareRelationsJob {
                 .map((MapFunction<String, SortableRelation>) value -> OBJECT_MAPPER.readValue(value, SortableRelation.class), Encoders.bean(SortableRelation.class));
     }
 
+    //TODO work in progress
     private static void prepareRelationsRDDFromPaths(SparkSession spark, String inputRelationsPath, String outputPath, int numPartitions) {
         JavaRDD<SortableRelation> rels = readPathRelationRDD(spark, inputRelationsPath)
                 .repartition(numPartitions);

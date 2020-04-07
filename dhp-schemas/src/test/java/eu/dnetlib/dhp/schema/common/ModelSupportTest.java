@@ -1,6 +1,5 @@
-package eu.dnetlib.dhp.common;
+package eu.dnetlib.dhp.schema.common;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;

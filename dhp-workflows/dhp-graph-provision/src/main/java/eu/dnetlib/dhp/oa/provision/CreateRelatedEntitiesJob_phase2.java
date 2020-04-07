@@ -6,6 +6,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
 import eu.dnetlib.dhp.oa.provision.model.TypedRow;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getKryoClasses;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects.
@@ -93,7 +93,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 
         SparkConf conf = new SparkConf();
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(getKryoClasses());
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {

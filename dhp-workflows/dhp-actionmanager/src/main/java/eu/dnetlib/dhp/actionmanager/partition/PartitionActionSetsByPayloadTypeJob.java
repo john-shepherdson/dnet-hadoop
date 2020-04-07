@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.actionmanager.partition;
 
-import eu.dnetlib.dhp.actionmanager.common.HdfsSupport;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJob;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import org.apache.commons.io.IOUtils;
@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static eu.dnetlib.dhp.actionmanager.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static org.apache.spark.sql.functions.*;
 
 /**

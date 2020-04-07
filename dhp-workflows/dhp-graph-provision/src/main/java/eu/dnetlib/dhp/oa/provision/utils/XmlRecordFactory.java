@@ -9,10 +9,14 @@ import com.google.common.collect.Sets;
 import com.mycila.xmltool.XMLDoc;
 import com.mycila.xmltool.XMLTag;
 import eu.dnetlib.dhp.oa.provision.model.*;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.MainEntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.util.LongAccumulator;
+import org.codehaus.janino.Mod;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -78,13 +82,13 @@ public class XmlRecordFactory implements Serializable {
         final OafEntity entity = toOafEntity(je.getEntity());
         TemplateFactory templateFactory = new TemplateFactory();
         try {
-            final EntityType type = GraphMappingUtils.EntityType.valueOf(je.getEntity().getType());
+            final EntityType type = EntityType.valueOf(je.getEntity().getType());
             final List<String> metadata = metadata(type, entity, contexts);
 
             // rels has to be processed before the contexts because they enrich the contextMap with the funding info.
             final List<String> relations = listRelations(je, templateFactory, contexts);
 
-            final String mainType = getMainType(type);
+            final String mainType = ModelSupport.getMainType(type);
             metadata.addAll(buildContexts(mainType, contexts));
             metadata.add(XmlSerializationUtils.parseDataInfo(entity.getDataInfo()));
 
@@ -106,7 +110,7 @@ public class XmlRecordFactory implements Serializable {
 
     private static OafEntity parseOaf(final String json, final String type) {
         try {
-            switch (GraphMappingUtils.EntityType.valueOf(type)) {
+            switch (EntityType.valueOf(type)) {
                 case publication:
                     return OBJECT_MAPPER.readValue(json, Publication.class);
                 case dataset:
@@ -168,7 +172,7 @@ public class XmlRecordFactory implements Serializable {
                 .collect(Collectors.toList()));
         }
 
-        if (GraphMappingUtils.isResult(type)) {
+        if (ModelSupport.isResult(type)) {
             final Result r = (Result) entity;
 
             if (r.getContext() != null) {
@@ -756,7 +760,7 @@ public class XmlRecordFactory implements Serializable {
 
             }
             final DataInfo info = rel.getDataInfo();
-            final String scheme = getScheme(re.getType(), targetType);
+            final String scheme = ModelSupport.getScheme(re.getType(), targetType);
 
             if (StringUtils.isBlank(scheme)) {
                 throw new IllegalArgumentException(String.format("missing scheme for: <%s - %s>", re.getType(), targetType));
@@ -782,7 +786,7 @@ public class XmlRecordFactory implements Serializable {
 
         final List<String> children = Lists.newArrayList();
         EntityType entityType = EntityType.valueOf(type);
-        if (MainEntityType.result.toString().equals(getMainType(entityType))) {
+        if (MainEntityType.result.toString().equals(ModelSupport.getMainType(entityType))) {
             final List<Instance> instances = ((Result) entity).getInstance();
             if (instances != null) {
                 for (final Instance instance : ((Result) entity).getInstance()) {

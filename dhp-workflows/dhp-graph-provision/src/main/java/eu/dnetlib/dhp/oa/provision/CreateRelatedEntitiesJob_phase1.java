@@ -6,6 +6,8 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -91,7 +93,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 
         SparkConf conf = new SparkConf();
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(getKryoClasses());
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {

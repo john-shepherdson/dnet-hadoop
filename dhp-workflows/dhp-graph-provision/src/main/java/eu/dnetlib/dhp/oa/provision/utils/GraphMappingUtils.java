@@ -1,12 +1,14 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
-import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.oaf.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.substringAfter;
@@ -15,100 +17,7 @@ public class GraphMappingUtils {
 
     public static final String SEPARATOR = "_";
 
-    public final static Map<EntityType, Class> entityTypes = Maps.newHashMap();
-
-    static {
-        entityTypes.put(EntityType.datasource, Datasource.class);
-        entityTypes.put(EntityType.organization, Organization.class);
-        entityTypes.put(EntityType.project, Project.class);
-        entityTypes.put(EntityType.dataset, Dataset.class);
-        entityTypes.put(EntityType.otherresearchproduct, OtherResearchProduct.class);
-        entityTypes.put(EntityType.software, Software.class);
-        entityTypes.put(EntityType.publication, Publication.class);
-    }
-
-    public enum EntityType {
-        publication, dataset, otherresearchproduct, software, datasource, organization, project;
-
-        public static <T extends OafEntity> EntityType fromClass(Class<T> clazz) {
-            switch (clazz.getName()) {
-                case "eu.dnetlib.dhp.schema.oaf.Publication"            : return publication;
-                case "eu.dnetlib.dhp.schema.oaf.Dataset"                : return dataset;
-                case "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct"   : return otherresearchproduct;
-                case "eu.dnetlib.dhp.schema.oaf.Software"               : return software;
-                case "eu.dnetlib.dhp.schema.oaf.Datasource"             : return datasource;
-                case "eu.dnetlib.dhp.schema.oaf.Organization"           : return organization;
-                case "eu.dnetlib.dhp.schema.oaf.Project"                : return project;
-                default: throw new IllegalArgumentException("Unknown OafEntity class: " + clazz.getName());
-            }
-        }
-    }
-
-    public enum MainEntityType {
-        result, datasource, organization, project
-    }
-
     public static Set<String> authorPidTypes = Sets.newHashSet("orcid", "magidentifier");
-
-    private static final String schemeTemplate = "dnet:%s_%s_relations";
-
-    private static Map<EntityType, MainEntityType> entityMapping = Maps.newHashMap();
-
-    static {
-        entityMapping.put(EntityType.publication,            MainEntityType.result);
-        entityMapping.put(EntityType.dataset,                MainEntityType.result);
-        entityMapping.put(EntityType.otherresearchproduct,   MainEntityType.result);
-        entityMapping.put(EntityType.software,               MainEntityType.result);
-        entityMapping.put(EntityType.datasource,             MainEntityType.datasource);
-        entityMapping.put(EntityType.organization,           MainEntityType.organization);
-        entityMapping.put(EntityType.project,                MainEntityType.project);
-    }
-
-    public static Class[] getKryoClasses() {
-        return new Class[]{
-                Author.class,
-                Context.class,
-                Country.class,
-                DataInfo.class,
-                eu.dnetlib.dhp.schema.oaf.Dataset.class,
-                Datasource.class,
-                ExternalReference.class,
-                ExtraInfo.class,
-                Field.class,
-                GeoLocation.class,
-                Instance.class,
-                Journal.class,
-                KeyValue.class,
-                Oaf.class,
-                OafEntity.class,
-                OAIProvenance.class,
-                Organization.class,
-                OriginDescription.class,
-                OtherResearchProduct.class,
-                Project.class,
-                Publication.class,
-                Qualifier.class,
-                Relation.class,
-                SortableRelation.class, //SUPPORT
-                Result.class,
-                Software.class,
-                StructuredProperty.class
-        };
-    }
-
-    public static String getScheme(final String sourceType, final String targetType) {
-        return String.format(schemeTemplate,
-                entityMapping.get(EntityType.valueOf(sourceType)).name(),
-                entityMapping.get(EntityType.valueOf(targetType)).name());
-    }
-
-    public static String getMainType(final EntityType type) {
-        return entityMapping.get(type).name();
-    }
-
-    public static boolean isResult(EntityType type) {
-        return MainEntityType.result.name().equals(getMainType(type));
-    }
 
     public static <E extends OafEntity> RelatedEntity asRelatedEntity(E entity, Class<E> clazz) {
 
@@ -119,7 +28,7 @@ public class GraphMappingUtils {
         re.setPid(entity.getPid());
         re.setCollectedfrom(entity.getCollectedfrom());
 
-        switch (GraphMappingUtils.EntityType.fromClass(clazz)) {
+        switch (EntityType.fromClass(clazz)) {
             case publication:
             case dataset:
             case otherresearchproduct:

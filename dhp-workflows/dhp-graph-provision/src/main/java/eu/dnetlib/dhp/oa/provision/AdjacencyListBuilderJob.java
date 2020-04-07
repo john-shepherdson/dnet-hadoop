@@ -1,11 +1,11 @@
 package eu.dnetlib.dhp.oa.provision;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.Tuple2;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getKryoClasses;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects.
@@ -82,7 +81,7 @@ public class AdjacencyListBuilderJob {
 
         SparkConf conf = new SparkConf();
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(getKryoClasses());
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {

@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.oa.graph;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -39,7 +40,7 @@ public class SparkGraphImporterJob {
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
         // Read the input file and convert it into RDD of serializable object
-        GraphMappingUtils.types.forEach((name, clazz) -> spark.createDataset(sc.textFile(inputPath + "/" + name)
+        ModelSupport.oafTypes.forEach((name, clazz) -> spark.createDataset(sc.textFile(inputPath + "/" + name)
                 .map(s -> new ObjectMapper().readValue(s, clazz))
                 .rdd(), Encoders.bean(clazz))
                 .write()

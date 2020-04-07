@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.actionmanager.promote;
 
-import eu.dnetlib.dhp.actionmanager.common.FunctionalInterfaceSupport.SerializableSupplier;
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static eu.dnetlib.dhp.actionmanager.common.ModelSupport.isSubClass;
+import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
 
 /**
  * Promote action payload functions.

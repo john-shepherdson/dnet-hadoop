@@ -1,9 +1,10 @@
 package eu.dnetlib.dhp.actionmanager.promote;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.actionmanager.common.FunctionalInterfaceSupport.SerializableSupplier;
-import eu.dnetlib.dhp.actionmanager.common.HdfsSupport;
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -20,8 +21,8 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static eu.dnetlib.dhp.actionmanager.common.ModelSupport.isSubClass;
-import static eu.dnetlib.dhp.actionmanager.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 /**
  * Applies a given action payload file to graph table of compatible type.
@@ -69,34 +70,7 @@ public class PromoteActionPayloadForGraphTableJob {
 
         SparkConf conf = new SparkConf();
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(new Class[]{
-                Author.class,
-                Context.class,
-                Country.class,
-                DataInfo.class,
-                eu.dnetlib.dhp.schema.oaf.Dataset.class,
-                Datasource.class,
-                ExternalReference.class,
-                ExtraInfo.class,
-                Field.class,
-                GeoLocation.class,
-                Instance.class,
-                Journal.class,
-                KeyValue.class,
-                Oaf.class,
-                OafEntity.class,
-                OAIProvenance.class,
-                Organization.class,
-                OriginDescription.class,
-                OtherResearchProduct.class,
-                Project.class,
-                Publication.class,
-                Qualifier.class,
-                Relation.class,
-                Result.class,
-                Software.class,
-                StructuredProperty.class
-        });
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {

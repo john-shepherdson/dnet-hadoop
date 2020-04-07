@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.actionmanager.promote;
 
-import eu.dnetlib.dhp.actionmanager.common.FunctionalInterfaceSupport.SerializableSupplier;
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

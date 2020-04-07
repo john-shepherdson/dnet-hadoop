@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static eu.dnetlib.dhp.actionmanager.common.ThrowingSupport.rethrowAsRuntimeException;
+import static eu.dnetlib.dhp.common.ThrowingSupport.rethrowAsRuntimeException;
 import static org.apache.spark.sql.functions.*;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static scala.collection.JavaConversions.mutableSeqAsJavaList;

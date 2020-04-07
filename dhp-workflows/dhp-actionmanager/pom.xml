@@ -52,5 +52,6 @@
             <artifactId>dhp-schemas</artifactId>
             <version>${project.version}</version>
         </dependency>
+
     </dependencies>
 </project>
