@@ -10,14 +10,13 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Text;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -28,65 +27,79 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
-public class SparkXmlIndexingJob {
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-    private static final Log log = LogFactory.getLog(SparkXmlIndexingJob.class);
+public class XmlIndexingJob {
+
+    private static final Logger log = LoggerFactory.getLogger(XmlIndexingJob.class);
 
     private static final Integer DEFAULT_BATCH_SIZE = 1000;
 
     private static final String LAYOUT = "index";
+    private static final String INTERPRETATION = "openaire";
+    private static final String SEPARATOR = "-";
+    public static final String DATE_FORMAT = "yyyy-MM-dd'T'hh:mm:ss'Z'";
 
     public static void main(String[] args) throws Exception {
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils.toString(
-                        SparkXmlIndexingJob.class.getResourceAsStream(
+                        XmlIndexingJob.class.getResourceAsStream(
                                 "/eu/dnetlib/dhp/oa/provision/input_params_update_index.json")));
         parser.parseArgument(args);
 
-        final String inputPath = parser.get("sourcePath");
+        Boolean isSparkSessionManaged = Optional
+                .ofNullable(parser.get("isSparkSessionManaged"))
+                .map(Boolean::valueOf)
+                .orElse(Boolean.TRUE);
+        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+
+        final String inputPath = parser.get("inputPath");
+        log.info("inputPath: {}", inputPath);
+
         final String isLookupUrl = parser.get("isLookupUrl");
+        log.info("isLookupUrl: {}", isLookupUrl);
+
         final String format = parser.get("format");
+        log.info("format: {}", format);
+
         final Integer batchSize = parser.getObjectMap().containsKey("batchSize") ? Integer.valueOf(parser.get("batchSize")) : DEFAULT_BATCH_SIZE;
+        log.info("batchSize: {}", batchSize);
 
         final ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
         final String fields = getLayoutSource(isLookup, format);
+        log.info("fields: {}", fields);
+
         final String xslt = getLayoutTransformer(isLookup);
 
         final String dsId = getDsId(format, isLookup);
+        log.info("dsId: {}", dsId);
+
         final String zkHost = getZkHost(isLookup);
+        log.info("zkHost: {}", zkHost);
+
         final String version = getRecordDatestamp();
 
         final String indexRecordXslt = getLayoutTransformer(format, fields, xslt);
+        log.info("indexRecordTransformer {}", indexRecordXslt);
 
-        log.info("indexRecordTransformer: " + indexRecordXslt);
+        final SparkConf conf = new SparkConf();
 
-        final String master = parser.get("master");
-        final SparkConf conf = new SparkConf()
-                .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        runWithSparkSession(conf, isSparkSessionManaged,
+                spark -> {
+                    final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-        try(SparkSession spark = getSession(conf, master)) {
+                    RDD<SolrInputDocument> docs = sc.sequenceFile(inputPath, Text.class, Text.class)
+                            .map(t -> t._2().toString())
+                            .map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
+                            .map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s))
+                            .rdd();
 
-            final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-
-            RDD<SolrInputDocument> docs = sc.sequenceFile(inputPath, Text.class, Text.class)
-                    .map(t -> t._2().toString())
-                    .map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-                    .map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s))
-                    .rdd();
-
-            SolrSupport.indexDocs(zkHost, format + "-" + LAYOUT + "-openaire", batchSize, docs);
-        }
-    }
-
-    private static SparkSession getSession(SparkConf conf, String master) {
-        return SparkSession
-                .builder()
-                .config(conf)
-                .appName(SparkXmlRecordBuilderJob.class.getSimpleName())
-                .master(master)
-                .getOrCreate();
+                    final String collection = format + SEPARATOR + LAYOUT + SEPARATOR + INTERPRETATION;
+                    SolrSupport.indexDocs(zkHost, collection, batchSize, docs);
+                });
     }
 
     private static String toIndexRecord(Transformer tr, final String record) {
@@ -95,7 +108,7 @@ public class SparkXmlIndexingJob {
             tr.transform(new StreamSource(new StringReader(record)), res);
             return res.getWriter().toString();
         } catch (Throwable e) {
-            System.out.println("XPathException on record:\n" + record);
+            log.error("XPathException on record: \n {}", record, e);
             throw new IllegalArgumentException(e);
         }
     }
@@ -127,7 +140,7 @@ public class SparkXmlIndexingJob {
      * @return the parsed date
      */
     public static String getRecordDatestamp() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").format(new Date());
+        return new SimpleDateFormat(DATE_FORMAT).format(new Date());
     }
 
     /**

@@ -1,41 +1,30 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-
 import java.io.Serializable;
+import java.util.List;
 
 public class JoinedEntity implements Serializable {
 
-    private String type;
+    private TypedRow entity;
 
-    private OafEntity entity;
+    private List<Tuple2> links;
 
-    private Links links;
-
-    public String getType() {
-        return type;
+    public JoinedEntity() {
     }
 
-    public JoinedEntity setType(String type) {
-        this.type = type;
-        return this;
-    }
-
-    public OafEntity getEntity() {
+    public TypedRow getEntity() {
         return entity;
     }
 
-    public JoinedEntity setEntity(OafEntity entity) {
+    public void setEntity(TypedRow entity) {
         this.entity = entity;
-        return this;
     }
 
-    public Links getLinks() {
+    public List<Tuple2> getLinks() {
         return links;
     }
 
-    public JoinedEntity setLinks(Links links) {
+    public void setLinks(List<Tuple2> links) {
         this.links = links;
-        return this;
     }
 }

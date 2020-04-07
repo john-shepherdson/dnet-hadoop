@@ -2,27 +2,50 @@ package eu.dnetlib.dhp.oa.provision.model;
 
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
-public class Tuple2 {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Tuple2 implements Serializable {
 
     private Relation relation;
 
     private RelatedEntity relatedEntity;
 
+    public Tuple2() {
+    }
+
+    public Tuple2(Relation relation, RelatedEntity relatedEntity) {
+        this.relation = relation;
+        this.relatedEntity = relatedEntity;
+    }
+
     public Relation getRelation() {
         return relation;
     }
 
-    public Tuple2 setRelation(Relation relation) {
+    public void setRelation(Relation relation) {
         this.relation = relation;
-        return this;
     }
 
     public RelatedEntity getRelatedEntity() {
         return relatedEntity;
     }
 
-    public Tuple2 setRelatedEntity(RelatedEntity relatedEntity) {
+    public void setRelatedEntity(RelatedEntity relatedEntity) {
         this.relatedEntity = relatedEntity;
-        return this;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tuple2 t2 = (Tuple2) o;
+        return getRelation().equals(t2.getRelation());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getRelation().hashCode());
+    }
+
 }
