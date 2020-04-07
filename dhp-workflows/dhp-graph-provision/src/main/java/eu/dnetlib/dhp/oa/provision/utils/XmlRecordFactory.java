@@ -292,8 +292,6 @@ public class XmlRecordFactory implements Serializable {
             if (r.getResourcetype() != null) {
                 metadata.add(XmlSerializationUtils.mapQualifier("resourcetype", r.getResourcetype()));
             }
-
-            metadata.add(XmlSerializationUtils.mapQualifier("bestaccessright", getBestAccessright(r)));
         }
 
         switch (type) {
