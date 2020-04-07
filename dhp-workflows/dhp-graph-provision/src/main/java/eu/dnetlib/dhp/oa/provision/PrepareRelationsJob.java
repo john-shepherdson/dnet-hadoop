@@ -92,7 +92,7 @@ public class PrepareRelationsJob {
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {
                     removeOutputDir(spark, outputPath);
-                    prepareRelationsRDDFromPaths(spark, inputRelationsPath, outputPath, numPartitions);
+                    prepareRelationsFromPaths(spark, inputRelationsPath, outputPath, numPartitions);
                 });
     }
 
