@@ -14,14 +14,13 @@ import org.apache.spark.sql.SaveMode;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 
 import static eu.dnetlib.dhp.PropagationConstant.createOutputDirs;
 import static eu.dnetlib.dhp.PropagationConstant.getConstraintList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 /**
  * For the association of the country to the datasource
@@ -38,53 +37,46 @@ public class PrepareResultCountryAssociation {
     public static void main(String[] args) throws Exception {
 
         String jsonConfiguration = IOUtils.toString(PrepareResultCountryAssociation.class
-                .getResourceAsStream("/eu/dnetlib/dhp/countrypropagation/input_countrypropagation_parameters.json"));
+                .getResourceAsStream("/eu/dnetlib/dhp/countrypropagation/input_prepare_dc_assoc.json"));
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 jsonConfiguration);
 
         parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
-
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
-
         String inputPath = parser.get("sourcePath");
         log.info("inputPath: {}", inputPath);
-
-
-        String graphTableClassName = parser.get("graphTableClassName");
-        log.info("graphTableClassName: {}", graphTableClassName);
 
         SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-        runWithSparkSession(conf, isSparkSessionManaged,
-                spark -> {
-                    removeOutputDir(spark, outputPath);
-                    joinRelationEntity(spark, inputRelationsPath, inputEntityPath, entityClazz, outputPath);
-                });
-
-
         final SparkSession spark = SparkSession
                 .builder()
-                .appName(PrepareResultCountryAssociation.class.getSimpleName())
+                .appName(SparkCountryPropagationJob.class.getSimpleName())
                 .master(parser.get("master"))
                 .config(conf)
                 .enableHiveSupport()
                 .getOrCreate();
 
-        //todo add link to working dir
+
         final String outputPath = "/tmp/provision/propagation/countrytoresultfrominstitutionalrepositories";
 
+
         createOutputDirs(outputPath, FileSystem.get(spark.sparkContext().hadoopConfiguration()));
+        prepareDatasourceCountryAssociation(spark,
+                Arrays.asList(parser.get("whitelist").split(";")),
+                Arrays.asList(parser.get("allowedtypes").split(";")),
+                inputPath,
+                outputPath);
 
-        List<String> whitelist = Arrays.asList(parser.get("whitelist").split(";"));
-        List<String> allowedtypes = Arrays.asList(parser.get("allowedtypes").split(";"));
 
+    }
+
+    private static void prepareDatasourceCountryAssociation(SparkSession spark,
+                                                            List<String> whitelist,
+                                                            List<String> allowedtypes,
+                                                            String inputPath,
+                                                            String outputPath) {
         String whitelisted = "";
         for (String i : whitelist){
             whitelisted += " OR id = '" + i + "'";
@@ -93,13 +85,13 @@ public class PrepareResultCountryAssociation {
 
 
         Dataset<Datasource> datasource = spark.createDataset(sc.textFile(inputPath + "/datasource")
-                .map(item -> new ObjectMapper().readValue(item, Datasource.class)).rdd(), Encoders.bean(Datasource.class));
+                .map(item -> OBJECT_MAPPER.readValue(item, Datasource.class)).rdd(), Encoders.bean(Datasource.class));
 
         Dataset<Relation> relation = spark.createDataset(sc.textFile(inputPath + "/relation")
-                .map(item -> new ObjectMapper().readValue(item, Relation.class)).rdd(), Encoders.bean(Relation.class));
+                .map(item -> OBJECT_MAPPER.readValue(item, Relation.class)).rdd(), Encoders.bean(Relation.class));
 
         Dataset<Organization> organization = spark.createDataset(sc.textFile(inputPath + "/organization")
-                .map(item -> new ObjectMapper().readValue(item, Organization.class)).rdd(), Encoders.bean(Organization.class));
+                .map(item -> OBJECT_MAPPER.readValue(item, Organization.class)).rdd(), Encoders.bean(Organization.class));
 
         datasource.createOrReplaceTempView("datasource");
         relation.createOrReplaceTempView("relation");
@@ -107,18 +99,18 @@ public class PrepareResultCountryAssociation {
 
         String query = "SELECT source ds, country.classid country " +
                 "FROM ( SELECT id " +
-                "FROM datasource " +
-                "WHERE (datainfo.deletedbyinference = false " + whitelisted + ") " +
-                getConstraintList("datasourcetype.classid = '", allowedtypes) + ") d " +
+                "       FROM datasource " +
+                "       WHERE (datainfo.deletedbyinference = false " + whitelisted + ") " +
+                               getConstraintList("datasourcetype.classid = '", allowedtypes) + ") d " +
                 "JOIN ( SELECT source, target " +
-                "FROM relation " +
-                "WHERE relclass = 'provides' " +
-                "AND datainfo.deletedbyinference = false ) rel " +
+                "       FROM relation " +
+                "       WHERE relclass = 'provides' " +
+                "       AND datainfo.deletedbyinference = false ) rel " +
                 "ON d.id = rel.source " +
                 "JOIN (SELECT id, country " +
-                "FROM organization " +
-                "WHERE datainfo.deletedbyinference = false " +
-                "AND length(country.classid)>0) o " +
+                "      FROM organization " +
+                "      WHERE datainfo.deletedbyinference = false " +
+                "      AND length(country.classid)>0) o " +
                 "ON o.id = rel.target";
 
         spark.sql(query)
@@ -129,4 +121,6 @@ public class PrepareResultCountryAssociation {
 
 
     }
+
+
 }
