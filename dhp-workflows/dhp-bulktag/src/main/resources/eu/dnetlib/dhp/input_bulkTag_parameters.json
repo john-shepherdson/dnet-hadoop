@@ -1,0 +1,27 @@
+[
+  {
+    "paramName":"is",
+    "paramLongName":"isLookupUrl",
+    "paramDescription": "URL of the isLookUp Service",
+    "paramRequired": true
+  },
+  {
+    "paramName":"mt",
+    "paramLongName":"master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName":"s",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the path of the sequencial file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "pm",
+    "paramLongName":"protoMap",
+    "paramDescription": "the json path associated to each selection field",
+    "paramRequired": true
+  }
+
+]

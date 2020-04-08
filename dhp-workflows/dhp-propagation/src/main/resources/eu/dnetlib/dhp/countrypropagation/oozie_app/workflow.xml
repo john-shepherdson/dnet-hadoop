@@ -24,6 +24,18 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
+        <property>
+            <name>sparkExecutorNumber</name>
+            <description>number of executors used</description>
+        </property>
+        <property>
+            <name>writeUpdate</name>
+            <description>writes the information found for the update. No double check done if the information is already present</description>
+        </property>
+        <property>
+            <name>saveGraph</name>
+            <description>writes new version of the graph after the propagation step</description>
+        </property>
     </parameters>
 
     <start to="CountryPropagation"/>
@@ -41,17 +53,25 @@
             <name>CountryPropagation</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory}
-                --executor-cores ${sparkExecutorCores}
+            <spark-opts>
+                --num-executors=${sparkExecutorNumber}
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
-                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+               --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--whitelist</arg><arg>${whitelist}</arg>
             <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
