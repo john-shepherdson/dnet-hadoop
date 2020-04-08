@@ -1,17 +1,12 @@
 package eu.dnetlib.dhp.application;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Base64;
-import java.util.zip.GZIPOutputStream;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ArgumentApplicationParserTest {
-
 
     @Test
     public void testParseParameter() throws Exception {

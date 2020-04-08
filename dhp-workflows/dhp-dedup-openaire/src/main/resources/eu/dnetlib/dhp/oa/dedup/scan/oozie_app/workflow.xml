@@ -1,0 +1,138 @@
+<workflow-app name="Duplicate Scan" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>graphBasePath</name>
+            <description>the raw graph base path</description>
+        </property>
+        <property>
+            <name>isLookUpUrl</name>
+            <description>the address of the lookUp service</description>
+        </property>
+        <property>
+            <name>actionSetId</name>
+            <description>id of the actionSet</description>
+        </property>
+        <property>
+            <name>workingPath</name>
+            <description>path for the working directory</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="CreateSimRel"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="CreateSimRel">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path="${workingPath}/${actionSetId}/*_simrel"/>
+            </prepare>
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Create Similarity Relations</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCreateSimRels</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn</arg>
+            <arg>--i</arg><arg>${graphBasePath}</arg>
+            <arg>--la</arg><arg>${isLookUpUrl}</arg>
+            <arg>--asi</arg><arg>${actionSetId}</arg>
+            <arg>--w</arg><arg>${workingPath}</arg>
+        </spark>
+        <ok to="CreateMergeRel"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateMergeRel">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path='${workingPath}/${actionSetId}/*_mergerel'/>
+            </prepare>
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Create Merge Relations</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCreateConnectedComponent</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn</arg>
+            <arg>--i</arg><arg>${graphBasePath}</arg>
+            <arg>--w</arg><arg>${workingPath}</arg>
+            <arg>--la</arg><arg>${isLookUpUrl}</arg>
+            <arg>--asi</arg><arg>${actionSetId}</arg>
+        </spark>
+        <ok to="CreateDedupRecord"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateDedupRecord">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <prepare>
+                <delete path='${workingPath}/${actionSetId}/*_deduprecord'/>
+            </prepare>
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Create Dedup Record</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCreateDedupRecord</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn</arg>
+            <arg>--i</arg><arg>${graphBasePath}</arg>
+            <arg>--w</arg><arg>${workingPath}</arg>
+            <arg>--la</arg><arg>${isLookUpUrl}</arg>
+            <arg>--asi</arg><arg>${actionSetId}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

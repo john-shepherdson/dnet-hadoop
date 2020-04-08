@@ -28,6 +28,10 @@ public class AbstractMigrationApplication implements Closeable {
 
 	private static final Log log = LogFactory.getLog(AbstractMigrationApplication.class);
 
+	protected AbstractMigrationApplication() { // ONLY FOR UNIT TEST
+		this.writer = null;
+	}
+
 	public AbstractMigrationApplication(final String hdfsPath) throws Exception {
 
 		log.info(String.format("Creating SequenceFile Writer, hdfsPath=%s", hdfsPath));

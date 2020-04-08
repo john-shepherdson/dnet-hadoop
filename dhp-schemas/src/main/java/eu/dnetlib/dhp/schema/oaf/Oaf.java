@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public abstract class Oaf implements Serializable {
     
@@ -42,5 +43,19 @@ public abstract class Oaf implements Serializable {
     protected int compareTrust(Oaf a, Oaf b) {
         return extractTrust(a).compareTo(extractTrust(b));
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Oaf oaf = (Oaf) o;
+        return Objects.equals(dataInfo, oaf.dataInfo) &&
+                Objects.equals(lastupdatetimestamp, oaf.lastupdatetimestamp);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dataInfo, lastupdatetimestamp);
     }
 }

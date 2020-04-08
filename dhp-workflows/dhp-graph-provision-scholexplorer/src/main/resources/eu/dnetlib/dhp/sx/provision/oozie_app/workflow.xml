@@ -1,0 +1,142 @@
+<workflow-app name="Materialize and Index graph to ElasticSearch" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>workingDirPath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>graphPath</name>
+            <description>the graph path</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>index</name>
+            <description>index name</description>
+        </property>
+        <property>
+            <name>idScholix</name>
+            <description>the identifier name of the scholix </description>
+        </property>
+        <property>
+            <name>idSummary</name>
+            <description>the identifier name of the summary</description>
+        </property>
+    </parameters>
+
+    <start to="indexSummary"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <action name="DeleteTargetPath">
+        <fs>
+            <delete path='${workingDirPath}'/>
+            <mkdir path='${workingDirPath}'/>
+        </fs>
+        <ok to="CalculateRelatedItem"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CalculateRelatedItem">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>calculate for each ID the number of related Dataset, publication and Unknown</name>
+            <class>eu.dnetlib.dhp.provision.SparkExtractRelationCount</class>
+            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
+            <arg>--relationPath</arg><arg>${graphPath}/relation</arg>
+        </spark>
+        <ok to="generateSummary"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="generateSummary">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>generate Summary</name>
+            <class>eu.dnetlib.dhp.provision.SparkGenerateSummary</class>
+            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
+            <arg>--graphPath</arg><arg>${graphPath}</arg>
+        </spark>
+        <ok to="generateScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="generateScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>generate Scholix</name>
+            <class>eu.dnetlib.dhp.provision.SparkGenerateScholix</class>
+            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory 6G --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
+            <arg>--graphPath</arg><arg>${graphPath}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="indexSummary">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>index Summary</name>
+            <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
+            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="32" </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${workingDirPath}/summary</arg>
+            <arg>--index</arg><arg>${index}_object</arg>
+            <arg>--idPath</arg><arg>id</arg>
+            <arg>--type</arg><arg>summary</arg>
+        </spark>
+        <ok to="indexScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="indexScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>index scholix</name>
+            <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
+            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory}  --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="8" </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${workingDirPath}/scholix_json</arg>
+            <arg>--index</arg><arg>${index}_scholix</arg>
+            <arg>--idPath</arg><arg>identifier</arg>
+            <arg>--type</arg><arg>scholix</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

@@ -1,11 +1,10 @@
 package eu.dnetlib.dhp.schema.oaf;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class Relation extends Oaf {
 
@@ -70,14 +69,36 @@ public class Relation extends Oaf {
 	}
 
 	public void mergeFrom(final Relation r) {
-		Assert.assertEquals("source ids must be equal", getSource(), r.getSource());
-		Assert.assertEquals("target ids must be equal", getTarget(), r.getTarget());
-		Assert.assertEquals("relType(s) must be equal", getRelType(), r.getRelType());
-		Assert.assertEquals("subRelType(s) must be equal", getSubRelType(), r.getSubRelType());
-		Assert.assertEquals("relClass(es) must be equal", getRelClass(), r.getRelClass());
-		setCollectedFrom(Stream.concat(getCollectedFrom().stream(), r.getCollectedFrom().stream())
-				.distinct() // relies on KeyValue.equals
-				.collect(Collectors.toList()));
+
+		checkArgument(Objects.equals(getSource(), r.getSource()),"source ids must be equal");
+		checkArgument(Objects.equals(getTarget(), r.getTarget()),"target ids must be equal");
+		checkArgument(Objects.equals(getRelType(), r.getRelType()),"relType(s) must be equal");
+		checkArgument(Objects.equals(getSubRelType(), r.getSubRelType()),"subRelType(s) must be equal");
+		checkArgument(Objects.equals(getRelClass(), r.getRelClass()),"relClass(es) must be equal");
+
+		setCollectedFrom(
+				Stream
+						.concat(Optional.ofNullable(getCollectedFrom()).map(Collection::stream).orElse(Stream.empty()),
+								Optional.ofNullable(r.getCollectedFrom()).map(Collection::stream).orElse(Stream.empty()))
+						.distinct() // relies on KeyValue.equals
+						.collect(Collectors.toList()));
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Relation relation = (Relation) o;
+		return relType.equals(relation.relType) &&
+				subRelType.equals(relation.subRelType) &&
+				relClass.equals(relation.relClass) &&
+				source.equals(relation.source) &&
+				target.equals(relation.target);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(relType, subRelType, relClass, source, target, collectedFrom);
 	}
 
 }

@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 
@@ -60,7 +61,7 @@ public class DispatchEntitiesApplication {
 		sc.textFile(sourcePath)
 				.filter(l -> isEntityType(l, type))
 				.map(l -> StringUtils.substringAfter(l, "|"))
-				.saveAsTextFile(targetPath + "/" + type); // use repartition(XXX) ???
+				.saveAsTextFile(targetPath + "/" + type, GzipCodec.class); // use repartition(XXX) ???
 	}
 
 	private static boolean isEntityType(final String line, final String type) {

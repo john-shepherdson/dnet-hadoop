@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class OtherResearchProduct extends Result implements Serializable {
 
@@ -39,11 +40,31 @@ public class OtherResearchProduct extends Result implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
+        if (!OtherResearchProduct.class.isAssignableFrom(e.getClass())){
+            return;
+        }
+
         OtherResearchProduct o = (OtherResearchProduct)e;
 
         contactperson = mergeLists(contactperson, o.getContactperson());
         contactgroup = mergeLists(contactgroup, o.getContactgroup());
         tool = mergeLists(tool, o.getTool());
         mergeOAFDataInfo(e);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        OtherResearchProduct that = (OtherResearchProduct) o;
+        return Objects.equals(contactperson, that.contactperson) &&
+                Objects.equals(contactgroup, that.contactgroup) &&
+                Objects.equals(tool, that.tool);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), contactperson, contactgroup, tool);
     }
 }

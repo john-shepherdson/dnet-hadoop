@@ -1,0 +1,127 @@
+[
+	{
+		"field": "organizationid",
+		"type": "string",
+		"value": "openaire____::openaire____::microsoft"
+	},
+	{
+		"field": "legalshortname",
+		"type": "string",
+		"value": "MSFTResearch"
+	},
+	{
+		"field": "legalname",
+		"type": "string",
+		"value": "Microsoft Research"
+	},
+	{
+		"field": "websiteurl",
+		"type": "string",
+		"value": "https://www.microsoft.com/en-us/research/"
+	},
+	{
+		"field": "logourl",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "eclegalbody",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "eclegalperson",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "ecnonprofit",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "ecresearchorganization",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "echighereducation",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "ecinternationalorganizationeurinterests",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "ecinternationalorganization",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "ecenterprise",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "ecsmevalidated",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "ecnutscode",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "dateofcollection",
+		"type": "date",
+		"value": "2018-10-19"
+	},
+	{
+		"field": "dateoftransformation",
+		"type": "date",
+		"value": "2018-10-19"
+	},
+	{
+		"field": "inferred",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "deletedbyinference",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "trust",
+		"type": "string",
+		"value": "0.9"
+	},
+	{
+		"field": "inferenceprovenance",
+		"type": "string",
+		"value": ""
+	},
+	{
+		"field": "collectedfromid",
+		"type": "string",
+		"value": "openaire____::TEST"
+	},
+	{
+		"field": "collectedfromname",
+		"type": "string",
+		"value": "TEST"
+	},
+	{
+		"field": "country",
+		"type": "string",
+		"value": "US@@@US@@@dnet:countries@@@dnet:countries"
+	},
+	{
+		"field": "provenanceaction",
+		"type": "not_used",
+		"value": "sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions"
+	}
+]

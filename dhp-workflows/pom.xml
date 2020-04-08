@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.1.6-SNAPSHOT</version>
+        <version>1.1.7-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -17,10 +17,13 @@
         <module>dhp-aggregation</module>
         <module>dhp-distcp</module>
         <module>dhp-graph-mapper</module>
-        <module>dhp-dedup</module>
+        <module>dhp-dedup-openaire</module>
         <module>dhp-bulktag</module>
         <module>dhp-propagation</module>
         <module>dhp-graph-provision</module>
+        <module>dhp-dedup-scholexplorer</module>
+        <module>dhp-graph-provision-scholexplorer</module>
+        <module>dhp-actionmanager</module>
     </modules>
 
     <pluginRepositories>
@@ -154,6 +157,7 @@
                     <plugin>
                         <groupId>eu.dnetlib.primer</groupId>
                         <artifactId>primer-maven-plugin</artifactId>
+                        <version>1.2.0</version>
                         <executions>
                             <execution>
                                 <id>priming</id>
@@ -233,6 +237,7 @@
                     <plugin>
                         <groupId>eu.dnetlib.dhp</groupId>
                         <artifactId>dhp-build-properties-maven-plugin</artifactId>
+                        <version>${project.version}</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
@@ -255,7 +260,10 @@
                                     <include>nameNode,jobTracker,queueName,importerQueueName,oozieLauncherQueueName,
                                         workingDir,oozieTopWfApplicationPath,oozieServiceLoc,
                                         sparkDriverMemory,sparkExecutorMemory,sparkExecutorCores,
-                                        oozie.wf.application.path,projectVersion,oozie.use.system.libpath</include>
+                                        oozie.wf.application.path,projectVersion,oozie.use.system.libpath,
+                                        oozieActionShareLibForSpark1,spark1YarnHistoryServerAddress,spark1EventLogDir,
+                                        oozieActionShareLibForSpark2,spark2YarnHistoryServerAddress,spark2EventLogDir
+                                    </include>
                                     <includeSystemProperties>true</includeSystemProperties>
                                     <includePropertyKeysFromFiles>
                                         <!-- <param>${workflow.source.dir}/job.properties</param> -->

@@ -1,0 +1,7 @@
+[
+  {"paramName":"mt",  "paramLongName":"master",               "paramDescription": "should be local or yarn",                                  "paramRequired": true},
+  {"paramName":"s",   "paramLongName":"sourcePath",           "paramDescription": "the path of the sequencial file to read",                  "paramRequired": true},
+  {"paramName":"t",   "paramLongName":"targetPath",           "paramDescription": "the path of the result data",                              "paramRequired": true},
+  {"paramName":"td",   "paramLongName":"targetDir",         "paramDescription": "the name of the result data",                              "paramRequired": true},
+  {"paramName":"e",   "paramLongName":"entities",             "paramDescription": "the entity type to be filtered",                           "paramRequired": true}
+]

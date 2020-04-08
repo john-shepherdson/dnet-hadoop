@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "in",
+    "paramLongName": "inputPath",
+    "paramDescription": "the path of the sequence file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path used to store temporary output files",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ilu",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "URL of the isLookUp Service",
+    "paramRequired": true
+  },
+  {
+    "paramName": "odt",
+    "paramLongName": "otherDsTypeId",
+    "paramDescription": "list of datasource types to populate field datasourcetypeui",
+    "paramRequired": true
+  }
+]

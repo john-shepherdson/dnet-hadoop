@@ -1,16 +1,19 @@
 <workflow-app name="import regular entities as Graph (all steps)" xmlns="uri:oozie:workflow:0.5">
+
     <parameters>
         <property>
-            <name>migrationPathStep1</name>
-            <description>the base path to store hdfs file</description>
+            <name>workingPath</name>
+            <value>/tmp/dhp_migration</value>
+            <description>the base path to store temporary intermediate data</description>
         </property>
         <property>
-            <name>migrationPathStep2</name>
-            <description>the temporary path to store entities before dispatching</description>
+            <name>graphBasePath</name>
+            <description>the target path to store raw graph</description>
         </property>
         <property>
-            <name>migrationPathStep3</name>
-            <description>the graph Raw base path</description>
+            <name>reuseContent</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
         </property>
         <property>
             <name>postgresURL</name>
@@ -46,16 +49,39 @@
         </property>
     </parameters>
 
-	<start to="ResetWorkingPath"/>
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
+	<start to="ReuseContent"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+    <decision name="ReuseContent">
+        <switch>
+            <case to="ResetWorkingPath">${wf:conf('reuseContent') eq false}</case>
+            <case to="ResetAllEntitiesPath">${wf:conf('reuseContent') eq true}</case>
+            <default to="ResetWorkingPath"/>
+        </switch>
+    </decision>
+
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${migrationPathStep1}'/>
-            <mkdir path='${migrationPathStep1}'/>
+            <delete path="${workingPath}"/>
+            <mkdir path="${workingPath}"/>
         </fs>
         <ok to="ImportDB"/>
         <error to="Kill"/>
@@ -63,10 +89,8 @@
 
     <action name="ImportDB">
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateDbEntitiesApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/db_records</arg>
+            <arg>-p</arg><arg>${workingPath}/db_records</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
@@ -77,10 +101,8 @@
     
     <action name="ImportODF">
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/odf_records</arg>
+            <arg>-p</arg><arg>${workingPath}/odf_records</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>ODF</arg>
@@ -93,24 +115,21 @@
 
     <action name="ImportOAF">
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${migrationPathStep1}/oaf_records</arg>
+            <arg>-p</arg><arg>${workingPath}/oaf_records</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>OAF</arg>
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>cleaned</arg>
         </java>
-        <ok to="ResetEntities"/>
+        <ok to="ResetAllEntitiesPath"/>
         <error to="Kill"/>
     </action>
-    
-	<action name="ResetEntities">
+
+    <action name="ResetAllEntitiesPath">
         <fs>
-            <delete path='${migrationPathStep2}'/>
-            <mkdir path='${migrationPathStep2}'/>
+            <delete path="${workingPath}/all_entities"/>
         </fs>
         <ok to="GenerateEntities"/>
         <error to="Kill"/>
@@ -118,29 +137,34 @@
 
     <action name="GenerateEntities">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>GenerateEntities</name>
             <class>eu.dnetlib.dhp.migration.step2.GenerateEntitiesApplication</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>-s</arg><arg>${migrationPathStep1}/db_records,${migrationPathStep1}/oaf_records,${migrationPathStep1}/odf_records</arg>
-            <arg>-t</arg><arg>${migrationPathStep2}/all_entities</arg>
+            <arg>-s</arg><arg>${workingPath}/db_records,${workingPath}/oaf_records,${workingPath}/odf_records</arg>
+            <arg>-t</arg><arg>${workingPath}/all_entities</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
         </spark>
-        <ok to="ResetGraph"/>
+        <ok to="ResetGraphPath"/>
         <error to="Kill"/>
     </action>
 
-	<action name="ResetGraph">
+    <action name="ResetGraphPath">
         <fs>
-            <delete path='${migrationPathStep3}'/>
-            <mkdir path='${migrationPathStep3}'/>
+            <delete path="${graphBasePath}/graph_raw"/>
+            <mkdir path="${graphBasePath}/graph_raw"/>
         </fs>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>
@@ -148,17 +172,22 @@
 
     <action name="GenerateGraph">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
             <name>GenerateGraph</name>
             <class>eu.dnetlib.dhp.migration.step3.DispatchEntitiesApplication</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory=${sparkDriverMemory} --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener" --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener" --conf spark.sql.warehouse.dir="/user/hive/warehouse"</spark-opts>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
+                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
+                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+            </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>-s</arg><arg>${migrationPathStep2}/all_entities</arg>
-            <arg>-g</arg><arg>${migrationPathStep3}</arg>
+            <arg>-s</arg><arg>${workingPath}/all_entities</arg>
+            <arg>-g</arg><arg>${graphBasePath}/graph_raw</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

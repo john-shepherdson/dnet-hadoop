@@ -1,0 +1,14 @@
+[
+  {
+    "paramName": "in",
+    "paramLongName": "inputPath",
+    "paramDescription": "the path of the sequence file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path used to store temporary output files",
+    "paramRequired": true
+  }
+]

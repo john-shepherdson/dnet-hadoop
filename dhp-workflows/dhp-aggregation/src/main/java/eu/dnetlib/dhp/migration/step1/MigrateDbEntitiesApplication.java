@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,7 @@ import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Project;
@@ -95,6 +97,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		}
 	}
 
+	protected MigrateDbEntitiesApplication() { // ONLY FOR UNIT TEST
+		super();
+		this.dbClient = null;
+		this.lastUpdateTimestamp = new Date().getTime();
+	}
+
 	public MigrateDbEntitiesApplication(final String hdfsPath, final String dbUrl, final String dbUser,
 			final String dbPassword) throws Exception {
 		super(hdfsPath);
@@ -102,12 +110,15 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		this.lastUpdateTimestamp = new Date().getTime();
 	}
 
-	public void execute(final String sqlFile, final Consumer<ResultSet> consumer) throws Exception {
+	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer) throws Exception {
 		final String sql = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/migration/sql/" + sqlFile));
+
+		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(oaf -> emitOaf(oaf));
+
 		dbClient.processResults(sql, consumer);
 	}
 
-	public void processDatasource(final ResultSet rs) {
+	public List<Oaf> processDatasource(final ResultSet rs) {
 
 		try {
 
@@ -161,61 +172,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds.setDataInfo(info);
 			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
-			// rs.getString("datasourceid");
-			// rs.getArray("identities");
-			// rs.getString("officialname");
-			// rs.getString("englishname");
-			// rs.getString("contactemail");
-			// rs.getString("openairecompatibility"); // COMPLEX ...@@@...
-			// rs.getString("websiteurl");
-			// rs.getString("logourl");
-			// rs.getArray("accessinfopackage");
-			// rs.getDouble("latitude");
-			// rs.getDouble("longitude");
-			// rs.getString("namespaceprefix");
-			// rs.getInt("odnumberofitems"); // NULL
-			// rs.getDate("odnumberofitemsdate"); // NULL
-			// rs.getArray("subjects");
-			// rs.getString("description");
-			// rs.getString("odpolicies"); // NULL
-			// rs.getArray("odlanguages");
-			// rs.getArray("odcontenttypes");
-			// rs.getBoolean("inferred"); // false
-			// rs.getBoolean("deletedbyinference");// false
-			// rs.getDouble("trust"); // 0.9
-			// rs.getString("inferenceprovenance"); // NULL
-			// rs.getDate("dateofcollection");
-			// rs.getDate("dateofvalidation");
-			// rs.getDate("releasestartdate");
-			// rs.getDate("releaseenddate");
-			// rs.getString("missionstatementurl");
-			// rs.getBoolean("dataprovider");
-			// rs.getBoolean("serviceprovider");
-			// rs.getString("databaseaccesstype");
-			// rs.getString("datauploadtype");
-			// rs.getString("databaseaccessrestriction");
-			// rs.getString("datauploadrestriction");
-			// rs.getBoolean("versioning");
-			// rs.getString("citationguidelineurl");
-			// rs.getString("qualitymanagementkind");
-			// rs.getString("pidsystems");
-			// rs.getString("certificates");
-			// rs.getArray("policies");
-			// rs.getString("collectedfromid");
-			// rs.getString("collectedfromname");
-			// rs.getString("datasourcetype"); // COMPLEX
-			// rs.getString("provenanceaction"); //
-			// 'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions'
-			// AS provenanceaction,
-			// rs.getString("journal"); // CONCAT(d.issn, '@@@', d.eissn, '@@@', d.lissn) AS journal
-
-			emitOaf(ds);
+			return Arrays.asList(ds);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void processProject(final ResultSet rs) {
+	public List<Oaf> processProject(final ResultSet rs) {
 		try {
 
 			final DataInfo info = prepareDataInfo(rs);
@@ -259,52 +222,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			p.setDataInfo(info);
 			p.setLastupdatetimestamp(lastUpdateTimestamp);
 
-			// rs.getString("projectid");
-			// rs.getString("code");
-			// rs.getString("websiteurl");
-			// rs.getString("acronym");
-			// rs.getString("title");
-			// rs.getDate("startdate");
-			// rs.getDate("enddate");
-			// rs.getString("callidentifier");
-			// rs.getString("keywords");
-			// rs.getInt("duration");
-			// rs.getBoolean("ecsc39");
-			// rs.getBoolean("oamandatepublications");
-			// rs.getBoolean("ecarticle29_3");
-			// rs.getDate("dateofcollection");
-			// rs.getDate("dateoftransformation");
-			// rs.getBoolean("inferred");
-			// rs.getBoolean("deletedbyinference");
-			// rs.getDouble("trust");
-			// rs.getString("inferenceprovenance");
-			// rs.getString("optional1");
-			// rs.getString("optional2");
-			// rs.getString("jsonextrainfo");
-			// rs.getString("contactfullname");
-			// rs.getString("contactfax");
-			// rs.getString("contactphone");
-			// rs.getString("contactemail");
-			// rs.getString("summary");
-			// rs.getString("currency");
-			// rs.getDouble("totalcost");
-			// rs.getDouble("fundedamount");
-			// rs.getString("collectedfromid");
-			// rs.getString("collectedfromname");
-			// rs.getString("contracttype"); // COMPLEX
-			// rs.getString("provenanceaction"); // COMPLEX
-			// rs.getArray("pid");
-			// rs.getArray("subjects");
-			// rs.getArray("fundingtree");
-
-			emitOaf(p);
+			return Arrays.asList(p);
 
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void processOrganization(final ResultSet rs) {
+	public List<Oaf> processOrganization(final ResultSet rs) {
 
 		try {
 
@@ -320,11 +245,11 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			o.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
 			o.setExtraInfo(new ArrayList<>());  // Values not present in the DB
 			o.setOaiprovenance(null); // Values not present in the DB
-			o.setLegalshortname(field("legalshortname", info));
-			o.setLegalname(field("legalname", info));
+			o.setLegalshortname(field(rs.getString("legalshortname"), info));
+			o.setLegalname(field(rs.getString("legalname"), info));
 			o.setAlternativeNames(new ArrayList<>());  // Values not returned by the SQL query
-			o.setWebsiteurl(field("websiteurl", info));
-			o.setLogourl(field("logourl", info));
+			o.setWebsiteurl(field(rs.getString("websiteurl"), info));
+			o.setLogourl(field(rs.getString("logourl"), info));
 			o.setEclegalbody(field(Boolean.toString(rs.getBoolean("eclegalbody")), info));
 			o.setEclegalperson(field(Boolean.toString(rs.getBoolean("eclegalperson")), info));
 			o.setEcnonprofit(field(Boolean.toString(rs.getBoolean("ecnonprofit")), info));
@@ -339,41 +264,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			o.setDataInfo(info);
 			o.setLastupdatetimestamp(lastUpdateTimestamp);
 
-			// rs.getString("organizationid");
-			// rs.getString("legalshortname");
-			// rs.getString("legalname");
-			// rs.getString("websiteurl");
-			// rs.getString("logourl");
-			// rs.getBoolean("eclegalbody");
-			// rs.getBoolean("eclegalperson");
-			// rs.getBoolean("ecnonprofit");
-			// rs.getBoolean("ecresearchorganization");
-			// rs.getBoolean("echighereducation");
-			// rs.getBoolean("ecinternationalorganizationeurinterests");
-			// rs.getBoolean("ecinternationalorganization");
-			// rs.getBoolean("ecenterprise");
-			// rs.getBoolean("ecsmevalidated");
-			// rs.getBoolean("ecnutscode");
-			// rs.getDate("dateofcollection");
-			// rs.getDate("dateoftransformation");
-			// rs.getBoolean("inferred");
-			// rs.getBoolean("deletedbyinference");
-			// rs.getDouble("trust");
-			// rs.getString("inferenceprovenance");
-			// rs.getString("collectedfromid");
-			// rs.getString("collectedfromname");
-			// rs.getString("country");
-			// rs.getString("provenanceaction");
-			// rs.getArray("pid");
-
-			emitOaf(o);
+			return Arrays.asList(o);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void processDatasourceOrganization(final ResultSet rs) {
-
+	public List<Oaf> processDatasourceOrganization(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs);
 			final String orgId = createOpenaireId(20, rs.getString("organization"), true);
@@ -389,7 +286,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			r1.setCollectedFrom(collectedFrom);
 			r1.setDataInfo(info);
 			r1.setLastupdatetimestamp(lastUpdateTimestamp);
-			emitOaf(r1);
 
 			final Relation r2 = new Relation();
 			r2.setRelType("datasourceOrganization");
@@ -400,29 +296,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			r2.setCollectedFrom(collectedFrom);
 			r2.setDataInfo(info);
 			r2.setLastupdatetimestamp(lastUpdateTimestamp);
-			emitOaf(r2);
 
-			// rs.getString("datasource");
-			// rs.getString("organization");
-			// rs.getDate("startdate"); // NULL
-			// rs.getDate("enddate"); // NULL
-			// rs.getBoolean("inferred"); // false
-			// rs.getBoolean("deletedbyinference"); // false
-			// rs.getDouble("trust"); // 0.9
-			// rs.getString("inferenceprovenance"); // NULL
-			// rs.getString("semantics"); // 'providedBy@@@provided
-			// by@@@dnet:datasources_organizations_typologies@@@dnet:datasources_organizations_typologies' AS
-			// semantics,
-			// rs.getString("provenanceaction"); // d.provenanceaction || '@@@' || d.provenanceaction ||
-			// '@@@dnet:provenanceActions@@@dnet:provenanceActions' AS provenanceaction
-
+			return Arrays.asList(r1, r2);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void processProjectOrganization(final ResultSet rs) {
-
+	public List<Oaf> processProjectOrganization(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs);
 			final String orgId = createOpenaireId(20, rs.getString("resporganization"), true);
@@ -438,7 +319,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			r1.setCollectedFrom(collectedFrom);
 			r1.setDataInfo(info);
 			r1.setLastupdatetimestamp(lastUpdateTimestamp);
-			emitOaf(r1);
 
 			final Relation r2 = new Relation();
 			r2.setRelType("projectOrganization");
@@ -449,30 +329,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			r2.setCollectedFrom(collectedFrom);
 			r2.setDataInfo(info);
 			r2.setLastupdatetimestamp(lastUpdateTimestamp);
-			emitOaf(r2);
 
-			// rs.getString("project");
-			// rs.getString("resporganization");
-			// rs.getInt("participantnumber");
-			// rs.getDouble("contribution");
-			// rs.getDate("startdate");// null
-			// rs.getDate("enddate");// null
-			// rs.getBoolean("inferred");// false
-			// rs.getBoolean("deletedbyinference"); // false
-			// rs.getDouble("trust");
-			// rs.getString("inferenceprovenance"); // NULL
-			// rs.getString("semantics"); // po.semanticclass || '@@@' || po.semanticclass ||
-			// '@@@dnet:project_organization_relations@@@dnet:project_organization_relations' AS semantics,
-			// rs.getString("provenanceaction"); //
-			// 'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions'
-			// AS provenanceaction
-
+			return Arrays.asList(r1, r2);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void processClaims(final ResultSet rs) {
+	public List<Oaf> processClaims(final ResultSet rs) {
 
 		final DataInfo info =
 				dataInfo(false, null, false, false, qualifier("user:claim", "user:claim", "dnet:provenanceActions", "dnet:provenanceActions"), "0.9");
@@ -495,7 +359,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				r.setLastupdatetimestamp(lastUpdateTimestamp);
 				r.setContext(prepareContext(rs.getString("source_id"), info));
 				r.setDataInfo(info);
-				emitOaf(r);
+
+				return Arrays.asList(r);
 			} else {
 				final String sourceId = createOpenaireId(rs.getString("source_type"), rs.getString("source_id"), false);
 				final String targetId = createOpenaireId(rs.getString("target_type"), rs.getString("target_id"), false);
@@ -525,14 +390,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				r1.setTarget(targetId);
 				r1.setDataInfo(info);
 				r1.setLastupdatetimestamp(lastUpdateTimestamp);
-				emitOaf(r1);
 
 				r2.setSource(targetId);
 				r2.setTarget(sourceId);
 				r2.setDataInfo(info);
 				r2.setLastupdatetimestamp(lastUpdateTimestamp);
-				emitOaf(r2);
 
+				return Arrays.asList(r1, r2);
 			}
 
 		} catch (final Exception e) {
@@ -563,7 +427,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	private List<Field<String>> prepareListFields(final Array array, final DataInfo info) {
 		try {
-			return listFields(info, (String[]) array.getArray());
+			return array != null ? listFields(info, (String[]) array.getArray()) : new ArrayList<>();
 		} catch (final SQLException e) {
 			throw new RuntimeException("Invalid SQL array", e);
 		}

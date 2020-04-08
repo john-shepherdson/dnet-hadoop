@@ -7,13 +7,13 @@ import eu.dnetlib.dhp.collection.worker.DnetCollectorWorker;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 
@@ -24,7 +24,7 @@ public class DnetCollectorWorkerApplicationTests {
     private MessageManager messageManager = mock(MessageManager.class);
 
     private DnetCollectorWorker worker;
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         final String apiJson = mapper.writeValueAsString(getApi());
@@ -47,7 +47,7 @@ public class DnetCollectorWorkerApplicationTests {
     }
 
 
-    @After
+    @AfterEach
     public void dropDown(){
         File f = new File("/tmp/file.seq");
         f.delete();
