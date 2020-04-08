@@ -123,7 +123,7 @@ public class SparkCountryPropagationJob2 {
                     .option("compression", "gzip")
                     .text(outputPath);
         }
-        
+
 
 
     private static <R extends Result> Dataset<Row> getPotentialResultToUpdate(SparkSession spark, String inputPath,
