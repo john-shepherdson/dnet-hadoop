@@ -5,7 +5,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
@@ -41,7 +40,7 @@ public class SparkCountryPropagationJob2 {
 
         final String outputPath = "/tmp/provision/propagation/countrytoresultfrominstitutionalrepositories";
         final String datasourcecountrypath = outputPath + "/prepared_datasource_country";
-        final String resultClassName = parser.get("resultClazz");
+        final String resultClassName = parser.get("resultTableName");
 
         final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".")+1);
 
@@ -67,7 +66,8 @@ public class SparkCountryPropagationJob2 {
         //broadcasting the result of the preparation step
         Broadcast<Dataset<DatasourceCountry>> broadcast_datasourcecountryassoc = sc.broadcast(datasourcecountryassoc);
 
-        Dataset<Row> potentialUpdates = getPotentialResultToUpdate(spark, inputPath, resultClazz, broadcast_datasourcecountryassoc);
+        Dataset<ResultCountrySet> potentialUpdates = getPotentialResultToUpdate(spark, inputPath, resultClazz,
+                broadcast_datasourcecountryassoc).as(Encoders.bean(ResultCountrySet.class));
 
         if(writeUpdates){
             writeUpdates(potentialUpdates.toJavaRDD(), outputPath + "/update_" + resultType);
@@ -80,7 +80,7 @@ public class SparkCountryPropagationJob2 {
 
     }
 
-    private static <R extends Result> void updateResultTable(SparkSession spark, Dataset<Row> potentialUpdates,
+    private static <R extends Result> void updateResultTable(SparkSession spark, Dataset<ResultCountrySet> potentialUpdates,
                                                              String inputPath,
                                                              Class<R> resultClazz,
                                                              String outputPath) {
@@ -91,23 +91,24 @@ public class SparkCountryPropagationJob2 {
                 .map(r -> new Tuple2<>(r.getId(), r),
                 Encoders.tuple(Encoders.STRING(), Encoders.bean(resultClazz)));
 
-        Dataset<Tuple2<String, List>> potential_update_pair = potentialUpdates.map(pu -> new Tuple2<>(pu.getString(0), pu.getList(1)),
-                Encoders.tuple(Encoders.STRING(), Encoders.bean(List.class)));
+        Dataset<Tuple2<String, ResultCountrySet>> potential_update_pair = potentialUpdates.map(pu -> new Tuple2<>(pu.getResultId(),
+                        pu),
+                Encoders.tuple(Encoders.STRING(), Encoders.bean(ResultCountrySet.class)));
 
         Dataset<R> new_table = result_pair
                 .joinWith(potential_update_pair, result_pair.col("_1").equalTo(potential_update_pair.col("_1")), "left")
-                .map((MapFunction<Tuple2<Tuple2<String, R>, Tuple2<String, List>>, R>) value -> {
+                .map((MapFunction<Tuple2<Tuple2<String, R>, Tuple2<String, ResultCountrySet>>, R>) value -> {
                     R r = value._1()._2();
-                    Optional<List<Object>> potentialNewCountries = Optional.ofNullable(value._2()).map(Tuple2::_2);
-                    if (potentialNewCountries != null) {
+                    Optional<ResultCountrySet> potentialNewCountries = Optional.ofNullable(value._2()).map(Tuple2::_2);
+                    if (potentialNewCountries.isPresent()) {
                         HashSet<String> countries = new HashSet<>();
                         for (Qualifier country : r.getCountry()) {
                             countries.add(country.getClassid());
                         }
 
-                        for (Object country : potentialNewCountries.get()) {
-                            if (!countries.contains(country)) {
-                                r.getCountry().add(getCountry((String) country));
+                        for (Country country : potentialNewCountries.get().getCountrySet()) {
+                            if (!countries.contains(country.getClassid())) {
+                                r.getCountry().add(getCountry(country.getClassid(),country.getClassname()));
                             }
                         }
                     }
@@ -117,7 +118,7 @@ public class SparkCountryPropagationJob2 {
 
 
             log.info("Saving graph table to path: {}", outputPath);
-            result
+            new_table
                     .toJSON()
                     .write()
                     .option("compression", "gzip")
@@ -151,6 +152,7 @@ public class SparkCountryPropagationJob2 {
 
     private static Dataset<Row> countryPropagationAssoc(SparkSession spark,
                                                         Broadcast<Dataset<DatasourceCountry>> broadcast_datasourcecountryassoc){
+
         Dataset<DatasourceCountry> datasource_country = broadcast_datasourcecountryassoc.value();
         datasource_country.createOrReplaceTempView("datasource_country");
 
@@ -183,7 +185,7 @@ public class SparkCountryPropagationJob2 {
                 .as(Encoders.bean(DatasourceCountry.class));
     }
 
-    private static void writeUpdates(JavaRDD<Row> potentialUpdates, String outputPath){
+    private static void writeUpdates(JavaRDD<ResultCountrySet> potentialUpdates, String outputPath){
         potentialUpdates.map(u -> OBJECT_MAPPER.writeValueAsString(u))
                 .saveAsTextFile(outputPath);
     }

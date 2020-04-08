@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class DatasourceCountry implements Serializable {
     private String dataSourceId;
-    private String country;
+    private Country country;
 
     public String getDataSourceId() {
         return dataSourceId;
@@ -14,11 +14,11 @@ public class DatasourceCountry implements Serializable {
         this.dataSourceId = dataSourceId;
     }
 
-    public String getCountry() {
+    public Country getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(Country country) {
         this.country = country;
     }
 }

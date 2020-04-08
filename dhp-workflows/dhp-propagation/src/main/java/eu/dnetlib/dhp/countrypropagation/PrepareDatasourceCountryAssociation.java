@@ -29,14 +29,14 @@ import org.slf4j.LoggerFactory;
  * relation provides between Datasource and Organization is exploited to get the country for the datasource
  */
 
-public class PrepareResultCountryAssociation {
-    private static final Logger log = LoggerFactory.getLogger(PrepareResultCountryAssociation.class);
+public class PrepareDatasourceCountryAssociation {
+    private static final Logger log = LoggerFactory.getLogger(PrepareDatasourceCountryAssociation.class);
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static void main(String[] args) throws Exception {
 
-        String jsonConfiguration = IOUtils.toString(PrepareResultCountryAssociation.class
+        String jsonConfiguration = IOUtils.toString(PrepareDatasourceCountryAssociation.class
                 .getResourceAsStream("/eu/dnetlib/dhp/countrypropagation/input_prepare_dc_assoc.json"));
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -97,7 +97,7 @@ public class PrepareResultCountryAssociation {
         relation.createOrReplaceTempView("relation");
         organization.createOrReplaceTempView("organization");
 
-        String query = "SELECT source ds, country.classid country " +
+        String query = "SELECT source ds, named_struct('classid', country.classid, 'classname', country.classname) country " +
                 "FROM ( SELECT id " +
                 "       FROM datasource " +
                 "       WHERE (datainfo.deletedbyinference = false " + whitelisted + ") " +

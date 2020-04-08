@@ -100,7 +100,7 @@ public class SparkCountryPropagationJob {
         datasource.createOrReplaceTempView("datasource");
         relation.createOrReplaceTempView("relation");
         organization.createOrReplaceTempView("organization");
-
+//todo add length(country.classid)>0
         String query = "SELECT source ds, target org, country.classid country " +
                 "FROM ( SELECT id " +
                 "FROM datasource " +
@@ -118,6 +118,7 @@ public class SparkCountryPropagationJob {
                 "WHERE datainfo.deletedbyinference = false ) o " +
                 "ON o.id = rel.target";
 
+        //todo broadcast
         Dataset<Row> rels = spark.sql(query);
         rels.createOrReplaceTempView("rels");
 
@@ -268,11 +269,11 @@ public class SparkCountryPropagationJob {
                 });
     }
 
-    private static JavaRDD<Row> propagateOnResult(SparkSession spark, String table) {
+    private static JavaRDD<Row> propagateOnResult(SparkSession spark, String result_type) {
         String query;
         query = "SELECT id, inst.collectedfrom.key cf , inst.hostedby.key hb " +
                 "FROM ( SELECT id, instance " +
-                "FROM " + table +
+                "FROM " + result_type +
                 " WHERE datainfo.deletedbyinference = false)  ds " +
                 "LATERAL VIEW EXPLODE(instance) i AS inst";
         Dataset<Row> cfhb = spark.sql(query);
