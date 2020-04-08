@@ -20,7 +20,6 @@ public class MergeAuthorTest {
     public void setUp() throws Exception {
         final String json = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/dedup/json/authors_merge.json"));
 
-
         publicationsToMerge = Arrays.asList(json.split("\n")).stream().map(s-> {
             try {
                 return mapper.readValue(s, Publication.class);

@@ -1,13 +1,14 @@
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,20 +18,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SparkDedupTest {
+public class SparkDedupTest implements Serializable {
 
-    @Mock
+    @Mock(serializable = true)
     ISLookUpService isLookUpService;
 
-    private SparkSession spark;
+    private static SparkSession spark;
+    private static JavaSparkContext jsc;
 
     private static String testGraphBasePath;
     private final static String testOutputBasePath = "/tmp/test_dedup_workflow";
@@ -43,10 +46,6 @@ public class SparkDedupTest {
         testGraphBasePath = Paths.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/entities").toURI()).toFile().getAbsolutePath();
 
         FileUtils.deleteDirectory(new File(testOutputBasePath));
-    }
-
-    @BeforeEach
-    private void setUp() throws IOException, ISLookUpException {
 
         spark = SparkSession
                 .builder()
@@ -55,13 +54,20 @@ public class SparkDedupTest {
                 .config(new SparkConf())
                 .getOrCreate();
 
-        when(isLookUpService.getResourceProfileByQuery(Mockito.contains(testActionSetId)))
+        jsc = new JavaSparkContext(spark.sparkContext());
+
+    }
+
+    @BeforeEach
+    private void setUp() throws IOException, ISLookUpException {
+
+        lenient().when(isLookUpService.getResourceProfileByQuery(Mockito.contains(testActionSetId)))
                 .thenReturn(IOUtils.toString(SparkDedupTest.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/profiles/mock_orchestrator.xml")));
 
-        when(isLookUpService.getResourceProfileByQuery(Mockito.contains("organization")))
+        lenient().when(isLookUpService.getResourceProfileByQuery(Mockito.contains("organization")))
                 .thenReturn(IOUtils.toString(SparkDedupTest.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
 
-        when(isLookUpService.getResourceProfileByQuery(Mockito.contains("publication")))
+        lenient().when(isLookUpService.getResourceProfileByQuery(Mockito.contains("publication")))
                 .thenReturn(IOUtils.toString(SparkDedupTest.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/pub.curr.conf.json")));
 
     }
@@ -85,11 +91,8 @@ public class SparkDedupTest {
         long orgs_simrel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel").count();
         long pubs_simrel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel").count();
 
-        System.out.println("pubs_simrel = " + pubs_simrel);
-        System.out.println("orgs_simrel = " + orgs_simrel);
-//        assertEquals(918, orgs_simrel);
-//        assertEquals(0, pubs_simrel);
-
+        assertEquals(3288, orgs_simrel);
+        assertEquals(7260, pubs_simrel);
     }
 
     @Test
@@ -111,16 +114,14 @@ public class SparkDedupTest {
         long orgs_mergerel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel").count();
         long pubs_mergerel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel").count();
 
-        System.out.println("pubs_mergerel = " + pubs_mergerel);
-        System.out.println("orgs_mergerel = " + orgs_mergerel);
-//        assertEquals(458, orgs_mergerel);
-//        assertEquals(0, pubs_mergerel);
+        assertEquals(1244, orgs_mergerel);
+        assertEquals(1460, pubs_mergerel);
 
     }
 
     @Test
     @Order(3)
-    public void dedupRecordTest() throws Exception {
+    public void createDedupRecordTest() throws Exception {
 
         ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils.toString(
@@ -134,13 +135,11 @@ public class SparkDedupTest {
 
         new SparkCreateDedupRecord(parser, spark).run(isLookUpService);
 
-        long orgs_deduprecord = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/organization_deduprecord").count();
-        long pubs_deduprecord = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/publication_deduprecord").count();
+        long orgs_deduprecord = jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_deduprecord").count();
+        long pubs_deduprecord = jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/publication_deduprecord").count();
 
-        System.out.println("pubs_deduprecord = " + pubs_deduprecord);
-        System.out.println("pubs_deduprecord = " + orgs_deduprecord);
-//        assertEquals(458, orgs_deduprecord);
-//        assertEquals(0, pubs_deduprecord);
+        assertEquals(82, orgs_deduprecord);
+        assertEquals(66, pubs_deduprecord);
     }
 
     @Test
@@ -159,12 +158,35 @@ public class SparkDedupTest {
 
         new SparkUpdateEntity(parser, spark).run(isLookUpService);
 
-        long organizations = spark.read().load(testDedupGraphBasePath + "/organization").count();
-        long publications = spark.read().load(testDedupGraphBasePath + "/publication").count();
+        long organizations = jsc.textFile(testDedupGraphBasePath + "/organization").count();
+        long publications = jsc.textFile(testDedupGraphBasePath + "/publication").count();
 
-        System.out.println("publications = " + publications);
-        System.out.println("organizations = " + organizations);
+        long mergedOrgs = spark
+                .read().load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel").as(Encoders.bean(Relation.class))
+                .where("relClass=='merges'")
+                .javaRDD()
+                .map(Relation::getTarget)
+                .distinct().count();
 
+        long mergedPubs = spark
+                .read().load(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel").as(Encoders.bean(Relation.class))
+                .where("relClass=='merges'")
+                .javaRDD()
+                .map(Relation::getTarget)
+                .distinct().count();
+
+        assertEquals(897, publications);
+        assertEquals(835, organizations);
+
+        long deletedOrgs = jsc.textFile(testDedupGraphBasePath + "/organization")
+                .filter(this::isDeletedByInference).count();
+        long deletedPubs = jsc.textFile(testDedupGraphBasePath + "/publication")
+                .filter(this::isDeletedByInference).count();
+
+        assertEquals(mergedOrgs, deletedOrgs);
+        assertEquals(mergedPubs, deletedPubs);
+
+        //TODO check the size of other entities not deduplicated
     }
 
     @Test
@@ -183,22 +205,13 @@ public class SparkDedupTest {
 
         new SparkPropagateRelation(parser, spark).run(isLookUpService);
 
-        long relations = spark.read().load(testDedupGraphBasePath + "/relation").count();
+        long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-        System.out.println("relations = " + relations);
+        assertEquals(826, relations);
 
     }
 
-    @Disabled("must be parametrized to run locally")
-    public void testHashCode() {
-        final String s1 = "20|grid________::6031f94bef015a37783268ec1e75f17f";
-        final String s2 = "20|nsf_________::b12be9edf414df8ee66b4c52a2d8da46";
-
-        final HashFunction hashFunction = Hashing.murmur3_128();
-
-        System.out.println(s1.hashCode());
-        System.out.println(hashFunction.hashString(s1).asLong());
-        System.out.println(s2.hashCode());
-        System.out.println(hashFunction.hashString(s2).asLong());
+    public boolean isDeletedByInference(String s) {
+        return  s.contains("\"deletedbyinference\":true");
     }
 }
