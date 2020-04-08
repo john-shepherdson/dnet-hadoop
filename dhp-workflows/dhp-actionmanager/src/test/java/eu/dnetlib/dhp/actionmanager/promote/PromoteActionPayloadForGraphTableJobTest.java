@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.actionmanager.promote;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
@@ -45,34 +46,7 @@ public class PromoteActionPayloadForGraphTableJobTest {
         conf.setAppName(PromoteActionPayloadForGraphTableJobTest.class.getSimpleName());
         conf.setMaster("local");
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(new Class[]{
-                Author.class,
-                Context.class,
-                Country.class,
-                DataInfo.class,
-                eu.dnetlib.dhp.schema.oaf.Dataset.class,
-                Datasource.class,
-                ExternalReference.class,
-                ExtraInfo.class,
-                Field.class,
-                GeoLocation.class,
-                Instance.class,
-                Journal.class,
-                KeyValue.class,
-                Oaf.class,
-                OafEntity.class,
-                OAIProvenance.class,
-                Organization.class,
-                OriginDescription.class,
-                OtherResearchProduct.class,
-                Project.class,
-                Publication.class,
-                Qualifier.class,
-                Relation.class,
-                Result.class,
-                Software.class,
-                StructuredProperty.class
-        });
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
         spark = SparkSession.builder().config(conf).getOrCreate();
     }
 
