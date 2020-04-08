@@ -12,18 +12,6 @@
     "paramRequired": true
   },
   {
-    "paramName":"wl",
-    "paramLongName":"whitelist",
-    "paramDescription": "datasource id that will be considered even if not in the allowed typology list. Split by ;",
-    "paramRequired": true
-  },
-  {
-    "paramName":"at",
-    "paramLongName":"allowedtypes",
-    "paramDescription": "the types of the allowed datasources. Split by ;",
-    "paramRequired": true
-  },
-  {
     "paramName":"h",
     "paramLongName":"hive_metastore_uris",
     "paramDescription": "the hive metastore uris",
@@ -39,6 +27,12 @@
     "paramName":"sg",
     "paramLongName":"saveGraph",
     "paramDescription": "true if the new version of the graph must be saved",
+    "paramRequired": true
+  },
+  {
+    "paramName":"tn",
+    "paramLongName":"resultTableName",
+    "paramDescription": "the name of the result table we are currently working on",
     "paramRequired": true
   }
 ]
