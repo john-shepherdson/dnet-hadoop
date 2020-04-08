@@ -30,6 +30,20 @@ public class SparkSessionSupport {
     }
 
     /**
+     * Runs a given function using SparkSession created with hive support and using default builder and supplied SparkConf.
+     * Stops SparkSession when SparkSession is managed. Allows to reuse SparkSession created externally.
+     *
+     * @param conf                  SparkConf instance
+     * @param isSparkSessionManaged When true will stop SparkSession
+     * @param fn                    Consumer to be applied to constructed SparkSession
+     */
+    public static void runWithSparkHiveSession(SparkConf conf,
+                                           Boolean isSparkSessionManaged,
+                                           ThrowingConsumer<SparkSession, Exception> fn) {
+        runWithSparkSession(c -> SparkSession.builder().config(c).enableHiveSupport().getOrCreate(), conf, isSparkSessionManaged, fn);
+    }
+
+    /**
      * Runs a given function using SparkSession created using supplied builder and supplied SparkConf. Stops SparkSession
      * when SparkSession is managed. Allows to reuse SparkSession created externally.
      *

@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.provision;
+package eu.dnetlib.dhp.provision.update;
 
 import com.jayway.jsonpath.JsonPath;
 import eu.dnetlib.dhp.provision.scholix.*;
@@ -15,16 +15,14 @@ import java.util.stream.Collectors;
 
 public class Datacite2Scholix {
 
-
+    private String rootPath = "$.attributes";
     final RelationMapper relationMapper;
 
     public Datacite2Scholix(RelationMapper relationMapper) {
         this.relationMapper = relationMapper;
     }
 
-
     public List<Scholix> generateScholixFromJson(final String dJson) {
-
         List<Map<String, String>> relIds = getRelatedIendtifiers(dJson);
         relIds = relIds!= null ? relIds.stream().filter(m->
                 m.containsKey("relatedIdentifierType") && m.containsKey("relationType" ) && m.containsKey( "relatedIdentifier")
@@ -32,22 +30,24 @@ public class Datacite2Scholix {
         if(relIds== null || relIds.size() ==0 )
             return null;
 
-
-
-        final String updated = JsonPath.read(dJson,"$.attributes.updated" );
+        final String updated = JsonPath.read(dJson, rootPath + ".updated");
         ScholixResource resource = generateDataciteScholixResource(dJson);
 
         return relIds.stream().flatMap(s-> {
             final List<Scholix> result = generateScholix(resource, s.get("relatedIdentifier"), s.get("relatedIdentifierType"), s.get("relationType"), updated);
             return result.stream();
         }).collect(Collectors.toList());
-
     }
 
+    public String getRootPath() {
+        return rootPath;
+    }
+
+    public void setRootPath(String rootPath) {
+        this.rootPath = rootPath;
+    }
 
     private List<Scholix> generateScholix(ScholixResource source, final String pid, final String pidtype, final String relType, final String updated) {
-
-
         if ("doi".equalsIgnoreCase(pidtype)) {
             ScholixResource target = new ScholixResource();
             target.setIdentifier(Collections.singletonList(new ScholixIdentifier(pid, pidtype)));
@@ -92,20 +92,17 @@ public class Datacite2Scholix {
             result.add(s2);
             return result;
         }
-
-
-
     }
 
     public ScholixResource generateDataciteScholixResource(String dJson) {
         ScholixResource resource = new ScholixResource();
-        String DOI_PATH = "$.attributes.doi";
+        String DOI_PATH = rootPath + ".doi";
         final String doi = JsonPath.read(dJson, DOI_PATH);
         resource.setIdentifier(Collections.singletonList(new ScholixIdentifier(doi, "doi")));
         resource.setObjectType(getType(dJson));
         resource.setDnetIdentifier(generateId(doi, "doi", resource.getObjectType()));
         resource.setCollectedFrom(generateDataciteCollectedFrom("complete"));
-        final String publisher = JsonPath.read(dJson, "$.attributes.publisher");
+        final String publisher = JsonPath.read(dJson, rootPath + ".publisher");
         if (StringUtils.isNotBlank(publisher))
             resource.setPublisher(Collections.singletonList(new ScholixEntityId(publisher, null)));
         final String date = getDate(dJson);
@@ -119,7 +116,7 @@ public class Datacite2Scholix {
     }
 
     private List<ScholixEntityId> getCreators(final String json) {
-        final List<String> creatorName = JsonPath.read(json, "$.attributes.creators[*].name");
+        final List<String> creatorName = JsonPath.read(json, rootPath + ".creators[*].name");
         if (creatorName!= null && creatorName.size() >0) {
             return  creatorName.stream().map(s-> new ScholixEntityId(s, null)).collect(Collectors.toList());
         }
@@ -127,12 +124,12 @@ public class Datacite2Scholix {
     }
 
     private String getTitle(final String json){
-        final List<String> titles = JsonPath.read(json, "$.attributes.titles[*].title");
+        final List<String> titles = JsonPath.read(json, rootPath + ".titles[*].title");
         return titles!= null && titles.size()>0?titles.get(0): null;
     }
 
     private String getDate(final String json) {
-        final  List<Map<String,String>> dates = JsonPath.read(json,"$.attributes.dates");
+        final  List<Map<String,String>> dates = JsonPath.read(json, rootPath + ".dates");
         if(dates!= null && dates.size()>0){
 
             List<Map<String, String>> issued = dates.stream().filter(s -> "issued".equalsIgnoreCase(s.get("dateType"))).collect(Collectors.toList());
@@ -152,7 +149,7 @@ public class Datacite2Scholix {
 
     private String getType(final String json) {
         try {
-            final String bibtext = JsonPath.read(json, "$.attributes.types.bibtex");
+            final String bibtext = JsonPath.read(json, rootPath + ".types.bibtex");
             if ("article".equalsIgnoreCase(bibtext)) {
                 return "publication";
             }
@@ -162,14 +159,10 @@ public class Datacite2Scholix {
         }
     }
 
-
-
-
     private List<Map<String, String>> getRelatedIendtifiers(final String json) {
-        String REL_IDENTIFIER_PATH = "$.attributes.relatedIdentifiers[*]";
+        String REL_IDENTIFIER_PATH = rootPath + ".relatedIdentifiers[*]";
         List<Map<String, String>> res = JsonPath.read(json, REL_IDENTIFIER_PATH);
         return res;
-
     }
 
     protected String generateId(final String pid, final String pidType, final String entityType) {
@@ -186,18 +179,7 @@ public class Datacite2Scholix {
                 break;
             default:
                 throw new IllegalArgumentException("unexpected value "+entityType);
-
         }
-
         return type+ DHPUtils.md5(String.format("%s::%s", pid.toLowerCase().trim(), pidType.toLowerCase().trim()));
     }
-
-
-
-
-
-
-
-
-
 }

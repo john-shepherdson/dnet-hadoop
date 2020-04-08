@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.provision;
+package eu.dnetlib.dhp.provision.update;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DataciteClient implements Iterator<String> {
+public class DataciteClientIterator implements Iterator<String> {
 
     final static String blobPath = "$.hits.hits[*]._source";
     final static String scrollIdPath = "$._scroll_id";
@@ -27,7 +27,7 @@ public class DataciteClient implements Iterator<String> {
     final String esIndex;
     final ObjectMapper mapper = new ObjectMapper();
 
-    public DataciteClient(final String esHost, final String esIndex, final long timestamp) throws IOException {
+    public DataciteClientIterator(final String esHost, final String esIndex, final long timestamp) throws IOException {
 
         this.esHost = esHost;
         this.esIndex = esIndex;
