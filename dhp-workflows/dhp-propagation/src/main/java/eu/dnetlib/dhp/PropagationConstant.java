@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFunction;
@@ -18,6 +17,8 @@ public class PropagationConstant {
     public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
 
     public final static String PROPAGATION_DATA_INFO_TYPE = "propagation";
+
+    public static final String TRUE = "true";
 
 
     public final static String DNET_COUNTRY_SCHEMA = "dnet:countries";
@@ -84,6 +85,8 @@ public class PropagationConstant {
     public static DataInfo getDataInfo(String inference_provenance, String inference_class_id, String inference_class_name){
         DataInfo di = new DataInfo();
         di.setInferred(true);
+        di.setDeletedbyinference(false);
+        di.setTrust("0.85");
         di.setInferenceprovenance(inference_provenance);
         di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name));
         return di;
@@ -119,10 +122,24 @@ public class PropagationConstant {
         return relations
                 .filter(r -> !r.getDataInfo().getDeletedbyinference())
                 .filter(r -> allowedsemrel.contains(r.getRelClass()) && RELATION_RESULTRESULT_REL_TYPE.equals(r.getRelType()))
-                .map(r -> new TypedRow().setSourceId(r.getSource()).setTargetId(r.getTarget()))
+                .map(r -> {
+                    TypedRow tr = new TypedRow();
+                    tr.setSourceId(r.getSource());
+                    tr.setTargetId(r.getTarget());
+                    return tr;
+                })
                 .mapToPair(toPair());
     }
 
+
+    public static String getConstraintList(String text, List<String> constraints){
+        String ret = " and (" + text + constraints.get(0) + "'";
+        for (int  i =1; i < constraints.size(); i++){
+            ret += " OR " + text  + constraints.get(i) + "'";
+        }
+        ret += ")";
+        return ret;
+    }
 
 
     public static List<TypedRow> getTypedRowsDatasourceResult(OafEntity oaf) {
@@ -155,7 +172,11 @@ public class PropagationConstant {
             datasources_provenance.add(i.getHostedby().getKey());
         }
         for (String dsId : datasources_provenance) {
-            lst.add(new TypedRow().setSourceId(dsId).setTargetId(oaf.getId()).setType(type));
+            TypedRow tr = new TypedRow();
+            tr.setSourceId(dsId);
+            tr.setTargetId(oaf.getId());
+            tr.setType(type);
+            lst.add(tr);
         }
         return lst;
     }
@@ -194,8 +215,8 @@ public class PropagationConstant {
     public static void createOutputDirs(String outputPath, FileSystem fs) throws IOException {
         if (fs.exists(new Path(outputPath))) {
             fs.delete(new Path(outputPath), true);
-            fs.mkdirs(new Path(outputPath));
         }
+        fs.mkdirs(new Path(outputPath));
     }
 
 }
