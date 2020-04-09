@@ -36,6 +36,15 @@
             <name>saveGraph</name>
             <description>writes new version of the graph after the propagation step</description>
         </property>
+        <property>
+            <name>outputPath</name>
+            <description>the path used to store temporary output files</description>
+        </property>
+        <property>
+            <name>preparedInfoPath</name>
+            <description>the path where prepared info have been stored</description>
+        </property>
+
     </parameters>
 
     <start to="prepare_datasource_country_association"/>
@@ -65,13 +74,14 @@
             <arg>--whitelist</arg><arg>${whitelist}</arg>
             <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
         <ok to="fork_join_apply_country_propagation"/>
         <error to="Kill"/>
     </action>
     <fork name="fork_join_apply_country_propagation">
-        <path start="join_propagation_publication"/>
-        <path start="join_propagation_dataset"/>
+<!--        <path start="join_propagation_publication"/>-->
+<!--        <path start="join_propagation_dataset"/>-->
         <path start="join_propagation_otherresearchproduct"/>
         <path start="join_propagation_software"/>
     </fork>
@@ -98,6 +108,8 @@
             <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
         <ok to="end"/>
         <error to="Kill"/>
@@ -125,6 +137,8 @@
             <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
         <ok to="end"/>
         <error to="Kill"/>
@@ -152,6 +166,8 @@
             <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
         <ok to="end"/>
         <error to="Kill"/>
@@ -179,11 +195,13 @@
             <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
         <ok to="end"/>
         <error to="Kill"/>
     </action>
-    
+
     <action name="CountryPropagation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
