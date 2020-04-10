@@ -1,33 +1,24 @@
 package eu.dnetlib.dhp.oa.graph;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Objects;
 
 public class GraphHiveImporterJobTest {
 
     private static final Logger log = LoggerFactory.getLogger(GraphHiveImporterJobTest.class);
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    private static final ClassLoader cl = GraphHiveImporterJobTest.class.getClassLoader();
 
     public static final String JDBC_DERBY_TEMPLATE = "jdbc:derby:;databaseName=%s/junit_metastore_db;create=true";
 

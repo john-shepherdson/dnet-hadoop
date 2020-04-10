@@ -1,13 +1,10 @@
-package eu.dnetlib.dhp.migration.step2;
+package eu.dnetlib.dhp.oa.graph.raw;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.graph.raw.common.DbClient;
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -16,36 +13,37 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.migration.step1.MigrateMongoMdstoresApplication;
-import eu.dnetlib.dhp.migration.utils.DbClient;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Software;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class GenerateEntitiesApplication {
 
-	private static final Log log = LogFactory.getLog(GenerateEntitiesApplication.class);
+	private static final Logger log = LoggerFactory.getLogger(GenerateEntitiesApplication.class);
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 				IOUtils.toString(MigrateMongoMdstoresApplication.class
-						.getResourceAsStream("/eu/dnetlib/dhp/migration/generate_entities_parameters.json")));
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/generate_entities_parameters.json")));
 
 		parser.parseArgument(args);
+
+		Boolean isSparkSessionManaged = Optional
+				.ofNullable(parser.get("isSparkSessionManaged"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.TRUE);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String sourcePaths = parser.get("sourcePaths");
 		final String targetPath = parser.get("targetPath");
@@ -56,31 +54,27 @@ public class GenerateEntitiesApplication {
 
 		final Map<String, String> code2name = loadClassNames(dbUrl, dbUser, dbPassword);
 
-		try (final SparkSession spark = newSparkSession(parser); final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext())) {
-			final List<String> existingSourcePaths = Arrays.stream(sourcePaths.split(",")).filter(p -> exists(sc, p)).collect(Collectors.toList());
-			generateEntities(sc, code2name, existingSourcePaths, targetPath);
-		}
+		SparkConf conf = new SparkConf();
+		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
+			removeOutputDir(spark, targetPath);
+			generateEntities(spark, code2name, sourcePaths, targetPath);
+		});
 	}
 
-	private static SparkSession newSparkSession(final ArgumentApplicationParser parser) {
-		return SparkSession
-				.builder()
-				.appName(GenerateEntitiesApplication.class.getSimpleName())
-				.master(parser.get("master"))
-				.getOrCreate();
-	}
-
-	private static void generateEntities(final JavaSparkContext sc,
+	private static void generateEntities(final SparkSession spark,
 			final Map<String, String> code2name,
-			final List<String> sourcePaths,
+			final String sourcePaths,
 			final String targetPath) {
 
+		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		final List<String> existingSourcePaths = Arrays.stream(sourcePaths.split(",")).filter(p -> exists(sc, p)).collect(Collectors.toList());
+
 		log.info("Generate entities from files:");
-		sourcePaths.forEach(log::info);
+		existingSourcePaths.forEach(log::info);
 
 		JavaRDD<String> inputRdd = sc.emptyRDD();
 
-		for (final String sp : sourcePaths) {
+		for (final String sp : existingSourcePaths) {
 			inputRdd = inputRdd.union(sc.sequenceFile(sp, Text.class, Text.class)
 					.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
 					.map(k -> convertToListOaf(k._1(), k._2(), code2name))
@@ -88,7 +82,8 @@ public class GenerateEntitiesApplication {
 					.map(oaf -> oaf.getClass().getSimpleName().toLowerCase() + "|" + convertToJson(oaf)));
 		}
 
-		inputRdd.saveAsTextFile(targetPath, GzipCodec.class);
+		inputRdd
+				.saveAsTextFile(targetPath, GzipCodec.class);
 
 	}
 
@@ -163,11 +158,15 @@ public class GenerateEntitiesApplication {
 
 	private static boolean exists(final JavaSparkContext context, final String pathToFile) {
 		try {
-			final FileSystem hdfs = org.apache.hadoop.fs.FileSystem.get(context.hadoopConfiguration());
+			final FileSystem hdfs = FileSystem.get(context.hadoopConfiguration());
 			final Path path = new Path(pathToFile);
 			return hdfs.exists(path);
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static void removeOutputDir(SparkSession spark, String path) {
+		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 }

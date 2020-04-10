@@ -1,17 +1,13 @@
-package eu.dnetlib.dhp.migration.utils;
-
-import java.io.Closeable;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.function.Consumer;
+package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.sql.*;
+import java.util.function.Consumer;
 
 public class DbClient implements Closeable {
 

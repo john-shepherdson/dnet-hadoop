@@ -1,14 +1,13 @@
-package eu.dnetlib.dhp.migration.step1;
+package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.asString;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.field;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.structuredProperty;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.oa.graph.raw.common.DbClient;
+import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -22,31 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.migration.utils.AbstractMigrationApplication;
-import eu.dnetlib.dhp.migration.utils.DbClient;
-import eu.dnetlib.dhp.schema.oaf.Context;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
@@ -61,7 +36,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-				IOUtils.toString(MigrateDbEntitiesApplication.class.getResourceAsStream("/eu/dnetlib/dhp/migration/migrate_db_entities_parameters.json")));
+				IOUtils.toString(MigrateDbEntitiesApplication.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_db_entities_parameters.json")));
 
 		parser.parseArgument(args);
 
@@ -111,7 +86,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 	}
 
 	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer) throws Exception {
-		final String sql = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/migration/sql/" + sqlFile));
+		final String sql = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/sql/" + sqlFile));
 
 		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(oaf -> emitOaf(oaf));
 

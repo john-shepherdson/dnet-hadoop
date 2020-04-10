@@ -1,28 +1,16 @@
-package eu.dnetlib.dhp.migration.step2;
+package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.field;
-import static eu.dnetlib.dhp.migration.utils.OafMapperUtils.structuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.Node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.Node;
-
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 

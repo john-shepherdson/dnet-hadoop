@@ -1,19 +1,18 @@
-package eu.dnetlib.dhp.migration.utils;
-
-import java.nio.charset.Charset;
-import java.text.Normalizer;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.text.WordUtils;
+package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.text.WordUtils;
+
+import java.nio.charset.Charset;
+import java.text.Normalizer;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class PacePerson {
 
@@ -105,7 +104,7 @@ public class PacePerson {
 
 	private List<String> splitTerms(final String s) {
 		if (particles == null) {
-			particles = loadFromClasspath("/eu/dnetlib/dhp/migration/pace/name_particles.txt");
+			particles = loadFromClasspath("/eu/dnetlib/dhp/oa/graph/pace/name_particles.txt");
 		}
 
 		final List<String> list = Lists.newArrayList();

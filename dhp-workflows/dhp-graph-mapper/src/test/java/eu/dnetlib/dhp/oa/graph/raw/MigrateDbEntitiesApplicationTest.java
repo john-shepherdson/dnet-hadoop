@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.migration.step1;
+package eu.dnetlib.dhp.oa.graph.raw;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

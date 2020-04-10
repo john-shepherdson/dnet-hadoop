@@ -1,17 +1,16 @@
-package eu.dnetlib.dhp.migration.step1;
+package eu.dnetlib.dhp.oa.graph.raw;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.oa.graph.raw.common.MdstoreClient;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.migration.utils.AbstractMigrationApplication;
-import eu.dnetlib.dhp.migration.utils.MdstoreClient;
 
 public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication implements Closeable {
 
@@ -21,7 +20,7 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-				IOUtils.toString(MigrateMongoMdstoresApplication.class.getResourceAsStream("/eu/dnetlib/dhp/migration/migrate_mongo_mstores_parameters.json")));
+				IOUtils.toString(MigrateMongoMdstoresApplication.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_mongo_mstores_parameters.json")));
 		parser.parseArgument(args);
 
 		final String mongoBaseUrl = parser.get("mongoBaseUrl");
