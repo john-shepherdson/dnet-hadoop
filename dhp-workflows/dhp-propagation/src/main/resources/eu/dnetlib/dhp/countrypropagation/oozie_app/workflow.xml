@@ -36,14 +36,6 @@
             <name>saveGraph</name>
             <description>writes new version of the graph after the propagation step</description>
         </property>
-        <property>
-            <name>outputPath</name>
-            <description>the path used to store temporary output files</description>
-        </property>
-        <property>
-            <name>preparedInfoPath</name>
-            <description>the path where prepared info have been stored</description>
-        </property>
 
     </parameters>
 
@@ -59,17 +51,16 @@
             <mode>cluster</mode>
             <name>PrepareDatasourceCountryAssociation</name>
             <class>eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation</class>
-            <jar>dhp-graph-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--whitelist</arg><arg>${whitelist}</arg>
             <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
@@ -80,8 +71,8 @@
         <error to="Kill"/>
     </action>
     <fork name="fork_join_apply_country_propagation">
-<!--        <path start="join_propagation_publication"/>-->
-<!--        <path start="join_propagation_dataset"/>-->
+        <path start="join_propagation_publication"/>
+        <path start="join_propagation_dataset"/>
         <path start="join_propagation_otherresearchproduct"/>
         <path start="join_propagation_software"/>
     </fork>
@@ -92,18 +83,19 @@
             <mode>cluster</mode>
             <name>countryPropagationForPublications</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob2</class>
-            <jar>dhp-graph-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
@@ -111,7 +103,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
-        <ok to="end"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
@@ -121,26 +113,27 @@
             <mode>cluster</mode>
             <name>countryPropagationForDataset</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob2</class>
-            <jar>dhp-graph-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/dataset</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
-        <ok to="end"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
@@ -150,26 +143,27 @@
             <mode>cluster</mode>
             <name>countryPropagationForORP</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob2</class>
-            <jar>dhp-graph-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/otherresearchproduct</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
-        <ok to="end"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
@@ -179,15 +173,47 @@
             <mode>cluster</mode>
             <name>countryPropagationForSoftware</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob2</class>
-            <jar>dhp-graph-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/software</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
+        </spark>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CountryPropagation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>countryPropagationForSoftware</name>
+            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob2</class>
+            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
@@ -198,42 +224,9 @@
             <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
         </spark>
-        <ok to="end"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="CountryPropagation">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>CountryPropagation</name>
-            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
-            <spark-opts>
-                --num-executors=${sparkExecutorNumber}
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-               --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-            </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--whitelist</arg><arg>${whitelist}</arg>
-            <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
+<join name="wait" to="End"/>
     <end name="End"/>
 </workflow-app>
