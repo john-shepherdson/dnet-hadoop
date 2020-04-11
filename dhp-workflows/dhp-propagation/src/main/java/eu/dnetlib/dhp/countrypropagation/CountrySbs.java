@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.countrypropagation;
 
 import java.io.Serializable;
 
-public class Country implements Serializable {
+public class CountrySbs implements Serializable {
     private String classid;
     private String classname;
 

@@ -1,11 +1,11 @@
 package eu.dnetlib.dhp.countrypropagation;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.ArrayList;
 
 public class ResultCountrySet implements Serializable {
     private String resultId;
-    private Set<Country> countrySet;
+    private ArrayList<CountrySbs> countrySet;
 
     public String getResultId() {
         return resultId;
@@ -15,11 +15,11 @@ public class ResultCountrySet implements Serializable {
         this.resultId = resultId;
     }
 
-    public Set<Country> getCountrySet() {
+    public ArrayList<CountrySbs> getCountrySet() {
         return countrySet;
     }
 
-    public void setCountrySet(Set<Country> countrySet) {
+    public void setCountrySet(ArrayList<CountrySbs> countrySet) {
         this.countrySet = countrySet;
     }
 }
