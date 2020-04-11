@@ -1,11 +1,5 @@
 [
   {
-    "paramName":"mt",
-    "paramLongName":"master",
-    "paramDescription": "should be local or yarn",
-    "paramRequired": true
-  },
-  {
     "paramName":"s",
     "paramLongName":"sourcePath",
     "paramDescription": "the path of the sequencial file to read",
@@ -20,7 +14,7 @@
   {
     "paramName":"wu",
     "paramLongName":"writeUpdate",
-    "paramDescription": "true if the update must be writte. No double check if information is already present",
+    "paramDescription": "true if the update must be written. No double check if information is already present",
     "paramRequired": true
   },
   {
@@ -46,5 +40,11 @@
     "paramLongName": "preparedInfoPath",
     "paramDescription": "the path where prepared info have been stored",
     "paramRequired": true
+  },
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "the path where prepared info have been stored",
+    "paramRequired": false
   }
 ]

@@ -1,11 +1,5 @@
 [
   {
-  "paramName":"mt",
-  "paramLongName":"master",
-  "paramDescription": "should be local or yarn",
-  "paramRequired": true
-  },
-  {
     "paramName":"s",
     "paramLongName":"sourcePath",
     "paramDescription": "the path of the sequencial file to read",
@@ -18,34 +12,10 @@
     "paramRequired": true
   },
   {
-    "paramName":"wu",
-    "paramLongName":"writeUpdate",
-    "paramDescription": "true if the update must be written. No double check if information is already present",
-    "paramRequired": false
-  },
-  {
-    "paramName":"sg",
-    "paramLongName":"saveGraph",
-    "paramDescription": "true if the new version of the graph must be saved",
-    "paramRequired": false
-  },
-  {
-    "paramName":"tn",
-    "paramLongName":"resultTableName",
-    "paramDescription": "the name of the result table we are currently working on",
-    "paramRequired": false
-  },
-  {
     "paramName": "out",
     "paramLongName": "outputPath",
     "paramDescription": "the path used to store temporary output files",
-    "paramRequired": false
-  },
-  {
-    "paramName": "p",
-    "paramLongName": "preparedInfoPath",
-    "paramDescription": "the path where prepared info have been stored",
-    "paramRequired": false
+    "paramRequired": true
   },
   {
     "paramName": "w",
