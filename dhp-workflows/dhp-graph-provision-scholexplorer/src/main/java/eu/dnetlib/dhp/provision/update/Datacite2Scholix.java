@@ -165,7 +165,7 @@ public class Datacite2Scholix {
         return res;
     }
 
-    protected String generateId(final String pid, final String pidType, final String entityType) {
+    public static String generateId(final String pid, final String pidType, final String entityType) {
         String type;
         switch (entityType){
             case "publication":
