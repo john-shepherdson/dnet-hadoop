@@ -6,19 +6,48 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * Relation aims to model any edge between two nodes in the OpenAIRE graph. It has a source id and a target id
+ * pointing to graph node identifiers and it is further characterised by the semantic of the link throught the fields
+ * relType, subRelType and relClass. Provenance information is modeled according to the dataInfo element and collectedFrom,
+ * while individual relationship types can provide extra information via the properties field.
+ */
 public class Relation extends Oaf {
 
+	/**
+	 * Main relationship classifier, values include 'resultResult', 'resultProject', 'resultOrganization', etc.
+	 */
 	private String relType;
 
+	/**
+	 * Further classifies a relationship, values include 'affiliation', 'similarity', 'supplement', etc.
+	 */
 	private String subRelType;
 
+	/**
+	 * Indicates the direction of the relationship, values include 'isSupplementTo', 'isSupplementedBy', 'merges, 'isMergedIn'.
+	 */
 	private String relClass;
 
+	/**
+	 * The source entity id.
+	 */
 	private String source;
 
+	/**
+	 * The target entity id.
+	 */
 	private String target;
 
+	/**
+	 * The list of datasource id/name pairs providing this relationship.
+	 */
 	private List<KeyValue> collectedFrom = new ArrayList<>();
+
+	/**
+	 * List of relation specific properties. Values values include 'similarityLevel', indicating the similarity score between a pair of publications.
+	 */
+	private List<KeyValue> properties = new ArrayList<>();
 
 	public String getRelType() {
 		return relType;
@@ -66,6 +95,14 @@ public class Relation extends Oaf {
 
 	public void setCollectedFrom(final List<KeyValue> collectedFrom) {
 		this.collectedFrom = collectedFrom;
+	}
+
+	public List<KeyValue> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(List<KeyValue> properties) {
+		this.properties = properties;
 	}
 
 	public void mergeFrom(final Relation r) {
