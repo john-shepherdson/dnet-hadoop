@@ -45,7 +45,7 @@ public class Relation extends Oaf {
 	private List<KeyValue> collectedFrom = new ArrayList<>();
 
 	/**
-	 * List of relation specific properties. Values values include 'similarityLevel', indicating the similarity score between a pair of publications.
+	 * List of relation specific properties. Values include 'similarityLevel', indicating the similarity score between a pair of publications.
 	 */
 	private List<KeyValue> properties = new ArrayList<>();
 
