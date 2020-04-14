@@ -1,11 +1,5 @@
 [
   {
-    "paramName":"mt",
-    "paramLongName":"master",
-    "paramDescription": "should be local or yarn",
-    "paramRequired": true
-  },
-  {
     "paramName":"s",
     "paramLongName":"sourcePath",
     "paramDescription": "the path of the sequencial file to read",
@@ -25,15 +19,15 @@
     "paramRequired": true
   },
   {
-    "paramName":"wu",
-    "paramLongName":"writeUpdate",
-    "paramDescription": "true if the update must be writte. No double check if information is already present",
+    "paramName":"pu",
+    "paramLongName":"potentialUpdatePath",
+    "paramDescription": "the path of the potential updates ",
     "paramRequired": true
   },
   {
-    "paramName":"sg",
-    "paramLongName":"saveGraph",
-    "paramDescription": "true if the new version of the graph must be saved",
+    "paramName":"al",
+    "paramLongName":"alreadyLinkedPath",
+    "paramDescription": "the path of the already linked project result_set",
     "paramRequired": true
   }
 ]
