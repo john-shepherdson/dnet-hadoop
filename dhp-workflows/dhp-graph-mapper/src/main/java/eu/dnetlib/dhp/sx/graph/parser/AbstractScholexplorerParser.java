@@ -2,10 +2,13 @@ package eu.dnetlib.dhp.sx.graph.parser;
 
 
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
+import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
 import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.scholexplorer.relation.RelInfo;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -15,6 +18,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public abstract class AbstractScholexplorerParser {
 
@@ -102,6 +106,74 @@ public abstract class AbstractScholexplorerParser {
             return type+StringUtils.substringAfter(pid, "::");
 
         return type+ DHPUtils.md5(String.format("%s::%s", pid.toLowerCase().trim(), pidType.toLowerCase().trim()));
+    }
+
+    protected DLIUnknown createUnknownObject(final String pid, final String pidType, final KeyValue cf, final DataInfo di, final String dateOfCollection) {
+        final DLIUnknown uk = new DLIUnknown();
+        uk.setId(generateId(pid, pidType, "unknown"));
+        ProvenaceInfo pi = new ProvenaceInfo();
+        pi.setId(cf.getKey());
+        pi.setName(cf.getValue());
+        pi.setCompletionStatus("incomplete");
+        uk.setDataInfo(di);
+        uk.setDlicollectedfrom(Collections.singletonList(pi));
+        final StructuredProperty sourcePid = new StructuredProperty();
+        sourcePid.setValue(pid);
+        final Qualifier pt = new Qualifier();
+        pt.setClassname(pidType);
+        pt.setClassid(pidType);
+        pt.setSchemename("dnet:pid_types");
+        pt.setSchemeid("dnet:pid_types");
+        sourcePid.setQualifier(pt);
+        uk.setPid(Collections.singletonList(sourcePid));
+        uk.setDateofcollection(dateOfCollection);
+        return uk;
+    }
+
+    protected void generateRelations(RelationMapper relationMapper, Result parsedObject, List<Oaf> result, DataInfo di, String dateOfCollection, List<VtdUtilityParser.Node> relatedIdentifiers) {
+        if(relatedIdentifiers!= null) {
+            result.addAll(relatedIdentifiers.stream()
+                    .flatMap(n -> {
+                        final List<DLIRelation> rels = new ArrayList<>();
+                        DLIRelation r = new DLIRelation();
+                        r.setSource(parsedObject.getId());
+                        final String relatedPid = n.getTextValue();
+                        final String relatedPidType = n.getAttributes().get("relatedIdentifierType");
+                        final String relatedType = n.getAttributes().getOrDefault("entityType", "unknown");
+                        String relationSemantic = n.getAttributes().get("relationType");
+                        String inverseRelation;
+                        final String targetId = generateId(relatedPid, relatedPidType, relatedType);
+                        r.setDateOfCollection(dateOfCollection);
+                        if (relationMapper.containsKey(relationSemantic.toLowerCase()))
+                        {
+                            RelInfo relInfo = relationMapper.get(relationSemantic.toLowerCase());
+                            relationSemantic = relInfo.getOriginal();
+                            inverseRelation = relInfo.getInverse();
+                        }
+                        else {
+                            relationSemantic = "Unknown";
+                            inverseRelation = "Unknown";
+                        }
+                        r.setTarget(targetId);
+                        r.setRelType(relationSemantic);
+                        r.setRelClass("datacite");
+                        r.setCollectedFrom(parsedObject.getCollectedfrom());
+                        r.setDataInfo(di);
+                        rels.add(r);
+                        r = new DLIRelation();
+                        r.setDataInfo(di);
+                        r.setSource(targetId);
+                        r.setTarget(parsedObject.getId());
+                        r.setRelType(inverseRelation);
+                        r.setRelClass("datacite");
+                        r.setCollectedFrom(parsedObject.getCollectedfrom());
+                        r.setDateOfCollection(dateOfCollection);
+                        rels.add(r);
+                        if("unknown".equalsIgnoreCase(relatedType))
+                            result.add(createUnknownObject(relatedPid, relatedPidType, parsedObject.getCollectedfrom().get(0), di, dateOfCollection));
+                        return rels.stream();
+                    }).collect(Collectors.toList()));
+        }
     }
 
 
