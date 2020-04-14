@@ -295,6 +295,12 @@
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
+				<artifactId>dnet-actionmanager-api</artifactId>
+				<version>[4.0.1,5.0.0)</version>
+			</dependency>
+
+			<dependency>
+				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-openaire-data-protos</artifactId>
 				<version>3.9.8-proto250</version>
 			</dependency>

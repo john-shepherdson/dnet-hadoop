@@ -53,5 +53,10 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>eu.dnetlib</groupId>
+            <artifactId>dnet-actionmanager-api</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

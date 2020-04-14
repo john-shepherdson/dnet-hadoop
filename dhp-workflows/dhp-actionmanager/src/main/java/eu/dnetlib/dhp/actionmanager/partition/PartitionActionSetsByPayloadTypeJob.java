@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.actionmanager.partition;
 
+import eu.dnetlib.dhp.actionmanager.ISClient;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJob;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -40,8 +41,6 @@ public class PartitionActionSetsByPayloadTypeJob {
                     StructField$.MODULE$.apply("payload", DataTypes.StringType, false, Metadata.empty())
             ));
 
-    private static final String INPUT_ACTION_SET_PATHS_SEPARATOR = ",";
-
     public static void main(String[] args) throws Exception {
         String jsonConfiguration = IOUtils.toString(
                 PromoteActionPayloadForGraphTableJob.class
@@ -55,11 +54,17 @@ public class PartitionActionSetsByPayloadTypeJob {
                 .orElse(Boolean.TRUE);
         logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        String inputActionSetPaths = parser.get("inputActionSetPaths");
-        logger.info("inputActionSetPaths: {}", inputActionSetPaths);
+        String inputActionSetIds = parser.get("inputActionSetIds");
+        logger.info("inputActionSetIds: {}", inputActionSetIds);
 
         String outputPath = parser.get("outputPath");
         logger.info("outputPath: {}", outputPath);
+
+        String isLookupUrl = parser.get("isLookupUrl");
+        logger.info("isLookupUrl: {}", isLookupUrl);
+
+        List<String> inputActionSetPaths = ISClient.getLatestRawsetPaths(isLookupUrl, inputActionSetIds);
+        logger.info("inputActionSetPaths: {}", String.join(",", inputActionSetPaths));
 
         SparkConf conf = new SparkConf();
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -67,9 +72,7 @@ public class PartitionActionSetsByPayloadTypeJob {
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {
                     removeOutputDir(spark, outputPath);
-                    readAndWriteActionSetsFromPaths(spark,
-                            Arrays.asList(inputActionSetPaths.split(INPUT_ACTION_SET_PATHS_SEPARATOR)),
-                            outputPath);
+                    readAndWriteActionSetsFromPaths(spark, inputActionSetPaths, outputPath);
                 });
     }
 

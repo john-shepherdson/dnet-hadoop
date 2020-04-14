@@ -2,7 +2,7 @@
 
     <parameters>
         <property>
-            <name>graphBasePath</name>
+            <name>graphOutputPath</name>
             <description>the target path to store raw graph</description>
         </property>
         <property>
@@ -343,7 +343,7 @@
             </spark-opts>
             <arg>--rawGraphPath</arg><arg>${workingDir}/graph_raw</arg>
             <arg>--claimsGraphPath</arg><arg>${workingDir}/graph_claims</arg>
-            <arg>--outputRawGaphPath</arg><arg>${graphBasePath}/graph_raw</arg>
+            <arg>--outputRawGaphPath</arg><arg>${graphOutputPath}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
         </spark>
         <ok to="wait_merge"/>
@@ -369,7 +369,7 @@
             </spark-opts>
             <arg>--rawGraphPath</arg><arg>${workingDir}/graph_raw</arg>
             <arg>--claimsGraphPath</arg><arg>${workingDir}/graph_claims</arg>
-            <arg>--outputRawGaphPath</arg><arg>${graphBasePath}/graph_raw</arg>
+            <arg>--outputRawGaphPath</arg><arg>${graphOutputPath}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
         </spark>
         <ok to="wait_merge"/>
@@ -395,7 +395,7 @@
             </spark-opts>
             <arg>--rawGraphPath</arg><arg>${workingDir}/graph_raw</arg>
             <arg>--claimsGraphPath</arg><arg>${workingDir}/graph_claims</arg>
-            <arg>--outputRawGaphPath</arg><arg>${graphBasePath}/graph_raw</arg>
+            <arg>--outputRawGaphPath</arg><arg>${graphOutputPath}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
         </spark>
         <ok to="wait_merge"/>
@@ -421,7 +421,7 @@
             </spark-opts>
             <arg>--rawGraphPath</arg><arg>${workingDir}/graph_raw</arg>
             <arg>--claimsGraphPath</arg><arg>${workingDir}/graph_claims</arg>
-            <arg>--outputRawGaphPath</arg><arg>${graphBasePath}/graph_raw</arg>
+            <arg>--outputRawGaphPath</arg><arg>${graphOutputPath}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
         </spark>
         <ok to="wait_merge"/>
@@ -447,7 +447,7 @@
             </spark-opts>
             <arg>--rawGraphPath</arg><arg>${workingDir}/graph_raw</arg>
             <arg>--claimsGraphPath</arg><arg>${workingDir}/graph_claims</arg>
-            <arg>--outputRawGaphPath</arg><arg>${graphBasePath}/graph_raw</arg>
+            <arg>--outputRawGaphPath</arg><arg>${graphOutputPath}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
         </spark>
         <ok to="wait_merge"/>
@@ -473,7 +473,7 @@
             </spark-opts>
             <arg>--rawGraphPath</arg><arg>${workingDir}/graph_raw</arg>
             <arg>--claimsGraphPath</arg><arg>${workingDir}/graph_claims</arg>
-            <arg>--outputRawGaphPath</arg><arg>${graphBasePath}/graph_raw</arg>
+            <arg>--outputRawGaphPath</arg><arg>${graphOutputPath}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
         </spark>
         <ok to="wait_merge"/>
@@ -499,7 +499,7 @@
             </spark-opts>
             <arg>--rawGraphPath</arg><arg>${workingDir}/graph_raw</arg>
             <arg>--claimsGraphPath</arg><arg>${workingDir}/graph_claims</arg>
-            <arg>--outputRawGaphPath</arg><arg>${graphBasePath}/graph_raw</arg>
+            <arg>--outputRawGaphPath</arg><arg>${graphOutputPath}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
         </spark>
         <ok to="wait_merge"/>
@@ -525,7 +525,7 @@
             </spark-opts>
             <arg>--rawGraphPath</arg><arg>${workingDir}/graph_raw</arg>
             <arg>--claimsGraphPath</arg><arg>${workingDir}/graph_claims</arg>
-            <arg>--outputRawGaphPath</arg><arg>${graphBasePath}/graph_raw</arg>
+            <arg>--outputRawGaphPath</arg><arg>${graphOutputPath}</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
         </spark>
         <ok to="wait_merge"/>

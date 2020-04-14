@@ -121,8 +121,8 @@ public class PromoteActionPayloadForGraphTableJob {
         logger.info("Reading graph table from path: {}", path);
         return spark
                 .read()
-                .textFile(path)
-                .map((MapFunction<String, G>) value -> OBJECT_MAPPER.readValue(value, rowClazz), Encoders.bean(rowClazz));
+                .parquet(path)
+                .as(Encoders.bean(rowClazz));
     }
 
     private static <A extends Oaf> Dataset<A> readActionPayload(SparkSession spark,
