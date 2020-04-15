@@ -44,7 +44,7 @@
   {
     "paramName": "ssm",
     "paramLongName": "isSparkSessionManaged",
-    "paramDescription": "the path where prepared info have been stored",
+    "paramDescription": "true if the spark session is managed, false otherwise",
     "paramRequired": false
   }
 ]
