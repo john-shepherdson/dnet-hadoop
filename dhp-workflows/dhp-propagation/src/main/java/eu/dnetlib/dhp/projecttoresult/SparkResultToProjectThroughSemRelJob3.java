@@ -73,16 +73,15 @@ public class SparkResultToProjectThroughSemRelJob3 {
 
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {
-                    //createOutputDirs(outputPath, FileSystem.get(spark.sparkContext().hadoopConfiguration()));
                     if(isTest(parser)) {
                         removeOutputDir(spark, outputPath);
                     }
-                    execPropagation(spark, inputPath, outputPath, alreadyLinkedPath, potentialUpdatePath, writeUpdates, saveGraph);
+                    execPropagation(spark, outputPath, alreadyLinkedPath, potentialUpdatePath, writeUpdates, saveGraph);
                 });
     }
 
 
-    private static void execPropagation(SparkSession spark, String inputPath, String outputPath, String alreadyLinkedPath, String potentialUpdatePath,
+    private static void execPropagation(SparkSession spark, String outputPath, String alreadyLinkedPath, String potentialUpdatePath,
                                  Boolean writeUpdate, Boolean saveGraph){
 
         Dataset<ProjectResultSet> toaddrelations = readAssocProjectResults(spark, potentialUpdatePath);
@@ -95,7 +94,6 @@ public class SparkResultToProjectThroughSemRelJob3 {
                     .mode(SaveMode.Overwrite)
                     .option("compression","gzip")
                     .text(outputPath +"/potential_updates");
-            //writeUpdates(toaddrelations.toJavaRDD(), outputPath + "/potential_updates");
         }
         if (saveGraph){
             getNewRelations(alreadyLinked, toaddrelations)
@@ -104,13 +102,7 @@ public class SparkResultToProjectThroughSemRelJob3 {
                     .mode(SaveMode.Append)
                     .option("compression", "gzip")
                     .text(outputPath);
-//            JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-//            sc.textFile(inputPath)
-//                    .map(item -> OBJECT_MAPPER.readValue(item, Relation.class))
-//                    .union(getNewRelations(alreadyLinked, toaddrelations)
-//                        .toJavaRDD())
-//                    .map(r -> OBJECT_MAPPER.writeValueAsString(r))
-//                    .saveAsTextFile(outputPath , GzipCodec.class);
+
         }
 
     }
