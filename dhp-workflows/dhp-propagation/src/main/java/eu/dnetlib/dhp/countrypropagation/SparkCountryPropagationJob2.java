@@ -114,6 +114,7 @@ public class SparkCountryPropagationJob2 {
                                                              Class<R> resultClazz,
                                                              String outputPath) {
 
+        log.info("Reading Graph table from: {}", inputPath);
         Dataset<R> result = readPathEntity(spark, inputPath, resultClazz);
 
         Dataset<Tuple2<String, R>> result_pair = result
@@ -171,17 +172,17 @@ public class SparkCountryPropagationJob2 {
     }
 
 
-    private static void createCfHbforresult(SparkSession spark) {
-        String query;
-        query = "SELECT id, inst.collectedfrom.key cf , inst.hostedby.key hb " +
-                "FROM ( SELECT id, instance " +
-                "FROM result " +
-                " WHERE datainfo.deletedbyinference = false)  ds " +
-                "LATERAL VIEW EXPLODE(instance) i AS inst";
-        Dataset<Row> cfhb = spark.sql(query);
-        cfhb.createOrReplaceTempView("cfhb");
-        log.info("cfhb_number : {}", cfhb.count());
-    }
+//    private static void createCfHbforresult(SparkSession spark) {
+//        String query;
+//        query = "SELECT id, inst.collectedfrom.key cf , inst.hostedby.key hb " +
+//                "FROM ( SELECT id, instance " +
+//                "FROM result " +
+//                " WHERE datainfo.deletedbyinference = false)  ds " +
+//                "LATERAL VIEW EXPLODE(instance) i AS inst";
+//        Dataset<Row> cfhb = spark.sql(query);
+//        cfhb.createOrReplaceTempView("cfhb");
+//        //log.info("cfhb_number : {}", cfhb.count());
+//    }
 
 
     private static Dataset<Row> countryPropagationAssoc(SparkSession spark,
@@ -203,18 +204,11 @@ public class SparkCountryPropagationJob2 {
                 " ON hb = dataSourceId   ) tmp " +
                 "GROUP BY id";
         Dataset<Row> potentialUpdates = spark.sql(query);
-        log.info("potential update number : {}", potentialUpdates.count());
+        //log.info("potential update number : {}", potentialUpdates.count());
         return potentialUpdates;
     }
 
-    private static <R extends Result> Dataset<R> readPathEntity(SparkSession spark, String inputEntityPath, Class<R> resultClazz) {
 
-        log.info("Reading Graph table from: {}", inputEntityPath);
-        return spark
-                .read()
-                .textFile(inputEntityPath)
-                .map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, resultClazz), Encoders.bean(resultClazz));
-    }
 
     private static Dataset<DatasourceCountry> readAssocDatasourceCountry(SparkSession spark, String relationPath) {
          return spark
@@ -227,6 +221,7 @@ public class SparkCountryPropagationJob2 {
         potentialUpdates
                 .toJSON()
                 .write()
+                .mode(SaveMode.Overwrite)
                 .option("compression", "gzip")
                 .text(outputPath);
 //                map(u -> OBJECT_MAPPER.writeValueAsString(u))
