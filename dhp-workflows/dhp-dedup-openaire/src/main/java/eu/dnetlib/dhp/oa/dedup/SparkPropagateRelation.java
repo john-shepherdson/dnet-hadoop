@@ -77,7 +77,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
         JavaRDD<String> relations = sc.textFile(DedupUtility.createEntityPath(graphBasePath, "relation"));
 
-        JavaRDD<String> newRels = relations.mapToPair(
+        relations.mapToPair(
                 (PairFunction<String, String, String>) s ->
                         new Tuple2<String, String>(MapDocumentUtil.getJPathString(SOURCEJSONPATH, s), s))
                 .leftOuterJoin(mergedIds)
@@ -97,10 +97,11 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                     }
                     return v1._2()._1();
                 }).filter(SparkPropagateRelation::containsDedup)
-                .repartition(500);
+                .repartition(500)
+                .saveAsTextFile(DedupUtility.createEntityPath(workingPath, "newRels"), GzipCodec.class);
 
         //update deleted by inference
-        relations = relations.mapToPair(
+        relations.mapToPair(
                 (PairFunction<String, String, String>) s ->
                         new Tuple2<String, String>(MapDocumentUtil.getJPathString(SOURCEJSONPATH, s), s))
                 .leftOuterJoin(mergedIds)
@@ -120,9 +121,16 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                     }
                     return v1._2()._1();
                 })
-                .repartition(500);
+                .repartition(500)
+                .saveAsTextFile(DedupUtility.createEntityPath(workingPath, "updated"), GzipCodec.class);
 
-        newRels.union(relations).repartition(1000)
+        JavaRDD<String> newRels = sc
+                .textFile(DedupUtility.createEntityPath(workingPath, "newRels"));
+
+        sc
+                .textFile(DedupUtility.createEntityPath(workingPath, "updated"))
+                .union(newRels)
+                .repartition(1000)
                 .saveAsTextFile(DedupUtility.createEntityPath(dedupGraphPath, "relation"), GzipCodec.class);
     }
 
