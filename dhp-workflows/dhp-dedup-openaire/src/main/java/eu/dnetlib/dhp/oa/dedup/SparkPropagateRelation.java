@@ -12,6 +12,9 @@ import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -29,6 +32,11 @@ import scala.Tuple2;
 import java.io.IOException;
 
 public class SparkPropagateRelation extends AbstractSparkAction {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);;
+
+            public static final int NUM_PARTITIONS = 3000;
 
     enum FieldType {
         SOURCE,
@@ -64,7 +72,17 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         System.out.println(String.format("workingPath:   '%s'", workingPath));
         System.out.println(String.format("dedupGraphPath:'%s'", dedupGraphPath));
 
+        final String relationsPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
+        final String newRelsPath = DedupUtility.createEntityPath(workingPath, "newRels");
+        final String fixedSourceId = DedupUtility.createEntityPath(workingPath, "fixedSourceId");
+        final String deletedSourceId = DedupUtility.createEntityPath(workingPath, "deletedSourceId");
+
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+        deletePath(relationsPath);
+        deletePath(newRelsPath);
+        deletePath(fixedSourceId);
+        deletePath(deletedSourceId);
 
         final Dataset<Relation> mergeRels = spark.read().load(DedupUtility.createMergeRelPath(workingPath, "*", "*")).as(Encoders.bean(Relation.class));
 
@@ -75,9 +93,9 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                 .toJavaRDD()
                 .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<String, String>(r.getString(1), r.getString(0)));
 
-        JavaRDD<String> relations = sc.textFile(DedupUtility.createEntityPath(graphBasePath, "relation"));
-
-        relations.mapToPair(
+        sc.textFile(DedupUtility.createEntityPath(graphBasePath, "relation"))
+                .repartition(NUM_PARTITIONS)
+                .mapToPair(
                 (PairFunction<String, String, String>) s ->
                         new Tuple2<String, String>(MapDocumentUtil.getJPathString(SOURCEJSONPATH, s), s))
                 .leftOuterJoin(mergedIds)
@@ -87,6 +105,9 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                     }
                     return v1._2()._1();
                 })
+                .saveAsTextFile(fixedSourceId, GzipCodec.class);
+
+        sc.textFile(fixedSourceId)
                 .mapToPair(
                         (PairFunction<String, String, String>) s ->
                                 new Tuple2<String, String>(MapDocumentUtil.getJPathString(TARGETJSONPATH, s), s))
@@ -97,12 +118,13 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                     }
                     return v1._2()._1();
                 }).filter(SparkPropagateRelation::containsDedup)
-                .repartition(500)
-                .saveAsTextFile(DedupUtility.createEntityPath(workingPath, "newRels"), GzipCodec.class);
+                .repartition(NUM_PARTITIONS)
+                .saveAsTextFile(newRelsPath, GzipCodec.class);
 
         //update deleted by inference
-        relations.mapToPair(
-                (PairFunction<String, String, String>) s ->
+        sc.textFile(DedupUtility.createEntityPath(graphBasePath, "relation"))
+                .repartition(NUM_PARTITIONS)
+                .mapToPair((PairFunction<String, String, String>) s ->
                         new Tuple2<String, String>(MapDocumentUtil.getJPathString(SOURCEJSONPATH, s), s))
                 .leftOuterJoin(mergedIds)
                 .map((Function<Tuple2<String, Tuple2<String, Optional<String>>>, String>) v1 -> {
@@ -111,6 +133,10 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                     }
                     return v1._2()._1();
                 })
+                .saveAsTextFile(deletedSourceId, GzipCodec.class);
+
+        sc.textFile(deletedSourceId)
+                .repartition(NUM_PARTITIONS)
                 .mapToPair(
                         (PairFunction<String, String, String>) s ->
                                 new Tuple2<String, String>(MapDocumentUtil.getJPathString(TARGETJSONPATH, s), s))
@@ -121,17 +147,30 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                     }
                     return v1._2()._1();
                 })
-                .repartition(500)
+                .repartition(NUM_PARTITIONS)
                 .saveAsTextFile(DedupUtility.createEntityPath(workingPath, "updated"), GzipCodec.class);
 
         JavaRDD<String> newRels = sc
-                .textFile(DedupUtility.createEntityPath(workingPath, "newRels"));
+                .textFile(newRelsPath);
 
         sc
                 .textFile(DedupUtility.createEntityPath(workingPath, "updated"))
                 .union(newRels)
-                .repartition(1000)
-                .saveAsTextFile(DedupUtility.createEntityPath(dedupGraphPath, "relation"), GzipCodec.class);
+                .repartition(NUM_PARTITIONS)
+                .saveAsTextFile(relationsPath, GzipCodec.class);
+    }
+
+    private void deletePath(String path) {
+        try {
+            Path p = new Path(path);
+            FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
+
+            if (fs.exists(p)) {
+                fs.delete(p, true);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static boolean containsDedup(final String json) {
@@ -142,20 +181,19 @@ public class SparkPropagateRelation extends AbstractSparkAction {
     }
 
     private static String replaceField(final String json, final String id, final FieldType type) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
-            Relation relation = mapper.readValue(json, Relation.class);
-            if (relation.getDataInfo() == null)
+            Relation relation = OBJECT_MAPPER.readValue(json, Relation.class);
+            if (relation.getDataInfo() == null) {
                 relation.setDataInfo(new DataInfo());
+            }
             relation.getDataInfo().setDeletedbyinference(false);
             switch (type) {
                 case SOURCE:
                     relation.setSource(id);
-                    return mapper.writeValueAsString(relation);
+                    return OBJECT_MAPPER.writeValueAsString(relation);
                 case TARGET:
                     relation.setTarget(id);
-                    return mapper.writeValueAsString(relation);
+                    return OBJECT_MAPPER.writeValueAsString(relation);
                 default:
                     throw new IllegalArgumentException("");
             }
@@ -165,14 +203,13 @@ public class SparkPropagateRelation extends AbstractSparkAction {
     }
 
     private static <T extends Oaf> String updateDeletedByInference(final String json, final Class<T> clazz) {
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
-            Oaf entity = mapper.readValue(json, clazz);
-            if (entity.getDataInfo()== null)
+            Oaf entity = OBJECT_MAPPER.readValue(json, clazz);
+            if (entity.getDataInfo() == null) {
                 entity.setDataInfo(new DataInfo());
+            }
             entity.getDataInfo().setDeletedbyinference(true);
-            return mapper.writeValueAsString(entity);
+            return OBJECT_MAPPER.writeValueAsString(entity);
         } catch (IOException e) {
             throw new RuntimeException("Unable to convert json", e);
         }
