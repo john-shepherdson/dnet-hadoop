@@ -1,13 +1,8 @@
 package eu.dnetlib.dhp.projecttoresult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.countrypropagation.CountryPropagationJobTest;
-import eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob2;
-import eu.dnetlib.dhp.schema.oaf.Country;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Software;
 import org.apache.commons.io.FileUtils;
-import org.apache.neethi.Assertion;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -20,13 +15,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProjectPropagationJobTest {
 
