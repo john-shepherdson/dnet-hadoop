@@ -113,6 +113,9 @@
 
     <action name="SkipPromoteDatasourceActionPayloadForDatasourceTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${outputGraphRootPath}/datasource"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${inputGraphRootPath}/datasource</arg>
             <arg>${outputGraphRootPath}/datasource</arg>
