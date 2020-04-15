@@ -13,7 +13,6 @@ import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -29,6 +28,7 @@ import scala.Tuple2;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class SparkCreateConnectedComponent extends AbstractSparkAction {
@@ -45,7 +45,7 @@ public class SparkCreateConnectedComponent extends AbstractSparkAction {
                         SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
         parser.parseArgument(args);
 
-        new SparkCreateSimRels(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+        new SparkCreateConnectedComponent(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
     @Override
@@ -56,12 +56,16 @@ public class SparkCreateConnectedComponent extends AbstractSparkAction {
         final String isLookUpUrl = parser.get("isLookUpUrl");
         final String actionSetId = parser.get("actionSetId");
 
+        System.out.println(String.format("graphBasePath: '%s'", graphBasePath));
+        System.out.println(String.format("isLookUpUrl:   '%s'", isLookUpUrl));
+        System.out.println(String.format("actionSetId:   '%s'", actionSetId));
+        System.out.println(String.format("workingPath:   '%s'", workingPath));
+
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
         for (DedupConfig dedupConf: getConfigurations(isLookUpService, actionSetId)) {
-
-            final String entity = dedupConf.getWf().getEntityType();
             final String subEntity = dedupConf.getWf().getSubEntityValue();
+            System.out.println(String.format("Creating mergerels for: '%s'", subEntity));
 
             final JavaPairRDD<Object, String> vertexes = sc.textFile(graphBasePath + "/" + subEntity)
                     .map(s -> MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), s))
@@ -72,26 +76,33 @@ public class SparkCreateConnectedComponent extends AbstractSparkAction {
             final Dataset<Relation> similarityRelations = spark.read().load(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity)).as(Encoders.bean(Relation.class));
             final RDD<Edge<String>> edgeRdd = similarityRelations.javaRDD().map(it -> new Edge<>(getHashcode(it.getSource()), getHashcode(it.getTarget()), it.getRelClass())).rdd();
             final JavaRDD<ConnectedComponent> cc = GraphProcessor.findCCs(vertexes.rdd(), edgeRdd, dedupConf.getWf().getMaxIterations()).toJavaRDD();
-            final Dataset<Relation> mergeRelation = spark.createDataset(cc.filter(k -> k.getDocIds().size() > 1).flatMap((FlatMapFunction<ConnectedComponent, Relation>) c ->
-                    c.getDocIds()
-                            .stream()
-                            .flatMap(id -> {
-                                List<Relation> tmp = new ArrayList<>();
-                                Relation r = new Relation();
-                                r.setSource(c.getCcId());
-                                r.setTarget(id);
-                                r.setRelClass("merges");
-                                tmp.add(r);
-                                r = new Relation();
-                                r.setTarget(c.getCcId());
-                                r.setSource(id);
-                                r.setRelClass("isMergedIn");
-                                tmp.add(r);
-                                return tmp.stream();
-                            }).iterator()).rdd(), Encoders.bean(Relation.class));
-                mergeRelation.write().mode("overwrite").save(DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity));
+            final Dataset<Relation> mergeRelation = spark.createDataset(cc.filter(k -> k.getDocIds().size() > 1)
+                    .flatMap(this::ccToMergeRel).rdd(), Encoders.bean(Relation.class));
+
+            mergeRelation
+                    .write().mode("overwrite")
+                    .save(DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity));
         }
 
+    }
+
+    public Iterator<Relation> ccToMergeRel(ConnectedComponent cc){
+        return cc.getDocIds()
+                .stream()
+                .flatMap(id -> {
+                    List<Relation> tmp = new ArrayList<>();
+                    Relation r = new Relation();
+                    r.setSource(cc.getCcId());
+                    r.setTarget(id);
+                    r.setRelClass("merges");
+                    tmp.add(r);
+                    r = new Relation();
+                    r.setTarget(cc.getCcId());
+                    r.setSource(id);
+                    r.setRelClass("isMergedIn");
+                    tmp.add(r);
+                    return tmp.stream();
+                }).iterator();
     }
 
     public  static long getHashcode(final String id) {

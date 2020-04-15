@@ -61,16 +61,18 @@ public class SparkCreateSimRels extends AbstractSparkAction {
         final String workingPath = parser.get("workingPath");
 
         System.out.println(String.format("graphBasePath: '%s'", graphBasePath));
-        System.out.println(String.format("isLookUpUrl: '%s'", isLookUpUrl));
-        System.out.println(String.format("actionSetId: '%s'", actionSetId));
-        System.out.println(String.format("workingPath: '%s'", workingPath));
+        System.out.println(String.format("isLookUpUrl:   '%s'", isLookUpUrl));
+        System.out.println(String.format("actionSetId:   '%s'", actionSetId));
+        System.out.println(String.format("workingPath:   '%s'", workingPath));
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
         //for each dedup configuration
         for (DedupConfig dedupConf: getConfigurations(isLookUpService, actionSetId)) {
+
             final String entity = dedupConf.getWf().getEntityType();
             final String subEntity = dedupConf.getWf().getSubEntityValue();
+            System.out.println(String.format("Creating simrels for: '%s'", subEntity));
 
             JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
                     .mapToPair((PairFunction<String, String, MapDocument>)  s -> {

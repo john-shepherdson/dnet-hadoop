@@ -60,6 +60,10 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         final String workingPath = parser.get("workingPath");
         final String dedupGraphPath = parser.get("dedupGraphPath");
 
+        System.out.println(String.format("graphBasePath: '%s'", graphBasePath));
+        System.out.println(String.format("workingPath:   '%s'", workingPath));
+        System.out.println(String.format("dedupGraphPath:'%s'", dedupGraphPath));
+
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
         final Dataset<Relation> mergeRels = spark.read().load(DedupUtility.createMergeRelPath(workingPath, "*", "*")).as(Encoders.bean(Relation.class));

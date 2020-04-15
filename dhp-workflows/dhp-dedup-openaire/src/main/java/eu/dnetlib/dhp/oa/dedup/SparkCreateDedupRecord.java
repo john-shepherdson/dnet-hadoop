@@ -32,7 +32,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
                         SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createDedupRecord_parameters.json")));
         parser.parseArgument(args);
 
-        new SparkCreateSimRels(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+        new SparkCreateDedupRecord(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
     @Override
@@ -43,10 +43,16 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
         final String actionSetId = parser.get("actionSetId");
         final String workingPath = parser.get("workingPath");
 
+        System.out.println(String.format("graphBasePath: '%s'", graphBasePath));
+        System.out.println(String.format("isLookUpUrl:   '%s'", isLookUpUrl));
+        System.out.println(String.format("actionSetId:   '%s'", actionSetId));
+        System.out.println(String.format("workingPath:   '%s'", workingPath));
+
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
         for (DedupConfig dedupConf: getConfigurations(isLookUpService, actionSetId)) {
             String subEntity = dedupConf.getWf().getSubEntityValue();
+            System.out.println(String.format("Creating deduprecords for: '%s'", subEntity));
 
             final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
             final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);

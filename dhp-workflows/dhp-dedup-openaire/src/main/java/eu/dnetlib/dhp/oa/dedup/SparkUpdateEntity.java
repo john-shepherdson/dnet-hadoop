@@ -69,6 +69,10 @@ public class SparkUpdateEntity extends AbstractSparkAction {
         final String workingPath = parser.get("workingPath");
         final String dedupGraphPath = parser.get("dedupGraphPath");
 
+        System.out.println(String.format("graphBasePath:  '%s'", graphBasePath));
+        System.out.println(String.format("workingPath:    '%s'", workingPath));
+        System.out.println(String.format("dedupGraphPath: '%s'", dedupGraphPath));
+
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
         //for each entity
