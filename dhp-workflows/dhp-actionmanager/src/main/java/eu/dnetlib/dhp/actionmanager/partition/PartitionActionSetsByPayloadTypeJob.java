@@ -41,6 +41,15 @@ public class PartitionActionSetsByPayloadTypeJob {
                     StructField$.MODULE$.apply("payload", DataTypes.StringType, false, Metadata.empty())
             ));
 
+    private ISClient isClient;
+
+    public PartitionActionSetsByPayloadTypeJob(String isLookupUrl) {
+        this.isClient = new ISClient(isLookupUrl);
+    }
+
+    public PartitionActionSetsByPayloadTypeJob() {
+    }
+
     public static void main(String[] args) throws Exception {
         String jsonConfiguration = IOUtils.toString(
                 PromoteActionPayloadForGraphTableJob.class
@@ -63,7 +72,12 @@ public class PartitionActionSetsByPayloadTypeJob {
         String isLookupUrl = parser.get("isLookupUrl");
         logger.info("isLookupUrl: {}", isLookupUrl);
 
-        List<String> inputActionSetPaths = ISClient.getLatestRawsetPaths(isLookupUrl, inputActionSetIds);
+        new PartitionActionSetsByPayloadTypeJob(isLookupUrl).run(isSparkSessionManaged, inputActionSetIds, outputPath);
+    }
+
+    protected void run(Boolean isSparkSessionManaged, String inputActionSetIds, String outputPath) {
+
+        List<String> inputActionSetPaths = getIsClient().getLatestRawsetPaths(inputActionSetIds);
         logger.info("inputActionSetPaths: {}", String.join(",", inputActionSetPaths));
 
         SparkConf conf = new SparkConf();
@@ -95,21 +109,15 @@ public class PartitionActionSetsByPayloadTypeJob {
                                                       String path) {
         logger.info("Reading actions from path: {}", path);
 
-        List<String> files = HdfsSupport.listFiles(path, spark.sparkContext().hadoopConfiguration());
-        logger.info("Found files: {}", String.join(",", files));
-
         JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-        return files
-                .stream()
-                .map(file -> {
-                    JavaRDD<Row> rdd = sc
-                            .sequenceFile(file, Text.class, Text.class)
-                            .map(x -> RowFactory.create(x._1().toString(), x._2().toString()));
-                    return spark.createDataFrame(rdd, KV_SCHEMA)
-                            .withColumn("atomic_action", from_json(col("value"), ATOMIC_ACTION_SCHEMA))
-                            .select(expr("atomic_action.*"));
-                })
-                .reduce(spark.createDataFrame(Collections.emptyList(), ATOMIC_ACTION_SCHEMA), Dataset::union);
+
+        JavaRDD<Row> rdd = sc
+                .sequenceFile(path, Text.class, Text.class)
+                .map(x -> RowFactory.create(x._1().toString(), x._2().toString()));
+
+        return spark.createDataFrame(rdd, KV_SCHEMA)
+                .withColumn("atomic_action", from_json(col("value"), ATOMIC_ACTION_SCHEMA))
+                .select(expr("atomic_action.*"));
     }
 
     private static void saveActions(Dataset<Row> actionDS,
@@ -120,5 +128,13 @@ public class PartitionActionSetsByPayloadTypeJob {
                 .partitionBy("clazz")
                 .mode(SaveMode.Append)
                 .parquet(path);
+    }
+
+    public ISClient getIsClient() {
+        return isClient;
+    }
+
+    public void setIsClient(ISClient isClient) {
+        this.isClient = isClient;
     }
 }

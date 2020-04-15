@@ -29,17 +29,21 @@ public class ISClient implements Serializable {
 
 	private static final String INPUT_ACTION_SET_ID_SEPARATOR = ",";
 
-	public static List<String> getLatestRawsetPaths(String isLookupUrl, String setIds) {
+	private ISLookUpService isLookup;
 
-		ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
-		ISClient isClient = new ISClient();
+	public ISClient(String isLookupUrl) {
+		isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
+	}
+
+	public List<String> getLatestRawsetPaths(String setIds) {
+
 		List<String> ids = Lists.newArrayList(Splitter.on(INPUT_ACTION_SET_ID_SEPARATOR)
 				.omitEmptyStrings()
 				.trimResults()
 				.split(setIds));
 
 		return ids.stream()
-				.map(id -> isClient.getSet(isLookup, id))
+				.map(id -> getSet(isLookup, id))
 				.map(as -> as.getPathToLatest())
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
