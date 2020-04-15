@@ -6,11 +6,13 @@ import eu.dnetlib.dhp.provision.scholix.ScholixResource;
 import eu.dnetlib.dhp.provision.update.CrossrefClient;
 import eu.dnetlib.dhp.provision.update.Datacite2Scholix;
 import eu.dnetlib.dhp.provision.update.DataciteClient;
+import eu.dnetlib.dhp.provision.update.DataciteClientIterator;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -25,7 +27,6 @@ public class DataciteClientTest {
         System.out.println(new ObjectMapper().writeValueAsString(s));
     }
 
-
     public void testResolveDataset() throws Exception {
         DataciteClient dc = new DataciteClient("ip-90-147-167-25.ct1.garrservices.it");
         ScholixResource datasetByDOI = dc.getDatasetByDOI("10.17182/hepdata.15392.v1/t5");
@@ -37,7 +38,5 @@ public class DataciteClientTest {
         ScholixResource crossrefByDOI = cr.getResourceByDOI("10.26850/1678-4618eqj.v35.1.2010.p41-46");
         Assertions.assertNotNull(crossrefByDOI);
         System.out.println(new ObjectMapper().writeValueAsString(crossrefByDOI));
-
-
     }
 }

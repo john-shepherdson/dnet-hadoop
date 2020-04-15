@@ -27,10 +27,12 @@ public class DataciteClientIterator implements Iterator<String> {
     final String esIndex;
     final ObjectMapper mapper = new ObjectMapper();
 
-    public DataciteClientIterator(final String esHost, final String esIndex, final long timestamp) throws IOException {
+    public DataciteClientIterator(final String esHost, final String esIndex, long timestamp) throws IOException {
 
         this.esHost = esHost;
         this.esIndex = esIndex;
+        // THIS FIX IS NECESSARY to avoid different timezone
+        timestamp -=  (60 *60 *2);
         final String body =getResponse(String.format("http://%s:9200/%s/_search?scroll=1m", esHost, esIndex), String.format("{\"size\":1000, \"query\":{\"range\":{\"timestamp\":{\"gte\":%d}}}}", timestamp));
         scrollId= getJPathString(scrollIdPath, body);
         buffer = getBlobs(body);
