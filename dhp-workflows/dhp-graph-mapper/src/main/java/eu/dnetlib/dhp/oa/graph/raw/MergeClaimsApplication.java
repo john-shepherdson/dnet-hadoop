@@ -100,16 +100,24 @@ public class MergeClaimsApplication {
 					return opRaw.isPresent() ? opRaw.get()._2() : opClaim.isPresent() ? opClaim.get()._2() : null;
 				}, Encoders.bean(clazz))
 				.filter(Objects::nonNull)
+				.map((MapFunction<T, String>) value -> OBJECT_MAPPER.writeValueAsString(value), Encoders.STRING())
 				.write()
 				.mode(SaveMode.Overwrite)
-				.parquet(outPath);
+				.option("compression", "gzip")
+				.text(outPath);
 	}
 
 	private static <T extends Oaf> Dataset<T> readFromPath(SparkSession spark, String path, Class<T> clazz) {
 		return spark.read()
+				.textFile(path)
+				.map((MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz))
+				.filter((FilterFunction<T>) value -> Objects.nonNull(idFn().apply(value)));
+		/*
+		return spark.read()
 				.load(path)
 				.as(Encoders.bean(clazz))
 				.filter((FilterFunction<T>) value -> Objects.nonNull(idFn().apply(value)));
+		 */
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

@@ -11,6 +11,10 @@
             <description>should import content from the aggregator or reuse a previous version</description>
         </property>
         <property>
+            <name>contentPath</name>
+            <description>path location to store (or reuse) content from the aggregator</description>
+        </property>
+        <property>
             <name>postgresURL</name>
             <description>the postgres URL to access to the database</description>
         </property>
@@ -108,10 +112,10 @@
     <action name="ImportDB_claims">
         <java>
             <prepare>
-                <delete path="${workingDir}/db_claims"/>
+                <delete path="${contentPath}/db_claims"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
-            <arg>-p</arg><arg>${workingDir}/db_claims</arg>
+            <arg>-p</arg><arg>${contentPath}/db_claims</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
@@ -124,10 +128,10 @@
     <action name="ImportODF_claims">
         <java>
             <prepare>
-                <delete path="${workingDir}/odf_claims"/>
+                <delete path="${contentPath}/odf_claims"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${workingDir}/odf_claims</arg>
+            <arg>-p</arg><arg>${contentPath}/odf_claims</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>ODF</arg>
@@ -141,10 +145,10 @@
     <action name="ImportOAF_claims">
         <java>
             <prepare>
-                <delete path="${workingDir}/oaf_claims"/>
+                <delete path="${contentPath}/oaf_claims"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${workingDir}/oaf_claims</arg>
+            <arg>-p</arg><arg>${contentPath}/oaf_claims</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>OAF</arg>
@@ -158,10 +162,10 @@
     <action name="ImportDB">
         <java>
             <prepare>
-                <delete path="${workingDir}/db_records"/>
+                <delete path="${contentPath}/db_records"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
-            <arg>-p</arg><arg>${workingDir}/db_records</arg>
+            <arg>-p</arg><arg>${contentPath}/db_records</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
@@ -173,10 +177,10 @@
     <action name="ImportODF">
         <java>
             <prepare>
-                <delete path="${workingDir}/odf_records"/>
+                <delete path="${contentPath}/odf_records"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${workingDir}/odf_records</arg>
+            <arg>-p</arg><arg>${contentPath}/odf_records</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>ODF</arg>
@@ -190,10 +194,10 @@
     <action name="ImportOAF">
         <java>
             <prepare>
-                <delete path="${workingDir}/oaf_records"/>
+                <delete path="${contentPath}/oaf_records"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${workingDir}/oaf_records</arg>
+            <arg>-p</arg><arg>${contentPath}/oaf_records</arg>
             <arg>-mongourl</arg><arg>${mongoURL}</arg>
             <arg>-mongodb</arg><arg>${mongoDb}</arg>
             <arg>-f</arg><arg>OAF</arg>
@@ -227,7 +231,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>-s</arg><arg>${workingDir}/db_claims,${workingDir}/oaf_claims,${workingDir}/odf_claims</arg>
+            <arg>-s</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
             <arg>-t</arg><arg>${workingDir}/entities_claim</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
@@ -276,7 +280,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>-s</arg><arg>${workingDir}/db_records,${workingDir}/oaf_records,${workingDir}/odf_records</arg>
+            <arg>-s</arg><arg>${contentPath}/db_records,${contentPath}/oaf_records,${contentPath}/odf_records</arg>
             <arg>-t</arg><arg>${workingDir}/entities</arg>
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>

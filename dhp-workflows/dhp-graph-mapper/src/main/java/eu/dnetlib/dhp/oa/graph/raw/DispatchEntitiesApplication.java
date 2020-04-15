@@ -64,6 +64,7 @@ public class DispatchEntitiesApplication {
 
 		log.info(String.format("Processing entities (%s) in file: %s", type, sourcePath));
 
+		/*
 		spark.read()
 				.textFile(sourcePath)
 				.filter((FilterFunction<String>) value -> isEntityType(value, type))
@@ -73,14 +74,13 @@ public class DispatchEntitiesApplication {
 				.mode(SaveMode.Overwrite)
 				.parquet(targetPath + "/" + type);
 
-		/*
+		 */
+
 		JavaSparkContext.fromSparkContext(spark.sparkContext())
 				.textFile(sourcePath)
 				.filter(l -> isEntityType(l, type))
 				.map(l -> StringUtils.substringAfter(l, "|"))
 				.saveAsTextFile(targetPath + "/" + type, GzipCodec.class); // use repartition(XXX) ???
-
-		 */
 	}
 
 	private static boolean isEntityType(final String line, final String type) {
