@@ -37,9 +37,9 @@ public class SparkDedupTest implements Serializable {
     private static JavaSparkContext jsc;
 
     private static String testGraphBasePath;
-    private static String testOutputBasePath = "/tmp/test_dedup_workflow";
+    private static String testOutputBasePath;
+    private static String testDedupGraphBasePath;
     private final static String testActionSetId = "test-orchestrator";
-    private static String testDedupGraphBasePath = "/tmp/test_dedup_workflow/dedup_graph";
 
     @BeforeAll
     private static void cleanUp() throws IOException, URISyntaxException {
