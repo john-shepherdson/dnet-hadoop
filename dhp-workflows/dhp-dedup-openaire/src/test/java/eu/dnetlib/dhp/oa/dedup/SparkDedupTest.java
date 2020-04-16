@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
+import static java.nio.file.Files.createTempDirectory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.lenient;
 
@@ -36,16 +37,20 @@ public class SparkDedupTest implements Serializable {
     private static JavaSparkContext jsc;
 
     private static String testGraphBasePath;
-    private final static String testOutputBasePath = "/tmp/test_dedup_workflow";
+    private static String testOutputBasePath = "/tmp/test_dedup_workflow";
     private final static String testActionSetId = "test-orchestrator";
-    private final static String testDedupGraphBasePath = "/tmp/test_dedup_workflow/dedup_graph";
+    private static String testDedupGraphBasePath = "/tmp/test_dedup_workflow/dedup_graph";
 
     @BeforeAll
     private static void cleanUp() throws IOException, URISyntaxException {
 
         testGraphBasePath = Paths.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/entities").toURI()).toFile().getAbsolutePath();
 
+        testOutputBasePath = createTempDirectory(SparkDedupTest.class.getSimpleName() + "-").toAbsolutePath().toString();
+        testDedupGraphBasePath = createTempDirectory(SparkDedupTest.class.getSimpleName() + "-").toAbsolutePath().toString();
+
         FileUtils.deleteDirectory(new File(testOutputBasePath));
+        FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
 
         spark = SparkSession
                 .builder()
@@ -54,7 +59,7 @@ public class SparkDedupTest implements Serializable {
                 .config(new SparkConf())
                 .getOrCreate();
 
-        jsc = new JavaSparkContext(spark.sparkContext());
+        jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
     }
 
@@ -69,7 +74,6 @@ public class SparkDedupTest implements Serializable {
 
         lenient().when(isLookUpService.getResourceProfileByQuery(Mockito.contains("publication")))
                 .thenReturn(IOUtils.toString(SparkDedupTest.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/pub.curr.conf.json")));
-
     }
 
     @Test
@@ -97,11 +101,11 @@ public class SparkDedupTest implements Serializable {
 
     @Test
     @Order(2)
-    public void createCCTest() throws Exception {
+    public void createMergeRelsTest() throws Exception {
 
         ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils.toString(
-                        SparkCreateConnectedComponent.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
+                        SparkCreateMergeRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
         parser.parseArgument(new String[]{
                 "-mt", "local[*]",
                 "-i", testGraphBasePath,
@@ -109,7 +113,7 @@ public class SparkDedupTest implements Serializable {
                 "-la", "lookupurl",
                 "-w", testOutputBasePath});
 
-        new SparkCreateConnectedComponent(parser, spark).run(isLookUpService);
+        new SparkCreateMergeRels(parser, spark).run(isLookUpService);
 
         long orgs_mergerel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel").count();
         long pubs_mergerel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel").count();
@@ -185,8 +189,6 @@ public class SparkDedupTest implements Serializable {
 
         assertEquals(mergedOrgs, deletedOrgs);
         assertEquals(mergedPubs, deletedPubs);
-
-        //TODO check the size of other entities not deduplicated
     }
 
     @Test
@@ -209,6 +211,12 @@ public class SparkDedupTest implements Serializable {
 
         assertEquals(826, relations);
 
+    }
+
+    @AfterAll
+    public static void finalCleanUp() throws IOException {
+        FileUtils.deleteDirectory(new File(testOutputBasePath));
+        FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
     }
 
     public boolean isDeletedByInference(String s) {

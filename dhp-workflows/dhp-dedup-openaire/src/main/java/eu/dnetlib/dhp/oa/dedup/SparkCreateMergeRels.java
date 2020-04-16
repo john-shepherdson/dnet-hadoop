@@ -16,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.graphx.Edge;
 import org.apache.spark.rdd.RDD;
@@ -31,11 +30,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SparkCreateConnectedComponent extends AbstractSparkAction {
+public class SparkCreateMergeRels extends AbstractSparkAction {
 
-    private static final Log log = LogFactory.getLog(SparkCreateConnectedComponent.class);
+    private static final Log log = LogFactory.getLog(SparkCreateMergeRels.class);
 
-    public SparkCreateConnectedComponent(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+    public SparkCreateMergeRels(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
         super(parser, spark);
     }
 
@@ -45,7 +44,7 @@ public class SparkCreateConnectedComponent extends AbstractSparkAction {
                         SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
         parser.parseArgument(args);
 
-        new SparkCreateConnectedComponent(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+        new SparkCreateMergeRels(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
     @Override

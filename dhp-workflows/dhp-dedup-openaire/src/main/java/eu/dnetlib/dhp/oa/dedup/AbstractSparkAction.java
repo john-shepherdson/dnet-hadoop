@@ -24,7 +24,7 @@ abstract class AbstractSparkAction implements Serializable {
     public ArgumentApplicationParser parser;   //parameters for the spark action
     public SparkSession spark; //the spark session
 
-    public AbstractSparkAction(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+    public AbstractSparkAction(ArgumentApplicationParser parser, SparkSession spark) {
 
         this.parser = parser;
         this.spark = spark;
