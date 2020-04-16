@@ -121,9 +121,9 @@ public class SparkCountryPropagationJob2 {
                 .map(r -> new Tuple2<>(r.getId(), r),
                 Encoders.tuple(Encoders.STRING(), Encoders.bean(resultClazz)));
 
-        Dataset<Tuple2<String, ResultCountrySet>> potential_update_pair = potentialUpdates.map(pu -> new Tuple2<>(pu.getResultId(),
-                        pu),
-                Encoders.tuple(Encoders.STRING(), Encoders.bean(ResultCountrySet.class)));
+//        Dataset<Tuple2<String, ResultCountrySet>> potential_update_pair = potentialUpdates.map(pu -> new Tuple2<>(pu.getResultId(),
+//                        pu),
+//                Encoders.tuple(Encoders.STRING(), Encoders.bean(ResultCountrySet.class)));
 
         Dataset<R> new_table = result_pair
                 .joinWith(potentialUpdates, result_pair.col("_1").equalTo(potentialUpdates.col("resultId")), "left_outer")

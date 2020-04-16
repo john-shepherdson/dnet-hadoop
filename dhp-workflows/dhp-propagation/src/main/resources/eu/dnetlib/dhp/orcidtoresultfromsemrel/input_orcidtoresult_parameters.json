@@ -16,5 +16,17 @@
     "paramLongName":"allowedsemrels",
     "paramDescription": "the allowed sematinc relations for propagation",
     "paramRequired": true
+  },
+  {
+    "paramName":"wu",
+    "paramLongName":"writeUpdate",
+    "paramDescription": "true if the update must be writte. No double check if information is already present",
+    "paramRequired": true
+  },
+  {
+    "paramName":"sg",
+    "paramLongName":"saveGraph",
+    "paramDescription": "true if the new version of the graph must be saved",
+    "paramRequired": true
   }
 ]
