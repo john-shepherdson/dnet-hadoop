@@ -4,16 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResultWithOrcid implements Serializable {
-    String id;
+public class ResultOrcidList implements Serializable {
+    String resultId;
     List<AutoritativeAuthor> authorList = new ArrayList<>();
 
-    public String getId() {
-        return id;
+    public String getResultId() {
+        return resultId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setResultId(String resultId) {
+        this.resultId = resultId;
     }
 
     public List<AutoritativeAuthor> getAuthorList() {
