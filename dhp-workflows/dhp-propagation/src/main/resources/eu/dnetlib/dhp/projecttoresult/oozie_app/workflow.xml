@@ -31,7 +31,6 @@
     </parameters>
 
     <start to="reset-outputpath"/>
-<!--<start to="prepare_project_results_association"/>-->
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -98,7 +97,7 @@
                     --conf spark.dynamicAllocation.enabled=true
                     --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
                 </spark-opts>
-                <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+<!--                <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/relation</arg>-->
                 <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
                 <arg>--saveGraph</arg><arg>${saveGraph}</arg>
                 <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -109,39 +108,6 @@
             <ok to="End"/>
             <error to="Kill"/>
         </action>
-
-    <action name="ProjectPropagation">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>ProjectToResultPropagation</name>
-            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob2</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
-            <spark-opts>
-                --num-executors=${sparkExecutorNumber}
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-            </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-            <arg>--potentialUpdatePath</arg><arg>${workingDir}/projecttoresult_propagation/preparedInfo/potentialUpdates</arg>
-            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/projecttoresult_propagation/preparedInfo/alreadyLinked</arg>
-        </spark>
-        <ok to="End"/>
-        <error to="Kill"/>
-    </action>
 
     <end name="End"/>
 </workflow-app>
