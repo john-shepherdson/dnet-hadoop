@@ -72,7 +72,7 @@ public class ProjectPropagationJobTest {
         SparkResultToProjectThroughSemRelJob3.main(new String[]{
                 "-isTest", Boolean.TRUE.toString(),
                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                "-sourcePath", getClass().getResource("/eu/dnetlib/dhp/projecttoresult/sample/relation").getPath(),
+//                "-sourcePath", getClass().getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/relation").getPath(),
                 "-hive_metastore_uris", "",
                 "-writeUpdate", "false",
                 "-saveGraph", "true",
@@ -100,7 +100,7 @@ public class ProjectPropagationJobTest {
         SparkResultToProjectThroughSemRelJob3.main(new String[]{
                 "-isTest", Boolean.TRUE.toString(),
                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                "-sourcePath", getClass().getResource("/eu/dnetlib/dhp/projecttoresult/sample/relation").getPath(),
+//                "-sourcePath", getClass().getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/relation").getPath(),
                 "-hive_metastore_uris", "",
                 "-writeUpdate", "false",
                 "-saveGraph", "true",
@@ -144,7 +144,7 @@ public class ProjectPropagationJobTest {
         SparkResultToProjectThroughSemRelJob3.main(new String[]{
                 "-isTest", Boolean.TRUE.toString(),
                 "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                "-sourcePath", getClass().getResource("/eu/dnetlib/dhp/projecttoresult/sample/relation").getPath(),
+//                "-sourcePath", getClass().getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/relation").getPath(),
                 "-hive_metastore_uris", "",
                 "-writeUpdate", "false",
                 "-saveGraph", "true",
