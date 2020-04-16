@@ -76,9 +76,6 @@
 
     <action name="UpdateEntity">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}"/>
-            </prepare>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Update Entity</name>
