@@ -105,11 +105,6 @@
 
     <action name="PropagateRelation">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/relation"/>
-                <delete path="${workingPath}/newRels"/>
-                <delete path="${workingPath}/updated"/>
-            </prepare>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Update Relations</name>

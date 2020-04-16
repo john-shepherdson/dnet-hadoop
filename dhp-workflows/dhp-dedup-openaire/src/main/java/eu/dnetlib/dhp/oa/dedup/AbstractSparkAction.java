@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
@@ -69,6 +70,36 @@ abstract class AbstractSparkAction implements Serializable {
 
     protected static SparkSession getSparkSession(ArgumentApplicationParser parser) {
         SparkConf conf = new SparkConf();
+
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        conf.registerKryoClasses(new Class[] {
+                Author.class,
+                Context.class,
+                Country.class,
+                DataInfo.class,
+                Dataset.class,
+                Datasource.class,
+                ExternalReference.class,
+                ExtraInfo.class,
+                Field.class,
+                GeoLocation.class,
+                Instance.class,
+                Journal.class,
+                KeyValue.class,
+                Oaf.class,
+                OafEntity.class,
+                OAIProvenance.class,
+                Organization.class,
+                OriginDescription.class,
+                OtherResearchProduct.class,
+                Project.class,
+                Publication.class,
+                Qualifier.class,
+                Relation.class,
+                Result.class,
+                Software.class,
+                StructuredProperty.class
+        });
 
         return SparkSession
                 .builder()
