@@ -108,7 +108,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Create Merge Relations</name>
-            <class>eu.dnetlib.dhp.oa.dedup.SparkCreateConnectedComponent</class>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCreateMergeRels</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
