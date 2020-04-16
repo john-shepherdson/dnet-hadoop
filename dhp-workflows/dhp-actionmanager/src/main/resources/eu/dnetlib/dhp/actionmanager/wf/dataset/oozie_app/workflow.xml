@@ -118,6 +118,9 @@
 
     <action name="SkipPromoteDatasetActionPayloadForDatasetTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${workingDir}/dataset"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${inputGraphRootPath}/dataset</arg>
             <arg>${workingDir}/dataset</arg>
@@ -166,6 +169,9 @@
 
     <action name="SkipPromoteResultActionPayloadForDatasetTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${outputGraphRootPath}/dataset"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${workingDir}/dataset</arg>
             <arg>${outputGraphRootPath}/dataset</arg>

@@ -117,6 +117,9 @@
 
     <action name="SkipPromoteOtherResearchProductActionPayloadForOtherResearchProductTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${workingDir}/otherresearchproduct"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${inputGraphRootPath}/otherresearchproduct</arg>
             <arg>${workingDir}/otherresearchproduct</arg>
@@ -165,6 +168,9 @@
 
     <action name="SkipPromoteResultActionPayloadForOtherResearchProductTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${outputGraphRootPath}/otherresearchproduct"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${workingDir}/otherresearchproduct</arg>
             <arg>${outputGraphRootPath}/otherresearchproduct</arg>
