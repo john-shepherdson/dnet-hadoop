@@ -6,6 +6,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
@@ -47,7 +48,7 @@ public class PrepareResultOrcidAssociationStep1 {
         final String resultClassName = parser.get("resultTableName");
         log.info("resultTableName: {}", resultClassName);
 
-        final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrel").split(";"));
+        final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
         log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
         final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
@@ -76,7 +77,7 @@ public class PrepareResultOrcidAssociationStep1 {
         //read the relation table and the table related to the result it is using
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
         org.apache.spark.sql.Dataset<Relation> relation = spark.createDataset(sc.textFile(inputPath + "/relation")
-                .map(item -> new ObjectMapper().readValue(item, Relation.class)).rdd(), Encoders.bean(Relation.class));
+                .map(item -> OBJECT_MAPPER.readValue(item, Relation.class)).rdd(), Encoders.bean(Relation.class));
         relation.createOrReplaceTempView("relation");
 
         log.info("Reading Graph table from: {}", inputPath + "/" + resultType);
@@ -84,7 +85,7 @@ public class PrepareResultOrcidAssociationStep1 {
 
         result.createOrReplaceTempView("result");
 
-        getPossibleResultOrcidAssociation(spark, allowedsemrel, outputPath);
+        getPossibleResultOrcidAssociation(spark, allowedsemrel, outputPath + "/" + resultType);
 
     }
 
@@ -107,12 +108,15 @@ public class PrepareResultOrcidAssociationStep1 {
 
         spark.sql(query)
                 .as(Encoders.bean(ResultOrcidList.class))
-                .toJSON()
-        .write()
-        .mode(SaveMode.Append)
-        .option("compression","gzip")
-        .text(outputPath)
-        ;
+                .toJavaRDD()
+                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
+                .saveAsTextFile(outputPath, GzipCodec.class);
+//                .toJSON()
+//        .write()
+//        .mode(SaveMode.Append)
+//        .option("compression","gzip")
+//        .text(outputPath)
+//        ;
     }
 
 

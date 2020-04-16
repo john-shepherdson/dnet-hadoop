@@ -21,7 +21,7 @@ public class PrepareResultOrcidAssociationStep2 {
 
     public static void main(String[] args) throws Exception {
         String jsonConfiguration = IOUtils.toString(SparkOrcidToResultFromSemRelJob3.class
-                .getResourceAsStream("/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_prepareorcidtoresult2_parameters.json"));
+                .getResourceAsStream("/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_prepareorcidtoresult_parameters2.json"));
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 jsonConfiguration);
@@ -50,7 +50,10 @@ public class PrepareResultOrcidAssociationStep2 {
 
     private static void mergeInfo(SparkSession spark, String inputPath, String outputPath) {
 
-        Dataset<ResultOrcidList> resultOrcidAssoc = readAssocResultOrcidList(spark, inputPath);
+        Dataset<ResultOrcidList> resultOrcidAssoc = readAssocResultOrcidList(spark, inputPath + "/publication")
+                .union(readAssocResultOrcidList(spark, inputPath + "/dataset"))
+                .union(readAssocResultOrcidList(spark, inputPath + "/otherresearchproduct"))
+                .union(readAssocResultOrcidList(spark, inputPath + "/software"));
 
         resultOrcidAssoc
                 .toJavaRDD()
