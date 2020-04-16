@@ -28,5 +28,11 @@
     "paramLongName": "allowedtypes",
     "paramDescription": "the allowed datasource types for country propagation",
     "paramRequired": true
+  },
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": false
   }
 ]
