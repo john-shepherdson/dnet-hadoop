@@ -4,31 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.TypedRow;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 
 public class SparkOrcidToResultFromSemRelJob {
     public static void main(String[] args) throws Exception {
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkOrcidToResultFromSemRelJob.class.getResourceAsStream("/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_orcid" +
-                "toresult_parameters.json")));
+        final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(SparkOrcidToResultFromSemRelJob.class.getResourceAsStream("/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_orcidtoresult_parameters.json")));
         parser.parseArgument(args);
         final SparkSession spark = SparkSession
                 .builder()
@@ -42,26 +37,24 @@ public class SparkOrcidToResultFromSemRelJob {
         final String outputPath = "/tmp/provision/propagation/orcidtoresult";
 
         final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
+        boolean writeUpdate = TRUE.equals(parser.get("writeUpdate"));
+        boolean saveGraph = TRUE.equals(parser.get("saveGraph"));
 
-        File directory = new File(outputPath);
+        createOutputDirs(outputPath, FileSystem.get(spark.sparkContext().hadoopConfiguration()));
 
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        JavaRDD<Relation> relations = sc.sequenceFile(inputPath + "/relation", Text.class, Text.class)
-                .map(item -> new ObjectMapper().readValue(item._2().toString(), Relation.class)).cache();
+        JavaRDD<Relation> relations = sc.textFile(inputPath + "/relation")
+                .map(item -> new ObjectMapper().readValue(item, Relation.class)).cache();
 
         JavaPairRDD<String, TypedRow> result_result = getResultResultSemRel(allowedsemrel, relations);
 
-        JavaRDD<Publication> publications = sc.sequenceFile(inputPath + "/publication", Text.class, Text.class)
-                .map(item -> new ObjectMapper().readValue(item._2().toString(), Publication.class));
-        JavaRDD<Dataset> datasets = sc.sequenceFile(inputPath + "/dataset", Text.class, Text.class)
-                .map(item -> new ObjectMapper().readValue(item._2().toString(), Dataset.class));
-        JavaRDD<Software> software = sc.sequenceFile(inputPath + "/software", Text.class, Text.class)
-                .map(item -> new ObjectMapper().readValue(item._2().toString(), Software.class));
-        JavaRDD<OtherResearchProduct> other = sc.sequenceFile(inputPath + "/otherresearchproduct", Text.class, Text.class)
-                .map(item -> new ObjectMapper().readValue(item._2().toString(), OtherResearchProduct.class));
+        JavaRDD<Publication> publications = sc.textFile(inputPath + "/publication")
+                .map(item -> new ObjectMapper().readValue(item, Publication.class));
+        JavaRDD<Dataset> datasets = sc.textFile(inputPath + "/dataset")
+                .map(item -> new ObjectMapper().readValue(item, Dataset.class));
+        JavaRDD<Software> software = sc.textFile(inputPath + "/software")
+                .map(item -> new ObjectMapper().readValue(item, Software.class));
+        JavaRDD<OtherResearchProduct> other = sc.textFile(inputPath + "/otherresearchproduct")
+                .map(item -> new ObjectMapper().readValue(item, OtherResearchProduct.class));
 
         //get the results having at least one author pid we are interested in
         JavaPairRDD<String, TypedRow> resultswithorcid = publications.map(p -> getTypedRow(p))
@@ -87,15 +80,25 @@ public class SparkOrcidToResultFromSemRelJob {
         JavaPairRDD<String, Result> sfw = software.mapToPair(p -> new Tuple2<>(p.getId(),p));
         JavaPairRDD<String, Result> orp = other.mapToPair(p -> new Tuple2<>(p.getId(),p));
 
-        updateResult(pubs, to_add_orcid_to_result, outputPath, "publication");
-        updateResult(dss, to_add_orcid_to_result, outputPath, "dataset");
-        updateResult(sfw, to_add_orcid_to_result, outputPath, "software");
-        updateResult(orp, to_add_orcid_to_result, outputPath, "otherresearchproduct");
+        if(writeUpdate){
+            writeResult(pubs, to_add_orcid_to_result, outputPath, "publication");
+            writeResult(dss, to_add_orcid_to_result, outputPath, "dataset");
+            writeResult(sfw, to_add_orcid_to_result, outputPath, "software");
+            writeResult(orp, to_add_orcid_to_result, outputPath, "otherresearchproduct");
+        }
+
+        if (saveGraph){
+            updateResult(pubs, to_add_orcid_to_result, outputPath, "publication");
+            updateResult(dss, to_add_orcid_to_result, outputPath, "dataset");
+            updateResult(sfw, to_add_orcid_to_result, outputPath, "software");
+            updateResult(orp, to_add_orcid_to_result, outputPath, "otherresearchproduct");
+        }
+
 
     }
 
 
-    private static Author enrichAutor(Author autoritative_author, Author author) {
+    public static eu.dnetlib.dhp.schema.oaf.Author enrichAutor(eu.dnetlib.dhp.schema.oaf.Author autoritative_author, eu.dnetlib.dhp.schema.oaf.Author author) {
         boolean toaddpid = false;
 
         if (StringUtils.isNoneEmpty(autoritative_author.getSurname())) {
@@ -137,32 +140,91 @@ public class SparkOrcidToResultFromSemRelJob {
     }
 
 
+    private static List<eu.dnetlib.dhp.schema.oaf.Author> enrichAutors(List<eu.dnetlib.dhp.schema.oaf.Author> autoritative_authors,
+                                                                       List<eu.dnetlib.dhp.schema.oaf.Author> to_enrich_authors, boolean filter){
+//        List<Author> autoritative_authors = p._2()._2().get().getAuthors();
+//        List<Author> to_enrich_authors = r.getAuthor();
 
-    private static void updateResult(JavaPairRDD<String, Result> results, JavaPairRDD<String, TypedRow> toupdateresult, String outputPath, String type) {
+        return to_enrich_authors
+                .stream()
+                .map(a -> {
+                    if (filter) {
+                        if (containsAllowedPid(a)) {
+                            return a;
+                        }
+                    }
+
+                    List<eu.dnetlib.dhp.schema.oaf.Author> lst = autoritative_authors.stream()
+                            .map(aa -> enrichAutor(aa, a)).filter(au -> !(au == null)).collect(Collectors.toList());
+                    if (lst.size() == 0) {
+                        return a;
+                    }
+                    return lst.get(0);//Each author can be enriched at most once. It cannot be the same as many different people
+
+                }).collect(Collectors.toList());
+    }
+
+    private static void writeResult(JavaPairRDD<String, Result> results, JavaPairRDD<String, TypedRow> toupdateresult,
+                                    String outputPath, String type) {
+
+        results.join(toupdateresult)
+                .map(p -> {
+                    Result r = p._2()._1();
+
+                        List<eu.dnetlib.dhp.schema.oaf.Author> autoritative_authors = p._2()._2().getAuthors();
+                        List<eu.dnetlib.dhp.schema.oaf.Author> to_enrich_authors = r.getAuthor();
+
+                        r.setAuthor(enrichAutors(autoritative_authors, to_enrich_authors, false));
+//                                .stream()
+//                                .map(a -> {
+//                                    if(filter) {
+//                                        if (containsAllowedPid(a)) {
+//                                            return a;
+//                                        }
+//                                    }
+//
+//                                    List<Author> lst = autoritative_authors.stream()
+//                                            .map(aa -> enrichAutor(aa, a)).filter(au -> !(au == null)).collect(Collectors.toList());
+//                                    if(lst.size() == 0){
+//                                        return a;
+//                                    }
+//                                    return lst.get(0);//Each author can be enriched at most once. It cannot be the same as many different people
+//
+//                                }).collect(Collectors.toList()));
+
+                    return r;
+                })
+                .map(p -> new ObjectMapper().writeValueAsString(p))
+                .saveAsTextFile(outputPath + "/" + type + "_update");
+    }
+
+
+    private static void updateResult(JavaPairRDD<String, Result> results, JavaPairRDD<String, TypedRow> toupdateresult,
+                                     String outputPath, String type) {
         results.leftOuterJoin(toupdateresult)
                 .map(p -> {
                     Result r = p._2()._1();
                     if (p._2()._2().isPresent()){
-                        List<Author> autoritative_authors = p._2()._2().get().getAuthors();
-                        List<Author> to_enrich_authors = r.getAuthor();
-                                //.stream().filter(a -> !containsAllowedPid(a))
-                                //.collect(Collectors.toList());
+                        List<eu.dnetlib.dhp.schema.oaf.Author> autoritative_authors = p._2()._2().get().getAuthors();
+                        List<eu.dnetlib.dhp.schema.oaf.Author> to_enrich_authors = r.getAuthor();
 
-                        r.setAuthor(to_enrich_authors
-                                .stream()
-                                .map(a -> {
-                                    if (containsAllowedPid(a)) {
-                                        return a;
-                                    }
-
-                                    List<Author> lst = autoritative_authors.stream()
-                                            .map(aa -> enrichAutor(aa, a)).filter(au -> !(au == null)).collect(Collectors.toList());
-                                    if(lst.size() == 0){
-                                        return a;
-                                    }
-                                    return lst.get(0);//Each author can be enriched at most once. It cannot be the same as many different people
-
-                                }).collect(Collectors.toList()));
+                        r.setAuthor(enrichAutors(autoritative_authors, to_enrich_authors, true));
+//                                .stream()
+//                                .map(a -> {
+//                                    if(filter) {
+//                                        if (containsAllowedPid(a)) {
+//                                            return a;
+//                                        }
+//                                    }
+//
+//                                    List<Author> lst = autoritative_authors.stream()
+//                                            .map(aa -> enrichAutor(aa, a)).filter(au -> !(au == null)).collect(Collectors.toList());
+//                                    if(lst.size() == 0){
+//                                        return a;
+//                                    }
+//                                    return lst.get(0);//Each author can be enriched at most once. It cannot be the same as many different people
+//
+//                                }).collect(Collectors.toList()));
                     }
                     return r;
                 })
@@ -195,7 +257,7 @@ public class SparkOrcidToResultFromSemRelJob {
 
     }
 
-    private static boolean containsAllowedPid(Author a){
+    private static boolean containsAllowedPid(eu.dnetlib.dhp.schema.oaf.Author a){
 
 
         return (a.getPid().stream().map(pid -> {
