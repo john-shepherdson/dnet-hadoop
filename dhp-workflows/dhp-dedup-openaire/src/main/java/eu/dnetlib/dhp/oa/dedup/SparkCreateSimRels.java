@@ -12,33 +12,26 @@ import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Text;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SparkCreateSimRels extends AbstractSparkAction {
 
-    private static final Log log = LogFactory.getLog(SparkCreateSimRels.class);
+    private static final Logger log = LoggerFactory.getLogger(SparkCreateSimRels.class);
 
-    public SparkCreateSimRels(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+    public SparkCreateSimRels(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
     }
 
@@ -81,10 +74,10 @@ public class SparkCreateSimRels extends AbstractSparkAction {
                     });
 
             //create blocks for deduplication
-            JavaPairRDD<String, List<MapDocument>> blocks = Deduper.createsortedBlocks(sc, mapDocument, dedupConf);
+            JavaPairRDD<String, List<MapDocument>> blocks = Deduper.createSortedBlocks(sc, mapDocument, dedupConf);
 
             //create relations by comparing only elements in the same group
-            final JavaPairRDD<String, String> dedupRels = Deduper.computeRelations2(sc, blocks, dedupConf);
+            final JavaPairRDD<String, String> dedupRels = Deduper.computeRelations(sc, blocks, dedupConf);
 
             JavaRDD<Relation> relationsRDD = dedupRels.map(r -> createSimRel(r._1(), r._2(), entity));
 

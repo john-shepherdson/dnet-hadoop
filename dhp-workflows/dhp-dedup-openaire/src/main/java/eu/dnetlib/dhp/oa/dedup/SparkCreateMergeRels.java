@@ -11,8 +11,6 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -24,6 +22,8 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import scala.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,9 +32,9 @@ import java.util.List;
 
 public class SparkCreateMergeRels extends AbstractSparkAction {
 
-    private static final Log log = LogFactory.getLog(SparkCreateMergeRels.class);
+    private static final Logger log = LoggerFactory.getLogger(SparkCreateMergeRels.class);
 
-    public SparkCreateMergeRels(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+    public SparkCreateMergeRels(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
     }
 
