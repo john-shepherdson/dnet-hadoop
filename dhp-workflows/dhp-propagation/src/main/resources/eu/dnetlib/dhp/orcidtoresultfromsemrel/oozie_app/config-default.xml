@@ -20,6 +20,10 @@
         <value>http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089</value>
     </property>
     <property>
+        <name>hive_metastore_uris</name>
+        <value>thrift://iis-cdh5-test-m3.ocean.icm.edu.pl:9083</value>
+    </property>
+    <property>
         <name>spark2EventLogDir</name>
         <value>/user/spark/spark2ApplicationHistory</value>
     </property>
