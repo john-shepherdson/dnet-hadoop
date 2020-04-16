@@ -64,7 +64,7 @@ public class PrepareResultInstRepoAssociation {
                 "where datainfo.deletedbyinference = false " +
                 "and relClass = '" + RELATION_RESULT_ORGANIZATION_REL_CLASS +"' " +
                 "group by source";
-        
+
 
         spark.sql(query)
                 .as(Encoders.bean(ResultOrganizationSet.class))
