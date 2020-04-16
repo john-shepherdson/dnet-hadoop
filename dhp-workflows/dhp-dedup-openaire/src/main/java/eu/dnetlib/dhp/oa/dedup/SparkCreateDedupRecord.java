@@ -8,21 +8,20 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class SparkCreateDedupRecord extends AbstractSparkAction {
 
-    private static final Log log = LogFactory.getLog(SparkCreateDedupRecord.class);
+    private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
 
-    public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+    public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
     }
 

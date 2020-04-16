@@ -22,6 +22,8 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.io.IOException;
@@ -29,11 +31,11 @@ import java.io.Serializable;
 
 public class SparkUpdateEntity extends AbstractSparkAction {
 
+    private static final Logger log = LoggerFactory.getLogger(SparkUpdateEntity.class);
+
     final String IDJSONPATH = "$.id";
 
-    private static final Log log = LogFactory.getLog(SparkUpdateEntity.class);
-
-    public SparkUpdateEntity(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+    public SparkUpdateEntity(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
     }
 
