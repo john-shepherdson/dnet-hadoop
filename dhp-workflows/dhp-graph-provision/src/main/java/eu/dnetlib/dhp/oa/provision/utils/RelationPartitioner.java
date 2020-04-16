@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import eu.dnetlib.dhp.oa.provision.model.SortableRelationKey;
+import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
 import org.apache.spark.Partitioner;
 import org.apache.spark.util.Utils;
 
@@ -23,7 +23,7 @@ public class RelationPartitioner extends Partitioner {
 
     @Override
     public int getPartition(Object key) {
-        return Utils.nonNegativeMod(((SortableRelationKey) key).getSourceId().hashCode(), numPartitions());
+        return Utils.nonNegativeMod(((SortableRelation) key).getSource().hashCode(), numPartitions());
     }
 
 }

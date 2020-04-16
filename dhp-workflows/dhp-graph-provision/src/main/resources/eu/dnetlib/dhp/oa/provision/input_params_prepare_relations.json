@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "irp",
+    "paramLongName": "inputRelationsPath",
+    "paramDescription": "path to input relations prepare",
+    "paramRequired": true
+  },
+  {
+    "paramName": "op",
+    "paramLongName": "outputPath",
+    "paramDescription": "root output location for prepared relations",
+    "paramRequired": true
+  },
+  {
+    "paramName": "rp",
+    "paramLongName": "relPartitions",
+    "paramDescription": "number or partitions for the relations Dataset",
+    "paramRequired": true
+  }
+]

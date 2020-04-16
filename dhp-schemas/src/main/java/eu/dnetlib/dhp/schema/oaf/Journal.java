@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Journal implements Serializable {
 
@@ -122,5 +123,29 @@ public class Journal implements Serializable {
 
     public void setDataInfo(DataInfo dataInfo) {
         this.dataInfo = dataInfo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Journal journal = (Journal) o;
+        return Objects.equals(name, journal.name) &&
+                Objects.equals(issnPrinted, journal.issnPrinted) &&
+                Objects.equals(issnOnline, journal.issnOnline) &&
+                Objects.equals(issnLinking, journal.issnLinking) &&
+                Objects.equals(ep, journal.ep) &&
+                Objects.equals(iss, journal.iss) &&
+                Objects.equals(sp, journal.sp) &&
+                Objects.equals(vol, journal.vol) &&
+                Objects.equals(edition, journal.edition) &&
+                Objects.equals(conferenceplace, journal.conferenceplace) &&
+                Objects.equals(conferencedate, journal.conferencedate) &&
+                Objects.equals(dataInfo, journal.dataInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, issnPrinted, issnOnline, issnLinking, ep, iss, sp, vol, edition, conferenceplace, conferencedate, dataInfo);
     }
 }

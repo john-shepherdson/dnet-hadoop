@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
+import com.google.common.base.Objects;
 import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
@@ -49,207 +50,218 @@ public class RelatedEntity implements Serializable {
         return id;
     }
 
-    public RelatedEntity setId(String id) {
+    public void setId(String id) {
         this.id = id;
-        return this;
-    }
-
-    public StructuredProperty getTitle() {
-        return title;
-    }
-
-    public RelatedEntity setTitle(StructuredProperty title) {
-        this.title = title;
-        return this;
-    }
-
-    public String getDateofacceptance() {
-        return dateofacceptance;
-    }
-
-    public RelatedEntity setDateofacceptance(String dateofacceptance) {
-        this.dateofacceptance = dateofacceptance;
-        return this;
-    }
-
-    public String getPublisher() {
-        return publisher;
-    }
-
-    public RelatedEntity setPublisher(String publisher) {
-        this.publisher = publisher;
-        return this;
-    }
-
-    public List<StructuredProperty> getPid() {
-        return pid;
-    }
-
-    public RelatedEntity setPid(List<StructuredProperty> pid) {
-        this.pid = pid;
-        return this;
-    }
-
-    public String getCodeRepositoryUrl() {
-        return codeRepositoryUrl;
-    }
-
-    public RelatedEntity setCodeRepositoryUrl(String codeRepositoryUrl) {
-        this.codeRepositoryUrl = codeRepositoryUrl;
-        return this;
-    }
-
-    public Qualifier getResulttype() {
-        return resulttype;
-    }
-
-    public RelatedEntity setResulttype(Qualifier resulttype) {
-        this.resulttype = resulttype;
-        return this;
-    }
-
-    public List<KeyValue> getCollectedfrom() {
-        return collectedfrom;
-    }
-
-    public RelatedEntity setCollectedfrom(List<KeyValue> collectedfrom) {
-        this.collectedfrom = collectedfrom;
-        return this;
-    }
-
-    public List<Instance> getInstances() {
-        return instances;
-    }
-
-    public RelatedEntity setInstances(List<Instance> instances) {
-        this.instances = instances;
-        return this;
-    }
-
-    public String getOfficialname() {
-        return officialname;
-    }
-
-    public RelatedEntity setOfficialname(String officialname) {
-        this.officialname = officialname;
-        return this;
-    }
-
-    public String getWebsiteurl() {
-        return websiteurl;
-    }
-
-    public RelatedEntity setWebsiteurl(String websiteurl) {
-        this.websiteurl = websiteurl;
-        return this;
-    }
-
-    public Qualifier getDatasourcetype() {
-        return datasourcetype;
-    }
-
-    public RelatedEntity setDatasourcetype(Qualifier datasourcetype) {
-        this.datasourcetype = datasourcetype;
-        return this;
-    }
-
-    public Qualifier getDatasourcetypeui() {
-        return datasourcetypeui;
-    }
-
-    public RelatedEntity setDatasourcetypeui(Qualifier datasourcetypeui) {
-        this.datasourcetypeui = datasourcetypeui;
-        return this;
-    }
-
-    public Qualifier getOpenairecompatibility() {
-        return openairecompatibility;
-    }
-
-    public RelatedEntity setOpenairecompatibility(Qualifier openairecompatibility) {
-        this.openairecompatibility = openairecompatibility;
-        return this;
-    }
-
-    public String getLegalname() {
-        return legalname;
-    }
-
-    public RelatedEntity setLegalname(String legalname) {
-        this.legalname = legalname;
-        return this;
-    }
-
-    public String getLegalshortname() {
-        return legalshortname;
-    }
-
-    public RelatedEntity setLegalshortname(String legalshortname) {
-        this.legalshortname = legalshortname;
-        return this;
-    }
-
-    public Qualifier getCountry() {
-        return country;
-    }
-
-    public RelatedEntity setCountry(Qualifier country) {
-        this.country = country;
-        return this;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public RelatedEntity setCode(String code) {
-        this.code = code;
-        return this;
-    }
-
-    public String getAcronym() {
-        return acronym;
-    }
-
-    public RelatedEntity setAcronym(String acronym) {
-        this.acronym = acronym;
-        return this;
-    }
-
-    public Qualifier getContracttype() {
-        return contracttype;
-    }
-
-    public RelatedEntity setContracttype(Qualifier contracttype) {
-        this.contracttype = contracttype;
-        return this;
-    }
-
-    public List<String> getFundingtree() {
-        return fundingtree;
-    }
-
-    public RelatedEntity setFundingtree(List<String> fundingtree) {
-        this.fundingtree = fundingtree;
-        return this;
-    }
-
-    public String getProjectTitle() {
-        return projectTitle;
-    }
-
-    public RelatedEntity setProjectTitle(String projectTitle) {
-        this.projectTitle = projectTitle;
-        return this;
     }
 
     public String getType() {
         return type;
     }
 
-    public RelatedEntity setType(String type) {
+    public void setType(String type) {
         this.type = type;
-        return this;
     }
 
+    public StructuredProperty getTitle() {
+        return title;
+    }
+
+    public void setTitle(StructuredProperty title) {
+        this.title = title;
+    }
+
+    public String getWebsiteurl() {
+        return websiteurl;
+    }
+
+    public void setWebsiteurl(String websiteurl) {
+        this.websiteurl = websiteurl;
+    }
+
+    public String getDateofacceptance() {
+        return dateofacceptance;
+    }
+
+    public void setDateofacceptance(String dateofacceptance) {
+        this.dateofacceptance = dateofacceptance;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public List<StructuredProperty> getPid() {
+        return pid;
+    }
+
+    public void setPid(List<StructuredProperty> pid) {
+        this.pid = pid;
+    }
+
+    public String getCodeRepositoryUrl() {
+        return codeRepositoryUrl;
+    }
+
+    public void setCodeRepositoryUrl(String codeRepositoryUrl) {
+        this.codeRepositoryUrl = codeRepositoryUrl;
+    }
+
+    public Qualifier getResulttype() {
+        return resulttype;
+    }
+
+    public void setResulttype(Qualifier resulttype) {
+        this.resulttype = resulttype;
+    }
+
+    public List<KeyValue> getCollectedfrom() {
+        return collectedfrom;
+    }
+
+    public void setCollectedfrom(List<KeyValue> collectedfrom) {
+        this.collectedfrom = collectedfrom;
+    }
+
+    public List<Instance> getInstances() {
+        return instances;
+    }
+
+    public void setInstances(List<Instance> instances) {
+        this.instances = instances;
+    }
+
+    public String getOfficialname() {
+        return officialname;
+    }
+
+    public void setOfficialname(String officialname) {
+        this.officialname = officialname;
+    }
+
+    public Qualifier getDatasourcetype() {
+        return datasourcetype;
+    }
+
+    public void setDatasourcetype(Qualifier datasourcetype) {
+        this.datasourcetype = datasourcetype;
+    }
+
+    public Qualifier getDatasourcetypeui() {
+        return datasourcetypeui;
+    }
+
+    public void setDatasourcetypeui(Qualifier datasourcetypeui) {
+        this.datasourcetypeui = datasourcetypeui;
+    }
+
+    public Qualifier getOpenairecompatibility() {
+        return openairecompatibility;
+    }
+
+    public void setOpenairecompatibility(Qualifier openairecompatibility) {
+        this.openairecompatibility = openairecompatibility;
+    }
+
+    public String getLegalname() {
+        return legalname;
+    }
+
+    public void setLegalname(String legalname) {
+        this.legalname = legalname;
+    }
+
+    public String getLegalshortname() {
+        return legalshortname;
+    }
+
+    public void setLegalshortname(String legalshortname) {
+        this.legalshortname = legalshortname;
+    }
+
+    public Qualifier getCountry() {
+        return country;
+    }
+
+    public void setCountry(Qualifier country) {
+        this.country = country;
+    }
+
+    public String getProjectTitle() {
+        return projectTitle;
+    }
+
+    public void setProjectTitle(String projectTitle) {
+        this.projectTitle = projectTitle;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getAcronym() {
+        return acronym;
+    }
+
+    public void setAcronym(String acronym) {
+        this.acronym = acronym;
+    }
+
+    public Qualifier getContracttype() {
+        return contracttype;
+    }
+
+    public void setContracttype(Qualifier contracttype) {
+        this.contracttype = contracttype;
+    }
+
+    public List<String> getFundingtree() {
+        return fundingtree;
+    }
+
+    public void setFundingtree(List<String> fundingtree) {
+        this.fundingtree = fundingtree;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RelatedEntity that = (RelatedEntity) o;
+        return Objects.equal(id, that.id) &&
+                Objects.equal(type, that.type) &&
+                Objects.equal(title, that.title) &&
+                Objects.equal(websiteurl, that.websiteurl) &&
+                Objects.equal(dateofacceptance, that.dateofacceptance) &&
+                Objects.equal(publisher, that.publisher) &&
+                Objects.equal(pid, that.pid) &&
+                Objects.equal(codeRepositoryUrl, that.codeRepositoryUrl) &&
+                Objects.equal(resulttype, that.resulttype) &&
+                Objects.equal(collectedfrom, that.collectedfrom) &&
+                Objects.equal(instances, that.instances) &&
+                Objects.equal(officialname, that.officialname) &&
+                Objects.equal(datasourcetype, that.datasourcetype) &&
+                Objects.equal(datasourcetypeui, that.datasourcetypeui) &&
+                Objects.equal(openairecompatibility, that.openairecompatibility) &&
+                Objects.equal(legalname, that.legalname) &&
+                Objects.equal(legalshortname, that.legalshortname) &&
+                Objects.equal(country, that.country) &&
+                Objects.equal(projectTitle, that.projectTitle) &&
+                Objects.equal(code, that.code) &&
+                Objects.equal(acronym, that.acronym) &&
+                Objects.equal(contracttype, that.contracttype) &&
+                Objects.equal(fundingtree, that.fundingtree);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, type, title, websiteurl, dateofacceptance, publisher, pid, codeRepositoryUrl, resulttype, collectedfrom, instances, officialname, datasourcetype, datasourcetypeui, openairecompatibility, legalname, legalshortname, country, projectTitle, code, acronym, contracttype, fundingtree);
+    }
 }

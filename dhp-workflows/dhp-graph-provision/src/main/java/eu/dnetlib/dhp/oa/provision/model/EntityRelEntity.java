@@ -1,54 +1,64 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
+import com.google.common.base.Objects;
+
 import java.io.Serializable;
 
 public class EntityRelEntity implements Serializable {
 
-    private TypedRow source;
-    private TypedRow relation;
-    private TypedRow target;
+    private TypedRow entity;
+    private SortableRelation relation;
+    private RelatedEntity target;
 
     public EntityRelEntity() {
     }
 
-    public EntityRelEntity(TypedRow source) {
-        this.source = source;
+    public EntityRelEntity(SortableRelation relation, RelatedEntity target) {
+        this(null, relation, target);
     }
 
-    //helpers
-    public Boolean hasMainEntity() {
-        return getSource() != null & getRelation() == null & getTarget() == null;
+    public EntityRelEntity(TypedRow entity, SortableRelation relation, RelatedEntity target) {
+        this.entity = entity;
+        this.relation = relation;
+        this.target = target;
     }
 
-    public Boolean hasRelatedEntity() {
-        return getSource() == null & getRelation() != null & getTarget() != null;
+    public TypedRow getEntity() {
+        return entity;
     }
 
-
-    public TypedRow getSource() {
-        return source;
+    public void setEntity(TypedRow entity) {
+        this.entity = entity;
     }
 
-    public EntityRelEntity setSource(TypedRow source) {
-        this.source = source;
-        return this;
-    }
-
-    public TypedRow getRelation() {
+    public SortableRelation getRelation() {
         return relation;
     }
 
-    public EntityRelEntity setRelation(TypedRow relation) {
+    public void setRelation(SortableRelation relation) {
         this.relation = relation;
-        return this;
     }
 
-    public TypedRow getTarget() {
+    public RelatedEntity getTarget() {
         return target;
     }
 
-    public EntityRelEntity setTarget(TypedRow target) {
+    public void setTarget(RelatedEntity target) {
         this.target = target;
-        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EntityRelEntity that = (EntityRelEntity) o;
+        return Objects.equal(entity, that.entity) &&
+                Objects.equal(relation, that.relation) &&
+                Objects.equal(target, that.target);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(entity, relation, target);
     }
 }

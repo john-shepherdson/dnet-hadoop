@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class Author implements Serializable {
 
@@ -63,5 +64,23 @@ public class Author implements Serializable {
 
     public void setAffiliation(List<Field<String>> affiliation) {
         this.affiliation = affiliation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Author author = (Author) o;
+        return Objects.equals(fullname, author.fullname) &&
+                Objects.equals(name, author.name) &&
+                Objects.equals(surname, author.surname) &&
+                Objects.equals(rank, author.rank) &&
+                Objects.equals(pid, author.pid) &&
+                Objects.equals(affiliation, author.affiliation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fullname, name, surname, rank, pid, affiliation);
     }
 }

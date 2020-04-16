@@ -295,6 +295,12 @@
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
+				<artifactId>dnet-actionmanager-api</artifactId>
+				<version>[4.0.1,5.0.0)</version>
+			</dependency>
+
+			<dependency>
+				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-openaire-data-protos</artifactId>
 				<version>3.9.8-proto250</version>
 			</dependency>
@@ -346,6 +352,12 @@
 				<artifactId>mongo-java-driver</artifactId>
 				<version>${mongodb.driver.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>42.2.10</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.antlr</groupId>
 				<artifactId>stringtemplate</artifactId>
