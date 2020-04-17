@@ -6,15 +6,21 @@
     "paramRequired": false
   },
   {
-    "paramName": "iasp",
-    "paramLongName": "inputActionSetPaths",
-    "paramDescription": "comma separated list of action sets to partition by payload type",
+    "paramName": "iasi",
+    "paramLongName": "inputActionSetIds",
+    "paramDescription": "comma separated list of action set ids to partition by payload type",
     "paramRequired": true
   },
   {
     "paramName": "op",
     "paramLongName": "outputPath",
     "paramDescription": "root output location for partitioned action sets",
+    "paramRequired": true
+  },
+  {
+    "paramName": "is",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "URL of the isLookUp Service",
     "paramRequired": true
   }
 ]

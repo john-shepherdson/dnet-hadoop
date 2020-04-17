@@ -1,6 +1,8 @@
 package eu.dnetlib.dhp.actionmanager.partition;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import eu.dnetlib.dhp.actionmanager.ISClient;
 import eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJobTest;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.hadoop.conf.Configuration;
@@ -15,7 +17,11 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import scala.Tuple2;
 import scala.collection.mutable.Seq;
 
@@ -31,6 +37,7 @@ import static org.apache.spark.sql.functions.*;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static scala.collection.JavaConversions.mutableSeqAsJavaList;
 
+@ExtendWith(MockitoExtension.class)
 public class PartitionActionSetsByPayloadTypeJobTest {
     private static final ClassLoader cl = PartitionActionSetsByPayloadTypeJobTest.class.getClassLoader();
 
@@ -64,20 +71,29 @@ public class PartitionActionSetsByPayloadTypeJobTest {
     @Nested
     class Main {
 
+        @Mock
+        private ISClient isClient;
+
         @Test
         public void shouldPartitionActionSetsByPayloadType(@TempDir Path workingDir) throws Exception {
             // given
-            Path inputActionSetsDir = workingDir.resolve("input").resolve("action_sets");
+            Path inputActionSetsBaseDir = workingDir.resolve("input").resolve("action_sets");
             Path outputDir = workingDir.resolve("output");
 
-            Map<String, List<String>> oafsByClassName = createActionSets(inputActionSetsDir);
+            Map<String, List<String>> oafsByClassName = createActionSets(inputActionSetsBaseDir);
+
+            List<String> inputActionSetsPaths = resolveInputActionSetPaths(inputActionSetsBaseDir);
 
             // when
-            PartitionActionSetsByPayloadTypeJob.main(new String[]{
-                    "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                    "-inputActionSetPaths", inputActionSetsDir.toString(),
-                    "-outputPath", outputDir.toString()
-            });
+            Mockito.when(isClient.getLatestRawsetPaths(Mockito.anyString())).thenReturn(inputActionSetsPaths);
+
+            PartitionActionSetsByPayloadTypeJob job = new PartitionActionSetsByPayloadTypeJob();
+            job.setIsClient(isClient);
+            job.run(
+                    Boolean.FALSE,
+                    "", // it can be empty we're mocking the response from isClient to resolve the paths
+                    outputDir.toString()
+            );
 
             // then
             Files.exists(outputDir);
@@ -94,10 +110,19 @@ public class PartitionActionSetsByPayloadTypeJobTest {
         }
     }
 
+    private List<String> resolveInputActionSetPaths(Path inputActionSetsBaseDir) throws IOException {
+        Path inputActionSetJsonDumpsDir = getInputActionSetJsonDumpsDir();
+        return Files
+                .list(inputActionSetJsonDumpsDir)
+                .map(path -> {
+                    String inputActionSetId = path.getFileName().toString();
+                    return inputActionSetsBaseDir.resolve(inputActionSetId).toString();
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private static Map<String, List<String>> createActionSets(Path inputActionSetsDir) throws IOException {
-        Path inputActionSetJsonDumpsDir = Paths
-                .get(Objects.requireNonNull(cl.getResource("eu/dnetlib/dhp/actionmanager/partition/input/"))
-                        .getFile());
+        Path inputActionSetJsonDumpsDir = getInputActionSetJsonDumpsDir();
 
         Map<String, List<String>> oafsByType = new HashMap<>();
         Files
@@ -136,6 +161,12 @@ public class PartitionActionSetsByPayloadTypeJobTest {
                 });
 
         return oafsByType;
+    }
+
+    private static Path getInputActionSetJsonDumpsDir() {
+        return Paths
+                .get(Objects.requireNonNull(cl.getResource("eu/dnetlib/dhp/actionmanager/partition/input/"))
+                        .getFile());
     }
 
     private static Dataset<String> readActionsFromJsonDump(String path) {

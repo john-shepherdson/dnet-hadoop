@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.sx.graph;
 
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -49,15 +50,15 @@ public class SparkSXGeneratePidSimlarity {
                                 .equalsIgnoreCase(StringUtils.substringAfter(t._2(), "::")))
                 .distinct();
 
-        JavaRDD<Relation> simRel = datasetSimRel.union(publicationSimRel).map(s -> {
-                    final Relation r = new Relation();
+        JavaRDD<DLIRelation> simRel = datasetSimRel.union(publicationSimRel).map(s -> {
+                    final DLIRelation r = new DLIRelation();
                     r.setSource(s._1());
                     r.setTarget(s._2());
                     r.setRelType("similar");
                     return r;
                 }
         );
-        spark.createDataset(simRel.rdd(), Encoders.bean(Relation.class)).distinct().write()
+        spark.createDataset(simRel.rdd(), Encoders.bean(DLIRelation.class)).distinct().write()
                 .mode(SaveMode.Overwrite).save(targetPath+"/pid_simRel");
     }
 }

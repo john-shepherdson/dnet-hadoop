@@ -7,6 +7,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import net.minidev.json.JSONArray;
@@ -135,19 +136,19 @@ public class SparkScholexplorerCreateRawGraphJob {
 
 
                 SparkSXGeneratePidSimlarity.generateDataFrame(spark, sc, inputPath.replace("/relation",""),targetPath.replace("/relation","") );
-                RDD<Relation> rdd = union.mapToPair((PairFunction<String, String, Relation>) f -> {
+                RDD<DLIRelation> rdd = union.mapToPair((PairFunction<String, String, DLIRelation>) f -> {
                     final String source = getJPathString(SOURCEJSONPATH, f);
                     final String target = getJPathString(TARGETJSONPATH, f);
                     final String reltype = getJPathString(RELJSONPATH, f);
                     ObjectMapper mapper = new ObjectMapper();
                     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                    return new Tuple2<>(DHPUtils.md5(String.format("%s::%s::%s", source.toLowerCase(), reltype.toLowerCase(), target.toLowerCase())), mapper.readValue(f, Relation.class));
+                    return new Tuple2<>(DHPUtils.md5(String.format("%s::%s::%s", source.toLowerCase(), reltype.toLowerCase(), target.toLowerCase())), mapper.readValue(f, DLIRelation.class));
                 }).reduceByKey((a, b) -> {
                     a.mergeFrom(b);
                     return a;
                 }).map(Tuple2::_2).rdd();
 
-                spark.createDataset(rdd, Encoders.bean(Relation.class)).write().mode(SaveMode.Overwrite).save(targetPath);
+                spark.createDataset(rdd, Encoders.bean(DLIRelation.class)).write().mode(SaveMode.Overwrite).save(targetPath);
                 Dataset<Relation> rel_ds =spark.read().load(targetPath).as(Encoders.bean(Relation.class));
 
                 System.out.println("LOADING PATH :"+targetPath.replace("/relation","")+"/pid_simRel");

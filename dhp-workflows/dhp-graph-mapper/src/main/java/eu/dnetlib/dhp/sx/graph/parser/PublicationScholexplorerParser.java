@@ -38,7 +38,8 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             di.setDeletedbyinference(false);
             di.setInvisible(false);
 
-            parsedObject.setDateofcollection(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='dateOfCollection']"));
+            String dateOfCollection = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='dateOfCollection']");
+            parsedObject.setDateofcollection(dateOfCollection);
 
             final String resolvedDate = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='resolvedDate']");
             parsedObject.setOriginalId(Collections.singletonList(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='recordIdentifier']")));
@@ -118,48 +119,7 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             final List<Node> relatedIdentifiers =
                     VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='relatedIdentifier']",
                             Arrays.asList("relatedIdentifierType", "relationType", "entityType", "inverseRelationType"));
-
-
-            if (relatedIdentifiers != null) {
-                result.addAll(relatedIdentifiers.stream()
-                        .flatMap(n -> {
-                            final List<Relation> rels = new ArrayList<>();
-                            Relation r = new Relation();
-                            r.setSource(parsedObject.getId());
-                            final String relatedPid = n.getTextValue();
-                            final String relatedPidType = n.getAttributes().get("relatedIdentifierType");
-                            final String relatedType = n.getAttributes().getOrDefault("entityType", "unknown");
-                            String relationSemantic = n.getAttributes().get("relationType");
-                            String inverseRelation = "Unknown";
-                            final String targetId = generateId(relatedPid, relatedPidType, relatedType);
-
-                            if (relationMapper.containsKey(relationSemantic.toLowerCase()))
-                            {
-                                RelInfo relInfo = relationMapper.get(relationSemantic.toLowerCase());
-                                relationSemantic = relInfo.getOriginal();
-                                inverseRelation = relInfo.getInverse();
-                            }
-                            else {
-                                relationSemantic = "Unknown";
-                            }
-                            r.setTarget(targetId);
-                            r.setRelType(relationSemantic);
-                            r.setCollectedFrom(parsedObject.getCollectedfrom());
-                            r.setRelClass("datacite");
-                            r.setDataInfo(di);
-                            rels.add(r);
-                            r = new Relation();
-                            r.setDataInfo(di);
-                            r.setSource(targetId);
-                            r.setTarget(parsedObject.getId());
-                            r.setRelType(inverseRelation);
-                            r.setRelClass("datacite");
-                            r.setCollectedFrom(parsedObject.getCollectedfrom());
-                            rels.add(r);
-
-                            return rels.stream();
-                        }).collect(Collectors.toList()));
-            }
+            generateRelations(relationMapper, parsedObject, result, di, dateOfCollection, relatedIdentifiers);
 
             final List<Node> hostedBy =
                     VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='hostedBy']", Arrays.asList("id", "name"));
@@ -206,8 +166,8 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
 
             description.setValue(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='description']"));
 
-            if (StringUtils.isNotBlank(description.getValue()) && description.getValue().length() > 512) {
-                description.setValue(description.getValue().substring(0, 512));
+            if (StringUtils.isNotBlank(description.getValue()) && description.getValue().length() > 10000) {
+                description.setValue(description.getValue().substring(0, 10000));
             }
 
             parsedObject.setDescription(Collections.singletonList(description));

@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.provision.scholix;
 import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +19,6 @@ public class ScholixResource implements Serializable {
     private List<ScholixEntityId> publisher;
     private List<ScholixCollectedFrom> collectedFrom;
 
-
-
-
-
     public static ScholixResource fromSummary(ScholixSummary summary) {
 
         final ScholixResource resource = new ScholixResource();
@@ -38,7 +33,7 @@ public class ScholixResource implements Serializable {
         resource.setObjectType(summary.getTypology().toString());
 
 
-        if (summary.getTitle() != null && summary.getTitle().size()>0)
+        if (summary.getTitle() != null && summary.getTitle().size() > 0)
             resource.setTitle(summary.getTitle().get(0));
 
         if (summary.getAuthor() != null)
@@ -47,7 +42,7 @@ public class ScholixResource implements Serializable {
                     .collect(Collectors.toList())
             );
 
-        if (summary.getDate() != null && summary.getDate().size()>0)
+        if (summary.getDate() != null && summary.getDate().size() > 0)
             resource.setPublicationDate(summary.getDate().get(0));
         if (summary.getPublisher() != null)
             resource.setPublisher(summary.getPublisher().stream()
@@ -64,6 +59,7 @@ public class ScholixResource implements Serializable {
         return resource;
 
     }
+
 
     public List<ScholixIdentifier> getIdentifier() {
         return identifier;

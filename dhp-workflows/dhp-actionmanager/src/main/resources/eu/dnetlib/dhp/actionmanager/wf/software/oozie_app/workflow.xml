@@ -117,6 +117,9 @@
 
     <action name="SkipPromoteSoftwareActionPayloadForSoftwareTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${workingDir}/software"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${inputGraphRootPath}/software</arg>
             <arg>${workingDir}/software</arg>
@@ -165,6 +168,9 @@
 
     <action name="SkipPromoteResultActionPayloadForSoftwareTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${outputGraphRootPath}/software"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${workingDir}/software</arg>
             <arg>${outputGraphRootPath}/software</arg>

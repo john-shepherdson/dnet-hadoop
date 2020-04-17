@@ -34,8 +34,13 @@ public class Datacite2Scholix {
         ScholixResource resource = generateDataciteScholixResource(dJson);
 
         return relIds.stream().flatMap(s-> {
-            final List<Scholix> result = generateScholix(resource, s.get("relatedIdentifier"), s.get("relatedIdentifierType"), s.get("relationType"), updated);
-            return result.stream();
+            try {
+                final List<Scholix> result = generateScholix(resource, ""+s.get("relatedIdentifier"), s.get("relatedIdentifierType"), s.get("relationType"), updated);
+                return result.stream();
+            } catch (Throwable e)
+            {
+                return new ArrayList<Scholix>().stream();
+            }
         }).collect(Collectors.toList());
     }
 
@@ -48,6 +53,7 @@ public class Datacite2Scholix {
     }
 
     private List<Scholix> generateScholix(ScholixResource source, final String pid, final String pidtype, final String relType, final String updated) {
+
         if ("doi".equalsIgnoreCase(pidtype)) {
             ScholixResource target = new ScholixResource();
             target.setIdentifier(Collections.singletonList(new ScholixIdentifier(pid, pidtype)));
@@ -165,7 +171,7 @@ public class Datacite2Scholix {
         return res;
     }
 
-    protected String generateId(final String pid, final String pidType, final String entityType) {
+    public static String generateId(final String pid, final String pidType, final String entityType) {
         String type;
         switch (entityType){
             case "publication":

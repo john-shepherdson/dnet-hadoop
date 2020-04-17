@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.actionmanager.partition;
 
+import eu.dnetlib.dhp.actionmanager.ISClient;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJob;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -40,7 +41,14 @@ public class PartitionActionSetsByPayloadTypeJob {
                     StructField$.MODULE$.apply("payload", DataTypes.StringType, false, Metadata.empty())
             ));
 
-    private static final String INPUT_ACTION_SET_PATHS_SEPARATOR = ",";
+    private ISClient isClient;
+
+    public PartitionActionSetsByPayloadTypeJob(String isLookupUrl) {
+        this.isClient = new ISClient(isLookupUrl);
+    }
+
+    public PartitionActionSetsByPayloadTypeJob() {
+    }
 
     public static void main(String[] args) throws Exception {
         String jsonConfiguration = IOUtils.toString(
@@ -55,11 +63,22 @@ public class PartitionActionSetsByPayloadTypeJob {
                 .orElse(Boolean.TRUE);
         logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        String inputActionSetPaths = parser.get("inputActionSetPaths");
-        logger.info("inputActionSetPaths: {}", inputActionSetPaths);
+        String inputActionSetIds = parser.get("inputActionSetIds");
+        logger.info("inputActionSetIds: {}", inputActionSetIds);
 
         String outputPath = parser.get("outputPath");
         logger.info("outputPath: {}", outputPath);
+
+        String isLookupUrl = parser.get("isLookupUrl");
+        logger.info("isLookupUrl: {}", isLookupUrl);
+
+        new PartitionActionSetsByPayloadTypeJob(isLookupUrl).run(isSparkSessionManaged, inputActionSetIds, outputPath);
+    }
+
+    protected void run(Boolean isSparkSessionManaged, String inputActionSetIds, String outputPath) {
+
+        List<String> inputActionSetPaths = getIsClient().getLatestRawsetPaths(inputActionSetIds);
+        logger.info("inputActionSetPaths: {}", String.join(",", inputActionSetPaths));
 
         SparkConf conf = new SparkConf();
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -67,9 +86,7 @@ public class PartitionActionSetsByPayloadTypeJob {
         runWithSparkSession(conf, isSparkSessionManaged,
                 spark -> {
                     removeOutputDir(spark, outputPath);
-                    readAndWriteActionSetsFromPaths(spark,
-                            Arrays.asList(inputActionSetPaths.split(INPUT_ACTION_SET_PATHS_SEPARATOR)),
-                            outputPath);
+                    readAndWriteActionSetsFromPaths(spark, inputActionSetPaths, outputPath);
                 });
     }
 
@@ -92,21 +109,15 @@ public class PartitionActionSetsByPayloadTypeJob {
                                                       String path) {
         logger.info("Reading actions from path: {}", path);
 
-        List<String> files = HdfsSupport.listFiles(path, spark.sparkContext().hadoopConfiguration());
-        logger.info("Found files: {}", String.join(",", files));
-
         JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-        return files
-                .stream()
-                .map(file -> {
-                    JavaRDD<Row> rdd = sc
-                            .sequenceFile(file, Text.class, Text.class)
-                            .map(x -> RowFactory.create(x._1().toString(), x._2().toString()));
-                    return spark.createDataFrame(rdd, KV_SCHEMA)
-                            .withColumn("atomic_action", from_json(col("value"), ATOMIC_ACTION_SCHEMA))
-                            .select(expr("atomic_action.*"));
-                })
-                .reduce(spark.createDataFrame(Collections.emptyList(), ATOMIC_ACTION_SCHEMA), Dataset::union);
+
+        JavaRDD<Row> rdd = sc
+                .sequenceFile(path, Text.class, Text.class)
+                .map(x -> RowFactory.create(x._1().toString(), x._2().toString()));
+
+        return spark.createDataFrame(rdd, KV_SCHEMA)
+                .withColumn("atomic_action", from_json(col("value"), ATOMIC_ACTION_SCHEMA))
+                .select(expr("atomic_action.*"));
     }
 
     private static void saveActions(Dataset<Row> actionDS,
@@ -117,5 +128,13 @@ public class PartitionActionSetsByPayloadTypeJob {
                 .partitionBy("clazz")
                 .mode(SaveMode.Append)
                 .parquet(path);
+    }
+
+    public ISClient getIsClient() {
+        return isClient;
+    }
+
+    public void setIsClient(ISClient isClient) {
+        this.isClient = isClient;
     }
 }

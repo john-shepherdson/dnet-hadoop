@@ -114,6 +114,9 @@
 
     <action name="SkipPromoteRelationActionPayloadForRelationTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${outputGraphRootPath}/relation"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${inputGraphRootPath}/relation</arg>
             <arg>${outputGraphRootPath}/relation</arg>

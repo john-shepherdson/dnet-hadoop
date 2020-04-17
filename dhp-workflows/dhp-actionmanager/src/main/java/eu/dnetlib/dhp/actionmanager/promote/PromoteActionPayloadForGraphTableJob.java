@@ -8,6 +8,7 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -119,10 +120,17 @@ public class PromoteActionPayloadForGraphTableJob {
                                                              String path,
                                                              Class<G> rowClazz) {
         logger.info("Reading graph table from path: {}", path);
-        return spark
-                .read()
+
+        return spark.read()
                 .textFile(path)
                 .map((MapFunction<String, G>) value -> OBJECT_MAPPER.readValue(value, rowClazz), Encoders.bean(rowClazz));
+
+        /*
+        return spark
+                .read()
+                .parquet(path)
+                .as(Encoders.bean(rowClazz));
+         */
     }
 
     private static <A extends Oaf> Dataset<A> readActionPayload(SparkSession spark,

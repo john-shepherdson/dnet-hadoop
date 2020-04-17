@@ -42,7 +42,8 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
             parsedObject.setOriginalId(Collections.singletonList(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='recordIdentifier']")));
 
             parsedObject.setOriginalObjIdentifier(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='objIdentifier']"));
-            parsedObject.setDateofcollection(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='dateOfCollection']"));
+            String dateOfCollection = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='dateOfCollection']");
+            parsedObject.setDateofcollection(dateOfCollection);
 
             final String resolvedDate = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='resolvedDate']");
 
@@ -123,7 +124,7 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
             List<String> descs = VtdUtilityParser.getTextValue(ap, vn, "//*[local-name()='description']");
             if (descs != null && descs.size() > 0)
                 parsedObject.setDescription(descs.stream()
-                        .map(it -> it.length() < 512 ? it : it.substring(0, 512))
+                        .map(it -> it.length() < 10000 ? it : it.substring(0, 10000))
                         .map(it -> {
                             final Field<String> d = new Field<>();
                             d.setValue(it);
@@ -137,48 +138,7 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
                             Arrays.asList("relatedIdentifierType", "relationType", "entityType", "inverseRelationType"));
 
 
-            if(relatedIdentifiers!= null) {
-                result.addAll(relatedIdentifiers.stream()
-                        .flatMap(n -> {
-                            final List<Relation> rels = new ArrayList<>();
-                            Relation r = new Relation();
-                            r.setSource(parsedObject.getId());
-                            final String relatedPid = n.getTextValue();
-                            final String relatedPidType = n.getAttributes().get("relatedIdentifierType");
-                            final String relatedType = n.getAttributes().getOrDefault("entityType", "unknown");
-                            String relationSemantic = n.getAttributes().get("relationType");
-                            String inverseRelation = n.getAttributes().get("inverseRelationType");
-                            final String targetId = generateId(relatedPid, relatedPidType, relatedType);
-
-                            if (relationMapper.containsKey(relationSemantic.toLowerCase()))
-                            {
-                                RelInfo relInfo = relationMapper.get(relationSemantic.toLowerCase());
-                                relationSemantic = relInfo.getOriginal();
-                                inverseRelation = relInfo.getInverse();
-                            }
-                            else {
-                                relationSemantic = "Unknown";
-                                inverseRelation = "Unknown";
-                            }
-                            r.setTarget(targetId);
-                            r.setRelType(relationSemantic);
-                            r.setRelClass("datacite");
-                            r.setCollectedFrom(parsedObject.getCollectedfrom());
-                            r.setDataInfo(di);
-                            rels.add(r);
-                            r = new Relation();
-                            r.setDataInfo(di);
-                            r.setSource(targetId);
-                            r.setTarget(parsedObject.getId());
-                            r.setRelType(inverseRelation);
-                            r.setRelClass("datacite");
-                            r.setCollectedFrom(parsedObject.getCollectedfrom());
-                            rels.add(r);
-                            if("unknown".equalsIgnoreCase(relatedType))
-                                result.add(createUnknownObject(relatedPid, relatedPidType, parsedObject.getCollectedfrom().get(0), di));
-                            return rels.stream();
-                        }).collect(Collectors.toList()));
-            }
+            generateRelations(relationMapper, parsedObject, result, di, dateOfCollection, relatedIdentifiers);
 
 
             final List<Node> hostedBy =
@@ -199,7 +159,7 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
             }
 
 
-            List<StructuredProperty> subjects = extractSubject(VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='resource']//*[local-name()='subject']", Arrays.asList("subjectScheme")));
+            List<StructuredProperty> subjects = extractSubject(VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='resource']//*[local-name()='subject']", Collections.singletonList("subjectScheme")));
 
             parsedObject.setSubject(subjects);
 
@@ -265,24 +225,6 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
     }
 
 
-    private DLIUnknown createUnknownObject(final String pid, final String pidType, final KeyValue cf, final DataInfo di) {
-        final DLIUnknown uk = new DLIUnknown();
-        uk.setId(generateId(pid, pidType, "unknown"));
-        ProvenaceInfo pi = new ProvenaceInfo();
-        pi.setId(cf.getKey());
-        pi.setName(cf.getValue());
-        pi.setCompletionStatus("incomplete");
-        uk.setDataInfo(di);
-        uk.setDlicollectedfrom(Collections.singletonList(pi));
-        final StructuredProperty sourcePid = new StructuredProperty();
-        sourcePid.setValue(pid);
-        final Qualifier pt = new Qualifier();
-        pt.setClassname(pidType);
-        pt.setClassid(pidType);
-        pt.setSchemename("dnet:pid_types");
-        pt.setSchemeid("dnet:pid_types");
-        sourcePid.setQualifier(pt);
-        uk.setPid(Collections.singletonList(sourcePid));
-        return uk;
-    }
+
+
 }
