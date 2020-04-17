@@ -3,16 +3,12 @@ package eu.dnetlib.dhp.provision;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.provision.scholix.Scholix;
 import eu.dnetlib.dhp.provision.scholix.ScholixResource;
-import eu.dnetlib.dhp.provision.update.CrossrefClient;
-import eu.dnetlib.dhp.provision.update.Datacite2Scholix;
-import eu.dnetlib.dhp.provision.update.DataciteClient;
-import eu.dnetlib.dhp.provision.update.DataciteClientIterator;
+import eu.dnetlib.dhp.provision.update.*;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 
@@ -26,6 +22,19 @@ public class DataciteClientTest {
         final List<Scholix> s = ds.generateScholixFromJson(json);
         System.out.println(new ObjectMapper().writeValueAsString(s));
     }
+
+
+//    public void  testS() throws Exception {
+//        RetrieveUpdateFromDatacite.main(new String[]{
+//                "-n", "file:///data/new_s2.txt",
+//                "-t", "/data/new_s2.txt",
+//                "-ts", "1586974078",
+//                "-ih", "ip-90-147-167-25.ct1.garrservices.it",
+//                "-in", "datacite",
+//        });
+//
+//    }
+
 
     public void testResolveDataset() throws Exception {
         DataciteClient dc = new DataciteClient("ip-90-147-167-25.ct1.garrservices.it");

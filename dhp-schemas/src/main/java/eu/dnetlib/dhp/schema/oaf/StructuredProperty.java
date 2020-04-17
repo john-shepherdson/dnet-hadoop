@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 
-public class StructuredProperty implements Serializable {
+public class    StructuredProperty implements Serializable {
 
     private String value;
 
