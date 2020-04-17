@@ -5,15 +5,11 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.util.*;
 
@@ -151,16 +147,11 @@ public class SparkOrcidToResultFromSemRelJob3 {
             }
         }
         if (toaddpid){
-            StructuredProperty pid = new StructuredProperty();
-            String aa_pid = autoritative_author.getOrcid();
-            pid.setValue(aa_pid);
-            pid.setQualifier(getQualifier(PROPAGATION_AUTHOR_PID, PROPAGATION_AUTHOR_PID ));
-            pid.setDataInfo(getDataInfo(PROPAGATION_DATA_INFO_TYPE, PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID, PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME));
-            if(author.getPid() == null){
-                author.setPid(Arrays.asList(pid));
-            }else{
-                author.getPid().add(pid);
-            }
+            StructuredProperty p = new StructuredProperty();
+            p.setValue(autoritative_author.getOrcid());
+            p.setQualifier(getQualifier(PROPAGATION_AUTHOR_PID, PROPAGATION_AUTHOR_PID ));
+            p.setDataInfo(getDataInfo(PROPAGATION_DATA_INFO_TYPE, PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID, PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME));
+            author.addPid(p);
 
         }
         return toaddpid;
