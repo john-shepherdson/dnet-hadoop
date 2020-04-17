@@ -83,12 +83,14 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                 .textFile(relationPath)
                 .map(patchRelFn(), Encoders.bean(Relation.class));
 
+        //change raw ids with dedup ids
         Dataset<Relation> newRels =
                 processDataset(
                     processDataset(rels, mergedIds, FieldType.SOURCE, getFixRelFn(FieldType.SOURCE)),
                 mergedIds, FieldType.TARGET, getFixRelFn(FieldType.TARGET))
                 .filter(SparkPropagateRelation::containsDedup);
 
+        //update deletedbyinference
         Dataset<Relation> updated = processDataset(
                 processDataset(rels, mergedIds, FieldType.SOURCE, getDeletedFn()),
                 mergedIds, FieldType.TARGET, getDeletedFn());
