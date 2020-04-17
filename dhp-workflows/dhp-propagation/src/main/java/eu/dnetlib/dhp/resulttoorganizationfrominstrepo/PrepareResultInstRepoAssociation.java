@@ -16,8 +16,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static eu.dnetlib.dhp.PropagationConstant.RELATION_RESULT_ORGANIZATION_REL_CLASS;
-import static eu.dnetlib.dhp.PropagationConstant.isSparkSessionManaged;
+import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 public class PrepareResultInstRepoAssociation {
@@ -107,7 +106,7 @@ public class PrepareResultInstRepoAssociation {
                 "AND datainfo.deletedbyinference = false  ) d " +
                 "JOIN ( SELECT source, target " +
                 "FROM relation " +
-                "WHERE relclass = 'provides' " +
+                "WHERE relclass = '" + RELATION_DATASOURCE_ORGANIZATION_REL_CLASS + "' " +
                 "AND datainfo.deletedbyinference = false ) rel " +
                 "ON d.id = rel.source ";
 
