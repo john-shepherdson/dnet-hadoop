@@ -107,7 +107,7 @@ public class PrepareDatasourceCountryAssociation {
                                getConstraintList("datasourcetype.classid = '", allowedtypes) + ") d " +
                 "JOIN ( SELECT source, target " +
                 "       FROM relation " +
-                "       WHERE relclass = 'provides' " +
+                "       WHERE relclass = '" + RELATION_DATASOURCE_ORGANIZATION_REL_CLASS + "' " +
                 "       AND datainfo.deletedbyinference = false ) rel " +
                 "ON d.id = rel.source " +
                 "JOIN (SELECT id, country " +
