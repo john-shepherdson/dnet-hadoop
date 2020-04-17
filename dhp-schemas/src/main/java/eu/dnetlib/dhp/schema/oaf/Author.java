@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Author implements Serializable {
 
@@ -83,4 +83,20 @@ public class Author implements Serializable {
     public int hashCode() {
         return Objects.hash(fullname, name, surname, rank, pid, affiliation);
     }
+
+    public void addPid(StructuredProperty pid) {
+
+        if (pid == null)
+            return;
+
+        if(this.pid == null){
+            this.pid = Arrays.asList(pid);
+        }else{
+            this.pid.add(pid);
+        }
+
+
+    }
+
+
 }
