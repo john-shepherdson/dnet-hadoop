@@ -1,7 +1,9 @@
 package eu.dnetlib.dhp.oa.dedup;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -20,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract class AbstractSparkAction implements Serializable {
+
+    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public ArgumentApplicationParser parser;   //parameters for the spark action
     public SparkSession spark; //the spark session
@@ -107,5 +112,9 @@ abstract class AbstractSparkAction implements Serializable {
                 .master(parser.get("master"))
                 .config(conf)
                 .getOrCreate();
+    }
+
+    protected static void removeOutputDir(SparkSession spark, String path) {
+        HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
     }
 }

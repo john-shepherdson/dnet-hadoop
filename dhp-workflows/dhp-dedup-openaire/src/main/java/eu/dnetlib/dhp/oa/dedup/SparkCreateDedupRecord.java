@@ -1,6 +1,5 @@
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -42,26 +41,27 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
         final String actionSetId = parser.get("actionSetId");
         final String workingPath = parser.get("workingPath");
 
-        System.out.println(String.format("graphBasePath: '%s'", graphBasePath));
-        System.out.println(String.format("isLookUpUrl:   '%s'", isLookUpUrl));
-        System.out.println(String.format("actionSetId:   '%s'", actionSetId));
-        System.out.println(String.format("workingPath:   '%s'", workingPath));
+        log.info("graphBasePath: '{}'", graphBasePath);
+        log.info("isLookUpUrl:   '{}'", isLookUpUrl);
+        log.info("actionSetId:   '{}'", actionSetId);
+        log.info("workingPath:   '{}'", workingPath);
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
         for (DedupConfig dedupConf: getConfigurations(isLookUpService, actionSetId)) {
             String subEntity = dedupConf.getWf().getSubEntityValue();
-            System.out.println(String.format("Creating deduprecords for: '%s'", subEntity));
+            log.info("Creating deduprecords for: '{}'", subEntity);
+
+            final String outputPath = DedupUtility.createDedupRecordPath(workingPath, actionSetId, subEntity);
+            removeOutputDir(spark, outputPath);
 
             final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
             final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
             final OafEntityType entityType = OafEntityType.valueOf(subEntity);
             final JavaRDD<OafEntity> dedupRecord =
                     DedupRecordFactory.createDedupRecord(sc, spark, mergeRelPath, entityPath, entityType, dedupConf);
-            dedupRecord.map(r -> {
-                ObjectMapper mapper = new ObjectMapper();
-                return mapper.writeValueAsString(r);
-            }).saveAsTextFile(DedupUtility.createDedupRecordPath(workingPath, actionSetId, subEntity));
+
+            dedupRecord.map(r -> OBJECT_MAPPER.writeValueAsString(r)).saveAsTextFile(outputPath);
         }
 
     }

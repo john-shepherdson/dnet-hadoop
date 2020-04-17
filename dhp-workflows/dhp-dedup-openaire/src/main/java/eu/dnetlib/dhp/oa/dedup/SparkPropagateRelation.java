@@ -27,9 +27,6 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
     private static final Logger log = LoggerFactory.getLogger(SparkPropagateRelation.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
     enum FieldType {
         SOURCE,
         TARGET
@@ -62,7 +59,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         log.info("dedupGraphPath: '{}'", dedupGraphPath);
 
         final String outputRelationPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
-        deletePath(outputRelationPath);
+        removeOutputDir(spark, outputRelationPath);
 
         Dataset<Relation> mergeRels = spark.read()
                 .load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))

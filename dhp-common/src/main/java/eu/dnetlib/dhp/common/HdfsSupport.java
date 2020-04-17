@@ -23,6 +23,21 @@ public class HdfsSupport {
     }
 
     /**
+     * Checks a path (file or dir) exists on HDFS.
+     *
+     * @param path          Path to be checked
+     * @param configuration Configuration of hadoop env
+     */
+    public static boolean exists(String path, Configuration configuration) {
+        logger.info("Removing path: {}", path);
+        return rethrowAsRuntimeException(() -> {
+            Path f = new Path(path);
+            FileSystem fileSystem = FileSystem.get(configuration);
+            return fileSystem.exists(f);
+        });
+    }
+
+    /**
      * Removes a path (file or dir) from HDFS.
      *
      * @param path          Path to be removed
