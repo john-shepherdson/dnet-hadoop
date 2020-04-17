@@ -1,0 +1,27 @@
+[
+	{
+		"field": "source_type",
+		"type": "string",
+		"value": "project"
+	},
+	{
+		"field": "source_id",
+		"type": "string",
+		"value": "corda__h2020::b38a638a93b505d670fcacc47a0283d6"
+	},
+	{
+		"field": "target_type",
+		"type": "string",
+		"value": "publication"
+	},
+	{
+		"field": "target_id",
+		"type": "string",
+		"value": "userclaim___::5b5117253d3c64c79809d0b92fa287b4"
+	},
+	{
+		"field": "semantics",
+		"type": "not_used",
+		"value": "resultProject_outcome_produces"
+	}
+]

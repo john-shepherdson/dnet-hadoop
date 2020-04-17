@@ -1,0 +1,177 @@
+<workflow-app name="Dedup Entities" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>entity</name>
+            <description>the entity that should be processed</description>
+        </property>
+        <property>
+            <name>dedupConf</name>
+            <description>the dedup Configuration</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the target path</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+    </parameters>
+    <start to="DeleteWorkingPath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="DeleteWorkingPath">
+        <fs>
+            <delete path='${targetPath}/${entity}'/>
+            <mkdir path="${targetPath}"/>  
+            <mkdir path="${targetPath}/${entity}"/>              
+        </fs>
+        <ok to="CreateSimRels"/>
+       <error to="Kill"/>
+    </action>
+
+    <action name="CreateSimRels">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Similarity Relations</name>
+            <class>eu.dnetlib.dedup.SparkCreateSimRels</class>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--dedupConf</arg><arg>${dedupConf}</arg>
+        </spark>
+        <ok to="CreateConnectedComponents"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateConnectedComponents">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Connected Components</name>
+            <class>eu.dnetlib.dedup.SparkCreateConnectedComponent</class>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--dedupConf</arg><arg>${dedupConf}</arg>
+        </spark>
+        <ok to="CreateDedupRecord"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateDedupRecord">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Dedup Record</name>
+            <class>eu.dnetlib.dedup.SparkCreateDedupRecord</class>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--dedupPath</arg><arg>${targetPath}</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--dedupConf</arg><arg>${dedupConf}</arg>
+        </spark>
+        <ok to="fixRelation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="fixRelation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Propagate Dedup Relations</name>
+            <class>eu.dnetlib.dedup.sx.SparkPropagateRelationsJob</class>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+           <arg>--mergeRelPath</arg><arg>${targetPath}/${entity}/mergeRel</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--targetRelPath</arg><arg>${targetPath}/${entity}/updated_relation</arg>
+        </spark>
+        <ok to="updateDeletedByInferenceEntity"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="updateDeletedByInferenceEntity">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Update ${entity} and add DedupRecord</name>
+            <class>eu.dnetlib.dedup.sx.SparkUpdateEntityJob</class>
+            <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg><arg>yarn-cluster</arg>
+            <arg>--entityPath</arg><arg>${sourcePath}/${entity}</arg>
+            <arg>--mergeRelPath</arg><arg>${targetPath}/${entity}/mergeRel</arg>
+            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--dedupRecordPath</arg><arg>${targetPath}/${entity}/dedup_records</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/${entity}/updated_record</arg>
+        </spark>
+        <ok to="replaceEntity"/>
+        <error to="Kill"/>
+    </action>
+    <action name="replaceEntity">
+        <fs>
+            <delete path='${sourcePath}/${entity}'/>
+            <delete path='${sourcePath}/relation'/>
+            <move source="${targetPath}/${entity}/updated_relation" target="${sourcePath}/relation" />
+            <move source="${targetPath}/${entity}/updated_record" target="${sourcePath}/${entity}" />
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <end name="End"/>
+</workflow-app>

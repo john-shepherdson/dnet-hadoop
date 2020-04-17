@@ -1,0 +1,32 @@
+[
+	{
+		"paramName": "issm",
+		"paramLongName": "isSparkSessionManaged",
+		"paramDescription": "when true will stop SparkSession after job execution",
+		"paramRequired": false
+	},
+	{
+		"paramName": "rgp",
+		"paramLongName": "rawGraphPath",
+		"paramDescription": "the raw graph path",
+		"paramRequired": true
+	},
+	{
+		"paramName": "cgp",
+		"paramLongName": "claimsGraphPath",
+		"paramDescription": "the path of the claims graph",
+		"paramRequired": true
+	},
+	{
+		"paramName": "ogp",
+		"paramLongName": "outputRawGaphPath",
+		"paramDescription": "the path of output graph, combining raw and claims",
+		"paramRequired": true
+	},
+	{
+		"paramName": "clazz",
+		"paramLongName": "graphTableClassName",
+		"paramDescription": "class name associated to the input entity path",
+		"paramRequired": true
+	}
+]

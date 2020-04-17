@@ -1,0 +1,27 @@
+[
+	{
+		"field": "source_type",
+		"type": "string",
+		"value": "context"
+	},
+	{
+		"field": "source_id",
+		"type": "string",
+		"value": "oa-pg"
+	},
+	{
+		"field": "target_type",
+		"type": "string",
+		"value": "publication"
+	},
+	{
+		"field": "target_id",
+		"type": "string",
+		"value": "userclaim___::d99de49026e79d271f3e7451d8de18b6"
+	},
+	{
+		"field": "semantics",
+		"type": "not_used",
+		"value": "isRelevantTo"
+	}
+]

@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class ExtraInfo implements Serializable {
     private String name;
@@ -52,5 +53,22 @@ public class ExtraInfo implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ExtraInfo extraInfo = (ExtraInfo) o;
+        return Objects.equals(name, extraInfo.name) &&
+                Objects.equals(typology, extraInfo.typology) &&
+                Objects.equals(provenance, extraInfo.provenance) &&
+                Objects.equals(trust, extraInfo.trust) &&
+                Objects.equals(value, extraInfo.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, typology, provenance, trust, value);
     }
 }
