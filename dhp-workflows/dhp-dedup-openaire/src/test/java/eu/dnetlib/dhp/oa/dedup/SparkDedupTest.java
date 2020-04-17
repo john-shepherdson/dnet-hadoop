@@ -81,6 +81,10 @@ public class SparkDedupTest implements Serializable {
 
         lenient().when(isLookUpService.getResourceProfileByQuery(Mockito.contains("publication")))
                 .thenReturn(IOUtils.toString(SparkDedupTest.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/pub.curr.conf.json")));
+
+        lenient().when(isLookUpService.getResourceProfileByQuery(Mockito.contains("software")))
+                .thenReturn(IOUtils.toString(SparkDedupTest.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/sw.curr.conf.json")));
+
     }
 
     @Test
@@ -101,9 +105,11 @@ public class SparkDedupTest implements Serializable {
 
         long orgs_simrel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel").count();
         long pubs_simrel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel").count();
+        long sw_simrel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/software_simrel").count();
 
         assertEquals(3288, orgs_simrel);
         assertEquals(7260, pubs_simrel);
+        assertEquals(344, sw_simrel);
     }
 
     @Test
@@ -124,10 +130,11 @@ public class SparkDedupTest implements Serializable {
 
         long orgs_mergerel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel").count();
         long pubs_mergerel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel").count();
+        long sw_mergerel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/software_mergerel").count();
 
         assertEquals(1244, orgs_mergerel);
         assertEquals(1460, pubs_mergerel);
-
+        assertEquals(288, sw_mergerel);
     }
 
     @Test
@@ -148,9 +155,11 @@ public class SparkDedupTest implements Serializable {
 
         long orgs_deduprecord = jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_deduprecord").count();
         long pubs_deduprecord = jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/publication_deduprecord").count();
+        long sw_deduprecord = jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/software_deduprecord").count();
 
         assertEquals(82, orgs_deduprecord);
         assertEquals(66, pubs_deduprecord);
+        assertEquals(51, sw_deduprecord);
     }
 
     @Test
@@ -171,6 +180,9 @@ public class SparkDedupTest implements Serializable {
 
         long organizations = jsc.textFile(testDedupGraphBasePath + "/organization").count();
         long publications = jsc.textFile(testDedupGraphBasePath + "/publication").count();
+        long projects = jsc.textFile(testDedupGraphBasePath + "/project").count();
+        long datasource = jsc.textFile(testDedupGraphBasePath + "/datasource").count();
+        long softwares = jsc.textFile(testDedupGraphBasePath + "/software").count();
 
         long mergedOrgs = spark
                 .read().load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel").as(Encoders.bean(Relation.class))
@@ -188,6 +200,9 @@ public class SparkDedupTest implements Serializable {
 
         assertEquals(897, publications);
         assertEquals(835, organizations);
+        assertEquals(100, projects);
+        assertEquals(100, datasource);
+        assertEquals(200, softwares);
 
         long deletedOrgs = jsc.textFile(testDedupGraphBasePath + "/organization")
                 .filter(this::isDeletedByInference).count();
