@@ -34,5 +34,17 @@
     "paramLongName":"resultTableName",
     "paramDescription": "the name of the result table we are currently working on",
     "paramRequired": true
+  },
+  {
+    "paramName":"pu",
+    "paramLongName":"possibleUpdatesPath",
+    "paramDescription": "the path the the association resultId orcid author list can be found",
+    "paramRequired": true
+  },
+  {
+    "paramName":"test",
+    "paramLongName":"isTest",
+    "paramDescription": "true if it is executing a test",
+    "paramRequired": false
   }
 ]
