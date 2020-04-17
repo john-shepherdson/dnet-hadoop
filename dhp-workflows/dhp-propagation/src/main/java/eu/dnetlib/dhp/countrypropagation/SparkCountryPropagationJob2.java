@@ -135,12 +135,16 @@ public class SparkCountryPropagationJob2 {
                         for (Qualifier country : r.getCountry()) {
                             countries.add(country.getClassid());
                         }
-
+                        Result res = new Result();
+                        res.setId(r.getId());
+                        List<Country> countryList = new ArrayList<>();
                         for (CountrySbs country : potentialNewCountries.get().getCountrySet()) {
                             if (!countries.contains(country.getClassid())) {
-                                r.getCountry().add(getCountry(country.getClassid(), country.getClassname()));
+                                countryList.add(getCountry(country.getClassid(), country.getClassname()));
                             }
                         }
+                        res.setCountry(countryList);
+                        r.mergeFrom(res);
                     }
                     return r;
                 }, Encoders.bean(resultClazz));
