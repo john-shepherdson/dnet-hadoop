@@ -118,6 +118,9 @@
 
     <action name="SkipPromotePublicationActionPayloadForPublicationTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${workingDir}/publication"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${inputGraphRootPath}/publication</arg>
             <arg>${workingDir}/publication</arg>
@@ -166,6 +169,9 @@
 
     <action name="SkipPromoteResultActionPayloadForPublicationTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${outputGraphRootPath}/publication"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${workingDir}/publication</arg>
             <arg>${outputGraphRootPath}/publication</arg>
