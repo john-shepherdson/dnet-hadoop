@@ -98,15 +98,20 @@ public class SparkResultToCommunityFromOrganizationJob2 {
                     if(rcl.isPresent()){
                         ArrayList<String> communitySet = rcl.get().getCommunityList();
                         List<String> contextList = ret.getContext().stream().map(con -> con.getId()).collect(Collectors.toList());
+                        Result res = new Result();
+                        res.setId(ret.getId());
+                        List<Context> propagatedContexts = new ArrayList<>();
                         for(String cId:communitySet){
                             if(!contextList.contains(cId)){
                                 Context newContext = new Context();
                                 newContext.setId(cId);
                                 newContext.setDataInfo(Arrays.asList(getDataInfo(PROPAGATION_DATA_INFO_TYPE,
                                         PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME)));
-                                ret.getContext().add(newContext);
+                                propagatedContexts.add(newContext);
                             }
                         }
+                        res.setContext(propagatedContexts);
+                        ret.mergeFrom(res);
                     }
                     return ret;
                 }, Encoders.bean(resultClazz))
