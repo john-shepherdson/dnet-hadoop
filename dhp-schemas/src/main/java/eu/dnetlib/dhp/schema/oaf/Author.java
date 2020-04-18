@@ -71,12 +71,12 @@ public class Author implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Author author = (Author) o;
-        return Objects.equals(fullname, author.fullname) &&
-                Objects.equals(name, author.name) &&
-                Objects.equals(surname, author.surname) &&
-                Objects.equals(rank, author.rank) &&
-                Objects.equals(pid, author.pid) &&
-                Objects.equals(affiliation, author.affiliation);
+        return Objects.equals(fullname, author.fullname)
+                && Objects.equals(name, author.name)
+                && Objects.equals(surname, author.surname)
+                && Objects.equals(rank, author.rank)
+                && Objects.equals(pid, author.pid)
+                && Objects.equals(affiliation, author.affiliation);
     }
 
     @Override

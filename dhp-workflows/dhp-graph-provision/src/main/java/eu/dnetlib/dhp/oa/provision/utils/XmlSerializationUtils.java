@@ -1,41 +1,43 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import eu.dnetlib.dhp.schema.oaf.*;
-
 import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class XmlSerializationUtils {
 
     // XML 1.0
     // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-    private final static String xml10pattern = "[^"
-            + "\u0009\r\n"
-            + "\u0020-\uD7FF"
-            + "\uE000-\uFFFD"
-            + "\ud800\udc00-\udbff\udfff"
-            + "]";
+    private static final String xml10pattern =
+            "[^"
+                    + "\u0009\r\n"
+                    + "\u0020-\uD7FF"
+                    + "\uE000-\uFFFD"
+                    + "\ud800\udc00-\udbff\udfff"
+                    + "]";
 
     public static String mapJournal(Journal j) {
-        final String attrs = new StringBuilder()
-            .append(attr("issn", j.getIssnPrinted()))
-            .append(attr("eissn", j.getIssnOnline()))
-            .append(attr("lissn", j.getIssnLinking()))
-            .append(attr("ep", j.getEp()))
-            .append(attr("iss", j.getIss()))
-            .append(attr("sp", j.getSp()))
-            .append(attr("vol", j.getVol()))
-            .toString()
-            .trim();
+        final String attrs =
+                new StringBuilder()
+                        .append(attr("issn", j.getIssnPrinted()))
+                        .append(attr("eissn", j.getIssnOnline()))
+                        .append(attr("lissn", j.getIssnLinking()))
+                        .append(attr("ep", j.getEp()))
+                        .append(attr("iss", j.getIss()))
+                        .append(attr("sp", j.getSp()))
+                        .append(attr("vol", j.getVol()))
+                        .toString()
+                        .trim();
 
         return new StringBuilder()
-            .append("<journal")
-            .append(isNotBlank(attrs) ? (" " + attrs) : "")
-            .append(">")
-            .append(escapeXml(j.getName()))
-            .append("</journal>")
-            .toString();
+                .append("<journal")
+                .append(isNotBlank(attrs) ? (" " + attrs) : "")
+                .append(">")
+                .append(escapeXml(j.getName()))
+                .append("</journal>")
+                .toString();
     }
 
     private static String attr(final String name, final String value) {
@@ -43,7 +45,11 @@ public class XmlSerializationUtils {
     }
 
     public static String mapStructuredProperty(String name, StructuredProperty t) {
-        return asXmlElement(name, t.getValue(), t.getQualifier(), t.getDataInfo() != null ? t.getDataInfo() : null);
+        return asXmlElement(
+                name,
+                t.getValue(),
+                t.getQualifier(),
+                t.getDataInfo() != null ? t.getDataInfo() : null);
     }
 
     public static String mapQualifier(String name, Qualifier q) {
@@ -51,8 +57,7 @@ public class XmlSerializationUtils {
     }
 
     public static String escapeXml(final String value) {
-        return value
-                .replaceAll("&", "&amp;")
+        return value.replaceAll("&", "&amp;")
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;")
                 .replaceAll("\"", "&quot;")
@@ -67,16 +72,25 @@ public class XmlSerializationUtils {
                 .append(asXmlElement("deletedbyinference", dataInfo.getDeletedbyinference() + ""))
                 .append(asXmlElement("trust", dataInfo.getTrust() + ""))
                 .append(asXmlElement("inferenceprovenance", dataInfo.getInferenceprovenance() + ""))
-                .append(asXmlElement("provenanceaction", null, dataInfo.getProvenanceaction(), null))
+                .append(
+                        asXmlElement(
+                                "provenanceaction", null, dataInfo.getProvenanceaction(), null))
                 .append("</datainfo>")
                 .toString();
     }
 
     private static StringBuilder dataInfoAsAttributes(final StringBuilder sb, final DataInfo info) {
-        return sb
-                .append(attr("inferred", info.getInferred() != null ? info.getInferred().toString() : ""))
+        return sb.append(
+                        attr(
+                                "inferred",
+                                info.getInferred() != null ? info.getInferred().toString() : ""))
                 .append(attr("inferenceprovenance", info.getInferenceprovenance()))
-                .append(attr("provenanceaction", info.getProvenanceaction() != null ? info.getProvenanceaction().getClassid() : ""))
+                .append(
+                        attr(
+                                "provenanceaction",
+                                info.getProvenanceaction() != null
+                                        ? info.getProvenanceaction().getClassid()
+                                        : ""))
                 .append(attr("trust", info.getTrust()));
     }
 
@@ -108,7 +122,8 @@ public class XmlSerializationUtils {
         return asXmlElement(name, value, null, null);
     }
 
-    public static String asXmlElement(final String name, final String value, final Qualifier q, final DataInfo info) {
+    public static String asXmlElement(
+            final String name, final String value, final Qualifier q, final DataInfo info) {
         StringBuilder sb = new StringBuilder();
         sb.append("<");
         sb.append(name);
@@ -116,12 +131,21 @@ public class XmlSerializationUtils {
             sb.append(getAttributes(q));
         }
         if (info != null) {
-            sb
-                .append(" ")
-                .append(attr("inferred", info.getInferred() != null ? info.getInferred().toString() : ""))
-                .append(attr("inferenceprovenance", info.getInferenceprovenance()))
-                .append(attr("provenanceaction", info.getProvenanceaction() != null ? info.getProvenanceaction().getClassid() : ""))
-                .append(attr("trust", info.getTrust()));
+            sb.append(" ")
+                    .append(
+                            attr(
+                                    "inferred",
+                                    info.getInferred() != null
+                                            ? info.getInferred().toString()
+                                            : ""))
+                    .append(attr("inferenceprovenance", info.getInferenceprovenance()))
+                    .append(
+                            attr(
+                                    "provenanceaction",
+                                    info.getProvenanceaction() != null
+                                            ? info.getProvenanceaction().getClassid()
+                                            : ""))
+                    .append(attr("trust", info.getTrust()));
         }
         if (isBlank(value)) {
             sb.append("/>");
@@ -147,5 +171,4 @@ public class XmlSerializationUtils {
                 .append(attr("schemename", q.getSchemename()))
                 .toString();
     }
-
 }

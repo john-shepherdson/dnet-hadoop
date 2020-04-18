@@ -1,18 +1,16 @@
 package eu.dnetlib.dhp.utils;
 
 import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONArray;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import net.minidev.json.JSONArray;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.commons.codec.binary.Hex;
 
 public class DHPUtils {
 
@@ -28,41 +26,40 @@ public class DHPUtils {
     }
 
     public static String generateIdentifier(final String originalId, final String nsPrefix) {
-        return String.format("%s::%s",nsPrefix, DHPUtils.md5(originalId));
+        return String.format("%s::%s", nsPrefix, DHPUtils.md5(originalId));
     }
 
-    public static String compressString(final String input ) {
-        try ( ByteArrayOutputStream out = new ByteArrayOutputStream();  Base64OutputStream b64os = new Base64OutputStream(out)) {
+    public static String compressString(final String input) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+                Base64OutputStream b64os = new Base64OutputStream(out)) {
             GZIPOutputStream gzip = new GZIPOutputStream(b64os);
             gzip.write(input.getBytes(StandardCharsets.UTF_8));
             gzip.close();
             return out.toString();
-        } catch (Throwable e ) {
+        } catch (Throwable e) {
             return null;
         }
     }
 
-
     public static String decompressString(final String input) {
         byte[] byteArray = Base64.decodeBase64(input.getBytes());
         int len;
-        try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream((byteArray))); ByteArrayOutputStream bos = new ByteArrayOutputStream(byteArray.length)) {
+        try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream((byteArray)));
+                ByteArrayOutputStream bos = new ByteArrayOutputStream(byteArray.length)) {
             byte[] buffer = new byte[1024];
-            while((len = gis.read(buffer)) != -1){
+            while ((len = gis.read(buffer)) != -1) {
                 bos.write(buffer, 0, len);
             }
             return bos.toString();
         } catch (Exception e) {
             return null;
         }
-
     }
 
     public static String getJPathString(final String jsonPath, final String json) {
         try {
             Object o = JsonPath.read(json, jsonPath);
-            if (o instanceof String)
-                return (String) o;
+            if (o instanceof String) return (String) o;
             if (o instanceof JSONArray && ((JSONArray) o).size() > 0)
                 return (String) ((JSONArray) o).get(0);
             return o.toString();
@@ -70,5 +67,4 @@ public class DHPUtils {
             return "";
         }
     }
-
 }

@@ -3,13 +3,12 @@ package eu.dnetlib.dhp.oa.provision.model;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Maps;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-
 import java.io.Serializable;
 import java.util.Map;
 
 public class SortableRelation extends Relation implements Comparable<Relation>, Serializable {
 
-    private final static Map<String, Integer> weights = Maps.newHashMap();
+    private static final Map<String, Integer> weights = Maps.newHashMap();
 
     static {
         weights.put("outcome", 0);

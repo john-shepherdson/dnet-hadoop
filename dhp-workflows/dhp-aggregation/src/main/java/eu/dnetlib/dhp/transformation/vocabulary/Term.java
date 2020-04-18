@@ -10,7 +10,6 @@ public class Term implements Serializable {
     private String code;
     private String synonyms;
 
-
     public String getEnglishName() {
         return englishName;
     }

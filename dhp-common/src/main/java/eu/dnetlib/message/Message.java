@@ -2,7 +2,6 @@ package eu.dnetlib.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -16,20 +15,12 @@ public class Message {
 
     private Map<String, String> body;
 
-
     public static Message fromJson(final String json) throws IOException {
         final ObjectMapper jsonMapper = new ObjectMapper();
         return jsonMapper.readValue(json, Message.class);
-
-
     }
 
-
-    public Message() {
-
-
-
-    }
+    public Message() {}
 
     public Message(String workflowId, String jobName, MessageType type, Map<String, String> body) {
         this.workflowId = workflowId;

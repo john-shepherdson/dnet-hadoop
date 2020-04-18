@@ -1,10 +1,6 @@
 package eu.dnetlib.dhp.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.cli.*;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
@@ -12,7 +8,9 @@ import java.io.StringWriter;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import java.util.zip.Inflater;
+import org.apache.commons.cli.*;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 
 public class ArgumentApplicationParser implements Serializable {
 
@@ -23,7 +21,8 @@ public class ArgumentApplicationParser implements Serializable {
 
     public ArgumentApplicationParser(final String json_configuration) throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
-        final OptionsParameter[] configuration = mapper.readValue(json_configuration, OptionsParameter[].class);
+        final OptionsParameter[] configuration =
+                mapper.readValue(json_configuration, OptionsParameter[].class);
         createOptionMap(configuration);
     }
 
@@ -33,22 +32,25 @@ public class ArgumentApplicationParser implements Serializable {
 
     private void createOptionMap(final OptionsParameter[] configuration) {
 
-        Arrays.stream(configuration).map(conf -> {
-            final Option o = new Option(conf.getParamName(), true, conf.getParamDescription());
-            o.setLongOpt(conf.getParamLongName());
-            o.setRequired(conf.isParamRequired());
-            if (conf.isCompressed()) {
-                compressedValues.add(conf.getParamLongName());
-            }
-            return o;
-        }).forEach(options::addOption);
+        Arrays.stream(configuration)
+                .map(
+                        conf -> {
+                            final Option o =
+                                    new Option(
+                                            conf.getParamName(), true, conf.getParamDescription());
+                            o.setLongOpt(conf.getParamLongName());
+                            o.setRequired(conf.isParamRequired());
+                            if (conf.isCompressed()) {
+                                compressedValues.add(conf.getParamLongName());
+                            }
+                            return o;
+                        })
+                .forEach(options::addOption);
 
-//        HelpFormatter formatter = new HelpFormatter();
-//        formatter.printHelp("myapp", null, options, null, true);
-
+        //        HelpFormatter formatter = new HelpFormatter();
+        //        formatter.printHelp("myapp", null, options, null, true);
 
     }
-
 
     public static String decompressValue(final String abstractCompressed) {
         try {
@@ -63,7 +65,7 @@ public class ArgumentApplicationParser implements Serializable {
         }
     }
 
-    public static String compressArgument(final String value)  throws Exception{
+    public static String compressArgument(final String value) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         GZIPOutputStream gzip = new GZIPOutputStream(out);
         gzip.write(value.getBytes());
@@ -74,7 +76,14 @@ public class ArgumentApplicationParser implements Serializable {
     public void parseArgument(final String[] args) throws Exception {
         CommandLineParser parser = new BasicParser();
         CommandLine cmd = parser.parse(options, args);
-        Arrays.stream(cmd.getOptions()).forEach(it -> objectMap.put(it.getLongOpt(), compressedValues.contains(it.getLongOpt())? decompressValue(it.getValue()): it.getValue()));
+        Arrays.stream(cmd.getOptions())
+                .forEach(
+                        it ->
+                                objectMap.put(
+                                        it.getLongOpt(),
+                                        compressedValues.contains(it.getLongOpt())
+                                                ? decompressValue(it.getValue())
+                                                : it.getValue()));
     }
 
     public String get(final String key) {

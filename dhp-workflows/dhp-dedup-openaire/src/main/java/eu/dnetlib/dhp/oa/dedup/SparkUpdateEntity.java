@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.dedup.model.Block;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
@@ -9,10 +8,8 @@ import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.model.FieldListImpl;
-import eu.dnetlib.pace.model.FieldValueImpl;
-import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
+import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -32,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
-import java.io.IOException;
-
 public class SparkUpdateEntity extends AbstractSparkAction {
 
     private static final Logger log = LoggerFactory.getLogger(SparkUpdateEntity.class);
@@ -45,10 +40,11 @@ public class SparkUpdateEntity extends AbstractSparkAction {
     }
 
     public static void main(String[] args) throws Exception {
-        ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils.toString(
-                        SparkUpdateEntity.class.getResourceAsStream(
-                                "/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
+        ArgumentApplicationParser parser =
+                new ArgumentApplicationParser(
+                        IOUtils.toString(
+                                SparkUpdateEntity.class.getResourceAsStream(
+                                        "/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
         parser.parseArgument(args);
 
         SparkConf conf = new SparkConf();
@@ -71,43 +67,62 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-        //for each entity
-        ModelSupport.entityTypes.forEach((entity, clazz) -> {
-            final String outputPath = dedupGraphPath + "/" + entity;
-            removeOutputDir(spark, outputPath);
+        // for each entity
+        ModelSupport.entityTypes.forEach(
+                (entity, clazz) -> {
+                    final String outputPath = dedupGraphPath + "/" + entity;
+                    removeOutputDir(spark, outputPath);
 
-            JavaRDD<String> sourceEntity = sc.textFile(DedupUtility.createEntityPath(graphBasePath, entity.toString()));
+                    JavaRDD<String> sourceEntity =
+                            sc.textFile(
+                                    DedupUtility.createEntityPath(
+                                            graphBasePath, entity.toString()));
 
-            if (mergeRelExists(workingPath, entity.toString())) {
+                    if (mergeRelExists(workingPath, entity.toString())) {
 
-                final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, "*", entity.toString());
-                final String dedupRecordPath = DedupUtility.createDedupRecordPath(workingPath, "*", entity.toString());
+                        final String mergeRelPath =
+                                DedupUtility.createMergeRelPath(
+                                        workingPath, "*", entity.toString());
+                        final String dedupRecordPath =
+                                DedupUtility.createDedupRecordPath(
+                                        workingPath, "*", entity.toString());
 
-                final Dataset<Relation> rel = spark.read()
-                        .load(mergeRelPath)
-                        .as(Encoders.bean(Relation.class));
+                        final Dataset<Relation> rel =
+                                spark.read().load(mergeRelPath).as(Encoders.bean(Relation.class));
 
-                final JavaPairRDD<String, String> mergedIds = rel
-                        .where("relClass == 'merges'")
-                        .select(rel.col("target"))
-                        .distinct()
-                        .toJavaRDD()
-                        .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "d"));
+                        final JavaPairRDD<String, String> mergedIds =
+                                rel.where("relClass == 'merges'")
+                                        .select(rel.col("target"))
+                                        .distinct()
+                                        .toJavaRDD()
+                                        .mapToPair(
+                                                (PairFunction<Row, String, String>)
+                                                        r -> new Tuple2<>(r.getString(0), "d"));
 
-                JavaPairRDD<String, String> entitiesWithId = sourceEntity
-                        .mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
+                        JavaPairRDD<String, String> entitiesWithId =
+                                sourceEntity.mapToPair(
+                                        (PairFunction<String, String, String>)
+                                                s ->
+                                                        new Tuple2<>(
+                                                                MapDocumentUtil.getJPathString(
+                                                                        IDJSONPATH, s),
+                                                                s));
 
-                JavaRDD<String> map = entitiesWithId
-                        .leftOuterJoin(mergedIds)
-                        .map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), clazz) : k._2()._1());
+                        JavaRDD<String> map =
+                                entitiesWithId
+                                        .leftOuterJoin(mergedIds)
+                                        .map(
+                                                k ->
+                                                        k._2()._2().isPresent()
+                                                                ? updateDeletedByInference(
+                                                                        k._2()._1(), clazz)
+                                                                : k._2()._1());
 
-                sourceEntity = map.union(sc.textFile(dedupRecordPath));
-            }
+                        sourceEntity = map.union(sc.textFile(dedupRecordPath));
+                    }
 
-            sourceEntity.saveAsTextFile(outputPath, GzipCodec.class);
-
-        });
-
+                    sourceEntity.saveAsTextFile(outputPath, GzipCodec.class);
+                });
     }
 
     public boolean mergeRelExists(String basePath, String entity) {
@@ -120,7 +135,10 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 
             for (FileStatus fs : fileStatuses) {
                 if (fs.isDirectory())
-                    if (fileSystem.exists(new Path(DedupUtility.createMergeRelPath(basePath, fs.getPath().getName(), entity))))
+                    if (fileSystem.exists(
+                            new Path(
+                                    DedupUtility.createMergeRelPath(
+                                            basePath, fs.getPath().getName(), entity))))
                         result = true;
             }
 
@@ -130,16 +148,15 @@ public class SparkUpdateEntity extends AbstractSparkAction {
         }
     }
 
-    private static <T extends OafEntity> String updateDeletedByInference(final String json, final Class<T> clazz) {
+    private static <T extends OafEntity> String updateDeletedByInference(
+            final String json, final Class<T> clazz) {
         try {
             Oaf entity = OBJECT_MAPPER.readValue(json, clazz);
-            if (entity.getDataInfo()== null)
-                entity.setDataInfo(new DataInfo());
+            if (entity.getDataInfo() == null) entity.setDataInfo(new DataInfo());
             entity.getDataInfo().setDeletedbyinference(true);
             return OBJECT_MAPPER.writeValueAsString(entity);
         } catch (IOException e) {
             throw new RuntimeException("Unable to convert json", e);
         }
     }
-
 }

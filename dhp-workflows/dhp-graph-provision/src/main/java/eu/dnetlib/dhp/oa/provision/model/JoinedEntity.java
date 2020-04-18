@@ -9,8 +9,7 @@ public class JoinedEntity implements Serializable {
 
     private List<Tuple2> links;
 
-    public JoinedEntity() {
-    }
+    public JoinedEntity() {}
 
     public TypedRow getEntity() {
         return entity;

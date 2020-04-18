@@ -1,6 +1,5 @@
 package eu.dnetlib.dhp.application;
 
-
 public class OptionsParameter {
 
     private String paramName;
@@ -9,8 +8,7 @@ public class OptionsParameter {
     private boolean paramRequired;
     private boolean compressed;
 
-    public OptionsParameter() {
-    }
+    public OptionsParameter() {}
 
     public String getParamName() {
         return paramName;

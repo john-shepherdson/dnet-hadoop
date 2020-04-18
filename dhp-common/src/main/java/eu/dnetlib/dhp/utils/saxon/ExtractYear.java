@@ -1,5 +1,9 @@
 package eu.dnetlib.dhp.utils.saxon;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.om.Item;
 import net.sf.saxon.om.Sequence;
@@ -7,14 +11,9 @@ import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.value.SequenceType;
 import net.sf.saxon.value.StringValue;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 public class ExtractYear extends AbstractExtensionFunction {
 
-    private static final String[] dateFormats = { "yyyy-MM-dd", "yyyy/MM/dd" };
+    private static final String[] dateFormats = {"yyyy-MM-dd", "yyyy/MM/dd"};
 
     @Override
     public String getName() {
@@ -45,7 +44,7 @@ public class ExtractYear extends AbstractExtensionFunction {
 
     @Override
     public SequenceType[] getArgumentTypes() {
-        return new SequenceType[] { SequenceType.OPTIONAL_ITEM };
+        return new SequenceType[] {SequenceType.OPTIONAL_ITEM};
     }
 
     @Override
@@ -60,7 +59,8 @@ public class ExtractYear extends AbstractExtensionFunction {
                 c.setTime(new SimpleDateFormat(format).parse(s));
                 String year = String.valueOf(c.get(Calendar.YEAR));
                 return year;
-            } catch (ParseException e) {}
+            } catch (ParseException e) {
+            }
         }
         return "";
     }

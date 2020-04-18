@@ -1,20 +1,17 @@
 package eu.dnetlib.dhp.parser.utility;
 
+import com.ximpleware.AutoPilot;
+import com.ximpleware.VTDNav;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import com.ximpleware.AutoPilot;
-import com.ximpleware.VTDNav;
-
-/**
- * Created by sandro on 9/29/16.
- */
+/** Created by sandro on 9/29/16. */
 public class VtdUtilityParser {
 
-    public static List<Node> getTextValuesWithAttributes(final AutoPilot ap, final VTDNav vn, final String xpath, final List<String> attributes)
+    public static List<Node> getTextValuesWithAttributes(
+            final AutoPilot ap, final VTDNav vn, final String xpath, final List<String> attributes)
             throws VtdException {
         final List<Node> results = new ArrayList<>();
         try {
@@ -35,25 +32,28 @@ public class VtdUtilityParser {
         }
     }
 
-    private static Map<String, String> getAttributes(final VTDNav vn, final List<String> attributes) {
+    private static Map<String, String> getAttributes(
+            final VTDNav vn, final List<String> attributes) {
         final Map<String, String> currentAttributes = new HashMap<>();
         if (attributes != null) {
 
-            attributes.forEach(attributeKey -> {
-                try {
-                    int attr = vn.getAttrVal(attributeKey);
-                    if (attr > -1) {
-                        currentAttributes.put(attributeKey, vn.toNormalizedString(attr));
-                    }
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            attributes.forEach(
+                    attributeKey -> {
+                        try {
+                            int attr = vn.getAttrVal(attributeKey);
+                            if (attr > -1) {
+                                currentAttributes.put(attributeKey, vn.toNormalizedString(attr));
+                            }
+                        } catch (Throwable e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
         }
         return currentAttributes;
     }
 
-    public static List<String> getTextValue(final AutoPilot ap, final VTDNav vn, final String xpath) throws VtdException {
+    public static List<String> getTextValue(final AutoPilot ap, final VTDNav vn, final String xpath)
+            throws VtdException {
         List<String> results = new ArrayList<>();
         try {
             ap.selectXPath(xpath);
@@ -67,13 +67,13 @@ public class VtdUtilityParser {
         }
     }
 
-    public static String getSingleValue(final AutoPilot ap, final VTDNav nav, final String xpath) throws VtdException {
+    public static String getSingleValue(final AutoPilot ap, final VTDNav nav, final String xpath)
+            throws VtdException {
         try {
             ap.selectXPath(xpath);
             while (ap.evalXPath() != -1) {
                 int it = nav.getText();
-                if (it > -1)
-                    return nav.toNormalizedString(it);
+                if (it > -1) return nav.toNormalizedString(it);
             }
             return null;
         } catch (Exception e) {
@@ -103,5 +103,4 @@ public class VtdUtilityParser {
             this.attributes = attributes;
         }
     }
-
 }

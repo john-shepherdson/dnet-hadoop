@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
+import com.google.common.collect.Lists;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -10,29 +11,23 @@ import javax.xml.stream.*;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
-import com.google.common.collect.Lists;
 import org.apache.solr.common.SolrInputDocument;
 
 /**
  * Optimized version of the document parser, drop in replacement of InputDocumentFactory.
  *
- * <p>
- * Faster because:
- * </p>
+ * <p>Faster because:
+ *
  * <ul>
- * <li>Doesn't create a DOM for the full document</li>
- * <li>Doesn't execute xpaths agains the DOM</li>
- * <li>Quickly serialize the 'result' element directly in a string.</li>
- * <li>Uses less memory: less pressure on GC and allows more threads to process this in parallel</li>
+ *   <li>Doesn't create a DOM for the full document
+ *   <li>Doesn't execute xpaths agains the DOM
+ *   <li>Quickly serialize the 'result' element directly in a string.
+ *   <li>Uses less memory: less pressure on GC and allows more threads to process this in parallel
  * </ul>
  *
- * <p>
- * This class is fully reentrant and can be invoked in parallel.
- * </p>
+ * <p>This class is fully reentrant and can be invoked in parallel.
  *
  * @author claudio
- *
  */
 public class StreamingInputDocumentFactory {
 
@@ -50,7 +45,9 @@ public class StreamingInputDocumentFactory {
 
     private static final String outFormat = new String("yyyy-MM-dd'T'hh:mm:ss'Z'");
 
-    private final static List<String> dateFormats = Arrays.asList("yyyy-MM-dd'T'hh:mm:ss", "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy", "yyyy");
+    private static final List<String> dateFormats =
+            Arrays.asList(
+                    "yyyy-MM-dd'T'hh:mm:ss", "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy", "yyyy");
 
     private static final String DEFAULTDNETRESULT = "dnetResult";
 
@@ -62,11 +59,14 @@ public class StreamingInputDocumentFactory {
 
     private static final int MAX_FIELD_LENGTH = 25000;
 
-    private ThreadLocal<XMLInputFactory> inputFactory = ThreadLocal.withInitial(() -> XMLInputFactory.newInstance());
+    private ThreadLocal<XMLInputFactory> inputFactory =
+            ThreadLocal.withInitial(() -> XMLInputFactory.newInstance());
 
-    private ThreadLocal<XMLOutputFactory> outputFactory = ThreadLocal.withInitial(() -> XMLOutputFactory.newInstance());
+    private ThreadLocal<XMLOutputFactory> outputFactory =
+            ThreadLocal.withInitial(() -> XMLOutputFactory.newInstance());
 
-    private ThreadLocal<XMLEventFactory> eventFactory = ThreadLocal.withInitial(() -> XMLEventFactory.newInstance());
+    private ThreadLocal<XMLEventFactory> eventFactory =
+            ThreadLocal.withInitial(() -> XMLEventFactory.newInstance());
 
     private String version;
 
@@ -78,7 +78,8 @@ public class StreamingInputDocumentFactory {
         this(version, dsId, DEFAULTDNETRESULT);
     }
 
-    public StreamingInputDocumentFactory(final String version, final String dsId, final String resultName) {
+    public StreamingInputDocumentFactory(
+            final String version, final String dsId, final String resultName) {
         this.version = version;
         this.dsId = dsId;
         this.resultName = resultName;
@@ -90,7 +91,8 @@ public class StreamingInputDocumentFactory {
         final List<Namespace> nsList = Lists.newLinkedList();
         try {
 
-            XMLEventReader parser = inputFactory.get().createXMLEventReader(new StringReader(inputDocument));
+            XMLEventReader parser =
+                    inputFactory.get().createXMLEventReader(new StringReader(inputDocument));
 
             final SolrInputDocument indexDocument = new SolrInputDocument(new HashMap<>());
 
@@ -150,13 +152,16 @@ public class StreamingInputDocumentFactory {
      * @param parser
      * @throws XMLStreamException
      */
-    protected void parseTargetFields(final SolrInputDocument indexDocument, final XMLEventReader parser) throws XMLStreamException {
+    protected void parseTargetFields(
+            final SolrInputDocument indexDocument, final XMLEventReader parser)
+            throws XMLStreamException {
 
         boolean hasFields = false;
 
         while (parser.hasNext()) {
             final XMLEvent targetEvent = parser.nextEvent();
-            if (targetEvent.isEndElement() && targetEvent.asEndElement().getName().getLocalPart().equals(TARGETFIELDS)) {
+            if (targetEvent.isEndElement()
+                    && targetEvent.asEndElement().getName().getLocalPart().equals(TARGETFIELDS)) {
                 break;
             }
 
@@ -185,18 +190,21 @@ public class StreamingInputDocumentFactory {
      * @param nsList
      * @throws XMLStreamException
      */
-    protected void copyResult(final SolrInputDocument indexDocument,
-                              final StringWriter results,
-                              final XMLEventReader parser,
-                              final List<Namespace> nsList,
-                              final String dnetResult) throws XMLStreamException {
+    protected void copyResult(
+            final SolrInputDocument indexDocument,
+            final StringWriter results,
+            final XMLEventReader parser,
+            final List<Namespace> nsList,
+            final String dnetResult)
+            throws XMLStreamException {
         final XMLEventWriter writer = outputFactory.get().createXMLEventWriter(results);
 
         for (Namespace ns : nsList) {
             eventFactory.get().createNamespace(ns.getPrefix(), ns.getNamespaceURI());
         }
 
-        StartElement newRecord = eventFactory.get().createStartElement("", null, RESULT, null, nsList.iterator());
+        StartElement newRecord =
+                eventFactory.get().createStartElement("", null, RESULT, null, nsList.iterator());
 
         // new root record
         writer.add(newRecord);
@@ -206,7 +214,8 @@ public class StreamingInputDocumentFactory {
             final XMLEvent resultEvent = parser.nextEvent();
 
             // TODO: replace with depth tracking instead of close tag tracking.
-            if (resultEvent.isEndElement() && resultEvent.asEndElement().getName().getLocalPart().equals(dnetResult)) {
+            if (resultEvent.isEndElement()
+                    && resultEvent.asEndElement().getName().getLocalPart().equals(dnetResult)) {
                 writer.add(eventFactory.get().createEndElement("", null, RESULT));
                 break;
             }
@@ -224,7 +233,8 @@ public class StreamingInputDocumentFactory {
      * @param field
      * @param value
      */
-    private final void addField(final SolrInputDocument indexDocument, final String field, final String value) {
+    private final void addField(
+            final SolrInputDocument indexDocument, final String field, final String value) {
         String cleaned = value.trim();
         if (!cleaned.isEmpty()) {
             // log.info("\n\n adding field " + field.toLowerCase() + " value: " + cleaned + "\n");
@@ -239,7 +249,8 @@ public class StreamingInputDocumentFactory {
      * @return the
      */
     protected final String getText(final XMLEvent text) {
-        if (text.isEndElement()) // log.warn("skipping because isEndOfElement " + text.asEndElement().getName().getLocalPart());
+        if (text.isEndElement()) // log.warn("skipping because isEndOfElement " +
+            // text.asEndElement().getName().getLocalPart());
             return "";
 
         final String data = text.asCharacters().getData();
@@ -249,5 +260,4 @@ public class StreamingInputDocumentFactory {
 
         return data;
     }
-
 }

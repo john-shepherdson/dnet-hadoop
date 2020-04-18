@@ -1,7 +1,6 @@
 package eu.dnetlib.dedup;
 
 public enum OafEntityType {
-
     datasource,
     organization,
     project,
@@ -9,7 +8,4 @@ public enum OafEntityType {
     otherresearchproduct,
     software,
     publication
-
-
-
 }

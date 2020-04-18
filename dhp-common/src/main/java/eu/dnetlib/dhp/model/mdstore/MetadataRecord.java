@@ -1,66 +1,52 @@
 package eu.dnetlib.dhp.model.mdstore;
 
 import eu.dnetlib.dhp.utils.DHPUtils;
-
 import java.io.Serializable;
 
-
-/**
- * This class models a record inside the new Metadata store collection on HDFS *
- *
- */
+/** This class models a record inside the new Metadata store collection on HDFS * */
 public class MetadataRecord implements Serializable {
 
-    /**
-     * The D-Net Identifier associated to the record
-     */
+    /** The D-Net Identifier associated to the record */
     private String id;
 
-    /**
-     * The original Identifier of the record
-     */
+    /** The original Identifier of the record */
     private String originalId;
 
-
-    /**
-     * The encoding of the record, should be JSON or XML
-     */
+    /** The encoding of the record, should be JSON or XML */
     private String encoding;
 
     /**
-     * The information about the provenance of the record see @{@link Provenance}
-     * for the model of this information
+     * The information about the provenance of the record see @{@link Provenance} for the model of
+     * this information
      */
     private Provenance provenance;
 
-    /**
-     * The content of the metadata
-     */
+    /** The content of the metadata */
     private String body;
 
-    /**
-     * the date when the record has been stored
-     */
+    /** the date when the record has been stored */
     private long dateOfCollection;
 
-    /**
-     * the date when the record has been stored
-     */
+    /** the date when the record has been stored */
     private long dateOfTransformation;
-
 
     public MetadataRecord() {
         this.dateOfCollection = System.currentTimeMillis();
     }
 
-    public MetadataRecord(String originalId, String encoding, Provenance provenance, String body, long dateOfCollection) {
+    public MetadataRecord(
+            String originalId,
+            String encoding,
+            Provenance provenance,
+            String body,
+            long dateOfCollection) {
 
         this.originalId = originalId;
         this.encoding = encoding;
         this.provenance = provenance;
         this.body = body;
         this.dateOfCollection = dateOfCollection;
-        this.id = DHPUtils.generateIdentifier(originalId,this.provenance.getNsPrefix());
+        this.id = DHPUtils.generateIdentifier(originalId, this.provenance.getNsPrefix());
     }
 
     public String getId() {
@@ -70,7 +56,6 @@ public class MetadataRecord implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
-
 
     public String getOriginalId() {
         return originalId;
@@ -95,7 +80,6 @@ public class MetadataRecord implements Serializable {
     public void setProvenance(Provenance provenance) {
         this.provenance = provenance;
     }
-
 
     public String getBody() {
         return body;
@@ -127,7 +111,6 @@ public class MetadataRecord implements Serializable {
             return false;
         }
         return ((MetadataRecord) o).getId().equalsIgnoreCase(id);
-
     }
 
     @Override

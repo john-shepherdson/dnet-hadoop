@@ -7,8 +7,7 @@ public class ScholixRelationship implements Serializable {
     private String schema;
     private String inverse;
 
-    public ScholixRelationship() {
-    }
+    public ScholixRelationship() {}
 
     public ScholixRelationship(String name, String schema, String inverse) {
         this.name = name;

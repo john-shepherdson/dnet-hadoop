@@ -16,19 +16,21 @@ public class Instance implements Serializable {
     private List<String> url;
 
     // other research products specifc
-    private  String distributionlocation;
+    private String distributionlocation;
 
     private KeyValue collectedfrom;
 
     private Field<String> dateofacceptance;
 
-    // ( article | book ) processing charges. Defined here to cope with possible wrongly typed results
+    // ( article | book ) processing charges. Defined here to cope with possible wrongly typed
+    // results
     private Field<String> processingchargeamount;
 
-    // currency - alphabetic code describe in ISO-4217. Defined here to cope with possible wrongly typed results
+    // currency - alphabetic code describe in ISO-4217. Defined here to cope with possible wrongly
+    // typed results
     private Field<String> processingchargecurrency;
 
-    private Field<String> refereed; //peer-review status
+    private Field<String> refereed; // peer-review status
 
     public Field<String> getLicense() {
         return license;
@@ -118,12 +120,19 @@ public class Instance implements Serializable {
         this.refereed = refereed;
     }
 
-    public String toComparableString(){
-        return String.format("%s::%s::%s::%s",
-                hostedby != null && hostedby.getKey()!= null  ? hostedby.getKey().toLowerCase() : "",
-                accessright!= null && accessright.getClassid()!= null ? accessright.getClassid() : "",
-                instancetype!= null && instancetype.getClassid()!= null ? instancetype.getClassid() : "",
-                url != null ? url:"");
+    public String toComparableString() {
+        return String.format(
+                "%s::%s::%s::%s",
+                hostedby != null && hostedby.getKey() != null
+                        ? hostedby.getKey().toLowerCase()
+                        : "",
+                accessright != null && accessright.getClassid() != null
+                        ? accessright.getClassid()
+                        : "",
+                instancetype != null && instancetype.getClassid() != null
+                        ? instancetype.getClassid()
+                        : "",
+                url != null ? url : "");
     }
 
     @Override
@@ -133,16 +142,12 @@ public class Instance implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
 
         Instance other = (Instance) obj;
 
-        return toComparableString()
-                .equals(other.toComparableString());
+        return toComparableString().equals(other.toComparableString());
     }
 }

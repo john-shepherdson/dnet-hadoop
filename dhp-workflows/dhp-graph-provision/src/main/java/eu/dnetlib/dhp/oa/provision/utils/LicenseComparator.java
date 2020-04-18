@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
-
 import java.util.Comparator;
 
 public class LicenseComparator implements Comparator<Qualifier> {
@@ -45,5 +44,4 @@ public class LicenseComparator implements Comparator<Qualifier> {
         // Else (but unlikely), lexicographical ordering will do.
         return lClass.compareTo(rClass);
     }
-
 }

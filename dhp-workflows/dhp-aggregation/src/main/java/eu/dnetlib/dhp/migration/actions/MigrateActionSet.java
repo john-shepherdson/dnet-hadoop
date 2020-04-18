@@ -6,6 +6,11 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -16,12 +21,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.tools.DistCp;
 import org.apache.hadoop.tools.DistCpOptions;
 import org.apache.hadoop.util.ToolRunner;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class MigrateActionSet {
 
@@ -34,9 +33,11 @@ public class MigrateActionSet {
     private static Boolean DEFAULT_TRANSFORM_ONLY = false;
 
     public static void main(String[] args) throws Exception {
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils.toString(MigrateActionSet.class.getResourceAsStream(
-                        "/eu/dnetlib/dhp/migration/migrate_actionsets_parameters.json")));
+        final ArgumentApplicationParser parser =
+                new ArgumentApplicationParser(
+                        IOUtils.toString(
+                                MigrateActionSet.class.getResourceAsStream(
+                                        "/eu/dnetlib/dhp/migration/migrate_actionsets_parameters.json")));
         parser.parseArgument(args);
 
         new MigrateActionSet().run(parser);
@@ -47,7 +48,7 @@ public class MigrateActionSet {
         final String isLookupUrl = parser.get("isLookupUrl");
         final String sourceNN = parser.get("sourceNameNode");
         final String targetNN = parser.get("targetNameNode");
-        final String workDir  = parser.get("workingDirectory");
+        final String workDir = parser.get("workingDirectory");
         final Integer distcp_num_maps = Integer.parseInt(parser.get("distcp_num_maps"));
 
         final String distcp_memory_mb = parser.get("distcp_memory_mb");
@@ -63,10 +64,12 @@ public class MigrateActionSet {
 
         ISLookUpService isLookUp = ISLookupClientFactory.getLookUpService(isLookupUrl);
 
-        Configuration conf = getConfiguration(distcp_task_timeout, distcp_memory_mb, distcp_num_maps);
+        Configuration conf =
+                getConfiguration(distcp_task_timeout, distcp_memory_mb, distcp_num_maps);
         FileSystem targetFS = FileSystem.get(conf);
 
-        Configuration sourceConf = getConfiguration(distcp_task_timeout, distcp_memory_mb, distcp_num_maps);
+        Configuration sourceConf =
+                getConfiguration(distcp_task_timeout, distcp_memory_mb, distcp_num_maps);
         sourceConf.set(FileSystem.FS_DEFAULT_NAME_KEY, sourceNN);
         FileSystem sourceFS = FileSystem.get(sourceConf);
 
@@ -75,14 +78,20 @@ public class MigrateActionSet {
         List<Path> targetPaths = new ArrayList<>();
 
         final List<Path> sourcePaths = getSourcePaths(sourceNN, isLookUp);
-        log.info(String.format("paths to process:\n%s", sourcePaths.stream().map(p -> p.toString()).collect(Collectors.joining("\n"))));
-        for(Path source : sourcePaths) {
+        log.info(
+                String.format(
+                        "paths to process:\n%s",
+                        sourcePaths.stream()
+                                .map(p -> p.toString())
+                                .collect(Collectors.joining("\n"))));
+        for (Path source : sourcePaths) {
 
             if (!sourceFS.exists(source)) {
                 log.warn(String.format("skipping unexisting path: %s", source));
             } else {
 
-                LinkedList<String> pathQ = Lists.newLinkedList(Splitter.on(SEPARATOR).split(source.toUri().getPath()));
+                LinkedList<String> pathQ =
+                        Lists.newLinkedList(Splitter.on(SEPARATOR).split(source.toUri().getPath()));
 
                 final String rawSet = pathQ.pollLast();
                 log.info(String.format("got RAWSET: %s", rawSet));
@@ -91,7 +100,14 @@ public class MigrateActionSet {
 
                     final String actionSetDirectory = pathQ.pollLast();
 
-                    final Path targetPath = new Path(targetNN + workDir + SEPARATOR + actionSetDirectory + SEPARATOR + rawSet);
+                    final Path targetPath =
+                            new Path(
+                                    targetNN
+                                            + workDir
+                                            + SEPARATOR
+                                            + actionSetDirectory
+                                            + SEPARATOR
+                                            + rawSet);
 
                     log.info(String.format("using TARGET PATH: %s", targetPath));
 
@@ -99,7 +115,13 @@ public class MigrateActionSet {
                         if (targetFS.exists(targetPath)) {
                             targetFS.delete(targetPath, true);
                         }
-                        runDistcp(distcp_num_maps, distcp_memory_mb, distcp_task_timeout, conf, source, targetPath);
+                        runDistcp(
+                                distcp_num_maps,
+                                distcp_memory_mb,
+                                distcp_task_timeout,
+                                conf,
+                                source,
+                                targetPath);
                     }
 
                     targetPaths.add(targetPath);
@@ -107,19 +129,25 @@ public class MigrateActionSet {
             }
         }
 
-        props.setProperty(TARGET_PATHS, targetPaths
-                .stream()
-                .map(p -> p.toString())
-                .collect(Collectors.joining(",")));
+        props.setProperty(
+                TARGET_PATHS,
+                targetPaths.stream().map(p -> p.toString()).collect(Collectors.joining(",")));
         File file = new File(System.getProperty("oozie.action.output.properties"));
 
-        try(OutputStream os = new FileOutputStream(file)) {
+        try (OutputStream os = new FileOutputStream(file)) {
             props.store(os, "");
         }
         System.out.println(file.getAbsolutePath());
     }
 
-    private void runDistcp(Integer distcp_num_maps, String distcp_memory_mb, String distcp_task_timeout, Configuration conf, Path source, Path targetPath) throws Exception {
+    private void runDistcp(
+            Integer distcp_num_maps,
+            String distcp_memory_mb,
+            String distcp_task_timeout,
+            Configuration conf,
+            Path source,
+            Path targetPath)
+            throws Exception {
 
         final DistCpOptions op = new DistCpOptions(source, targetPath);
         op.setMaxMaps(distcp_num_maps);
@@ -127,20 +155,25 @@ public class MigrateActionSet {
         op.preserve(DistCpOptions.FileAttribute.REPLICATION);
         op.preserve(DistCpOptions.FileAttribute.CHECKSUMTYPE);
 
-        int res = ToolRunner.run(new DistCp(conf, op), new String[]{
-                "-Dmapred.task.timeout=" + distcp_task_timeout,
-                "-Dmapreduce.map.memory.mb=" + distcp_memory_mb,
-                "-pb",
-                "-m " + distcp_num_maps,
-                source.toString(),
-                targetPath.toString()});
+        int res =
+                ToolRunner.run(
+                        new DistCp(conf, op),
+                        new String[] {
+                            "-Dmapred.task.timeout=" + distcp_task_timeout,
+                            "-Dmapreduce.map.memory.mb=" + distcp_memory_mb,
+                            "-pb",
+                            "-m " + distcp_num_maps,
+                            source.toString(),
+                            targetPath.toString()
+                        });
 
         if (res != 0) {
             throw new RuntimeException(String.format("distcp exited with code %s", res));
         }
     }
 
-    private Configuration getConfiguration(String distcp_task_timeout, String distcp_memory_mb, Integer distcp_num_maps) {
+    private Configuration getConfiguration(
+            String distcp_task_timeout, String distcp_memory_mb, Integer distcp_num_maps) {
         final Configuration conf = new Configuration();
         conf.set("dfs.webhdfs.socket.connect-timeout", distcp_task_timeout);
         conf.set("dfs.webhdfs.socket.read-timeout", distcp_task_timeout);
@@ -151,20 +184,20 @@ public class MigrateActionSet {
         return conf;
     }
 
-    private List<Path> getSourcePaths(String sourceNN, ISLookUpService isLookUp) throws ISLookUpException {
-        String XQUERY = "distinct-values(\n" +
-                "let $basePath := collection('/db/DRIVER/ServiceResources/ActionManagerServiceResourceType')//SERVICE_PROPERTIES/PROPERTY[@key = 'basePath']/@value/string()\n" +
-                "for $x in collection('/db/DRIVER/ActionManagerSetDSResources/ActionManagerSetDSResourceType') \n" +
-                "let $setDir := $x//SET/@directory/string()\n" +
-                "let $rawSet := $x//RAW_SETS/LATEST/@id/string()\n" +
-                "return concat($basePath, '/', $setDir, '/', $rawSet))";
+    private List<Path> getSourcePaths(String sourceNN, ISLookUpService isLookUp)
+            throws ISLookUpException {
+        String XQUERY =
+                "distinct-values(\n"
+                        + "let $basePath := collection('/db/DRIVER/ServiceResources/ActionManagerServiceResourceType')//SERVICE_PROPERTIES/PROPERTY[@key = 'basePath']/@value/string()\n"
+                        + "for $x in collection('/db/DRIVER/ActionManagerSetDSResources/ActionManagerSetDSResourceType') \n"
+                        + "let $setDir := $x//SET/@directory/string()\n"
+                        + "let $rawSet := $x//RAW_SETS/LATEST/@id/string()\n"
+                        + "return concat($basePath, '/', $setDir, '/', $rawSet))";
 
         log.info(String.format("running xquery:\n%s", XQUERY));
-        return isLookUp.quickSearchProfile(XQUERY)
-                .stream()
+        return isLookUp.quickSearchProfile(XQUERY).stream()
                 .map(p -> sourceNN + p)
                 .map(Path::new)
                 .collect(Collectors.toList());
     }
-
 }

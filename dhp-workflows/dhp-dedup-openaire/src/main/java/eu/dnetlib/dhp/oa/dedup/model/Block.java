@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.oa.dedup.model;
 
 import com.google.common.collect.Lists;
 import eu.dnetlib.pace.model.MapDocument;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,11 +35,13 @@ public class Block implements Serializable {
         Iterable<Block> it = () -> blocks;
 
         block.setDocuments(
-            StreamSupport.stream(it.spliterator(), false)
-                .flatMap(b -> b.getDocuments().stream())
-                .sorted(Comparator.comparing(a -> a.getFieldMap().get(orderField).stringValue()))
-                .limit(maxSize)
-                .collect(Collectors.toCollection(ArrayList::new)));
+                StreamSupport.stream(it.spliterator(), false)
+                        .flatMap(b -> b.getDocuments().stream())
+                        .sorted(
+                                Comparator.comparing(
+                                        a -> a.getFieldMap().get(orderField).stringValue()))
+                        .limit(maxSize)
+                        .collect(Collectors.toCollection(ArrayList::new)));
         return block;
     }
 
@@ -48,12 +49,12 @@ public class Block implements Serializable {
         Block block = new Block();
         block.setKey(b1.getKey());
         block.setDocuments(
-            Stream.concat(
-                    b1.getDocuments().stream(),
-                    b2.getDocuments().stream())
-                    .sorted(Comparator.comparing(a -> a.getFieldMap().get(orderField).stringValue()))
-                    .limit(maxSize)
-                    .collect(Collectors.toCollection(ArrayList::new)));
+                Stream.concat(b1.getDocuments().stream(), b2.getDocuments().stream())
+                        .sorted(
+                                Comparator.comparing(
+                                        a -> a.getFieldMap().get(orderField).stringValue()))
+                        .limit(maxSize)
+                        .collect(Collectors.toCollection(ArrayList::new)));
 
         return block;
     }
