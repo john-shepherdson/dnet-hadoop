@@ -174,8 +174,8 @@
             <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
         </spark>
-<!--        <ok to="fork-join-exec-propagation"/>-->
-        <ok to="End"/>
+        <ok to="fork-join-exec-propagation"/>
+<!--        <ok to="End"/>-->
         <error to="Kill"/>
 
     </action>
@@ -204,7 +204,8 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
@@ -230,7 +231,8 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
@@ -256,7 +258,8 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
@@ -282,7 +285,8 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/software</arg>
