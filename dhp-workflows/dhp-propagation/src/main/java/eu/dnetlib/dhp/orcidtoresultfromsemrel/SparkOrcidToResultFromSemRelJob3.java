@@ -2,16 +2,21 @@ package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
@@ -45,9 +50,6 @@ public class SparkOrcidToResultFromSemRelJob3 {
 
         final String resultClassName = parser.get("resultTableName");
         log.info("resultTableName: {}", resultClassName);
-
-        final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
-        log.info("resultType: {}", resultType);
 
         final Boolean saveGraph = Optional
                 .ofNullable(parser.get("saveGraph"))
