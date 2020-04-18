@@ -1,26 +1,15 @@
 package eu.dnetlib.dhp.resulttocommunityfromorganization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import eu.dnetlib.dhp.TypedRow;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.orcidtoresultfromsemrel.ResultOrcidList;
-import eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob3;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,9 +46,6 @@ public class SparkResultToCommunityFromOrganizationJob2 {
 
         final String resultClassName = parser.get("resultTableName");
         log.info("resultTableName: {}", resultClassName);
-
-        final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
-        log.info("resultType: {}", resultType);
 
         final Boolean saveGraph = Optional
                 .ofNullable(parser.get("saveGraph"))

@@ -2,16 +2,10 @@ package eu.dnetlib.dhp.resulttocommunityfromorganization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import eu.dnetlib.dhp.TypedRow;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.orcidtoresultfromsemrel.PrepareResultOrcidAssociationStep1;
-import eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob3;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +23,7 @@ public class PrepareResultCommunitySet {
 
     public static void main(String[] args) throws Exception {
         String jsonConfiguration = IOUtils.toString(PrepareResultCommunitySet.class
-                .getResourceAsStream("/eu/dnetlib/dhp/resulttocommunityfromorganization/input_communitytoresult_parameters.json"));
+                .getResourceAsStream("/eu/dnetlib/dhp/resulttocommunityfromorganization/input_preparecommunitytoresult_parameters.json"));
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 jsonConfiguration);
