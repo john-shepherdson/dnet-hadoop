@@ -9,7 +9,7 @@
     "paramName":"sg",
     "paramLongName":"saveGraph",
     "paramDescription": "true if the new version of the graph must be saved",
-    "paramRequired": true
+    "paramRequired": false
   },
   {
     "paramName":"h",
