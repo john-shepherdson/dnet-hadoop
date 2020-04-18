@@ -20,7 +20,7 @@ public class PrepareResultOrcidAssociationStep2 {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static void main(String[] args) throws Exception {
-        String jsonConfiguration = IOUtils.toString(SparkOrcidToResultFromSemRelJob3.class
+        String jsonConfiguration = IOUtils.toString(PrepareResultOrcidAssociationStep2.class
                 .getResourceAsStream("/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_prepareorcidtoresult_parameters2.json"));
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(
