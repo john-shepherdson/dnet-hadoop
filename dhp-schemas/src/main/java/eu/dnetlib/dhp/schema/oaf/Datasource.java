@@ -72,7 +72,7 @@ public class Datasource extends OafEntity implements Serializable {
 
     private Field<String> citationguidelineurl;
 
-    //{yes, no, uknown}
+    // {yes, no, uknown}
     private Field<String> qualitymanagementkind;
 
     private Field<String> pidsystems;
@@ -367,65 +367,148 @@ public class Datasource extends OafEntity implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
-        if (!Datasource.class.isAssignableFrom(e.getClass())){
+        if (!Datasource.class.isAssignableFrom(e.getClass())) {
             return;
         }
 
-        Datasource d = (Datasource)e;
+        Datasource d = (Datasource) e;
 
-        datasourcetype = d.getDatasourcetype() != null && compareTrust(this, e)<0? d.getDatasourcetype() : datasourcetype;
-        openairecompatibility = d.getOpenairecompatibility() != null && compareTrust(this, e)<0? d.getOpenairecompatibility() : openairecompatibility;
-        officialname = d.getOfficialname() != null && compareTrust(this, e)<0? d.getOfficialname() : officialname;
-        englishname = d.getEnglishname() != null && compareTrust(this, e)<0? d.getEnglishname() : officialname;
-        websiteurl = d.getWebsiteurl() != null && compareTrust(this, e)<0? d.getWebsiteurl() : websiteurl;
-        logourl = d.getLogourl() != null && compareTrust(this, e)<0? d.getLogourl() : getLogourl();
-        contactemail = d.getContactemail() != null && compareTrust(this, e)<0? d.getContactemail() : contactemail;
-        namespaceprefix = d.getNamespaceprefix() != null && compareTrust(this, e)<0? d.getNamespaceprefix() : namespaceprefix;
-        latitude = d.getLatitude() != null && compareTrust(this, e)<0? d.getLatitude() : latitude;
-        longitude = d.getLongitude() != null && compareTrust(this, e)<0? d.getLongitude() : longitude;
-        dateofvalidation = d.getDateofvalidation() != null && compareTrust(this, e)<0? d.getDateofvalidation() : dateofvalidation;
-        description = d.getDescription() != null && compareTrust(this, e)<0? d.getDescription() : description;
+        datasourcetype =
+                d.getDatasourcetype() != null && compareTrust(this, e) < 0
+                        ? d.getDatasourcetype()
+                        : datasourcetype;
+        openairecompatibility =
+                d.getOpenairecompatibility() != null && compareTrust(this, e) < 0
+                        ? d.getOpenairecompatibility()
+                        : openairecompatibility;
+        officialname =
+                d.getOfficialname() != null && compareTrust(this, e) < 0
+                        ? d.getOfficialname()
+                        : officialname;
+        englishname =
+                d.getEnglishname() != null && compareTrust(this, e) < 0
+                        ? d.getEnglishname()
+                        : officialname;
+        websiteurl =
+                d.getWebsiteurl() != null && compareTrust(this, e) < 0
+                        ? d.getWebsiteurl()
+                        : websiteurl;
+        logourl =
+                d.getLogourl() != null && compareTrust(this, e) < 0 ? d.getLogourl() : getLogourl();
+        contactemail =
+                d.getContactemail() != null && compareTrust(this, e) < 0
+                        ? d.getContactemail()
+                        : contactemail;
+        namespaceprefix =
+                d.getNamespaceprefix() != null && compareTrust(this, e) < 0
+                        ? d.getNamespaceprefix()
+                        : namespaceprefix;
+        latitude =
+                d.getLatitude() != null && compareTrust(this, e) < 0 ? d.getLatitude() : latitude;
+        longitude =
+                d.getLongitude() != null && compareTrust(this, e) < 0
+                        ? d.getLongitude()
+                        : longitude;
+        dateofvalidation =
+                d.getDateofvalidation() != null && compareTrust(this, e) < 0
+                        ? d.getDateofvalidation()
+                        : dateofvalidation;
+        description =
+                d.getDescription() != null && compareTrust(this, e) < 0
+                        ? d.getDescription()
+                        : description;
         subjects = mergeLists(subjects, d.getSubjects());
 
         // opendoar specific fields (od*)
-        odnumberofitems = d.getOdnumberofitems() != null && compareTrust(this, e)<0? d.getOdnumberofitems() : odnumberofitems;
-        odnumberofitemsdate = d.getOdnumberofitemsdate() != null && compareTrust(this, e)<0? d.getOdnumberofitemsdate() : odnumberofitemsdate;
-        odpolicies = d.getOdpolicies() != null && compareTrust(this, e)<0? d.getOdpolicies() : odpolicies;
+        odnumberofitems =
+                d.getOdnumberofitems() != null && compareTrust(this, e) < 0
+                        ? d.getOdnumberofitems()
+                        : odnumberofitems;
+        odnumberofitemsdate =
+                d.getOdnumberofitemsdate() != null && compareTrust(this, e) < 0
+                        ? d.getOdnumberofitemsdate()
+                        : odnumberofitemsdate;
+        odpolicies =
+                d.getOdpolicies() != null && compareTrust(this, e) < 0
+                        ? d.getOdpolicies()
+                        : odpolicies;
         odlanguages = mergeLists(odlanguages, d.getOdlanguages());
         odcontenttypes = mergeLists(odcontenttypes, d.getOdcontenttypes());
         accessinfopackage = mergeLists(accessinfopackage, d.getAccessinfopackage());
 
         // re3data fields
-        releasestartdate = d.getReleasestartdate() != null && compareTrust(this, e)<0? d.getReleasestartdate() : releasestartdate;
-        releaseenddate = d.getReleaseenddate() != null && compareTrust(this, e)<0? d.getReleaseenddate() : releaseenddate;
-        missionstatementurl = d.getMissionstatementurl() != null && compareTrust(this, e)<0? d.getMissionstatementurl() : missionstatementurl;
-        dataprovider = d.getDataprovider() != null && compareTrust(this, e)<0? d.getDataprovider() : dataprovider;
-        serviceprovider = d.getServiceprovider() != null && compareTrust(this, e)<0? d.getServiceprovider() : serviceprovider;
+        releasestartdate =
+                d.getReleasestartdate() != null && compareTrust(this, e) < 0
+                        ? d.getReleasestartdate()
+                        : releasestartdate;
+        releaseenddate =
+                d.getReleaseenddate() != null && compareTrust(this, e) < 0
+                        ? d.getReleaseenddate()
+                        : releaseenddate;
+        missionstatementurl =
+                d.getMissionstatementurl() != null && compareTrust(this, e) < 0
+                        ? d.getMissionstatementurl()
+                        : missionstatementurl;
+        dataprovider =
+                d.getDataprovider() != null && compareTrust(this, e) < 0
+                        ? d.getDataprovider()
+                        : dataprovider;
+        serviceprovider =
+                d.getServiceprovider() != null && compareTrust(this, e) < 0
+                        ? d.getServiceprovider()
+                        : serviceprovider;
 
         // {open, restricted or closed}
-        databaseaccesstype = d.getDatabaseaccesstype() != null && compareTrust(this, e)<0? d.getDatabaseaccesstype() : databaseaccesstype;
+        databaseaccesstype =
+                d.getDatabaseaccesstype() != null && compareTrust(this, e) < 0
+                        ? d.getDatabaseaccesstype()
+                        : databaseaccesstype;
 
         // {open, restricted or closed}
-        datauploadtype = d.getDatauploadtype() != null && compareTrust(this, e)<0? d.getDatauploadtype() : datauploadtype;
+        datauploadtype =
+                d.getDatauploadtype() != null && compareTrust(this, e) < 0
+                        ? d.getDatauploadtype()
+                        : datauploadtype;
 
         // {feeRequired, registration, other}
-        databaseaccessrestriction = d.getDatabaseaccessrestriction() != null && compareTrust(this, e)<0? d.getDatabaseaccessrestriction() : databaseaccessrestriction;
+        databaseaccessrestriction =
+                d.getDatabaseaccessrestriction() != null && compareTrust(this, e) < 0
+                        ? d.getDatabaseaccessrestriction()
+                        : databaseaccessrestriction;
 
         // {feeRequired, registration, other}
-        datauploadrestriction = d.getDatauploadrestriction() != null && compareTrust(this, e)<0? d.getDatauploadrestriction() : datauploadrestriction;
+        datauploadrestriction =
+                d.getDatauploadrestriction() != null && compareTrust(this, e) < 0
+                        ? d.getDatauploadrestriction()
+                        : datauploadrestriction;
 
-        versioning = d.getVersioning() != null && compareTrust(this, e)<0? d.getVersioning() : versioning;
-        citationguidelineurl = d.getCitationguidelineurl() != null && compareTrust(this, e)<0? d.getCitationguidelineurl() : citationguidelineurl;
+        versioning =
+                d.getVersioning() != null && compareTrust(this, e) < 0
+                        ? d.getVersioning()
+                        : versioning;
+        citationguidelineurl =
+                d.getCitationguidelineurl() != null && compareTrust(this, e) < 0
+                        ? d.getCitationguidelineurl()
+                        : citationguidelineurl;
 
-        //{yes, no, unknown}
-        qualitymanagementkind = d.getQualitymanagementkind() != null && compareTrust(this, e)<0? d.getQualitymanagementkind() : qualitymanagementkind;
-        pidsystems = d.getPidsystems() != null && compareTrust(this, e)<0? d.getPidsystems() : pidsystems;
+        // {yes, no, unknown}
+        qualitymanagementkind =
+                d.getQualitymanagementkind() != null && compareTrust(this, e) < 0
+                        ? d.getQualitymanagementkind()
+                        : qualitymanagementkind;
+        pidsystems =
+                d.getPidsystems() != null && compareTrust(this, e) < 0
+                        ? d.getPidsystems()
+                        : pidsystems;
 
-        certificates = d.getCertificates() != null && compareTrust(this, e)<0? d.getCertificates() : certificates;
+        certificates =
+                d.getCertificates() != null && compareTrust(this, e) < 0
+                        ? d.getCertificates()
+                        : certificates;
 
         policies = mergeLists(policies, d.getPolicies());
 
-        journal = d.getJournal() != null && compareTrust(this, e)<0? d.getJournal() : journal;
+        journal = d.getJournal() != null && compareTrust(this, e) < 0 ? d.getJournal() : journal;
 
         mergeOAFDataInfo(e);
     }
@@ -436,45 +519,81 @@ public class Datasource extends OafEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Datasource that = (Datasource) o;
-        return Objects.equals(datasourcetype, that.datasourcetype) &&
-                Objects.equals(openairecompatibility, that.openairecompatibility) &&
-                Objects.equals(officialname, that.officialname) &&
-                Objects.equals(englishname, that.englishname) &&
-                Objects.equals(websiteurl, that.websiteurl) &&
-                Objects.equals(logourl, that.logourl) &&
-                Objects.equals(contactemail, that.contactemail) &&
-                Objects.equals(namespaceprefix, that.namespaceprefix) &&
-                Objects.equals(latitude, that.latitude) &&
-                Objects.equals(longitude, that.longitude) &&
-                Objects.equals(dateofvalidation, that.dateofvalidation) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(subjects, that.subjects) &&
-                Objects.equals(odnumberofitems, that.odnumberofitems) &&
-                Objects.equals(odnumberofitemsdate, that.odnumberofitemsdate) &&
-                Objects.equals(odpolicies, that.odpolicies) &&
-                Objects.equals(odlanguages, that.odlanguages) &&
-                Objects.equals(odcontenttypes, that.odcontenttypes) &&
-                Objects.equals(accessinfopackage, that.accessinfopackage) &&
-                Objects.equals(releasestartdate, that.releasestartdate) &&
-                Objects.equals(releaseenddate, that.releaseenddate) &&
-                Objects.equals(missionstatementurl, that.missionstatementurl) &&
-                Objects.equals(dataprovider, that.dataprovider) &&
-                Objects.equals(serviceprovider, that.serviceprovider) &&
-                Objects.equals(databaseaccesstype, that.databaseaccesstype) &&
-                Objects.equals(datauploadtype, that.datauploadtype) &&
-                Objects.equals(databaseaccessrestriction, that.databaseaccessrestriction) &&
-                Objects.equals(datauploadrestriction, that.datauploadrestriction) &&
-                Objects.equals(versioning, that.versioning) &&
-                Objects.equals(citationguidelineurl, that.citationguidelineurl) &&
-                Objects.equals(qualitymanagementkind, that.qualitymanagementkind) &&
-                Objects.equals(pidsystems, that.pidsystems) &&
-                Objects.equals(certificates, that.certificates) &&
-                Objects.equals(policies, that.policies) &&
-                Objects.equals(journal, that.journal);
+        return Objects.equals(datasourcetype, that.datasourcetype)
+                && Objects.equals(openairecompatibility, that.openairecompatibility)
+                && Objects.equals(officialname, that.officialname)
+                && Objects.equals(englishname, that.englishname)
+                && Objects.equals(websiteurl, that.websiteurl)
+                && Objects.equals(logourl, that.logourl)
+                && Objects.equals(contactemail, that.contactemail)
+                && Objects.equals(namespaceprefix, that.namespaceprefix)
+                && Objects.equals(latitude, that.latitude)
+                && Objects.equals(longitude, that.longitude)
+                && Objects.equals(dateofvalidation, that.dateofvalidation)
+                && Objects.equals(description, that.description)
+                && Objects.equals(subjects, that.subjects)
+                && Objects.equals(odnumberofitems, that.odnumberofitems)
+                && Objects.equals(odnumberofitemsdate, that.odnumberofitemsdate)
+                && Objects.equals(odpolicies, that.odpolicies)
+                && Objects.equals(odlanguages, that.odlanguages)
+                && Objects.equals(odcontenttypes, that.odcontenttypes)
+                && Objects.equals(accessinfopackage, that.accessinfopackage)
+                && Objects.equals(releasestartdate, that.releasestartdate)
+                && Objects.equals(releaseenddate, that.releaseenddate)
+                && Objects.equals(missionstatementurl, that.missionstatementurl)
+                && Objects.equals(dataprovider, that.dataprovider)
+                && Objects.equals(serviceprovider, that.serviceprovider)
+                && Objects.equals(databaseaccesstype, that.databaseaccesstype)
+                && Objects.equals(datauploadtype, that.datauploadtype)
+                && Objects.equals(databaseaccessrestriction, that.databaseaccessrestriction)
+                && Objects.equals(datauploadrestriction, that.datauploadrestriction)
+                && Objects.equals(versioning, that.versioning)
+                && Objects.equals(citationguidelineurl, that.citationguidelineurl)
+                && Objects.equals(qualitymanagementkind, that.qualitymanagementkind)
+                && Objects.equals(pidsystems, that.pidsystems)
+                && Objects.equals(certificates, that.certificates)
+                && Objects.equals(policies, that.policies)
+                && Objects.equals(journal, that.journal);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), datasourcetype, openairecompatibility, officialname, englishname, websiteurl, logourl, contactemail, namespaceprefix, latitude, longitude, dateofvalidation, description, subjects, odnumberofitems, odnumberofitemsdate, odpolicies, odlanguages, odcontenttypes, accessinfopackage, releasestartdate, releaseenddate, missionstatementurl, dataprovider, serviceprovider, databaseaccesstype, datauploadtype, databaseaccessrestriction, datauploadrestriction, versioning, citationguidelineurl, qualitymanagementkind, pidsystems, certificates, policies, journal);
+        return Objects.hash(
+                super.hashCode(),
+                datasourcetype,
+                openairecompatibility,
+                officialname,
+                englishname,
+                websiteurl,
+                logourl,
+                contactemail,
+                namespaceprefix,
+                latitude,
+                longitude,
+                dateofvalidation,
+                description,
+                subjects,
+                odnumberofitems,
+                odnumberofitemsdate,
+                odpolicies,
+                odlanguages,
+                odcontenttypes,
+                accessinfopackage,
+                releasestartdate,
+                releaseenddate,
+                missionstatementurl,
+                dataprovider,
+                serviceprovider,
+                databaseaccesstype,
+                datauploadtype,
+                databaseaccessrestriction,
+                datauploadrestriction,
+                versioning,
+                citationguidelineurl,
+                qualitymanagementkind,
+                pidsystems,
+                certificates,
+                policies,
+                journal);
     }
 }

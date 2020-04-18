@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
 public class DataInfo implements Serializable {
@@ -12,7 +11,6 @@ public class DataInfo implements Serializable {
     private String trust;
     private String inferenceprovenance;
     private Qualifier provenanceaction;
-
 
     public Boolean getInvisible() {
         return invisible;
@@ -67,16 +65,22 @@ public class DataInfo implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataInfo dataInfo = (DataInfo) o;
-        return Objects.equals(invisible, dataInfo.invisible) &&
-                Objects.equals(inferred, dataInfo.inferred) &&
-                Objects.equals(deletedbyinference, dataInfo.deletedbyinference) &&
-                Objects.equals(trust, dataInfo.trust) &&
-                Objects.equals(inferenceprovenance, dataInfo.inferenceprovenance) &&
-                Objects.equals(provenanceaction, dataInfo.provenanceaction);
+        return Objects.equals(invisible, dataInfo.invisible)
+                && Objects.equals(inferred, dataInfo.inferred)
+                && Objects.equals(deletedbyinference, dataInfo.deletedbyinference)
+                && Objects.equals(trust, dataInfo.trust)
+                && Objects.equals(inferenceprovenance, dataInfo.inferenceprovenance)
+                && Objects.equals(provenanceaction, dataInfo.provenanceaction);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(invisible, inferred, deletedbyinference, trust, inferenceprovenance, provenanceaction);
+        return Objects.hash(
+                invisible,
+                inferred,
+                deletedbyinference,
+                trust,
+                inferenceprovenance,
+                provenanceaction);
     }
 }

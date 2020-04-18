@@ -1,10 +1,9 @@
 package eu.dnetlib.dhp.oa.provision;
 
-import org.junit.jupiter.api.BeforeEach;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.junit.jupiter.api.BeforeEach;
 
 public class GraphJoinerTest {
 
@@ -21,18 +20,22 @@ public class GraphJoinerTest {
     }
 
     private static void copyFiles(Path source, Path target) throws IOException {
-        Files.list(source).forEach(f -> {
-            try {
-                if (Files.isDirectory(f)) {
-                    Path subTarget = Files.createDirectories(target.resolve(f.getFileName()));
-                    copyFiles(f, subTarget);
-                } else {
-                    Files.copy(f, target.resolve(f.getFileName()));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-        });
+        Files.list(source)
+                .forEach(
+                        f -> {
+                            try {
+                                if (Files.isDirectory(f)) {
+                                    Path subTarget =
+                                            Files.createDirectories(
+                                                    target.resolve(f.getFileName()));
+                                    copyFiles(f, subTarget);
+                                } else {
+                                    Files.copy(f, target.resolve(f.getFileName()));
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                throw new RuntimeException(e);
+                            }
+                        });
     }
 }

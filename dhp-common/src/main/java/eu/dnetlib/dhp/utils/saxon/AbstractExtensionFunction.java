@@ -9,10 +9,13 @@ import net.sf.saxon.trans.XPathException;
 
 public abstract class AbstractExtensionFunction extends ExtensionFunctionDefinition {
 
-    public static String DEFAULT_SAXON_EXT_NS_URI = "http://www.d-net.research-infrastructures.eu/saxon-extension";
+    public static String DEFAULT_SAXON_EXT_NS_URI =
+            "http://www.d-net.research-infrastructures.eu/saxon-extension";
 
     public abstract String getName();
-    public abstract Sequence doCall(XPathContext context, Sequence[] arguments) throws XPathException;
+
+    public abstract Sequence doCall(XPathContext context, Sequence[] arguments)
+            throws XPathException;
 
     @Override
     public StructuredQName getFunctionQName() {
@@ -28,5 +31,4 @@ public abstract class AbstractExtensionFunction extends ExtensionFunctionDefinit
             }
         };
     }
-
 }

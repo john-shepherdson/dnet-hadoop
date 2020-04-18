@@ -2,10 +2,7 @@ package eu.dnetlib.dhp.provision;
 
 import java.io.Serializable;
 
-/**
- * This class models the information of related items
- */
-
+/** This class models the information of related items */
 public class RelatedItemInfo implements Serializable {
 
     private String source;
@@ -16,10 +13,10 @@ public class RelatedItemInfo implements Serializable {
 
     private long relatedUnknown = 0;
 
-    public RelatedItemInfo() {
-    }
+    public RelatedItemInfo() {}
 
-    public RelatedItemInfo(String source, long relatedDataset, long relatedPublication, long relatedUnknown) {
+    public RelatedItemInfo(
+            String source, long relatedDataset, long relatedPublication, long relatedUnknown) {
         this.source = source;
         this.relatedDataset = relatedDataset;
         this.relatedPublication = relatedPublication;

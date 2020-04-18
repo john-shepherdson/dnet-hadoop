@@ -1,7 +1,7 @@
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.apache.spark.sql.functions.col;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -9,18 +9,12 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-
-import java.io.IOException;
-
-import static org.apache.spark.sql.functions.col;
 
 public class SparkPropagateRelation extends AbstractSparkAction {
 
@@ -31,14 +25,17 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         TARGET
     }
 
-    public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+    public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark)
+            throws Exception {
         super(parser, spark);
     }
 
     public static void main(String[] args) throws Exception {
-        ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils.toString(SparkCreateSimRels.class.getResourceAsStream(
-                        "/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json")));
+        ArgumentApplicationParser parser =
+                new ArgumentApplicationParser(
+                        IOUtils.toString(
+                                SparkCreateSimRels.class.getResourceAsStream(
+                                        "/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json")));
 
         parser.parseArgument(args);
 
@@ -64,47 +61,63 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         final String outputRelationPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
         removeOutputDir(spark, outputRelationPath);
 
-        Dataset<Relation> mergeRels = spark.read()
-                .load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
-                .as(Encoders.bean(Relation.class));
+        Dataset<Relation> mergeRels =
+                spark.read()
+                        .load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
+                        .as(Encoders.bean(Relation.class));
 
-        Dataset<Tuple2<String, String>> mergedIds = mergeRels
-                .where(col("relClass").equalTo("merges"))
-                .select(col("source"), col("target"))
-                .distinct()
-                .map((MapFunction<Row, Tuple2<String, String>>)
-                        r -> new Tuple2<>(r.getString(1), r.getString(0)),
-                        Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
-                .cache();
+        Dataset<Tuple2<String, String>> mergedIds =
+                mergeRels
+                        .where(col("relClass").equalTo("merges"))
+                        .select(col("source"), col("target"))
+                        .distinct()
+                        .map(
+                                (MapFunction<Row, Tuple2<String, String>>)
+                                        r -> new Tuple2<>(r.getString(1), r.getString(0)),
+                                Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
+                        .cache();
 
         final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
-        Dataset<Relation> rels = spark.read()
-                .textFile(relationPath)
-                .map(patchRelFn(), Encoders.bean(Relation.class));
+        Dataset<Relation> rels =
+                spark.read()
+                        .textFile(relationPath)
+                        .map(patchRelFn(), Encoders.bean(Relation.class));
 
         Dataset<Relation> newRels =
                 processDataset(
-                    processDataset(rels, mergedIds, FieldType.SOURCE, getFixRelFn(FieldType.SOURCE)),
-                mergedIds, FieldType.TARGET, getFixRelFn(FieldType.TARGET))
-                .filter(SparkPropagateRelation::containsDedup);
+                                processDataset(
+                                        rels,
+                                        mergedIds,
+                                        FieldType.SOURCE,
+                                        getFixRelFn(FieldType.SOURCE)),
+                                mergedIds,
+                                FieldType.TARGET,
+                                getFixRelFn(FieldType.TARGET))
+                        .filter(SparkPropagateRelation::containsDedup);
 
-        Dataset<Relation> updated = processDataset(
-                processDataset(rels, mergedIds, FieldType.SOURCE, getDeletedFn()),
-                mergedIds, FieldType.TARGET, getDeletedFn());
+        Dataset<Relation> updated =
+                processDataset(
+                        processDataset(rels, mergedIds, FieldType.SOURCE, getDeletedFn()),
+                        mergedIds,
+                        FieldType.TARGET,
+                        getDeletedFn());
 
         save(newRels.union(updated), outputRelationPath, SaveMode.Overwrite);
-
     }
 
-    private static Dataset<Relation> processDataset(Dataset<Relation> rels, Dataset<Tuple2<String, String>> mergedIds, FieldType type,
-                                                    MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation> mapFn) {
-        final Dataset<Tuple2<String, Relation>> mapped = rels
-                .map((MapFunction<Relation, Tuple2<String, Relation>>)
+    private static Dataset<Relation> processDataset(
+            Dataset<Relation> rels,
+            Dataset<Tuple2<String, String>> mergedIds,
+            FieldType type,
+            MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation> mapFn) {
+        final Dataset<Tuple2<String, Relation>> mapped =
+                rels.map(
+                        (MapFunction<Relation, Tuple2<String, Relation>>)
                                 r -> new Tuple2<>(getId(r, type), r),
                         Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)));
-        return mapped
-                .joinWith(mergedIds, mapped.col("_1").equalTo(mergedIds.col("_1")), "left_outer")
+        return mapped.joinWith(
+                        mergedIds, mapped.col("_1").equalTo(mergedIds.col("_1")), "left_outer")
                 .map(mapFn, Encoders.bean(Relation.class));
     }
 
@@ -129,7 +142,8 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         }
     }
 
-    private static MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation> getFixRelFn(FieldType type) {
+    private static MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation>
+            getFixRelFn(FieldType type) {
         return value -> {
             if (value._2() != null) {
                 Relation r = value._1()._2();
@@ -153,7 +167,8 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         };
     }
 
-    private static MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation> getDeletedFn() {
+    private static MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation>
+            getDeletedFn() {
         return value -> {
             if (value._2() != null) {
                 Relation r = value._1()._2();
@@ -168,7 +183,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
     }
 
     private static boolean containsDedup(final Relation r) {
-        return r.getSource().toLowerCase().contains("dedup") || r.getTarget().toLowerCase().contains("dedup");
+        return r.getSource().toLowerCase().contains("dedup")
+                || r.getTarget().toLowerCase().contains("dedup");
     }
-
 }

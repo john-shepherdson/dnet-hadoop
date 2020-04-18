@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.schema.action;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-
 import java.io.Serializable;
 
 @JsonDeserialize(using = AtomicActionDeserializer.class)
@@ -12,8 +11,7 @@ public class AtomicAction<T extends Oaf> implements Serializable {
 
     private T payload;
 
-    public AtomicAction() {
-    }
+    public AtomicAction() {}
 
     public AtomicAction(Class<T> clazz, T payload) {
         this.clazz = clazz;

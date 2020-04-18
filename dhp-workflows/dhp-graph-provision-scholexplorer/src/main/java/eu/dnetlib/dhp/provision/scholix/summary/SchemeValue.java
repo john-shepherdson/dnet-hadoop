@@ -6,9 +6,7 @@ public class SchemeValue implements Serializable {
     private String scheme;
     private String value;
 
-    public SchemeValue() {
-
-    }
+    public SchemeValue() {}
 
     public SchemeValue(String scheme, String value) {
         this.scheme = scheme;

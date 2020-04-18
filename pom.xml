@@ -463,6 +463,36 @@
 		</pluginManagement>
 		<plugins>
 			<plugin>
+				<groupId>com.cosium.code</groupId>
+				<artifactId>git-code-format-maven-plugin</artifactId>
+				<version>${git-code-format-maven-plugin.version}</version>
+				<executions>
+					<!-- On commit, format the modified java files -->
+					<execution>
+						<id>install-formatter-hook</id>
+						<goals>
+							<goal>install-hooks</goal>
+						</goals>
+					</execution>
+					<!-- On Maven verify phase, fail if any file
+                    (including unmodified) is badly formatted -->
+					<execution>
+						<id>validate-code-format</id>
+						<goals>
+							<goal>validate-code-format</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<googleJavaFormatOptions>
+						<aosp>true</aosp>
+						<fixImportsOnly>false</fixImportsOnly>
+						<skipSortingImports>false</skipSortingImports>
+						<skipRemovingUnusedImports>false</skipRemovingUnusedImports>
+					</googleJavaFormatOptions>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5.3</version>
@@ -535,6 +565,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
+		<git-code-format-maven-plugin.version>2.4</git-code-format-maven-plugin.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
 		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>

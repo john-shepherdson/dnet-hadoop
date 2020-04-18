@@ -21,8 +21,8 @@ public class ExtractInfoTest {
     @Test
     public void testScholix() throws Exception {
         final String jsonSummary = IOUtils.toString(getClass().getResourceAsStream("summary.json"));
-        final String jsonRelation = IOUtils.toString(getClass().getResourceAsStream("relation.json"));
+        final String jsonRelation =
+                IOUtils.toString(getClass().getResourceAsStream("relation.json"));
         Scholix.generateScholixWithSource(jsonSummary, jsonRelation);
     }
-
 }

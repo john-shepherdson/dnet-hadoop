@@ -1,17 +1,16 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+
 import com.google.common.collect.Sets;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.oaf.*;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 public class GraphMappingUtils {
 
@@ -33,7 +32,6 @@ public class GraphMappingUtils {
             case dataset:
             case otherresearchproduct:
             case software:
-
                 Result result = (Result) entity;
 
                 if (result.getTitle() == null && !result.getTitle().isEmpty()) {
@@ -45,8 +43,8 @@ public class GraphMappingUtils {
                 re.setResulttype(result.getResulttype());
                 re.setInstances(result.getInstance());
 
-                //TODO still to be mapped
-                //re.setCodeRepositoryUrl(j.read("$.coderepositoryurl"));
+                // TODO still to be mapped
+                // re.setCodeRepositoryUrl(j.read("$.coderepositoryurl"));
 
                 break;
             case datasource:
@@ -76,9 +74,8 @@ public class GraphMappingUtils {
 
                 List<Field<String>> f = p.getFundingtree();
                 if (!f.isEmpty()) {
-                    re.setFundingtree(f.stream()
-                            .map(s -> s.getValue())
-                            .collect(Collectors.toList()));
+                    re.setFundingtree(
+                            f.stream().map(s -> s.getValue()).collect(Collectors.toList()));
                 }
                 break;
         }
@@ -104,5 +101,4 @@ public class GraphMappingUtils {
     public static String getRelDescriptor(String relType, String subRelType, String relClass) {
         return relType + SEPARATOR + subRelType + SEPARATOR + relClass;
     }
-
 }

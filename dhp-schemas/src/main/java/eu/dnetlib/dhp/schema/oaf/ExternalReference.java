@@ -97,18 +97,19 @@ public class ExternalReference implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExternalReference that = (ExternalReference) o;
-        return Objects.equals(sitename, that.sitename) &&
-                Objects.equals(label, that.label) &&
-                Objects.equals(url, that.url) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(qualifier, that.qualifier) &&
-                Objects.equals(refidentifier, that.refidentifier) &&
-                Objects.equals(query, that.query) &&
-                Objects.equals(dataInfo, that.dataInfo);
+        return Objects.equals(sitename, that.sitename)
+                && Objects.equals(label, that.label)
+                && Objects.equals(url, that.url)
+                && Objects.equals(description, that.description)
+                && Objects.equals(qualifier, that.qualifier)
+                && Objects.equals(refidentifier, that.refidentifier)
+                && Objects.equals(query, that.query)
+                && Objects.equals(dataInfo, that.dataInfo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sitename, label, url, description, qualifier, refidentifier, query, dataInfo);
+        return Objects.hash(
+                sitename, label, url, description, qualifier, refidentifier, query, dataInfo);
     }
 }

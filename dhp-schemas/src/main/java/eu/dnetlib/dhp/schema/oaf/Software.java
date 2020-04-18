@@ -50,7 +50,7 @@ public class Software extends Result implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
-        if (!Software.class.isAssignableFrom(e.getClass())){
+        if (!Software.class.isAssignableFrom(e.getClass())) {
             return;
         }
 
@@ -59,9 +59,15 @@ public class Software extends Result implements Serializable {
 
         license = mergeLists(license, s.getLicense());
 
-        codeRepositoryUrl = s.getCodeRepositoryUrl()!= null && compareTrust(this, s)<0?s.getCodeRepositoryUrl():codeRepositoryUrl;
+        codeRepositoryUrl =
+                s.getCodeRepositoryUrl() != null && compareTrust(this, s) < 0
+                        ? s.getCodeRepositoryUrl()
+                        : codeRepositoryUrl;
 
-        programmingLanguage= s.getProgrammingLanguage()!= null && compareTrust(this, s)<0?s.getProgrammingLanguage():programmingLanguage;
+        programmingLanguage =
+                s.getProgrammingLanguage() != null && compareTrust(this, s) < 0
+                        ? s.getProgrammingLanguage()
+                        : programmingLanguage;
 
         mergeOAFDataInfo(e);
     }
@@ -72,14 +78,19 @@ public class Software extends Result implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Software software = (Software) o;
-        return Objects.equals(documentationUrl, software.documentationUrl) &&
-                Objects.equals(license, software.license) &&
-                Objects.equals(codeRepositoryUrl, software.codeRepositoryUrl) &&
-                Objects.equals(programmingLanguage, software.programmingLanguage);
+        return Objects.equals(documentationUrl, software.documentationUrl)
+                && Objects.equals(license, software.license)
+                && Objects.equals(codeRepositoryUrl, software.codeRepositoryUrl)
+                && Objects.equals(programmingLanguage, software.programmingLanguage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), documentationUrl, license, codeRepositoryUrl, programmingLanguage);
+        return Objects.hash(
+                super.hashCode(),
+                documentationUrl,
+                license,
+                codeRepositoryUrl,
+                programmingLanguage);
     }
 }
