@@ -8,9 +8,7 @@ public class CollectedFromType implements Serializable {
     private String datasourceId;
     private String completionStatus;
 
-
-    public CollectedFromType() {
-    }
+    public CollectedFromType() {}
 
     public CollectedFromType(String datasourceName, String datasourceId, String completionStatus) {
         this.datasourceName = datasourceName;

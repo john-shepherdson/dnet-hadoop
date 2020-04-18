@@ -1,17 +1,17 @@
 package eu.dnetlib.dhp.utils.saxon;
 
-import net.sf.saxon.Configuration;
-import net.sf.saxon.TransformerFactoryImpl;
-
+import java.io.StringReader;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
+import net.sf.saxon.Configuration;
+import net.sf.saxon.TransformerFactoryImpl;
 
 public class SaxonTransformerFactory {
 
     /**
      * Creates the index record transformer from the given XSLT
+     *
      * @param xslt
      * @return
      * @throws TransformerException
@@ -26,5 +26,4 @@ public class SaxonTransformerFactory {
 
         return factory.newTransformer(new StreamSource(new StringReader(xslt)));
     }
-
 }

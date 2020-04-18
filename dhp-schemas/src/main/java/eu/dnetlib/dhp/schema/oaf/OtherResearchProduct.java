@@ -40,11 +40,11 @@ public class OtherResearchProduct extends Result implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
-        if (!OtherResearchProduct.class.isAssignableFrom(e.getClass())){
+        if (!OtherResearchProduct.class.isAssignableFrom(e.getClass())) {
             return;
         }
 
-        OtherResearchProduct o = (OtherResearchProduct)e;
+        OtherResearchProduct o = (OtherResearchProduct) e;
 
         contactperson = mergeLists(contactperson, o.getContactperson());
         contactgroup = mergeLists(contactgroup, o.getContactgroup());
@@ -58,9 +58,9 @@ public class OtherResearchProduct extends Result implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         OtherResearchProduct that = (OtherResearchProduct) o;
-        return Objects.equals(contactperson, that.contactperson) &&
-                Objects.equals(contactgroup, that.contactgroup) &&
-                Objects.equals(tool, that.tool);
+        return Objects.equals(contactperson, that.contactperson)
+                && Objects.equals(contactgroup, that.contactgroup)
+                && Objects.equals(tool, that.tool);
     }
 
     @Override

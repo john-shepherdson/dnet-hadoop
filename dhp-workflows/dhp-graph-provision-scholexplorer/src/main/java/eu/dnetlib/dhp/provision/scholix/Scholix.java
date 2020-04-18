@@ -23,7 +23,6 @@ public class Scholix implements Serializable {
 
     private String identifier;
 
-
     public Scholix clone(final ScholixResource t) {
         final Scholix clone = new Scholix();
         clone.setPublicationDate(publicationDate);
@@ -34,70 +33,100 @@ public class Scholix implements Serializable {
         clone.setTarget(t);
         clone.generatelinkPublisher();
         clone.generateIdentifier();
-        return  clone;
+        return clone;
     }
 
-
-    public static Scholix generateScholixWithSource(final String sourceSummaryJson, final String relation) {
+    public static Scholix generateScholixWithSource(
+            final String sourceSummaryJson, final String relation) {
         final ObjectMapper mapper = new ObjectMapper();
 
         try {
-            ScholixSummary scholixSummary = mapper.readValue(sourceSummaryJson, ScholixSummary.class);
+            ScholixSummary scholixSummary =
+                    mapper.readValue(sourceSummaryJson, ScholixSummary.class);
             Relation rel = mapper.readValue(relation, Relation.class);
             final Scholix s = new Scholix();
-            if (scholixSummary.getDate() != null && scholixSummary.getDate().size()>0)
+            if (scholixSummary.getDate() != null && scholixSummary.getDate().size() > 0)
                 s.setPublicationDate(scholixSummary.getDate().get(0));
-            s.setLinkprovider(rel.getCollectedFrom().stream().map(cf ->
-                    new ScholixEntityId(cf.getValue(), Collections.singletonList(
-                            new ScholixIdentifier(cf.getKey(), "dnet_identifier")
-                    ))).collect(Collectors.toList()));
-            s.setRelationship(new ScholixRelationship(rel.getRelType(),rel.getRelClass(),null ));
+            s.setLinkprovider(
+                    rel.getCollectedFrom().stream()
+                            .map(
+                                    cf ->
+                                            new ScholixEntityId(
+                                                    cf.getValue(),
+                                                    Collections.singletonList(
+                                                            new ScholixIdentifier(
+                                                                    cf.getKey(),
+                                                                    "dnet_identifier"))))
+                            .collect(Collectors.toList()));
+            s.setRelationship(new ScholixRelationship(rel.getRelType(), rel.getRelClass(), null));
             s.setSource(ScholixResource.fromSummary(scholixSummary));
             return s;
         } catch (Throwable e) {
-            throw new RuntimeException(String.format("Summary: %s \n relation:%s",sourceSummaryJson, relation), e);
+            throw new RuntimeException(
+                    String.format("Summary: %s \n relation:%s", sourceSummaryJson, relation), e);
         }
     }
 
-    public static Scholix generateScholixWithSource(final ScholixSummary scholixSummary, final Relation rel) {
+    public static Scholix generateScholixWithSource(
+            final ScholixSummary scholixSummary, final Relation rel) {
         final Scholix s = new Scholix();
-        if (scholixSummary.getDate() != null && scholixSummary.getDate().size()>0)
+        if (scholixSummary.getDate() != null && scholixSummary.getDate().size() > 0)
             s.setPublicationDate(scholixSummary.getDate().get(0));
-        s.setLinkprovider(rel.getCollectedFrom().stream().map(cf ->
-                new ScholixEntityId(cf.getValue(), Collections.singletonList(
-                        new ScholixIdentifier(cf.getKey(), "dnet_identifier")
-                ))).collect(Collectors.toList()));
-        s.setRelationship(new ScholixRelationship(rel.getRelType(),rel.getRelClass(),null ));
+        s.setLinkprovider(
+                rel.getCollectedFrom().stream()
+                        .map(
+                                cf ->
+                                        new ScholixEntityId(
+                                                cf.getValue(),
+                                                Collections.singletonList(
+                                                        new ScholixIdentifier(
+                                                                cf.getKey(), "dnet_identifier"))))
+                        .collect(Collectors.toList()));
+        s.setRelationship(new ScholixRelationship(rel.getRelType(), rel.getRelClass(), null));
         s.setSource(ScholixResource.fromSummary(scholixSummary));
 
         s.setIdentifier(rel.getTarget());
-//        ScholixResource mockTarget = new ScholixResource();
-//        mockTarget.setDnetIdentifier(rel.getTarget());
-//        s.setTarget(mockTarget);
-//        s.generateIdentifier();
+        //        ScholixResource mockTarget = new ScholixResource();
+        //        mockTarget.setDnetIdentifier(rel.getTarget());
+        //        s.setTarget(mockTarget);
+        //        s.generateIdentifier();
         return s;
     }
-
 
     public void generatelinkPublisher() {
         Set<String> publisher = new HashSet<>();
         if (source.getPublisher() != null)
-            publisher.addAll(source.getPublisher().stream().map(ScholixEntityId::getName).collect(Collectors.toList()));
+            publisher.addAll(
+                    source.getPublisher().stream()
+                            .map(ScholixEntityId::getName)
+                            .collect(Collectors.toList()));
         if (target.getPublisher() != null)
-            publisher.addAll(target.getPublisher().stream().map(ScholixEntityId::getName).collect(Collectors.toList()));
-        this.publisher = publisher.stream().map(k -> new ScholixEntityId(k ,null)).collect(Collectors.toList());
+            publisher.addAll(
+                    target.getPublisher().stream()
+                            .map(ScholixEntityId::getName)
+                            .collect(Collectors.toList()));
+        this.publisher =
+                publisher.stream()
+                        .map(k -> new ScholixEntityId(k, null))
+                        .collect(Collectors.toList());
     }
 
-    public  void generateIdentifier( ) {
-        setIdentifier(DHPUtils.md5(String.format("%s::%s::%s",source.getDnetIdentifier(),relationship.getName(), target.getDnetIdentifier())));
-
+    public void generateIdentifier() {
+        setIdentifier(
+                DHPUtils.md5(
+                        String.format(
+                                "%s::%s::%s",
+                                source.getDnetIdentifier(),
+                                relationship.getName(),
+                                target.getDnetIdentifier())));
     }
 
     public Scholix addTarget(final String targetSummaryJson) {
         final ObjectMapper mapper = new ObjectMapper();
 
         try {
-            ScholixSummary targetSummary = mapper.readValue(targetSummaryJson, ScholixSummary.class);
+            ScholixSummary targetSummary =
+                    mapper.readValue(targetSummaryJson, ScholixSummary.class);
             setTarget(ScholixResource.fromSummary(targetSummary));
             generateIdentifier();
             return this;
@@ -157,6 +186,7 @@ public class Scholix implements Serializable {
     public String getIdentifier() {
         return identifier;
     }
+
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
     }

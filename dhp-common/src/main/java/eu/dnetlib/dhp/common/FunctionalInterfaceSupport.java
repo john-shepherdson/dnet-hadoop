@@ -3,23 +3,19 @@ package eu.dnetlib.dhp.common;
 import java.io.Serializable;
 import java.util.function.Supplier;
 
-/**
- * Provides serializable and throwing extensions to standard functional interfaces.
- */
+/** Provides serializable and throwing extensions to standard functional interfaces. */
 public class FunctionalInterfaceSupport {
 
-    private FunctionalInterfaceSupport() {
-    }
+    private FunctionalInterfaceSupport() {}
 
     /**
-     * Serializable supplier of any kind of objects. To be used withing spark processing pipelines when supplying
-     * functions externally.
+     * Serializable supplier of any kind of objects. To be used withing spark processing pipelines
+     * when supplying functions externally.
      *
      * @param <T>
      */
     @FunctionalInterface
-    public interface SerializableSupplier<T> extends Supplier<T>, Serializable {
-    }
+    public interface SerializableSupplier<T> extends Supplier<T>, Serializable {}
 
     /**
      * Extension of consumer accepting functions throwing an exception.
@@ -52,5 +48,4 @@ public class FunctionalInterfaceSupport {
     public interface ThrowingRunnable<E extends Exception> {
         void run() throws E;
     }
-
 }

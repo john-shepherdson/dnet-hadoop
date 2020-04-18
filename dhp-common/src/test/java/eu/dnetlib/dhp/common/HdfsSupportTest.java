@@ -1,9 +1,6 @@
 package eu.dnetlib.dhp.common;
 
-import org.apache.hadoop.conf.Configuration;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,8 +8,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.apache.hadoop.conf.Configuration;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class HdfsSupportTest {
 
@@ -22,8 +21,8 @@ public class HdfsSupportTest {
         @Test
         public void shouldThrowARuntimeExceptionOnError() {
             // when
-            assertThrows(RuntimeException.class, () ->
-                    HdfsSupport.remove(null, new Configuration()));
+            assertThrows(
+                    RuntimeException.class, () -> HdfsSupport.remove(null, new Configuration()));
         }
 
         @Test
@@ -54,8 +53,8 @@ public class HdfsSupportTest {
         @Test
         public void shouldThrowARuntimeExceptionOnError() {
             // when
-            assertThrows(RuntimeException.class, () ->
-                    HdfsSupport.listFiles(null, new Configuration()));
+            assertThrows(
+                    RuntimeException.class, () -> HdfsSupport.listFiles(null, new Configuration()));
         }
 
         @Test
@@ -68,8 +67,10 @@ public class HdfsSupportTest {
 
             // then
             assertEquals(2, paths.size());
-            List<String> expecteds = Arrays.stream(new String[]{subDir1.toString(), subDir2.toString()})
-                    .sorted().collect(Collectors.toList());
+            List<String> expecteds =
+                    Arrays.stream(new String[] {subDir1.toString(), subDir2.toString()})
+                            .sorted()
+                            .collect(Collectors.toList());
             List<String> actuals = paths.stream().sorted().collect(Collectors.toList());
             assertTrue(actuals.get(0).contains(expecteds.get(0)));
             assertTrue(actuals.get(1).contains(expecteds.get(1)));

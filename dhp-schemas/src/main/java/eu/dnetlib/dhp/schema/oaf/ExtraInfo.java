@@ -60,11 +60,11 @@ public class ExtraInfo implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExtraInfo extraInfo = (ExtraInfo) o;
-        return Objects.equals(name, extraInfo.name) &&
-                Objects.equals(typology, extraInfo.typology) &&
-                Objects.equals(provenance, extraInfo.provenance) &&
-                Objects.equals(trust, extraInfo.trust) &&
-                Objects.equals(value, extraInfo.value);
+        return Objects.equals(name, extraInfo.name)
+                && Objects.equals(typology, extraInfo.typology)
+                && Objects.equals(provenance, extraInfo.provenance)
+                && Objects.equals(trust, extraInfo.trust)
+                && Objects.equals(value, extraInfo.value);
     }
 
     @Override

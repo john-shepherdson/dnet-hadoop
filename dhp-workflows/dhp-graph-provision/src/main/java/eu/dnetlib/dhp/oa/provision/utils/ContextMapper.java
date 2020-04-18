@@ -4,22 +4,23 @@ import com.google.common.base.Joiner;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.HashMap;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.HashMap;
-
 public class ContextMapper extends HashMap<String, ContextDef> implements Serializable {
 
     private static final long serialVersionUID = 2159682308502487305L;
 
-    private final static String XQUERY = "for $x in //RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='ContextDSResourceType']//*[name()='context' or name()='category' or name()='concept'] return <entry id=\"{$x/@id}\" label=\"{$x/@label|$x/@name}\" name=\"{$x/name()}\" type=\"{$x/@type}\"/>";
+    private static final String XQUERY =
+            "for $x in //RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='ContextDSResourceType']//*[name()='context' or name()='category' or name()='concept'] return <entry id=\"{$x/@id}\" label=\"{$x/@label|$x/@name}\" name=\"{$x/name()}\" type=\"{$x/@type}\"/>";
 
-    public static ContextMapper fromIS(final String isLookupUrl) throws DocumentException, ISLookUpException {
+    public static ContextMapper fromIS(final String isLookupUrl)
+            throws DocumentException, ISLookUpException {
         ISLookUpService isLookUp = ISLookupClientFactory.getLookUpService(isLookupUrl);
         StringBuilder sb = new StringBuilder("<ContextDSResources>");
         Joiner.on("").appendTo(sb, isLookUp.quickSearchProfile(XQUERY));
@@ -42,5 +43,4 @@ public class ContextMapper extends HashMap<String, ContextDef> implements Serial
         }
         return contextMapper;
     }
-
 }

@@ -6,25 +6,25 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ProvisionUtil {
 
-    public final static String deletedByInferenceJPATH = "$.dataInfo.deletedbyinference";
-    public final static String TARGETJSONPATH = "$.target";
-    public final static String SOURCEJSONPATH = "$.source";
+    public static final String deletedByInferenceJPATH = "$.dataInfo.deletedbyinference";
+    public static final String TARGETJSONPATH = "$.target";
+    public static final String SOURCEJSONPATH = "$.source";
 
-//    public static RelatedItemInfo getItemType(final String item, final String idPath) {
-//        String targetId = DHPUtils.getJPathString(idPath, item);
-//        switch (StringUtils.substringBefore(targetId, "|")) {
-//            case "50":
-//                return new RelatedItemInfo(null,0,1,0);
-//            case "60":
-//                return new RelatedItemInfo(null,1,0,0);
-//            case "70":
-//                return new RelatedItemInfo(null,0,0,1);
-//            default:
-//                throw new RuntimeException("Unknonw target ID");
-//
-//        }
-//
-//    }
+    //    public static RelatedItemInfo getItemType(final String item, final String idPath) {
+    //        String targetId = DHPUtils.getJPathString(idPath, item);
+    //        switch (StringUtils.substringBefore(targetId, "|")) {
+    //            case "50":
+    //                return new RelatedItemInfo(null,0,1,0);
+    //            case "60":
+    //                return new RelatedItemInfo(null,1,0,0);
+    //            case "70":
+    //                return new RelatedItemInfo(null,0,0,1);
+    //            default:
+    //                throw new RuntimeException("Unknonw target ID");
+    //
+    //        }
+    //
+    //    }
 
     public static Boolean isNotDeleted(final String item) {
         return !"true".equalsIgnoreCase(DHPUtils.getJPathString(deletedByInferenceJPATH, item));
@@ -41,7 +41,6 @@ public class ProvisionUtil {
                 return Typology.unknown;
             default:
                 throw new RuntimeException("Unknonw ID type");
-
         }
     }
 }

@@ -1,18 +1,19 @@
 package eu.dnetlib.dhp.utils.saxon;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import net.sf.saxon.expr.XPathContext;
 import net.sf.saxon.om.Sequence;
 import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.value.SequenceType;
 import net.sf.saxon.value.StringValue;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class NormalizeDate extends AbstractExtensionFunction {
 
-    private static final String[] normalizeDateFormats = { "yyyy-MM-dd'T'hh:mm:ss", "yyyy-MM-dd", "yyyy/MM/dd", "yyyy" };
+    private static final String[] normalizeDateFormats = {
+        "yyyy-MM-dd'T'hh:mm:ss", "yyyy-MM-dd", "yyyy/MM/dd", "yyyy"
+    };
 
     private static final String normalizeOutFormat = new String("yyyy-MM-dd'T'hh:mm:ss'Z'");
 
@@ -42,7 +43,7 @@ public class NormalizeDate extends AbstractExtensionFunction {
 
     @Override
     public SequenceType[] getArgumentTypes() {
-        return new SequenceType[] { SequenceType.OPTIONAL_ITEM };
+        return new SequenceType[] {SequenceType.OPTIONAL_ITEM};
     }
 
     @Override
@@ -58,9 +59,9 @@ public class NormalizeDate extends AbstractExtensionFunction {
                 Date parse = new SimpleDateFormat(format).parse(date);
                 String res = new SimpleDateFormat(normalizeOutFormat).format(parse);
                 return res;
-            } catch (ParseException e) {}
+            } catch (ParseException e) {
+            }
         }
         return "";
     }
-
 }

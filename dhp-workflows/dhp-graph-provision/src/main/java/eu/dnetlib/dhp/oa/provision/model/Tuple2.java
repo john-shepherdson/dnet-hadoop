@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
 import eu.dnetlib.dhp.schema.oaf.Relation;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -11,8 +10,7 @@ public class Tuple2 implements Serializable {
 
     private RelatedEntity relatedEntity;
 
-    public Tuple2() {
-    }
+    public Tuple2() {}
 
     public Tuple2(Relation relation, RelatedEntity relatedEntity) {
         this.relation = relation;
@@ -47,5 +45,4 @@ public class Tuple2 implements Serializable {
     public int hashCode() {
         return Objects.hash(getRelation().hashCode());
     }
-
 }

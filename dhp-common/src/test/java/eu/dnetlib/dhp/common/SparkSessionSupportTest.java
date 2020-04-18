@@ -1,14 +1,13 @@
 package eu.dnetlib.dhp.common;
 
+import static org.mockito.Mockito.*;
+
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.ThrowingConsumer;
+import java.util.function.Function;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.Function;
-
-import static org.mockito.Mockito.*;
 
 public class SparkSessionSupportTest {
 
@@ -16,7 +15,8 @@ public class SparkSessionSupportTest {
     class RunWithSparkSession {
 
         @Test
-        public void shouldExecuteFunctionAndNotStopSparkSessionWhenSparkSessionIsNotManaged() throws Exception {
+        public void shouldExecuteFunctionAndNotStopSparkSessionWhenSparkSessionIsNotManaged()
+                throws Exception {
             // given
             SparkSession spark = mock(SparkSession.class);
             SparkConf conf = mock(SparkConf.class);
@@ -34,7 +34,8 @@ public class SparkSessionSupportTest {
         }
 
         @Test
-        public void shouldExecuteFunctionAndStopSparkSessionWhenSparkSessionIsManaged() throws Exception {
+        public void shouldExecuteFunctionAndStopSparkSessionWhenSparkSessionIsManaged()
+                throws Exception {
             // given
             SparkSession spark = mock(SparkSession.class);
             SparkConf conf = mock(SparkConf.class);

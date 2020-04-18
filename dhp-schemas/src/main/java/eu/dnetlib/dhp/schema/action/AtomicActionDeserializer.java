@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-
 import java.io.IOException;
 
 public class AtomicActionDeserializer extends JsonDeserializer {
 
     @Override
-    public Object deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public Object deserialize(JsonParser jp, DeserializationContext ctxt)
+            throws IOException, JsonProcessingException {
         JsonNode node = jp.getCodec().readTree(jp);
         String classTag = node.get("clazz").asText();
         JsonNode payload = node.get("payload");

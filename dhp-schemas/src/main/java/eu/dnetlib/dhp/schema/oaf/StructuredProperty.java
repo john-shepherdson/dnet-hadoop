@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 
-public class    StructuredProperty implements Serializable {
+public class StructuredProperty implements Serializable {
 
     private String value;
 
@@ -34,8 +34,8 @@ public class    StructuredProperty implements Serializable {
         this.dataInfo = dataInfo;
     }
 
-    public String toComparableString(){
-        return  value != null ? value.toLowerCase() : "";
+    public String toComparableString() {
+        return value != null ? value.toLowerCase() : "";
     }
 
     @Override
@@ -45,16 +45,12 @@ public class    StructuredProperty implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
 
         StructuredProperty other = (StructuredProperty) obj;
 
-        return toComparableString()
-                .equals(other.toComparableString());
+        return toComparableString().equals(other.toComparableString());
     }
 }

@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.oa.provision;
 
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
 import com.lucidworks.spark.util.SolrSupport;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
@@ -8,6 +10,16 @@ import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpDocumentNotFoundException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Optional;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
@@ -17,19 +29,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class XmlIndexingJob {
 
@@ -44,16 +43,17 @@ public class XmlIndexingJob {
 
     public static void main(String[] args) throws Exception {
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils.toString(
-                        XmlIndexingJob.class.getResourceAsStream(
-                                "/eu/dnetlib/dhp/oa/provision/input_params_update_index.json")));
+        final ArgumentApplicationParser parser =
+                new ArgumentApplicationParser(
+                        IOUtils.toString(
+                                XmlIndexingJob.class.getResourceAsStream(
+                                        "/eu/dnetlib/dhp/oa/provision/input_params_update_index.json")));
         parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
+        Boolean isSparkSessionManaged =
+                Optional.ofNullable(parser.get("isSparkSessionManaged"))
+                        .map(Boolean::valueOf)
+                        .orElse(Boolean.TRUE);
         log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
         final String inputPath = parser.get("inputPath");
@@ -65,7 +65,10 @@ public class XmlIndexingJob {
         final String format = parser.get("format");
         log.info("format: {}", format);
 
-        final Integer batchSize = parser.getObjectMap().containsKey("batchSize") ? Integer.valueOf(parser.get("batchSize")) : DEFAULT_BATCH_SIZE;
+        final Integer batchSize =
+                parser.getObjectMap().containsKey("batchSize")
+                        ? Integer.valueOf(parser.get("batchSize"))
+                        : DEFAULT_BATCH_SIZE;
         log.info("batchSize: {}", batchSize);
 
         final ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
@@ -87,17 +90,30 @@ public class XmlIndexingJob {
 
         final SparkConf conf = new SparkConf();
 
-        runWithSparkSession(conf, isSparkSessionManaged,
+        runWithSparkSession(
+                conf,
+                isSparkSessionManaged,
                 spark -> {
-                    final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+                    final JavaSparkContext sc =
+                            JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-                    RDD<SolrInputDocument> docs = sc.sequenceFile(inputPath, Text.class, Text.class)
-                            .map(t -> t._2().toString())
-                            .map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-                            .map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s))
-                            .rdd();
+                    RDD<SolrInputDocument> docs =
+                            sc.sequenceFile(inputPath, Text.class, Text.class)
+                                    .map(t -> t._2().toString())
+                                    .map(
+                                            s ->
+                                                    toIndexRecord(
+                                                            SaxonTransformerFactory.newInstance(
+                                                                    indexRecordXslt),
+                                                            s))
+                                    .map(
+                                            s ->
+                                                    new StreamingInputDocumentFactory(version, dsId)
+                                                            .parseDocument(s))
+                                    .rdd();
 
-                    final String collection = format + SEPARATOR + LAYOUT + SEPARATOR + INTERPRETATION;
+                    final String collection =
+                            format + SEPARATOR + LAYOUT + SEPARATOR + INTERPRETATION;
                     SolrSupport.indexDocs(zkHost, collection, batchSize, docs);
                 });
     }
@@ -116,15 +132,16 @@ public class XmlIndexingJob {
     /**
      * Creates the XSLT responsible for building the index xml records.
      *
-     * @param format       Metadata format name (DMF|TMF)
-     * @param xslt         xslt for building the index record transformer
-     * @param fields       the list of fields
+     * @param format Metadata format name (DMF|TMF)
+     * @param xslt xslt for building the index record transformer
+     * @param fields the list of fields
      * @return the javax.xml.transform.Transformer
-     * @throws ISLookUpException    could happen
-     * @throws IOException          could happen
+     * @throws ISLookUpException could happen
+     * @throws IOException could happen
      * @throws TransformerException could happen
      */
-    private static String getLayoutTransformer(String format, String fields, String xslt) throws TransformerException {
+    private static String getLayoutTransformer(String format, String fields, String xslt)
+            throws TransformerException {
 
         final Transformer layoutTransformer = SaxonTransformerFactory.newInstance(xslt);
         final StreamResult layoutToXsltXslt = new StreamResult(new StringWriter());
@@ -136,7 +153,9 @@ public class XmlIndexingJob {
     }
 
     /**
-     * method return a solr-compatible string representation of a date, used to mark all records as indexed today
+     * method return a solr-compatible string representation of a date, used to mark all records as
+     * indexed today
+     *
      * @return the parsed date
      */
     public static String getRecordDatestamp() {
@@ -144,18 +163,22 @@ public class XmlIndexingJob {
     }
 
     /**
-     * Method retrieves from the information system the list of fields associated to the given MDFormat name
+     * Method retrieves from the information system the list of fields associated to the given
+     * MDFormat name
      *
      * @param isLookup the ISLookup service stub
      * @param format the Metadata format name
      * @return the string representation of the list of fields to be indexed
-     *
      * @throws ISLookUpDocumentNotFoundException
      * @throws ISLookUpException
      */
-    private static String getLayoutSource(final ISLookUpService isLookup, final String format) throws ISLookUpDocumentNotFoundException, ISLookUpException {
-        return doLookup(isLookup, String.format(
-                "collection('')//RESOURCE_PROFILE[.//RESOURCE_TYPE/@value = 'MDFormatDSResourceType' and .//NAME='%s']//LAYOUT[@name='%s']", format, LAYOUT));
+    private static String getLayoutSource(final ISLookUpService isLookup, final String format)
+            throws ISLookUpDocumentNotFoundException, ISLookUpException {
+        return doLookup(
+                isLookup,
+                String.format(
+                        "collection('')//RESOURCE_PROFILE[.//RESOURCE_TYPE/@value = 'MDFormatDSResourceType' and .//NAME='%s']//LAYOUT[@name='%s']",
+                        format, LAYOUT));
     }
 
     /**
@@ -163,42 +186,54 @@ public class XmlIndexingJob {
      *
      * @param isLookup the ISLookup service stub
      * @return the string representation of the XSLT contained in the transformation rule profile
-     *
      * @throws ISLookUpDocumentNotFoundException
      * @throws ISLookUpException
      */
     private static String getLayoutTransformer(ISLookUpService isLookup) throws ISLookUpException {
-        return doLookup(isLookup, "collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType')" +
-                    "//RESOURCE_PROFILE[./BODY/CONFIGURATION/SCRIPT/TITLE/text() = 'openaireLayoutToRecordStylesheet']//CODE/node()");
+        return doLookup(
+                isLookup,
+                "collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType')"
+                        + "//RESOURCE_PROFILE[./BODY/CONFIGURATION/SCRIPT/TITLE/text() = 'openaireLayoutToRecordStylesheet']//CODE/node()");
     }
 
     /**
-     * Method retrieves from the information system the IndexDS profile ID associated to the given MDFormat name
+     * Method retrieves from the information system the IndexDS profile ID associated to the given
+     * MDFormat name
+     *
      * @param format
      * @param isLookup
      * @return the IndexDS identifier
      * @throws ISLookUpException
      */
-    private static String getDsId(String format, ISLookUpService isLookup) throws ISLookUpException {
-        return doLookup(isLookup, String.format("collection('/db/DRIVER/IndexDSResources/IndexDSResourceType')" +
-                        "//RESOURCE_PROFILE[./BODY/CONFIGURATION/METADATA_FORMAT/text() = '%s']//RESOURCE_IDENTIFIER/@value/string()", format));
+    private static String getDsId(String format, ISLookUpService isLookup)
+            throws ISLookUpException {
+        return doLookup(
+                isLookup,
+                String.format(
+                        "collection('/db/DRIVER/IndexDSResources/IndexDSResourceType')"
+                                + "//RESOURCE_PROFILE[./BODY/CONFIGURATION/METADATA_FORMAT/text() = '%s']//RESOURCE_IDENTIFIER/@value/string()",
+                        format));
     }
 
     /**
      * Method retrieves from the information system the zookeeper quorum of the Solr server
+     *
      * @param isLookup
      * @return the zookeeper quorum of the Solr server
      * @throws ISLookUpException
      */
     private static String getZkHost(ISLookUpService isLookup) throws ISLookUpException {
-        return doLookup(isLookup, "for $x in /RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='IndexServiceResourceType'] return $x//PROTOCOL[./@name='solr']/@address/string()");
+        return doLookup(
+                isLookup,
+                "for $x in /RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='IndexServiceResourceType'] return $x//PROTOCOL[./@name='solr']/@address/string()");
     }
 
-    private static String doLookup(ISLookUpService isLookup, String xquery) throws ISLookUpException {
+    private static String doLookup(ISLookUpService isLookup, String xquery)
+            throws ISLookUpException {
         log.info(String.format("running xquery: %s", xquery));
         final String res = isLookup.getResourceProfileByQuery(xquery);
-        log.info(String.format("got response (100 chars): %s", StringUtils.left(res, 100) + " ..."));
+        log.info(
+                String.format("got response (100 chars): %s", StringUtils.left(res, 100) + " ..."));
         return res;
     }
-
 }

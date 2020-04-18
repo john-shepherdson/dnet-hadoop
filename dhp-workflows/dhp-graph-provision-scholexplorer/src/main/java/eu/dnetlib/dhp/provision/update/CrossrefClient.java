@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.provision.update;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import eu.dnetlib.dhp.provision.scholix.ScholixResource;
+import java.io.ByteArrayOutputStream;
+import java.util.zip.Inflater;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -10,15 +12,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.ByteArrayOutputStream;
-import java.util.zip.Inflater;
-
 public class CrossrefClient {
 
     private String host;
-    private String index ="crossref";
+    private String index = "crossref";
     private String indexType = "item";
-
 
     public CrossrefClient(String host) {
         this.host = host;
@@ -63,26 +61,33 @@ public class CrossrefClient {
             decompresser.end();
             return new String(unzippeddata);
         } catch (Throwable e) {
-            throw new RuntimeException("Wrong record:" + blob,e);
+            throw new RuntimeException("Wrong record:" + blob, e);
         }
     }
 
-
-
     public ScholixResource getResourceByDOI(final String doi) {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet(String.format("http://%s:9200/%s/%s/%s", host, index,indexType, doi.replaceAll("/","%2F")));
+            HttpGet httpGet =
+                    new HttpGet(
+                            String.format(
+                                    "http://%s:9200/%s/%s/%s",
+                                    host, index, indexType, doi.replaceAll("/", "%2F")));
             CloseableHttpResponse response = client.execute(httpGet);
             String json = IOUtils.toString(response.getEntity().getContent());
             if (json.contains("blob")) {
                 JsonParser p = new JsonParser();
                 final JsonElement root = p.parse(json);
-                json =decompressBlob(root.getAsJsonObject().get("_source").getAsJsonObject().get("blob").getAsString());
+                json =
+                        decompressBlob(
+                                root.getAsJsonObject()
+                                        .get("_source")
+                                        .getAsJsonObject()
+                                        .get("blob")
+                                        .getAsString());
             }
             return CrossRefParserJSON.parseRecord(json);
         } catch (Throwable e) {
             return null;
         }
-
     }
 }

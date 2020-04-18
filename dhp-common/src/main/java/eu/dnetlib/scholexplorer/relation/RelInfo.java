@@ -2,7 +2,7 @@ package eu.dnetlib.scholexplorer.relation;
 
 import java.io.Serializable;
 
-public class RelInfo  implements Serializable {
+public class RelInfo implements Serializable {
     private String original;
     private String inverse;
 

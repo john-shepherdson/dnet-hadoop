@@ -3,21 +3,18 @@ package eu.dnetlib.dedup.graph;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dedup.DedupUtility;
 import eu.dnetlib.pace.util.PaceException;
-import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class ConnectedComponent implements Serializable {
 
     private Set<String> docIds;
     private String ccId;
 
-
-    public ConnectedComponent() {
-    }
+    public ConnectedComponent() {}
 
     public ConnectedComponent(Set<String> docIds) {
         this.docIds = docIds;
@@ -28,7 +25,7 @@ public class ConnectedComponent implements Serializable {
         if (docIds.size() > 1) {
             final String s = getMin();
             String prefix = s.split("\\|")[0];
-            ccId =prefix + "|dedup_______::" + DedupUtility.md5(s);
+            ccId = prefix + "|dedup_______::" + DedupUtility.md5(s);
             return ccId;
         } else {
             return docIds.iterator().next();
@@ -36,24 +33,25 @@ public class ConnectedComponent implements Serializable {
     }
 
     @JsonIgnore
-    public String getMin(){
+    public String getMin() {
 
         final StringBuilder min = new StringBuilder();
-        docIds.forEach(i -> {
-            if (StringUtils.isBlank(min.toString())) {
-                min.append(i);
-            } else {
-                if (min.toString().compareTo(i) > 0) {
-                    min.setLength(0);
-                    min.append(i);
-                }
-            }
-        });
+        docIds.forEach(
+                i -> {
+                    if (StringUtils.isBlank(min.toString())) {
+                        min.append(i);
+                    } else {
+                        if (min.toString().compareTo(i) > 0) {
+                            min.setLength(0);
+                            min.append(i);
+                        }
+                    }
+                });
         return min.toString();
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(this);

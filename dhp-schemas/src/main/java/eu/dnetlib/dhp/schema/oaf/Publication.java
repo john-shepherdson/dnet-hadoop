@@ -20,14 +20,13 @@ public class Publication extends Result implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
-        if (!Publication.class.isAssignableFrom(e.getClass())){
+        if (!Publication.class.isAssignableFrom(e.getClass())) {
             return;
         }
 
         Publication p = (Publication) e;
 
-        if (p.getJournal() != null && compareTrust(this, e)<0)
-            journal = p.getJournal();
+        if (p.getJournal() != null && compareTrust(this, e) < 0) journal = p.getJournal();
         mergeOAFDataInfo(e);
     }
 

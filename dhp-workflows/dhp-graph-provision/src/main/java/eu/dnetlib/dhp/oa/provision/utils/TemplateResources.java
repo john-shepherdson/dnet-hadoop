@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
 import com.google.common.io.Resources;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -23,9 +22,7 @@ public class TemplateResources {
         return Resources.toString(Resources.getResource(classpathResource), StandardCharsets.UTF_8);
     }
 
-    public TemplateResources() throws IOException {
-
-    }
+    public TemplateResources() throws IOException {}
 
     public String getEntity() {
         return entity;
@@ -50,5 +47,4 @@ public class TemplateResources {
     public String getChild() {
         return child;
     }
-
 }

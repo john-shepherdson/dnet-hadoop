@@ -10,7 +10,7 @@ public class ProvenaceInfo implements Serializable {
 
     private String completionStatus;
 
-    private String collectionMode ="collected";
+    private String collectionMode = "collected";
 
     public String getId() {
         return id;

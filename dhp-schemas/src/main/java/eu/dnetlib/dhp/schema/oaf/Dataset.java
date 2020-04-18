@@ -20,7 +20,7 @@ public class Dataset extends Result implements Serializable {
 
     private List<GeoLocation> geolocation;
 
-    public  Field<String> getStoragedate() {
+    public Field<String> getStoragedate() {
         return storagedate;
     }
 
@@ -80,23 +80,32 @@ public class Dataset extends Result implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
-        if (!Dataset.class.isAssignableFrom(e.getClass())){
+        if (!Dataset.class.isAssignableFrom(e.getClass())) {
             return;
         }
 
         final Dataset d = (Dataset) e;
 
-        storagedate = d.getStoragedate() != null && compareTrust(this, e)<0? d.getStoragedate() : storagedate;
+        storagedate =
+                d.getStoragedate() != null && compareTrust(this, e) < 0
+                        ? d.getStoragedate()
+                        : storagedate;
 
-        device= d.getDevice() != null && compareTrust(this, e)<0? d.getDevice() : device;
+        device = d.getDevice() != null && compareTrust(this, e) < 0 ? d.getDevice() : device;
 
-        size= d.getSize() != null && compareTrust(this, e)<0? d.getSize() : size;
+        size = d.getSize() != null && compareTrust(this, e) < 0 ? d.getSize() : size;
 
-        version= d.getVersion() != null && compareTrust(this, e)<0? d.getVersion() : version;
+        version = d.getVersion() != null && compareTrust(this, e) < 0 ? d.getVersion() : version;
 
-        lastmetadataupdate= d.getLastmetadataupdate() != null && compareTrust(this, e)<0? d.getLastmetadataupdate() :lastmetadataupdate;
+        lastmetadataupdate =
+                d.getLastmetadataupdate() != null && compareTrust(this, e) < 0
+                        ? d.getLastmetadataupdate()
+                        : lastmetadataupdate;
 
-        metadataversionnumber= d.getMetadataversionnumber() != null && compareTrust(this, e)<0? d.getMetadataversionnumber() : metadataversionnumber;
+        metadataversionnumber =
+                d.getMetadataversionnumber() != null && compareTrust(this, e) < 0
+                        ? d.getMetadataversionnumber()
+                        : metadataversionnumber;
 
         geolocation = mergeLists(geolocation, d.getGeolocation());
 
@@ -109,17 +118,25 @@ public class Dataset extends Result implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Dataset dataset = (Dataset) o;
-        return Objects.equals(storagedate, dataset.storagedate) &&
-                Objects.equals(device, dataset.device) &&
-                Objects.equals(size, dataset.size) &&
-                Objects.equals(version, dataset.version) &&
-                Objects.equals(lastmetadataupdate, dataset.lastmetadataupdate) &&
-                Objects.equals(metadataversionnumber, dataset.metadataversionnumber) &&
-                Objects.equals(geolocation, dataset.geolocation);
+        return Objects.equals(storagedate, dataset.storagedate)
+                && Objects.equals(device, dataset.device)
+                && Objects.equals(size, dataset.size)
+                && Objects.equals(version, dataset.version)
+                && Objects.equals(lastmetadataupdate, dataset.lastmetadataupdate)
+                && Objects.equals(metadataversionnumber, dataset.metadataversionnumber)
+                && Objects.equals(geolocation, dataset.geolocation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), storagedate, device, size, version, lastmetadataupdate, metadataversionnumber, geolocation);
+        return Objects.hash(
+                super.hashCode(),
+                storagedate,
+                device,
+                size,
+                version,
+                lastmetadataupdate,
+                metadataversionnumber,
+                geolocation);
     }
 }

@@ -9,7 +9,6 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +28,6 @@ public class ScholixSummary implements Serializable {
     private long relatedDatasets;
     private long relatedUnknown;
     private List<CollectedFromType> datasources;
-
 
     public String getId() {
         return id;
@@ -137,7 +135,6 @@ public class ScholixSummary implements Serializable {
         this.datasources = datasources;
     }
 
-
     public static ScholixSummary fromJsonOAF(final Typology oafType, final String oafJson) {
         try {
             final ObjectMapper mapper = new ObjectMapper();
@@ -145,11 +142,14 @@ public class ScholixSummary implements Serializable {
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             switch (oafType) {
                 case dataset:
-                    return summaryFromDataset(mapper.readValue(oafJson, DLIDataset.class), relatedItemInfo);
+                    return summaryFromDataset(
+                            mapper.readValue(oafJson, DLIDataset.class), relatedItemInfo);
                 case publication:
-                    return summaryFromPublication(mapper.readValue(oafJson, DLIPublication.class), relatedItemInfo);
+                    return summaryFromPublication(
+                            mapper.readValue(oafJson, DLIPublication.class), relatedItemInfo);
                 case unknown:
-                    return summaryFromUnknown(mapper.readValue(oafJson, DLIUnknown.class), relatedItemInfo);
+                    return summaryFromUnknown(
+                            mapper.readValue(oafJson, DLIUnknown.class), relatedItemInfo);
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -157,22 +157,30 @@ public class ScholixSummary implements Serializable {
         return null;
     }
 
-    public static String fromJsonOAF(final Typology oafType, final String oafJson, final String relEntityJson) {
+    public static String fromJsonOAF(
+            final Typology oafType, final String oafJson, final String relEntityJson) {
         try {
             final ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-            RelatedItemInfo relatedItemInfo = mapper.readValue(relEntityJson, RelatedItemInfo.class);
+            RelatedItemInfo relatedItemInfo =
+                    mapper.readValue(relEntityJson, RelatedItemInfo.class);
 
             switch (oafType) {
                 case dataset:
-                    return mapper.writeValueAsString(summaryFromDataset(mapper.readValue(oafJson, DLIDataset.class), relatedItemInfo));
+                    return mapper.writeValueAsString(
+                            summaryFromDataset(
+                                    mapper.readValue(oafJson, DLIDataset.class), relatedItemInfo));
                 case publication:
-                    return mapper.writeValueAsString(summaryFromPublication(mapper.readValue(oafJson, DLIPublication.class), relatedItemInfo));
+                    return mapper.writeValueAsString(
+                            summaryFromPublication(
+                                    mapper.readValue(oafJson, DLIPublication.class),
+                                    relatedItemInfo));
                 case unknown:
-                    return mapper.writeValueAsString(summaryFromUnknown(mapper.readValue(oafJson, DLIUnknown.class), relatedItemInfo));
+                    return mapper.writeValueAsString(
+                            summaryFromUnknown(
+                                    mapper.readValue(oafJson, DLIUnknown.class), relatedItemInfo));
             }
-
 
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -181,23 +189,32 @@ public class ScholixSummary implements Serializable {
         return null;
     }
 
-
-    private static ScholixSummary summaryFromDataset(final DLIDataset item, final RelatedItemInfo relatedItemInfo) {
+    private static ScholixSummary summaryFromDataset(
+            final DLIDataset item, final RelatedItemInfo relatedItemInfo) {
         ScholixSummary summary = new ScholixSummary();
         summary.setId(item.getId());
 
         if (item.getPid() != null)
-            summary.setLocalIdentifier(item.getPid().stream()
-                    .map(p -> new TypedIdentifier(p.getValue(), p.getQualifier().getClassid()))
-                    .collect(Collectors.toList())
-            );
+            summary.setLocalIdentifier(
+                    item.getPid().stream()
+                            .map(
+                                    p ->
+                                            new TypedIdentifier(
+                                                    p.getValue(), p.getQualifier().getClassid()))
+                            .collect(Collectors.toList()));
 
         summary.setTypology(Typology.dataset);
         if (item.getTitle() != null)
-            summary.setTitle(item.getTitle().stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
+            summary.setTitle(
+                    item.getTitle().stream()
+                            .map(StructuredProperty::getValue)
+                            .collect(Collectors.toList()));
 
         if (item.getAuthor() != null) {
-            summary.setAuthor(item.getAuthor().stream().map(Author::getFullname).collect(Collectors.toList()));
+            summary.setAuthor(
+                    item.getAuthor().stream()
+                            .map(Author::getFullname)
+                            .collect(Collectors.toList()));
         }
 
         if (item.getRelevantdate() != null)
@@ -205,19 +222,18 @@ public class ScholixSummary implements Serializable {
                     item.getRelevantdate().stream()
                             .filter(d -> "date".equalsIgnoreCase(d.getQualifier().getClassname()))
                             .map(StructuredProperty::getValue)
-                            .collect(Collectors.toList())
-            );
+                            .collect(Collectors.toList()));
 
         if (item.getDescription() != null && item.getDescription().size() > 0)
             summary.setDescription(item.getDescription().get(0).getValue());
 
         if (item.getSubject() != null) {
-            summary.setSubject(item.getSubject().stream()
-                    .map(s -> new SchemeValue(s.getQualifier().getClassid(), s.getValue()))
-                    .collect(Collectors.toList())
-            );
+            summary.setSubject(
+                    item.getSubject().stream()
+                            .map(s -> new SchemeValue(s.getQualifier().getClassid(), s.getValue()))
+                            .collect(Collectors.toList()));
         }
-        if (item.getPublisher()!= null)
+        if (item.getPublisher() != null)
             summary.setPublisher(Collections.singletonList(item.getPublisher().getValue()));
 
         summary.setRelatedDatasets(relatedItemInfo.getRelatedDataset());
@@ -225,29 +241,44 @@ public class ScholixSummary implements Serializable {
         summary.setRelatedUnknown(relatedItemInfo.getRelatedUnknown());
 
         if (item.getDlicollectedfrom() != null)
-            summary.setDatasources(item.getDlicollectedfrom().stream()
-                    .map(
-                            c -> new CollectedFromType(c.getName(), c.getId(), c.getCompletionStatus())
-                    ).collect(Collectors.toList()));
+            summary.setDatasources(
+                    item.getDlicollectedfrom().stream()
+                            .map(
+                                    c ->
+                                            new CollectedFromType(
+                                                    c.getName(),
+                                                    c.getId(),
+                                                    c.getCompletionStatus()))
+                            .collect(Collectors.toList()));
         return summary;
     }
 
-    private static ScholixSummary summaryFromPublication(final DLIPublication item, final RelatedItemInfo relatedItemInfo) {
+    private static ScholixSummary summaryFromPublication(
+            final DLIPublication item, final RelatedItemInfo relatedItemInfo) {
         ScholixSummary summary = new ScholixSummary();
         summary.setId(item.getId());
 
         if (item.getPid() != null)
-            summary.setLocalIdentifier(item.getPid().stream()
-                    .map(p -> new TypedIdentifier(p.getValue(), p.getQualifier().getClassid()))
-                    .collect(Collectors.toList())
-            );
+            summary.setLocalIdentifier(
+                    item.getPid().stream()
+                            .map(
+                                    p ->
+                                            new TypedIdentifier(
+                                                    p.getValue(), p.getQualifier().getClassid()))
+                            .collect(Collectors.toList()));
 
         summary.setTypology(Typology.publication);
         if (item.getTitle() != null)
-            summary.setTitle(item.getTitle().stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
+            summary.setTitle(
+                    item.getTitle().stream()
+                            .map(StructuredProperty::getValue)
+                            .collect(Collectors.toList()));
 
         if (item.getAuthor() != null) {
-            summary.setAuthor(item.getAuthor().stream().map(Author::getFullname).collect(Collectors.toList()));
+            summary.setAuthor(
+                    item.getAuthor().stream()
+                            .map(Author::getFullname)
+                            .collect(Collectors.toList()));
         }
 
         if (item.getRelevantdate() != null)
@@ -255,55 +286,66 @@ public class ScholixSummary implements Serializable {
                     item.getRelevantdate().stream()
                             .filter(d -> "date".equalsIgnoreCase(d.getQualifier().getClassname()))
                             .map(StructuredProperty::getValue)
-                            .collect(Collectors.toList())
-            );
+                            .collect(Collectors.toList()));
 
         if (item.getDescription() != null && item.getDescription().size() > 0)
             summary.setDescription(item.getDescription().get(0).getValue());
 
         if (item.getSubject() != null) {
-            summary.setSubject(item.getSubject().stream()
-                    .map(s -> new SchemeValue(s.getQualifier().getClassid(), s.getValue()))
-                    .collect(Collectors.toList())
-            );
+            summary.setSubject(
+                    item.getSubject().stream()
+                            .map(s -> new SchemeValue(s.getQualifier().getClassid(), s.getValue()))
+                            .collect(Collectors.toList()));
         }
 
-        if (item.getPublisher()!= null)
+        if (item.getPublisher() != null)
             summary.setPublisher(Collections.singletonList(item.getPublisher().getValue()));
-
 
         summary.setRelatedDatasets(relatedItemInfo.getRelatedDataset());
         summary.setRelatedPublications(relatedItemInfo.getRelatedPublication());
         summary.setRelatedUnknown(relatedItemInfo.getRelatedUnknown());
 
         if (item.getDlicollectedfrom() != null)
-            summary.setDatasources(item.getDlicollectedfrom().stream()
-                    .map(
-                            c -> new CollectedFromType(c.getName(), c.getId(), c.getCompletionStatus())
-                    ).collect(Collectors.toList()));
-
+            summary.setDatasources(
+                    item.getDlicollectedfrom().stream()
+                            .map(
+                                    c ->
+                                            new CollectedFromType(
+                                                    c.getName(),
+                                                    c.getId(),
+                                                    c.getCompletionStatus()))
+                            .collect(Collectors.toList()));
 
         return summary;
     }
 
-    private static ScholixSummary summaryFromUnknown(final DLIUnknown item, final RelatedItemInfo relatedItemInfo) {
+    private static ScholixSummary summaryFromUnknown(
+            final DLIUnknown item, final RelatedItemInfo relatedItemInfo) {
         ScholixSummary summary = new ScholixSummary();
         summary.setId(item.getId());
         if (item.getPid() != null)
-            summary.setLocalIdentifier(item.getPid().stream()
-                    .map(p -> new TypedIdentifier(p.getValue(), p.getQualifier().getClassid()))
-                    .collect(Collectors.toList())
-            );
+            summary.setLocalIdentifier(
+                    item.getPid().stream()
+                            .map(
+                                    p ->
+                                            new TypedIdentifier(
+                                                    p.getValue(), p.getQualifier().getClassid()))
+                            .collect(Collectors.toList()));
 
         summary.setRelatedDatasets(relatedItemInfo.getRelatedDataset());
         summary.setRelatedPublications(relatedItemInfo.getRelatedPublication());
         summary.setRelatedUnknown(relatedItemInfo.getRelatedUnknown());
         summary.setTypology(Typology.unknown);
         if (item.getDlicollectedfrom() != null)
-            summary.setDatasources(item.getDlicollectedfrom().stream()
-                    .map(
-                            c -> new CollectedFromType(c.getName(), c.getId(), c.getCompletionStatus())
-                    ).collect(Collectors.toList()));
+            summary.setDatasources(
+                    item.getDlicollectedfrom().stream()
+                            .map(
+                                    c ->
+                                            new CollectedFromType(
+                                                    c.getName(),
+                                                    c.getId(),
+                                                    c.getCompletionStatus()))
+                            .collect(Collectors.toList()));
         return summary;
     }
 }

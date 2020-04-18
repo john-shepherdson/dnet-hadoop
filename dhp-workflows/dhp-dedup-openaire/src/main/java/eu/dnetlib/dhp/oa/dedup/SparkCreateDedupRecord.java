@@ -1,64 +1,84 @@
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
+import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SparkCreateDedupRecord {
+public class SparkCreateDedupRecord extends AbstractSparkAction {
 
-    public static void main(String[] args) throws Exception {
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils.toString(
-                        SparkCreateDedupRecord.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createDedupRecord_parameters.json")));
-        parser.parseArgument(args);
+    private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
 
-        new SparkCreateDedupRecord().run(parser);
+    public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) {
+        super(parser, spark);
     }
 
-    private void run(ArgumentApplicationParser parser) throws ISLookUpException, DocumentException {
+    public static void main(String[] args) throws Exception {
+        ArgumentApplicationParser parser =
+                new ArgumentApplicationParser(
+                        IOUtils.toString(
+                                SparkCreateSimRels.class.getResourceAsStream(
+                                        "/eu/dnetlib/dhp/oa/dedup/createDedupRecord_parameters.json")));
+        parser.parseArgument(args);
+
+        SparkConf conf = new SparkConf();
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+
+        new SparkCreateDedupRecord(parser, getSparkSession(conf))
+                .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+    }
+
+    @Override
+    public void run(ISLookUpService isLookUpService)
+            throws ISLookUpException, DocumentException, IOException {
 
         final String graphBasePath = parser.get("graphBasePath");
         final String isLookUpUrl = parser.get("isLookUpUrl");
         final String actionSetId = parser.get("actionSetId");
         final String workingPath = parser.get("workingPath");
 
-        try (SparkSession spark = getSparkSession(parser)) {
-            final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+        log.info("graphBasePath: '{}'", graphBasePath);
+        log.info("isLookUpUrl:   '{}'", isLookUpUrl);
+        log.info("actionSetId:   '{}'", actionSetId);
+        log.info("workingPath:   '{}'", workingPath);
 
-            for (DedupConfig dedupConf: DedupUtility.getConfigurations(isLookUpUrl, actionSetId)) {
-                String subEntity = dedupConf.getWf().getSubEntityValue();
+        for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
+            String subEntity = dedupConf.getWf().getSubEntityValue();
+            log.info("Creating deduprecords for: '{}'", subEntity);
 
-                final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
-                final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
-                final OafEntityType entityType = OafEntityType.valueOf(subEntity);
-                final JavaRDD<OafEntity> dedupRecord =
-                        DedupRecordFactory.createDedupRecord(sc, spark, mergeRelPath, entityPath, entityType, dedupConf);
-                dedupRecord.map(r -> {
-                    ObjectMapper mapper = new ObjectMapper();
-                    return mapper.writeValueAsString(r);
-                }).saveAsTextFile(DedupUtility.createDedupRecordPath(workingPath, actionSetId, subEntity));
-            }
+            final String outputPath =
+                    DedupUtility.createDedupRecordPath(workingPath, actionSetId, subEntity);
+            removeOutputDir(spark, outputPath);
+
+            final String mergeRelPath =
+                    DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
+            final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
+
+            Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
+
+            DedupRecordFactory.createDedupRecord(spark, mergeRelPath, entityPath, clazz, dedupConf)
+                    .map(
+                            (MapFunction<OafEntity, String>)
+                                    value -> OBJECT_MAPPER.writeValueAsString(value),
+                            Encoders.STRING())
+                    .write()
+                    .mode(SaveMode.Overwrite)
+                    .json(outputPath);
         }
     }
-
-    private static SparkSession getSparkSession(ArgumentApplicationParser parser) {
-        SparkConf conf = new SparkConf();
-
-        return SparkSession
-                .builder()
-                .appName(SparkCreateDedupRecord.class.getSimpleName())
-                .master(parser.get("master"))
-                .config(conf)
-                .enableHiveSupport()
-                .getOrCreate();
-    }
 }
-
