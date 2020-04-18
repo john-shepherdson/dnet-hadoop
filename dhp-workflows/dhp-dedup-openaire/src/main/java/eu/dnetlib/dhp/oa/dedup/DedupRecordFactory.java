@@ -27,15 +27,15 @@ public class DedupRecordFactory {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public static <T extends OafEntity> Dataset<T> createDedupRecord(
-            final SparkSession spark, final String mergeRelsInputPath, final String entitiesInputPath, final Class<T> clazz, final DedupConfig dedupConf) {
+            final SparkSession spark, final String mergeRelsInputPath, final String entitiesInputPath, final Class<T> clazz) {
 
         long ts = System.currentTimeMillis();
 
         //<id, json_entity>
         Dataset<Tuple2<String, T>> entities = spark.read()
                 .textFile(entitiesInputPath)
-                .map((MapFunction<String, Tuple2<String, T>>) it -> {
-                    T entity = OBJECT_MAPPER.readValue(it, clazz);
+                .map((MapFunction<String, Tuple2<String, T>>) s -> {
+                    T entity = OBJECT_MAPPER.readValue(s, clazz);
                     return new Tuple2<>(entity.getId(), entity);
                 }, Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
 

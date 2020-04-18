@@ -95,7 +95,6 @@ public class SparkDedupTest implements Serializable {
                 IOUtils.toString(
                         SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createSimRels_parameters.json")));
         parser.parseArgument(new String[]{
-                "-mt", "local[*]",
                 "-i", testGraphBasePath,
                 "-asi", testActionSetId,
                 "-la", "lookupurl",
@@ -120,7 +119,6 @@ public class SparkDedupTest implements Serializable {
                 IOUtils.toString(
                         SparkCreateMergeRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
         parser.parseArgument(new String[]{
-                "-mt", "local[*]",
                 "-i", testGraphBasePath,
                 "-asi", testActionSetId,
                 "-la", "lookupurl",
@@ -145,7 +143,6 @@ public class SparkDedupTest implements Serializable {
                 IOUtils.toString(
                         SparkCreateDedupRecord.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createDedupRecord_parameters.json")));
         parser.parseArgument(new String[]{
-                "-mt", "local[*]",
                 "-i", testGraphBasePath,
                 "-asi", testActionSetId,
                 "-la", "lookupurl",
@@ -170,7 +167,6 @@ public class SparkDedupTest implements Serializable {
                 IOUtils.toString(
                         SparkUpdateEntity.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
         parser.parseArgument(new String[]{
-                "-mt", "local[*]",
                 "-i", testGraphBasePath,
                 "-w", testOutputBasePath,
                 "-o", testDedupGraphBasePath
@@ -221,7 +217,6 @@ public class SparkDedupTest implements Serializable {
                 IOUtils.toString(
                         SparkPropagateRelation.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json")));
         parser.parseArgument(new String[]{
-                "-mt", "local[*]",
                 "-i", testGraphBasePath,
                 "-w", testOutputBasePath,
                 "-o", testDedupGraphBasePath
