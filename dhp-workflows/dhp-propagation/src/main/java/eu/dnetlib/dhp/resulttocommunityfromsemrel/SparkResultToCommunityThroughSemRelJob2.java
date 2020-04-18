@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 
-import com.cloudera.com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.QueryInformationSystem;
 import eu.dnetlib.dhp.TypedRow;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -21,24 +21,19 @@ import java.util.stream.Collectors;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 
-public class SparkResultToCommunityThroughSemRelJob {
+public class SparkResultToCommunityThroughSemRelJob2 {
     public static void main(String[] args) throws Exception {
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils
-                .toString(SparkResultToCommunityThroughSemRelJob.class
+                .toString(SparkResultToCommunityThroughSemRelJob2.class
                         .getResourceAsStream("/eu/dnetlib/dhp/resulttocommunityfromsemrel/input_propagationresultcommunityfromsemrel_parameters.json")));
         parser.parseArgument(args);
-
-        for(String key :  parser.getObjectMap().keySet()){
-            System.out.println(key + " = " + parser.get(key));
-        }
-
 
        SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
         final SparkSession spark = SparkSession
                 .builder()
-                .appName(SparkResultToCommunityThroughSemRelJob.class.getSimpleName())
+                .appName(SparkResultToCommunityThroughSemRelJob2.class.getSimpleName())
                 .master(parser.get("master"))
                 .config(conf)
                 .enableHiveSupport()
@@ -48,128 +43,157 @@ public class SparkResultToCommunityThroughSemRelJob {
         final String inputPath = parser.get("sourcePath");
         final String outputPath = "/tmp/provision/propagation/resulttocommunityfromsemrel";
 
-        //final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
-        final List<String> allowedsemrel = Arrays.asList("isSupplementedBy", "isSupplementTo");
-        //final List<String> communityIdList = QueryInformationSystem.getCommunityList(parser.get("isLookupUrl"));
-        final List<String> communityIdList = QueryInformationSystem.getCommunityList("http://beta.services.openaire.eu:8280/is/services/isLookUp");
+        final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
+        //final List<String> allowedsemrel = Arrays.asList("isSupplementedBy", "isSupplementTo");
+        final List<String> communityIdList = QueryInformationSystem.getCommunityList(parser.get("isLookupUrl"));
+        //final List<String> communityIdList = QueryInformationSystem.getCommunityList("http://beta.services.openaire.eu:8280/is/services/isLookUp");
 
         createOutputDirs(outputPath, FileSystem.get(spark.sparkContext().hadoopConfiguration()));
 
 
-        JavaRDD<Publication> all_publication_rdd = sc.textFile(inputPath + "/publication")
-                .map(item -> new ObjectMapper().readValue(item, Publication.class))
-                .filter(p -> !p.getDataInfo().getDeletedbyinference()).cache();
-        JavaRDD<Publication> publication_rdd = all_publication_rdd
-                .filter(p -> relatedToCommunities(p, communityIdList)).cache();
+        JavaRDD<Publication> publication_rdd = sc.textFile(inputPath + "/publication")
+                .map(item -> new ObjectMapper().readValue(item, Publication.class));
 
-        JavaRDD<Dataset> all_dataset_rdd = sc.textFile(inputPath + "/dataset")
-                .map(item -> new ObjectMapper().readValue(item, Dataset.class))
-                .filter(p -> !p.getDataInfo().getDeletedbyinference()).cache();
-        JavaRDD<Dataset> dataset_rdd = all_dataset_rdd
-                .filter(p -> relatedToCommunities(p, communityIdList)).cache();
-
-        JavaRDD<OtherResearchProduct> all_orp_rdd = sc.textFile(inputPath + "/otherresearchproduct")
-                .map(item -> new ObjectMapper().readValue(item, OtherResearchProduct.class))
-                .filter(p -> !p.getDataInfo().getDeletedbyinference()).cache();
-        JavaRDD<OtherResearchProduct> orp_rdd = all_orp_rdd.filter(p -> relatedToCommunities(p, communityIdList)).cache();
-
-        JavaRDD<Software> all_software_rdd = sc.textFile(inputPath + "/software")
-                .map(item -> new ObjectMapper().readValue(item, Software.class))
-                .filter(p -> !p.getDataInfo().getDeletedbyinference()).cache();
-        JavaRDD<Software> software_rdd = all_software_rdd.filter(p -> relatedToCommunities(p, communityIdList)).cache();
+        System.out.println(publication_rdd.count());
+//        JavaRDD<Dataset> dataset_rdd = sc.textFile(inputPath + "/dataset")
+//                .map(item -> new ObjectMapper().readValue(item, Dataset.class));
+//
+//        JavaRDD<OtherResearchProduct> orp_rdd = sc.textFile(inputPath + "/otherresearchproduct")
+//                .map(item -> new ObjectMapper().readValue(item, OtherResearchProduct.class));
+//
+//        JavaRDD<Software> software_rdd = sc.textFile(inputPath + "/software")
+//                .map(item -> new ObjectMapper().readValue(item, Software.class));
 
         JavaRDD<Relation> relation_rdd = sc.textFile(inputPath + "/relation")
-                .map(item -> new ObjectMapper().readValue(item, Relation.class))
-                .filter(r -> !r.getDataInfo().getDeletedbyinference())
-                .filter(r -> allowedsemrel.contains(r.getRelClass()) && RELATION_RESULTRESULT_REL_TYPE.equals(r.getRelType())).cache();
+                .map(item -> new ObjectMapper().readValue(item, Relation.class));
+
+        System.out.println(relation_rdd.count());
+
+//                .filter(r -> !r.getDataInfo().getDeletedbyinference())
+//                .filter(r -> allowedsemrel.contains(r.getRelClass()) && RELATION_RESULTRESULT_REL_TYPE.equals(r.getRelType())).cache();
 
 
         org.apache.spark.sql.Dataset<Publication> publication = spark.createDataset(publication_rdd.rdd(),
                 Encoders.bean(Publication.class));
 
-        org.apache.spark.sql.Dataset<Dataset> dataset = spark.createDataset(dataset_rdd.rdd(),
-                Encoders.bean(Dataset.class));
-
-        org.apache.spark.sql.Dataset<OtherResearchProduct> other = spark.createDataset(orp_rdd.rdd(),
-                Encoders.bean(OtherResearchProduct.class));
-
-        org.apache.spark.sql.Dataset<Software> software = spark.createDataset(software_rdd.rdd(),
-                Encoders.bean(Software.class));
-
         org.apache.spark.sql.Dataset<Relation> relation = spark.createDataset(relation_rdd.rdd(),
                 Encoders.bean(Relation.class));
 
+//        org.apache.spark.sql.Dataset<Dataset> dataset = spark.createDataset(dataset_rdd.rdd(),
+//                Encoders.bean(Dataset.class));
+//
+//        org.apache.spark.sql.Dataset<OtherResearchProduct> other = spark.createDataset(orp_rdd.rdd(),
+//                Encoders.bean(OtherResearchProduct.class));
+//
+//        org.apache.spark.sql.Dataset<Software> software = spark.createDataset(software_rdd.rdd(),
+//                Encoders.bean(Software.class));
+//
+//        org.apache.spark.sql.Dataset<Relation> relation = spark.createDataset(relation_rdd.rdd(),
+//                Encoders.bean(Relation.class));
+
         publication.createOrReplaceTempView("publication");
         relation.createOrReplaceTempView("relation");
-        dataset.createOrReplaceTempView("dataset");
-        software.createOrReplaceTempView("software");
-        other.createOrReplaceTempView("other");
+//        relation.createOrReplaceTempView("relation");
+//        dataset.createOrReplaceTempView("dataset");
+//        software.createOrReplaceTempView("software");
+//        other.createOrReplaceTempView("other");
 
-//        org.apache.spark.sql.Dataset<Row> publication_context = getContext(spark, "publication");
-//        publication_context.createOrReplaceTempView("publication_context");
+        String communitylist = getConstraintList(" co.id = '", communityIdList);
 
-        org.apache.spark.sql.Dataset<Row> publication_context = spark.sql( "SELECT relation.source, " +
-                "publication.context , relation.target " +
-                "FROM publication " +
-                " JOIN relation  " +
-                "ON  id = source");
-
-        org.apache.spark.sql.Dataset<Row> dataset_context = getContext(spark, "dataset");
-        dataset_context.createOrReplaceTempView("dataset_context");
-
-        org.apache.spark.sql.Dataset<Row> software_context = getContext(spark, "software");
-        software_context.createOrReplaceTempView("software_context");
-
-        org.apache.spark.sql.Dataset<Row> other_context = getContext(spark, "other");
-        other_context.createOrReplaceTempView("other_context");
-
-        publication = spark.createDataset(all_publication_rdd.rdd(),
-                Encoders.bean(Publication.class));
-        publication.createOrReplaceTempView("publication");
-
-        dataset = spark.createDataset(all_dataset_rdd.rdd(),
-                Encoders.bean(Dataset.class));
-        dataset.createOrReplaceTempView("dataset");
-
-        other = spark.createDataset(all_orp_rdd.rdd(),
-                Encoders.bean(OtherResearchProduct.class));
-        other.createOrReplaceTempView("other");
-
-        software = spark.createDataset(all_software_rdd.rdd(),
-                Encoders.bean(Software.class));
-        software.createOrReplaceTempView("software");
+        String semrellist = getConstraintList(" relClass = '", allowedsemrel );
 
 
-        org.apache.spark.sql.Dataset<Row> toupdatesoftwareresult = getUpdateCommunitiesForTable(spark, "software");
-        org.apache.spark.sql.Dataset<Row> toupdatedatasetresult = getUpdateCommunitiesForTable(spark, "dataset");
-        org.apache.spark.sql.Dataset<Row> toupdatepublicationreresult = getUpdateCommunitiesForTable(spark, "publication");
-        org.apache.spark.sql.Dataset<Row> toupdateotherresult = getUpdateCommunitiesForTable(spark, "other");
-
-        createUpdateForResultDatasetWrite(toupdatesoftwareresult.toJavaRDD(), outputPath, "software_update",
-                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
-
-        createUpdateForResultDatasetWrite(toupdatedatasetresult.toJavaRDD(),  outputPath, "dataset_update",
-                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
-
-        createUpdateForResultDatasetWrite(toupdatepublicationreresult.toJavaRDD(),  outputPath, "publication_update",
-                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
-
-        createUpdateForResultDatasetWrite(toupdateotherresult.toJavaRDD(), outputPath, "other_update",
-                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+        String query = "Select source, community_context, target " +
+                "from (select id, collect_set(co.id) community_context " +
+                "from  publication " +
+                "lateral view explode (context) c as co " +
+                "where datainfo.deletedbyinference = false "+ communitylist +
+                " group by id) p " +
+                "JOIN " +
+                "(select * " +
+                "from relation " +
+                "where datainfo.deletedbyinference = false and (relClass = 'isSupplementedBy' OR relClass = 'isSupplementTo')) r " +
+                "ON p.id = r.source";
 
 
-        updateForDatasetDataset(toupdatedatasetresult.toJavaRDD(), dataset.toJavaRDD(), outputPath, "dataset",
-                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+        org.apache.spark.sql.Dataset<Row> publication_context = spark.sql( query);
+        publication_context.createOrReplaceTempView("publication_context");
 
-        updateForOtherDataset(toupdateotherresult.toJavaRDD(), other.toJavaRDD(), outputPath, "otherresearchproduct",
-                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+        //( source, (mes, dh-ch-, ni), target )
+        query = "select target , collect_set(co) " +
+                "from (select target, community_context " +
+                "from publication_context pc join publication p on " +
+                "p.id = pc.source) tmp " +
+                "lateral view explode (community_context) c as co " +
+                "group by target";
 
-        updateForSoftwareDataset(toupdatesoftwareresult.toJavaRDD(), software.toJavaRDD(), outputPath, "software",
-                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
 
-        updateForPublicationDataset(toupdatepublicationreresult.toJavaRDD(), publication.toJavaRDD(), outputPath, "publication",
-                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
 
+        org.apache.spark.sql.Dataset<Row> toupdatepublicationreresult = spark.sql(query);
+
+        System.out.println(toupdatepublicationreresult.count());
+
+        toupdatepublicationreresult.toJavaRDD()
+                .map(r -> {
+                    TypedRow tp = new TypedRow();
+                    tp.setSourceId(r.getString(0));
+                    r.getList(1).stream().forEach(c -> tp.add((String)c));
+                    return tp;
+                })
+                .map(tr -> new ObjectMapper().writeValueAsString(tr))
+                .saveAsTextFile(outputPath + "/community2semrelonpublication");
+//        toupdatepublicationreresult.toJavaRDD().flatMap(c -> {
+//
+//            String source = c.getString(0);
+//            List<Relation> relation_list = new ArrayList<>();
+//            c.getList(1).stream()
+//                    .forEach(res -> {
+//                        Relation r = new Relation();
+//                        r.setSource(source);
+//                        r.setTarget((String)res);
+//                        r.setRelClass("produces");
+//                        relation_list.add(r);
+//                        r = new Relation();
+//                        r.setSource((String)res);
+//                        r.setTarget(source);
+//                        r.setRelClass("isProducedBy");
+//                        relation_list.add(r);
+//                    });
+//            return relation_list.iterator();
+//        }).map(tr -> new ObjectMapper().writeValueAsString(tr))
+//                .saveAsTextFile(outputPath + "/community2semrel");
+//
+
+//        org.apache.spark.sql.Dataset<Row> toupdatesoftwareresult = getUpdateCommunitiesForTable(spark, "software");
+//        org.apache.spark.sql.Dataset<Row> toupdatedatasetresult = getUpdateCommunitiesForTable(spark, "dataset");
+//        org.apache.spark.sql.Dataset<Row> toupdatepublicationreresult = getUpdateCommunitiesForTable(spark, "publication");
+//        org.apache.spark.sql.Dataset<Row> toupdateotherresult = getUpdateCommunitiesForTable(spark, "other");
+
+//        createUpdateForResultDatasetWrite(toupdatesoftwareresult.toJavaRDD(), outputPath, "software_update",
+//                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+//
+//        createUpdateForResultDatasetWrite(toupdatedatasetresult.toJavaRDD(),  outputPath, "dataset_update",
+//                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+
+//        createUpdateForResultDatasetWrite(toupdatepublicationreresult.toJavaRDD(),  outputPath, "publication_update",
+//                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+
+//        createUpdateForResultDatasetWrite(toupdateotherresult.toJavaRDD(), outputPath, "other_update",
+//                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+//
+//
+//        updateForDatasetDataset(toupdatedatasetresult.toJavaRDD(), dataset.toJavaRDD(), outputPath, "dataset",
+//                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+//
+//        updateForOtherDataset(toupdateotherresult.toJavaRDD(), other.toJavaRDD(), outputPath, "otherresearchproduct",
+//                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+//
+//        updateForSoftwareDataset(toupdatesoftwareresult.toJavaRDD(), software.toJavaRDD(), outputPath, "software",
+//                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+//
+//        updateForPublicationDataset(toupdatepublicationreresult.toJavaRDD(), publication.toJavaRDD(), outputPath, "publication",
+//                PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID, PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME, communityIdList);
+//
 
 /*
         JavaPairRDD<String, TypedRow> resultLinkedToCommunities = publication

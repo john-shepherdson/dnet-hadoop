@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.communitytoresultthroughsemrel;
+package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.QueryInformationSystem;
@@ -33,7 +33,8 @@ public class SparkResultToCommunityThroughSemRelJob {
             System.out.println(key + " = " + parser.get(key));
         }
 
-   /*     SparkConf conf = new SparkConf();
+
+       SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
         final SparkSession spark = SparkSession
                 .builder()
@@ -45,7 +46,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
         final String inputPath = parser.get("sourcePath");
-        final String outputPath = "/tmp/provision/propagation/communitytoresultthroughsemrel";
+        final String outputPath = "/tmp/provision/propagation/resulttocommunityfromsemrel";
 
         //final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
         final List<String> allowedsemrel = Arrays.asList("isSupplementedBy", "isSupplementTo");
@@ -104,8 +105,14 @@ public class SparkResultToCommunityThroughSemRelJob {
         software.createOrReplaceTempView("software");
         other.createOrReplaceTempView("other");
 
-        org.apache.spark.sql.Dataset<Row> publication_context = getContext(spark, "publication");
-        publication_context.createOrReplaceTempView("publication_context");
+//        org.apache.spark.sql.Dataset<Row> publication_context = getContext(spark, "publication");
+//        publication_context.createOrReplaceTempView("publication_context");
+
+        org.apache.spark.sql.Dataset<Row> publication_context = spark.sql( "SELECT relation.source, " +
+                "publication.context , relation.target " +
+                "FROM publication " +
+                " JOIN relation  " +
+                "ON  id = source");
 
         org.apache.spark.sql.Dataset<Row> dataset_context = getContext(spark, "dataset");
         dataset_context.createOrReplaceTempView("dataset_context");
@@ -202,7 +209,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 */
     }
 
-  /*  private static org.apache.spark.sql.Dataset<Row> getUpdateCommunitiesForTable(SparkSession spark, String table){
+   private static org.apache.spark.sql.Dataset<Row> getUpdateCommunitiesForTable(SparkSession spark, String table){
         String query = "SELECT target_id, collect_set(co.id) context_id  " +
                 "       FROM (SELECT t.id target_id, s.context source_context " +
                 "             FROM context_software s " +
@@ -223,7 +230,7 @@ public class SparkResultToCommunityThroughSemRelJob {
                 "             FROM other_context o " +
                 "             JOIN " + table + " t  " +
                 "             ON o.target = t.id)  TMP " +
-                "             LATERAL VIEW EXPLORE(source_context) MyT as co " +
+                "             LATERAL VIEW EXPLODE(source_context) MyT as co " +
                 "             GROUP BY target_id" ;
 
         return spark.sql(query);
@@ -413,7 +420,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 
 
     private static org.apache.spark.sql.Dataset<Row> getContext(SparkSession spark, String table){
-        String query = "SELECT source, context , target " +
+        String query = "SELECT relation.source, " + table +".context , relation.target " +
                 "FROM " + table  +
                 " JOIN relation  " +
                 "ON  id = source" ;
@@ -484,5 +491,5 @@ public class SparkResultToCommunityThroughSemRelJob {
             return tp;
         }
         return null;
-    }*/
+    }
 }
