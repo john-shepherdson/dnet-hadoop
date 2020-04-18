@@ -1,23 +1,26 @@
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.oa.dedup.model.Block;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.model.FieldListImpl;
+import eu.dnetlib.pace.model.FieldValueImpl;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.Text;
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -27,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.io.IOException;
-import java.util.List;
 
 public class SparkCreateSimRels extends AbstractSparkAction {
 
@@ -43,7 +45,17 @@ public class SparkCreateSimRels extends AbstractSparkAction {
                         SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/createSimRels_parameters.json")));
         parser.parseArgument(args);
 
-        new SparkCreateSimRels(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+        SparkConf conf = new SparkConf();
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        conf.registerKryoClasses(new Class[] {
+                MapDocument.class,
+                FieldListImpl.class,
+                FieldValueImpl.class,
+                Block.class
+        });
+
+        new SparkCreateSimRels(parser, getSparkSession(conf))
+                .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
     @Override
@@ -60,8 +72,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
         log.info("actionSetId:   '{}'", actionSetId);
         log.info("workingPath:   '{}'", workingPath);
 
-        final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
         //for each dedup configuration
         for (DedupConfig dedupConf: getConfigurations(isLookUpService, actionSetId)) {
 
@@ -72,29 +82,30 @@ public class SparkCreateSimRels extends AbstractSparkAction {
             final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity);
             removeOutputDir(spark, outputPath);
 
-            JavaPairRDD<String, MapDocument> mapDocument = sc.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-                    .mapToPair((PairFunction<String, String, MapDocument>)  s -> {
+            JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+            JavaPairRDD<String, MapDocument> mapDocuments = sc.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+                    .mapToPair((PairFunction<String, String, MapDocument>) s -> {
                         MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
                         return new Tuple2<>(d.getIdentifier(), d);
                     });
 
             //create blocks for deduplication
-            JavaPairRDD<String, List<MapDocument>> blocks = Deduper.createSortedBlocks(sc, mapDocument, dedupConf);
+            JavaPairRDD<String, Block> blocks = Deduper.createSortedBlocks(mapDocuments, dedupConf);
 
             //create relations by comparing only elements in the same group
-            final JavaPairRDD<String, String> dedupRels = Deduper.computeRelations(sc, blocks, dedupConf);
-
-            JavaRDD<Relation> relationsRDD = dedupRels.map(r -> createSimRel(r._1(), r._2(), entity));
+            JavaRDD<Relation> relations = Deduper.computeRelations(sc, blocks, dedupConf)
+                    .map(t -> createSimRel(t._1(), t._2(), entity));
 
             //save the simrel in the workingdir
-            spark.createDataset(relationsRDD.rdd(), Encoders.bean(Relation.class))
+            spark.createDataset(relations.rdd(), Encoders.bean(Relation.class))
                     .write()
                     .mode(SaveMode.Append)
                     .save(outputPath);
         }
     }
 
-    public Relation createSimRel(String source, String target, String entity) {
+    private Relation createSimRel(String source, String target, String entity) {
         final Relation r = new Relation();
         r.setSource(source);
         r.setTarget(target);
@@ -102,7 +113,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
         r.setRelClass("isSimilarTo");
         r.setDataInfo(new DataInfo());
 
-        switch(entity){
+        switch(entity) {
             case "result":
                 r.setRelType("resultResult");
                 break;

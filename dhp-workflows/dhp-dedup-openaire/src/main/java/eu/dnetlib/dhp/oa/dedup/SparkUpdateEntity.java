@@ -1,13 +1,17 @@
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.oa.dedup.model.Block;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.model.FieldListImpl;
+import eu.dnetlib.pace.model.FieldValueImpl;
+import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -15,6 +19,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -28,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class SparkUpdateEntity extends AbstractSparkAction {
 
@@ -43,10 +47,16 @@ public class SparkUpdateEntity extends AbstractSparkAction {
     public static void main(String[] args) throws Exception {
         ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils.toString(
-                        SparkUpdateEntity.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
+                        SparkUpdateEntity.class.getResourceAsStream(
+                                "/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
         parser.parseArgument(args);
 
-        new SparkUpdateEntity(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+        SparkConf conf = new SparkConf();
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+
+        new SparkUpdateEntity(parser, getSparkSession(conf))
+                .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
     public void run(ISLookUpService isLookUpService) throws IOException {

@@ -91,7 +91,6 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--o</arg><arg>${dedupGraphPath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>

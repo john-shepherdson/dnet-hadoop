@@ -4,6 +4,7 @@ import com.google.common.hash.Hashing;
 import eu.dnetlib.dhp.oa.dedup.graph.ConnectedComponent;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.graph.GraphProcessor;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -13,8 +14,8 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.graphx.Edge;
@@ -52,7 +53,11 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
         final String isLookUpUrl = parser.get("isLookUpUrl");
         log.info("isLookupUrl {}", isLookUpUrl);
 
-        new SparkCreateMergeRels(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(isLookUpUrl));
+        SparkConf conf = new SparkConf();
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+
+        new SparkCreateMergeRels(parser, getSparkSession(conf)).run(ISLookupClientFactory.getLookUpService(isLookUpUrl));
     }
 
     @Override
@@ -79,32 +84,30 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
             log.info("Max iterations {}", maxIterations);
 
             final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
+
             final JavaPairRDD<Object, String> vertexes = sc.textFile(graphBasePath + "/" + subEntity)
                     .map(s -> MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), s))
-                    .mapToPair((PairFunction<String, Object, String>)
-                            s -> new Tuple2<>(getHashcode(s), s));
+                    .mapToPair((PairFunction<String, Object, String>) s -> new Tuple2<>(hash(s), s));
 
-            final Dataset<Relation> similarityRelations = spark
+            final RDD<Edge<String>> edgeRdd = spark
                     .read()
                     .load(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity))
-                    .as(Encoders.bean(Relation.class));
-
-            final RDD<Edge<String>> edgeRdd = similarityRelations
+                    .as(Encoders.bean(Relation.class))
                     .javaRDD()
-                    .map(it -> new Edge<>(getHashcode(it.getSource()), getHashcode(it.getTarget()), it.getRelClass()))
+                    .map(it -> new Edge<>(hash(it.getSource()), hash(it.getTarget()), it.getRelClass()))
                     .rdd();
 
-            final RDD<Relation> connectedComponents = GraphProcessor.findCCs(vertexes.rdd(), edgeRdd, maxIterations)
+            final Dataset<Relation> mergeRels = spark
+                    .createDataset(GraphProcessor.findCCs(vertexes.rdd(), edgeRdd, maxIterations)
                     .toJavaRDD()
                     .filter(k -> k.getDocIds().size() > 1)
                     .flatMap(cc -> ccToMergeRel(cc, dedupConf))
-                    .rdd();
+                    .rdd(), Encoders.bean(Relation.class));
 
-            spark
-                    .createDataset(connectedComponents, Encoders.bean(Relation.class))
+            mergeRels
                     .write()
                     .mode(SaveMode.Append)
-                    .save(mergeRelPath);
+                    .parquet(mergeRelPath);
         }
 
     }
@@ -148,7 +151,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
         return r;
     }
 
-    public  static long getHashcode(final String id) {
+    public static long hash(final String id) {
         return Hashing.murmur3_128().hashString(id).asLong();
     }
 

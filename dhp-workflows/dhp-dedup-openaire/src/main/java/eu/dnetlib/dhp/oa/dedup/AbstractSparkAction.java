@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
 import org.apache.spark.SparkConf;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -73,45 +76,19 @@ abstract class AbstractSparkAction implements Serializable {
 
     abstract void run(ISLookUpService isLookUpService) throws DocumentException, IOException, ISLookUpException;
 
-    protected static SparkSession getSparkSession(ArgumentApplicationParser parser) {
-        SparkConf conf = new SparkConf();
-
-        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(new Class[] {
-                Author.class,
-                Context.class,
-                Country.class,
-                DataInfo.class,
-                Dataset.class,
-                Datasource.class,
-                ExternalReference.class,
-                ExtraInfo.class,
-                Field.class,
-                GeoLocation.class,
-                Instance.class,
-                Journal.class,
-                KeyValue.class,
-                Oaf.class,
-                OafEntity.class,
-                OAIProvenance.class,
-                Organization.class,
-                OriginDescription.class,
-                OtherResearchProduct.class,
-                Project.class,
-                Publication.class,
-                Qualifier.class,
-                Relation.class,
-                Result.class,
-                Software.class,
-                StructuredProperty.class
-        });
-
+    protected static SparkSession getSparkSession(SparkConf conf) {
         return SparkSession
                 .builder()
-                .appName(SparkCreateSimRels.class.getSimpleName())
-                .master(parser.get("master"))
                 .config(conf)
                 .getOrCreate();
+    }
+
+    protected static <T> void save(Dataset<T> dataset, String outPath, SaveMode mode) {
+        dataset
+                .write()
+                .option("compression", "gzip")
+                .mode(mode)
+                .json(outPath);
     }
 
     protected static void removeOutputDir(SparkSession spark, String path) {

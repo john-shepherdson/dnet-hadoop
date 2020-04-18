@@ -1,11 +1,5 @@
 [
   {
-    "paramName": "mt",
-    "paramLongName": "master",
-    "paramDescription": "should be local or yarn",
-    "paramRequired": true
-  },
-  {
     "paramName": "i",
     "paramLongName": "graphBasePath",
     "paramDescription": "the base path of raw graph",
