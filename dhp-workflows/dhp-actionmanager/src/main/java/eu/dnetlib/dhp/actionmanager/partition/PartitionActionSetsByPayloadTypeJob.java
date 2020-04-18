@@ -99,6 +99,8 @@ public class PartitionActionSetsByPayloadTypeJob {
                                                         List<String> inputActionSetPaths,
                                                         String outputPath) {
         inputActionSetPaths
+                .stream()
+                .filter(path -> HdfsSupport.exists(path, spark.sparkContext().hadoopConfiguration()))
                 .forEach(inputActionSetPath -> {
                     Dataset<Row> actionDS = readActionSetFromPath(spark, inputActionSetPath);
                     saveActions(actionDS, outputPath);

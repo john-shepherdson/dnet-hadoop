@@ -1,17 +1,23 @@
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.oa.dedup.model.Block;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.model.FieldListImpl;
+import eu.dnetlib.pace.model.FieldValueImpl;
+import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -27,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 public class SparkUpdateEntity extends AbstractSparkAction {
 
@@ -42,27 +47,16 @@ public class SparkUpdateEntity extends AbstractSparkAction {
     public static void main(String[] args) throws Exception {
         ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils.toString(
-                        SparkUpdateEntity.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
+                        SparkUpdateEntity.class.getResourceAsStream(
+                                "/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
         parser.parseArgument(args);
 
-        new SparkUpdateEntity(parser, getSparkSession(parser)).run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
-    }
+        SparkConf conf = new SparkConf();
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
-    public boolean mergeRelExists(String basePath, String entity) throws IOException {
-
-        boolean result = false;
-
-        FileSystem fileSystem = FileSystem.get(new Configuration());
-
-        FileStatus[] fileStatuses = fileSystem.listStatus(new Path(basePath));
-
-        for (FileStatus fs : fileStatuses) {
-            if (fs.isDirectory())
-                if (fileSystem.exists(new Path(DedupUtility.createMergeRelPath(basePath, fs.getPath().getName(), entity))))
-                    result = true;
-        }
-
-        return result;
+        new SparkUpdateEntity(parser, getSparkSession(conf))
+                .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
     public void run(ISLookUpService isLookUpService) throws IOException {
@@ -71,75 +65,81 @@ public class SparkUpdateEntity extends AbstractSparkAction {
         final String workingPath = parser.get("workingPath");
         final String dedupGraphPath = parser.get("dedupGraphPath");
 
-        System.out.println(String.format("graphBasePath:  '%s'", graphBasePath));
-        System.out.println(String.format("workingPath:    '%s'", workingPath));
-        System.out.println(String.format("dedupGraphPath: '%s'", dedupGraphPath));
+        log.info("graphBasePath:  '{}'", graphBasePath);
+        log.info("workingPath:    '{}'", workingPath);
+        log.info("dedupGraphPath: '{}'", dedupGraphPath);
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
         //for each entity
-        for (OafEntityType entity: OafEntityType.values()) {
+        ModelSupport.entityTypes.forEach((entity, clazz) -> {
+            final String outputPath = dedupGraphPath + "/" + entity;
+            removeOutputDir(spark, outputPath);
 
             JavaRDD<String> sourceEntity = sc.textFile(DedupUtility.createEntityPath(graphBasePath, entity.toString()));
 
             if (mergeRelExists(workingPath, entity.toString())) {
 
-                final Dataset<Relation> rel = spark.read().load(DedupUtility.createMergeRelPath(workingPath, "*", entity.toString())).as(Encoders.bean(Relation.class));
+                final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, "*", entity.toString());
+                final String dedupRecordPath = DedupUtility.createDedupRecordPath(workingPath, "*", entity.toString());
+
+                final Dataset<Relation> rel = spark.read()
+                        .load(mergeRelPath)
+                        .as(Encoders.bean(Relation.class));
 
                 final JavaPairRDD<String, String> mergedIds = rel
                         .where("relClass == 'merges'")
                         .select(rel.col("target"))
                         .distinct()
                         .toJavaRDD()
-                        .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<String, String>(r.getString(0), "d"));
+                        .mapToPair((PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "d"));
 
-                final JavaRDD<String> dedupEntity = sc.textFile(DedupUtility.createDedupRecordPath(workingPath, "*", entity.toString()));
+                JavaPairRDD<String, String> entitiesWithId = sourceEntity
+                        .mapToPair((PairFunction<String, String, String>) s -> new Tuple2<>(MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
 
-                JavaPairRDD<String, String> entitiesWithId = sourceEntity.mapToPair((PairFunction<String, String, String>) s -> new Tuple2<String, String>(MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
+                JavaRDD<String> map = entitiesWithId
+                        .leftOuterJoin(mergedIds)
+                        .map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), clazz) : k._2()._1());
 
-                JavaRDD<String> map = entitiesWithId.leftOuterJoin(mergedIds).map(k -> k._2()._2().isPresent() ? updateDeletedByInference(k._2()._1(), getOafClass(entity)) : k._2()._1());
-                sourceEntity = map.union(dedupEntity);
-
+                sourceEntity = map.union(sc.textFile(dedupRecordPath));
             }
 
-            sourceEntity.saveAsTextFile(dedupGraphPath + "/" + entity, GzipCodec.class);
+            sourceEntity.saveAsTextFile(outputPath, GzipCodec.class);
 
-        }
+        });
 
     }
 
-    public Class<? extends Oaf> getOafClass(OafEntityType className) {
-        switch (className.toString()) {
-            case "publication":
-                return Publication.class;
-            case "dataset":
-                return eu.dnetlib.dhp.schema.oaf.Dataset.class;
-            case "datasource":
-                return Datasource.class;
-            case "software":
-                return Software.class;
-            case "organization":
-                return Organization.class;
-            case "otherresearchproduct":
-                return OtherResearchProduct.class;
-            case "project":
-                return Project.class;
-            default:
-                throw new IllegalArgumentException("Illegal type " + className);
-        }
-    }
+    public boolean mergeRelExists(String basePath, String entity) {
 
-    private static <T extends Oaf> String updateDeletedByInference(final String json, final Class<T> clazz) {
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        boolean result = false;
         try {
-            Oaf entity = mapper.readValue(json, clazz);
+            FileSystem fileSystem = FileSystem.get(new Configuration());
+
+            FileStatus[] fileStatuses = fileSystem.listStatus(new Path(basePath));
+
+            for (FileStatus fs : fileStatuses) {
+                if (fs.isDirectory())
+                    if (fileSystem.exists(new Path(DedupUtility.createMergeRelPath(basePath, fs.getPath().getName(), entity))))
+                        result = true;
+            }
+
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static <T extends OafEntity> String updateDeletedByInference(final String json, final Class<T> clazz) {
+        try {
+            Oaf entity = OBJECT_MAPPER.readValue(json, clazz);
             if (entity.getDataInfo()== null)
                 entity.setDataInfo(new DataInfo());
             entity.getDataInfo().setDeletedbyinference(true);
-            return mapper.writeValueAsString(entity);
+            return OBJECT_MAPPER.writeValueAsString(entity);
         } catch (IOException e) {
             throw new RuntimeException("Unable to convert json", e);
         }
     }
+
 }

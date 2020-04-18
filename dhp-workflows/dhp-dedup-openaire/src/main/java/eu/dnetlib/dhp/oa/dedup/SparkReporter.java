@@ -13,9 +13,9 @@ import java.util.Map;
 
 public class SparkReporter implements Serializable, Reporter {
 
-    final List<Tuple2<String, String>> relations = new ArrayList<>();
-    private static final Log log = LogFactory.getLog(SparkReporter.class);
-    Map<String, LongAccumulator> accumulators;
+    private final List<Tuple2<String, String>> relations = new ArrayList<>();
+
+    private Map<String, LongAccumulator> accumulators;
 
     public SparkReporter(Map<String, LongAccumulator> accumulators){
         this.accumulators = accumulators;

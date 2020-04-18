@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -10,11 +11,9 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -26,9 +25,6 @@ import static org.apache.spark.sql.functions.col;
 public class SparkPropagateRelation extends AbstractSparkAction {
 
     private static final Logger log = LoggerFactory.getLogger(SparkPropagateRelation.class);
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     enum FieldType {
         SOURCE,
@@ -46,7 +42,11 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
         parser.parseArgument(args);
 
-        new SparkPropagateRelation(parser, getSparkSession(parser))
+        SparkConf conf = new SparkConf();
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+
+        new SparkPropagateRelation(parser, getSparkSession(conf))
                 .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
@@ -62,7 +62,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         log.info("dedupGraphPath: '{}'", dedupGraphPath);
 
         final String outputRelationPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
-        deletePath(outputRelationPath);
+        removeOutputDir(spark, outputRelationPath);
 
         Dataset<Relation> mergeRels = spark.read()
                 .load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
@@ -95,7 +95,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                 processDataset(rels, mergedIds, FieldType.SOURCE, getDeletedFn()),
                 mergedIds, FieldType.TARGET, getDeletedFn());
 
-        save(newRels.union(updated), outputRelationPath);
+        save(newRels.union(updated), outputRelationPath, SaveMode.Overwrite);
 
     }
 
@@ -167,26 +167,6 @@ public class SparkPropagateRelation extends AbstractSparkAction {
             }
             return value._1()._2();
         };
-    }
-
-    private void deletePath(String path) {
-        try {
-            Path p = new Path(path);
-            FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
-
-            if (fs.exists(p)) {
-                fs.delete(p, true);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void save(Dataset<Relation> dataset, String outPath) {
-        dataset
-                .write()
-                .option("compression", "gzip")
-                .json(outPath);
     }
 
     private static boolean containsDedup(final Relation r) {

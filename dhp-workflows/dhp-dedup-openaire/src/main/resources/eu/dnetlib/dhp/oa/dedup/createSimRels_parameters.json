@@ -1,11 +1,5 @@
 [
   {
-    "paramName": "mt",
-    "paramLongName": "master",
-    "paramDescription": "should be local or yarn",
-    "paramRequired": true
-  },
-  {
     "paramName": "la",
     "paramLongName": "isLookUpUrl",
     "paramDescription": "address for the LookUp",

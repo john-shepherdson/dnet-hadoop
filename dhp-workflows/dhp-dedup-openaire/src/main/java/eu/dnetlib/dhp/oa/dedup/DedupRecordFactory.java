@@ -1,274 +1,95 @@
 package eu.dnetlib.dhp.oa.dedup;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.codehaus.jackson.map.ObjectMapper;
+
 import scala.Tuple2;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 public class DedupRecordFactory {
 
-    public static JavaRDD<OafEntity> createDedupRecord(final JavaSparkContext sc, final SparkSession spark, final String mergeRelsInputPath, final String entitiesInputPath, final OafEntityType entityType, final DedupConfig dedupConf) {
+    protected static final ObjectMapper OBJECT_MAPPER = new com.fasterxml.jackson.databind.ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    public static <T extends OafEntity> Dataset<T> createDedupRecord(
+            final SparkSession spark, final String mergeRelsInputPath, final String entitiesInputPath, final Class<T> clazz, final DedupConfig dedupConf) {
+
         long ts = System.currentTimeMillis();
+
         //<id, json_entity>
-        final JavaPairRDD<String, String> inputJsonEntities = sc.textFile(entitiesInputPath)
-                .mapToPair((PairFunction<String, String, String>) it ->
-                        new Tuple2<String, String>(MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), it), it)
-                );
+        Dataset<Tuple2<String, T>> entities = spark.read()
+                .textFile(entitiesInputPath)
+                .map((MapFunction<String, Tuple2<String, T>>) it -> {
+                    T entity = OBJECT_MAPPER.readValue(it, clazz);
+                    return new Tuple2<>(entity.getId(), entity);
+                }, Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
+
 
         //<source, target>: source is the dedup_id, target is the id of the mergedIn
-        JavaPairRDD<String, String> mergeRels = spark
-                .read().load(mergeRelsInputPath).as(Encoders.bean(Relation.class))
-                .where("relClass=='merges'")
-                .javaRDD()
-                .mapToPair(
-                        (PairFunction<Relation, String, String>) r ->
-                                new Tuple2<String, String>(r.getTarget(), r.getSource())
-                );
+        Dataset<Tuple2<String, String>> mergeRels = spark
+                .read()
+                .load(mergeRelsInputPath)
+                .as(Encoders.bean(Relation.class))
+                .where("relClass == 'merges'")
+                .map((MapFunction<Relation, Tuple2<String, String>>)
+                        r -> new Tuple2<>(r.getSource(), r.getTarget()), Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
         //<dedup_id, json_entity_merged>
-        final JavaPairRDD<String, String> joinResult = mergeRels.join(inputJsonEntities).mapToPair((PairFunction<Tuple2<String, Tuple2<String, String>>, String, String>) Tuple2::_2);
-
-        JavaPairRDD<String, Iterable<String>> sortedJoinResult = joinResult.groupByKey();
-
-        switch (entityType) {
-            case publication:
-                return sortedJoinResult.map(p -> DedupRecordFactory.publicationMerger(p, ts));
-            case dataset:
-                return sortedJoinResult.map(d -> DedupRecordFactory.datasetMerger(d, ts));
-            case project:
-                return sortedJoinResult.map(p -> DedupRecordFactory.projectMerger(p, ts));
-            case software:
-                return sortedJoinResult.map(s -> DedupRecordFactory.softwareMerger(s, ts));
-            case datasource:
-                return sortedJoinResult.map(d -> DedupRecordFactory.datasourceMerger(d, ts));
-            case organization:
-                return sortedJoinResult.map(o -> DedupRecordFactory.organizationMerger(o, ts));
-            case otherresearchproduct:
-                return sortedJoinResult.map(o -> DedupRecordFactory.otherresearchproductMerger(o, ts));
-            default:
-                return null;
-        }
-
+        return mergeRels.joinWith(entities, mergeRels.col("_1").equalTo(entities.col("_1")), "left_outer")
+                .filter((FilterFunction<Tuple2<Tuple2<String, String>, Tuple2<String, T>>>) value -> value._2() != null)
+                .map((MapFunction<Tuple2<Tuple2<String, String>, Tuple2<String, T>>, T>)
+                        value -> value._2()._2(), Encoders.kryo(clazz))
+                .groupByKey((MapFunction<T, String>) value -> value.getId(), Encoders.STRING())
+                .mapGroups((MapGroupsFunction<String, T, T>)
+                        (key, values) -> entityMerger(key, values, ts, clazz), Encoders.bean(clazz));
     }
 
-    private static Publication publicationMerger(Tuple2<String, Iterable<String>> e, final long ts) {
+    private static <T extends OafEntity> T entityMerger(String id, Iterator<T> entities, final long ts, Class<T> clazz) {
+        try {
+            T entity = clazz.newInstance();
+            entity.setId(id);
+            if (entity.getDataInfo() == null) {
+                entity.setDataInfo(new DataInfo());
+            }
+            entity.getDataInfo().setTrust("0.9");
+            entity.setLastupdatetimestamp(ts);
 
-        Publication p = new Publication(); //the result of the merge, to be returned at the end
+            final Collection<String> dates = Lists.newArrayList();
+            entities.forEachRemaining(e -> {
+                entity.mergeFrom(e);
+                if (ModelSupport.isSubClass(e, Result.class)) {
+                    Result r1 = (Result) e;
+                    Result er = (Result) entity;
+                    er.setAuthor(DedupUtility.mergeAuthor(er.getAuthor(), r1.getAuthor()));
 
-        p.setId(e._1());
-
-        final ObjectMapper mapper = new ObjectMapper();
-
-        final Collection<String> dateofacceptance = Lists.newArrayList();
-
-        if (e._2() != null)
-            e._2().forEach(pub -> {
-                try {
-                    Publication publication = mapper.readValue(pub, Publication.class);
-
-                    p.mergeFrom(publication);
-                    p.setAuthor(DedupUtility.mergeAuthor(p.getAuthor(), publication.getAuthor()));
-                    //add to the list if they are not null
-                    if (publication.getDateofacceptance() != null)
-                        dateofacceptance.add(publication.getDateofacceptance().getValue());
-                } catch (Exception exc) {
-                    throw new RuntimeException(exc);
-                }
-            });
-        p.setDateofacceptance(DatePicker.pick(dateofacceptance));
-        if (p.getDataInfo() == null)
-            p.setDataInfo(new DataInfo());
-        p.getDataInfo().setTrust("0.9");
-        p.setLastupdatetimestamp(ts);
-        return p;
-    }
-
-    private static Dataset datasetMerger(Tuple2<String, Iterable<String>> e, final long ts) {
-
-        Dataset d = new Dataset(); //the result of the merge, to be returned at the end
-
-        d.setId(e._1());
-
-        final ObjectMapper mapper = new ObjectMapper();
-
-        final Collection<String> dateofacceptance = Lists.newArrayList();
-
-        if (e._2() != null)
-            e._2().forEach(dat -> {
-                try {
-                    Dataset dataset = mapper.readValue(dat, Dataset.class);
-
-                    d.mergeFrom(dataset);
-                    d.setAuthor(DedupUtility.mergeAuthor(d.getAuthor(), dataset.getAuthor()));
-                    //add to the list if they are not null
-                    if (dataset.getDateofacceptance() != null)
-                        dateofacceptance.add(dataset.getDateofacceptance().getValue());
-                } catch (Exception exc) {
-                    throw new RuntimeException(exc);
-                }
-            });
-        d.setDateofacceptance(DatePicker.pick(dateofacceptance));
-        if (d.getDataInfo() == null)
-            d.setDataInfo(new DataInfo());
-        d.getDataInfo().setTrust("0.9");
-        d.setLastupdatetimestamp(ts);
-        return d;
-    }
-
-    private static Project projectMerger(Tuple2<String, Iterable<String>> e, final long ts) {
-
-        Project p = new Project(); //the result of the merge, to be returned at the end
-
-        p.setId(e._1());
-
-        final ObjectMapper mapper = new ObjectMapper();
-        if (e._2() != null)
-            e._2().forEach(proj -> {
-                try {
-                    Project project = mapper.readValue(proj, Project.class);
-
-                    p.mergeFrom(project);
-                } catch (Exception exc) {
-                    throw new RuntimeException(exc);
-                }
-            });
-        if (p.getDataInfo() == null)
-            p.setDataInfo(new DataInfo());
-        p.getDataInfo().setTrust("0.9");
-        p.setLastupdatetimestamp(ts);
-        return p;
-    }
-
-    private static Software softwareMerger(Tuple2<String, Iterable<String>> e, final long ts) {
-
-        Software s = new Software(); //the result of the merge, to be returned at the end
-
-        s.setId(e._1());
-        final ObjectMapper mapper = new ObjectMapper();
-        final Collection<String> dateofacceptance = Lists.newArrayList();
-        if (e._2() != null)
-            e._2().forEach(soft -> {
-                try {
-                    Software software = mapper.readValue(soft, Software.class);
-
-                    s.mergeFrom(software);
-                    s.setAuthor(DedupUtility.mergeAuthor(s.getAuthor(), software.getAuthor()));
-                    //add to the list if they are not null
-                    if (software.getDateofacceptance() != null)
-                        dateofacceptance.add(software.getDateofacceptance().getValue());
-                } catch (Exception exc) {
-                    throw new RuntimeException(exc);
-                }
-            });
-        s.setDateofacceptance(DatePicker.pick(dateofacceptance));
-        if (s.getDataInfo() == null)
-            s.setDataInfo(new DataInfo());
-        s.getDataInfo().setTrust("0.9");
-        s.setLastupdatetimestamp(ts);
-        return s;
-    }
-
-    private static Datasource datasourceMerger(Tuple2<String, Iterable<String>> e, final long ts) {
-        Datasource d = new Datasource(); //the result of the merge, to be returned at the end
-        d.setId(e._1());
-        final ObjectMapper mapper = new ObjectMapper();
-        if (e._2() != null)
-            e._2().forEach(dat -> {
-                try {
-                    Datasource datasource = mapper.readValue(dat, Datasource.class);
-
-                    d.mergeFrom(datasource);
-                } catch (Exception exc) {
-                    throw new RuntimeException(exc);
-                }
-            });
-        if (d.getDataInfo() == null)
-            d.setDataInfo(new DataInfo());
-        d.getDataInfo().setTrust("0.9");
-        d.setLastupdatetimestamp(ts);
-        return d;
-    }
-
-    private static Organization organizationMerger(Tuple2<String, Iterable<String>> e, final long ts) {
-
-        Organization o = new Organization(); //the result of the merge, to be returned at the end
-
-        o.setId(e._1());
-
-        final ObjectMapper mapper = new ObjectMapper();
-
-
-        StringBuilder trust = new StringBuilder("0.0");
-
-        if (e._2() != null)
-            e._2().forEach(pub -> {
-                try {
-                    Organization organization = mapper.readValue(pub, Organization.class);
-
-                    final String currentTrust = organization.getDataInfo().getTrust();
-                    if (!"1.0".equals(currentTrust)) {
-                        trust.setLength(0);
-                        trust.append(currentTrust);
+                    if (er.getDateofacceptance() != null) {
+                        dates.add(r1.getDateofacceptance().getValue());
                     }
-                    o.mergeFrom(organization);
-
-                } catch (Exception exc) {
-                    throw new RuntimeException(exc);
                 }
             });
 
-        if (o.getDataInfo() == null)
-        {
-            o.setDataInfo(new DataInfo());
+            if (ModelSupport.isSubClass(entity, Result.class)) {
+                ((Result) entity).setDateofacceptance(DatePicker.pick(dates));
+            }
+            return entity;
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new RuntimeException(e);
         }
-        if (o.getDataInfo() == null)
-            o.setDataInfo(new DataInfo());
-        o.getDataInfo().setTrust("0.9");
-        o.setLastupdatetimestamp(ts);
-
-        return o;
-    }
-
-    private static OtherResearchProduct otherresearchproductMerger(Tuple2<String, Iterable<String>> e, final long ts) {
-
-        OtherResearchProduct o = new OtherResearchProduct(); //the result of the merge, to be returned at the end
-
-        o.setId(e._1());
-
-        final ObjectMapper mapper = new ObjectMapper();
-
-        final Collection<String> dateofacceptance = Lists.newArrayList();
-
-        if (e._2() != null)
-            e._2().forEach(orp -> {
-                try {
-                    OtherResearchProduct otherResearchProduct = mapper.readValue(orp, OtherResearchProduct.class);
-
-                    o.mergeFrom(otherResearchProduct);
-                    o.setAuthor(DedupUtility.mergeAuthor(o.getAuthor(), otherResearchProduct.getAuthor()));
-                    //add to the list if they are not null
-                    if (otherResearchProduct.getDateofacceptance() != null)
-                        dateofacceptance.add(otherResearchProduct.getDateofacceptance().getValue());
-                } catch (Exception exc) {
-                    throw new RuntimeException(exc);
-                }
-            });
-        if (o.getDataInfo() == null)
-            o.setDataInfo(new DataInfo());
-        o.setDateofacceptance(DatePicker.pick(dateofacceptance));
-        o.getDataInfo().setTrust("0.9");
-        o.setLastupdatetimestamp(ts);
-        return o;
     }
 
 }
