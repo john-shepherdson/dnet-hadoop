@@ -8,11 +8,12 @@ import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OrcidDSManager {
 
-	private static final Logger logger = Logger.getLogger(OrcidDSManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(OrcidDSManager.class);
 	
 	private String hdfsServerUri;
 	private String hadoopUsername;
