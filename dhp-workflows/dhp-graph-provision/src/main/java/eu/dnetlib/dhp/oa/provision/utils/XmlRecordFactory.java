@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ import org.dom4j.io.XMLWriter;
 
 public class XmlRecordFactory implements Serializable {
 
+    public static final String REL_SUBTYPE_DEDUP = "dedup";
     private Map<String, LongAccumulator> accumulators;
 
     private Set<String> specialDatasourceTypes;
@@ -91,7 +93,14 @@ public class XmlRecordFactory implements Serializable {
             // rels has to be processed before the contexts because they enrich the contextMap with
             // the
             // funding info.
-            final List<String> relations = listRelations(je, templateFactory, contexts);
+            final List<String> relations =
+                    je.getLinks().stream()
+                            .filter(
+                                    t ->
+                                            !REL_SUBTYPE_DEDUP.equalsIgnoreCase(
+                                                    t.getRelation().getSubRelType()))
+                            .map(link -> mapRelation(link, templateFactory, contexts))
+                            .collect(Collectors.toCollection(ArrayList::new));
 
             final String mainType = ModelSupport.getMainType(type);
             metadata.addAll(buildContexts(mainType, contexts));
@@ -102,7 +111,7 @@ public class XmlRecordFactory implements Serializable {
                             mainType,
                             metadata,
                             relations,
-                            listChildren(entity, je.getEntity().getType(), templateFactory),
+                            listChildren(entity, je, templateFactory),
                             listExtraInfo(entity));
 
             return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
@@ -919,171 +928,149 @@ public class XmlRecordFactory implements Serializable {
         metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", dsType));
     }
 
-    private Qualifier getBestAccessright(final Result r) {
-        Qualifier bestAccessRight = new Qualifier();
-        bestAccessRight.setClassid("UNKNOWN");
-        bestAccessRight.setClassname("not available");
-        bestAccessRight.setSchemeid("dnet:access_modes");
-        bestAccessRight.setSchemename("dnet:access_modes");
+    private String mapRelation(Tuple2 link, TemplateFactory templateFactory, Set<String> contexts) {
+        final Relation rel = link.getRelation();
+        final RelatedEntity re = link.getRelatedEntity();
+        final String targetType = link.getRelatedEntity().getType();
 
-        final LicenseComparator lc = new LicenseComparator();
-        for (final Instance instance : r.getInstance()) {
-            if (lc.compare(bestAccessRight, instance.getAccessright()) > 0) {
-                bestAccessRight = instance.getAccessright();
-            }
+        final List<String> metadata = Lists.newArrayList();
+        switch (EntityType.valueOf(targetType)) {
+            case publication:
+            case dataset:
+            case otherresearchproduct:
+            case software:
+                if (re.getTitle() != null && isNotBlank(re.getTitle().getValue())) {
+                    metadata.add(
+                            XmlSerializationUtils.mapStructuredProperty("title", re.getTitle()));
+                }
+                if (isNotBlank(re.getDateofacceptance())) {
+                    metadata.add(
+                            XmlSerializationUtils.asXmlElement(
+                                    "dateofacceptance", re.getDateofacceptance()));
+                }
+                if (isNotBlank(re.getPublisher())) {
+                    metadata.add(
+                            XmlSerializationUtils.asXmlElement("publisher", re.getPublisher()));
+                }
+                if (isNotBlank(re.getCodeRepositoryUrl())) {
+                    metadata.add(
+                            XmlSerializationUtils.asXmlElement(
+                                    "coderepositoryurl", re.getCodeRepositoryUrl()));
+                }
+                if (re.getResulttype() != null & re.getResulttype().isBlank()) {
+                    metadata.add(
+                            XmlSerializationUtils.mapQualifier("resulttype", re.getResulttype()));
+                }
+                if (re.getCollectedfrom() != null) {
+                    metadata.addAll(
+                            re.getCollectedfrom().stream()
+                                    .map(
+                                            kv ->
+                                                    XmlSerializationUtils.mapKeyValue(
+                                                            "collectedfrom", kv))
+                                    .collect(Collectors.toList()));
+                }
+                if (re.getPid() != null) {
+                    metadata.addAll(
+                            re.getPid().stream()
+                                    .map(p -> XmlSerializationUtils.mapStructuredProperty("pid", p))
+                                    .collect(Collectors.toList()));
+                }
+                break;
+            case datasource:
+                if (isNotBlank(re.getOfficialname())) {
+                    metadata.add(
+                            XmlSerializationUtils.asXmlElement(
+                                    "officialname", re.getOfficialname()));
+                }
+                if (re.getDatasourcetype() != null & !re.getDatasourcetype().isBlank()) {
+                    mapDatasourceType(metadata, re.getDatasourcetype());
+                }
+                if (re.getOpenairecompatibility() != null
+                        & !re.getOpenairecompatibility().isBlank()) {
+                    metadata.add(
+                            XmlSerializationUtils.mapQualifier(
+                                    "openairecompatibility", re.getOpenairecompatibility()));
+                }
+                break;
+            case organization:
+                if (isNotBlank(re.getLegalname())) {
+                    metadata.add(
+                            XmlSerializationUtils.asXmlElement("legalname", re.getLegalname()));
+                }
+                if (isNotBlank(re.getLegalshortname())) {
+                    metadata.add(
+                            XmlSerializationUtils.asXmlElement(
+                                    "legalshortname", re.getLegalshortname()));
+                }
+                if (re.getCountry() != null & !re.getCountry().isBlank()) {
+                    metadata.add(XmlSerializationUtils.mapQualifier("country", re.getCountry()));
+                }
+                break;
+            case project:
+                if (isNotBlank(re.getProjectTitle())) {
+                    metadata.add(XmlSerializationUtils.asXmlElement("title", re.getProjectTitle()));
+                }
+                if (isNotBlank(re.getCode())) {
+                    metadata.add(XmlSerializationUtils.asXmlElement("code", re.getCode()));
+                }
+                if (isNotBlank(re.getAcronym())) {
+                    metadata.add(XmlSerializationUtils.asXmlElement("acronym", re.getAcronym()));
+                }
+                if (re.getContracttype() != null & !re.getContracttype().isBlank()) {
+                    metadata.add(
+                            XmlSerializationUtils.mapQualifier(
+                                    "contracttype", re.getContracttype()));
+                }
+                if (re.getFundingtree() != null & contexts != null) {
+                    metadata.addAll(
+                            re.getFundingtree().stream()
+                                    .peek(ft -> fillContextMap(ft, contexts))
+                                    .map(ft -> getRelFundingTree(ft))
+                                    .collect(Collectors.toList()));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("invalid target type: " + targetType);
         }
-        return bestAccessRight;
-    }
+        final DataInfo info = rel.getDataInfo();
+        final String scheme = ModelSupport.getScheme(re.getType(), targetType);
 
-    private List<String> listRelations(
-            final JoinedEntity je, TemplateFactory templateFactory, final Set<String> contexts) {
-        final List<String> rels = Lists.newArrayList();
-
-        for (final Tuple2 link : je.getLinks()) {
-
-            final Relation rel = link.getRelation();
-            final RelatedEntity re = link.getRelatedEntity();
-            final String targetType = link.getRelatedEntity().getType();
-
-            final List<String> metadata = Lists.newArrayList();
-            switch (EntityType.valueOf(targetType)) {
-                case publication:
-                case dataset:
-                case otherresearchproduct:
-                case software:
-                    if (re.getTitle() != null && isNotBlank(re.getTitle().getValue())) {
-                        metadata.add(
-                                XmlSerializationUtils.mapStructuredProperty(
-                                        "title", re.getTitle()));
-                    }
-                    if (isNotBlank(re.getDateofacceptance())) {
-                        metadata.add(
-                                XmlSerializationUtils.asXmlElement(
-                                        "dateofacceptance", re.getDateofacceptance()));
-                    }
-                    if (isNotBlank(re.getPublisher())) {
-                        metadata.add(
-                                XmlSerializationUtils.asXmlElement("publisher", re.getPublisher()));
-                    }
-                    if (isNotBlank(re.getCodeRepositoryUrl())) {
-                        metadata.add(
-                                XmlSerializationUtils.asXmlElement(
-                                        "coderepositoryurl", re.getCodeRepositoryUrl()));
-                    }
-                    if (re.getResulttype() != null & re.getResulttype().isBlank()) {
-                        metadata.add(
-                                XmlSerializationUtils.mapQualifier(
-                                        "resulttype", re.getResulttype()));
-                    }
-                    if (re.getCollectedfrom() != null) {
-                        metadata.addAll(
-                                re.getCollectedfrom().stream()
-                                        .map(
-                                                kv ->
-                                                        XmlSerializationUtils.mapKeyValue(
-                                                                "collectedfrom", kv))
-                                        .collect(Collectors.toList()));
-                    }
-                    if (re.getPid() != null) {
-                        metadata.addAll(
-                                re.getPid().stream()
-                                        .map(
-                                                p ->
-                                                        XmlSerializationUtils.mapStructuredProperty(
-                                                                "pid", p))
-                                        .collect(Collectors.toList()));
-                    }
-                    break;
-                case datasource:
-                    if (isNotBlank(re.getOfficialname())) {
-                        metadata.add(
-                                XmlSerializationUtils.asXmlElement(
-                                        "officialname", re.getOfficialname()));
-                    }
-                    if (re.getDatasourcetype() != null & !re.getDatasourcetype().isBlank()) {
-                        mapDatasourceType(metadata, re.getDatasourcetype());
-                    }
-                    if (re.getOpenairecompatibility() != null
-                            & !re.getOpenairecompatibility().isBlank()) {
-                        metadata.add(
-                                XmlSerializationUtils.mapQualifier(
-                                        "openairecompatibility", re.getOpenairecompatibility()));
-                    }
-                    break;
-                case organization:
-                    if (isNotBlank(re.getLegalname())) {
-                        metadata.add(
-                                XmlSerializationUtils.asXmlElement("legalname", re.getLegalname()));
-                    }
-                    if (isNotBlank(re.getLegalshortname())) {
-                        metadata.add(
-                                XmlSerializationUtils.asXmlElement(
-                                        "legalshortname", re.getLegalshortname()));
-                    }
-                    if (re.getCountry() != null & !re.getCountry().isBlank()) {
-                        metadata.add(
-                                XmlSerializationUtils.mapQualifier("country", re.getCountry()));
-                    }
-                    break;
-                case project:
-                    if (isNotBlank(re.getProjectTitle())) {
-                        metadata.add(
-                                XmlSerializationUtils.asXmlElement("title", re.getProjectTitle()));
-                    }
-                    if (isNotBlank(re.getCode())) {
-                        metadata.add(XmlSerializationUtils.asXmlElement("code", re.getCode()));
-                    }
-                    if (isNotBlank(re.getAcronym())) {
-                        metadata.add(
-                                XmlSerializationUtils.asXmlElement("acronym", re.getAcronym()));
-                    }
-                    if (re.getContracttype() != null & !re.getContracttype().isBlank()) {
-                        metadata.add(
-                                XmlSerializationUtils.mapQualifier(
-                                        "contracttype", re.getContracttype()));
-                    }
-                    if (re.getFundingtree() != null) {
-                        metadata.addAll(
-                                re.getFundingtree().stream()
-                                        .peek(ft -> fillContextMap(ft, contexts))
-                                        .map(ft -> getRelFundingTree(ft))
-                                        .collect(Collectors.toList()));
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("invalid target type: " + targetType);
-            }
-            final DataInfo info = rel.getDataInfo();
-            final String scheme = ModelSupport.getScheme(re.getType(), targetType);
-
-            if (StringUtils.isBlank(scheme)) {
-                throw new IllegalArgumentException(
-                        String.format("missing scheme for: <%s - %s>", re.getType(), targetType));
-            }
-
-            final String accumulatorName =
-                    getRelDescriptor(rel.getRelType(), rel.getSubRelType(), rel.getRelClass());
-            if (accumulators.containsKey(accumulatorName)) {
-                accumulators.get(accumulatorName).add(1);
-            }
-
-            rels.add(
-                    templateFactory.getRel(
-                            targetType,
-                            rel.getTarget(),
-                            Sets.newHashSet(metadata),
-                            rel.getRelClass(),
-                            scheme,
-                            info));
+        if (StringUtils.isBlank(scheme)) {
+            throw new IllegalArgumentException(
+                    String.format("missing scheme for: <%s - %s>", re.getType(), targetType));
         }
-        return rels;
+
+        final String accumulatorName =
+                getRelDescriptor(rel.getRelType(), rel.getSubRelType(), rel.getRelClass());
+        if (accumulators.containsKey(accumulatorName)) {
+            accumulators.get(accumulatorName).add(1);
+        }
+
+        return templateFactory.getRel(
+                targetType,
+                rel.getTarget(),
+                Sets.newHashSet(metadata),
+                rel.getRelClass(),
+                scheme,
+                info);
     }
 
     private List<String> listChildren(
-            final OafEntity entity, String type, TemplateFactory templateFactory) {
+            final OafEntity entity, JoinedEntity je, TemplateFactory templateFactory) {
 
         final List<String> children = Lists.newArrayList();
-        EntityType entityType = EntityType.valueOf(type);
+        EntityType entityType = EntityType.valueOf(je.getEntity().getType());
+
+        children.addAll(
+                je.getLinks().stream()
+                        .filter(
+                                link ->
+                                        REL_SUBTYPE_DEDUP.equalsIgnoreCase(
+                                                link.getRelation().getSubRelType()))
+                        .map(link -> mapRelation(link, templateFactory, null))
+                        .collect(Collectors.toCollection(ArrayList::new)));
+
         if (MainEntityType.result.toString().equals(ModelSupport.getMainType(entityType))) {
             final List<Instance> instances = ((Result) entity).getInstance();
             if (instances != null) {

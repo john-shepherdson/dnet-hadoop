@@ -6,7 +6,6 @@ import eu.dnetlib.dhp.oa.dedup.graph.ConnectedComponent;
 import eu.dnetlib.dhp.oa.dedup.graph.GraphProcessor;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -35,9 +34,7 @@ import scala.Tuple2;
 
 public class SparkCreateMergeRels extends AbstractSparkAction {
 
-    public static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
     private static final Logger log = LoggerFactory.getLogger(SparkCreateMergeRels.class);
-    public static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
 
     public SparkCreateMergeRels(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
@@ -148,22 +145,13 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
         r.setRelClass(relClass);
         r.setSubRelType("dedup");
 
-        DataInfo info = new DataInfo();
-        info.setDeletedbyinference(false);
-        info.setInferred(true);
-        info.setInvisible(false);
+        DataInfo info = getDataInfo();
         info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
-        Qualifier provenanceAction = new Qualifier();
-        provenanceAction.setClassid(PROVENANCE_ACTION_CLASS);
-        provenanceAction.setClassname(PROVENANCE_ACTION_CLASS);
-        provenanceAction.setSchemeid(DNET_PROVENANCE_ACTIONS);
-        provenanceAction.setSchemename(DNET_PROVENANCE_ACTIONS);
-        info.setProvenanceaction(provenanceAction);
 
         // TODO calculate the trust value based on the similarity score of the elements in the CC
         // info.setTrust();
 
-        r.setDataInfo(info);
+        r.setDataInfo(getDataInfo());
         return r;
     }
 

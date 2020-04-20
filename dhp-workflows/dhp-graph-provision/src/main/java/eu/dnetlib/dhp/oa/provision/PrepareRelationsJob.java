@@ -95,7 +95,18 @@ public class PrepareRelationsJob {
         readPathRelation(spark, inputRelationsPath)
                 .filter(
                         (FilterFunction<SortableRelation>)
-                                value -> value.getDataInfo().getDeletedbyinference() == false)
+                                r -> {
+                                    try {
+                                        return r != null
+                                                && r.getDataInfo() != null
+                                                && !r.getDataInfo().getDeletedbyinference();
+                                    } catch (NullPointerException e) {
+                                        log.info(
+                                                "invalid NPE '{}'",
+                                                OBJECT_MAPPER.writeValueAsString(r));
+                                        throw e;
+                                    }
+                                })
                 .groupByKey(
                         (MapFunction<SortableRelation, String>) value -> value.getSource(),
                         Encoders.STRING())
