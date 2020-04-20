@@ -32,7 +32,7 @@ public class OrcidDSManager {
     	FileSystem fs = initFileSystemObject(conf);
     	String tarGzUri = hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(summariesFileNameTarGz);
     	logger.info("Started parsing "+tarGzUri);
-    	Path outputPath = new Path(hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(outputAuthorsPath).concat(Long.toString(System.currentTimeMillis())).concat("/authors_part"));
+    	Path outputPath = new Path(hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(outputAuthorsPath).concat(Long.toString(System.currentTimeMillis())).concat("/authors.seq"));
     	SummariesDecompressor.parseGzSummaries(conf, tarGzUri, outputPath);
     }
     
