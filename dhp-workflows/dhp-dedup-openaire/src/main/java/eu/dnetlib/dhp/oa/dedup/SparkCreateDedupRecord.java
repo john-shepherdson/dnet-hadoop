@@ -71,7 +71,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 
             Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
 
-            DedupRecordFactory.createDedupRecord(spark, mergeRelPath, entityPath, clazz, dedupConf)
+            DedupRecordFactory.createDedupRecord(spark, mergeRelPath, entityPath, clazz)
                     .map(
                             (MapFunction<OafEntity, String>)
                                     value -> OBJECT_MAPPER.writeValueAsString(value),

@@ -5,29 +5,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.pace.config.DedupConfig;
 import java.util.Collection;
 import java.util.Iterator;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 public class DedupRecordFactory {
 
+    private static final Logger log = LoggerFactory.getLogger(DedupRecordFactory.class);
+
     protected static final ObjectMapper OBJECT_MAPPER =
-            new com.fasterxml.jackson.databind.ObjectMapper()
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public static <T extends OafEntity> Dataset<T> createDedupRecord(
             final SparkSession spark,
             final String mergeRelsInputPath,
             final String entitiesInputPath,
-            final Class<T> clazz,
-            final DedupConfig dedupConf) {
+            final Class<T> clazz) {
 
         long ts = System.currentTimeMillis();
 
@@ -54,40 +54,39 @@ public class DedupRecordFactory {
                                         r -> new Tuple2<>(r.getSource(), r.getTarget()),
                                 Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
-        // <dedup_id, json_entity_merged>
         return mergeRels
-                .joinWith(entities, mergeRels.col("_1").equalTo(entities.col("_1")), "left_outer")
-                .filter(
-                        (FilterFunction<Tuple2<Tuple2<String, String>, Tuple2<String, T>>>)
-                                value -> value._2() != null)
+                .joinWith(entities, mergeRels.col("_2").equalTo(entities.col("_1")), "inner")
                 .map(
-                        (MapFunction<Tuple2<Tuple2<String, String>, Tuple2<String, T>>, T>)
-                                value -> value._2()._2(),
-                        Encoders.kryo(clazz))
-                .groupByKey((MapFunction<T, String>) value -> value.getId(), Encoders.STRING())
+                        (MapFunction<
+                                        Tuple2<Tuple2<String, String>, Tuple2<String, T>>,
+                                        Tuple2<String, T>>)
+                                value -> new Tuple2<>(value._1()._1(), value._2()._2()),
+                        Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)))
+                .groupByKey(
+                        (MapFunction<Tuple2<String, T>, String>) entity -> entity._1(),
+                        Encoders.STRING())
                 .mapGroups(
-                        (MapGroupsFunction<String, T, T>)
+                        (MapGroupsFunction<String, Tuple2<String, T>, T>)
                                 (key, values) -> entityMerger(key, values, ts, clazz),
                         Encoders.bean(clazz));
     }
 
     private static <T extends OafEntity> T entityMerger(
-            String id, Iterator<T> entities, final long ts, Class<T> clazz) {
+            String id, Iterator<Tuple2<String, T>> entities, long ts, Class<T> clazz) {
         try {
             T entity = clazz.newInstance();
             entity.setId(id);
-            if (entity.getDataInfo() == null) {
-                entity.setDataInfo(new DataInfo());
-            }
+            entity.setDataInfo(new DataInfo());
             entity.getDataInfo().setTrust("0.9");
             entity.setLastupdatetimestamp(ts);
 
             final Collection<String> dates = Lists.newArrayList();
             entities.forEachRemaining(
-                    e -> {
-                        entity.mergeFrom(e);
-                        if (ModelSupport.isSubClass(e, Result.class)) {
-                            Result r1 = (Result) e;
+                    t -> {
+                        T duplicate = t._2();
+                        entity.mergeFrom(duplicate);
+                        if (ModelSupport.isSubClass(duplicate, Result.class)) {
+                            Result r1 = (Result) duplicate;
                             Result er = (Result) entity;
                             er.setAuthor(DedupUtility.mergeAuthor(er.getAuthor(), r1.getAuthor()));
 
