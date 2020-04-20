@@ -1,17 +1,10 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
 import java.io.IOException;
 import java.sql.Array;
 import java.sql.Date;
@@ -20,7 +13,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,13 +42,14 @@ public class MigrateDbEntitiesApplicationTest {
 
         final Datasource ds = (Datasource) list.get(0);
         assertValidId(ds.getId());
-        assertValidId(ds.getCollectedfrom().get(0).getKey());
         assertEquals(ds.getOfficialname().getValue(), getValueAsString("officialname", fields));
         assertEquals(ds.getEnglishname().getValue(), getValueAsString("englishname", fields));
         assertEquals(ds.getContactemail().getValue(), getValueAsString("contactemail", fields));
         assertEquals(ds.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
         assertEquals(
                 ds.getNamespaceprefix().getValue(), getValueAsString("namespaceprefix", fields));
+        assertEquals(
+                ds.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
         assertEquals(
                 ds.getCollectedfrom().get(0).getValue(),
                 getValueAsString("collectedfromname", fields));
@@ -72,9 +65,10 @@ public class MigrateDbEntitiesApplicationTest {
 
         final Project p = (Project) list.get(0);
         assertValidId(p.getId());
-        assertValidId(p.getCollectedfrom().get(0).getKey());
         assertEquals(p.getAcronym().getValue(), getValueAsString("acronym", fields));
         assertEquals(p.getTitle().getValue(), getValueAsString("title", fields));
+        assertEquals(
+                p.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
         assertEquals(
                 p.getCollectedfrom().get(0).getValue(),
                 getValueAsString("collectedfromname", fields));
@@ -92,7 +86,6 @@ public class MigrateDbEntitiesApplicationTest {
 
         final Organization o = (Organization) list.get(0);
         assertValidId(o.getId());
-        assertValidId(o.getCollectedfrom().get(0).getKey());
         assertEquals(o.getLegalshortname().getValue(), getValueAsString("legalshortname", fields));
         assertEquals(o.getLegalname().getValue(), getValueAsString("legalname", fields));
         assertEquals(o.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
@@ -105,6 +98,8 @@ public class MigrateDbEntitiesApplicationTest {
         assertEquals(
                 o.getCountry().getSchemename(),
                 getValueAsString("country", fields).split("@@@")[3]);
+        assertEquals(
+                o.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
         assertEquals(
                 o.getCollectedfrom().get(0).getValue(),
                 getValueAsString("collectedfromname", fields));
@@ -142,8 +137,6 @@ public class MigrateDbEntitiesApplicationTest {
         assertValidId(r2.getSource());
         assertEquals(r1.getSource(), r2.getTarget());
         assertEquals(r2.getSource(), r1.getTarget());
-        assertValidId(r1.getCollectedfrom().get(0).getKey());
-        assertValidId(r2.getCollectedfrom().get(0).getKey());
     }
 
     @Test
@@ -153,12 +146,7 @@ public class MigrateDbEntitiesApplicationTest {
         final List<Oaf> list = app.processClaims(rs);
 
         assertEquals(1, list.size());
-        assertTrue(list.get(0) instanceof Result);
-        final Result r = (Result) list.get(0);
-
         verifyMocks(fields);
-
-        assertValidId(r.getCollectedfrom().get(0).getKey());
     }
 
     @Test
@@ -169,33 +157,6 @@ public class MigrateDbEntitiesApplicationTest {
 
         assertEquals(2, list.size());
         verifyMocks(fields);
-
-        assertTrue(list.get(0) instanceof Relation);
-        assertTrue(list.get(1) instanceof Relation);
-
-        final Relation r1 = (Relation) list.get(0);
-        final Relation r2 = (Relation) list.get(1);
-
-        assertValidId(r1.getSource());
-        assertValidId(r1.getTarget());
-        assertValidId(r2.getSource());
-        assertValidId(r2.getTarget());
-        assertNotNull(r1.getDataInfo());
-        assertNotNull(r2.getDataInfo());
-        assertNotNull(r1.getDataInfo().getTrust());
-        assertNotNull(r2.getDataInfo().getTrust());
-        assertEquals(r1.getSource(), r2.getTarget());
-        assertEquals(r2.getSource(), r1.getTarget());
-        assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
-        assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
-        assertTrue(StringUtils.isNotBlank(r1.getRelType()));
-        assertTrue(StringUtils.isNotBlank(r2.getRelType()));
-
-        assertValidId(r1.getCollectedfrom().get(0).getKey());
-        assertValidId(r2.getCollectedfrom().get(0).getKey());
-
-        // System.out.println(new ObjectMapper().writeValueAsString(r1));
-        // System.out.println(new ObjectMapper().writeValueAsString(r2));
     }
 
     private List<TypedField> prepareMocks(final String jsonFile) throws IOException, SQLException {

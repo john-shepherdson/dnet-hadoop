@@ -48,7 +48,7 @@ public class Scholix implements Serializable {
             if (scholixSummary.getDate() != null && scholixSummary.getDate().size() > 0)
                 s.setPublicationDate(scholixSummary.getDate().get(0));
             s.setLinkprovider(
-                    rel.getCollectedfrom().stream()
+                    rel.getCollectedFrom().stream()
                             .map(
                                     cf ->
                                             new ScholixEntityId(
@@ -73,7 +73,7 @@ public class Scholix implements Serializable {
         if (scholixSummary.getDate() != null && scholixSummary.getDate().size() > 0)
             s.setPublicationDate(scholixSummary.getDate().get(0));
         s.setLinkprovider(
-                rel.getCollectedfrom().stream()
+                rel.getCollectedFrom().stream()
                         .map(
                                 cf ->
                                         new ScholixEntityId(

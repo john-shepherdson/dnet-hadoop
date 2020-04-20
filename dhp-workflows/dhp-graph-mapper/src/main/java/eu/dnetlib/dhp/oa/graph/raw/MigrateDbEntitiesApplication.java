@@ -1,35 +1,11 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.asString;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import eu.dnetlib.dhp.oa.graph.raw.common.DbClient;
-import eu.dnetlib.dhp.schema.oaf.Context;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Array;
@@ -143,8 +119,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             ds.setOriginalId(Arrays.asList(rs.getString("datasourceid")));
             ds.setCollectedfrom(
                     listKeyValues(
-                            createOpenaireId(10, rs.getString("collectedfromid"), true),
-                            rs.getString("collectedfromname")));
+                            rs.getString("collectedfromid"), rs.getString("collectedfromname")));
             ds.setPid(new ArrayList<>());
             ds.setDateofcollection(asString(rs.getDate("dateofcollection")));
             ds.setDateoftransformation(null); // Value not returned by the SQL query
@@ -210,8 +185,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             p.setOriginalId(Arrays.asList(rs.getString("projectid")));
             p.setCollectedfrom(
                     listKeyValues(
-                            createOpenaireId(10, rs.getString("collectedfromid"), true),
-                            rs.getString("collectedfromname")));
+                            rs.getString("collectedfromid"), rs.getString("collectedfromname")));
             p.setPid(new ArrayList<>());
             p.setDateofcollection(asString(rs.getDate("dateofcollection")));
             p.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
@@ -266,8 +240,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             o.setOriginalId(Arrays.asList(rs.getString("organizationid")));
             o.setCollectedfrom(
                     listKeyValues(
-                            createOpenaireId(10, rs.getString("collectedfromid"), true),
-                            rs.getString("collectedfromname")));
+                            rs.getString("collectedfromid"), rs.getString("collectedfromname")));
             o.setPid(new ArrayList<>());
             o.setDateofcollection(asString(rs.getDate("dateofcollection")));
             o.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
@@ -312,8 +285,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             final String dsId = createOpenaireId(10, rs.getString("datasource"), true);
             final List<KeyValue> collectedFrom =
                     listKeyValues(
-                            createOpenaireId(10, rs.getString("collectedfromid"), true),
-                            rs.getString("collectedfromname"));
+                            rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
             final Relation r1 = new Relation();
             r1.setRelType("datasourceOrganization");
@@ -321,7 +293,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             r1.setRelClass("isProvidedBy");
             r1.setSource(dsId);
             r1.setTarget(orgId);
-            r1.setCollectedfrom(collectedFrom);
+            r1.setCollectedFrom(collectedFrom);
             r1.setDataInfo(info);
             r1.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -331,7 +303,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             r2.setRelClass("provides");
             r2.setSource(orgId);
             r2.setTarget(dsId);
-            r2.setCollectedfrom(collectedFrom);
+            r2.setCollectedFrom(collectedFrom);
             r2.setDataInfo(info);
             r2.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -348,8 +320,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             final String projectId = createOpenaireId(40, rs.getString("project"), true);
             final List<KeyValue> collectedFrom =
                     listKeyValues(
-                            createOpenaireId(10, rs.getString("collectedfromid"), true),
-                            rs.getString("collectedfromname"));
+                            rs.getString("collectedfromid"), rs.getString("collectedfromname"));
 
             final Relation r1 = new Relation();
             r1.setRelType("projectOrganization");
@@ -357,7 +328,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             r1.setRelClass("isParticipant");
             r1.setSource(projectId);
             r1.setTarget(orgId);
-            r1.setCollectedfrom(collectedFrom);
+            r1.setCollectedFrom(collectedFrom);
             r1.setDataInfo(info);
             r1.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -367,7 +338,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
             r2.setRelClass("hasParticipant");
             r2.setSource(orgId);
             r2.setTarget(projectId);
-            r2.setCollectedfrom(collectedFrom);
+            r2.setCollectedFrom(collectedFrom);
             r2.setDataInfo(info);
             r2.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -392,9 +363,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
                                 "dnet:provenanceActions"),
                         "0.9");
 
-        final List<KeyValue> collectedFrom =
-                listKeyValues(createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
-
         try {
 
             if (rs.getString("source_type").equals("context")) {
@@ -413,7 +381,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
                 r.setLastupdatetimestamp(lastUpdateTimestamp);
                 r.setContext(prepareContext(rs.getString("source_id"), info));
                 r.setDataInfo(info);
-                r.setCollectedfrom(collectedFrom);
 
                 return Arrays.asList(r);
             } else {
@@ -428,22 +395,18 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
                 final Relation r2 = new Relation();
 
                 if (rs.getString("source_type").equals("project")) {
-                    r1.setCollectedfrom(collectedFrom);
                     r1.setRelType("resultProject");
                     r1.setSubRelType("outcome");
                     r1.setRelClass("produces");
 
-                    r2.setCollectedfrom(collectedFrom);
                     r2.setRelType("resultProject");
                     r2.setSubRelType("outcome");
                     r2.setRelClass("isProducedBy");
                 } else {
-                    r1.setCollectedfrom(collectedFrom);
                     r1.setRelType("resultResult");
                     r1.setSubRelType("relationship");
                     r1.setRelClass("isRelatedTo");
 
-                    r2.setCollectedfrom(collectedFrom);
                     r2.setRelType("resultResult");
                     r2.setSubRelType("relationship");
                     r2.setRelClass("isRelatedTo");

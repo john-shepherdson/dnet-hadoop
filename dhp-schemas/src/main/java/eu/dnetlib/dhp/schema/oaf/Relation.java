@@ -18,6 +18,8 @@ public class Relation extends Oaf {
 
     private String target;
 
+    private List<KeyValue> collectedFrom = new ArrayList<>();
+
     public String getRelType() {
         return relType;
     }
@@ -58,6 +60,14 @@ public class Relation extends Oaf {
         this.target = target;
     }
 
+    public List<KeyValue> getCollectedFrom() {
+        return collectedFrom;
+    }
+
+    public void setCollectedFrom(final List<KeyValue> collectedFrom) {
+        this.collectedFrom = collectedFrom;
+    }
+
     public void mergeFrom(final Relation r) {
 
         checkArgument(Objects.equals(getSource(), r.getSource()), "source ids must be equal");
@@ -67,12 +77,12 @@ public class Relation extends Oaf {
                 Objects.equals(getSubRelType(), r.getSubRelType()), "subRelType(s) must be equal");
         checkArgument(Objects.equals(getRelClass(), r.getRelClass()), "relClass(es) must be equal");
 
-        setCollectedfrom(
+        setCollectedFrom(
                 Stream.concat(
-                                Optional.ofNullable(getCollectedfrom())
+                                Optional.ofNullable(getCollectedFrom())
                                         .map(Collection::stream)
                                         .orElse(Stream.empty()),
-                                Optional.ofNullable(r.getCollectedfrom())
+                                Optional.ofNullable(r.getCollectedFrom())
                                         .map(Collection::stream)
                                         .orElse(Stream.empty()))
                         .distinct() // relies on KeyValue.equals
@@ -93,6 +103,6 @@ public class Relation extends Oaf {
 
     @Override
     public int hashCode() {
-        return Objects.hash(relType, subRelType, relClass, source, target, collectedfrom);
+        return Objects.hash(relType, subRelType, relClass, source, target, collectedFrom);
     }
 }

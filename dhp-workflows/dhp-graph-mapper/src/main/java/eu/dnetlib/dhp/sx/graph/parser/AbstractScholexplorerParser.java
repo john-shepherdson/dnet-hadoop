@@ -186,7 +186,7 @@ public abstract class AbstractScholexplorerParser {
                                         r.setTarget(targetId);
                                         r.setRelType(relationSemantic);
                                         r.setRelClass("datacite");
-                                        r.setCollectedfrom(parsedObject.getCollectedfrom());
+                                        r.setCollectedFrom(parsedObject.getCollectedfrom());
                                         r.setDataInfo(di);
                                         rels.add(r);
                                         r = new DLIRelation();
@@ -195,7 +195,7 @@ public abstract class AbstractScholexplorerParser {
                                         r.setTarget(parsedObject.getId());
                                         r.setRelType(inverseRelation);
                                         r.setRelClass("datacite");
-                                        r.setCollectedfrom(parsedObject.getCollectedfrom());
+                                        r.setCollectedFrom(parsedObject.getCollectedfrom());
                                         r.setDateOfCollection(dateOfCollection);
                                         rels.add(r);
                                         if ("unknown".equalsIgnoreCase(relatedType))

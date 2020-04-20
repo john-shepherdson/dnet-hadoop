@@ -232,7 +232,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
             r1.setRelClass("isRelatedTo");
             r1.setSource(docId);
             r1.setTarget(otherId);
-            r1.setCollectedfrom(Arrays.asList(collectedFrom));
+            r1.setCollectedFrom(Arrays.asList(collectedFrom));
             r1.setDataInfo(info);
             r1.setLastupdatetimestamp(lastUpdateTimestamp);
             res.add(r1);
@@ -243,7 +243,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
             r2.setRelClass("isRelatedTo");
             r2.setSource(otherId);
             r2.setTarget(docId);
-            r2.setCollectedfrom(Arrays.asList(collectedFrom));
+            r2.setCollectedFrom(Arrays.asList(collectedFrom));
             r2.setDataInfo(info);
             r2.setLastupdatetimestamp(lastUpdateTimestamp);
             res.add(r2);

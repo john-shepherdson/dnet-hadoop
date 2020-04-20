@@ -10,6 +10,8 @@ public abstract class OafEntity extends Oaf implements Serializable {
 
     private List<String> originalId;
 
+    private List<KeyValue> collectedfrom;
+
     private List<StructuredProperty> pid;
 
     private String dateofcollection;
@@ -34,6 +36,14 @@ public abstract class OafEntity extends Oaf implements Serializable {
 
     public void setOriginalId(List<String> originalId) {
         this.originalId = originalId;
+    }
+
+    public List<KeyValue> getCollectedfrom() {
+        return collectedfrom;
+    }
+
+    public void setCollectedfrom(List<KeyValue> collectedfrom) {
+        this.collectedfrom = collectedfrom;
     }
 
     public List<StructuredProperty> getPid() {

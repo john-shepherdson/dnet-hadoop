@@ -1,24 +1,13 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
 public abstract class Oaf implements Serializable {
 
-    protected List<KeyValue> collectedfrom;
-
     private DataInfo dataInfo;
 
     private Long lastupdatetimestamp;
-
-    public List<KeyValue> getCollectedfrom() {
-        return collectedfrom;
-    }
-
-    public void setCollectedfrom(List<KeyValue> collectedfrom) {
-        this.collectedfrom = collectedfrom;
-    }
 
     public DataInfo getDataInfo() {
         return dataInfo;

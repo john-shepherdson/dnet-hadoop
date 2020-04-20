@@ -334,7 +334,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
         r.setRelClass(relClass);
         r.setSource(source);
         r.setTarget(target);
-        r.setCollectedfrom(Arrays.asList(collectedFrom));
+        r.setCollectedFrom(Arrays.asList(collectedFrom));
         r.setDataInfo(info);
         r.setLastupdatetimestamp(lastUpdateTimestamp);
         return r;
