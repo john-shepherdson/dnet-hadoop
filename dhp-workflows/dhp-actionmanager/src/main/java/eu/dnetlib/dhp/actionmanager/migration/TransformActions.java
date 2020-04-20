@@ -16,6 +16,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -101,9 +102,8 @@ public class TransformActions implements Serializable {
                             a ->
                                     eu.dnetlib.actionmanager.actions.AtomicAction.fromJSON(
                                             a._2().toString()))
-                    .map(a -> doTransform(a))
-                    // .filter(Objects::isNull)
-                    // .filter(a -> a.getPayload() == null)
+                    .map(TransformActions::doTransform)
+                    .filter(Objects::nonNull)
                     .mapToPair(
                             a ->
                                     new Tuple2<>(
@@ -121,6 +121,11 @@ public class TransformActions implements Serializable {
 
     private static AtomicAction doTransform(eu.dnetlib.actionmanager.actions.AtomicAction aa)
             throws InvalidProtocolBufferException {
+
+        // dedup similarity relations had empty target value, don't migrate them
+        if (aa.getTargetValue().length == 0) {
+            return null;
+        }
         final OafProtos.Oaf proto_oaf = OafProtos.Oaf.parseFrom(aa.getTargetValue());
         final Oaf oaf = ProtoConverter.convert(proto_oaf);
         switch (proto_oaf.getKind()) {
