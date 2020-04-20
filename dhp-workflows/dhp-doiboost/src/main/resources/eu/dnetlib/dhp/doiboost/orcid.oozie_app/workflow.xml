@@ -29,10 +29,10 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.doiboost.orcid.OrcidDSManager</main-class>
-            <!-- ENRICO FILL THE RIGHT ARG SECTION -->
-            <arg>-t</arg><arg>${workingPath}/input/crossref/index_dump</arg>
+            <arg>-d</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-
+			<arg>-f</arg><arg>ORCID_2019_summaries.tar.gz</arg>
+			<arg>-o</arg><arg>output/</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>

@@ -1,35 +1,30 @@
 package eu.dnetlib.doiboost.orcid;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Properties;
-
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+
 public class OrcidDSManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(OrcidDSManager.class);
 	
 	private String hdfsServerUri;
-	private String hadoopUsername;
     private String hdfsOrcidDefaultPath;
     private String summariesFileNameTarGz;
     private String outputAuthorsPath;
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, Exception {
     	logger.info("OrcidDSManager started");
     	OrcidDSManager orcidDSManager = new OrcidDSManager();
-    	try {
-			orcidDSManager.initGARRProperties();
-			orcidDSManager.generateAuthors();
-		} catch (Exception e) {
-			logger.error("Generating authors data: "+e.getMessage());
-		}
+		orcidDSManager.loadArgs(args);
+		orcidDSManager.generateAuthors();
     }
 
     public void generateAuthors() throws Exception {
@@ -37,7 +32,7 @@ public class OrcidDSManager {
     	FileSystem fs = initFileSystemObject(conf);
     	String tarGzUri = hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(summariesFileNameTarGz);
     	logger.info("Started parsing "+tarGzUri);
-    	Path outputPath = new Path(hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(outputAuthorsPath).concat(Long.toString(System.currentTimeMillis())).concat("/authors_part"));
+    	Path outputPath = new Path(hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(outputAuthorsPath).concat(Long.toString(System.currentTimeMillis())).concat("/authors.seq"));
     	SummariesDecompressor.parseGzSummaries(conf, tarGzUri, outputPath);
     }
     
@@ -49,9 +44,6 @@ public class OrcidDSManager {
     	// Because of Maven
     	conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
     	conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-    	// Set HADOOP user
-    	System.setProperty("HADOOP_USER_NAME", hadoopUsername);
-    	System.setProperty("hadoop.home.dir", "/");
     	return conf;
     }
     
@@ -66,34 +58,18 @@ public class OrcidDSManager {
 		}
     	return fs;
     }
-    
-    private void loadProperties() throws FileNotFoundException, IOException {
-        
-    	Properties appProps = new Properties();
-    	ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-    	appProps.load(classLoader.getResourceAsStream("orciddsmanager/props/app.properties"));
-    	hdfsServerUri = appProps.getProperty("hdfs.server.uri");
-    	hadoopUsername = appProps.getProperty("hdfs.hadoopusername");
-    	hdfsOrcidDefaultPath = appProps.getProperty("hdfs.orcid.defaultpath");
-    	summariesFileNameTarGz = appProps.getProperty("hdfs.orcid.summariesfilename.tar.gz");
-    	outputAuthorsPath = appProps.getProperty("hdfs.orcid.output.authorspath");
-    }
-    
-    private void initDefaultProperties() throws FileNotFoundException, IOException {
-        
-    	hdfsServerUri = "hdfs://localhost:9000";
-    	hadoopUsername = "enrico.ottonello";
-    	hdfsOrcidDefaultPath = "/user/enrico.ottonello/orcid/";
-    	summariesFileNameTarGz = "ORCID_2019_summaries.tar.gz";
-    	outputAuthorsPath = "output/";
-    }
-    
-    private void initGARRProperties() throws FileNotFoundException, IOException {
-        
-    	hdfsServerUri = "hdfs://hadoop-rm1.garr-pa1.d4science.org:8020";
-    	hadoopUsername = "root";
-    	hdfsOrcidDefaultPath = "/data/orcid_summaries/";
-    	summariesFileNameTarGz = "ORCID_2019_summaries.tar.gz";
-    	outputAuthorsPath = "output/";
+ 
+    private void loadArgs(String[] args) throws IOException, Exception {
+    	final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(OrcidDSManager.class.getResourceAsStream("/eu/dnetlib/dhp/doiboost/create_orcid_authors_data.json")));
+        parser.parseArgument(args);
+
+        final String hdfsServerUri = parser.get("hdfsServerUri");
+        logger.info("HDFS URI: "+hdfsServerUri);
+        Path hdfsOrcidDefaultPath = new Path(parser.get("hdfsOrcidDefaultPath"));
+        logger.info("Default Path: "+hdfsOrcidDefaultPath);
+        final String summariesFileNameTarGz = parser.get("summariesFileNameTarGz");
+        logger.info("Summaries File Name: "+summariesFileNameTarGz);
+        final String outputAuthorsPath = parser.get("summariesFileNameTarGz");
+        logger.info("Output Authors Data: "+outputAuthorsPath);
     }
 }

@@ -122,14 +122,14 @@ public class SummariesDecompressor {
 						}
 			        }
 			        
-			        if ((counter % 1000) == 0) {
+			        if ((counter % 100000) == 0) {
 			        	logger.info("Current xml records parsed: "+counter);
 			        }
 			    }
     		}
 		} catch (IOException e) {
 			logger.error("Parsing record from gzip archive: "+e.getMessage());
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
     	logger.info("Summaries parse completed");
     	logger.info("Total XML records parsed: "+counter);
