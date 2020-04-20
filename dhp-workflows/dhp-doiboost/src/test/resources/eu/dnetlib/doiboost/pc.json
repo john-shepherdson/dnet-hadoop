@@ -112,8 +112,34 @@
       ]
     ]
   },
+  "published-print": {
+    "timestamp": 1446095513000,
+    "date-time": "2015-10-29T05:11:53Z",
+    "date-parts": [
+      [
+        2015,
+        2,
+        29
+      ]
+    ]
+  },
+  "published-online": {
+        "date-parts": [
+      [
+        2015,
+        2,
+        2
+      ]
+    ]
+  },
   "title": [
     "Genetic transformation of micropropagated shoots ofPinus radiataD.Don"
+  ],
+  "original-title": [
+    "OR TITLE"
+  ],
+  "short-title": [
+    "SHORT TITLE"
   ],
   "group-title": "Plant Biology",
   "subtype": "preprint"

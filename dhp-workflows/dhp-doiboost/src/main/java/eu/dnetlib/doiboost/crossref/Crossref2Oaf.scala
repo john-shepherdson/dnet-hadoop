@@ -2,8 +2,10 @@ package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
+import org.apache.commons.lang.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
+import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
 import org.slf4j.Logger
 
@@ -11,7 +13,7 @@ import scala.collection.JavaConverters._
 
 class Crossref2Oaf {
 
-//STATIC STRING
+  //STATIC STRING
   val MAG = "MAG"
   val ORCID = "ORCID"
   val CROSSREF = "Crossref"
@@ -105,59 +107,123 @@ class Crossref2Oaf {
     // Add DataInfo
     result.setDataInfo(generateDataInfo())
 
-    result.setLastupdatetimestamp((json \"indexed" \"timestamp").extract[Long])
-    result.setDateofcollection((json \"indexed" \"date-time").extract[String])
+    result.setLastupdatetimestamp((json \ "indexed" \ "timestamp").extract[Long])
+    result.setDateofcollection((json \ "indexed" \ "date-time").extract[String])
 
-    //result.setCollectedfrom()
+    result.setCollectedfrom(List(createCollectedFrom()).asJava)
 
+    // Publisher ( Name of work's publisher mapped into  Result/Publisher)
+    val publisher = (json \ "publisher").extract[String]
+    result.setPublisher(asField(publisher))
+
+    // TITLE
+    val mainTitles = for {JString(title) <- json \ "title"} yield createSP(title, "main title", "dnet:dataCite_title")
+    val originalTitles = for {JString(title) <- json \ "original-title"} yield createSP(title, "alternative title", "dnet:dataCite_title")
+    val shortTitles = for {JString(title) <- json \ "short-title"} yield createSP(title, "alternative title", "dnet:dataCite_title")
+    result.setTitle((mainTitles ::: originalTitles ::: shortTitles).asJava)
+
+    // DESCRIPTION
+    val descriptionList = for {JString(description) <- json \ "abstract"} yield asField(description)
+    result.setDescription(descriptionList.asJava)
+    // Source
+    val sourceList = for {JString(source) <- json \ "source"} yield asField(source)
+
+    result.setSource(sourceList.asJava)
+
+
+    //RELEVANT DATE Mapping
+    val createdDate =generateDate((json \ "created" \"date-time").extract[String],(json \ "created"\"date-parts").extract[List[List[Int]]],"created", "dnet:dataCite_date" )
+    val postedDate =generateDate((json \ "posted" \"date-time").extractOrElse[String](null),(json \ "posted"\"date-parts").extract[List[List[Int]]],"available", "dnet:dataCite_date" )
+    val acceptedDate =generateDate((json \ "accepted" \"date-time").extractOrElse[String](null),(json \ "accepted"\"date-parts").extract[List[List[Int]]],"accepted", "dnet:dataCite_date" )
+    val publishedPrintDate =generateDate((json \ "published-print" \"date-time").extractOrElse[String](null),(json \ "published-print"\"date-parts").extract[List[List[Int]]],"published-print", "dnet:dataCite_date" )
+    val publishedOnlineDate =generateDate((json \ "published-online" \"date-time").extractOrElse[String](null),(json \ "published-online"\"date-parts").extract[List[List[Int]]],"published-online", "dnet:dataCite_date" )
+
+    result.setRelevantdate(List(createdDate ,postedDate, acceptedDate,publishedOnlineDate, publishedPrintDate).asJava)
     result
   }
 
 
-  def generateIdentifier(oaf: Result, doi:String): String = {
-    val id = DHPUtils.md5(doi.toLowerCase)
-    if (oaf.isInstanceOf[Dataset])
-      return s"60|${doiBoostNSPREFIX}${SEPARATOR}${id}"
-    s"50|${doiBoostNSPREFIX}${SEPARATOR}${id}"
-  }
-
-  def generateDataInfo(): DataInfo = {
-    val di =new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust("0.9")
-    di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
-    di
-  }
+  def generateDate(dt: String, datePart: List[List[Int]], classId: String, schemeId: String): StructuredProperty = {
+    if (StringUtils.isNotBlank(dt))
+      return createSP(dt, classId, schemeId)
 
 
-  def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
-    val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
-    sp.setValue(value)
-    sp
-
-  }
-
-  def createQualifier(cls:String, sch:String):Qualifier = {
-    val q = new Qualifier
-    q.setClassid(cls)
-    q.setClassname(cls)
-    q.setSchemeid(sch)
-    q.setSchemename(sch)
-    q
-  }
-
-
-  def generateItemFromType(objectType: String, objectSubType: String): Result = {
-    if (mappingCrossrefType.contains(objectType)) {
-      if (mappingCrossrefType(objectType).equalsIgnoreCase("publication"))
-        return new Publication()
-      if (mappingCrossrefType(objectType).equalsIgnoreCase("dataset"))
-        return new Dataset()
+    if (datePart != null && datePart.size == 1) {
+      val res = datePart.head
+      if (res.size == 3) {
+        val dp = f"${res.head}-${res(1)}%02d-${res(2)}%02d"
+        println(dp)
+        if (dp.length == 10) {
+          return createSP(dp, classId, schemeId)
+        }
+      }
     }
     null
   }
 
-}
+
+    def generateIdentifier(oaf: Result, doi: String): String = {
+      val id = DHPUtils.md5(doi.toLowerCase)
+      if (oaf.isInstanceOf[Dataset])
+        return s"60|${doiBoostNSPREFIX}${SEPARATOR}${id}"
+      s"50|${doiBoostNSPREFIX}${SEPARATOR}${id}"
+    }
+
+    def asField[T](value: T): Field[T] = {
+      val tmp = new Field[T]
+      tmp.setValue(value)
+      tmp
+
+
+    }
+
+
+    def generateDataInfo(): DataInfo = {
+      val di = new DataInfo
+      di.setDeletedbyinference(false)
+      di.setInferred(false)
+      di.setInvisible(false)
+      di.setTrust("0.9")
+      di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
+      di
+    }
+
+
+    def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
+      val sp = new StructuredProperty
+      sp.setQualifier(createQualifier(classId, schemeId))
+      sp.setValue(value)
+      sp
+
+    }
+
+    def createCollectedFrom(): KeyValue = {
+
+      val cf = new KeyValue
+      cf.setValue(CROSSREF)
+      cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5("crossref"))
+      cf
+
+    }
+
+    def createQualifier(cls: String, sch: String): Qualifier = {
+      val q = new Qualifier
+      q.setClassid(cls)
+      q.setClassname(cls)
+      q.setSchemeid(sch)
+      q.setSchemename(sch)
+      q
+    }
+
+
+    def generateItemFromType(objectType: String, objectSubType: String): Result = {
+      if (mappingCrossrefType.contains(objectType)) {
+        if (mappingCrossrefType(objectType).equalsIgnoreCase("publication"))
+          return new Publication()
+        if (mappingCrossrefType(objectType).equalsIgnoreCase("dataset"))
+          return new Dataset()
+      }
+      null
+    }
+
+  }
