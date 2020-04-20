@@ -41,7 +41,7 @@ public class ProtoConverter implements Serializable {
         rel.setRelType(r.getRelType().toString());
         rel.setSubRelType(r.getSubRelType().toString());
         rel.setRelClass(r.getRelClass());
-        rel.setCollectedFrom(
+        rel.setCollectedfrom(
                 r.getCollectedfromCount() > 0
                         ? r.getCollectedfromList().stream()
                                 .map(kv -> mapKV(kv))
