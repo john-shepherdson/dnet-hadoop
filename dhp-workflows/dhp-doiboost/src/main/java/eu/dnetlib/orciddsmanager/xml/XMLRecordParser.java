@@ -1,4 +1,4 @@
-package orciddsmanager.xml;
+package eu.dnetlib.orciddsmanager.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,7 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import orciddsmanager.model.AuthorData;
+import eu.dnetlib.orciddsmanager.model.AuthorData;
+
 
 public class XMLRecordParser {
 

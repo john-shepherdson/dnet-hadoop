@@ -1,4 +1,4 @@
-package orciddsmanager;
+package eu.dnetlib.orciddsmanager;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -13,9 +13,9 @@ import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import orciddsmanager.json.JsonWriter;
-import orciddsmanager.model.AuthorData;
-import orciddsmanager.xml.XMLRecordParser;
+import eu.dnetlib.orciddsmanager.json.JsonWriter;
+import eu.dnetlib.orciddsmanager.model.AuthorData;
+import eu.dnetlib.orciddsmanager.xml.XMLRecordParser;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

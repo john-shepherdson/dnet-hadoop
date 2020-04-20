@@ -1,4 +1,4 @@
-package orciddsmanager;
+package eu.dnetlib.orciddsmanager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

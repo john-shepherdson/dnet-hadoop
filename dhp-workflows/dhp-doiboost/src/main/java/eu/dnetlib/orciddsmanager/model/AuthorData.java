@@ -1,4 +1,4 @@
-package orciddsmanager.model;
+package eu.dnetlib.orciddsmanager.model;
 
 public class AuthorData {
 

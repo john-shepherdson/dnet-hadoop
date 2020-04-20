@@ -1,8 +1,9 @@
-package orciddsmanager.json;
+package eu.dnetlib.orciddsmanager.json;
 
 import com.google.gson.JsonObject;
 
-import orciddsmanager.model.AuthorData;
+import eu.dnetlib.orciddsmanager.model.AuthorData;
+
 
 public class JsonWriter {
 
