@@ -58,7 +58,7 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
 
 		assertValidId(r1.getSource());
-		assertValidId(r2.getTarget());
+		assertValidId(r1.getTarget());
 		assertValidId(r2.getSource());
 		assertValidId(r2.getTarget());
 		assertNotNull(r1.getDataInfo());
@@ -97,7 +97,7 @@ public class MappersTest {
 		assertTrue(d.getSubject().size() > 0);
 
 		assertValidId(r1.getSource());
-		assertValidId(r2.getTarget());
+		assertValidId(r1.getTarget());
 		assertValidId(r2.getSource());
 		assertValidId(r2.getTarget());
 		assertNotNull(r1.getDataInfo());
