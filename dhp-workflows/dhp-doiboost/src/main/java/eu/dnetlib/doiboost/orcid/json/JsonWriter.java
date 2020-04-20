@@ -1,8 +1,8 @@
-package eu.dnetlib.orciddsmanager.json;
+package eu.dnetlib.doiboost.orcid.json;
 
 import com.google.gson.JsonObject;
 
-import eu.dnetlib.orciddsmanager.model.AuthorData;
+import eu.dnetlib.doiboost.orcid.model.AuthorData;
 
 
 public class JsonWriter {

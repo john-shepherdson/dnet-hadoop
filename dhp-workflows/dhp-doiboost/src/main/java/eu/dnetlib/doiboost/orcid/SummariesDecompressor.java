@@ -1,5 +1,8 @@
-package eu.dnetlib.orciddsmanager;
+package eu.dnetlib.doiboost.orcid;
 
+import eu.dnetlib.doiboost.orcid.json.JsonWriter;
+import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.hadoop.conf.Configuration;
@@ -12,10 +15,6 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
-
-import eu.dnetlib.orciddsmanager.json.JsonWriter;
-import eu.dnetlib.orciddsmanager.model.AuthorData;
-import eu.dnetlib.orciddsmanager.xml.XMLRecordParser;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

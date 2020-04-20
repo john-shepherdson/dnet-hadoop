@@ -21,7 +21,7 @@ public class DoiBoostTest {
 
     Logger logger = LoggerFactory.getLogger(DoiBoostTest.class);
 
-    @Test
+
     public void test() throws Exception {
 
         //SparkDownloadContentFromCrossref.main(null);

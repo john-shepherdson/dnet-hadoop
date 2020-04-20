@@ -1,4 +1,4 @@
-package eu.dnetlib.orciddsmanager;
+package eu.dnetlib.doiboost.orcid;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -6,7 +6,6 @@ import java.net.URI;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;

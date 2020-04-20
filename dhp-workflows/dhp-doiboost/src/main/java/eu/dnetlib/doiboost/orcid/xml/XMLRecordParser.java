@@ -1,4 +1,4 @@
-package eu.dnetlib.orciddsmanager.xml;
+package eu.dnetlib.doiboost.orcid.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,11 +13,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import eu.dnetlib.doiboost.orcid.model.AuthorData;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
-import eu.dnetlib.orciddsmanager.model.AuthorData;
 
 
 public class XMLRecordParser {
