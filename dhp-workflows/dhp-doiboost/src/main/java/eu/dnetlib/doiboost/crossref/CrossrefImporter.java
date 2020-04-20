@@ -1,14 +1,19 @@
-package eu.dnetlib.doiboost;
+package eu.dnetlib.doiboost.crossref;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
-import org.apache.http.HttpHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.util.zip.Inflater;
 
 
 public class CrossrefImporter {
@@ -18,13 +23,18 @@ public class CrossrefImporter {
     public static void main(String[] args) throws Exception {
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(IOUtils.toString(CrossrefImporter.class.getResourceAsStream("/eu/dnetlib/dhp/doiboost/import_from_es.json")));
+        Logger logger = LoggerFactory.getLogger(CrossrefImporter.class);
         parser.parseArgument(args);
-        System.out.println(parser.get("targetPath"));
-
 
         final String hdfsuri = parser.get("namenode");
-        System.out.println(hdfsuri);
+        logger.info("HDFS URI"+hdfsuri);
         Path hdfswritepath = new Path(parser.get("targetPath"));
+        logger.info("TargetPath: "+hdfsuri);
+
+        final Long timestamp = StringUtils.isNotBlank(parser.get("timestamp"))?Long.parseLong(parser.get("timestamp")):-1;
+
+        if(timestamp>0)
+            logger.info("Timestamp added "+timestamp);
 
 
         // ====== Init HDFS File System Object
@@ -37,12 +47,11 @@ public class CrossrefImporter {
 
 
 
-        ESClient client = new ESClient("ip-90-147-167-25.ct1.garrservices.it", "crossref");
+        ESClient client = timestamp>0?new ESClient("ip-90-147-167-25.ct1.garrservices.it", "crossref", timestamp):new ESClient("ip-90-147-167-25.ct1.garrservices.it", "crossref");
 
         try (SequenceFile.Writer writer = SequenceFile.createWriter(conf,
                 SequenceFile.Writer.file(hdfswritepath), SequenceFile.Writer.keyClass(IntWritable.class),
                 SequenceFile.Writer.valueClass(Text.class))) {
-
 
             int i = 0;
             long start= System.currentTimeMillis();
@@ -53,13 +62,32 @@ public class CrossrefImporter {
                 key.set(i++);
                 value.set(client.next());
                 writer.append(key, value);
-                if (i % 100000 == 0) {
+                if (i % 1000000 == 0) {
                     end = System.currentTimeMillis();
-                    final float time = (end - start) / 1000;
-                    System.out.println(String.format("Imported %d records last 100000 imported in %f seconds", i, time));
+                    final float time = (end - start) / 1000.0F;
+                    logger.info(String.format("Imported %d records last 100000 imported in %f seconds", i, time));
                     start = System.currentTimeMillis();
                 }
             }
+        }
+    }
+
+    public static String decompressBlob(final String blob) {
+        try {
+            byte[] byteArray = Base64.decodeBase64(blob.getBytes());
+            final Inflater decompresser = new Inflater();
+            decompresser.setInput(byteArray);
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream(byteArray.length);
+            byte[] buffer = new byte[8192];
+            while (!decompresser.finished()) {
+                int size = decompresser.inflate(buffer);
+                bos.write(buffer, 0, size);
+            }
+            byte[] unzippeddata = bos.toByteArray();
+            decompresser.end();
+            return new String(unzippeddata);
+        } catch (Throwable e) {
+            throw new RuntimeException("Wrong record:" + blob,e);
         }
     }
 }

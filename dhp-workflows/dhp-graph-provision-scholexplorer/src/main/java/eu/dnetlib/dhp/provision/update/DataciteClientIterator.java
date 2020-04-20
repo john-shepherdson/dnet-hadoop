@@ -36,14 +36,11 @@ public class DataciteClientIterator implements Iterator<String> {
         final String body =getResponse(String.format("http://%s:9200/%s/_search?scroll=1m", esHost, esIndex), String.format("{\"size\":1000, \"query\":{\"range\":{\"timestamp\":{\"gte\":%d}}}}", timestamp));
         scrollId= getJPathString(scrollIdPath, body);
         buffer = getBlobs(body);
-
     }
-
 
     public String getResponse(final String url,final String json ) {
         CloseableHttpClient client = HttpClients.createDefault();
         try {
-
             HttpPost httpPost = new HttpPost(url);
             if (json!= null) {
                 StringEntity entity = new StringEntity(json);
@@ -63,7 +60,6 @@ public class DataciteClientIterator implements Iterator<String> {
                 throw new RuntimeException("Unable to close client ",e);
             }
         }
-
     }
 
     private String  getJPathString(final String jsonPath, final String json) {

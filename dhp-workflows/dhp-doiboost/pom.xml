@@ -11,19 +11,15 @@
     <artifactId>dhp-doiboost</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.3.4</version>
         </dependency>
-
-
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
@@ -34,7 +30,6 @@
                    <artifactId>cxf-rt-transports-http</artifactId>
                </exclusion>
            </exclusions>
-
         </dependency>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
@@ -45,6 +40,17 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.11</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_2.11</artifactId>
+        </dependency>
+
 
 
     </dependencies>

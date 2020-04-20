@@ -28,7 +28,7 @@
         <java>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <main-class>eu.dnetlib.doiboost.CrossrefImporter</main-class>
+            <main-class>eu.dnetlib.doiboost.crossref.CrossrefImporter</main-class>
             <arg>-t</arg><arg>${workingPath}/input/crossref/index_dump</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
         </java>
