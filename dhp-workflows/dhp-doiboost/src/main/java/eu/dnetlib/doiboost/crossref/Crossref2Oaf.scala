@@ -106,8 +106,9 @@ class Crossref2Oaf {
     result.setDataInfo(generateDataInfo())
 
     result.setLastupdatetimestamp((json \"indexed" \"timestamp").extract[Long])
-
     result.setDateofcollection((json \"indexed" \"date-time").extract[String])
+
+    //result.setCollectedfrom()
 
     result
   }
