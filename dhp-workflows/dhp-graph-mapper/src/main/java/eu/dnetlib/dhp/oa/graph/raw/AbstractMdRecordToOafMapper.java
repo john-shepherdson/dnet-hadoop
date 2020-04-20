@@ -80,11 +80,11 @@ public abstract class AbstractMdRecordToOafMapper {
 
 			final String type = doc.valueOf("//dr:CobjCategory/@type");
 			final KeyValue collectedFrom =
-					keyValue(doc.valueOf("//oaf:collectedFrom/@id"), doc.valueOf("//oaf:collectedFrom/@name"));
+					keyValue(createOpenaireId(10, doc.valueOf("//oaf:collectedFrom/@id"), true), doc.valueOf("//oaf:collectedFrom/@name"));
 			final KeyValue hostedBy =
 					StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
 							? collectedFrom
-							: keyValue(doc.valueOf("//oaf:hostedBy/@id"), doc.valueOf("//oaf:hostedBy/@name"));
+							: keyValue(createOpenaireId(10, doc.valueOf("//oaf:hostedBy/@id"), true), doc.valueOf("//oaf:hostedBy/@name"));
 
 			final DataInfo info = prepareDataInfo(doc);
 			final long lastUpdateTimestamp = new Date().getTime();

@@ -29,6 +29,7 @@ import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
 
 @ExtendWith(MockitoExtension.class)
 public class MigrateDbEntitiesApplicationTest {
@@ -53,12 +54,12 @@ public class MigrateDbEntitiesApplicationTest {
 
 		final Datasource ds = (Datasource) list.get(0);
 		assertValidId(ds.getId());
+		assertValidId(ds.getCollectedfrom().get(0).getKey());
 		assertEquals(ds.getOfficialname().getValue(), getValueAsString("officialname", fields));
 		assertEquals(ds.getEnglishname().getValue(), getValueAsString("englishname", fields));
 		assertEquals(ds.getContactemail().getValue(), getValueAsString("contactemail", fields));
 		assertEquals(ds.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
 		assertEquals(ds.getNamespaceprefix().getValue(), getValueAsString("namespaceprefix", fields));
-		assertEquals(ds.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
 		assertEquals(ds.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
@@ -72,10 +73,11 @@ public class MigrateDbEntitiesApplicationTest {
 
 		final Project p = (Project) list.get(0);
 		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertEquals(p.getAcronym().getValue(), getValueAsString("acronym", fields));
 		assertEquals(p.getTitle().getValue(), getValueAsString("title", fields));
-		assertEquals(p.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
 		assertEquals(p.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+
 	}
 
 	@Test
@@ -90,6 +92,7 @@ public class MigrateDbEntitiesApplicationTest {
 
 		final Organization o = (Organization) list.get(0);
 		assertValidId(o.getId());
+		assertValidId(o.getCollectedfrom().get(0).getKey());
 		assertEquals(o.getLegalshortname().getValue(), getValueAsString("legalshortname", fields));
 		assertEquals(o.getLegalname().getValue(), getValueAsString("legalname", fields));
 		assertEquals(o.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
@@ -97,7 +100,6 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(o.getCountry().getClassname(), getValueAsString("country", fields).split("@@@")[1]);
 		assertEquals(o.getCountry().getSchemeid(), getValueAsString("country", fields).split("@@@")[2]);
 		assertEquals(o.getCountry().getSchemename(), getValueAsString("country", fields).split("@@@")[3]);
-		assertEquals(o.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
 		assertEquals(o.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
@@ -133,6 +135,8 @@ public class MigrateDbEntitiesApplicationTest {
 		assertValidId(r2.getSource());
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
+		assertValidId(r1.getCollectedFrom().get(0).getKey());
+		assertValidId(r2.getCollectedFrom().get(0).getKey());
 	}
 
 	@Test
@@ -142,8 +146,12 @@ public class MigrateDbEntitiesApplicationTest {
 		final List<Oaf> list = app.processClaims(rs);
 
 		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Result);
+		final Result r = (Result) list.get(0);
 
 		verifyMocks(fields);
+
+		assertValidId(r.getCollectedfrom().get(0).getKey());
 	}
 
 	@Test
@@ -175,6 +183,9 @@ public class MigrateDbEntitiesApplicationTest {
 		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
 		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+
+		assertValidId(r1.getCollectedFrom().get(0).getKey());
+		assertValidId(r2.getCollectedFrom().get(0).getKey());
 
 		// System.out.println(new ObjectMapper().writeValueAsString(r1));
 		// System.out.println(new ObjectMapper().writeValueAsString(r2));

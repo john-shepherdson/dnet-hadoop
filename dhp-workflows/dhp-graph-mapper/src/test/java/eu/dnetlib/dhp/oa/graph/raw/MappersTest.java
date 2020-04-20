@@ -51,6 +51,7 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertTrue(p.getAuthor().size() > 0);
 		assertTrue(p.getSubject().size() > 0);
@@ -61,6 +62,8 @@ public class MappersTest {
 		assertValidId(r1.getTarget());
 		assertValidId(r2.getSource());
 		assertValidId(r2.getTarget());
+		assertValidId(r1.getCollectedFrom().get(0).getKey());
+		assertValidId(r2.getCollectedFrom().get(0).getKey());
 		assertNotNull(r1.getDataInfo());
 		assertNotNull(r2.getDataInfo());
 		assertNotNull(r1.getDataInfo().getTrust());
@@ -92,6 +95,7 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
+		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
 		assertTrue(d.getSubject().size() > 0);
@@ -124,6 +128,7 @@ public class MappersTest {
 		final Software s = (Software) list.get(0);
 
 		assertValidId(s.getId());
+		assertValidId(s.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(s.getTitle().get(0).getValue()));
 		assertTrue(s.getAuthor().size() > 0);
 		assertTrue(s.getSubject().size() > 0);
