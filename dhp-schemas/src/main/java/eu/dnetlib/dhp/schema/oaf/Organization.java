@@ -122,7 +122,8 @@ public class Organization extends OafEntity implements Serializable {
         return ecinternationalorganizationeurinterests;
     }
 
-    public void setEcinternationalorganizationeurinterests(Field<String> ecinternationalorganizationeurinterests) {
+    public void setEcinternationalorganizationeurinterests(
+            Field<String> ecinternationalorganizationeurinterests) {
         this.ecinternationalorganizationeurinterests = ecinternationalorganizationeurinterests;
     }
 
@@ -166,32 +167,70 @@ public class Organization extends OafEntity implements Serializable {
         this.country = country;
     }
 
-
     @Override
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
-        if (!Organization.class.isAssignableFrom(e.getClass())){
+        if (!Organization.class.isAssignableFrom(e.getClass())) {
             return;
         }
 
         final Organization o = (Organization) e;
-        legalshortname = o.getLegalshortname() != null && compareTrust(this, e)<0? o.getLegalshortname() : legalshortname;
-        legalname = o.getLegalname() != null && compareTrust(this, e)<0 ? o.getLegalname() : legalname;
+        legalshortname =
+                o.getLegalshortname() != null && compareTrust(this, e) < 0
+                        ? o.getLegalshortname()
+                        : legalshortname;
+        legalname =
+                o.getLegalname() != null && compareTrust(this, e) < 0
+                        ? o.getLegalname()
+                        : legalname;
         alternativeNames = mergeLists(o.getAlternativeNames(), alternativeNames);
-        websiteurl = o.getWebsiteurl() != null && compareTrust(this, e)<0? o.getWebsiteurl() : websiteurl;
-        logourl = o.getLogourl() != null && compareTrust(this, e)<0? o.getLogourl() : logourl;
-        eclegalbody = o.getEclegalbody() != null && compareTrust(this, e)<0? o.getEclegalbody() : eclegalbody;
-        eclegalperson = o.getEclegalperson() != null && compareTrust(this, e)<0? o.getEclegalperson() : eclegalperson;
-        ecnonprofit = o.getEcnonprofit() != null && compareTrust(this, e)<0? o.getEcnonprofit() : ecnonprofit;
-        ecresearchorganization = o.getEcresearchorganization() != null && compareTrust(this, e)<0? o.getEcresearchorganization() : ecresearchorganization;
-        echighereducation = o.getEchighereducation() != null && compareTrust(this, e)<0? o.getEchighereducation() : echighereducation;
-        ecinternationalorganizationeurinterests = o.getEcinternationalorganizationeurinterests() != null && compareTrust(this, e)<0? o.getEcinternationalorganizationeurinterests() : ecinternationalorganizationeurinterests;
-        ecinternationalorganization = o.getEcinternationalorganization() != null && compareTrust(this, e)<0? o.getEcinternationalorganization() : ecinternationalorganization;
-        ecenterprise = o.getEcenterprise() != null && compareTrust(this, e)<0? o.getEcenterprise() :ecenterprise;
-        ecsmevalidated = o.getEcsmevalidated() != null && compareTrust(this, e)<0? o.getEcsmevalidated() :ecsmevalidated;
-        ecnutscode = o.getEcnutscode() != null && compareTrust(this, e)<0? o.getEcnutscode() :ecnutscode;
-        country = o.getCountry() != null && compareTrust(this, e)<0 ? o.getCountry() :country;
+        websiteurl =
+                o.getWebsiteurl() != null && compareTrust(this, e) < 0
+                        ? o.getWebsiteurl()
+                        : websiteurl;
+        logourl = o.getLogourl() != null && compareTrust(this, e) < 0 ? o.getLogourl() : logourl;
+        eclegalbody =
+                o.getEclegalbody() != null && compareTrust(this, e) < 0
+                        ? o.getEclegalbody()
+                        : eclegalbody;
+        eclegalperson =
+                o.getEclegalperson() != null && compareTrust(this, e) < 0
+                        ? o.getEclegalperson()
+                        : eclegalperson;
+        ecnonprofit =
+                o.getEcnonprofit() != null && compareTrust(this, e) < 0
+                        ? o.getEcnonprofit()
+                        : ecnonprofit;
+        ecresearchorganization =
+                o.getEcresearchorganization() != null && compareTrust(this, e) < 0
+                        ? o.getEcresearchorganization()
+                        : ecresearchorganization;
+        echighereducation =
+                o.getEchighereducation() != null && compareTrust(this, e) < 0
+                        ? o.getEchighereducation()
+                        : echighereducation;
+        ecinternationalorganizationeurinterests =
+                o.getEcinternationalorganizationeurinterests() != null && compareTrust(this, e) < 0
+                        ? o.getEcinternationalorganizationeurinterests()
+                        : ecinternationalorganizationeurinterests;
+        ecinternationalorganization =
+                o.getEcinternationalorganization() != null && compareTrust(this, e) < 0
+                        ? o.getEcinternationalorganization()
+                        : ecinternationalorganization;
+        ecenterprise =
+                o.getEcenterprise() != null && compareTrust(this, e) < 0
+                        ? o.getEcenterprise()
+                        : ecenterprise;
+        ecsmevalidated =
+                o.getEcsmevalidated() != null && compareTrust(this, e) < 0
+                        ? o.getEcsmevalidated()
+                        : ecsmevalidated;
+        ecnutscode =
+                o.getEcnutscode() != null && compareTrust(this, e) < 0
+                        ? o.getEcnutscode()
+                        : ecnutscode;
+        country = o.getCountry() != null && compareTrust(this, e) < 0 ? o.getCountry() : country;
         mergeOAFDataInfo(o);
     }
 
@@ -201,26 +240,45 @@ public class Organization extends OafEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Organization that = (Organization) o;
-        return Objects.equals(legalshortname, that.legalshortname) &&
-                Objects.equals(legalname, that.legalname) &&
-                Objects.equals(alternativeNames, that.alternativeNames) &&
-                Objects.equals(websiteurl, that.websiteurl) &&
-                Objects.equals(logourl, that.logourl) &&
-                Objects.equals(eclegalbody, that.eclegalbody) &&
-                Objects.equals(eclegalperson, that.eclegalperson) &&
-                Objects.equals(ecnonprofit, that.ecnonprofit) &&
-                Objects.equals(ecresearchorganization, that.ecresearchorganization) &&
-                Objects.equals(echighereducation, that.echighereducation) &&
-                Objects.equals(ecinternationalorganizationeurinterests, that.ecinternationalorganizationeurinterests) &&
-                Objects.equals(ecinternationalorganization, that.ecinternationalorganization) &&
-                Objects.equals(ecenterprise, that.ecenterprise) &&
-                Objects.equals(ecsmevalidated, that.ecsmevalidated) &&
-                Objects.equals(ecnutscode, that.ecnutscode) &&
-                Objects.equals(country, that.country);
+        return Objects.equals(legalshortname, that.legalshortname)
+                && Objects.equals(legalname, that.legalname)
+                && Objects.equals(alternativeNames, that.alternativeNames)
+                && Objects.equals(websiteurl, that.websiteurl)
+                && Objects.equals(logourl, that.logourl)
+                && Objects.equals(eclegalbody, that.eclegalbody)
+                && Objects.equals(eclegalperson, that.eclegalperson)
+                && Objects.equals(ecnonprofit, that.ecnonprofit)
+                && Objects.equals(ecresearchorganization, that.ecresearchorganization)
+                && Objects.equals(echighereducation, that.echighereducation)
+                && Objects.equals(
+                        ecinternationalorganizationeurinterests,
+                        that.ecinternationalorganizationeurinterests)
+                && Objects.equals(ecinternationalorganization, that.ecinternationalorganization)
+                && Objects.equals(ecenterprise, that.ecenterprise)
+                && Objects.equals(ecsmevalidated, that.ecsmevalidated)
+                && Objects.equals(ecnutscode, that.ecnutscode)
+                && Objects.equals(country, that.country);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), legalshortname, legalname, alternativeNames, websiteurl, logourl, eclegalbody, eclegalperson, ecnonprofit, ecresearchorganization, echighereducation, ecinternationalorganizationeurinterests, ecinternationalorganization, ecenterprise, ecsmevalidated, ecnutscode, country);
+        return Objects.hash(
+                super.hashCode(),
+                legalshortname,
+                legalname,
+                alternativeNames,
+                websiteurl,
+                logourl,
+                eclegalbody,
+                eclegalperson,
+                ecnonprofit,
+                ecresearchorganization,
+                echighereducation,
+                ecinternationalorganizationeurinterests,
+                ecinternationalorganization,
+                ecenterprise,
+                ecsmevalidated,
+                ecnutscode,
+                country);
     }
 }

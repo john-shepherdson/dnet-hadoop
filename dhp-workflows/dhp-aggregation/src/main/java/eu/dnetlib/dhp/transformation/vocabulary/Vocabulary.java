@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.transformation.vocabulary;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 public class Vocabulary implements Serializable {
 
@@ -51,7 +50,4 @@ public class Vocabulary implements Serializable {
     public void setTerms(List<Term> terms) {
         this.terms = terms;
     }
-
-
-
 }

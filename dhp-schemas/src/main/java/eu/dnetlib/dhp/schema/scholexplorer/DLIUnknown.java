@@ -1,15 +1,13 @@
 package eu.dnetlib.dhp.schema.scholexplorer;
 
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 public class DLIUnknown extends Oaf implements Serializable {
 
@@ -49,7 +47,6 @@ public class DLIUnknown extends Oaf implements Serializable {
         this.id = id;
     }
 
-
     public List<StructuredProperty> getPid() {
         return pid;
     }
@@ -75,33 +72,45 @@ public class DLIUnknown extends Oaf implements Serializable {
     }
 
     public void mergeFrom(DLIUnknown p) {
-        if ("complete".equalsIgnoreCase(p.completionStatus))
-            completionStatus = "complete";
+        if ("complete".equalsIgnoreCase(p.completionStatus)) completionStatus = "complete";
         dlicollectedfrom = mergeProvenance(dlicollectedfrom, p.getDlicollectedfrom());
     }
 
-    private List<ProvenaceInfo> mergeProvenance(final List<ProvenaceInfo> a, final List<ProvenaceInfo> b) {
+    private List<ProvenaceInfo> mergeProvenance(
+            final List<ProvenaceInfo> a, final List<ProvenaceInfo> b) {
         Map<String, ProvenaceInfo> result = new HashMap<>();
         if (a != null)
-            a.forEach(p -> {
-                if (p != null && StringUtils.isNotBlank(p.getId()) && result.containsKey(p.getId())) {
-                    if ("incomplete".equalsIgnoreCase(result.get(p.getId()).getCompletionStatus()) && StringUtils.isNotBlank(p.getCompletionStatus())) {
-                        result.put(p.getId(), p);
-                    }
+            a.forEach(
+                    p -> {
+                        if (p != null
+                                && StringUtils.isNotBlank(p.getId())
+                                && result.containsKey(p.getId())) {
+                            if ("incomplete"
+                                            .equalsIgnoreCase(
+                                                    result.get(p.getId()).getCompletionStatus())
+                                    && StringUtils.isNotBlank(p.getCompletionStatus())) {
+                                result.put(p.getId(), p);
+                            }
 
-                } else if (p != null && p.getId() != null && !result.containsKey(p.getId()))
-                    result.put(p.getId(), p);
-            });
+                        } else if (p != null && p.getId() != null && !result.containsKey(p.getId()))
+                            result.put(p.getId(), p);
+                    });
         if (b != null)
-            b.forEach(p -> {
-                if (p != null && StringUtils.isNotBlank(p.getId()) && result.containsKey(p.getId())) {
-                    if ("incomplete".equalsIgnoreCase(result.get(p.getId()).getCompletionStatus()) && StringUtils.isNotBlank(p.getCompletionStatus())) {
-                        result.put(p.getId(), p);
-                    }
+            b.forEach(
+                    p -> {
+                        if (p != null
+                                && StringUtils.isNotBlank(p.getId())
+                                && result.containsKey(p.getId())) {
+                            if ("incomplete"
+                                            .equalsIgnoreCase(
+                                                    result.get(p.getId()).getCompletionStatus())
+                                    && StringUtils.isNotBlank(p.getCompletionStatus())) {
+                                result.put(p.getId(), p);
+                            }
 
-                } else if (p != null && p.getId() != null && !result.containsKey(p.getId()))
-                    result.put(p.getId(), p);
-            });
+                        } else if (p != null && p.getId() != null && !result.containsKey(p.getId()))
+                            result.put(p.getId(), p);
+                    });
 
         return new ArrayList<>(result.values());
     }

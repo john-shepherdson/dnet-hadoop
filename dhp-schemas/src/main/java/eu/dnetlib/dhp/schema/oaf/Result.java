@@ -223,7 +223,7 @@ public class Result extends OafEntity implements Serializable {
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
-        if (!Result.class.isAssignableFrom(e.getClass())){
+        if (!Result.class.isAssignableFrom(e.getClass())) {
             return;
         }
 
@@ -231,11 +231,9 @@ public class Result extends OafEntity implements Serializable {
 
         instance = mergeLists(instance, r.getInstance());
 
-        if (r.getResulttype() != null && compareTrust(this, r) < 0)
-            resulttype = r.getResulttype();
+        if (r.getResulttype() != null && compareTrust(this, r) < 0) resulttype = r.getResulttype();
 
-        if (r.getLanguage() != null && compareTrust(this, r) < 0)
-            language = r.getLanguage();
+        if (r.getLanguage() != null && compareTrust(this, r) < 0) language = r.getLanguage();
 
         country = mergeLists(country, r.getCountry());
 
@@ -247,8 +245,7 @@ public class Result extends OafEntity implements Serializable {
 
         description = longestLists(description, r.getDescription());
 
-        if (r.getPublisher() != null && compareTrust(this, r) < 0)
-            publisher = r.getPublisher();
+        if (r.getPublisher() != null && compareTrust(this, r) < 0) publisher = r.getPublisher();
 
         if (r.getEmbargoenddate() != null && compareTrust(this, r) < 0)
             embargoenddate = r.getEmbargoenddate();
@@ -261,8 +258,7 @@ public class Result extends OafEntity implements Serializable {
 
         contributor = mergeLists(contributor, r.getContributor());
 
-        if (r.getResourcetype() != null)
-            resourcetype = r.getResourcetype();
+        if (r.getResourcetype() != null) resourcetype = r.getResourcetype();
 
         coverage = mergeLists(coverage, r.getCoverage());
 
@@ -271,13 +267,21 @@ public class Result extends OafEntity implements Serializable {
         externalReference = mergeLists(externalReference, r.getExternalReference());
     }
 
-
     private List<Field<String>> longestLists(List<Field<String>> a, List<Field<String>> b) {
-        if (a == null || b == null)
-            return a == null ? b : a;
+        if (a == null || b == null) return a == null ? b : a;
         if (a.size() == b.size()) {
-            int msa = a.stream().filter(i -> i.getValue() != null).map(i -> i.getValue().length()).max(Comparator.naturalOrder()).orElse(0);
-            int msb = b.stream().filter(i -> i.getValue() != null).map(i -> i.getValue().length()).max(Comparator.naturalOrder()).orElse(0);
+            int msa =
+                    a.stream()
+                            .filter(i -> i.getValue() != null)
+                            .map(i -> i.getValue().length())
+                            .max(Comparator.naturalOrder())
+                            .orElse(0);
+            int msb =
+                    b.stream()
+                            .filter(i -> i.getValue() != null)
+                            .map(i -> i.getValue().length())
+                            .max(Comparator.naturalOrder())
+                            .orElse(0);
             return msa > msb ? a : b;
         }
         return a.size() > b.size() ? a : b;
@@ -289,31 +293,53 @@ public class Result extends OafEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Result result = (Result) o;
-        return Objects.equals(author, result.author) &&
-                Objects.equals(resulttype, result.resulttype) &&
-                Objects.equals(language, result.language) &&
-                Objects.equals(country, result.country) &&
-                Objects.equals(subject, result.subject) &&
-                Objects.equals(title, result.title) &&
-                Objects.equals(relevantdate, result.relevantdate) &&
-                Objects.equals(description, result.description) &&
-                Objects.equals(dateofacceptance, result.dateofacceptance) &&
-                Objects.equals(publisher, result.publisher) &&
-                Objects.equals(embargoenddate, result.embargoenddate) &&
-                Objects.equals(source, result.source) &&
-                Objects.equals(fulltext, result.fulltext) &&
-                Objects.equals(format, result.format) &&
-                Objects.equals(contributor, result.contributor) &&
-                Objects.equals(resourcetype, result.resourcetype) &&
-                Objects.equals(coverage, result.coverage) &&
-                Objects.equals(bestaccessright, result.bestaccessright) &&
-                Objects.equals(context, result.context) &&
-                Objects.equals(externalReference, result.externalReference) &&
-                Objects.equals(instance, result.instance);
+        return Objects.equals(author, result.author)
+                && Objects.equals(resulttype, result.resulttype)
+                && Objects.equals(language, result.language)
+                && Objects.equals(country, result.country)
+                && Objects.equals(subject, result.subject)
+                && Objects.equals(title, result.title)
+                && Objects.equals(relevantdate, result.relevantdate)
+                && Objects.equals(description, result.description)
+                && Objects.equals(dateofacceptance, result.dateofacceptance)
+                && Objects.equals(publisher, result.publisher)
+                && Objects.equals(embargoenddate, result.embargoenddate)
+                && Objects.equals(source, result.source)
+                && Objects.equals(fulltext, result.fulltext)
+                && Objects.equals(format, result.format)
+                && Objects.equals(contributor, result.contributor)
+                && Objects.equals(resourcetype, result.resourcetype)
+                && Objects.equals(coverage, result.coverage)
+                && Objects.equals(bestaccessright, result.bestaccessright)
+                && Objects.equals(context, result.context)
+                && Objects.equals(externalReference, result.externalReference)
+                && Objects.equals(instance, result.instance);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), author, resulttype, language, country, subject, title, relevantdate, description, dateofacceptance, publisher, embargoenddate, source, fulltext, format, contributor, resourcetype, coverage, bestaccessright, context, externalReference, instance);
+        return Objects.hash(
+                super.hashCode(),
+                author,
+                resulttype,
+                language,
+                country,
+                subject,
+                title,
+                relevantdate,
+                description,
+                dateofacceptance,
+                publisher,
+                embargoenddate,
+                source,
+                fulltext,
+                format,
+                contributor,
+                resourcetype,
+                coverage,
+                bestaccessright,
+                context,
+                externalReference,
+                instance);
     }
 }

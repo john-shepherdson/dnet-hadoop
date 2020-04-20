@@ -1,9 +1,8 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
+import org.apache.commons.lang3.StringUtils;
 
 public class KeyValue implements Serializable {
 
@@ -38,7 +37,12 @@ public class KeyValue implements Serializable {
     }
 
     public String toComparableString() {
-        return isBlank()?"":String.format("%s::%s", key != null ? key.toLowerCase() : "", value != null ? value.toLowerCase() : "");
+        return isBlank()
+                ? ""
+                : String.format(
+                        "%s::%s",
+                        key != null ? key.toLowerCase() : "",
+                        value != null ? value.toLowerCase() : "");
     }
 
     @JsonIgnore
@@ -53,12 +57,9 @@ public class KeyValue implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
 
         KeyValue other = (KeyValue) obj;
 

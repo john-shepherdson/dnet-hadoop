@@ -1,18 +1,14 @@
 package eu.dnetlib.dhp.schema.action;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import org.apache.commons.lang3.StringUtils;
-
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author claudio.atzori
- */
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
+
+/** @author claudio.atzori */
 public class AtomicActionTest {
 
     @Test
@@ -36,7 +32,5 @@ public class AtomicActionTest {
 
         assertEquals(aa1.getClazz(), aa2.getClazz());
         assertEquals(aa1.getPayload(), aa2.getPayload());
-
     }
-
 }

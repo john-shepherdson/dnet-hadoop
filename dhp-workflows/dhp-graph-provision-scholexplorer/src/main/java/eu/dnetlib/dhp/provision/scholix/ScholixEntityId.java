@@ -7,8 +7,7 @@ public class ScholixEntityId implements Serializable {
     private String name;
     private List<ScholixIdentifier> identifiers;
 
-    public ScholixEntityId() {
-    }
+    public ScholixEntityId() {}
 
     public ScholixEntityId(String name, List<ScholixIdentifier> identifiers) {
         this.name = name;

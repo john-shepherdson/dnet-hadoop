@@ -1,30 +1,46 @@
 package eu.dnetlib.dhp.application;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
 
 public class ArgumentApplicationParserTest {
 
     @Test
     public void testParseParameter() throws Exception {
-        final String jsonConfiguration = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/application/parameters.json"));
+        final String jsonConfiguration =
+                IOUtils.toString(
+                        this.getClass()
+                                .getResourceAsStream("/eu/dnetlib/application/parameters.json"));
         assertNotNull(jsonConfiguration);
         ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(new String[]{"-p", "value0",
-                "-a", "value1",
-                "-n", "value2",
-                "-u", "value3",
-                "-ru", "value4",
-                "-rp", "value5",
-                "-rh", "value6",
-                "-ro", "value7",
-                "-rr", "value8",
-                "-w", "value9",
-                "-cc", ArgumentApplicationParser.compressArgument(jsonConfiguration)
-        });
+        parser.parseArgument(
+                new String[] {
+                    "-p",
+                    "value0",
+                    "-a",
+                    "value1",
+                    "-n",
+                    "value2",
+                    "-u",
+                    "value3",
+                    "-ru",
+                    "value4",
+                    "-rp",
+                    "value5",
+                    "-rh",
+                    "value6",
+                    "-ro",
+                    "value7",
+                    "-rr",
+                    "value8",
+                    "-w",
+                    "value9",
+                    "-cc",
+                    ArgumentApplicationParser.compressArgument(jsonConfiguration)
+                });
         assertNotNull(parser.get("hdfsPath"));
         assertNotNull(parser.get("apidescriptor"));
         assertNotNull(parser.get("namenode"));
@@ -47,10 +63,4 @@ public class ArgumentApplicationParserTest {
         assertEquals("value9", parser.get("workflowId"));
         assertEquals(jsonConfiguration, parser.get("ccCoco"));
     }
-
-
-
-
-
-
 }

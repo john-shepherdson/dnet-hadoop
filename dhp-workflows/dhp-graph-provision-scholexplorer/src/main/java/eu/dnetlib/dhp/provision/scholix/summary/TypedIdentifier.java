@@ -6,8 +6,7 @@ public class TypedIdentifier implements Serializable {
     private String id;
     private String type;
 
-    public TypedIdentifier() {
-    }
+    public TypedIdentifier() {}
 
     public TypedIdentifier(String id, String type) {
         this.id = id;

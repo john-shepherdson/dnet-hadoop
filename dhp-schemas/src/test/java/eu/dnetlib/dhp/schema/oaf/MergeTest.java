@@ -1,11 +1,11 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MergeTest {
 
@@ -19,7 +19,7 @@ public class MergeTest {
     @Test
     public void mergeListsTest() {
 
-        //string list merge test
+        // string list merge test
         List<String> a = Arrays.asList("a", "b", "c", "e");
         List<String> b = Arrays.asList("a", "b", "c", "d");
         List<String> c = null;
@@ -44,7 +44,6 @@ public class MergeTest {
 
         assertNotNull(a.getCollectedfrom());
         assertEquals(3, a.getCollectedfrom().size());
-
     }
 
     @Test
@@ -60,7 +59,6 @@ public class MergeTest {
 
         assertNotNull(a.getSubject());
         assertEquals(3, a.getSubject().size());
-
     }
 
     private KeyValue setKV(final String key, final String value) {
@@ -73,7 +71,8 @@ public class MergeTest {
         return k;
     }
 
-    private StructuredProperty setSP(final String value, final String schema, final String classname) {
+    private StructuredProperty setSP(
+            final String value, final String schema, final String classname) {
         StructuredProperty s = new StructuredProperty();
         s.setValue(value);
         Qualifier q = new Qualifier();

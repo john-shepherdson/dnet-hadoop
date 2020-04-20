@@ -6,8 +6,7 @@ public class ScholixIdentifier implements Serializable {
     private String identifier;
     private String schema;
 
-    public ScholixIdentifier() {
-    }
+    public ScholixIdentifier() {}
 
     public ScholixIdentifier(String identifier, String schema) {
         this.identifier = identifier;

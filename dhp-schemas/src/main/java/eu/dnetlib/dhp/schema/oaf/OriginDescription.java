@@ -70,16 +70,17 @@ public class OriginDescription implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OriginDescription that = (OriginDescription) o;
-        return Objects.equals(harvestDate, that.harvestDate) &&
-                Objects.equals(altered, that.altered) &&
-                Objects.equals(baseURL, that.baseURL) &&
-                Objects.equals(identifier, that.identifier) &&
-                Objects.equals(datestamp, that.datestamp) &&
-                Objects.equals(metadataNamespace, that.metadataNamespace);
+        return Objects.equals(harvestDate, that.harvestDate)
+                && Objects.equals(altered, that.altered)
+                && Objects.equals(baseURL, that.baseURL)
+                && Objects.equals(identifier, that.identifier)
+                && Objects.equals(datestamp, that.datestamp)
+                && Objects.equals(metadataNamespace, that.metadataNamespace);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(harvestDate, altered, baseURL, identifier, datestamp, metadataNamespace);
+        return Objects.hash(
+                harvestDate, altered, baseURL, identifier, datestamp, metadataNamespace);
     }
 }

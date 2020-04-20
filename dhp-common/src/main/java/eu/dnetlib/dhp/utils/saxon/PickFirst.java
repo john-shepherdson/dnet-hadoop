@@ -24,7 +24,8 @@ public class PickFirst extends AbstractExtensionFunction {
         final String s1 = getValue(arguments[0]);
         final String s2 = getValue(arguments[1]);
 
-        return new StringValue(StringUtils.isNotBlank(s1) ? s1 : StringUtils.isNotBlank(s2) ? s2 : "");
+        return new StringValue(
+                StringUtils.isNotBlank(s1) ? s1 : StringUtils.isNotBlank(s2) ? s2 : "");
     }
 
     private String getValue(final Sequence arg) throws XPathException {
@@ -49,12 +50,11 @@ public class PickFirst extends AbstractExtensionFunction {
 
     @Override
     public SequenceType[] getArgumentTypes() {
-        return new SequenceType[] { SequenceType.OPTIONAL_ITEM };
+        return new SequenceType[] {SequenceType.OPTIONAL_ITEM};
     }
 
     @Override
     public SequenceType getResultType(SequenceType[] suppliedArgumentTypes) {
         return SequenceType.SINGLE_STRING;
     }
-
 }

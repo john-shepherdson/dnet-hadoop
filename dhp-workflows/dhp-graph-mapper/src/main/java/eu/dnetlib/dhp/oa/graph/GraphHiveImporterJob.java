@@ -1,8 +1,11 @@
 package eu.dnetlib.dhp.oa.graph;
 
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -12,26 +15,23 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-
 public class GraphHiveImporterJob {
 
     private static final Logger log = LoggerFactory.getLogger(GraphHiveImporterJob.class);
 
     public static void main(String[] args) throws Exception {
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils.toString(GraphHiveImporterJob.class.getResourceAsStream(
-                        "/eu/dnetlib/dhp/oa/graph/input_graph_hive_parameters.json")));
+        final ArgumentApplicationParser parser =
+                new ArgumentApplicationParser(
+                        IOUtils.toString(
+                                GraphHiveImporterJob.class.getResourceAsStream(
+                                        "/eu/dnetlib/dhp/oa/graph/input_graph_hive_parameters.json")));
         parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
+        Boolean isSparkSessionManaged =
+                Optional.ofNullable(parser.get("isSparkSessionManaged"))
+                        .map(Boolean::valueOf)
+                        .orElse(Boolean.TRUE);
         log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
         String inputPath = parser.get("inputPath");
@@ -46,7 +46,9 @@ public class GraphHiveImporterJob {
         SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", hiveMetastoreUris);
 
-        runWithSparkHiveSession(conf, isSparkSessionManaged,
+        runWithSparkHiveSession(
+                conf,
+                isSparkSessionManaged,
                 spark -> loadGraphAsHiveDB(spark, inputPath, hiveDbName));
     }
 
@@ -58,12 +60,15 @@ public class GraphHiveImporterJob {
 
         final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
         // Read the input file and convert it into RDD of serializable object
-        ModelSupport.oafTypes.forEach((name, clazz) -> spark.createDataset(sc.textFile(inputPath + "/" + name)
-                .map(s -> new ObjectMapper().readValue(s, clazz))
-                .rdd(), Encoders.bean(clazz))
-                .write()
-                .mode(SaveMode.Overwrite)
-                .saveAsTable(hiveDbName + "." + name));
+        ModelSupport.oafTypes.forEach(
+                (name, clazz) ->
+                        spark.createDataset(
+                                        sc.textFile(inputPath + "/" + name)
+                                                .map(s -> new ObjectMapper().readValue(s, clazz))
+                                                .rdd(),
+                                        Encoders.bean(clazz))
+                                .write()
+                                .mode(SaveMode.Overwrite)
+                                .saveAsTable(hiveDbName + "." + name));
     }
-
 }

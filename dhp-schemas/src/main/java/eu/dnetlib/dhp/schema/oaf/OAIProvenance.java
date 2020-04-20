@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class OAIProvenance  implements Serializable {
+public class OAIProvenance implements Serializable {
 
     private OriginDescription originDescription;
 

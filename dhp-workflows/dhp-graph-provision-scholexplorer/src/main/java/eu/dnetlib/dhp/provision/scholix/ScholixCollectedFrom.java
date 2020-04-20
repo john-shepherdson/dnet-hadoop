@@ -8,10 +8,10 @@ public class ScholixCollectedFrom implements Serializable {
     private String provisionMode;
     private String completionStatus;
 
-    public ScholixCollectedFrom() {
-    }
+    public ScholixCollectedFrom() {}
 
-    public ScholixCollectedFrom(ScholixEntityId provider, String provisionMode, String completionStatus) {
+    public ScholixCollectedFrom(
+            ScholixEntityId provider, String provisionMode, String completionStatus) {
         this.provider = provider;
         this.provisionMode = provisionMode;
         this.completionStatus = completionStatus;

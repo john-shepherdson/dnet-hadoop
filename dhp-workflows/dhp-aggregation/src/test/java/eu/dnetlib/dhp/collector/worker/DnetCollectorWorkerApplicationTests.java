@@ -1,5 +1,8 @@
 package eu.dnetlib.dhp.collector.worker;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.collector.worker.model.ApiDescriptor;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -7,23 +10,18 @@ import eu.dnetlib.dhp.collection.worker.DnetCollectorWorker;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
+import java.io.File;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
-
-
 public class DnetCollectorWorkerApplicationTests {
-
 
     private ArgumentApplicationParser argumentParser = mock(ArgumentApplicationParser.class);
     private MessageManager messageManager = mock(MessageManager.class);
 
     private DnetCollectorWorker worker;
+
     @BeforeEach
     public void setup() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
@@ -35,24 +33,29 @@ public class DnetCollectorWorkerApplicationTests {
         when(argumentParser.get("workflowId")).thenReturn("sandro");
         when(argumentParser.get("rabbitOngoingQueue")).thenReturn("sandro");
 
-        when(messageManager.sendMessage(any(Message.class), anyString(), anyBoolean(),anyBoolean())).thenAnswer(a -> {
-            System.out.println("sent message: "+a.getArguments()[0]);
-            return true;
-        });
-        when(messageManager.sendMessage(any(Message.class), anyString())).thenAnswer(a -> {
-            System.out.println("Called");
-            return true;
-        });
-        worker = new DnetCollectorWorker(new CollectorPluginFactory(), argumentParser, messageManager);
+        when(messageManager.sendMessage(
+                        any(Message.class), anyString(), anyBoolean(), anyBoolean()))
+                .thenAnswer(
+                        a -> {
+                            System.out.println("sent message: " + a.getArguments()[0]);
+                            return true;
+                        });
+        when(messageManager.sendMessage(any(Message.class), anyString()))
+                .thenAnswer(
+                        a -> {
+                            System.out.println("Called");
+                            return true;
+                        });
+        worker =
+                new DnetCollectorWorker(
+                        new CollectorPluginFactory(), argumentParser, messageManager);
     }
 
-
     @AfterEach
-    public void dropDown(){
+    public void dropDown() {
         File f = new File("/tmp/file.seq");
         f.delete();
     }
-
 
     @Test
     public void testFindPlugin() throws Exception {
@@ -60,7 +63,6 @@ public class DnetCollectorWorkerApplicationTests {
         assertNotNull(collectorPluginEnumerator.getPluginByProtocol("oai"));
         assertNotNull(collectorPluginEnumerator.getPluginByProtocol("OAI"));
     }
-
 
     @Test
     public void testCollectionOAI() throws Exception {
@@ -86,5 +88,4 @@ public class DnetCollectorWorkerApplicationTests {
         api.getParams().put("format", "oai_dc");
         return api;
     }
-
 }

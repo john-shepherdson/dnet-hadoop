@@ -24,6 +24,29 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
+
+        <property>
+            <name>oozieActionShareLibForSpark2</name>
+            <description>oozie action sharelib for spark 2.*</description>
+        </property>
+        <property>
+            <name>spark2ExtraListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
+            <description>spark 2.* extra listeners classname</description>
+        </property>
+        <property>
+            <name>spark2SqlQueryExecutionListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
+            <description>spark 2.* sql query execution listeners classname</description>
+        </property>
+        <property>
+            <name>spark2YarnHistoryServerAddress</name>
+            <description>spark 2.* yarn history server address</description>
+        </property>
+        <property>
+            <name>spark2EventLogDir</name>
+            <description>spark 2.* event log dir location</description>
+        </property>
     </parameters>
 
     <global>
@@ -38,68 +61,146 @@
                 <name>oozie.launcher.mapred.job.queue.name</name>
                 <value>${oozieLauncherQueueName}</value>
             </property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
         </configuration>
     </global>
 
-    <start to="UpdateEntity"/>
+    <start to="PropagateRelation"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="UpdateEntity">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <prepare>
-                <delete path='${dedupGraphPath}'/>
-            </prepare>
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Update Entity</name>
-            <class>eu.dnetlib.dhp.oa.dedup.SparkUpdateEntity</class>
-            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
-                --executor-cores ${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
-                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
-                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
-            </spark-opts>
-            <arg>-mt</arg><arg>yarn</arg>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
-            <arg>--o</arg><arg>${dedupGraphPath}</arg>
-        </spark>
-        <ok to="PropagateRelation"/>
-        <error to="Kill"/>
-    </action>
-
     <action name="PropagateRelation">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <prepare>
-                <delete path='${dedupGraphPath}/relation'/>
-            </prepare>
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Update Relations</name>
             <class>eu.dnetlib.dhp.oa.dedup.SparkPropagateRelation</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
-                --executor-cores ${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners="com.cloudera.spark.lineage.NavigatorAppListener"
-                --conf spark.sql.queryExecutionListeners="com.cloudera.spark.lineage.NavigatorQueryListener"
-                --conf spark.sql.warehouse.dir="/user/hive/warehouse"
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>-mt</arg><arg>yarn</arg>
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--o</arg><arg>${dedupGraphPath}</arg>
             <arg>--w</arg><arg>${workingPath}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="fork_copy_entities"/>
         <error to="Kill"/>
     </action>
+
+    <fork name="fork_copy_entities">
+        <path start="copy_datasource"/>
+        <path start="copy_project"/>
+        <path start="copy_organization"/>
+        <path start="copy_publication"/>
+        <path start="copy_dataset"/>
+        <path start="copy_software"/>
+        <path start="copy_otherresearchproduct"/>
+    </fork>
+
+    <action name="copy_datasource">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${dedupGraphPath}/datasource"/>
+            </prepare>
+            <arg>-pb</arg>
+            <arg>${graphBasePath}/datasource</arg>
+            <arg>${dedupGraphPath}/datasource</arg>
+        </distcp>
+        <ok to="wait_copy"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_project">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${dedupGraphPath}/project"/>
+            </prepare>
+            <arg>-pb</arg>
+            <arg>${graphBasePath}/project</arg>
+            <arg>${dedupGraphPath}/project</arg>
+        </distcp>
+        <ok to="wait_copy"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${dedupGraphPath}/organization"/>
+            </prepare>
+            <arg>-pb</arg>
+            <arg>${graphBasePath}/organization</arg>
+            <arg>${dedupGraphPath}/organization</arg>
+        </distcp>
+        <ok to="wait_copy"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_publication">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${dedupGraphPath}/publication"/>
+            </prepare>
+            <arg>-pb</arg>
+            <arg>${graphBasePath}/publication</arg>
+            <arg>${dedupGraphPath}/publication</arg>
+        </distcp>
+        <ok to="wait_copy"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_dataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${dedupGraphPath}/dataset"/>
+            </prepare>
+            <arg>-pb</arg>
+            <arg>${graphBasePath}/dataset</arg>
+            <arg>${dedupGraphPath}/dataset</arg>
+        </distcp>
+        <ok to="wait_copy"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_software">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${dedupGraphPath}/software"/>
+            </prepare>
+            <arg>-pb</arg>
+            <arg>${graphBasePath}/software</arg>
+            <arg>${dedupGraphPath}/software</arg>
+        </distcp>
+        <ok to="wait_copy"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_otherresearchproduct">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${dedupGraphPath}/otherresearchproduct"/>
+            </prepare>
+            <arg>-pb</arg>
+            <arg>${graphBasePath}/otherresearchproduct</arg>
+            <arg>${dedupGraphPath}/otherresearchproduct</arg>
+        </distcp>
+        <ok to="wait_copy"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_copy" to="End"/>
 
     <end name="End"/>
 </workflow-app>

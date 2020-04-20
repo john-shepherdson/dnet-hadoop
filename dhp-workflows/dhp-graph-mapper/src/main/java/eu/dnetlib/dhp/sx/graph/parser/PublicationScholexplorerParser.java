@@ -8,15 +8,13 @@ import eu.dnetlib.dhp.parser.utility.VtdUtilityParser.Node;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
 import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
-import eu.dnetlib.scholexplorer.relation.RelInfo;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 public class PublicationScholexplorerParser extends AbstractScholexplorerParser {
 
@@ -29,7 +27,6 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             vg.setDoc(record.getBytes());
             vg.parse(true);
 
-
             final VTDNav vn = vg.getNav();
             final AutoPilot ap = new AutoPilot(vn);
 
@@ -38,11 +35,16 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             di.setDeletedbyinference(false);
             di.setInvisible(false);
 
-            String dateOfCollection = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='dateOfCollection']");
+            String dateOfCollection =
+                    VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='dateOfCollection']");
             parsedObject.setDateofcollection(dateOfCollection);
 
-            final String resolvedDate = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='resolvedDate']");
-            parsedObject.setOriginalId(Collections.singletonList(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='recordIdentifier']")));
+            final String resolvedDate =
+                    VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='resolvedDate']");
+            parsedObject.setOriginalId(
+                    Collections.singletonList(
+                            VtdUtilityParser.getSingleValue(
+                                    ap, vn, "//*[local-name()='recordIdentifier']")));
 
             if (StringUtils.isNotBlank(resolvedDate)) {
                 StructuredProperty currentDate = new StructuredProperty();
@@ -56,122 +58,163 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
                 parsedObject.setRelevantdate(Collections.singletonList(currentDate));
             }
 
-
-            final List<Node> pid = VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='pid']", Arrays.asList("type"));
+            final List<Node> pid =
+                    VtdUtilityParser.getTextValuesWithAttributes(
+                            ap, vn, "//*[local-name()='pid']", Arrays.asList("type"));
 
             StructuredProperty currentPid = extractIdentifier(pid, "type");
             if (currentPid == null) return null;
             inferPid(currentPid);
             parsedObject.setPid(Collections.singletonList(currentPid));
-            final String sourceId = generateId(currentPid.getValue(), currentPid.getQualifier().getClassid(), "publication");
+            final String sourceId =
+                    generateId(
+                            currentPid.getValue(),
+                            currentPid.getQualifier().getClassid(),
+                            "publication");
             parsedObject.setId(sourceId);
 
-            parsedObject.setOriginalObjIdentifier(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='objIdentifier']"));
+            parsedObject.setOriginalObjIdentifier(
+                    VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='objIdentifier']"));
 
-            String provisionMode = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='provisionMode']");
+            String provisionMode =
+                    VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='provisionMode']");
 
             List<Node> collectedFromNodes =
-                    VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='collectedFrom']", Arrays.asList("name", "id", "mode", "completionStatus"));
+                    VtdUtilityParser.getTextValuesWithAttributes(
+                            ap,
+                            vn,
+                            "//*[local-name()='collectedFrom']",
+                            Arrays.asList("name", "id", "mode", "completionStatus"));
 
             List<Node> resolvededFromNodes =
-                    VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='resolvedFrom']", Arrays.asList("name", "id", "mode", "completionStatus"));
+                    VtdUtilityParser.getTextValuesWithAttributes(
+                            ap,
+                            vn,
+                            "//*[local-name()='resolvedFrom']",
+                            Arrays.asList("name", "id", "mode", "completionStatus"));
 
-            final String publisher = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='publisher']");
+            final String publisher =
+                    VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='publisher']");
             Field<String> pf = new Field<>();
             pf.setValue(publisher);
 
             parsedObject.setPublisher(pf);
             final List<ProvenaceInfo> provenances = new ArrayList<>();
             if (collectedFromNodes != null && collectedFromNodes.size() > 0) {
-                collectedFromNodes.forEach(it -> {
-                    final ProvenaceInfo provenance = new ProvenaceInfo();
-                    provenance.setId(it.getAttributes().get("id"));
-                    provenance.setName(it.getAttributes().get("name"));
-                    provenance.setCollectionMode(provisionMode);
-                    provenance.setCompletionStatus(it.getAttributes().get("completionStatus"));
-                    provenances.add(provenance);
-                });
+                collectedFromNodes.forEach(
+                        it -> {
+                            final ProvenaceInfo provenance = new ProvenaceInfo();
+                            provenance.setId(it.getAttributes().get("id"));
+                            provenance.setName(it.getAttributes().get("name"));
+                            provenance.setCollectionMode(provisionMode);
+                            provenance.setCompletionStatus(
+                                    it.getAttributes().get("completionStatus"));
+                            provenances.add(provenance);
+                        });
             }
 
             if (resolvededFromNodes != null && resolvededFromNodes.size() > 0) {
-                resolvededFromNodes.forEach(it -> {
-                    final ProvenaceInfo provenance = new ProvenaceInfo();
-                    provenance.setId(it.getAttributes().get("id"));
-                    provenance.setName(it.getAttributes().get("name"));
-                    provenance.setCollectionMode("resolved");
-                    provenance.setCompletionStatus(it.getAttributes().get("completionStatus"));
-                    provenances.add(provenance);
-                });
+                resolvededFromNodes.forEach(
+                        it -> {
+                            final ProvenaceInfo provenance = new ProvenaceInfo();
+                            provenance.setId(it.getAttributes().get("id"));
+                            provenance.setName(it.getAttributes().get("name"));
+                            provenance.setCollectionMode("resolved");
+                            provenance.setCompletionStatus(
+                                    it.getAttributes().get("completionStatus"));
+                            provenances.add(provenance);
+                        });
             }
 
             parsedObject.setDlicollectedfrom(provenances);
-            parsedObject.setCompletionStatus(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='completionStatus']"));
+            parsedObject.setCompletionStatus(
+                    VtdUtilityParser.getSingleValue(
+                            ap, vn, "//*[local-name()='completionStatus']"));
 
-            parsedObject.setCollectedfrom(parsedObject.getDlicollectedfrom().stream().map(
-                    p -> {
-                        final KeyValue cf = new KeyValue();
-                        cf.setKey(p.getId());
-                        cf.setValue(p.getName());
-                        return cf;
-                    }
-            ).collect(Collectors.toList()));
+            parsedObject.setCollectedfrom(
+                    parsedObject.getDlicollectedfrom().stream()
+                            .map(
+                                    p -> {
+                                        final KeyValue cf = new KeyValue();
+                                        cf.setKey(p.getId());
+                                        cf.setValue(p.getName());
+                                        return cf;
+                                    })
+                            .collect(Collectors.toList()));
 
             final List<Node> relatedIdentifiers =
-                    VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='relatedIdentifier']",
-                            Arrays.asList("relatedIdentifierType", "relationType", "entityType", "inverseRelationType"));
-            generateRelations(relationMapper, parsedObject, result, di, dateOfCollection, relatedIdentifiers);
+                    VtdUtilityParser.getTextValuesWithAttributes(
+                            ap,
+                            vn,
+                            "//*[local-name()='relatedIdentifier']",
+                            Arrays.asList(
+                                    "relatedIdentifierType",
+                                    "relationType",
+                                    "entityType",
+                                    "inverseRelationType"));
+            generateRelations(
+                    relationMapper, parsedObject, result, di, dateOfCollection, relatedIdentifiers);
 
             final List<Node> hostedBy =
-                    VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='hostedBy']", Arrays.asList("id", "name"));
-
+                    VtdUtilityParser.getTextValuesWithAttributes(
+                            ap, vn, "//*[local-name()='hostedBy']", Arrays.asList("id", "name"));
 
             if (hostedBy != null) {
-                parsedObject.setInstance(hostedBy.stream().map(it ->
-                {
-                    final Instance i = new Instance();
-                    i.setUrl(Collections.singletonList(currentPid.getValue()));
-                    KeyValue h = new KeyValue();
-                    i.setHostedby(h);
-                    h.setKey(it.getAttributes().get("id"));
-                    h.setValue(it.getAttributes().get("name"));
-                    return i;
-                }).collect(Collectors.toList()));
+                parsedObject.setInstance(
+                        hostedBy.stream()
+                                .map(
+                                        it -> {
+                                            final Instance i = new Instance();
+                                            i.setUrl(
+                                                    Collections.singletonList(
+                                                            currentPid.getValue()));
+                                            KeyValue h = new KeyValue();
+                                            i.setHostedby(h);
+                                            h.setKey(it.getAttributes().get("id"));
+                                            h.setValue(it.getAttributes().get("name"));
+                                            return i;
+                                        })
+                                .collect(Collectors.toList()));
             }
 
-            final List<String> authorsNode = VtdUtilityParser.getTextValue(ap, vn, "//*[local-name()='creator']");
+            final List<String> authorsNode =
+                    VtdUtilityParser.getTextValue(ap, vn, "//*[local-name()='creator']");
             if (authorsNode != null)
-                parsedObject.setAuthor(authorsNode
-                        .stream()
-                        .map(a -> {
-                            final Author author = new Author();
-                            author.setFullname(a);
-                            return author;
-                        }).collect(Collectors.toList())
-                );
+                parsedObject.setAuthor(
+                        authorsNode.stream()
+                                .map(
+                                        a -> {
+                                            final Author author = new Author();
+                                            author.setFullname(a);
+                                            return author;
+                                        })
+                                .collect(Collectors.toList()));
 
-            final List<String> titles = VtdUtilityParser.getTextValue(ap, vn, "//*[local-name()='title']");
+            final List<String> titles =
+                    VtdUtilityParser.getTextValue(ap, vn, "//*[local-name()='title']");
             if (titles != null) {
-                parsedObject.setTitle(titles.stream()
-                        .map(t -> {
-                                    final StructuredProperty st = new StructuredProperty();
-                                    st.setValue(t);
-                                    return st;
-                                }
-                        ).collect(Collectors.toList())
-                );
+                parsedObject.setTitle(
+                        titles.stream()
+                                .map(
+                                        t -> {
+                                            final StructuredProperty st = new StructuredProperty();
+                                            st.setValue(t);
+                                            return st;
+                                        })
+                                .collect(Collectors.toList()));
             }
-
 
             Field<String> description = new Field<>();
 
-            description.setValue(VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='description']"));
+            description.setValue(
+                    VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='description']"));
 
-            if (StringUtils.isNotBlank(description.getValue()) && description.getValue().length() > 10000) {
+            if (StringUtils.isNotBlank(description.getValue())
+                    && description.getValue().length() > 10000) {
                 description.setValue(description.getValue().substring(0, 10000));
             }
 
             parsedObject.setDescription(Collections.singletonList(description));
-
 
             final String cd = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='date']");
 
@@ -185,7 +228,13 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             date.setQualifier(dq);
             parsedObject.setRelevantdate(Collections.singletonList(date));
 
-            List<StructuredProperty> subjects = extractSubject(VtdUtilityParser.getTextValuesWithAttributes(ap, vn, "//*[local-name()='subject']", Collections.singletonList("scheme")));
+            List<StructuredProperty> subjects =
+                    extractSubject(
+                            VtdUtilityParser.getTextValuesWithAttributes(
+                                    ap,
+                                    vn,
+                                    "//*[local-name()='subject']",
+                                    Collections.singletonList("scheme")));
             parsedObject.setSubject(subjects);
 
             parsedObject.setDataInfo(di);
@@ -205,8 +254,5 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
             log.error("Error on parsing record ", e);
             return null;
         }
-
     }
-
-
 }

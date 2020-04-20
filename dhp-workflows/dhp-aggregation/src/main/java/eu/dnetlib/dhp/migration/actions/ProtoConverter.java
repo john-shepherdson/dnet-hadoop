@@ -4,12 +4,11 @@ import com.google.common.collect.Lists;
 import com.googlecode.protobuf.format.JsonFormat;
 import eu.dnetlib.data.proto.*;
 import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 public class ProtoConverter implements Serializable {
 
@@ -42,10 +41,12 @@ public class ProtoConverter implements Serializable {
         rel.setRelType(r.getRelType().toString());
         rel.setSubRelType(r.getSubRelType().toString());
         rel.setRelClass(r.getRelClass());
-        rel.setCollectedFrom(r.getCollectedfromCount() > 0 ?
-                r.getCollectedfromList().stream()
-                        .map(kv -> mapKV(kv))
-                        .collect(Collectors.toList()) : null);
+        rel.setCollectedfrom(
+                r.getCollectedfromCount() > 0
+                        ? r.getCollectedfromList().stream()
+                                .map(kv -> mapKV(kv))
+                                .collect(Collectors.toList())
+                        : null);
         return rel;
     }
 
@@ -71,8 +72,7 @@ public class ProtoConverter implements Serializable {
 
         final ResultProtos.Result r = oaf.getEntity().getResult();
         if (r.getInstanceCount() > 0) {
-            return r.getInstanceList()
-                    .stream()
+            return r.getInstanceList().stream()
                     .map(i -> convertInstance(i))
                     .collect(Collectors.toList());
         }
@@ -96,15 +96,16 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Organization convertOrganization(OafProtos.Oaf oaf) {
-        final OrganizationProtos.Organization.Metadata m = oaf.getEntity().getOrganization().getMetadata();
+        final OrganizationProtos.Organization.Metadata m =
+                oaf.getEntity().getOrganization().getMetadata();
         final Organization org = setOaf(new Organization(), oaf);
         setEntity(org, oaf);
         org.setLegalshortname(mapStringField(m.getLegalshortname()));
         org.setLegalname(mapStringField(m.getLegalname()));
-        org.setAlternativeNames(m.getAlternativeNamesList().
-                stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
+        org.setAlternativeNames(
+                m.getAlternativeNamesList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
         org.setWebsiteurl(mapStringField(m.getWebsiteurl()));
         org.setLogourl(mapStringField(m.getLogourl()));
         org.setEclegalbody(mapStringField(m.getEclegalbody()));
@@ -112,7 +113,8 @@ public class ProtoConverter implements Serializable {
         org.setEcnonprofit(mapStringField(m.getEcnonprofit()));
         org.setEcresearchorganization(mapStringField(m.getEcresearchorganization()));
         org.setEchighereducation(mapStringField(m.getEchighereducation()));
-        org.setEcinternationalorganizationeurinterests(mapStringField(m.getEcinternationalorganizationeurinterests()));
+        org.setEcinternationalorganizationeurinterests(
+                mapStringField(m.getEcinternationalorganizationeurinterests()));
         org.setEcinternationalorganization(mapStringField(m.getEcinternationalorganization()));
         org.setEcenterprise(mapStringField(m.getEcenterprise()));
         org.setEcsmevalidated(mapStringField(m.getEcsmevalidated()));
@@ -123,13 +125,14 @@ public class ProtoConverter implements Serializable {
     }
 
     private static Datasource convertDataSource(OafProtos.Oaf oaf) {
-        final DatasourceProtos.Datasource.Metadata m = oaf.getEntity().getDatasource().getMetadata();
+        final DatasourceProtos.Datasource.Metadata m =
+                oaf.getEntity().getDatasource().getMetadata();
         final Datasource datasource = setOaf(new Datasource(), oaf);
         setEntity(datasource, oaf);
-        datasource.setAccessinfopackage(m.getAccessinfopackageList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
+        datasource.setAccessinfopackage(
+                m.getAccessinfopackageList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
         datasource.setCertificates(mapStringField(m.getCertificates()));
         datasource.setCitationguidelineurl(mapStringField(m.getCitationguidelineurl()));
         datasource.setContactemail(mapStringField(m.getContactemail()));
@@ -148,36 +151,35 @@ public class ProtoConverter implements Serializable {
         datasource.setLogourl(mapStringField(m.getLogourl()));
         datasource.setMissionstatementurl(mapStringField(m.getMissionstatementurl()));
         datasource.setNamespaceprefix(mapStringField(m.getNamespaceprefix()));
-        datasource.setOdcontenttypes(m.getOdcontenttypesList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
-        datasource.setOdlanguages(m.getOdlanguagesList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
+        datasource.setOdcontenttypes(
+                m.getOdcontenttypesList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
+        datasource.setOdlanguages(
+                m.getOdlanguagesList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
         datasource.setOdnumberofitems(mapStringField(m.getOdnumberofitems()));
         datasource.setOdnumberofitemsdate(mapStringField(m.getOdnumberofitemsdate()));
         datasource.setOdpolicies(mapStringField(m.getOdpolicies()));
         datasource.setOfficialname(mapStringField(m.getOfficialname()));
         datasource.setOpenairecompatibility(mapQualifier(m.getOpenairecompatibility()));
         datasource.setPidsystems(mapStringField(m.getPidsystems()));
-        datasource.setPolicies(m.getPoliciesList()
-                .stream()
-                .map(ProtoConverter::mapKV)
-                .collect(Collectors.toList()));
+        datasource.setPolicies(
+                m.getPoliciesList().stream()
+                        .map(ProtoConverter::mapKV)
+                        .collect(Collectors.toList()));
         datasource.setQualitymanagementkind(mapStringField(m.getQualitymanagementkind()));
         datasource.setReleaseenddate(mapStringField(m.getReleaseenddate()));
         datasource.setServiceprovider(mapBoolField(m.getServiceprovider()));
         datasource.setReleasestartdate(mapStringField(m.getReleasestartdate()));
-        datasource.setSubjects(m.getSubjectsList()
-                .stream()
-                .map(ProtoConverter::mapStructuredProperty)
-                .collect(Collectors.toList()));
+        datasource.setSubjects(
+                m.getSubjectsList().stream()
+                        .map(ProtoConverter::mapStructuredProperty)
+                        .collect(Collectors.toList()));
         datasource.setVersioning(mapBoolField(m.getVersioning()));
         datasource.setWebsiteurl(mapStringField(m.getWebsiteurl()));
         datasource.setJournal(mapJournal(m.getJournal()));
-
 
         return datasource;
     }
@@ -204,14 +206,16 @@ public class ProtoConverter implements Serializable {
         project.setFundedamount(m.getFundedamount());
         project.setTotalcost(m.getTotalcost());
         project.setKeywords(mapStringField(m.getKeywords()));
-        project.setSubjects(m.getSubjectsList().stream()
-                .map(sp -> mapStructuredProperty(sp))
-                .collect(Collectors.toList()));
+        project.setSubjects(
+                m.getSubjectsList().stream()
+                        .map(sp -> mapStructuredProperty(sp))
+                        .collect(Collectors.toList()));
         project.setTitle(mapStringField(m.getTitle()));
         project.setWebsiteurl(mapStringField(m.getWebsiteurl()));
-        project.setFundingtree(m.getFundingtreeList().stream()
-                .map(f -> mapStringField(f))
-                .collect(Collectors.toList()));
+        project.setFundingtree(
+                m.getFundingtreeList().stream()
+                        .map(f -> mapStringField(f))
+                        .collect(Collectors.toList()));
         project.setJsonextrainfo(mapStringField(m.getJsonextrainfo()));
         project.setSummary(mapStringField(m.getSummary()));
         project.setOptional1(mapStringField(m.getOptional1()));
@@ -242,14 +246,14 @@ public class ProtoConverter implements Serializable {
         setEntity(software, oaf);
         setResult(software, oaf);
 
-        software.setDocumentationUrl(m.getDocumentationUrlList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
-        software.setLicense(m.getLicenseList()
-                .stream()
-                .map(ProtoConverter::mapStructuredProperty)
-                .collect(Collectors.toList()));
+        software.setDocumentationUrl(
+                m.getDocumentationUrlList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
+        software.setLicense(
+                m.getLicenseList().stream()
+                        .map(ProtoConverter::mapStructuredProperty)
+                        .collect(Collectors.toList()));
         software.setCodeRepositoryUrl(mapStringField(m.getCodeRepositoryUrl()));
         software.setProgrammingLanguage(mapQualifier(m.getProgrammingLanguage()));
         return software;
@@ -260,18 +264,18 @@ public class ProtoConverter implements Serializable {
         OtherResearchProduct otherResearchProducts = setOaf(new OtherResearchProduct(), oaf);
         setEntity(otherResearchProducts, oaf);
         setResult(otherResearchProducts, oaf);
-        otherResearchProducts.setContactperson(m.getContactpersonList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
-        otherResearchProducts.setContactgroup(m.getContactgroupList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
-        otherResearchProducts.setTool(m.getToolList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
+        otherResearchProducts.setContactperson(
+                m.getContactpersonList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
+        otherResearchProducts.setContactgroup(
+                m.getContactgroupList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
+        otherResearchProducts.setTool(
+                m.getToolList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
 
         return otherResearchProducts;
     }
@@ -298,12 +302,11 @@ public class ProtoConverter implements Serializable {
         dataset.setVersion(mapStringField(m.getVersion()));
         dataset.setLastmetadataupdate(mapStringField(m.getLastmetadataupdate()));
         dataset.setMetadataversionnumber(mapStringField(m.getMetadataversionnumber()));
-        dataset.setGeolocation(m.getGeolocationList()
-                .stream()
-                .map(ProtoConverter::mapGeolocation)
-                .collect(Collectors.toList()));
+        dataset.setGeolocation(
+                m.getGeolocationList().stream()
+                        .map(ProtoConverter::mapGeolocation)
+                        .collect(Collectors.toList()));
         return dataset;
-
     }
 
     public static <T extends Oaf> T setOaf(T oaf, OafProtos.Oaf o) {
@@ -313,100 +316,103 @@ public class ProtoConverter implements Serializable {
     }
 
     public static <T extends OafEntity> T setEntity(T entity, OafProtos.Oaf oaf) {
-        //setting Entity fields
+        // setting Entity fields
         final OafProtos.OafEntity e = oaf.getEntity();
         entity.setId(e.getId());
         entity.setOriginalId(e.getOriginalIdList());
-        entity.setCollectedfrom(e.getCollectedfromList()
-                .stream()
-                .map(ProtoConverter::mapKV)
-                .collect(Collectors.toList()));
-        entity.setPid(e.getPidList().stream()
-                .map(ProtoConverter::mapStructuredProperty)
-                .collect(Collectors.toList()));
+        entity.setCollectedfrom(
+                e.getCollectedfromList().stream()
+                        .map(ProtoConverter::mapKV)
+                        .collect(Collectors.toList()));
+        entity.setPid(
+                e.getPidList().stream()
+                        .map(ProtoConverter::mapStructuredProperty)
+                        .collect(Collectors.toList()));
         entity.setDateofcollection(e.getDateofcollection());
         entity.setDateoftransformation(e.getDateoftransformation());
-        entity.setExtraInfo(e.getExtraInfoList()
-                .stream()
-                .map(ProtoConverter::mapExtraInfo)
-                .collect(Collectors.toList()));
+        entity.setExtraInfo(
+                e.getExtraInfoList().stream()
+                        .map(ProtoConverter::mapExtraInfo)
+                        .collect(Collectors.toList()));
         return entity;
     }
 
     public static <T extends Result> T setResult(T entity, OafProtos.Oaf oaf) {
-        //setting Entity fields
+        // setting Entity fields
         final ResultProtos.Result.Metadata m = oaf.getEntity().getResult().getMetadata();
-        entity.setAuthor(m.getAuthorList()
-                .stream()
-                .map(ProtoConverter::mapAuthor)
-                .collect(Collectors.toList()));
+        entity.setAuthor(
+                m.getAuthorList().stream()
+                        .map(ProtoConverter::mapAuthor)
+                        .collect(Collectors.toList()));
         entity.setResulttype(mapQualifier(m.getResulttype()));
         entity.setLanguage(mapQualifier(m.getLanguage()));
-        entity.setCountry(m.getCountryList()
-                .stream()
-                .map(ProtoConverter::mapQualifierAsCountry)
-                .collect(Collectors.toList()));
-        entity.setSubject(m.getSubjectList()
-                .stream()
-                .map(ProtoConverter::mapStructuredProperty)
-                .collect(Collectors.toList()));
-        entity.setTitle(m.getTitleList()
-                .stream()
-                .map(ProtoConverter::mapStructuredProperty)
-                .collect(Collectors.toList()));
-        entity.setRelevantdate(m.getRelevantdateList()
-                .stream()
-                .map(ProtoConverter::mapStructuredProperty)
-                .collect(Collectors.toList()));
-        entity.setDescription(m.getDescriptionList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
+        entity.setCountry(
+                m.getCountryList().stream()
+                        .map(ProtoConverter::mapQualifierAsCountry)
+                        .collect(Collectors.toList()));
+        entity.setSubject(
+                m.getSubjectList().stream()
+                        .map(ProtoConverter::mapStructuredProperty)
+                        .collect(Collectors.toList()));
+        entity.setTitle(
+                m.getTitleList().stream()
+                        .map(ProtoConverter::mapStructuredProperty)
+                        .collect(Collectors.toList()));
+        entity.setRelevantdate(
+                m.getRelevantdateList().stream()
+                        .map(ProtoConverter::mapStructuredProperty)
+                        .collect(Collectors.toList()));
+        entity.setDescription(
+                m.getDescriptionList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
         entity.setDateofacceptance(mapStringField(m.getDateofacceptance()));
         entity.setPublisher(mapStringField(m.getPublisher()));
         entity.setEmbargoenddate(mapStringField(m.getEmbargoenddate()));
-        entity.setSource(m.getSourceList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
-        entity.setFulltext(m.getFulltextList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
-        entity.setFormat(m.getFormatList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
-        entity.setContributor(m.getContributorList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
+        entity.setSource(
+                m.getSourceList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
+        entity.setFulltext(
+                m.getFulltextList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
+        entity.setFormat(
+                m.getFormatList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
+        entity.setContributor(
+                m.getContributorList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
         entity.setResourcetype(mapQualifier(m.getResourcetype()));
-        entity.setCoverage(m.getCoverageList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
-        entity.setContext(m.getContextList()
-                .stream()
-                .map(ProtoConverter::mapContext)
-                .collect(Collectors.toList()));
+        entity.setCoverage(
+                m.getCoverageList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
+        entity.setContext(
+                m.getContextList().stream()
+                        .map(ProtoConverter::mapContext)
+                        .collect(Collectors.toList()));
 
-        entity.setBestaccessright(getBestAccessRights(oaf.getEntity().getResult().getInstanceList()));
+        entity.setBestaccessright(
+                getBestAccessRights(oaf.getEntity().getResult().getInstanceList()));
 
         return entity;
     }
 
     private static Qualifier getBestAccessRights(List<ResultProtos.Result.Instance> instanceList) {
         if (instanceList != null) {
-            final Optional<FieldTypeProtos.Qualifier> min = instanceList.stream()
-                    .map(i -> i.getAccessright()).min(new LicenseComparator());
+            final Optional<FieldTypeProtos.Qualifier> min =
+                    instanceList.stream().map(i -> i.getAccessright()).min(new LicenseComparator());
 
             final Qualifier rights = min.isPresent() ? mapQualifier(min.get()) : new Qualifier();
 
             if (StringUtils.isBlank(rights.getClassid())) {
                 rights.setClassid(UNKNOWN);
             }
-            if (StringUtils.isBlank(rights.getClassname()) || UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
+            if (StringUtils.isBlank(rights.getClassname())
+                    || UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
                 rights.setClassname(NOT_AVAILABLE);
             }
             if (StringUtils.isBlank(rights.getSchemeid())) {
@@ -425,13 +431,12 @@ public class ProtoConverter implements Serializable {
 
         final Context entity = new Context();
         entity.setId(context.getId());
-        entity.setDataInfo(context.getDataInfoList()
-                .stream()
-                .map(ProtoConverter::mapDataInfo)
-                .collect(Collectors.toList()));
+        entity.setDataInfo(
+                context.getDataInfoList().stream()
+                        .map(ProtoConverter::mapDataInfo)
+                        .collect(Collectors.toList()));
         return entity;
     }
-
 
     public static KeyValue mapKV(FieldTypeProtos.KeyValue kv) {
         final KeyValue keyValue = new KeyValue();
@@ -495,7 +500,8 @@ public class ProtoConverter implements Serializable {
         return entity;
     }
 
-    public static OriginDescription mapOriginalDescription(FieldTypeProtos.OAIProvenance.OriginDescription originDescription) {
+    public static OriginDescription mapOriginalDescription(
+            FieldTypeProtos.OAIProvenance.OriginDescription originDescription) {
         final OriginDescription originDescriptionResult = new OriginDescription();
         originDescriptionResult.setHarvestDate(originDescription.getHarvestDate());
         originDescriptionResult.setAltered(originDescription.getAltered());
@@ -550,24 +556,24 @@ public class ProtoConverter implements Serializable {
         entity.setName(author.getName());
         entity.setSurname(author.getSurname());
         entity.setRank(author.getRank());
-        entity.setPid(author.getPidList()
-                .stream()
-                .map(kv -> {
-                    final StructuredProperty sp = new StructuredProperty();
-                    sp.setValue(kv.getValue());
-                    final Qualifier q = new Qualifier();
-                    q.setClassid(kv.getKey());
-                    q.setClassname(kv.getKey());
-                    sp.setQualifier(q);
-                    return sp;
-                })
-                .collect(Collectors.toList()));
-        entity.setAffiliation(author.getAffiliationList()
-                .stream()
-                .map(ProtoConverter::mapStringField)
-                .collect(Collectors.toList()));
+        entity.setPid(
+                author.getPidList().stream()
+                        .map(
+                                kv -> {
+                                    final StructuredProperty sp = new StructuredProperty();
+                                    sp.setValue(kv.getValue());
+                                    final Qualifier q = new Qualifier();
+                                    q.setClassid(kv.getKey());
+                                    q.setClassname(kv.getKey());
+                                    sp.setQualifier(q);
+                                    return sp;
+                                })
+                        .collect(Collectors.toList()));
+        entity.setAffiliation(
+                author.getAffiliationList().stream()
+                        .map(ProtoConverter::mapStringField)
+                        .collect(Collectors.toList()));
         return entity;
-
     }
 
     public static GeoLocation mapGeolocation(ResultProtos.Result.GeoLocation geoLocation) {

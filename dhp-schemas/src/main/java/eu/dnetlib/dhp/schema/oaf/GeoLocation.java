@@ -1,9 +1,8 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
+import org.apache.commons.lang3.StringUtils;
 
 public class GeoLocation implements Serializable {
 
@@ -39,13 +38,17 @@ public class GeoLocation implements Serializable {
 
     @JsonIgnore
     public boolean isBlank() {
-        return StringUtils.isBlank(point) &&
-                StringUtils.isBlank(box) &&
-                StringUtils.isBlank(place);
+        return StringUtils.isBlank(point) && StringUtils.isBlank(box) && StringUtils.isBlank(place);
     }
 
     public String toComparableString() {
-        return isBlank()?"":String.format("%s::%s%s", point != null ? point.toLowerCase() : "", box != null ? box.toLowerCase() : "", place != null ? place.toLowerCase() : "");
+        return isBlank()
+                ? ""
+                : String.format(
+                        "%s::%s%s",
+                        point != null ? point.toLowerCase() : "",
+                        box != null ? box.toLowerCase() : "",
+                        place != null ? place.toLowerCase() : "");
     }
 
     @Override
@@ -55,16 +58,12 @@ public class GeoLocation implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
 
         GeoLocation other = (GeoLocation) obj;
 
-        return toComparableString()
-                .equals(other.toComparableString());
+        return toComparableString().equals(other.toComparableString());
     }
 }

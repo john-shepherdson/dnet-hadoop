@@ -266,44 +266,91 @@ public class Project extends OafEntity implements Serializable {
         this.fundedamount = fundedamount;
     }
 
-
     @Override
     public void mergeFrom(OafEntity e) {
         super.mergeFrom(e);
 
-        if (!Project.class.isAssignableFrom(e.getClass())){
+        if (!Project.class.isAssignableFrom(e.getClass())) {
             return;
         }
 
-        Project p = (Project)e;
+        Project p = (Project) e;
 
-            websiteurl= p.getWebsiteurl()!= null && compareTrust(this,e)<0?p.getWebsiteurl():websiteurl;
-            code= p.getCode()!=null && compareTrust(this,e)<0?p.getCode():code;
-            acronym= p.getAcronym()!= null && compareTrust(this,e)<0?p.getAcronym():acronym;
-            title= p.getTitle()!= null && compareTrust(this,e)<0?p.getTitle():title;
-            startdate= p.getStartdate()!=null && compareTrust(this,e)<0?p.getStartdate():startdate;
-            enddate= p.getEnddate()!=null && compareTrust(this,e)<0?p.getEnddate():enddate;
-            callidentifier= p.getCallidentifier()!=null && compareTrust(this,e)<0?p.getCallidentifier():callidentifier;
-            keywords= p.getKeywords()!=null && compareTrust(this,e)<0?p.getKeywords():keywords;
-            duration= p.getDuration()!=null && compareTrust(this,e)<0?p.getDuration():duration;
-            ecsc39= p.getEcsc39()!=null && compareTrust(this,e)<0?p.getEcsc39():ecsc39;
-            oamandatepublications= p.getOamandatepublications()!=null && compareTrust(this,e)<0?p.getOamandatepublications():oamandatepublications;
-            ecarticle29_3= p.getEcarticle29_3()!=null && compareTrust(this,e)<0?p.getEcarticle29_3():ecarticle29_3;
-            subjects= mergeLists(subjects, p.getSubjects());
-            fundingtree= mergeLists(fundingtree, p.getFundingtree());
-            contracttype= p.getContracttype()!=null && compareTrust(this,e)<0?p.getContracttype():contracttype;
-            optional1= p.getOptional1()!=null && compareTrust(this,e)<0?p.getOptional1():optional1;
-            optional2= p.getOptional2()!=null && compareTrust(this,e)<0?p.getOptional2():optional2;
-            jsonextrainfo= p.getJsonextrainfo()!=null && compareTrust(this,e)<0?p.getJsonextrainfo():jsonextrainfo;
-            contactfullname= p.getContactfullname()!=null && compareTrust(this,e)<0?p.getContactfullname():contactfullname;
-            contactfax= p.getContactfax()!=null && compareTrust(this,e)<0?p.getContactfax():contactfax;
-            contactphone= p.getContactphone()!=null && compareTrust(this,e)<0?p.getContactphone():contactphone;
-            contactemail= p.getContactemail()!=null && compareTrust(this,e)<0?p.getContactemail():contactemail;
-            summary= p.getSummary()!=null && compareTrust(this,e)<0?p.getSummary():summary;
-            currency= p.getCurrency()!=null && compareTrust(this,e)<0?p.getCurrency():currency;
-            totalcost= p.getTotalcost()!=null && compareTrust(this,e)<0?p.getTotalcost():totalcost;
-            fundedamount= p.getFundedamount()!= null && compareTrust(this,e)<0?p.getFundedamount():fundedamount;
-            mergeOAFDataInfo(e);
+        websiteurl =
+                p.getWebsiteurl() != null && compareTrust(this, e) < 0
+                        ? p.getWebsiteurl()
+                        : websiteurl;
+        code = p.getCode() != null && compareTrust(this, e) < 0 ? p.getCode() : code;
+        acronym = p.getAcronym() != null && compareTrust(this, e) < 0 ? p.getAcronym() : acronym;
+        title = p.getTitle() != null && compareTrust(this, e) < 0 ? p.getTitle() : title;
+        startdate =
+                p.getStartdate() != null && compareTrust(this, e) < 0
+                        ? p.getStartdate()
+                        : startdate;
+        enddate = p.getEnddate() != null && compareTrust(this, e) < 0 ? p.getEnddate() : enddate;
+        callidentifier =
+                p.getCallidentifier() != null && compareTrust(this, e) < 0
+                        ? p.getCallidentifier()
+                        : callidentifier;
+        keywords =
+                p.getKeywords() != null && compareTrust(this, e) < 0 ? p.getKeywords() : keywords;
+        duration =
+                p.getDuration() != null && compareTrust(this, e) < 0 ? p.getDuration() : duration;
+        ecsc39 = p.getEcsc39() != null && compareTrust(this, e) < 0 ? p.getEcsc39() : ecsc39;
+        oamandatepublications =
+                p.getOamandatepublications() != null && compareTrust(this, e) < 0
+                        ? p.getOamandatepublications()
+                        : oamandatepublications;
+        ecarticle29_3 =
+                p.getEcarticle29_3() != null && compareTrust(this, e) < 0
+                        ? p.getEcarticle29_3()
+                        : ecarticle29_3;
+        subjects = mergeLists(subjects, p.getSubjects());
+        fundingtree = mergeLists(fundingtree, p.getFundingtree());
+        contracttype =
+                p.getContracttype() != null && compareTrust(this, e) < 0
+                        ? p.getContracttype()
+                        : contracttype;
+        optional1 =
+                p.getOptional1() != null && compareTrust(this, e) < 0
+                        ? p.getOptional1()
+                        : optional1;
+        optional2 =
+                p.getOptional2() != null && compareTrust(this, e) < 0
+                        ? p.getOptional2()
+                        : optional2;
+        jsonextrainfo =
+                p.getJsonextrainfo() != null && compareTrust(this, e) < 0
+                        ? p.getJsonextrainfo()
+                        : jsonextrainfo;
+        contactfullname =
+                p.getContactfullname() != null && compareTrust(this, e) < 0
+                        ? p.getContactfullname()
+                        : contactfullname;
+        contactfax =
+                p.getContactfax() != null && compareTrust(this, e) < 0
+                        ? p.getContactfax()
+                        : contactfax;
+        contactphone =
+                p.getContactphone() != null && compareTrust(this, e) < 0
+                        ? p.getContactphone()
+                        : contactphone;
+        contactemail =
+                p.getContactemail() != null && compareTrust(this, e) < 0
+                        ? p.getContactemail()
+                        : contactemail;
+        summary = p.getSummary() != null && compareTrust(this, e) < 0 ? p.getSummary() : summary;
+        currency =
+                p.getCurrency() != null && compareTrust(this, e) < 0 ? p.getCurrency() : currency;
+        totalcost =
+                p.getTotalcost() != null && compareTrust(this, e) < 0
+                        ? p.getTotalcost()
+                        : totalcost;
+        fundedamount =
+                p.getFundedamount() != null && compareTrust(this, e) < 0
+                        ? p.getFundedamount()
+                        : fundedamount;
+        mergeOAFDataInfo(e);
     }
 
     @Override
@@ -312,36 +359,63 @@ public class Project extends OafEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Project project = (Project) o;
-        return Objects.equals(websiteurl, project.websiteurl) &&
-                Objects.equals(code, project.code) &&
-                Objects.equals(acronym, project.acronym) &&
-                Objects.equals(title, project.title) &&
-                Objects.equals(startdate, project.startdate) &&
-                Objects.equals(enddate, project.enddate) &&
-                Objects.equals(callidentifier, project.callidentifier) &&
-                Objects.equals(keywords, project.keywords) &&
-                Objects.equals(duration, project.duration) &&
-                Objects.equals(ecsc39, project.ecsc39) &&
-                Objects.equals(oamandatepublications, project.oamandatepublications) &&
-                Objects.equals(ecarticle29_3, project.ecarticle29_3) &&
-                Objects.equals(subjects, project.subjects) &&
-                Objects.equals(fundingtree, project.fundingtree) &&
-                Objects.equals(contracttype, project.contracttype) &&
-                Objects.equals(optional1, project.optional1) &&
-                Objects.equals(optional2, project.optional2) &&
-                Objects.equals(jsonextrainfo, project.jsonextrainfo) &&
-                Objects.equals(contactfullname, project.contactfullname) &&
-                Objects.equals(contactfax, project.contactfax) &&
-                Objects.equals(contactphone, project.contactphone) &&
-                Objects.equals(contactemail, project.contactemail) &&
-                Objects.equals(summary, project.summary) &&
-                Objects.equals(currency, project.currency) &&
-                Objects.equals(totalcost, project.totalcost) &&
-                Objects.equals(fundedamount, project.fundedamount);
+        return Objects.equals(websiteurl, project.websiteurl)
+                && Objects.equals(code, project.code)
+                && Objects.equals(acronym, project.acronym)
+                && Objects.equals(title, project.title)
+                && Objects.equals(startdate, project.startdate)
+                && Objects.equals(enddate, project.enddate)
+                && Objects.equals(callidentifier, project.callidentifier)
+                && Objects.equals(keywords, project.keywords)
+                && Objects.equals(duration, project.duration)
+                && Objects.equals(ecsc39, project.ecsc39)
+                && Objects.equals(oamandatepublications, project.oamandatepublications)
+                && Objects.equals(ecarticle29_3, project.ecarticle29_3)
+                && Objects.equals(subjects, project.subjects)
+                && Objects.equals(fundingtree, project.fundingtree)
+                && Objects.equals(contracttype, project.contracttype)
+                && Objects.equals(optional1, project.optional1)
+                && Objects.equals(optional2, project.optional2)
+                && Objects.equals(jsonextrainfo, project.jsonextrainfo)
+                && Objects.equals(contactfullname, project.contactfullname)
+                && Objects.equals(contactfax, project.contactfax)
+                && Objects.equals(contactphone, project.contactphone)
+                && Objects.equals(contactemail, project.contactemail)
+                && Objects.equals(summary, project.summary)
+                && Objects.equals(currency, project.currency)
+                && Objects.equals(totalcost, project.totalcost)
+                && Objects.equals(fundedamount, project.fundedamount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), websiteurl, code, acronym, title, startdate, enddate, callidentifier, keywords, duration, ecsc39, oamandatepublications, ecarticle29_3, subjects, fundingtree, contracttype, optional1, optional2, jsonextrainfo, contactfullname, contactfax, contactphone, contactemail, summary, currency, totalcost, fundedamount);
+        return Objects.hash(
+                super.hashCode(),
+                websiteurl,
+                code,
+                acronym,
+                title,
+                startdate,
+                enddate,
+                callidentifier,
+                keywords,
+                duration,
+                ecsc39,
+                oamandatepublications,
+                ecarticle29_3,
+                subjects,
+                fundingtree,
+                contracttype,
+                optional1,
+                optional2,
+                jsonextrainfo,
+                contactfullname,
+                contactfax,
+                contactphone,
+                contactemail,
+                summary,
+                currency,
+                totalcost,
+                fundedamount);
     }
 }

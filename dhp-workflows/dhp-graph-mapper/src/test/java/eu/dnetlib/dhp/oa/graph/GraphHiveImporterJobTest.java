@@ -1,6 +1,9 @@
 package eu.dnetlib.dhp.oa.graph;
 
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.spark.SparkConf;
@@ -12,15 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 public class GraphHiveImporterJobTest {
 
     private static final Logger log = LoggerFactory.getLogger(GraphHiveImporterJobTest.class);
 
-    public static final String JDBC_DERBY_TEMPLATE = "jdbc:derby:;databaseName=%s/junit_metastore_db;create=true";
+    public static final String JDBC_DERBY_TEMPLATE =
+            "jdbc:derby:;databaseName=%s/junit_metastore_db;create=true";
 
     private static SparkSession spark;
 
@@ -45,14 +45,16 @@ public class GraphHiveImporterJobTest {
         conf.set("spark.ui.enabled", "false");
         conf.set("spark.sql.warehouse.dir", workingDir.toString());
         conf.set("hive.metastore.warehouse.dir", workingDir.resolve("warehouse").toString());
-        conf.set("javax.jdo.option.ConnectionURL", String.format(JDBC_DERBY_TEMPLATE, workingDir.resolve("warehouse").toString()));
+        conf.set(
+                "javax.jdo.option.ConnectionURL",
+                String.format(JDBC_DERBY_TEMPLATE, workingDir.resolve("warehouse").toString()));
 
-        spark = SparkSession
-                .builder()
-                .appName(GraphHiveImporterJobTest.class.getSimpleName())
-                .config(conf)
-                .enableHiveSupport()
-                .getOrCreate();
+        spark =
+                SparkSession.builder()
+                        .appName(GraphHiveImporterJobTest.class.getSimpleName())
+                        .config(conf)
+                        .enableHiveSupport()
+                        .getOrCreate();
     }
 
     @AfterAll
@@ -64,20 +66,25 @@ public class GraphHiveImporterJobTest {
     @Test
     public void testImportGraphAsHiveDB() throws Exception {
 
-        GraphHiveImporterJob.main(new String[]{
-                "-isSparkSessionManaged", Boolean.FALSE.toString(),
-                "-inputPath", getClass().getResource("/eu/dnetlib/dhp/oa/graph/sample").getPath(),
-                "-hiveMetastoreUris", "",
-                "-hiveDbName", dbName
-        });
+        GraphHiveImporterJob.main(
+                new String[] {
+                    "-isSparkSessionManaged",
+                    Boolean.FALSE.toString(),
+                    "-inputPath",
+                    getClass().getResource("/eu/dnetlib/dhp/oa/graph/sample").getPath(),
+                    "-hiveMetastoreUris",
+                    "",
+                    "-hiveDbName",
+                    dbName
+                });
 
-        ModelSupport.oafTypes.forEach((name, clazz) -> {
-            long count = spark.read().table(dbName + "." + name).count();
-            int expected = name.equals("relation") ? 100 : 10;
+        ModelSupport.oafTypes.forEach(
+                (name, clazz) -> {
+                    long count = spark.read().table(dbName + "." + name).count();
+                    int expected = name.equals("relation") ? 100 : 10;
 
-            Assertions.assertEquals(expected, count, String.format("%s should be %s", name, expected));
-        });
-
+                    Assertions.assertEquals(
+                            expected, count, String.format("%s should be %s", name, expected));
+                });
     }
-
 }
