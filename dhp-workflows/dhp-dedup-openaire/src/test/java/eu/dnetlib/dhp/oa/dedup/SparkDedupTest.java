@@ -272,7 +272,17 @@ public class SparkDedupTest implements Serializable {
                         .distinct()
                         .count();
 
-        assertEquals(831, publications);
+        long mergedSw =
+                spark.read()
+                        .load(testOutputBasePath + "/" + testActionSetId + "/software_mergerel")
+                        .as(Encoders.bean(Relation.class))
+                        .where("relClass=='merges'")
+                        .javaRDD()
+                        .map(Relation::getTarget)
+                        .distinct()
+                        .count();
+
+        assertEquals(897, publications);
         assertEquals(835, organizations);
         assertEquals(100, projects);
         assertEquals(100, datasource);
@@ -288,8 +298,14 @@ public class SparkDedupTest implements Serializable {
                         .filter(this::isDeletedByInference)
                         .count();
 
+        long deletedSw =
+                jsc.textFile(testDedupGraphBasePath + "/software")
+                .filter(this::isDeletedByInference)
+                .count();
+
         assertEquals(mergedOrgs, deletedOrgs);
         assertEquals(mergedPubs, deletedPubs);
+        assertEquals(mergedSw, deletedSw);
     }
 
     @Test
