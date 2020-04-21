@@ -1,27 +1,23 @@
 package eu.dnetlib.dhp.community;
 
-
 public class TagginConstants {
 
+    public static final String BULKTAG_DATA_INFO_TYPE = "bulktagging";
 
-    public final static String BULKTAG_DATA_INFO_TYPE = "bulktagging";
+    public static final String DNET_SCHEMA_NAME = "dnet:provenanceActions";
+    public static final String DNET_SCHEMA_ID = "dnet:provenanceActions";
 
-    public final static String DNET_SCHEMA_NAME = "dnet:provenanceActions";
-    public final static String DNET_SCHEMA_ID = "dnet:provenanceActions";
+    public static final String CLASS_ID_SUBJECT = "community:subject";
+    public static final String CLASS_ID_DATASOURCE = "community:datasource";
+    public static final String CLASS_ID_CZENODO = "community:zenodocommunity";
 
-    public final static String CLASS_ID_SUBJECT = "bulktagging:community:subject";
-    public final static String CLASS_ID_DATASOURCE = "bulktagging:community:datasource";
-    public final static String CLASS_ID_CZENODO = "bulktagging:community:zenodocommunity";
+    public static final String SCHEMA_ID = "dnet:provenanceActions";
+    public static final String COUNTER_GROUP = "Bulk Tagging";
 
-    public final static String SCHEMA_ID = "dnet:provenanceActions";
-    public final static String COUNTER_GROUP = "Bulk Tagging";
+    public static final String ZENODO_COMMUNITY_INDICATOR = "zenodo.org/communities/";
 
-    public final static String ZENODO_COMMUNITY_INDICATOR = "zenodo.org/communities/";
-
-    public final static String CLASS_NAME_BULKTAG_SUBJECT = "Bulktagging for Community - Subject";
-    public final static String CLASS_NAME_BULKTAG_DATASOURCE = "Bulktagging for Community - Datasource";
-    public final static String CLASS_NAME_BULKTAG_ZENODO = "Bulktagging for Community - Zenodo";
-
-
-
+    public static final String CLASS_NAME_BULKTAG_SUBJECT = "Bulktagging for Community - Subject";
+    public static final String CLASS_NAME_BULKTAG_DATASOURCE =
+            "Bulktagging for Community - Datasource";
+    public static final String CLASS_NAME_BULKTAG_ZENODO = "Bulktagging for Community - Zenodo";
 }

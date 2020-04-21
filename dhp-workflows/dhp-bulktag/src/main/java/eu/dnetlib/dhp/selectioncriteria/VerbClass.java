@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface VerbClass {
+@interface VerbClass {
 
-    public String value();
+    String value();
 }

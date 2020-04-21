@@ -1,13 +1,11 @@
 package eu.dnetlib.dhp.community;
 
 import com.google.gson.Gson;
+import java.io.Serializable;
 import org.dom4j.Node;
 
-
-/**
- * Created by miriam on 01/08/2018.
- */
-public class ZenodoCommunity {
+/** Created by miriam on 01/08/2018. */
+public class ZenodoCommunity implements Serializable {
 
     private String zenodoCommunityId;
 
@@ -29,18 +27,16 @@ public class ZenodoCommunity {
         this.selCriteria = selCriteria;
     }
 
-    private void setSelCriteria(String json){
-        //Type collectionType = new TypeToken<Collection<Constraints>>(){}.getType();
+    private void setSelCriteria(String json) {
+        // Type collectionType = new TypeToken<Collection<Constraints>>(){}.getType();
         selCriteria = new Gson().fromJson(json, SelectionConstraints.class);
-
     }
 
-    public void setSelCriteria(Node n){
-        if (n==null){
+    public void setSelCriteria(Node n) {
+        if (n == null) {
             selCriteria = null;
-        }else{
+        } else {
             setSelCriteria(n.getText());
         }
     }
-
 }

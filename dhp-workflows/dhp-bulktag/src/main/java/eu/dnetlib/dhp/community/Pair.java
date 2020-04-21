@@ -1,11 +1,10 @@
 package eu.dnetlib.dhp.community;
 
 import com.google.gson.Gson;
+import java.io.Serializable;
 
-/**
- * Created by miriam on 03/08/2018.
- */
-public class Pair<A,B> {
+/** Created by miriam on 03/08/2018. */
+public class Pair<A, B> implements Serializable {
     private A fst;
     private B snd;
 
@@ -27,12 +26,12 @@ public class Pair<A,B> {
         return this;
     }
 
-    public Pair(A a, B b){
+    public Pair(A a, B b) {
         fst = a;
         snd = b;
     }
 
-    public String toJson(){
+    public String toJson() {
         return new Gson().toJson(this);
     }
 }

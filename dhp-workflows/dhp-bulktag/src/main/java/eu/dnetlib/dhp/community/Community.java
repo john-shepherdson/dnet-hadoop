@@ -1,16 +1,14 @@
 package eu.dnetlib.dhp.community;
 
 import com.google.gson.Gson;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Created by miriam on 01/08/2018.
- */
-public class Community {
+/** Created by miriam on 01/08/2018. */
+public class Community implements Serializable {
 
     private static final Log log = LogFactory.getLog(Community.class);
 
@@ -19,14 +17,15 @@ public class Community {
     private List<Datasource> datasources = new ArrayList<>();
     private List<ZenodoCommunity> zenodoCommunities = new ArrayList<>();
 
-
     public String toJson() {
         final Gson g = new Gson();
         return g.toJson(this);
     }
 
     public boolean isValid() {
-        return !getSubjects().isEmpty() || !getDatasources().isEmpty() || !getZenodoCommunities().isEmpty();
+        return !getSubjects().isEmpty()
+                || !getDatasources().isEmpty()
+                || !getZenodoCommunities().isEmpty();
     }
 
     public String getId() {
@@ -60,5 +59,4 @@ public class Community {
     public void setZenodoCommunities(List<ZenodoCommunity> zenodoCommunities) {
         this.zenodoCommunities = zenodoCommunities;
     }
-
 }
