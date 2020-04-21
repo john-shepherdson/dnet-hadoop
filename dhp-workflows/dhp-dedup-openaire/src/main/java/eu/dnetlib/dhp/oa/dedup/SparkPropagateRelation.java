@@ -4,6 +4,7 @@ import static org.apache.spark.sql.functions.col;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -124,7 +125,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
         return value -> {
             final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
             if (rel.getDataInfo() == null) {
-                rel.setDataInfo(getDataInfo());
+                rel.setDataInfo(new DataInfo());
             }
             return rel;
         };
@@ -148,7 +149,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
                 Relation r = value._1()._2();
                 String id = value._2()._2();
                 if (r.getDataInfo() == null) {
-                    r.setDataInfo(getDataInfo());
+                    r.setDataInfo(new DataInfo());
                 }
                 r.getDataInfo().setDeletedbyinference(false);
                 switch (type) {
@@ -172,7 +173,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
             if (value._2() != null) {
                 Relation r = value._1()._2();
                 if (r.getDataInfo() == null) {
-                    r.setDataInfo(getDataInfo());
+                    r.setDataInfo(new DataInfo());
                 }
                 r.getDataInfo().setDeletedbyinference(true);
                 return r;
