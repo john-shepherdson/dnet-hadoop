@@ -12,11 +12,7 @@
         <value>true</value>
     </property>
     <property>
-        <name>oozie.action.sharelib.for.spark</name>
-        <value>spark2</value>
-    </property>
-    <property>
-        <name>hive_metastore_uris</name>
+        <name>hiveMetastoreUris</name>
         <value>thrift://iis-cdh5-test-m3.ocean.icm.edu.pl:9083</value>
     </property>
     <property>
@@ -24,7 +20,7 @@
         <value>jdbc:hive2://iis-cdh5-test-m3.ocean.icm.edu.pl:10000</value>
     </property>
     <property>
-        <name>hive_db_name</name>
+        <name>hiveDbName</name>
         <value>openaire</value>
     </property>
 </configuration>
