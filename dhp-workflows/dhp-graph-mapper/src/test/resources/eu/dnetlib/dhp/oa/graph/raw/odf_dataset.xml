@@ -87,6 +87,7 @@
     <oaf:language>und</oaf:language>
     <oaf:concept id="https://zenodo.org/communities/epfl"/>
     <oaf:hostedBy id="re3data_____::r3d100010468" name="Zenodo"/>
+    <oaf:projectid>corda_______::226852</oaf:projectid>
     <oaf:collectedFrom id="re3data_____::r3d100010468" name="Zenodo"/>
   </metadata>
   <about xmlns:dc="http://purl.org/dc/elements/1.1/"

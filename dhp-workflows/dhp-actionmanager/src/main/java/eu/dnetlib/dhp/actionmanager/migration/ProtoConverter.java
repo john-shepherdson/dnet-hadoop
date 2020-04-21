@@ -1,4 +1,9 @@
-package eu.dnetlib.dhp.migration.actions;
+package eu.dnetlib.dhp.actionmanager.migration;
+
+import static eu.dnetlib.data.proto.KindProtos.Kind.entity;
+import static eu.dnetlib.data.proto.KindProtos.Kind.relation;
+import static eu.dnetlib.data.proto.TypeProtos.*;
+import static eu.dnetlib.data.proto.TypeProtos.Type.*;
 
 import com.google.common.collect.Lists;
 import com.googlecode.protobuf.format.JsonFormat;
@@ -41,7 +46,7 @@ public class ProtoConverter implements Serializable {
         rel.setRelType(r.getRelType().toString());
         rel.setSubRelType(r.getSubRelType().toString());
         rel.setRelClass(r.getRelClass());
-        rel.setCollectedFrom(
+        rel.setCollectedfrom(
                 r.getCollectedfromCount() > 0
                         ? r.getCollectedfromList().stream()
                                 .map(kv -> mapKV(kv))

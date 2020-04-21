@@ -1,9 +1,38 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.keyValue;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.oaiIProvenance;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 
-import eu.dnetlib.dhp.schema.oaf.*;
-import java.util.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.GeoLocation;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.Journal;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
@@ -29,6 +58,12 @@ public abstract class AbstractMdRecordToOafMapper {
             qualifier("software", "software", "dnet:result_typologies", "dnet:result_typologies");
     protected static final Qualifier OTHER_RESULTTYPE_QUALIFIER =
             qualifier("other", "other", "dnet:result_typologies", "dnet:result_typologies");
+    protected static final Qualifier REPOSITORY_QUALIFIER =
+            qualifier(
+                    "sysimport:crosswalk:repository",
+                    "sysimport:crosswalk:repository",
+                    "dnet:provenanceActions",
+                    "dnet:provenanceActions");
 
     protected AbstractMdRecordToOafMapper(final Map<String, String> code2name) {
         this.code2name = code2name;
@@ -55,13 +90,13 @@ public abstract class AbstractMdRecordToOafMapper {
             final String type = doc.valueOf("//dr:CobjCategory/@type");
             final KeyValue collectedFrom =
                     keyValue(
-                            doc.valueOf("//oaf:collectedFrom/@id"),
+                            createOpenaireId(10, doc.valueOf("//oaf:collectedFrom/@id"), true),
                             doc.valueOf("//oaf:collectedFrom/@name"));
             final KeyValue hostedBy =
                     StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
                             ? collectedFrom
                             : keyValue(
-                                    doc.valueOf("//oaf:hostedBy/@id"),
+                                    createOpenaireId(10, doc.valueOf("//oaf:hostedBy/@id"), true),
                                     doc.valueOf("//oaf:hostedBy/@name"));
 
             final DataInfo info = prepareDataInfo(doc);
@@ -154,7 +189,7 @@ public abstract class AbstractMdRecordToOafMapper {
             r1.setRelClass("isProducedBy");
             r1.setSource(docId);
             r1.setTarget(projectId);
-            r1.setCollectedFrom(Arrays.asList(collectedFrom));
+            r1.setCollectedfrom(Arrays.asList(collectedFrom));
             r1.setDataInfo(info);
             r1.setLastupdatetimestamp(lastUpdateTimestamp);
             res.add(r1);
@@ -165,7 +200,7 @@ public abstract class AbstractMdRecordToOafMapper {
             r2.setRelClass("produces");
             r2.setSource(projectId);
             r2.setTarget(docId);
-            r2.setCollectedFrom(Arrays.asList(collectedFrom));
+            r2.setCollectedfrom(Arrays.asList(collectedFrom));
             r2.setDataInfo(info);
             r2.setLastupdatetimestamp(lastUpdateTimestamp);
             res.add(r2);
@@ -398,7 +433,7 @@ public abstract class AbstractMdRecordToOafMapper {
         final Node n = doc.selectSingleNode("//oaf:datainfo");
 
         if (n == null) {
-            return null;
+            return dataInfo(false, null, false, false, REPOSITORY_QUALIFIER, "0.9");
         }
 
         final String paClassId = n.valueOf("./oaf:provenanceaction/@classid");

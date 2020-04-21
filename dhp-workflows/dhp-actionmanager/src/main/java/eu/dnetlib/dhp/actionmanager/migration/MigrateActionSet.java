@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.migration.actions;
+package eu.dnetlib.dhp.actionmanager.migration;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -9,35 +9,36 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.tools.DistCp;
 import org.apache.hadoop.tools.DistCpOptions;
 import org.apache.hadoop.util.ToolRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MigrateActionSet {
 
-    private static final Log log = LogFactory.getLog(MigrateActionSet.class);
+    private static final Logger log = LoggerFactory.getLogger(MigrateActionSet.class);
 
     private static final String SEPARATOR = "/";
     private static final String TARGET_PATHS = "target_paths";
     private static final String RAWSET_PREFIX = "rawset_";
-
-    private static Boolean DEFAULT_TRANSFORM_ONLY = false;
 
     public static void main(String[] args) throws Exception {
         final ArgumentApplicationParser parser =
                 new ArgumentApplicationParser(
                         IOUtils.toString(
                                 MigrateActionSet.class.getResourceAsStream(
-                                        "/eu/dnetlib/dhp/migration/migrate_actionsets_parameters.json")));
+                                        "/eu/dnetlib/dhp/actionmanager/migration/migrate_actionsets_parameters.json")));
         parser.parseArgument(args);
 
         new MigrateActionSet().run(parser);
@@ -56,11 +57,11 @@ public class MigrateActionSet {
 
         final String transform_only_s = parser.get("transform_only");
 
-        log.info("transform only param: " + transform_only_s);
+        log.info("transform only param: {}", transform_only_s);
 
         final Boolean transformOnly = Boolean.valueOf(parser.get("transform_only"));
 
-        log.info("transform only: " + transformOnly);
+        log.info("transform only: {}", transformOnly);
 
         ISLookUpService isLookUp = ISLookupClientFactory.getLookUpService(isLookupUrl);
 
@@ -79,22 +80,19 @@ public class MigrateActionSet {
 
         final List<Path> sourcePaths = getSourcePaths(sourceNN, isLookUp);
         log.info(
-                String.format(
-                        "paths to process:\n%s",
-                        sourcePaths.stream()
-                                .map(p -> p.toString())
-                                .collect(Collectors.joining("\n"))));
+                "paths to process:\n{}",
+                sourcePaths.stream().map(p -> p.toString()).collect(Collectors.joining("\n")));
         for (Path source : sourcePaths) {
 
             if (!sourceFS.exists(source)) {
-                log.warn(String.format("skipping unexisting path: %s", source));
+                log.warn("skipping unexisting path: {}", source);
             } else {
 
                 LinkedList<String> pathQ =
                         Lists.newLinkedList(Splitter.on(SEPARATOR).split(source.toUri().getPath()));
 
                 final String rawSet = pathQ.pollLast();
-                log.info(String.format("got RAWSET: %s", rawSet));
+                log.info("got RAWSET: {}", rawSet);
 
                 if (StringUtils.isNotBlank(rawSet) && rawSet.startsWith(RAWSET_PREFIX)) {
 
@@ -109,7 +107,7 @@ public class MigrateActionSet {
                                             + SEPARATOR
                                             + rawSet);
 
-                    log.info(String.format("using TARGET PATH: %s", targetPath));
+                    log.info("using TARGET PATH: {}", targetPath);
 
                     if (!transformOnly) {
                         if (targetFS.exists(targetPath)) {
