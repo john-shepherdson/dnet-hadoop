@@ -72,7 +72,7 @@ public class SparkDedupTest implements Serializable {
 
         spark =
                 SparkSession.builder()
-                        .appName(SparkCreateSimRels.class.getSimpleName())
+                        .appName(SparkDedupTest.class.getSimpleName())
                         .master("local[*]")
                         .config(new SparkConf())
                         .getOrCreate();
@@ -300,8 +300,8 @@ public class SparkDedupTest implements Serializable {
 
         long deletedSw =
                 jsc.textFile(testDedupGraphBasePath + "/software")
-                .filter(this::isDeletedByInference)
-                .count();
+                        .filter(this::isDeletedByInference)
+                        .count();
 
         assertEquals(mergedOrgs, deletedOrgs);
         assertEquals(mergedPubs, deletedPubs);
