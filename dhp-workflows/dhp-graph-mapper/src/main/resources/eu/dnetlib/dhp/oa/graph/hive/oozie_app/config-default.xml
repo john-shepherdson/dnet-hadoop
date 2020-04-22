@@ -16,7 +16,7 @@
         <value>thrift://iis-cdh5-test-m3.ocean.icm.edu.pl:9083</value>
     </property>
     <property>
-        <name>hive_jdbc_url</name>
+        <name>hiveJdbcUrl</name>
         <value>jdbc:hive2://iis-cdh5-test-m3.ocean.icm.edu.pl:10000</value>
     </property>
     <property>

@@ -10,6 +10,14 @@
             <description>the target hive database name</description>
         </property>
         <property>
+            <name>hiveJdbcUrl</name>
+            <description>hive server jdbc url</description>
+        </property>
+        <property>
+            <name>hiveMetastoreUris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -105,9 +113,9 @@
                     <value>${hiveMetastoreUris}</value>
                 </property>
             </configuration>
-            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <jdbc-url>${hiveJdbcUrl}/${hiveDbName}</jdbc-url>
             <script>lib/scripts/postprocessing.sql</script>
-            <param>hive_db_name=${hive_db_name}</param>
+            <param>hiveDbName=${hiveDbName}</param>
         </hive2>
         <ok to="End"/>
         <error to="Kill"/>
