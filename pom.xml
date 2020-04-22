@@ -292,6 +292,12 @@
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-actionmanager-common</artifactId>
 				<version>6.0.5</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.hadoop</groupId>
+						<artifactId>hadoop-common</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
