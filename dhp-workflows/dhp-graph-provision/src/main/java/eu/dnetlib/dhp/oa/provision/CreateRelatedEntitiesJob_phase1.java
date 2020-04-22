@@ -11,11 +11,13 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.*;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -104,16 +106,12 @@ public class CreateRelatedEntitiesJob_phase1 {
             SparkSession spark,
             String inputRelationsPath,
             String inputEntityPath,
-            Class<E> entityClazz,
+            Class<E> clazz,
             String outputPath) {
 
         Dataset<Tuple2<String, SortableRelation>> relsByTarget =
                 readPathRelation(spark, inputRelationsPath)
-                        .filter(
-                                (FilterFunction<SortableRelation>)
-                                        value ->
-                                                value.getDataInfo().getDeletedbyinference()
-                                                        == false)
+                        .filter("dataInfo.deletedbyinference == false")
                         .map(
                                 (MapFunction<SortableRelation, Tuple2<String, SortableRelation>>)
                                         r -> new Tuple2<>(r.getTarget(), r),
@@ -122,10 +120,11 @@ public class CreateRelatedEntitiesJob_phase1 {
                         .cache();
 
         Dataset<Tuple2<String, RelatedEntity>> entities =
-                readPathEntity(spark, inputEntityPath, entityClazz)
+                readPathEntity(spark, inputEntityPath, clazz)
+                        .filter("dataInfo.invisible == false")
                         .map(
                                 (MapFunction<E, RelatedEntity>)
-                                        value -> asRelatedEntity(value, entityClazz),
+                                        value -> asRelatedEntity(value, clazz),
                                 Encoders.bean(RelatedEntity.class))
                         .map(
                                 (MapFunction<RelatedEntity, Tuple2<String, RelatedEntity>>)
@@ -146,7 +145,7 @@ public class CreateRelatedEntitiesJob_phase1 {
                         Encoders.bean(EntityRelEntity.class))
                 .write()
                 .mode(SaveMode.Overwrite)
-                .parquet(outputPath + "/" + EntityType.fromClass(entityClazz));
+                .parquet(outputPath + "/" + EntityType.fromClass(clazz));
     }
 
     private static <E extends OafEntity> Dataset<E> readPathEntity(
@@ -159,6 +158,81 @@ public class CreateRelatedEntitiesJob_phase1 {
                         (MapFunction<String, E>)
                                 value -> OBJECT_MAPPER.readValue(value, entityClazz),
                         Encoders.bean(entityClazz));
+    }
+
+    public static <E extends OafEntity> RelatedEntity asRelatedEntity(E entity, Class<E> clazz) {
+
+        final RelatedEntity re = new RelatedEntity();
+        re.setId(entity.getId());
+        re.setType(EntityType.fromClass(clazz).name());
+
+        re.setPid(entity.getPid());
+        re.setCollectedfrom(entity.getCollectedfrom());
+
+        switch (EntityType.fromClass(clazz)) {
+            case publication:
+            case dataset:
+            case otherresearchproduct:
+            case software:
+                Result result = (Result) entity;
+
+                if (result.getTitle() != null && !result.getTitle().isEmpty()) {
+                    re.setTitle(result.getTitle().stream().findFirst().get());
+                }
+
+                re.setDateofacceptance(getValue(result.getDateofacceptance()));
+                re.setPublisher(getValue(result.getPublisher()));
+                re.setResulttype(result.getResulttype());
+                re.setInstances(result.getInstance());
+
+                // TODO still to be mapped
+                // re.setCodeRepositoryUrl(j.read("$.coderepositoryurl"));
+
+                break;
+            case datasource:
+                Datasource d = (Datasource) entity;
+
+                re.setOfficialname(getValue(d.getOfficialname()));
+                re.setWebsiteurl(getValue(d.getWebsiteurl()));
+                re.setDatasourcetype(d.getDatasourcetype());
+                re.setOpenairecompatibility(d.getOpenairecompatibility());
+
+                break;
+            case organization:
+                Organization o = (Organization) entity;
+
+                re.setLegalname(getValue(o.getLegalname()));
+                re.setLegalshortname(getValue(o.getLegalshortname()));
+                re.setCountry(o.getCountry());
+                re.setWebsiteurl(getValue(o.getWebsiteurl()));
+                break;
+            case project:
+                Project p = (Project) entity;
+
+                re.setProjectTitle(getValue(p.getTitle()));
+                re.setCode(getValue(p.getCode()));
+                re.setAcronym(getValue(p.getAcronym()));
+                re.setContracttype(p.getContracttype());
+
+                List<Field<String>> f = p.getFundingtree();
+                if (!f.isEmpty()) {
+                    re.setFundingtree(
+                            f.stream().map(s -> s.getValue()).collect(Collectors.toList()));
+                }
+                break;
+        }
+        return re;
+    }
+
+    private static String getValue(Field<String> field) {
+        return getFieldValueWithDefault(field, "");
+    }
+
+    private static <T> T getFieldValueWithDefault(Field<T> f, T defaultValue) {
+        return Optional.ofNullable(f)
+                .filter(Objects::nonNull)
+                .map(x -> x.getValue())
+                .orElse(defaultValue);
     }
 
     /**

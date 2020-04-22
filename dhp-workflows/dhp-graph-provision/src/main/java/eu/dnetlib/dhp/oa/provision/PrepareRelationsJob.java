@@ -76,9 +76,6 @@ public class PrepareRelationsJob {
         String outputPath = parser.get("outputPath");
         log.info("outputPath: {}", outputPath);
 
-        int numPartitions = Integer.parseInt(parser.get("relPartitions"));
-        log.info("relPartitions: {}", numPartitions);
-
         SparkConf conf = new SparkConf();
 
         runWithSparkSession(
@@ -86,27 +83,14 @@ public class PrepareRelationsJob {
                 isSparkSessionManaged,
                 spark -> {
                     removeOutputDir(spark, outputPath);
-                    prepareRelationsFromPaths(spark, inputRelationsPath, outputPath, numPartitions);
+                    prepareRelationsFromPaths(spark, inputRelationsPath, outputPath);
                 });
     }
 
     private static void prepareRelationsFromPaths(
-            SparkSession spark, String inputRelationsPath, String outputPath, int numPartitions) {
+            SparkSession spark, String inputRelationsPath, String outputPath) {
         readPathRelation(spark, inputRelationsPath)
-                .filter(
-                        (FilterFunction<SortableRelation>)
-                                r -> {
-                                    try {
-                                        return r != null
-                                                && r.getDataInfo() != null
-                                                && !r.getDataInfo().getDeletedbyinference();
-                                    } catch (NullPointerException e) {
-                                        log.info(
-                                                "invalid NPE '{}'",
-                                                OBJECT_MAPPER.writeValueAsString(r));
-                                        throw e;
-                                    }
-                                })
+                .filter("dataInfo.deletedbyinference == false")
                 .groupByKey(
                         (MapFunction<SortableRelation, String>) value -> value.getSource(),
                         Encoders.STRING())
@@ -114,7 +98,6 @@ public class PrepareRelationsJob {
                         (FlatMapGroupsFunction<String, SortableRelation, SortableRelation>)
                                 (key, values) -> Iterators.limit(values, MAX_RELS),
                         Encoders.bean(SortableRelation.class))
-                .repartition(numPartitions)
                 .write()
                 .mode(SaveMode.Overwrite)
                 .parquet(outputPath);

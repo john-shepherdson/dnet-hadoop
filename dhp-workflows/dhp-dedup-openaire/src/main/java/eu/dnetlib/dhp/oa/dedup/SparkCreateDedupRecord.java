@@ -11,8 +11,6 @@ import eu.dnetlib.pace.config.DedupConfig;
 import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
@@ -72,12 +70,9 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
             Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
 
             DedupRecordFactory.createDedupRecord(spark, mergeRelPath, entityPath, clazz)
-                    .map(
-                            (MapFunction<OafEntity, String>)
-                                    value -> OBJECT_MAPPER.writeValueAsString(value),
-                            Encoders.STRING())
                     .write()
                     .mode(SaveMode.Overwrite)
+                    .option("compression", "gzip")
                     .json(outputPath);
         }
     }

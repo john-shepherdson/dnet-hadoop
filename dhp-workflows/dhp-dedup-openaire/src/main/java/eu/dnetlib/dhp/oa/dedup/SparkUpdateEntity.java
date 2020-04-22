@@ -33,7 +33,7 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 
     private static final Logger log = LoggerFactory.getLogger(SparkUpdateEntity.class);
 
-    final String IDJSONPATH = "$.id";
+    private static final String IDJSONPATH = "$.id";
 
     public SparkUpdateEntity(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
@@ -65,27 +65,25 @@ public class SparkUpdateEntity extends AbstractSparkAction {
         log.info("workingPath:    '{}'", workingPath);
         log.info("dedupGraphPath: '{}'", dedupGraphPath);
 
-        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+        final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
         // for each entity
         ModelSupport.entityTypes.forEach(
-                (entity, clazz) -> {
-                    final String outputPath = dedupGraphPath + "/" + entity;
+                (type, clazz) -> {
+                    final String outputPath = dedupGraphPath + "/" + type;
                     removeOutputDir(spark, outputPath);
 
                     JavaRDD<String> sourceEntity =
                             sc.textFile(
-                                    DedupUtility.createEntityPath(
-                                            graphBasePath, entity.toString()));
+                                    DedupUtility.createEntityPath(graphBasePath, type.toString()));
 
-                    if (mergeRelExists(workingPath, entity.toString())) {
+                    if (mergeRelExists(workingPath, type.toString())) {
 
                         final String mergeRelPath =
-                                DedupUtility.createMergeRelPath(
-                                        workingPath, "*", entity.toString());
+                                DedupUtility.createMergeRelPath(workingPath, "*", type.toString());
                         final String dedupRecordPath =
                                 DedupUtility.createDedupRecordPath(
-                                        workingPath, "*", entity.toString());
+                                        workingPath, "*", type.toString());
 
                         final Dataset<Relation> rel =
                                 spark.read().load(mergeRelPath).as(Encoders.bean(Relation.class));
@@ -107,7 +105,6 @@ public class SparkUpdateEntity extends AbstractSparkAction {
                                                                 MapDocumentUtil.getJPathString(
                                                                         IDJSONPATH, s),
                                                                 s));
-
                         JavaRDD<String> map =
                                 entitiesWithId
                                         .leftOuterJoin(mergedIds)
