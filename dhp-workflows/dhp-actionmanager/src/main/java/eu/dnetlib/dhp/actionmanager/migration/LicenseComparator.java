@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.migration.actions;
+package eu.dnetlib.dhp.actionmanager.migration;
 
 import eu.dnetlib.data.proto.FieldTypeProtos.Qualifier;
 import java.util.Comparator;

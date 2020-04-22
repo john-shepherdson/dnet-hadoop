@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.Block;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -114,7 +115,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
         r.setTarget(target);
         r.setSubRelType("dedupSimilarity");
         r.setRelClass("isSimilarTo");
-        r.setDataInfo(getDataInfo());
+        r.setDataInfo(new DataInfo());
 
         switch (entity) {
             case "result":

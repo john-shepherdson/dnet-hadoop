@@ -14,9 +14,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.Document;
@@ -25,9 +23,6 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 abstract class AbstractSparkAction implements Serializable {
-
-    protected static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
-    protected static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
 
     protected static final ObjectMapper OBJECT_MAPPER =
             new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -89,29 +84,8 @@ abstract class AbstractSparkAction implements Serializable {
         return SparkSession.builder().config(conf).getOrCreate();
     }
 
-    protected static <T extends Oaf> void save(Dataset<T> dataset, String outPath, SaveMode mode) {
-        dataset.map(
-                        (MapFunction<T, String>) value -> OBJECT_MAPPER.writeValueAsString(value),
-                        Encoders.STRING())
-                .write()
-                .option("compression", "gzip")
-                .mode(mode)
-                .text(outPath);
-    }
-
-    protected static DataInfo getDataInfo() {
-        DataInfo info = new DataInfo();
-        info.setDeletedbyinference(false);
-        info.setInferred(true);
-        info.setInvisible(false);
-
-        Qualifier provenanceAction = new Qualifier();
-        provenanceAction.setClassid(PROVENANCE_ACTION_CLASS);
-        provenanceAction.setClassname(PROVENANCE_ACTION_CLASS);
-        provenanceAction.setSchemeid(DNET_PROVENANCE_ACTIONS);
-        provenanceAction.setSchemename(DNET_PROVENANCE_ACTIONS);
-        info.setProvenanceaction(provenanceAction);
-        return info;
+    protected static <T> void save(Dataset<T> dataset, String outPath, SaveMode mode) {
+        dataset.write().option("compression", "gzip").mode(mode).json(outPath);
     }
 
     protected static void removeOutputDir(SparkSession spark, String path) {

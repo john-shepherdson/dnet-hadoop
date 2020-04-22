@@ -8,6 +8,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -16,14 +17,20 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import scala.Tuple2;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -41,7 +48,7 @@ public class SparkDedupTest implements Serializable {
     private static final String testActionSetId = "test-orchestrator";
 
     @BeforeAll
-    private static void cleanUp() throws IOException, URISyntaxException {
+    public static void cleanUp() throws IOException, URISyntaxException {
 
         testGraphBasePath =
                 Paths.get(
@@ -74,7 +81,7 @@ public class SparkDedupTest implements Serializable {
     }
 
     @BeforeEach
-    private void setUp() throws IOException, ISLookUpException {
+    public void setUp() throws IOException, ISLookUpException {
 
         lenient()
                 .when(isLookUpService.getResourceProfileByQuery(Mockito.contains(testActionSetId)))
@@ -96,6 +103,13 @@ public class SparkDedupTest implements Serializable {
                         IOUtils.toString(
                                 SparkDedupTest.class.getResourceAsStream(
                                         "/eu/dnetlib/dhp/dedup/conf/pub.curr.conf.json")));
+
+        lenient()
+                .when(isLookUpService.getResourceProfileByQuery(Mockito.contains("software")))
+                .thenReturn(
+                        IOUtils.toString(
+                                SparkDedupTest.class.getResourceAsStream(
+                                        "/eu/dnetlib/dhp/dedup/conf/sw.curr.conf.json")));
     }
 
     @Test
@@ -109,7 +123,6 @@ public class SparkDedupTest implements Serializable {
                                         "/eu/dnetlib/dhp/oa/dedup/createSimRels_parameters.json")));
         parser.parseArgument(
                 new String[] {
-                    "-mt", "local[*]",
                     "-i", testGraphBasePath,
                     "-asi", testActionSetId,
                     "-la", "lookupurl",
@@ -126,9 +139,14 @@ public class SparkDedupTest implements Serializable {
                 spark.read()
                         .load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
                         .count();
+        long sw_simrel =
+                spark.read()
+                        .load(testOutputBasePath + "/" + testActionSetId + "/software_simrel")
+                        .count();
 
-        assertEquals(3288, orgs_simrel);
+        assertEquals(3432, orgs_simrel);
         assertEquals(7260, pubs_simrel);
+        assertEquals(344, sw_simrel);
     }
 
     @Test
@@ -142,7 +160,6 @@ public class SparkDedupTest implements Serializable {
                                         "/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
         parser.parseArgument(
                 new String[] {
-                    "-mt", "local[*]",
                     "-i", testGraphBasePath,
                     "-asi", testActionSetId,
                     "-la", "lookupurl",
@@ -159,9 +176,14 @@ public class SparkDedupTest implements Serializable {
                 spark.read()
                         .load(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel")
                         .count();
+        long sw_mergerel =
+                spark.read()
+                        .load(testOutputBasePath + "/" + testActionSetId + "/software_mergerel")
+                        .count();
 
-        assertEquals(1244, orgs_mergerel);
+        assertEquals(1276, orgs_mergerel);
         assertEquals(1460, pubs_mergerel);
+        assertEquals(288, sw_mergerel);
     }
 
     @Test
@@ -175,7 +197,6 @@ public class SparkDedupTest implements Serializable {
                                         "/eu/dnetlib/dhp/oa/dedup/createDedupRecord_parameters.json")));
         parser.parseArgument(
                 new String[] {
-                    "-mt", "local[*]",
                     "-i", testGraphBasePath,
                     "-asi", testActionSetId,
                     "-la", "lookupurl",
@@ -198,9 +219,13 @@ public class SparkDedupTest implements Serializable {
                                         + testActionSetId
                                         + "/publication_deduprecord")
                         .count();
+        long sw_deduprecord =
+                jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/software_deduprecord")
+                        .count();
 
         assertEquals(82, orgs_deduprecord);
         assertEquals(66, pubs_deduprecord);
+        assertEquals(51, sw_deduprecord);
     }
 
     @Test
@@ -214,7 +239,6 @@ public class SparkDedupTest implements Serializable {
                                         "/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
         parser.parseArgument(
                 new String[] {
-                    "-mt", "local[*]",
                     "-i", testGraphBasePath,
                     "-w", testOutputBasePath,
                     "-o", testDedupGraphBasePath
@@ -224,6 +248,9 @@ public class SparkDedupTest implements Serializable {
 
         long organizations = jsc.textFile(testDedupGraphBasePath + "/organization").count();
         long publications = jsc.textFile(testDedupGraphBasePath + "/publication").count();
+        long projects = jsc.textFile(testDedupGraphBasePath + "/project").count();
+        long datasource = jsc.textFile(testDedupGraphBasePath + "/datasource").count();
+        long softwares = jsc.textFile(testDedupGraphBasePath + "/software").count();
 
         long mergedOrgs =
                 spark.read()
@@ -245,13 +272,17 @@ public class SparkDedupTest implements Serializable {
                         .distinct()
                         .count();
 
-        assertEquals(897, publications);
+        assertEquals(831, publications);
         assertEquals(835, organizations);
+        assertEquals(100, projects);
+        assertEquals(100, datasource);
+        assertEquals(200, softwares);
 
         long deletedOrgs =
                 jsc.textFile(testDedupGraphBasePath + "/organization")
                         .filter(this::isDeletedByInference)
                         .count();
+
         long deletedPubs =
                 jsc.textFile(testDedupGraphBasePath + "/publication")
                         .filter(this::isDeletedByInference)
@@ -272,7 +303,6 @@ public class SparkDedupTest implements Serializable {
                                         "/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json")));
         parser.parseArgument(
                 new String[] {
-                    "-mt", "local[*]",
                     "-i", testGraphBasePath,
                     "-w", testOutputBasePath,
                     "-o", testDedupGraphBasePath
@@ -283,6 +313,43 @@ public class SparkDedupTest implements Serializable {
         long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
         assertEquals(826, relations);
+
+        // check deletedbyinference
+        final Dataset<Relation> mergeRels =
+                spark.read()
+                        .load(DedupUtility.createMergeRelPath(testOutputBasePath, "*", "*"))
+                        .as(Encoders.bean(Relation.class));
+        final JavaPairRDD<String, String> mergedIds =
+                mergeRels
+                        .where("relClass == 'merges'")
+                        .select(mergeRels.col("target"))
+                        .distinct()
+                        .toJavaRDD()
+                        .mapToPair(
+                                (PairFunction<Row, String, String>)
+                                        r -> new Tuple2<String, String>(r.getString(0), "d"));
+
+        JavaRDD<String> toCheck =
+                jsc.textFile(testDedupGraphBasePath + "/relation")
+                        .mapToPair(
+                                json ->
+                                        new Tuple2<>(
+                                                MapDocumentUtil.getJPathString("$.source", json),
+                                                json))
+                        .join(mergedIds)
+                        .map(t -> t._2()._1())
+                        .mapToPair(
+                                json ->
+                                        new Tuple2<>(
+                                                MapDocumentUtil.getJPathString("$.target", json),
+                                                json))
+                        .join(mergedIds)
+                        .map(t -> t._2()._1());
+
+        long deletedbyinference = toCheck.filter(this::isDeletedByInference).count();
+        long updated = toCheck.count();
+
+        assertEquals(updated, deletedbyinference);
     }
 
     @AfterAll
