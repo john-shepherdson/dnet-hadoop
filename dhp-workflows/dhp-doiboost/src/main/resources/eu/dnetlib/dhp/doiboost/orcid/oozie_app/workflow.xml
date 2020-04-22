@@ -1,18 +1,18 @@
-<workflow-app name="import Crossref from index into HDFS" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="import Orcid" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>workingPath</name>
             <description>the working dir base path</description>
         </property>
     </parameters>
-
+    
     <start to="ResetWorkingPath"/>
-
-
+    
+    
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-
+    
     <action name="ResetWorkingPath">
         <fs>
             <delete path='${workingPath}/output'/>
@@ -21,9 +21,9 @@
         <ok to="ImportOrcidSummary"/>
         <error to="Kill"/>
     </action>
-
-
-
+    
+    
+    
     <action name="ImportOrcidSummary">
         <java>
             <job-tracker>${jobTracker}</job-tracker>
@@ -31,8 +31,8 @@
             <main-class>eu.dnetlib.doiboost.orcid.OrcidDSManager</main-class>
             <arg>-d</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-			<arg>-f</arg><arg>ORCID_2019_summaries.tar.gz</arg>
-			<arg>-o</arg><arg>output/</arg>
+            <arg>-f</arg><arg>ORCID_2019_summaries.tar.gz</arg>
+            <arg>-o</arg><arg>output/</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>

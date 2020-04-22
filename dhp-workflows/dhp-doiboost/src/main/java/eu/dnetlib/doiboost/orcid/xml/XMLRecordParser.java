@@ -1,98 +1,81 @@
 package eu.dnetlib.doiboost.orcid.xml;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Iterator;
-
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
+import com.ximpleware.AutoPilot;
+import com.ximpleware.EOFException;
+import com.ximpleware.EncodingException;
+import com.ximpleware.EntityException;
+import com.ximpleware.ParseException;
+import com.ximpleware.VTDGen;
+import com.ximpleware.VTDNav;
+import eu.dnetlib.dhp.parser.utility.VtdException;
+import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
 import eu.dnetlib.doiboost.orcid.model.AuthorData;
-import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
+import java.util.Arrays;
+import java.util.List;
 
 public class XMLRecordParser {
 
-	public static AuthorData parse(ByteArrayInputStream bytesStream) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-		bytesStream.reset();
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-		builderFactory.setNamespaceAware(true);
-		DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		
-		Document xmlDocument = builder.parse(bytesStream);
-		XPath xPath = XPathFactory.newInstance().newXPath();
-		xPath.setNamespaceContext(new NamespaceContext() {
-		    @Override
-		    public Iterator getPrefixes(String arg0) {
-		        return null;
-		    }
-		    @Override
-		    public String getPrefix(String arg0) {
-		        return null;
-		    }
-		    @Override
-		    public String getNamespaceURI(String arg0) {
-		        if ("common".equals(arg0)) {
-		            return "http://www.orcid.org/ns/common";
-		        }
-		        else if ("person".equals(arg0)) {
-		            return "http://www.orcid.org/ns/person";
-		        }
-		        else if ("personal-details".equals(arg0)) {
-		            return "http://www.orcid.org/ns/personal-details";
-		        }
-		        else if ("other-name".equals(arg0)) {
-		            return "http://www.orcid.org/ns/other-name";
-		        }
-		        else if ("record".equals(arg0)) {
-		            return "http://www.orcid.org/ns/record";
-		        }
-		        else if ("error".equals(arg0)) {
-		            return "http://www.orcid.org/ns/error";
-		        }
-		        return null;
-		    }
-		});
-		
-		AuthorData authorData = new AuthorData();
-		String errorPath = "//error:response-code";
-		String error = (String)xPath.compile(errorPath).evaluate(xmlDocument, XPathConstants.STRING);
-		if (!StringUtils.isBlank(error)) {
-			authorData.setErrorCode(error);
-			return authorData;
-		}
-		String oidPath = "//record:record/@path";
-		String oid = (String)xPath.compile(oidPath).evaluate(xmlDocument, XPathConstants.STRING);
-		if (!StringUtils.isBlank(oid)) {
-			oid = oid.substring(1);
-			authorData.setOid(oid);
-		}
-		else {
-			return null;
-		}
-		String namePath = "//personal-details:given-names";
-		String name = (String)xPath.compile(namePath).evaluate(xmlDocument, XPathConstants.STRING);
-		if (!StringUtils.isBlank(name)) {
-			authorData.setName(name);
-		}
-		String surnamePath = "//personal-details:family-name";
-		String surname = (String)xPath.compile(surnamePath).evaluate(xmlDocument, XPathConstants.STRING);
-		if (!StringUtils.isBlank(surname)) {
-			authorData.setSurname(surname);
-		}
-		String creditnamePath = "//personal-details:credit-name";
-		String creditName = (String)xPath.compile(creditnamePath).evaluate(xmlDocument, XPathConstants.STRING);
-		if (!StringUtils.isBlank(creditName)) {
-			authorData.setCreditName(creditName);
-		}
-		return authorData;
-	}
+    private static final String NS_COMMON_URL = "http://www.orcid.org/ns/common";
+    private static final String NS_COMMON = "common";
+    private static final String NS_PERSON_URL = "http://www.orcid.org/ns/person";
+    private static final String NS_PERSON = "person";
+    private static final String NS_DETAILS_URL = "http://www.orcid.org/ns/personal-details";
+    private static final String NS_DETAILS = "personal-details";
+    private static final String NS_OTHER_URL = "http://www.orcid.org/ns/other-name";
+    private static final String NS_OTHER = "other-name";
+    private static final String NS_RECORD_URL = "http://www.orcid.org/ns/record";
+    private static final String NS_RECORD = "record";
+    private static final String NS_ERROR_URL = "http://www.orcid.org/ns/error";
+    private static final String NS_ERROR = "error";
+
+    public static AuthorData VTDParse(byte[] bytes)
+            throws VtdException, EncodingException, EOFException, EntityException, ParseException {
+        final VTDGen vg = new VTDGen();
+        vg.setDoc(bytes);
+        vg.parse(true);
+        final VTDNav vn = vg.getNav();
+        final AutoPilot ap = new AutoPilot(vn);
+        ap.declareXPathNameSpace(NS_COMMON, NS_COMMON_URL);
+        ap.declareXPathNameSpace(NS_PERSON, NS_PERSON_URL);
+        ap.declareXPathNameSpace(NS_DETAILS, NS_DETAILS_URL);
+        ap.declareXPathNameSpace(NS_OTHER, NS_OTHER_URL);
+        ap.declareXPathNameSpace(NS_RECORD, NS_RECORD_URL);
+        ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
+
+        AuthorData authorData = new AuthorData();
+        final List<String> errors = VtdUtilityParser.getTextValue(ap, vn, "//error:response-code");
+        if (!errors.isEmpty()) {
+            authorData.setErrorCode(errors.get(0));
+            return authorData;
+        }
+
+        List<VtdUtilityParser.Node> recordNodes =
+                VtdUtilityParser.getTextValuesWithAttributes(
+                        ap, vn, "//record:record", Arrays.asList("path"));
+        if (!recordNodes.isEmpty()) {
+            final String oid = (recordNodes.get(0).getAttributes().get("path")).substring(1);
+            authorData.setOid(oid);
+        } else {
+            return null;
+        }
+
+        final List<String> names =
+                VtdUtilityParser.getTextValue(ap, vn, "//personal-details:given-names");
+        if (!names.isEmpty()) {
+            authorData.setName(names.get(0));
+        }
+
+        final List<String> surnames =
+                VtdUtilityParser.getTextValue(ap, vn, "//personal-details:family-name");
+        if (!surnames.isEmpty()) {
+            authorData.setSurname(surnames.get(0));
+        }
+
+        final List<String> creditNames =
+                VtdUtilityParser.getTextValue(ap, vn, "//personal-details:credit-name");
+        if (!creditNames.isEmpty()) {
+            authorData.setCreditName(creditNames.get(0));
+        }
+        return authorData;
+    }
 }

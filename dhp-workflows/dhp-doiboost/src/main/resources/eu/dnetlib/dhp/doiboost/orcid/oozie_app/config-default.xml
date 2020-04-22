@@ -15,4 +15,8 @@
         <name>oozie.launcher.mapreduce.user.classpath.first</name>
         <value>true</value>
     </property>
+    <property>
+      <name>oozie.launcher.mapreduce.map.java.opts</name>
+      <value>-Xmx4g</value>
+    </property>
 </configuration>
