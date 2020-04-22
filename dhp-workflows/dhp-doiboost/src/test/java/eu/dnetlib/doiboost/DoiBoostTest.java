@@ -30,9 +30,9 @@ public class DoiBoostTest {
     }
 
     @Test
-    public void testConvertCrossRef2Oaf() throws IOException {
+    public void testConvertPreprintCrossRef2Oaf() throws IOException {
 
-        final String json = IOUtils.toString(getClass().getResourceAsStream("pc.json"));
+        final String json = IOUtils.toString(getClass().getResourceAsStream("article.json"));
         ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         assertNotNull(json);
         assertFalse(StringUtils.isBlank(json));
@@ -73,13 +73,79 @@ public class DoiBoostTest {
         assertTrue(
                 result.getRelevantdate().stream()
                         .anyMatch(d -> d.getQualifier().getClassid().equalsIgnoreCase("created")));
+        //        assertTrue(
+        //                result.getRelevantdate().stream()
+        //                        .anyMatch(
+        //                                d ->
+        // d.getQualifier().getClassid().equalsIgnoreCase("available")));
+        //        assertTrue(
+        //                result.getRelevantdate().stream()
+        //                        .anyMatch(d ->
+        // d.getQualifier().getClassid().equalsIgnoreCase("accepted")));
         assertTrue(
                 result.getRelevantdate().stream()
                         .anyMatch(
-                                d -> d.getQualifier().getClassid().equalsIgnoreCase("available")));
+                                d ->
+                                        d.getQualifier()
+                                                .getClassid()
+                                                .equalsIgnoreCase("published-online")));
+        //        assertTrue(
+        //                result.getRelevantdate().stream()
+        //                        .anyMatch(
+        //                                d ->
+        //                                        d.getQualifier()
+        //                                                .getClassid()
+        //                                                .equalsIgnoreCase("published-print")));
+
+        logger.info(mapper.writeValueAsString(result));
+    }
+
+    @Test
+    public void testConvertBooktCrossRef2Oaf() throws IOException {
+
+        final String json = IOUtils.toString(getClass().getResourceAsStream("book.json"));
+        ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        assertNotNull(json);
+        assertFalse(StringUtils.isBlank(json));
+        Crossref2Oaf cf = new Crossref2Oaf();
+        final Result result = cf.convert(json, logger);
+        assertNotNull(result);
+        logger.info(mapper.writeValueAsString(result));
+
+        assertNotNull(result.getDataInfo(), "Datainfo test not null Failed");
+        assertNotNull(
+                result.getDataInfo().getProvenanceaction(),
+                "DataInfo/Provenance test not null Failed");
+        assertFalse(
+                StringUtils.isBlank(result.getDataInfo().getProvenanceaction().getClassid()),
+                "DataInfo/Provenance/classId test not null Failed");
+        assertFalse(
+                StringUtils.isBlank(result.getDataInfo().getProvenanceaction().getClassname()),
+                "DataInfo/Provenance/className test not null Failed");
+        assertFalse(
+                StringUtils.isBlank(result.getDataInfo().getProvenanceaction().getSchemeid()),
+                "DataInfo/Provenance/SchemeId test not null Failed");
+        assertFalse(
+                StringUtils.isBlank(result.getDataInfo().getProvenanceaction().getSchemename()),
+                "DataInfo/Provenance/SchemeName test not null Failed");
+
+        assertNotNull(result.getCollectedfrom(), "CollectedFrom test not null Failed");
+        assertTrue(result.getCollectedfrom().size() > 0);
+        assertTrue(
+                result.getCollectedfrom().stream()
+                        .anyMatch(
+                                c ->
+                                        c.getKey()
+                                                .equalsIgnoreCase(
+                                                        "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")));
+        assertTrue(
+                result.getCollectedfrom().stream()
+                        .anyMatch(c -> c.getValue().equalsIgnoreCase("crossref")));
+
         assertTrue(
                 result.getRelevantdate().stream()
-                        .anyMatch(d -> d.getQualifier().getClassid().equalsIgnoreCase("accepted")));
+                        .anyMatch(d -> d.getQualifier().getClassid().equalsIgnoreCase("created")));
+
         assertTrue(
                 result.getRelevantdate().stream()
                         .anyMatch(
@@ -94,8 +160,6 @@ public class DoiBoostTest {
                                         d.getQualifier()
                                                 .getClassid()
                                                 .equalsIgnoreCase("published-print")));
-
-        logger.info(mapper.writeValueAsString(result));
     }
 
     @Test
