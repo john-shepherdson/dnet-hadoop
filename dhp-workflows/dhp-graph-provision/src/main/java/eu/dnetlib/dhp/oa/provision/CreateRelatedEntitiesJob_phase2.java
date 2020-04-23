@@ -216,6 +216,7 @@ public class CreateRelatedEntitiesJob_phase2 {
                         (MapFunction<String, E>)
                                 value -> OBJECT_MAPPER.readValue(value, entityClazz),
                         Encoders.bean(entityClazz))
+                .filter("dataInfo.invisible == false")
                 .map(
                         (MapFunction<E, TypedRow>)
                                 value ->
