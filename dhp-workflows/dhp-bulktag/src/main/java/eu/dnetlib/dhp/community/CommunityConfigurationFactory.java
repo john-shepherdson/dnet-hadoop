@@ -4,11 +4,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import eu.dnetlib.dhp.selectioncriteria.InterfaceAdapter;
 import eu.dnetlib.dhp.selectioncriteria.Selection;
 import eu.dnetlib.dhp.selectioncriteria.VerbResolver;
 import eu.dnetlib.dhp.selectioncriteria.VerbResolverFactory;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,15 +20,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
-
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Created by miriam on 03/08/2018.
- */
+/** Created by miriam on 03/08/2018. */
 public class CommunityConfigurationFactory {
 
     private static final Log log = LogFactory.getLog(CommunityConfigurationFactory.class);
@@ -38,9 +33,9 @@ public class CommunityConfigurationFactory {
 
         final Document doc = new SAXReader().read(new StringReader(xml));
 
-        final Map<String,Community> communities = Maps.newHashMap();
+        final Map<String, Community> communities = Maps.newHashMap();
 
-        for(final Object o : doc.selectNodes("//community")) {
+        for (final Object o : doc.selectNodes("//community")) {
 
             final Node node = (Node) o;
 
@@ -54,8 +49,7 @@ public class CommunityConfigurationFactory {
         log.info(String.format("loaded %s community configuration profiles", communities.size()));
         log.debug(String.format("loaded community configuration:\n%s", communities.toString()));
 
-
-            return new CommunityConfiguration(communities);
+        return new CommunityConfiguration(communities);
     }
 
     public static CommunityConfiguration fromJson(final String json) {
@@ -88,9 +82,9 @@ public class CommunityConfigurationFactory {
 
         final List<String> subjects = Lists.newArrayList();
 
-        final List <Node> list = node.selectNodes("./subjects/subject");
+        final List<Node> list = node.selectNodes("./subjects/subject");
 
-        for(Node n : list){
+        for (Node n : list) {
             log.debug("text of the node " + n.getText());
             subjects.add(StringUtils.trim(n.getText()));
         }
@@ -98,11 +92,10 @@ public class CommunityConfigurationFactory {
         return subjects;
     }
 
-
     private static List<Datasource> parseDatasources(final Node node) {
-        final List <Node> list = node.selectNodes("./datasources/datasource");
+        final List<Node> list = node.selectNodes("./datasources/datasource");
         final List<Datasource> datasourceList = new ArrayList<>();
-        for(Node n : list){
+        for (Node n : list) {
             Datasource d = new Datasource();
             d.setOpenaireId(n.selectSingleNode("./openaireId").getText());
             d.setSelCriteria(n.selectSingleNode("./selcriteria"), resolver);
@@ -115,23 +108,21 @@ public class CommunityConfigurationFactory {
     private static List<ZenodoCommunity> parseZenodoCommunities(final Node node) {
         final Node oacommunitynode = node.selectSingleNode("./oacommunity");
         String oacommunity = null;
-        if (oacommunitynode != null){
+        if (oacommunitynode != null) {
             String tmp = oacommunitynode.getText();
-            if(StringUtils.isNotBlank(tmp))
-                oacommunity = tmp;
+            if (StringUtils.isNotBlank(tmp)) oacommunity = tmp;
         }
-
 
         final List<Node> list = node.selectNodes("./zenodocommunities/zenodocommunity");
         final List<ZenodoCommunity> zenodoCommunityList = new ArrayList<>();
-        for(Node n : list){
+        for (Node n : list) {
             ZenodoCommunity zc = new ZenodoCommunity();
             zc.setZenodoCommunityId(n.selectSingleNode("./zenodoid").getText());
             zc.setSelCriteria(n.selectSingleNode("./selcriteria"));
 
             zenodoCommunityList.add(zc);
         }
-        if(oacommunity != null){
+        if (oacommunity != null) {
             ZenodoCommunity zc = new ZenodoCommunity();
             zc.setZenodoCommunityId(oacommunity);
             zenodoCommunityList.add(zc);
@@ -139,8 +130,4 @@ public class CommunityConfigurationFactory {
         log.info("size of the zenodo community list " + zenodoCommunityList.size());
         return zenodoCommunityList;
     }
-
-
-
-
 }

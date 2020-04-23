@@ -1,18 +1,17 @@
 package eu.dnetlib.dhp.selectioncriteria;
 
+import java.io.Serializable;
 
 @VerbClass("not_equals")
-public class NotEqualVerb implements Selection {
+public class NotEqualVerb implements Selection, Serializable {
 
     private String param;
-
 
     public NotEqualVerb(final String param) {
         this.param = param;
     }
 
-    public NotEqualVerb() {
-    }
+    public NotEqualVerb() {}
 
     public String getParam() {
         return param;

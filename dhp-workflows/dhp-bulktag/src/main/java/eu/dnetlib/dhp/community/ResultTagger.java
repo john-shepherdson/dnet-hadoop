@@ -56,7 +56,8 @@ public class ResultTagger implements Serializable {
         // Verify if the entity is deletedbyinference. In case verify if to clean the context list
         // from all the zenodo communities
         if (result.getDataInfo().getDeletedbyinference()) {
-            if (clearContext(result)) return result;
+            clearContext(result);
+            return result;
         }
 
         // communities contains all the communities to be added as context for the result
@@ -118,7 +119,15 @@ public class ResultTagger implements Serializable {
                 .map(
                         c -> {
                             if (communities.contains(c.getId())) {
-                                List<DataInfo> dataInfoList = c.getDataInfo();
+                                Optional<List<DataInfo>> opt_dataInfoList =
+                                        Optional.ofNullable(c.getDataInfo());
+                                List<DataInfo> dataInfoList;
+                                if (opt_dataInfoList.isPresent())
+                                    dataInfoList = opt_dataInfoList.get();
+                                else {
+                                    dataInfoList = new ArrayList<>();
+                                    c.setDataInfo(dataInfoList);
+                                }
                                 if (subjects.contains(c.getId()))
                                     dataInfoList.add(
                                             getDataInfo(
@@ -153,7 +162,7 @@ public class ResultTagger implements Serializable {
                                 c -> {
                                     Context context = new Context();
                                     context.setId(c);
-                                    List<DataInfo> dataInfoList = Arrays.asList();
+                                    List<DataInfo> dataInfoList = new ArrayList<>();
                                     if (subjects.contains(c))
                                         dataInfoList.add(
                                                 getDataInfo(

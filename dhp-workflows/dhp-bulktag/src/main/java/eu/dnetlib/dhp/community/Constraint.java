@@ -1,13 +1,9 @@
 package eu.dnetlib.dhp.community;
 
-
-
 import eu.dnetlib.dhp.selectioncriteria.Selection;
 import eu.dnetlib.dhp.selectioncriteria.VerbResolver;
-
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-
 
 public class Constraint implements Serializable {
     private String verb;
@@ -15,8 +11,7 @@ public class Constraint implements Serializable {
     private String value;
     private Selection selection;
 
-    public Constraint() {
-    }
+    public Constraint() {}
 
     public String getVerb() {
         return verb;
@@ -42,21 +37,17 @@ public class Constraint implements Serializable {
         this.value = value;
     }
 
-
-
-    public void setSelection(Selection sel){
+    public void setSelection(Selection sel) {
         selection = sel;
     }
 
-    public void setSelection(VerbResolver resolver) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        selection = resolver.getSelectionCriteria(verb,value);
+    public void setSelection(VerbResolver resolver)
+            throws InvocationTargetException, NoSuchMethodException, InstantiationException,
+                    IllegalAccessException {
+        selection = resolver.getSelectionCriteria(verb, value);
     }
 
-
-    public boolean verifyCriteria(String metadata){
+    public boolean verifyCriteria(String metadata) {
         return selection.apply(metadata);
     }
-
-
-
 }

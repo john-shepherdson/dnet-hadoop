@@ -1,12 +1,13 @@
 package eu.dnetlib.dhp.selectioncriteria;
 
+import java.io.Serializable;
+
 @VerbClass("not_contains")
-public class NotContainsVerb implements Selection {
+public class NotContainsVerb implements Selection, Serializable {
 
     private String param;
 
-    public NotContainsVerb() {
-    }
+    public NotContainsVerb() {}
 
     public NotContainsVerb(final String param) {
         this.param = param;

@@ -1,12 +1,13 @@
 package eu.dnetlib.dhp.selectioncriteria;
 
+import java.io.Serializable;
+
 @VerbClass("contains")
-public class ContainsVerb implements Selection {
+public class ContainsVerb implements Selection, Serializable {
 
     private String param;
 
-    public ContainsVerb() {
-    }
+    public ContainsVerb() {}
 
     public ContainsVerb(final String param) {
         this.param = param;
