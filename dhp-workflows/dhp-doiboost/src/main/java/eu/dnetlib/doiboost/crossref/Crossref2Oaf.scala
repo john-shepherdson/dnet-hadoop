@@ -10,10 +10,11 @@ import org.json4s.jackson.JsonMethods._
 import org.slf4j.Logger
 import scala.collection.JavaConverters._
 
-case class  mappingAffiliation(name:String)
-case class mappingAuthor(given: Option[String], family: String, ORCID: Option[String], affiliation:Option[mappingAffiliation]) {}
+case class mappingAffiliation(name: String)
+case class mappingAuthor(given: Option[String], family: String, ORCID: Option[String], affiliation: Option[mappingAffiliation]) {}
 
-class Crossref2Oaf {
+
+case object Crossref2Oaf {
 
   //STATIC STRING
   val MAG = "MAG"
@@ -27,7 +28,6 @@ class Crossref2Oaf {
   val SEPARATOR = "::"
   val DNET_LANGUAGES = "dnet:languages"
   val PID_TYPES = "dnet:pid_types"
-
 
   val mappingCrossrefType = Map(
     "book-section" -> "publication",
@@ -84,7 +84,7 @@ class Crossref2Oaf {
   )
 
 
-  def mappingResult(result: Result, json: JValue, cobjCategory:String): Result = {
+  def mappingResult(result: Result, json: JValue, cobjCategory: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
@@ -111,7 +111,7 @@ class Crossref2Oaf {
     result.setCollectedfrom(List(createCollectedFrom()).asJava)
 
     // Publisher ( Name of work's publisher mapped into  Result/Publisher)
-    val publisher = (json \ "publisher").extract[String]
+    val publisher = (json \ "publisher").extractOrElse[String](null)
     result.setPublisher(asField(publisher))
 
     // TITLE
@@ -144,7 +144,7 @@ class Crossref2Oaf {
 
     //Mapping AUthor
 
-    val authorList:List[mappingAuthor] = (json \ "author").extract[List[mappingAuthor]]
+    val authorList: List[mappingAuthor] = (json \ "author").extractOrElse[List[mappingAuthor]](List())
 
     result.setAuthor(authorList.map(a => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull)).asJava)
 
@@ -152,8 +152,8 @@ class Crossref2Oaf {
 
     val instance = new Instance()
     val license = for {
-                      JString(lic) <- json \ "license" \ "URL"
-                       } yield asField(lic)
+      JString(lic) <- json \ "license" \ "URL"
+    } yield asField(lic)
     val l = license.filter(d => StringUtils.isNotBlank(d.getValue))
     if (l.nonEmpty)
       instance.setLicense(l.head)
@@ -161,24 +161,22 @@ class Crossref2Oaf {
     instance.setAccessright(createQualifier("Restricted", "dnet:access_modes"))
 
     result.setInstance(List(instance).asJava)
-    instance.setInstancetype(createQualifier(cobjCategory.substring(0,4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
+    instance.setInstancetype(createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
 
     instance.setCollectedfrom(createCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
       instance.setDateofacceptance(asField(issuedDate))
     }
-    val s: String =(json \ "URL").extract[String]
-    val links:List[String] = ((for {JString(url) <-json \ "link" \ "URL"} yield  url) ::: List(s)).filter(p =>p != null).distinct
+    val s: String = (json \ "URL").extract[String]
+    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
     if (links.nonEmpty)
       instance.setUrl(links.asJava)
     result
   }
 
 
-
-
-  def generateAuhtor(given:String, family:String, orcid:String):Author = {
-    val a =new  Author
+  def generateAuhtor(given: String, family: String, orcid: String): Author = {
+    val a = new Author
     a.setName(given)
     a.setSurname(family)
     a.setFullname(s"${given} ${family}")
@@ -202,30 +200,28 @@ class Crossref2Oaf {
     if (result == null)
       return result
     val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"));
-    logger.debug(mappingCrossrefType(objectType))
-    logger.debug(cOBJCategory)
+//    logger.debug(mappingCrossrefType(objectType))
+//    logger.debug(cOBJCategory)
 
     mappingResult(result, json, cOBJCategory)
 
 
     result match {
-      case publication: Publication => convertPublication(publication)
+      case publication: Publication => convertPublication(publication, json, cOBJCategory)
       case dataset: Dataset => convertDataset(dataset)
     }
-
-
-
 
 
     result
   }
 
   def convertDataset(dataset: Dataset): Unit = {
-
+    //TODO probably we need to add relation and other stuff here
   }
 
 
-  def convertPublication(publication: Publication, json: JValue, cobjCategory:String): Unit = {
+  def convertPublication(publication: Publication, json: JValue, cobjCategory: String): Unit = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     val containerTitles = for {JString(ct) <- json \ "container-title"} yield ct
 
 
@@ -243,11 +239,43 @@ class Crossref2Oaf {
           publication.setSource(List(asField(source)).asJava)
       }
     } else {
-      val issn =
+      // Mapping Journal
+
+      val issnInfos = for {JArray(issn_types) <- json \ "issn-type"
+                           JObject(issn_type) <- issn_types
+                           JField("type", JString(tp)) <- issn_type
+                           JField("value", JString(vl)) <- issn_type
+                           } yield Tuple2(tp, vl)
+
+      val volume = (json \ "volume").extractOrElse[String] (null)
+      if (containerTitles.nonEmpty) {
+        val journal = new Journal
+        journal.setName(containerTitles.head)
+        if (issnInfos.nonEmpty) {
+
+          issnInfos.foreach(tp => {
+            tp._1 match {
+              case "electronic" => journal.setIssnOnline(tp._2)
+              case "print" => journal.setIssnPrinted(tp._2)
+            }
+          })
+
+        }
+        journal.setVol(volume)
+
+        val page = (json \ "page").extractOrElse[String] (null)
+        if(page!= null ) {
+          val pp = page.split("-")
+          journal.setSp(pp.head)
+          if (pp.size > 1)
+            journal.setEp(pp(1))
+        }
+
+
+        publication.setJournal(journal)
+      }
+
     }
-
-    // Mapping other types of publications
-
 
 
   }
@@ -322,7 +350,7 @@ class Crossref2Oaf {
 
   }
 
-  def createQualifier(clsName: String,clsValue: String, schName: String, schValue: String): Qualifier = {
+  def createQualifier(clsName: String, clsValue: String, schName: String, schValue: String): Qualifier = {
     val q = new Qualifier
     q.setClassid(clsName)
     q.setClassname(clsValue)
