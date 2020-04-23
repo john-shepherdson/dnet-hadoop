@@ -98,6 +98,8 @@ public class MappersTest {
         assertTrue(d.getAuthor().size() > 0);
         assertTrue(d.getSubject().size() > 0);
         assertTrue(d.getInstance().size() > 0);
+        assertTrue(d.getContext().size() > 0);
+        assertTrue(d.getContext().get(0).getId().length() > 0);
 
         assertValidId(r1.getSource());
         assertValidId(r1.getTarget());
