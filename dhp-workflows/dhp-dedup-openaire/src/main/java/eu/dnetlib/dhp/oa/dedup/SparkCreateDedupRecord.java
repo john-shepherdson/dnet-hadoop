@@ -3,7 +3,9 @@ package eu.dnetlib.dhp.oa.dedup;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -20,6 +22,10 @@ import org.slf4j.LoggerFactory;
 public class SparkCreateDedupRecord extends AbstractSparkAction {
 
     private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
+
+    public static final String ROOT_TRUST = "0.8";
+    public static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
+    public static final String PROVENANCE_ACTIONS = "dnet:provenanceActions";
 
     public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
@@ -67,13 +73,30 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
                     DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
             final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
 
-            Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
-
-            DedupRecordFactory.createDedupRecord(spark, mergeRelPath, entityPath, clazz)
+            final Class<OafEntity> clazz =
+                    ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
+            final DataInfo dataInfo = getDataInfo(dedupConf);
+            DedupRecordFactory.createDedupRecord(spark, dataInfo, mergeRelPath, entityPath, clazz)
                     .write()
                     .mode(SaveMode.Overwrite)
                     .option("compression", "gzip")
                     .json(outputPath);
         }
+    }
+
+    private static DataInfo getDataInfo(DedupConfig dedupConf) {
+        DataInfo info = new DataInfo();
+        info.setDeletedbyinference(false);
+        info.setInferred(true);
+        info.setInvisible(false);
+        info.setTrust(ROOT_TRUST);
+        info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
+        Qualifier provenance = new Qualifier();
+        provenance.setClassid(PROVENANCE_ACTION_CLASS);
+        provenance.setClassname(PROVENANCE_ACTION_CLASS);
+        provenance.setSchemeid(PROVENANCE_ACTIONS);
+        provenance.setSchemename(PROVENANCE_ACTIONS);
+        info.setProvenanceaction(provenance);
+        return info;
     }
 }
