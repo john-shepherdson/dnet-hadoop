@@ -55,12 +55,12 @@
         <error to="Kill"/>
     </action>
 
-<action name="fork_exec_bulktag">
+<fork name="fork_exec_bulktag">
     <path start="join_bulktag_publication"/>
     <path start="join_bulktag_dataset"/>
     <path start="join_bulktag_otherresearchproduct"/>
     <path start="join_bulktag_software"/>
-</action>
+</fork>
     <action name="join_bulktag_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -84,7 +84,7 @@
             <!--        <arg>&#45;&#45;hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
-            <arg>--proto_map</arg><arg>${protoMap}</arg>
+            <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="wait"/>
@@ -113,7 +113,7 @@
             <!--        <arg>&#45;&#45;hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
-            <arg>--proto_map</arg><arg>${protoMap}</arg>
+            <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="wait"/>
@@ -142,7 +142,7 @@
             <!--        <arg>&#45;&#45;hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
-            <arg>--proto_map</arg><arg>${protoMap}</arg>
+            <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="wait"/>
@@ -171,7 +171,7 @@
             <!--        <arg>&#45;&#45;hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/software</arg>
-            <arg>--proto_map</arg><arg>${protoMap}</arg>
+            <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="wait"/>
