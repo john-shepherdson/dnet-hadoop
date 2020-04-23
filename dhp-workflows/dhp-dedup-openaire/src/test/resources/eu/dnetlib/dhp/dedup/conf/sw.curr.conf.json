@@ -11,7 +11,9 @@
       "maxChildren" : "100",
       "slidingWindowSize" : "200",
       "rootBuilder" : [ "result", "resultProject_outcome_isProducedBy", "resultResult_publicationDataset_isRelatedTo", "resultResult_similarity_isAmongTopNSimilarDocuments", "resultResult_similarity_hasAmongTopNSimilarDocuments", "resultOrganization_affiliation_hasAuthorInstitution", "resultResult_part_hasPart", "resultResult_part_isPartOf", "resultResult_supplement_isSupplementTo", "resultResult_supplement_isSupplementedBy", "resultResult_version_isVersionOf" ],
-      "includeChildren" : "true"
+      "includeChildren" : "true",
+      "idPath" : "$.id",
+      "maxIterations" : 20
     },
     "pace" : {
       "clustering" : [
