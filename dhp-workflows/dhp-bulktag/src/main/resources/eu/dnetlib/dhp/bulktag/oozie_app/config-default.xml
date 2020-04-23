@@ -24,12 +24,20 @@
         <value>http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089</value>
     </property>
     <property>
-        <name>spark2EventLogDir</name>
-        <value>/user/spark/spark2ApplicationHistory</value>
+        <name>spark2ExtraListeners</name>
+        <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
+    </property>
+    <property>
+        <name>spark2SqlQueryExecutionListeners</name>
+        <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
     </property>
     <property>
         <name>sparkExecutorNumber</name>
-        <value>1</value>
+        <value>4</value>
+    </property>
+    <property>
+        <name>spark2EventLogDir</name>
+        <value>/user/spark/spark2ApplicationHistory</value>
     </property>
     <property>
         <name>sparkDriverMemory</name>
