@@ -28,7 +28,7 @@ public class SparkBulkTagJob2 {
         String jsonConfiguration =
                 IOUtils.toString(
                         SparkBulkTagJob2.class.getResourceAsStream(
-                                "/eu/dnetlib/dhp/input_bulktag_parameters.json"));
+                                "/eu/dnetlib/dhp/bulktag/input_bulktag_parameters.json"));
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -74,7 +74,7 @@ public class SparkBulkTagJob2 {
         String taggingConf = parser.get("taggingConf");
 
         if (isTest) {
-            cc = CommunityConfigurationFactory.fromJson(taggingConf);
+            cc = CommunityConfigurationFactory.newInstance(taggingConf);
         } else {
             cc = QueryInformationSystem.getCommunityConfiguration(parser.get("isLookupUrl"));
         }
