@@ -27,11 +27,25 @@
 </kill>
     <action name="reset-outputpath">
         <fs>
-            <delete path='${workingDir}/projecttoresult_propagation/relation'/>
+            <delete path='${workingDir}/orcid_propagation'/>
+            <delete path='${workingDir}/preparedInfo'/>
         </fs>
+        <ok to="copy_relation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_relation">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/relation</arg>
+            <arg>${nameNode}/${workingDir}/orcid_propagation/relation</arg>
+        </distcp>
         <ok to="fork_prepare_assoc_step1"/>
         <error to="Kill"/>
     </action>
+
+
     <fork name="fork_prepare_assoc_step1">
         <path start="join_prepare_publication"/>
         <path start="join_prepare_dataset"/>
@@ -208,7 +222,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcid_propagation/publication</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -235,7 +249,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcid_propagation/dataset</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -262,7 +276,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcid_propagation/otherresearchproduct</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -289,7 +303,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcid_propagation/software</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>

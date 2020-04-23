@@ -22,11 +22,20 @@
 
     <action name="reset-outputpath">
         <fs>
-            <delete path='${workingDir}/resulttoorganization_propagation/relation'/>
+            <delete path='${workingDir}/resulttoorganization_propagation'/>
         </fs>
-        <ok to="copy_relation"/>
+        <ok to="copy_relations"/>
         <error to="Kill"/>
     </action>
+
+    <fork name="copy_relations">
+        <path start="copy_relation"/>
+        <path start="copy_publication"/>
+        <path start="copy_dataset"/>
+        <path start="copy_orp"/>
+        <path start="copy_software"/>
+    </fork>
+
     <action name="copy_relation">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -34,10 +43,53 @@
             <arg>${nameNode}/${sourcePath}/relation</arg>
             <arg>${nameNode}/${workingDir}/resulttoorganization_propagation/relation</arg>
         </distcp>
-        <ok to="prepare_result_organization_association"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
+    <action name="copy_publication">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/publication</arg>
+            <arg>${nameNode}/${workingDir}/resulttoorganization_propagation/publication</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_dataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/dataset</arg>
+            <arg>${nameNode}/${workingDir}/resulttoorganization_propagation/dataset</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_orp">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/otherresearchproduct</arg>
+            <arg>${nameNode}/${workingDir}/resulttoorganization_propagation/otherresearchproduct</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_software">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/software</arg>
+            <arg>${nameNode}/${workingDir}/resulttoorganization_propagation/software</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+    <join name="wait" to="prepare_result_organization_association"/>
     <action name="prepare_result_organization_association">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>

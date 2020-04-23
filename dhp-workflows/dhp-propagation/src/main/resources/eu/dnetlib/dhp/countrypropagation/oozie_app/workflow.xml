@@ -39,12 +39,30 @@
 
     </parameters>
 
-    <start to="prepare_datasource_country_association"/>
+    <start to="reset-outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+    <action name="reset-outputpath">
+        <fs>
+            <delete path='${workingDir}/country_propagation'/>
+            <delete path='${workingDir}/preparedInfo'/>
+        </fs>
+        <ok to="copy_relation"/>
+        <error to="Kill"/>
+    </action>
 
+    <action name="copy_relation">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/relation</arg>
+            <arg>${nameNode}/${workingDir}/country_propagation/relation</arg>
+        </distcp>
+        <ok to="prepare_datasource_country_association"/>
+        <error to="Kill"/>
+    </action>
     <action name="prepare_datasource_country_association">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -65,7 +83,7 @@
             <arg>--whitelist</arg><arg>${whitelist}</arg>
             <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="fork_join_apply_country_propagation"/>
         <error to="Kill"/>
@@ -101,7 +119,7 @@
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -131,7 +149,7 @@
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/country_propagation/dataset</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -161,7 +179,7 @@
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/country_propagation/otherresearchproduct</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -191,7 +209,7 @@
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/country_propagation/software</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country_propagation/preparedInfo</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
