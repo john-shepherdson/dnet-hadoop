@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Author implements Serializable {
 
@@ -86,17 +85,12 @@ public class Author implements Serializable {
 
     public void addPid(StructuredProperty pid) {
 
-        if (pid == null)
-            return;
+        if (pid == null) return;
 
-        if(this.pid == null){
+        if (this.pid == null) {
             this.pid = Arrays.asList(pid);
-        }else{
+        } else {
             this.pid.add(pid);
         }
-
-
     }
-
-
 }
