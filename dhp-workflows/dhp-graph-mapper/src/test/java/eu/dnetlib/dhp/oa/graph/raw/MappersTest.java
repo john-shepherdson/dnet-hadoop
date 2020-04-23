@@ -54,6 +54,7 @@ public class MappersTest {
         assertTrue(p.getSubject().size() > 0);
         assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
         assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
+        assertTrue(p.getInstance().size() > 0);
 
         assertValidId(r1.getSource());
         assertValidId(r1.getTarget());
@@ -96,6 +97,7 @@ public class MappersTest {
         assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
         assertTrue(d.getAuthor().size() > 0);
         assertTrue(d.getSubject().size() > 0);
+        assertTrue(d.getInstance().size() > 0);
 
         assertValidId(r1.getSource());
         assertValidId(r1.getTarget());
@@ -129,6 +131,7 @@ public class MappersTest {
         assertTrue(StringUtils.isNotBlank(s.getTitle().get(0).getValue()));
         assertTrue(s.getAuthor().size() > 0);
         assertTrue(s.getSubject().size() > 0);
+        assertTrue(s.getInstance().size() > 0);
     }
 
     private void assertValidId(final String id) {
