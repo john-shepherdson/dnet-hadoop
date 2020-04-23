@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +20,10 @@ public class Dataset extends Result implements Serializable {
     private Field<String> metadataversionnumber;
 
     private List<GeoLocation> geolocation;
+
+    public Dataset() {
+        setResulttype(ModelConstants.DATASET_DEFAULT_RESULTTYPE);
+    }
 
     public Field<String> getStoragedate() {
         return storagedate;

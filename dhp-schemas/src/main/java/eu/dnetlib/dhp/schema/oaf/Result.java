@@ -231,6 +231,9 @@ public class Result extends OafEntity implements Serializable {
 
         instance = mergeLists(instance, r.getInstance());
 
+        if (r.getBestaccessright() != null && compareTrust(this, r) < 0)
+            bestaccessright = r.getBestaccessright();
+
         if (r.getResulttype() != null && compareTrust(this, r) < 0) resulttype = r.getResulttype();
 
         if (r.getLanguage() != null && compareTrust(this, r) < 0) language = r.getLanguage();

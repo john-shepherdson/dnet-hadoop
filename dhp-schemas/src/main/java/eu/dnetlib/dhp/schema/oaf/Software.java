@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +14,10 @@ public class Software extends Result implements Serializable {
     private Field<String> codeRepositoryUrl;
 
     private Qualifier programmingLanguage;
+
+    public Software() {
+        setResulttype(ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE);
+    }
 
     public List<Field<String>> getDocumentationUrl() {
         return documentationUrl;

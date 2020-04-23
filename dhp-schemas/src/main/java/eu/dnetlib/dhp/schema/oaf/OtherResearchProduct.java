@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -11,6 +12,10 @@ public class OtherResearchProduct extends Result implements Serializable {
     private List<Field<String>> contactgroup;
 
     private List<Field<String>> tool;
+
+    public OtherResearchProduct() {
+        setResulttype(ModelConstants.ORP_DEFAULT_RESULTTYPE);
+    }
 
     public List<Field<String>> getContactperson() {
         return contactperson;

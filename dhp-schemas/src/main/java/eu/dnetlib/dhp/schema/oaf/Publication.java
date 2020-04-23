@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -7,6 +8,10 @@ public class Publication extends Result implements Serializable {
 
     // publication specific
     private Journal journal;
+
+    public Publication() {
+        setResulttype(ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE);
+    }
 
     public Journal getJournal() {
         return journal;
