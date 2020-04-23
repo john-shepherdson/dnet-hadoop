@@ -118,7 +118,9 @@ public class SparkDedupTest implements Serializable {
                                         "/eu/dnetlib/dhp/dedup/conf/ds.curr.conf.json")));
 
         lenient()
-                .when(isLookUpService.getResourceProfileByQuery(Mockito.contains("otherresearchproduct")))
+                .when(
+                        isLookUpService.getResourceProfileByQuery(
+                                Mockito.contains("otherresearchproduct")))
                 .thenReturn(
                         IOUtils.toString(
                                 SparkDedupTest.class.getResourceAsStream(
@@ -164,7 +166,11 @@ public class SparkDedupTest implements Serializable {
 
         long orp_simrel =
                 spark.read()
-                        .load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
+                        .load(
+                                testOutputBasePath
+                                        + "/"
+                                        + testActionSetId
+                                        + "/otherresearchproduct_simrel")
                         .count();
 
         assertEquals(3432, orgs_simrel);
@@ -213,7 +219,11 @@ public class SparkDedupTest implements Serializable {
 
         long orp_mergerel =
                 spark.read()
-                        .load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_mergerel")
+                        .load(
+                                testOutputBasePath
+                                        + "/"
+                                        + testActionSetId
+                                        + "/otherresearchproduct_mergerel")
                         .count();
 
         assertEquals(1276, orgs_mergerel);
@@ -254,7 +264,8 @@ public class SparkDedupTest implements Serializable {
                                 testOutputBasePath
                                         + "/"
                                         + testActionSetId
-                                        + "/publication_deduprecord").count();
+                                        + "/publication_deduprecord")
+                        .count();
         long sw_deduprecord =
                 jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/software_deduprecord")
                         .count();
@@ -262,7 +273,11 @@ public class SparkDedupTest implements Serializable {
                 jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/dataset_deduprecord")
                         .count();
         long orp_deduprecord =
-                jsc.textFile(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_deduprecord")
+                jsc.textFile(
+                                testOutputBasePath
+                                        + "/"
+                                        + testActionSetId
+                                        + "/otherresearchproduct_deduprecord")
                         .count();
 
         assertEquals(82, orgs_deduprecord);
@@ -296,7 +311,8 @@ public class SparkDedupTest implements Serializable {
         long datasource = jsc.textFile(testDedupGraphBasePath + "/datasource").count();
         long softwares = jsc.textFile(testDedupGraphBasePath + "/software").count();
         long dataset = jsc.textFile(testDedupGraphBasePath + "/dataset").count();
-        long otherresearchproduct = jsc.textFile(testDedupGraphBasePath + "/otherresearchproduct").count();
+        long otherresearchproduct =
+                jsc.textFile(testDedupGraphBasePath + "/otherresearchproduct").count();
 
         long mergedOrgs =
                 spark.read()
@@ -340,7 +356,11 @@ public class SparkDedupTest implements Serializable {
 
         long mergedOrp =
                 spark.read()
-                        .load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_mergerel")
+                        .load(
+                                testOutputBasePath
+                                        + "/"
+                                        + testActionSetId
+                                        + "/otherresearchproduct_mergerel")
                         .as(Encoders.bean(Relation.class))
                         .where("relClass=='merges'")
                         .javaRDD()
