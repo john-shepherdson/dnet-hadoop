@@ -25,6 +25,7 @@ public class DedupRecordFactory {
 
     public static <T extends OafEntity> Dataset<T> createDedupRecord(
             final SparkSession spark,
+            final DataInfo dataInfo,
             final String mergeRelsInputPath,
             final String entitiesInputPath,
             final Class<T> clazz) {
@@ -67,41 +68,39 @@ public class DedupRecordFactory {
                         Encoders.STRING())
                 .mapGroups(
                         (MapGroupsFunction<String, Tuple2<String, T>, T>)
-                                (key, values) -> entityMerger(key, values, ts, clazz),
+                                (key, values) -> entityMerger(key, values, ts, dataInfo),
                         Encoders.bean(clazz));
     }
 
     private static <T extends OafEntity> T entityMerger(
-            String id, Iterator<Tuple2<String, T>> entities, long ts, Class<T> clazz) {
-        try {
-            T entity = clazz.newInstance();
-            entity.setId(id);
-            entity.setDataInfo(new DataInfo());
-            entity.getDataInfo().setTrust("0.9");
-            entity.setLastupdatetimestamp(ts);
+            String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo) {
 
-            final Collection<String> dates = Lists.newArrayList();
-            entities.forEachRemaining(
-                    t -> {
-                        T duplicate = t._2();
-                        entity.mergeFrom(duplicate);
-                        if (ModelSupport.isSubClass(duplicate, Result.class)) {
-                            Result r1 = (Result) duplicate;
-                            Result er = (Result) entity;
-                            er.setAuthor(DedupUtility.mergeAuthor(er.getAuthor(), r1.getAuthor()));
+        T entity = entities.next()._2();
 
-                            if (er.getDateofacceptance() != null) {
-                                dates.add(r1.getDateofacceptance().getValue());
-                            }
+        final Collection<String> dates = Lists.newArrayList();
+        entities.forEachRemaining(
+                t -> {
+                    T duplicate = t._2();
+                    entity.mergeFrom(duplicate);
+                    if (ModelSupport.isSubClass(duplicate, Result.class)) {
+                        Result r1 = (Result) duplicate;
+                        Result er = (Result) entity;
+                        er.setAuthor(DedupUtility.mergeAuthor(er.getAuthor(), r1.getAuthor()));
+
+                        if (r1.getDateofacceptance() != null) {
+                            dates.add(r1.getDateofacceptance().getValue());
                         }
-                    });
+                    }
+                });
 
-            if (ModelSupport.isSubClass(entity, Result.class)) {
-                ((Result) entity).setDateofacceptance(DatePicker.pick(dates));
-            }
-            return entity;
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new RuntimeException(e);
+        if (ModelSupport.isSubClass(entity, Result.class)) {
+            ((Result) entity).setDateofacceptance(DatePicker.pick(dates));
         }
+
+        entity.setId(id);
+        entity.setLastupdatetimestamp(ts);
+        entity.setDataInfo(dataInfo);
+
+        return entity;
     }
 }

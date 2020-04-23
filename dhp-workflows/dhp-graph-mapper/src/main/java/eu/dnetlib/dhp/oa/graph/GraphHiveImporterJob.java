@@ -19,6 +19,8 @@ public class GraphHiveImporterJob {
 
     private static final Logger log = LoggerFactory.getLogger(GraphHiveImporterJob.class);
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     public static void main(String[] args) throws Exception {
 
         final ArgumentApplicationParser parser =
@@ -37,11 +39,11 @@ public class GraphHiveImporterJob {
         String inputPath = parser.get("inputPath");
         log.info("inputPath: {}", inputPath);
 
-        String hiveMetastoreUris = parser.get("hiveMetastoreUris");
-        log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
-
         String hiveDbName = parser.get("hiveDbName");
         log.info("hiveDbName: {}", hiveDbName);
+
+        String hiveMetastoreUris = parser.get("hiveMetastoreUris");
+        log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
 
         SparkConf conf = new SparkConf();
         conf.set("hive.metastore.uris", hiveMetastoreUris);
@@ -58,13 +60,13 @@ public class GraphHiveImporterJob {
         spark.sql(String.format("DROP DATABASE IF EXISTS %s CASCADE", hiveDbName));
         spark.sql(String.format("CREATE DATABASE IF NOT EXISTS %s", hiveDbName));
 
-        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+        final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
         // Read the input file and convert it into RDD of serializable object
         ModelSupport.oafTypes.forEach(
                 (name, clazz) ->
                         spark.createDataset(
                                         sc.textFile(inputPath + "/" + name)
-                                                .map(s -> new ObjectMapper().readValue(s, clazz))
+                                                .map(s -> OBJECT_MAPPER.readValue(s, clazz))
                                                 .rdd(),
                                         Encoders.bean(clazz))
                                 .write()

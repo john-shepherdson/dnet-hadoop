@@ -25,7 +25,7 @@ public class ConnectedComponent implements Serializable {
         if (docIds.size() > 1) {
             final String s = getMin();
             String prefix = s.split("\\|")[0];
-            ccId = prefix + "|dedup_______::" + DedupUtility.md5(s);
+            ccId = prefix + "|dedup_wf_001::" + DedupUtility.md5(s);
             return ccId;
         } else {
             return docIds.iterator().next();
