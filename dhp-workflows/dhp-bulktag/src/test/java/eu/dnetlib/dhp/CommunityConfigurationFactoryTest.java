@@ -18,9 +18,6 @@ import org.junit.jupiter.api.Test;
 /** Created by miriam on 03/08/2018. */
 public class CommunityConfigurationFactoryTest {
 
-    private static String xml;
-    private static String xml1;
-
     private final VerbResolver resolver = new VerbResolver();
 
     @Test
