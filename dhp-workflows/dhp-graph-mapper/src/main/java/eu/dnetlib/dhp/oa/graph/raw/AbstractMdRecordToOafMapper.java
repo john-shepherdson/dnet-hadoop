@@ -12,6 +12,7 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProper
 
 import eu.dnetlib.dhp.oa.graph.raw.common.MigrationConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -237,9 +238,23 @@ public abstract class AbstractMdRecordToOafMapper {
         r.setContributor(prepareContributors(doc, info));
         r.setResourcetype(prepareResourceType(doc, info));
         r.setCoverage(prepareCoverages(doc, info));
-        r.setContext(new ArrayList<>()); // NOT PRESENT IN MDSTORES
+        r.setContext(prepareContexts(doc, info));
         r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
         r.setInstance(prepareInstances(doc, info, collectedFrom, hostedBy));
+    }
+
+    private List<Context> prepareContexts(final Document doc, final DataInfo info) {
+        final List<Context> list = new ArrayList<>();
+        for (final Object o : doc.selectNodes("//oaf:concept")) {
+            final String cid = ((Node) o).valueOf("@id");
+            if (StringUtils.isNotBlank(cid)) {
+                final Context c = new Context();
+                c.setId(cid);
+                c.setDataInfo(Arrays.asList(info));
+                list.add(c);
+            }
+        }
+        return list;
     }
 
     protected abstract Qualifier prepareResourceType(Document doc, DataInfo info);
