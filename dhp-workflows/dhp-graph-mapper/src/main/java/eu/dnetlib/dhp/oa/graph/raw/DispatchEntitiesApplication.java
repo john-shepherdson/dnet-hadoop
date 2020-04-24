@@ -2,16 +2,18 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +21,6 @@ import org.slf4j.LoggerFactory;
 public class DispatchEntitiesApplication {
 
     private static final Logger log = LoggerFactory.getLogger(DispatchEntitiesApplication.class);
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static void main(final String[] args) throws Exception {
         final ArgumentApplicationParser parser =
@@ -45,15 +45,9 @@ public class DispatchEntitiesApplication {
                 isSparkSessionManaged,
                 spark -> {
                     removeOutputDir(spark, targetPath);
-
-                    processEntity(spark, Publication.class, sourcePath, targetPath);
-                    processEntity(spark, Dataset.class, sourcePath, targetPath);
-                    processEntity(spark, Software.class, sourcePath, targetPath);
-                    processEntity(spark, OtherResearchProduct.class, sourcePath, targetPath);
-                    processEntity(spark, Datasource.class, sourcePath, targetPath);
-                    processEntity(spark, Organization.class, sourcePath, targetPath);
-                    processEntity(spark, Project.class, sourcePath, targetPath);
-                    processEntity(spark, Relation.class, sourcePath, targetPath);
+                    ModelSupport.oafTypes
+                            .values()
+                            .forEach(clazz -> processEntity(spark, clazz, sourcePath, targetPath));
                 });
     }
 
@@ -64,26 +58,18 @@ public class DispatchEntitiesApplication {
             final String targetPath) {
         final String type = clazz.getSimpleName().toLowerCase();
 
-        log.info(String.format("Processing entities (%s) in file: %s", type, sourcePath));
+        log.info("Processing entities ({}) in file: {}", type, sourcePath);
 
-        /*
         spark.read()
-        		.textFile(sourcePath)
-        		.filter((FilterFunction<String>) value -> isEntityType(value, type))
-        		.map((MapFunction<String, String>) value -> StringUtils.substringAfter(value, "|"), Encoders.STRING())
-        		.map((MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz))
-        		.write()
-        		.mode(SaveMode.Overwrite)
-        		.parquet(targetPath + "/" + type);
-
-         */
-
-        JavaSparkContext.fromSparkContext(spark.sparkContext())
                 .textFile(sourcePath)
-                .filter(l -> isEntityType(l, type))
-                .map(l -> StringUtils.substringAfter(l, "|"))
-                .saveAsTextFile(
-                        targetPath + "/" + type, GzipCodec.class); // use repartition(XXX) ???
+                .filter((FilterFunction<String>) value -> isEntityType(value, type))
+                .map(
+                        (MapFunction<String, String>) l -> StringUtils.substringAfter(l, "|"),
+                        Encoders.STRING())
+                .write()
+                .option("compression", "gzip")
+                .mode(SaveMode.Overwrite)
+                .text(targetPath + "/" + type);
     }
 
     private static boolean isEntityType(final String line, final String type) {
