@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.schema.common;
 import com.google.common.collect.Maps;
 import eu.dnetlib.dhp.schema.oaf.*;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 /** Oaf model utility methods. */
 public class ModelSupport {
@@ -145,5 +147,67 @@ public class ModelSupport {
                 schemeTemplate,
                 entityMapping.get(EntityType.valueOf(sourceType)).name(),
                 entityMapping.get(EntityType.valueOf(targetType)).name());
+    }
+
+    public static <T extends Oaf> Function<T, String> idFn() {
+        return x -> {
+            if (isSubClass(x, Relation.class)) {
+                return idFnForRelation(x);
+            }
+            return idFnForOafEntity(x);
+        };
+    }
+
+    private static <T extends Oaf> String idFnForRelation(T t) {
+        Relation r = (Relation) t;
+        return Optional.ofNullable(r.getSource())
+                .map(
+                        source ->
+                                Optional.ofNullable(r.getTarget())
+                                        .map(
+                                                target ->
+                                                        Optional.ofNullable(r.getRelType())
+                                                                .map(
+                                                                        relType ->
+                                                                                Optional.ofNullable(
+                                                                                                r
+                                                                                                        .getSubRelType())
+                                                                                        .map(
+                                                                                                subRelType ->
+                                                                                                        Optional
+                                                                                                                .ofNullable(
+                                                                                                                        r
+                                                                                                                                .getRelClass())
+                                                                                                                .map(
+                                                                                                                        relClass ->
+                                                                                                                                String
+                                                                                                                                        .join(
+                                                                                                                                                source,
+                                                                                                                                                target,
+                                                                                                                                                relType,
+                                                                                                                                                subRelType,
+                                                                                                                                                relClass))
+                                                                                                                .orElse(
+                                                                                                                        String
+                                                                                                                                .join(
+                                                                                                                                        source,
+                                                                                                                                        target,
+                                                                                                                                        relType,
+                                                                                                                                        subRelType)))
+                                                                                        .orElse(
+                                                                                                String
+                                                                                                        .join(
+                                                                                                                source,
+                                                                                                                target,
+                                                                                                                relType)))
+                                                                .orElse(
+                                                                        String.join(
+                                                                                source, target)))
+                                        .orElse(source))
+                .orElse(null);
+    }
+
+    private static <T extends Oaf> String idFnForOafEntity(T t) {
+        return ((OafEntity) t).getId();
     }
 }

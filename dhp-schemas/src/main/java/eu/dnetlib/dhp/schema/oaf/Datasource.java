@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public class Datasource extends OafEntity implements Serializable {
 
@@ -511,89 +510,5 @@ public class Datasource extends OafEntity implements Serializable {
         journal = d.getJournal() != null && compareTrust(this, e) < 0 ? d.getJournal() : journal;
 
         mergeOAFDataInfo(e);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Datasource that = (Datasource) o;
-        return Objects.equals(datasourcetype, that.datasourcetype)
-                && Objects.equals(openairecompatibility, that.openairecompatibility)
-                && Objects.equals(officialname, that.officialname)
-                && Objects.equals(englishname, that.englishname)
-                && Objects.equals(websiteurl, that.websiteurl)
-                && Objects.equals(logourl, that.logourl)
-                && Objects.equals(contactemail, that.contactemail)
-                && Objects.equals(namespaceprefix, that.namespaceprefix)
-                && Objects.equals(latitude, that.latitude)
-                && Objects.equals(longitude, that.longitude)
-                && Objects.equals(dateofvalidation, that.dateofvalidation)
-                && Objects.equals(description, that.description)
-                && Objects.equals(subjects, that.subjects)
-                && Objects.equals(odnumberofitems, that.odnumberofitems)
-                && Objects.equals(odnumberofitemsdate, that.odnumberofitemsdate)
-                && Objects.equals(odpolicies, that.odpolicies)
-                && Objects.equals(odlanguages, that.odlanguages)
-                && Objects.equals(odcontenttypes, that.odcontenttypes)
-                && Objects.equals(accessinfopackage, that.accessinfopackage)
-                && Objects.equals(releasestartdate, that.releasestartdate)
-                && Objects.equals(releaseenddate, that.releaseenddate)
-                && Objects.equals(missionstatementurl, that.missionstatementurl)
-                && Objects.equals(dataprovider, that.dataprovider)
-                && Objects.equals(serviceprovider, that.serviceprovider)
-                && Objects.equals(databaseaccesstype, that.databaseaccesstype)
-                && Objects.equals(datauploadtype, that.datauploadtype)
-                && Objects.equals(databaseaccessrestriction, that.databaseaccessrestriction)
-                && Objects.equals(datauploadrestriction, that.datauploadrestriction)
-                && Objects.equals(versioning, that.versioning)
-                && Objects.equals(citationguidelineurl, that.citationguidelineurl)
-                && Objects.equals(qualitymanagementkind, that.qualitymanagementkind)
-                && Objects.equals(pidsystems, that.pidsystems)
-                && Objects.equals(certificates, that.certificates)
-                && Objects.equals(policies, that.policies)
-                && Objects.equals(journal, that.journal);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                super.hashCode(),
-                datasourcetype,
-                openairecompatibility,
-                officialname,
-                englishname,
-                websiteurl,
-                logourl,
-                contactemail,
-                namespaceprefix,
-                latitude,
-                longitude,
-                dateofvalidation,
-                description,
-                subjects,
-                odnumberofitems,
-                odnumberofitemsdate,
-                odpolicies,
-                odlanguages,
-                odcontenttypes,
-                accessinfopackage,
-                releasestartdate,
-                releaseenddate,
-                missionstatementurl,
-                dataprovider,
-                serviceprovider,
-                databaseaccesstype,
-                datauploadtype,
-                databaseaccessrestriction,
-                datauploadrestriction,
-                versioning,
-                citationguidelineurl,
-                qualitymanagementkind,
-                pidsystems,
-                certificates,
-                policies,
-                journal);
     }
 }

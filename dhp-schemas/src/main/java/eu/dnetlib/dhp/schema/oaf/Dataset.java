@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.schema.oaf;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public class Dataset extends Result implements Serializable {
 
@@ -115,33 +114,5 @@ public class Dataset extends Result implements Serializable {
         geolocation = mergeLists(geolocation, d.getGeolocation());
 
         mergeOAFDataInfo(d);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Dataset dataset = (Dataset) o;
-        return Objects.equals(storagedate, dataset.storagedate)
-                && Objects.equals(device, dataset.device)
-                && Objects.equals(size, dataset.size)
-                && Objects.equals(version, dataset.version)
-                && Objects.equals(lastmetadataupdate, dataset.lastmetadataupdate)
-                && Objects.equals(metadataversionnumber, dataset.metadataversionnumber)
-                && Objects.equals(geolocation, dataset.geolocation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                super.hashCode(),
-                storagedate,
-                device,
-                size,
-                version,
-                lastmetadataupdate,
-                metadataversionnumber,
-                geolocation);
     }
 }

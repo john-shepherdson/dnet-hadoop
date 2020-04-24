@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.raw.common.DbClient;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -28,6 +29,8 @@ import scala.Tuple2;
 public class GenerateEntitiesApplication {
 
     private static final Logger log = LoggerFactory.getLogger(GenerateEntitiesApplication.class);
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static void main(final String[] args) throws Exception {
         final ArgumentApplicationParser parser =
@@ -78,7 +81,7 @@ public class GenerateEntitiesApplication {
         log.info("Generate entities from files:");
         existingSourcePaths.forEach(log::info);
 
-        JavaRDD<String> inputRdd = sc.emptyRDD();
+        JavaRDD<Oaf> inputRdd = sc.emptyRDD();
 
         for (final String sp : existingSourcePaths) {
             inputRdd =
@@ -86,15 +89,29 @@ public class GenerateEntitiesApplication {
                             sc.sequenceFile(sp, Text.class, Text.class)
                                     .map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
                                     .map(k -> convertToListOaf(k._1(), k._2(), code2name))
-                                    .flatMap(list -> list.iterator())
-                                    .map(
-                                            oaf ->
-                                                    oaf.getClass().getSimpleName().toLowerCase()
-                                                            + "|"
-                                                            + convertToJson(oaf)));
+                                    .flatMap(list -> list.iterator()));
         }
 
-        inputRdd.saveAsTextFile(targetPath, GzipCodec.class);
+        inputRdd.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
+                .reduceByKey((o1, o2) -> merge(o1, o2))
+                .map(Tuple2::_2)
+                .map(
+                        oaf ->
+                                oaf.getClass().getSimpleName().toLowerCase()
+                                        + "|"
+                                        + OBJECT_MAPPER.writeValueAsString(oaf))
+                .saveAsTextFile(targetPath, GzipCodec.class);
+    }
+
+    private static Oaf merge(Oaf o1, Oaf o2) {
+        if (ModelSupport.isSubClass(o1, OafEntity.class)) {
+            ((OafEntity) o1).mergeFrom((OafEntity) o2);
+        } else if (ModelSupport.isSubClass(o1, Relation.class)) {
+            ((Relation) o1).mergeFrom((Relation) o2);
+        } else {
+            throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
+        }
+        return o1;
     }
 
     private static List<Oaf> convertToListOaf(
@@ -120,9 +137,10 @@ public class GenerateEntitiesApplication {
                 return Arrays.asList(convertFromJson(s, Dataset.class));
             case "software":
                 return Arrays.asList(convertFromJson(s, Software.class));
-            case "otherresearchproducts":
-            default:
+            case "otherresearchproduct":
                 return Arrays.asList(convertFromJson(s, OtherResearchProduct.class));
+            default:
+                throw new RuntimeException("type not managed: " + type.toLowerCase());
         }
     }
 
@@ -150,17 +168,9 @@ public class GenerateEntitiesApplication {
         return map;
     }
 
-    private static String convertToJson(final Oaf oaf) {
-        try {
-            return new ObjectMapper().writeValueAsString(oaf);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static Oaf convertFromJson(final String s, final Class<? extends Oaf> clazz) {
         try {
-            return new ObjectMapper().readValue(s, clazz);
+            return OBJECT_MAPPER.readValue(s, clazz);
         } catch (final Exception e) {
             log.error("Error parsing object of class: " + clazz);
             log.error(s);
