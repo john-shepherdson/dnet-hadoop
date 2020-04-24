@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.oa.graph;
 
+import eu.dnetlib.dhp.oa.graph.hive.GraphHiveImporterJob;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import java.io.IOException;
 import java.nio.file.Files;

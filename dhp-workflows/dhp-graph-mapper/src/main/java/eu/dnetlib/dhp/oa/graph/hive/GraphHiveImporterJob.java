@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.oa.graph;
+package eu.dnetlib.dhp.oa.graph.hive;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
