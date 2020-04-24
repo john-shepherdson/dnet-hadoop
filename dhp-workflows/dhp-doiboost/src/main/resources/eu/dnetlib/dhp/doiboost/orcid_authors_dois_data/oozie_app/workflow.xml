@@ -1,0 +1,39 @@
+<workflow-app name="Generate Orcid Authors DOIs Data" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>workingPath_activities</name>
+            <description>the working dir base path</description>
+        </property>
+    </parameters>
+    
+    <start to="ResetWorkingPath"/>
+    
+    
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    
+    <action name="ResetWorkingPath">
+        <fs>
+            <delete path='${workingPath_activities}/output'/>
+            <mkdir path='${workingPath_activities}/output'/>
+        </fs>
+        <ok to="GenerateOrcidAuthorsDOIsData"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="GenerateOrcidAuthorsDOIsData">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcid.OrcidAuthorsDOIsDataGen</main-class>
+            <arg>-d</arg><arg>${workingPath_activities}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_0.tar.gz</arg>
+            <arg>-o</arg><arg>output/</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>

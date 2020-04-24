@@ -10,6 +10,7 @@ import com.ximpleware.VTDNav;
 import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
 import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.doiboost.orcid.model.WorkData;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,9 +27,13 @@ public class XMLRecordParser {
     private static final String NS_RECORD_URL = "http://www.orcid.org/ns/record";
     private static final String NS_RECORD = "record";
     private static final String NS_ERROR_URL = "http://www.orcid.org/ns/error";
+
+    private static final String NS_WORK = "work";
+    private static final String NS_WORK_URL = "http://www.orcid.org/ns/work";
+
     private static final String NS_ERROR = "error";
 
-    public static AuthorData VTDParse(byte[] bytes)
+    public static AuthorData VTDParseAuthorData(byte[] bytes)
             throws VtdException, EncodingException, EOFException, EntityException, ParseException {
         final VTDGen vg = new VTDGen();
         vg.setDoc(bytes);
@@ -77,5 +82,45 @@ public class XMLRecordParser {
             authorData.setCreditName(creditNames.get(0));
         }
         return authorData;
+    }
+
+    public static WorkData VTDParseWorkData(byte[] bytes)
+            throws VtdException, EncodingException, EOFException, EntityException, ParseException {
+        final VTDGen vg = new VTDGen();
+        vg.setDoc(bytes);
+        vg.parse(true);
+        final VTDNav vn = vg.getNav();
+        final AutoPilot ap = new AutoPilot(vn);
+        ap.declareXPathNameSpace(NS_COMMON, NS_COMMON_URL);
+        ap.declareXPathNameSpace(NS_WORK, NS_WORK_URL);
+        ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
+
+        WorkData workData = new WorkData();
+        final List<String> errors = VtdUtilityParser.getTextValue(ap, vn, "//error:response-code");
+        if (!errors.isEmpty()) {
+            workData.setErrorCode(errors.get(0));
+            return workData;
+        }
+
+        List<VtdUtilityParser.Node> workNodes =
+                VtdUtilityParser.getTextValuesWithAttributes(
+                        ap, vn, "//work:work", Arrays.asList("path"));
+        if (!workNodes.isEmpty()) {
+            final String oid = (workNodes.get(0).getAttributes().get("path")).split("/")[1];
+            workData.setOid(oid);
+        } else {
+            return null;
+        }
+
+        final List<String> dois =
+                VtdUtilityParser.getTextValue(
+                        ap,
+                        vn,
+                        "//common:external-id-type[text()=\"doi\"]/../common:external-id-value");
+        if (!dois.isEmpty()) {
+            workData.setDoi(dois.get(0));
+            workData.setDoiFound(true);
+        }
+        return workData;
     }
 }

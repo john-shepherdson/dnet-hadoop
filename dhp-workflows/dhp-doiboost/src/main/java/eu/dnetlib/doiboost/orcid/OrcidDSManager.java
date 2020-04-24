@@ -11,8 +11,8 @@ import org.mortbay.log.Log;
 
 public class OrcidDSManager {
 
-    private String hdfsServerUri;
-    private String hdfsOrcidDefaultPath;
+    protected String hdfsServerUri;
+    protected String hdfsOrcidDefaultPath;
     private String summariesFileNameTarGz;
     private String outputAuthorsPath;
 
@@ -35,7 +35,7 @@ public class OrcidDSManager {
         SummariesDecompressor.parseGzSummaries(conf, tarGzUri, outputPath);
     }
 
-    private Configuration initConfigurationObject() {
+    protected Configuration initConfigurationObject() {
         // ====== Init HDFS File System Object
         Configuration conf = new Configuration();
         // Set FileSystem URI
@@ -46,7 +46,7 @@ public class OrcidDSManager {
         return conf;
     }
 
-    private FileSystem initFileSystemObject(Configuration conf) {
+    protected FileSystem initFileSystemObject(Configuration conf) {
         // Get the filesystem - HDFS
         FileSystem fs = null;
         try {
