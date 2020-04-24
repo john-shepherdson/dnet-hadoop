@@ -18,11 +18,16 @@
             <delete path='${workingPath_activities}/output'/>
             <mkdir path='${workingPath_activities}/output'/>
         </fs>
-        <ok to="GenerateOrcidAuthorsDOIsData"/>
+        <ok to="fork_generate_orcid_authors_dois"/>
         <error to="Kill"/>
     </action>
     
-    <action name="GenerateOrcidAuthorsDOIsData">
+    <fork name = "fork_generate_orcid_authors_dois">
+      <path start = "Generate_Orcid_Authors_DOIs_0"/>
+      <path start = "Generate_Orcid_Authors_DOIs_1"/>
+   	</fork>
+   	
+    <action name="Generate_Orcid_Authors_DOIs_0">
         <java>
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
@@ -30,10 +35,27 @@
             <arg>-d</arg><arg>${workingPath_activities}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_0.tar.gz</arg>
-            <arg>-o</arg><arg>output/</arg>
+            <arg>-o</arg><arg>output/authors_dois_0.seq</arg>
         </java>
-        <ok to="End"/>
+        <ok to="join_node"/>
         <error to="Kill"/>
     </action>
-    <end name="End"/>
+    
+     <action name="Generate_Orcid_Authors_DOIs_1">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcid.OrcidAuthorsDOIsDataGen</main-class>
+            <arg>-d</arg><arg>${workingPath_activities}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_1.tar.gz</arg>
+            <arg>-o</arg><arg>output/authors_dois_1.seq</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+   <join name = "join_node" to = "End"/>
+    
+   <end name="End"/>
 </workflow-app>

@@ -25,11 +25,7 @@ public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
         String tarGzUri =
                 hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(activitiesFileNameTarGz);
         Path outputPath =
-                new Path(
-                        hdfsServerUri
-                                .concat(hdfsOrcidDefaultPath)
-                                .concat(outputAuthorsDOIsPath)
-                                .concat("authors_dois.seq"));
+                new Path(hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(outputAuthorsDOIsPath));
         ActivitiesDecompressor.parseGzActivities(conf, tarGzUri, outputPath);
     }
 
