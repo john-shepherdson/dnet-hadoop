@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp;
+package eu.dnetlib.dhp.bulktag;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -28,7 +28,7 @@ public class SparkBulkTagJob2 {
         String jsonConfiguration =
                 IOUtils.toString(
                         SparkBulkTagJob2.class.getResourceAsStream(
-                                "/eu/dnetlib/dhp/bulktag/input_bulktag_parameters.json"));
+                                "/eu/dnetlib/dhp/bulktag/input_bulkTag_parameters.json"));
 
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 

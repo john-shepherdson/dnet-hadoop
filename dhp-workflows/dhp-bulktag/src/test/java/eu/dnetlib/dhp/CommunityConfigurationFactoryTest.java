@@ -141,4 +141,15 @@ public class CommunityConfigurationFactoryTest {
 
         System.out.println(cc.toJson());
     }
+
+    @Test
+    public void temporaneo() throws Exception {
+        String xml =
+                IOUtils.toString(
+                        getClass()
+                                .getResourceAsStream(
+                                        "/eu/dnetlib/dhp/communityconfiguration/tagging_conf.xml"));
+        final CommunityConfiguration cc = CommunityConfigurationFactory.newInstance(xml);
+        System.out.println(cc.toJson());
+    }
 }

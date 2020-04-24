@@ -67,8 +67,8 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>bulkTagging</name>
-            <class>eu.dnetlib.dhp.SparkBulkTagJob2</class>
+            <name>bulkTagging-publication</name>
+            <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob2</class>
             <jar>dhp-bulktag-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
@@ -96,8 +96,8 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>bulkTagging</name>
-            <class>eu.dnetlib.dhp.SparkBulkTagJob2</class>
+            <name>bulkTagging-dataset</name>
+            <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob2</class>
             <jar>dhp-bulktag-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
@@ -125,8 +125,8 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>bulkTagging</name>
-            <class>eu.dnetlib.dhp.SparkBulkTagJob2</class>
+            <name>bulkTagging-orp</name>
+            <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob2</class>
             <jar>dhp-bulktag-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
@@ -154,8 +154,8 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>bulkTagging</name>
-            <class>eu.dnetlib.dhp.SparkBulkTagJob2</class>
+            <name>bulkTagging-software</name>
+            <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob2</class>
             <jar>dhp-bulktag-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}

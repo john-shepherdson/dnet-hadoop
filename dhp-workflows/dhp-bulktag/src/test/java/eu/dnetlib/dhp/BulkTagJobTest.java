@@ -3,6 +3,7 @@ package eu.dnetlib.dhp;
 import static eu.dnetlib.dhp.community.TagginConstants.ZENODO_COMMUNITY_INDICATOR;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.bulktag.SparkBulkTagJob2;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Publication;
