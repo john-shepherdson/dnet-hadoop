@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -10,7 +9,6 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -83,7 +81,9 @@ public class MergeClaimsApplication {
                 readFromPath(spark, rawPath, clazz)
                         .map(
                                 (MapFunction<T, Tuple2<String, T>>)
-                                        value -> new Tuple2<>(idFn().apply(value), value),
+                                        value ->
+                                                new Tuple2<>(
+                                                        ModelSupport.idFn().apply(value), value),
                                 Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
 
         final JavaSparkContext jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -92,13 +92,10 @@ public class MergeClaimsApplication {
                         .getValue()
                         .map(
                                 (MapFunction<T, Tuple2<String, T>>)
-                                        value -> new Tuple2<>(idFn().apply(value), value),
+                                        value ->
+                                                new Tuple2<>(
+                                                        ModelSupport.idFn().apply(value), value),
                                 Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
-
-        /*
-        Dataset<Tuple2<String, T>> claim = readFromPath(spark, claimPath, clazz)
-        		.map((MapFunction<T, Tuple2<String, T>>) value -> new Tuple2<>(idFn().apply(value), value), Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
-        */
 
         raw.joinWith(claim, raw.col("_1").equalTo(claim.col("_1")), "full_outer")
                 .map(
@@ -131,78 +128,12 @@ public class MergeClaimsApplication {
                 .map(
                         (MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, clazz),
                         Encoders.bean(clazz))
-                .filter((FilterFunction<T>) value -> Objects.nonNull(idFn().apply(value)));
-        /*
-        return spark.read()
-        		.load(path)
-        		.as(Encoders.bean(clazz))
-        		.filter((FilterFunction<T>) value -> Objects.nonNull(idFn().apply(value)));
-         */
+                .filter(
+                        (FilterFunction<T>)
+                                value -> Objects.nonNull(ModelSupport.idFn().apply(value)));
     }
 
     private static void removeOutputDir(SparkSession spark, String path) {
         HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-    }
-
-    private static <T extends Oaf> Function<T, String> idFn() {
-        return x -> {
-            if (isSubClass(x, Relation.class)) {
-                return idFnForRelation(x);
-            }
-            return idFnForOafEntity(x);
-        };
-    }
-
-    private static <T extends Oaf> String idFnForRelation(T t) {
-        Relation r = (Relation) t;
-        return Optional.ofNullable(r.getSource())
-                .map(
-                        source ->
-                                Optional.ofNullable(r.getTarget())
-                                        .map(
-                                                target ->
-                                                        Optional.ofNullable(r.getRelType())
-                                                                .map(
-                                                                        relType ->
-                                                                                Optional.ofNullable(
-                                                                                                r
-                                                                                                        .getSubRelType())
-                                                                                        .map(
-                                                                                                subRelType ->
-                                                                                                        Optional
-                                                                                                                .ofNullable(
-                                                                                                                        r
-                                                                                                                                .getRelClass())
-                                                                                                                .map(
-                                                                                                                        relClass ->
-                                                                                                                                String
-                                                                                                                                        .join(
-                                                                                                                                                source,
-                                                                                                                                                target,
-                                                                                                                                                relType,
-                                                                                                                                                subRelType,
-                                                                                                                                                relClass))
-                                                                                                                .orElse(
-                                                                                                                        String
-                                                                                                                                .join(
-                                                                                                                                        source,
-                                                                                                                                        target,
-                                                                                                                                        relType,
-                                                                                                                                        subRelType)))
-                                                                                        .orElse(
-                                                                                                String
-                                                                                                        .join(
-                                                                                                                source,
-                                                                                                                target,
-                                                                                                                relType)))
-                                                                .orElse(
-                                                                        String.join(
-                                                                                source, target)))
-                                        .orElse(source))
-                .orElse(null);
-    }
-
-    private static <T extends Oaf> String idFnForOafEntity(T t) {
-        return ((OafEntity) t).getId();
     }
 }

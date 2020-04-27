@@ -166,10 +166,8 @@ public class PromoteActionPayloadForGraphTableJob {
                 actionPayloadClazz.getSimpleName(),
                 rowClazz.getSimpleName());
 
-        SerializableSupplier<Function<G, String>> rowIdFn =
-                PromoteActionPayloadForGraphTableJob::idFn;
-        SerializableSupplier<Function<A, String>> actionPayloadIdFn =
-                PromoteActionPayloadForGraphTableJob::idFn;
+        SerializableSupplier<Function<G, String>> rowIdFn = ModelSupport::idFn;
+        SerializableSupplier<Function<A, String>> actionPayloadIdFn = ModelSupport::idFn;
         SerializableSupplier<BiFunction<G, A, G>> mergeRowWithActionPayloadAndGetFn =
                 MergeAndGet.functionFor(strategy);
         SerializableSupplier<BiFunction<G, G, G>> mergeRowsAndGetFn =
@@ -190,68 +188,6 @@ public class PromoteActionPayloadForGraphTableJob {
 
         return PromoteActionPayloadFunctions.groupGraphTableByIdAndMerge(
                 joinedAndMerged, rowIdFn, mergeRowsAndGetFn, zeroFn, isNotZeroFn, rowClazz);
-    }
-
-    private static <T extends Oaf> Function<T, String> idFn() {
-        return x -> {
-            if (isSubClass(x, Relation.class)) {
-                return idFnForRelation(x);
-            }
-            return idFnForOafEntity(x);
-        };
-    }
-
-    private static <T extends Oaf> String idFnForRelation(T t) {
-        Relation r = (Relation) t;
-        return Optional.ofNullable(r.getSource())
-                .map(
-                        source ->
-                                Optional.ofNullable(r.getTarget())
-                                        .map(
-                                                target ->
-                                                        Optional.ofNullable(r.getRelType())
-                                                                .map(
-                                                                        relType ->
-                                                                                Optional.ofNullable(
-                                                                                                r
-                                                                                                        .getSubRelType())
-                                                                                        .map(
-                                                                                                subRelType ->
-                                                                                                        Optional
-                                                                                                                .ofNullable(
-                                                                                                                        r
-                                                                                                                                .getRelClass())
-                                                                                                                .map(
-                                                                                                                        relClass ->
-                                                                                                                                String
-                                                                                                                                        .join(
-                                                                                                                                                source,
-                                                                                                                                                target,
-                                                                                                                                                relType,
-                                                                                                                                                subRelType,
-                                                                                                                                                relClass))
-                                                                                                                .orElse(
-                                                                                                                        String
-                                                                                                                                .join(
-                                                                                                                                        source,
-                                                                                                                                        target,
-                                                                                                                                        relType,
-                                                                                                                                        subRelType)))
-                                                                                        .orElse(
-                                                                                                String
-                                                                                                        .join(
-                                                                                                                source,
-                                                                                                                target,
-                                                                                                                relType)))
-                                                                .orElse(
-                                                                        String.join(
-                                                                                source, target)))
-                                        .orElse(source))
-                .orElse(null);
-    }
-
-    private static <T extends Oaf> String idFnForOafEntity(T t) {
-        return ((OafEntity) t).getId();
     }
 
     private static <T extends Oaf> SerializableSupplier<T> zeroFn(Class<T> clazz) {

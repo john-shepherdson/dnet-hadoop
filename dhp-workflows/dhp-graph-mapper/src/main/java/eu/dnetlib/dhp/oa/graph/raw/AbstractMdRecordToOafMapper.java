@@ -10,7 +10,9 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.oaiIProvenance;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 
+import eu.dnetlib.dhp.oa.graph.raw.common.MigrationConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -45,25 +47,6 @@ public abstract class AbstractMdRecordToOafMapper {
 
     protected static final Qualifier MAIN_TITLE_QUALIFIER =
             qualifier("main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
-
-    protected static final Qualifier PUBLICATION_RESULTTYPE_QUALIFIER =
-            qualifier(
-                    "publication",
-                    "publication",
-                    "dnet:result_typologies",
-                    "dnet:result_typologies");
-    protected static final Qualifier DATASET_RESULTTYPE_QUALIFIER =
-            qualifier("dataset", "dataset", "dnet:result_typologies", "dnet:result_typologies");
-    protected static final Qualifier SOFTWARE_RESULTTYPE_QUALIFIER =
-            qualifier("software", "software", "dnet:result_typologies", "dnet:result_typologies");
-    protected static final Qualifier OTHER_RESULTTYPE_QUALIFIER =
-            qualifier("other", "other", "dnet:result_typologies", "dnet:result_typologies");
-    protected static final Qualifier REPOSITORY_QUALIFIER =
-            qualifier(
-                    "sysimport:crosswalk:repository",
-                    "sysimport:crosswalk:repository",
-                    "dnet:provenanceActions",
-                    "dnet:provenanceActions");
 
     protected AbstractMdRecordToOafMapper(final Map<String, String> code2name) {
         this.code2name = code2name;
@@ -123,14 +106,14 @@ public abstract class AbstractMdRecordToOafMapper {
             case "publication":
                 final Publication p = new Publication();
                 populateResultFields(p, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-                p.setResulttype(PUBLICATION_RESULTTYPE_QUALIFIER);
+                p.setResulttype(MigrationConstants.PUBLICATION_RESULTTYPE_QUALIFIER);
                 p.setJournal(prepareJournal(doc, info));
                 oafs.add(p);
                 break;
             case "dataset":
                 final Dataset d = new Dataset();
                 populateResultFields(d, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-                d.setResulttype(DATASET_RESULTTYPE_QUALIFIER);
+                d.setResulttype(MigrationConstants.DATASET_RESULTTYPE_QUALIFIER);
                 d.setStoragedate(prepareDatasetStorageDate(doc, info));
                 d.setDevice(prepareDatasetDevice(doc, info));
                 d.setSize(prepareDatasetSize(doc, info));
@@ -143,7 +126,7 @@ public abstract class AbstractMdRecordToOafMapper {
             case "software":
                 final Software s = new Software();
                 populateResultFields(s, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-                s.setResulttype(SOFTWARE_RESULTTYPE_QUALIFIER);
+                s.setResulttype(MigrationConstants.SOFTWARE_RESULTTYPE_QUALIFIER);
                 s.setDocumentationUrl(prepareSoftwareDocumentationUrls(doc, info));
                 s.setLicense(prepareSoftwareLicenses(doc, info));
                 s.setCodeRepositoryUrl(prepareSoftwareCodeRepositoryUrl(doc, info));
@@ -154,7 +137,7 @@ public abstract class AbstractMdRecordToOafMapper {
             default:
                 final OtherResearchProduct o = new OtherResearchProduct();
                 populateResultFields(o, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-                o.setResulttype(OTHER_RESULTTYPE_QUALIFIER);
+                o.setResulttype(MigrationConstants.OTHER_RESULTTYPE_QUALIFIER);
                 o.setContactperson(prepareOtherResearchProductContactPersons(doc, info));
                 o.setContactgroup(prepareOtherResearchProductContactGroups(doc, info));
                 o.setTool(prepareOtherResearchProductTools(doc, info));
@@ -255,9 +238,23 @@ public abstract class AbstractMdRecordToOafMapper {
         r.setContributor(prepareContributors(doc, info));
         r.setResourcetype(prepareResourceType(doc, info));
         r.setCoverage(prepareCoverages(doc, info));
-        r.setContext(new ArrayList<>()); // NOT PRESENT IN MDSTORES
+        r.setContext(prepareContexts(doc, info));
         r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
         r.setInstance(prepareInstances(doc, info, collectedFrom, hostedBy));
+    }
+
+    private List<Context> prepareContexts(final Document doc, final DataInfo info) {
+        final List<Context> list = new ArrayList<>();
+        for (final Object o : doc.selectNodes("//oaf:concept")) {
+            final String cid = ((Node) o).valueOf("@id");
+            if (StringUtils.isNotBlank(cid)) {
+                final Context c = new Context();
+                c.setId(cid);
+                c.setDataInfo(Arrays.asList(info));
+                list.add(c);
+            }
+        }
+        return list;
     }
 
     protected abstract Qualifier prepareResourceType(Document doc, DataInfo info);
@@ -433,7 +430,13 @@ public abstract class AbstractMdRecordToOafMapper {
         final Node n = doc.selectSingleNode("//oaf:datainfo");
 
         if (n == null) {
-            return dataInfo(false, null, false, false, REPOSITORY_QUALIFIER, "0.9");
+            return dataInfo(
+                    false,
+                    null,
+                    false,
+                    false,
+                    MigrationConstants.REPOSITORY_PROVENANCE_ACTIONS,
+                    "0.9");
         }
 
         final String paClassId = n.valueOf("./oaf:provenanceaction/@classid");

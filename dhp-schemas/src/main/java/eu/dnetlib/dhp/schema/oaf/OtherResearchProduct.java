@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public class OtherResearchProduct extends Result implements Serializable {
 
@@ -11,6 +11,10 @@ public class OtherResearchProduct extends Result implements Serializable {
     private List<Field<String>> contactgroup;
 
     private List<Field<String>> tool;
+
+    public OtherResearchProduct() {
+        setResulttype(ModelConstants.ORP_DEFAULT_RESULTTYPE);
+    }
 
     public List<Field<String>> getContactperson() {
         return contactperson;
@@ -50,21 +54,5 @@ public class OtherResearchProduct extends Result implements Serializable {
         contactgroup = mergeLists(contactgroup, o.getContactgroup());
         tool = mergeLists(tool, o.getTool());
         mergeOAFDataInfo(e);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        OtherResearchProduct that = (OtherResearchProduct) o;
-        return Objects.equals(contactperson, that.contactperson)
-                && Objects.equals(contactgroup, that.contactgroup)
-                && Objects.equals(tool, that.tool);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), contactperson, contactgroup, tool);
     }
 }

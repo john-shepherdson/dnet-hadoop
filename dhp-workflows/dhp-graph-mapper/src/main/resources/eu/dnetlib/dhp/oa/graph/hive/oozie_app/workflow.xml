@@ -2,12 +2,20 @@
 
     <parameters>
         <property>
-            <name>sourcePath</name>
+            <name>inputPath</name>
             <description>the source path</description>
         </property>
         <property>
-            <name>hive_db_name</name>
+            <name>hiveDbName</name>
             <description>the target hive database name</description>
+        </property>
+        <property>
+            <name>hiveJdbcUrl</name>
+            <description>hive server jdbc url</description>
+        </property>
+        <property>
+            <name>hiveMetastoreUris</name>
+            <description>hive server metastore URIs</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -75,7 +83,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>MapGraphAsHiveDB</name>
-            <class>eu.dnetlib.dhp.oa.graph.GraphHiveImporterJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveImporterJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -87,9 +95,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_db_name</arg><arg>${hive_db_name}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--inputPath</arg><arg>${inputPath}</arg>
+            <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
         <ok to="PostProcessing"/>
         <error to="Kill"/>
@@ -102,12 +110,12 @@
             <configuration>
                 <property>
                     <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
+                    <value>${hiveMetastoreUris}</value>
                 </property>
             </configuration>
-            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <jdbc-url>${hiveJdbcUrl}/${hiveDbName}</jdbc-url>
             <script>lib/scripts/postprocessing.sql</script>
-            <param>hive_db_name=${hive_db_name}</param>
+            <param>hiveDbName=${hiveDbName}</param>
         </hive2>
         <ok to="End"/>
         <error to="Kill"/>

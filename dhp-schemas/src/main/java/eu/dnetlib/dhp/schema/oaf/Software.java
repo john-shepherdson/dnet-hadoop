@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.schema.oaf;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public class Software extends Result implements Serializable {
 
@@ -13,6 +13,10 @@ public class Software extends Result implements Serializable {
     private Field<String> codeRepositoryUrl;
 
     private Qualifier programmingLanguage;
+
+    public Software() {
+        setResulttype(ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE);
+    }
 
     public List<Field<String>> getDocumentationUrl() {
         return documentationUrl;
@@ -70,27 +74,5 @@ public class Software extends Result implements Serializable {
                         : programmingLanguage;
 
         mergeOAFDataInfo(e);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Software software = (Software) o;
-        return Objects.equals(documentationUrl, software.documentationUrl)
-                && Objects.equals(license, software.license)
-                && Objects.equals(codeRepositoryUrl, software.codeRepositoryUrl)
-                && Objects.equals(programmingLanguage, software.programmingLanguage);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                super.hashCode(),
-                documentationUrl,
-                license,
-                codeRepositoryUrl,
-                programmingLanguage);
     }
 }

@@ -13,6 +13,7 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import eu.dnetlib.dhp.oa.graph.raw.common.DbClient;
+import eu.dnetlib.dhp.oa.graph.raw.common.MigrationConstants;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -48,13 +49,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
         implements Closeable {
-
-    private static final Qualifier ENTITYREGISTRY_PROVENANCE_ACTION =
-            qualifier(
-                    "sysimport:crosswalk:entityregistry",
-                    "sysimport:crosswalk:entityregistry",
-                    "dnet:provenance_actions",
-                    "dnet:provenance_actions");
 
     private static final Log log = LogFactory.getLog(MigrateDbEntitiesApplication.class);
 
@@ -402,12 +396,16 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 
                 if (rs.getString("target_type").equals("dataset")) {
                     r = new Dataset();
+                    r.setResulttype(MigrationConstants.DATASET_RESULTTYPE_QUALIFIER);
                 } else if (rs.getString("target_type").equals("software")) {
                     r = new Software();
+                    r.setResulttype(MigrationConstants.SOFTWARE_RESULTTYPE_QUALIFIER);
                 } else if (rs.getString("target_type").equals("other")) {
                     r = new OtherResearchProduct();
+                    r.setResulttype(MigrationConstants.OTHER_RESULTTYPE_QUALIFIER);
                 } else {
                     r = new Publication();
+                    r.setResulttype(MigrationConstants.PUBLICATION_RESULTTYPE_QUALIFIER);
                 }
                 r.setId(createOpenaireId(50, rs.getString("target_id"), false));
                 r.setLastupdatetimestamp(lastUpdateTimestamp);
@@ -484,7 +482,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
                 inferenceprovenance,
                 inferred,
                 false,
-                ENTITYREGISTRY_PROVENANCE_ACTION,
+                MigrationConstants.ENTITYREGISTRY_PROVENANCE_ACTION,
                 trust);
     }
 

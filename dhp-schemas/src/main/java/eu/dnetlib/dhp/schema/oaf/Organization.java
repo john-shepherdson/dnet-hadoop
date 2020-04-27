@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public class Organization extends OafEntity implements Serializable {
 
@@ -232,53 +231,5 @@ public class Organization extends OafEntity implements Serializable {
                         : ecnutscode;
         country = o.getCountry() != null && compareTrust(this, e) < 0 ? o.getCountry() : country;
         mergeOAFDataInfo(o);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Organization that = (Organization) o;
-        return Objects.equals(legalshortname, that.legalshortname)
-                && Objects.equals(legalname, that.legalname)
-                && Objects.equals(alternativeNames, that.alternativeNames)
-                && Objects.equals(websiteurl, that.websiteurl)
-                && Objects.equals(logourl, that.logourl)
-                && Objects.equals(eclegalbody, that.eclegalbody)
-                && Objects.equals(eclegalperson, that.eclegalperson)
-                && Objects.equals(ecnonprofit, that.ecnonprofit)
-                && Objects.equals(ecresearchorganization, that.ecresearchorganization)
-                && Objects.equals(echighereducation, that.echighereducation)
-                && Objects.equals(
-                        ecinternationalorganizationeurinterests,
-                        that.ecinternationalorganizationeurinterests)
-                && Objects.equals(ecinternationalorganization, that.ecinternationalorganization)
-                && Objects.equals(ecenterprise, that.ecenterprise)
-                && Objects.equals(ecsmevalidated, that.ecsmevalidated)
-                && Objects.equals(ecnutscode, that.ecnutscode)
-                && Objects.equals(country, that.country);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                super.hashCode(),
-                legalshortname,
-                legalname,
-                alternativeNames,
-                websiteurl,
-                logourl,
-                eclegalbody,
-                eclegalperson,
-                ecnonprofit,
-                ecresearchorganization,
-                echighereducation,
-                ecinternationalorganizationeurinterests,
-                ecinternationalorganization,
-                ecenterprise,
-                ecsmevalidated,
-                ecnutscode,
-                country);
     }
 }

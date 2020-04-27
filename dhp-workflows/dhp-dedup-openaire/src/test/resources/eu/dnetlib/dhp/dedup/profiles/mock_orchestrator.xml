@@ -15,6 +15,8 @@
                     <SCAN id="organization"/>
                     <SCAN id="publication"/>
                     <SCAN id="software"/>
+                    <SCAN id="dataset"/>
+                    <SCAN id="otherresearchproduct"/>
                 </SCAN_SEQUENCE>
             </DEDUPLICATION>
         </CONFIGURATION>

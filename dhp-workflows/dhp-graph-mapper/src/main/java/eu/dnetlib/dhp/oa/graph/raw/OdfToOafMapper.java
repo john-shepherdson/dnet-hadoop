@@ -1,8 +1,19 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.GeoLocation;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,33 +73,44 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
             final DataInfo info,
             final KeyValue collectedfrom,
             final KeyValue hostedby) {
-        final List<Instance> res = new ArrayList<>();
+
+        final Instance instance = new Instance();
+        instance.setUrl(new ArrayList<>());
+        instance.setInstancetype(
+                prepareQualifier(
+                        doc,
+                        "//dr:CobjCategory",
+                        "dnet:publication_resource",
+                        "dnet:publication_resource"));
+        instance.setCollectedfrom(collectedfrom);
+        instance.setHostedby(hostedby);
+        instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
+        instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
+        instance.setAccessright(
+                prepareQualifier(
+                        doc, "//oaf:accessrights", "dnet:access_modes", "dnet:access_modes"));
+        instance.setLicense(field(doc.valueOf("//oaf:license"), info));
+        instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
+        instance.setProcessingchargeamount(
+                field(doc.valueOf("//oaf:processingchargeamount"), info));
+        instance.setProcessingchargecurrency(
+                field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+
         for (final Object o :
                 doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
-            final Instance instance = new Instance();
-            instance.setUrl(Arrays.asList(((Node) o).getText().trim()));
-            instance.setInstancetype(
-                    prepareQualifier(
-                            doc,
-                            "//dr:CobjCategory",
-                            "dnet:publication_resource",
-                            "dnet:publication_resource"));
-            instance.setCollectedfrom(collectedfrom);
-            instance.setHostedby(hostedby);
-            instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
-            instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
-            instance.setAccessright(
-                    prepareQualifier(
-                            doc, "//oaf:accessrights", "dnet:access_modes", "dnet:access_modes"));
-            instance.setLicense(field(doc.valueOf("//oaf:license"), info));
-            instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
-            instance.setProcessingchargeamount(
-                    field(doc.valueOf("//oaf:processingchargeamount"), info));
-            instance.setProcessingchargecurrency(
-                    field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
-            res.add(instance);
+            instance.getUrl().add(((Node) o).getText().trim());
         }
-        return res;
+        for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='URL']")) {
+            instance.getUrl().add(((Node) o).getText().trim());
+        }
+        for (final Object o :
+                doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='DOI']")) {
+            instance.getUrl().add("http://dx.doi.org/" + ((Node) o).getText().trim());
+        }
+        for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='DOI']")) {
+            instance.getUrl().add("http://dx.doi.org/" + ((Node) o).getText().trim());
+        }
+        return Arrays.asList(instance);
     }
 
     @Override
