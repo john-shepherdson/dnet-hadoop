@@ -2,16 +2,16 @@ package eu.dnetlib.dhp.selectioncriteria;
 
 import java.io.Serializable;
 
-@VerbClass("not_equals")
-public class NotEqualVerb implements Selection, Serializable {
+@VerbClass("not_equals_ignorecase")
+public class NotEqualVerbIgnoreCase implements Selection, Serializable {
 
     private String param;
 
-    public NotEqualVerb(final String param) {
+    public NotEqualVerbIgnoreCase(final String param) {
         this.param = param;
     }
 
-    public NotEqualVerb() {}
+    public NotEqualVerbIgnoreCase() {}
 
     public String getParam() {
         return param;
@@ -23,6 +23,6 @@ public class NotEqualVerb implements Selection, Serializable {
 
     @Override
     public boolean apply(String value) {
-        return !value.equals(param);
+        return !value.equalsIgnoreCase(param);
     }
 }

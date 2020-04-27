@@ -2,20 +2,20 @@ package eu.dnetlib.dhp.selectioncriteria;
 
 import java.io.Serializable;
 
-@VerbClass("equals")
-public class EqualVerb implements Selection, Serializable {
+@VerbClass("contains_ignorecase")
+public class ContainsVerbIgnoreCase implements Selection, Serializable {
 
     private String param;
 
-    public EqualVerb() {}
+    public ContainsVerbIgnoreCase() {}
 
-    public EqualVerb(final String param) {
+    public ContainsVerbIgnoreCase(final String param) {
         this.param = param;
     }
 
     @Override
     public boolean apply(String value) {
-        return value.equals(param);
+        return value.toLowerCase().contains(param.toLowerCase());
     }
 
     public String getParam() {
