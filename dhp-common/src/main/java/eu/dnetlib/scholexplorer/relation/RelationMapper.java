@@ -1,3 +1,4 @@
+
 package eu.dnetlib.scholexplorer.relation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,12 +8,11 @@ import org.apache.commons.io.IOUtils;
 
 public class RelationMapper extends HashMap<String, RelInfo> implements Serializable {
 
-  public static RelationMapper load() throws Exception {
+	public static RelationMapper load() throws Exception {
 
-    final String json =
-        IOUtils.toString(RelationMapper.class.getResourceAsStream("relations.json"));
+		final String json = IOUtils.toString(RelationMapper.class.getResourceAsStream("relations.json"));
 
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.readValue(json, RelationMapper.class);
-  }
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.readValue(json, RelationMapper.class);
+	}
 }

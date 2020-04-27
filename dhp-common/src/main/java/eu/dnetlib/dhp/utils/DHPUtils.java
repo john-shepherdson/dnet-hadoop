@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.utils;
 
 import com.jayway.jsonpath.JsonPath;
@@ -14,57 +15,58 @@ import org.apache.commons.codec.binary.Hex;
 
 public class DHPUtils {
 
-  public static String md5(final String s) {
-    try {
-      final MessageDigest md = MessageDigest.getInstance("MD5");
-      md.update(s.getBytes("UTF-8"));
-      return new String(Hex.encodeHex(md.digest()));
-    } catch (final Exception e) {
-      System.err.println("Error creating id");
-      return null;
-    }
-  }
+	public static String md5(final String s) {
+		try {
+			final MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(s.getBytes("UTF-8"));
+			return new String(Hex.encodeHex(md.digest()));
+		} catch (final Exception e) {
+			System.err.println("Error creating id");
+			return null;
+		}
+	}
 
-  public static String generateIdentifier(final String originalId, final String nsPrefix) {
-    return String.format("%s::%s", nsPrefix, DHPUtils.md5(originalId));
-  }
+	public static String generateIdentifier(final String originalId, final String nsPrefix) {
+		return String.format("%s::%s", nsPrefix, DHPUtils.md5(originalId));
+	}
 
-  public static String compressString(final String input) {
-    try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Base64OutputStream b64os = new Base64OutputStream(out)) {
-      GZIPOutputStream gzip = new GZIPOutputStream(b64os);
-      gzip.write(input.getBytes(StandardCharsets.UTF_8));
-      gzip.close();
-      return out.toString();
-    } catch (Throwable e) {
-      return null;
-    }
-  }
+	public static String compressString(final String input) {
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+			Base64OutputStream b64os = new Base64OutputStream(out)) {
+			GZIPOutputStream gzip = new GZIPOutputStream(b64os);
+			gzip.write(input.getBytes(StandardCharsets.UTF_8));
+			gzip.close();
+			return out.toString();
+		} catch (Throwable e) {
+			return null;
+		}
+	}
 
-  public static String decompressString(final String input) {
-    byte[] byteArray = Base64.decodeBase64(input.getBytes());
-    int len;
-    try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream((byteArray)));
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(byteArray.length)) {
-      byte[] buffer = new byte[1024];
-      while ((len = gis.read(buffer)) != -1) {
-        bos.write(buffer, 0, len);
-      }
-      return bos.toString();
-    } catch (Exception e) {
-      return null;
-    }
-  }
+	public static String decompressString(final String input) {
+		byte[] byteArray = Base64.decodeBase64(input.getBytes());
+		int len;
+		try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream((byteArray)));
+			ByteArrayOutputStream bos = new ByteArrayOutputStream(byteArray.length)) {
+			byte[] buffer = new byte[1024];
+			while ((len = gis.read(buffer)) != -1) {
+				bos.write(buffer, 0, len);
+			}
+			return bos.toString();
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
-  public static String getJPathString(final String jsonPath, final String json) {
-    try {
-      Object o = JsonPath.read(json, jsonPath);
-      if (o instanceof String) return (String) o;
-      if (o instanceof JSONArray && ((JSONArray) o).size() > 0)
-        return (String) ((JSONArray) o).get(0);
-      return o.toString();
-    } catch (Exception e) {
-      return "";
-    }
-  }
+	public static String getJPathString(final String jsonPath, final String json) {
+		try {
+			Object o = JsonPath.read(json, jsonPath);
+			if (o instanceof String)
+				return (String) o;
+			if (o instanceof JSONArray && ((JSONArray) o).size() > 0)
+				return (String) ((JSONArray) o).get(0);
+			return o.toString();
+		} catch (Exception e) {
+			return "";
+		}
+	}
 }
