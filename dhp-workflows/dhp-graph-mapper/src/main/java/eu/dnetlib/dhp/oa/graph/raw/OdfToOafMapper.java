@@ -295,48 +295,53 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
         for (final Object o :
                 doc.selectNodes(
                         "//datacite:relatedIdentifier[@relatedIdentifierType='OPENAIRE']")) {
-            final String otherId = createOpenaireId(50, ((Node) o).getText(), false);
-            final String type = ((Node) o).valueOf("@relationType");
 
-            if (type.equals("IsSupplementTo")) {
-                res.add(
-                        prepareOtherResultRel(
-                                collectedFrom,
-                                info,
-                                lastUpdateTimestamp,
-                                docId,
-                                otherId,
-                                "supplement",
-                                "isSupplementTo"));
-                res.add(
-                        prepareOtherResultRel(
-                                collectedFrom,
-                                info,
-                                lastUpdateTimestamp,
-                                otherId,
-                                docId,
-                                "supplement",
-                                "isSupplementedBy"));
-            } else if (type.equals("IsPartOf")) {
-                res.add(
-                        prepareOtherResultRel(
-                                collectedFrom,
-                                info,
-                                lastUpdateTimestamp,
-                                docId,
-                                otherId,
-                                "part",
-                                "IsPartOf"));
-                res.add(
-                        prepareOtherResultRel(
-                                collectedFrom,
-                                info,
-                                lastUpdateTimestamp,
-                                otherId,
-                                docId,
-                                "part",
-                                "HasParts"));
-            } else {
+            final String originalId = ((Node) o).getText();
+
+            if (StringUtils.isNotBlank(originalId)) {
+                final String otherId = createOpenaireId(50, originalId, false);
+                final String type = ((Node) o).valueOf("@relationType");
+
+                if (type.equals("IsSupplementTo")) {
+                    res.add(
+                            prepareOtherResultRel(
+                                    collectedFrom,
+                                    info,
+                                    lastUpdateTimestamp,
+                                    docId,
+                                    otherId,
+                                    "supplement",
+                                    "isSupplementTo"));
+                    res.add(
+                            prepareOtherResultRel(
+                                    collectedFrom,
+                                    info,
+                                    lastUpdateTimestamp,
+                                    otherId,
+                                    docId,
+                                    "supplement",
+                                    "isSupplementedBy"));
+                } else if (type.equals("IsPartOf")) {
+                    res.add(
+                            prepareOtherResultRel(
+                                    collectedFrom,
+                                    info,
+                                    lastUpdateTimestamp,
+                                    docId,
+                                    otherId,
+                                    "part",
+                                    "IsPartOf"));
+                    res.add(
+                            prepareOtherResultRel(
+                                    collectedFrom,
+                                    info,
+                                    lastUpdateTimestamp,
+                                    otherId,
+                                    docId,
+                                    "part",
+                                    "HasParts"));
+                } else {
+                }
             }
         }
         return res;
