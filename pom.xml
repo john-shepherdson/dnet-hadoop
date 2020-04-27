@@ -562,7 +562,6 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
-		<git-code-format-maven-plugin.version>2.4</git-code-format-maven-plugin.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
 		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
