@@ -21,23 +21,25 @@
             <description>number of cores used by single executor</description>
         </property>
         <property>
-            <name>writeUpdate</name>
-            <description>writes the information found for the update. No double check done if the information is already present</description>
-        </property>
-        <property>
             <name>saveGraph</name>
             <description>writes new version of the graph after the propagation step</description>
         </property>
     </parameters>
 
     <start to="reset-outputpath"/>
+<!--    <start to="apply_propagation"/>-->
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
     <action name="reset-outputpath">
         <fs>
-            <delete path='${workingDir}/projecttoresult_propagation'/>
+            <delete path='${workingDir}/preparedInfo'/>
+            <delete path='${workingDir}/relation'/>
+            <delete path='${workingDir}/dataset'/>
+            <delete path='${workingDir}/software'/>
+            <delete path='${workingDir}/publication'/>
+            <delete path='${workingDir}/otherresearchproduct'/>
         </fs>
         <ok to="copy_relations"/>
         <error to="Kill"/>
@@ -55,7 +57,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${workingDir}/projecttoresult_propagation/relation</arg>
+            <arg>${nameNode}/${workingDir}/relation</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -66,7 +68,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/publication</arg>
-            <arg>${nameNode}/${workingDir}/projecttoresult_propagation/publication</arg>
+            <arg>${nameNode}/${workingDir}/publication</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -77,7 +79,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/dataset</arg>
-            <arg>${nameNode}/${workingDir}/projecttoresult_propagation/dataset</arg>
+            <arg>${nameNode}/${workingDir}/dataset</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -88,7 +90,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/otherresearchproduct</arg>
-            <arg>${nameNode}/${workingDir}/projecttoresult_propagation/otherresearchproduct</arg>
+            <arg>${nameNode}/${workingDir}/otherresearchproduct</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -99,7 +101,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/software</arg>
-            <arg>${nameNode}/${workingDir}/projecttoresult_propagation/software</arg>
+            <arg>${nameNode}/${workingDir}/software</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -127,8 +129,8 @@
                 <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
                 <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
                 <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-                <arg>--potentialUpdatePath</arg><arg>${workingDir}/projecttoresult_propagation/preparedInfo/potentialUpdates</arg>
-                <arg>--alreadyLinkedPath</arg><arg>${workingDir}/projecttoresult_propagation/preparedInfo/alreadyLinked</arg>
+                <arg>--potentialUpdatePath</arg><arg>${workingDir}/preparedInfo/potentialUpdates</arg>
+                <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
             </spark>
             <ok to="apply_propagation"/>
             <error to="Kill"/>
@@ -152,13 +154,11 @@
                     --conf spark.dynamicAllocation.enabled=true
                     --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
                 </spark-opts>
-<!--                <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/relation</arg>-->
-                <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
                 <arg>--saveGraph</arg><arg>${saveGraph}</arg>
                 <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-                <arg>--outputPath</arg><arg>${workingDir}/projecttoresult_propagation/relation</arg>
-                <arg>--potentialUpdatePath</arg><arg>${workingDir}/projecttoresult_propagation/preparedInfo/potentialUpdates</arg>
-                <arg>--alreadyLinkedPath</arg><arg>${workingDir}/projecttoresult_propagation/preparedInfo/alreadyLinked</arg>
+                <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
+                <arg>--potentialUpdatePath</arg><arg>${workingDir}/preparedInfo/potentialUpdates</arg>
+                <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
             </spark>
             <ok to="End"/>
             <error to="Kill"/>
