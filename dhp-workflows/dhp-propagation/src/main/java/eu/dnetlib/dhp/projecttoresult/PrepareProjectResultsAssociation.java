@@ -12,6 +12,7 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.*;
@@ -95,45 +96,57 @@ public class PrepareProjectResultsAssociation {
         resproj_relation.createOrReplaceTempView("resproj_relation");
 
         query =
-                "SELECT projectId, collect_set(resId) resultSet "
-                        + "FROM ("
-                        + "      SELECT r1.target resId, r2.target projectId "
+                "SELECT resultId, collect_set(projectId) projectSet "
+                        + "FROM ( "
+                        + "SELECT r1.target resultId, r2.target projectId "
                         + "      FROM (SELECT source, target "
                         + "            FROM relation "
                         + "            WHERE datainfo.deletedbyinference = false  "
                         + getConstraintList(" relClass = '", allowedsemrel)
-                        + ") r1"
+                        + "            ) r1"
                         + "      JOIN resproj_relation r2 "
                         + "      ON r1.source = r2.source "
                         + "      ) tmp "
-                        + "GROUP BY projectId ";
+                        + "GROUP BY resultId ";
+        //        query =
+        //                "SELECT projectId, collect_set(resId) resultSet "
+        //                        + "FROM ("
+        //                        + "      SELECT r1.target resId, r2.target projectId "
+        //                        + "      FROM (SELECT source, target "
+        //                        + "            FROM relation "
+        //                        + "            WHERE datainfo.deletedbyinference = false  "
+        //                        + getConstraintList(" relClass = '", allowedsemrel)
+        //                        + ") r1"
+        //                        + "      JOIN resproj_relation r2 "
+        //                        + "      ON r1.source = r2.source "
+        //                        + "      ) tmp "
+        //                        + "GROUP BY projectId ";
 
         spark.sql(query)
-                .as(Encoders.bean(ProjectResultSet.class))
-                .toJSON()
-                .write()
-                .mode(SaveMode.Overwrite)
-                .option("compression", "gzip")
-                .text(potentialUpdatePath);
-        //                .toJavaRDD()
-        //                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
-        //                .saveAsTextFile(potentialUpdatePath, GzipCodec.class);
+                .as(Encoders.bean(ResultProjectSet.class))
+                //                .toJSON()
+                //                .write()
+                //                .mode(SaveMode.Overwrite)
+                //                .option("compression", "gzip")
+                //                .text(potentialUpdatePath);
+                .toJavaRDD()
+                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
+                .saveAsTextFile(potentialUpdatePath, GzipCodec.class);
 
         query =
-                "SELECT target projectId, collect_set(source) resultSet "
+                "SELECT source resultId, collect_set(target) projectSet "
                         + "FROM resproj_relation "
-                        + "GROUP BY target";
+                        + "GROUP BY source";
 
         spark.sql(query)
-                .as(Encoders.bean(ProjectResultSet.class))
-                .toJSON()
-                .write()
-                .mode(SaveMode.Overwrite)
-                .option("compression", "gzip")
-                .text(alreadyLinkedPath);
-        //                .toJavaRDD()
-        //                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
-        //                .saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
-
+                .as(Encoders.bean(ResultProjectSet.class))
+                //                .toJSON()
+                //                .write()
+                //                .mode(SaveMode.Overwrite)
+                //                .option("compression", "gzip")
+                //                .text(alreadyLinkedPath);
+                .toJavaRDD()
+                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
+                .saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
     }
 }

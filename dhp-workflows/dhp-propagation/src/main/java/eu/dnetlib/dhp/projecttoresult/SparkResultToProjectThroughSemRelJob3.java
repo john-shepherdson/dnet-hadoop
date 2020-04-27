@@ -9,6 +9,7 @@ import eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.*;
@@ -44,9 +45,6 @@ public class SparkResultToProjectThroughSemRelJob3 {
         final String alreadyLinkedPath = parser.get("alreadyLinkedPath");
         log.info("alreadyLinkedPath {}: ", alreadyLinkedPath);
 
-        final Boolean writeUpdates = Boolean.valueOf(parser.get("writeUpdate"));
-        log.info("writeUpdate: {}", writeUpdates);
-
         final Boolean saveGraph = Boolean.valueOf(parser.get("saveGraph"));
         log.info("saveGraph: {}", saveGraph);
 
@@ -60,12 +58,7 @@ public class SparkResultToProjectThroughSemRelJob3 {
                         removeOutputDir(spark, outputPath);
                     }
                     execPropagation(
-                            spark,
-                            outputPath,
-                            alreadyLinkedPath,
-                            potentialUpdatePath,
-                            writeUpdates,
-                            saveGraph);
+                            spark, outputPath, alreadyLinkedPath, potentialUpdatePath, saveGraph);
                 });
     }
 
@@ -74,21 +67,12 @@ public class SparkResultToProjectThroughSemRelJob3 {
             String outputPath,
             String alreadyLinkedPath,
             String potentialUpdatePath,
-            Boolean writeUpdate,
             Boolean saveGraph) {
 
-        Dataset<ProjectResultSet> toaddrelations =
-                readAssocProjectResults(spark, potentialUpdatePath);
-        Dataset<ProjectResultSet> alreadyLinked = readAssocProjectResults(spark, alreadyLinkedPath);
+        Dataset<ResultProjectSet> toaddrelations =
+                readAssocResultProjects(spark, potentialUpdatePath);
+        Dataset<ResultProjectSet> alreadyLinked = readAssocResultProjects(spark, alreadyLinkedPath);
 
-        if (writeUpdate) {
-            toaddrelations
-                    .toJSON()
-                    .write()
-                    .mode(SaveMode.Overwrite)
-                    .option("compression", "gzip")
-                    .text(outputPath + "/potential_updates");
-        }
         if (saveGraph) {
             getNewRelations(alreadyLinked, toaddrelations)
                     .toJSON()
@@ -100,56 +84,66 @@ public class SparkResultToProjectThroughSemRelJob3 {
     }
 
     private static Dataset<Relation> getNewRelations(
-            Dataset<ProjectResultSet> alreadyLinked, Dataset<ProjectResultSet> toaddrelations) {
+            Dataset<ResultProjectSet> alreadyLinked, Dataset<ResultProjectSet> toaddrelations) {
 
         return toaddrelations
                 .joinWith(
                         alreadyLinked,
-                        toaddrelations.col("projectId").equalTo(alreadyLinked.col("projectId")),
-                        "left")
+                        toaddrelations.col("resultId").equalTo(alreadyLinked.col("resultId")),
+                        "left_outer")
                 .flatMap(
                         value -> {
                             List<Relation> new_relations = new ArrayList<>();
-                            ProjectResultSet potential_update = value._1();
-                            ProjectResultSet already_linked = value._2();
-                            String projId = already_linked.getProjectId();
-                            potential_update.getResultSet().stream()
+                            ResultProjectSet potential_update = value._1();
+                            Optional<ResultProjectSet> already_linked =
+                                    Optional.ofNullable(value._2());
+                            if (already_linked.isPresent()) {
+                                already_linked.get().getProjectSet().stream()
+                                        .forEach(
+                                                (p -> {
+                                                    if (potential_update
+                                                            .getProjectSet()
+                                                            .contains(p)) {
+                                                        potential_update.getProjectSet().remove(p);
+                                                    }
+                                                }));
+                            }
+                            String resId = potential_update.getResultId();
+                            potential_update.getProjectSet().stream()
                                     .forEach(
-                                            rId -> {
-                                                if (!already_linked.getResultSet().contains(rId)) {
-                                                    new_relations.add(
-                                                            getRelation(
-                                                                    rId,
-                                                                    projId,
-                                                                    RELATION_RESULT_PROJECT_REL_CLASS,
-                                                                    RELATION_RESULTPROJECT_REL_TYPE,
-                                                                    RELATION_RESULTPROJECT_SUBREL_TYPE,
-                                                                    PROPAGATION_DATA_INFO_TYPE,
-                                                                    PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
-                                                                    PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
-                                                    new_relations.add(
-                                                            getRelation(
-                                                                    projId,
-                                                                    rId,
-                                                                    RELATION_PROJECT_RESULT_REL_CLASS,
-                                                                    RELATION_RESULTPROJECT_REL_TYPE,
-                                                                    RELATION_RESULTPROJECT_SUBREL_TYPE,
-                                                                    PROPAGATION_DATA_INFO_TYPE,
-                                                                    PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
-                                                                    PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
-                                                }
+                                            pId -> {
+                                                new_relations.add(
+                                                        getRelation(
+                                                                resId,
+                                                                pId,
+                                                                RELATION_RESULT_PROJECT_REL_CLASS,
+                                                                RELATION_RESULTPROJECT_REL_TYPE,
+                                                                RELATION_RESULTPROJECT_SUBREL_TYPE,
+                                                                PROPAGATION_DATA_INFO_TYPE,
+                                                                PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
+                                                                PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
+                                                new_relations.add(
+                                                        getRelation(
+                                                                pId,
+                                                                resId,
+                                                                RELATION_PROJECT_RESULT_REL_CLASS,
+                                                                RELATION_RESULTPROJECT_REL_TYPE,
+                                                                RELATION_RESULTPROJECT_SUBREL_TYPE,
+                                                                PROPAGATION_DATA_INFO_TYPE,
+                                                                PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
+                                                                PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
                                             });
                             return new_relations.iterator();
                         },
                         Encoders.bean(Relation.class));
     }
 
-    private static Dataset<ProjectResultSet> readAssocProjectResults(
+    private static Dataset<ResultProjectSet> readAssocResultProjects(
             SparkSession spark, String potentialUpdatePath) {
         return spark.read()
                 .textFile(potentialUpdatePath)
                 .map(
-                        value -> OBJECT_MAPPER.readValue(value, ProjectResultSet.class),
-                        Encoders.bean(ProjectResultSet.class));
+                        value -> OBJECT_MAPPER.readValue(value, ResultProjectSet.class),
+                        Encoders.bean(ResultProjectSet.class));
     }
 }
