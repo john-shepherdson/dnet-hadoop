@@ -29,10 +29,6 @@
             <description>number of executors used</description>
         </property>
         <property>
-            <name>writeUpdate</name>
-            <description>writes the information found for the update. No double check done if the information is already present</description>
-        </property>
-        <property>
             <name>saveGraph</name>
             <description>writes new version of the graph after the propagation step</description>
         </property>
@@ -46,8 +42,12 @@
     </kill>
     <action name="reset-outputpath">
         <fs>
-            <delete path='${workingDir}/country_propagation'/>
             <delete path='${workingDir}/preparedInfo'/>
+            <delete path='${workingDir}/relation'/>
+            <delete path='${workingDir}/dataset'/>
+            <delete path='${workingDir}/software'/>
+            <delete path='${workingDir}/publication'/>
+            <delete path='${workingDir}/otherresearchproduct'/>
         </fs>
         <ok to="copy_relation"/>
         <error to="Kill"/>
@@ -58,7 +58,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${workingDir}/country_propagation/relation</arg>
+            <arg>${nameNode}/${workingDir}/relation</arg>
         </distcp>
         <ok to="prepare_datasource_country_association"/>
         <error to="Kill"/>
@@ -115,10 +115,9 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="wait"/>
@@ -145,10 +144,9 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="wait"/>
@@ -175,10 +173,9 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="wait"/>
@@ -205,10 +202,9 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--writeUpdate</arg><arg>${writeUpdate}</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country_propagation/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/software</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="wait"/>
