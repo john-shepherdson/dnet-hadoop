@@ -5,19 +5,19 @@ import java.util.Iterator;
 
 public class OaiIteratorFactory {
 
-    private HttpConnector httpConnector;
+  private HttpConnector httpConnector;
 
-    public Iterator<String> newIterator(
-            final String baseUrl,
-            final String mdFormat,
-            final String set,
-            final String fromDate,
-            final String untilDate) {
-        return new OaiIterator(baseUrl, mdFormat, set, fromDate, untilDate, getHttpConnector());
-    }
+  public Iterator<String> newIterator(
+      final String baseUrl,
+      final String mdFormat,
+      final String set,
+      final String fromDate,
+      final String untilDate) {
+    return new OaiIterator(baseUrl, mdFormat, set, fromDate, untilDate, getHttpConnector());
+  }
 
-    private HttpConnector getHttpConnector() {
-        if (httpConnector == null) httpConnector = new HttpConnector();
-        return httpConnector;
-    }
+  private HttpConnector getHttpConnector() {
+    if (httpConnector == null) httpConnector = new HttpConnector();
+    return httpConnector;
+  }
 }

@@ -21,82 +21,81 @@ import org.slf4j.LoggerFactory;
 
 public class SparkCreateDedupRecord extends AbstractSparkAction {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
+  private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
 
-    public static final String ROOT_TRUST = "0.8";
-    public static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
-    public static final String PROVENANCE_ACTIONS = "dnet:provenanceActions";
+  public static final String ROOT_TRUST = "0.8";
+  public static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
+  public static final String PROVENANCE_ACTIONS = "dnet:provenanceActions";
 
-    public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) {
-        super(parser, spark);
+  public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) {
+    super(parser, spark);
+  }
+
+  public static void main(String[] args) throws Exception {
+    ArgumentApplicationParser parser =
+        new ArgumentApplicationParser(
+            IOUtils.toString(
+                SparkCreateSimRels.class.getResourceAsStream(
+                    "/eu/dnetlib/dhp/oa/dedup/createDedupRecord_parameters.json")));
+    parser.parseArgument(args);
+
+    SparkConf conf = new SparkConf();
+    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+    conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+
+    new SparkCreateDedupRecord(parser, getSparkSession(conf))
+        .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+  }
+
+  @Override
+  public void run(ISLookUpService isLookUpService)
+      throws ISLookUpException, DocumentException, IOException {
+
+    final String graphBasePath = parser.get("graphBasePath");
+    final String isLookUpUrl = parser.get("isLookUpUrl");
+    final String actionSetId = parser.get("actionSetId");
+    final String workingPath = parser.get("workingPath");
+
+    log.info("graphBasePath: '{}'", graphBasePath);
+    log.info("isLookUpUrl:   '{}'", isLookUpUrl);
+    log.info("actionSetId:   '{}'", actionSetId);
+    log.info("workingPath:   '{}'", workingPath);
+
+    for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
+      String subEntity = dedupConf.getWf().getSubEntityValue();
+      log.info("Creating deduprecords for: '{}'", subEntity);
+
+      final String outputPath =
+          DedupUtility.createDedupRecordPath(workingPath, actionSetId, subEntity);
+      removeOutputDir(spark, outputPath);
+
+      final String mergeRelPath =
+          DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
+      final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
+
+      final Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
+      final DataInfo dataInfo = getDataInfo(dedupConf);
+      DedupRecordFactory.createDedupRecord(spark, dataInfo, mergeRelPath, entityPath, clazz)
+          .write()
+          .mode(SaveMode.Overwrite)
+          .option("compression", "gzip")
+          .json(outputPath);
     }
+  }
 
-    public static void main(String[] args) throws Exception {
-        ArgumentApplicationParser parser =
-                new ArgumentApplicationParser(
-                        IOUtils.toString(
-                                SparkCreateSimRels.class.getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/dedup/createDedupRecord_parameters.json")));
-        parser.parseArgument(args);
-
-        SparkConf conf = new SparkConf();
-        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
-
-        new SparkCreateDedupRecord(parser, getSparkSession(conf))
-                .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
-    }
-
-    @Override
-    public void run(ISLookUpService isLookUpService)
-            throws ISLookUpException, DocumentException, IOException {
-
-        final String graphBasePath = parser.get("graphBasePath");
-        final String isLookUpUrl = parser.get("isLookUpUrl");
-        final String actionSetId = parser.get("actionSetId");
-        final String workingPath = parser.get("workingPath");
-
-        log.info("graphBasePath: '{}'", graphBasePath);
-        log.info("isLookUpUrl:   '{}'", isLookUpUrl);
-        log.info("actionSetId:   '{}'", actionSetId);
-        log.info("workingPath:   '{}'", workingPath);
-
-        for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
-            String subEntity = dedupConf.getWf().getSubEntityValue();
-            log.info("Creating deduprecords for: '{}'", subEntity);
-
-            final String outputPath =
-                    DedupUtility.createDedupRecordPath(workingPath, actionSetId, subEntity);
-            removeOutputDir(spark, outputPath);
-
-            final String mergeRelPath =
-                    DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
-            final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
-
-            final Class<OafEntity> clazz =
-                    ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
-            final DataInfo dataInfo = getDataInfo(dedupConf);
-            DedupRecordFactory.createDedupRecord(spark, dataInfo, mergeRelPath, entityPath, clazz)
-                    .write()
-                    .mode(SaveMode.Overwrite)
-                    .option("compression", "gzip")
-                    .json(outputPath);
-        }
-    }
-
-    private static DataInfo getDataInfo(DedupConfig dedupConf) {
-        DataInfo info = new DataInfo();
-        info.setDeletedbyinference(false);
-        info.setInferred(true);
-        info.setInvisible(false);
-        info.setTrust(ROOT_TRUST);
-        info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
-        Qualifier provenance = new Qualifier();
-        provenance.setClassid(PROVENANCE_ACTION_CLASS);
-        provenance.setClassname(PROVENANCE_ACTION_CLASS);
-        provenance.setSchemeid(PROVENANCE_ACTIONS);
-        provenance.setSchemename(PROVENANCE_ACTIONS);
-        info.setProvenanceaction(provenance);
-        return info;
-    }
+  private static DataInfo getDataInfo(DedupConfig dedupConf) {
+    DataInfo info = new DataInfo();
+    info.setDeletedbyinference(false);
+    info.setInferred(true);
+    info.setInvisible(false);
+    info.setTrust(ROOT_TRUST);
+    info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
+    Qualifier provenance = new Qualifier();
+    provenance.setClassid(PROVENANCE_ACTION_CLASS);
+    provenance.setClassname(PROVENANCE_ACTION_CLASS);
+    provenance.setSchemeid(PROVENANCE_ACTIONS);
+    provenance.setSchemename(PROVENANCE_ACTIONS);
+    info.setProvenanceaction(provenance);
+    return info;
+  }
 }

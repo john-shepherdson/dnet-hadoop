@@ -11,41 +11,39 @@ import org.junit.jupiter.api.BeforeEach;
 
 public class MergeAuthorTest {
 
-    private List<Publication> publicationsToMerge;
-    private final ObjectMapper mapper = new ObjectMapper();
+  private List<Publication> publicationsToMerge;
+  private final ObjectMapper mapper = new ObjectMapper();
 
-    @BeforeEach
-    public void setUp() throws Exception {
-        final String json =
-                IOUtils.toString(
-                        this.getClass()
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/dedup/json/authors_merge.json"));
+  @BeforeEach
+  public void setUp() throws Exception {
+    final String json =
+        IOUtils.toString(
+            this.getClass().getResourceAsStream("/eu/dnetlib/dhp/dedup/json/authors_merge.json"));
 
-        publicationsToMerge =
-                Arrays.asList(json.split("\n")).stream()
-                        .map(
-                                s -> {
-                                    try {
-                                        return mapper.readValue(s, Publication.class);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                })
-                        .collect(Collectors.toList());
-    }
+    publicationsToMerge =
+        Arrays.asList(json.split("\n")).stream()
+            .map(
+                s -> {
+                  try {
+                    return mapper.readValue(s, Publication.class);
+                  } catch (IOException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .collect(Collectors.toList());
+  }
 
-    // FIX ME Michele DB this tests doesn't work
-    // @Test
-    public void test() throws Exception {
-        Publication dedup = new Publication();
+  // FIX ME Michele DB this tests doesn't work
+  // @Test
+  public void test() throws Exception {
+    Publication dedup = new Publication();
 
-        publicationsToMerge.forEach(
-                p -> {
-                    dedup.mergeFrom(p);
-                    dedup.setAuthor(DedupUtility.mergeAuthor(dedup.getAuthor(), p.getAuthor()));
-                });
+    publicationsToMerge.forEach(
+        p -> {
+          dedup.mergeFrom(p);
+          dedup.setAuthor(DedupUtility.mergeAuthor(dedup.getAuthor(), p.getAuthor()));
+        });
 
-        System.out.println(mapper.writeValueAsString(dedup));
-    }
+    System.out.println(mapper.writeValueAsString(dedup));
+  }
 }

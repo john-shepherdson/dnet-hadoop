@@ -47,76 +47,77 @@ import org.slf4j.LoggerFactory;
  */
 public class AdjacencyListBuilderJob {
 
-    private static final Logger log = LoggerFactory.getLogger(AdjacencyListBuilderJob.class);
+  private static final Logger log = LoggerFactory.getLogger(AdjacencyListBuilderJob.class);
 
-    public static final int MAX_LINKS = 100;
+  public static final int MAX_LINKS = 100;
 
-    public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
 
-        final ArgumentApplicationParser parser =
-                new ArgumentApplicationParser(
-                        IOUtils.toString(
-                                AdjacencyListBuilderJob.class.getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/provision/input_params_build_adjacency_lists.json")));
-        parser.parseArgument(args);
+    final ArgumentApplicationParser parser =
+        new ArgumentApplicationParser(
+            IOUtils.toString(
+                AdjacencyListBuilderJob.class.getResourceAsStream(
+                    "/eu/dnetlib/dhp/oa/provision/input_params_build_adjacency_lists.json")));
+    parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged =
-                Optional.ofNullable(parser.get("isSparkSessionManaged"))
-                        .map(Boolean::valueOf)
-                        .orElse(Boolean.TRUE);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+    Boolean isSparkSessionManaged =
+        Optional.ofNullable(parser.get("isSparkSessionManaged"))
+            .map(Boolean::valueOf)
+            .orElse(Boolean.TRUE);
+    log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        String inputPath = parser.get("inputPath");
-        log.info("inputPath: {}", inputPath);
+    String inputPath = parser.get("inputPath");
+    log.info("inputPath: {}", inputPath);
 
-        String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+    String outputPath = parser.get("outputPath");
+    log.info("outputPath: {}", outputPath);
 
-        SparkConf conf = new SparkConf();
-        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+    SparkConf conf = new SparkConf();
+    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+    conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    removeOutputDir(spark, outputPath);
-                    createAdjacencyLists(spark, inputPath, outputPath);
-                });
-    }
+    runWithSparkSession(
+        conf,
+        isSparkSessionManaged,
+        spark -> {
+          removeOutputDir(spark, outputPath);
+          createAdjacencyLists(spark, inputPath, outputPath);
+        });
+  }
 
-    private static void createAdjacencyLists(
-            SparkSession spark, String inputPath, String outputPath) {
+  private static void createAdjacencyLists(
+      SparkSession spark, String inputPath, String outputPath) {
 
-        log.info("Reading joined entities from: {}", inputPath);
-        spark.read()
-                .load(inputPath)
-                .as(Encoders.bean(EntityRelEntity.class))
-                .groupByKey(
-                        (MapFunction<EntityRelEntity, String>) value -> value.getEntity().getId(),
-                        Encoders.STRING())
-                .mapGroups(
-                        (MapGroupsFunction<String, EntityRelEntity, JoinedEntity>)
-                                (key, values) -> {
-                                    JoinedEntity j = new JoinedEntity();
-                                    List<Tuple2> links = new ArrayList<>();
-                                    while (values.hasNext() && links.size() < MAX_LINKS) {
-                                        EntityRelEntity curr = values.next();
-                                        if (j.getEntity() == null) {
-                                            j.setEntity(curr.getEntity());
-                                        }
-                                        links.add(new Tuple2(curr.getRelation(), curr.getTarget()));
-                                    }
-                                    j.setLinks(links);
-                                    return j;
-                                },
-                        Encoders.bean(JoinedEntity.class))
-                .write()
-                .mode(SaveMode.Overwrite)
-                .parquet(outputPath);
-    }
+    log.info("Reading joined entities from: {}", inputPath);
+    spark
+        .read()
+        .load(inputPath)
+        .as(Encoders.bean(EntityRelEntity.class))
+        .groupByKey(
+            (MapFunction<EntityRelEntity, String>) value -> value.getEntity().getId(),
+            Encoders.STRING())
+        .mapGroups(
+            (MapGroupsFunction<String, EntityRelEntity, JoinedEntity>)
+                (key, values) -> {
+                  JoinedEntity j = new JoinedEntity();
+                  List<Tuple2> links = new ArrayList<>();
+                  while (values.hasNext() && links.size() < MAX_LINKS) {
+                    EntityRelEntity curr = values.next();
+                    if (j.getEntity() == null) {
+                      j.setEntity(curr.getEntity());
+                    }
+                    links.add(new Tuple2(curr.getRelation(), curr.getTarget()));
+                  }
+                  j.setLinks(links);
+                  return j;
+                },
+            Encoders.bean(JoinedEntity.class))
+        .write()
+        .mode(SaveMode.Overwrite)
+        .parquet(outputPath);
+  }
 
-    private static void removeOutputDir(SparkSession spark, String path) {
-        HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-    }
+  private static void removeOutputDir(SparkSession spark, String path) {
+    HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+  }
 }

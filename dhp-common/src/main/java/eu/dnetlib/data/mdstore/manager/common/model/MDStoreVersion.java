@@ -13,85 +13,85 @@ import javax.persistence.TemporalType;
 @Table(name = "mdstore_versions")
 public class MDStoreVersion implements Serializable {
 
-    /** */
-    private static final long serialVersionUID = -4763494442274298339L;
+  /** */
+  private static final long serialVersionUID = -4763494442274298339L;
 
-    @Id
-    @Column(name = "id")
-    private String id;
+  @Id
+  @Column(name = "id")
+  private String id;
 
-    @Column(name = "mdstore")
-    private String mdstore;
+  @Column(name = "mdstore")
+  private String mdstore;
 
-    @Column(name = "writing")
-    private boolean writing;
+  @Column(name = "writing")
+  private boolean writing;
 
-    @Column(name = "readcount")
-    private int readCount = 0;
+  @Column(name = "readcount")
+  private int readCount = 0;
 
-    @Column(name = "lastupdate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdate;
+  @Column(name = "lastupdate")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastUpdate;
 
-    @Column(name = "size")
-    private long size = 0;
+  @Column(name = "size")
+  private long size = 0;
 
-    public static MDStoreVersion newInstance(final String mdId, final boolean writing) {
-        final MDStoreVersion t = new MDStoreVersion();
-        t.setId(mdId + "-" + new Date().getTime());
-        t.setMdstore(mdId);
-        t.setLastUpdate(null);
-        t.setWriting(writing);
-        t.setReadCount(0);
-        t.setSize(0);
-        return t;
-    }
+  public static MDStoreVersion newInstance(final String mdId, final boolean writing) {
+    final MDStoreVersion t = new MDStoreVersion();
+    t.setId(mdId + "-" + new Date().getTime());
+    t.setMdstore(mdId);
+    t.setLastUpdate(null);
+    t.setWriting(writing);
+    t.setReadCount(0);
+    t.setSize(0);
+    return t;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setId(final String id) {
-        this.id = id;
-    }
+  public void setId(final String id) {
+    this.id = id;
+  }
 
-    public String getMdstore() {
-        return mdstore;
-    }
+  public String getMdstore() {
+    return mdstore;
+  }
 
-    public void setMdstore(final String mdstore) {
-        this.mdstore = mdstore;
-    }
+  public void setMdstore(final String mdstore) {
+    this.mdstore = mdstore;
+  }
 
-    public boolean isWriting() {
-        return writing;
-    }
+  public boolean isWriting() {
+    return writing;
+  }
 
-    public void setWriting(final boolean writing) {
-        this.writing = writing;
-    }
+  public void setWriting(final boolean writing) {
+    this.writing = writing;
+  }
 
-    public int getReadCount() {
-        return readCount;
-    }
+  public int getReadCount() {
+    return readCount;
+  }
 
-    public void setReadCount(final int readCount) {
-        this.readCount = readCount;
-    }
+  public void setReadCount(final int readCount) {
+    this.readCount = readCount;
+  }
 
-    public Date getLastUpdate() {
-        return lastUpdate;
-    }
+  public Date getLastUpdate() {
+    return lastUpdate;
+  }
 
-    public void setLastUpdate(final Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
+  public void setLastUpdate(final Date lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
 
-    public long getSize() {
-        return size;
-    }
+  public long getSize() {
+    return size;
+  }
 
-    public void setSize(final long size) {
-        this.size = size;
-    }
+  public void setSize(final long size) {
+    this.size = size;
+  }
 }
