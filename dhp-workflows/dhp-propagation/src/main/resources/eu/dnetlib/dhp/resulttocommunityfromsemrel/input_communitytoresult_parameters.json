@@ -35,6 +35,12 @@
     "paramLongName": "preparedInfoPath",
     "paramDescription": "the path where prepared info have been stored",
     "paramRequired": true
+  },
+  {
+    "paramName":"test",
+    "paramLongName":"isTest",
+    "paramDescription": "true if it is executing a test",
+    "paramRequired": false
   }
 
 ]
