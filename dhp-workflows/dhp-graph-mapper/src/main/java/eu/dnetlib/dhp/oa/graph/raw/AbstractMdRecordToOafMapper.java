@@ -164,29 +164,34 @@ public abstract class AbstractMdRecordToOafMapper {
         final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
 
         for (final Object o : doc.selectNodes("//oaf:projectid")) {
-            final String projectId = createOpenaireId(40, ((Node) o).getText(), true);
 
-            final Relation r1 = new Relation();
-            r1.setRelType("resultProject");
-            r1.setSubRelType("outcome");
-            r1.setRelClass("isProducedBy");
-            r1.setSource(docId);
-            r1.setTarget(projectId);
-            r1.setCollectedfrom(Arrays.asList(collectedFrom));
-            r1.setDataInfo(info);
-            r1.setLastupdatetimestamp(lastUpdateTimestamp);
-            res.add(r1);
+            final String originalId = ((Node) o).getText();
 
-            final Relation r2 = new Relation();
-            r2.setRelType("resultProject");
-            r2.setSubRelType("outcome");
-            r2.setRelClass("produces");
-            r2.setSource(projectId);
-            r2.setTarget(docId);
-            r2.setCollectedfrom(Arrays.asList(collectedFrom));
-            r2.setDataInfo(info);
-            r2.setLastupdatetimestamp(lastUpdateTimestamp);
-            res.add(r2);
+            if (StringUtils.isNotBlank(originalId)) {
+                final String projectId = createOpenaireId(40, originalId, true);
+
+                final Relation r1 = new Relation();
+                r1.setRelType("resultProject");
+                r1.setSubRelType("outcome");
+                r1.setRelClass("isProducedBy");
+                r1.setSource(docId);
+                r1.setTarget(projectId);
+                r1.setCollectedfrom(Arrays.asList(collectedFrom));
+                r1.setDataInfo(info);
+                r1.setLastupdatetimestamp(lastUpdateTimestamp);
+                res.add(r1);
+
+                final Relation r2 = new Relation();
+                r2.setRelType("resultProject");
+                r2.setSubRelType("outcome");
+                r2.setRelClass("produces");
+                r2.setSource(projectId);
+                r2.setTarget(docId);
+                r2.setCollectedfrom(Arrays.asList(collectedFrom));
+                r2.setDataInfo(info);
+                r2.setLastupdatetimestamp(lastUpdateTimestamp);
+                res.add(r2);
+            }
         }
 
         return res;

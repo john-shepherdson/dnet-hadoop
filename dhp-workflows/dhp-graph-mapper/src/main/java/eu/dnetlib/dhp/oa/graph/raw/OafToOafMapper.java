@@ -4,11 +4,21 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.GeoLocation;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
@@ -224,29 +234,35 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
         final List<Oaf> res = new ArrayList<>();
 
         for (final Object o : doc.selectNodes("//*[local-name()='relatedDataset']")) {
-            final String otherId = createOpenaireId(50, ((Node) o).getText(), false);
 
-            final Relation r1 = new Relation();
-            r1.setRelType("resultResult");
-            r1.setSubRelType("publicationDataset");
-            r1.setRelClass("isRelatedTo");
-            r1.setSource(docId);
-            r1.setTarget(otherId);
-            r1.setCollectedfrom(Arrays.asList(collectedFrom));
-            r1.setDataInfo(info);
-            r1.setLastupdatetimestamp(lastUpdateTimestamp);
-            res.add(r1);
+            final String originalId = ((Node) o).getText();
 
-            final Relation r2 = new Relation();
-            r2.setRelType("resultResult");
-            r2.setSubRelType("publicationDataset");
-            r2.setRelClass("isRelatedTo");
-            r2.setSource(otherId);
-            r2.setTarget(docId);
-            r2.setCollectedfrom(Arrays.asList(collectedFrom));
-            r2.setDataInfo(info);
-            r2.setLastupdatetimestamp(lastUpdateTimestamp);
-            res.add(r2);
+            if (StringUtils.isNotBlank(originalId)) {
+
+                final String otherId = createOpenaireId(50, originalId, false);
+
+                final Relation r1 = new Relation();
+                r1.setRelType("resultResult");
+                r1.setSubRelType("publicationDataset");
+                r1.setRelClass("isRelatedTo");
+                r1.setSource(docId);
+                r1.setTarget(otherId);
+                r1.setCollectedfrom(Arrays.asList(collectedFrom));
+                r1.setDataInfo(info);
+                r1.setLastupdatetimestamp(lastUpdateTimestamp);
+                res.add(r1);
+
+                final Relation r2 = new Relation();
+                r2.setRelType("resultResult");
+                r2.setSubRelType("publicationDataset");
+                r2.setRelClass("isRelatedTo");
+                r2.setSource(otherId);
+                r2.setTarget(docId);
+                r2.setCollectedfrom(Arrays.asList(collectedFrom));
+                r2.setDataInfo(info);
+                r2.setLastupdatetimestamp(lastUpdateTimestamp);
+                res.add(r2);
+            }
         }
         return res;
     }
