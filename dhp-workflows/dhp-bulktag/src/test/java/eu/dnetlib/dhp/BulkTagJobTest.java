@@ -795,9 +795,9 @@ public class BulkTagJobTest {
         org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
         idExplodeCommunity.show(false);
-        Assertions.assertEquals(2, idExplodeCommunity.count());
+        Assertions.assertEquals(3, idExplodeCommunity.count());
 
         Assertions.assertEquals(
-                2, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
+                3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
     }
 }
