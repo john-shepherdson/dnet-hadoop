@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.utils;
 
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class ISLookupClientFactory {
 

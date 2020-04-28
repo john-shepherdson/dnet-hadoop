@@ -1,12 +1,13 @@
 
 package eu.dnetlib.dhp.collection.worker;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
-import eu.dnetlib.message.MessageManager;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
+import eu.dnetlib.message.MessageManager;
 
 /**
  * DnetCollectortWorkerApplication is the main class responsible to start the Dnet Collection into HDFS. This module

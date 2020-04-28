@@ -1,17 +1,11 @@
 
 package eu.dnetlib.dhp.provision.update;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.provision.scholix.Scholix;
-import eu.dnetlib.dhp.provision.scholix.ScholixIdentifier;
-import eu.dnetlib.dhp.provision.scholix.ScholixRelationship;
-import eu.dnetlib.dhp.provision.scholix.ScholixResource;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
@@ -21,6 +15,15 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.provision.scholix.Scholix;
+import eu.dnetlib.dhp.provision.scholix.ScholixIdentifier;
+import eu.dnetlib.dhp.provision.scholix.ScholixRelationship;
+import eu.dnetlib.dhp.provision.scholix.ScholixResource;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class SparkResolveScholixTarget {

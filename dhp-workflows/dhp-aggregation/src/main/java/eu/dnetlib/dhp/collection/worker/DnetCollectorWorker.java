@@ -1,19 +1,12 @@
 
 package eu.dnetlib.dhp.collection.worker;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.collector.worker.model.ApiDescriptor;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
-import eu.dnetlib.message.Message;
-import eu.dnetlib.message.MessageManager;
-import eu.dnetlib.message.MessageType;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -22,6 +15,16 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.collector.worker.model.ApiDescriptor;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
+import eu.dnetlib.message.Message;
+import eu.dnetlib.message.MessageManager;
+import eu.dnetlib.message.MessageType;
 
 public class DnetCollectorWorker {
 

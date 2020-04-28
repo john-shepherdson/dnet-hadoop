@@ -1,18 +1,20 @@
 
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.hash.Hashing;
 import java.nio.charset.Charset;
 import java.text.Normalizer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.text.WordUtils;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.hash.Hashing;
 
 public class PacePerson {
 

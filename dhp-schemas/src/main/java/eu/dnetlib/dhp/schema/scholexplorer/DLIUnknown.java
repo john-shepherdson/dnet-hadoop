@@ -1,14 +1,16 @@
 
 package eu.dnetlib.dhp.schema.scholexplorer;
 
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class DLIUnknown extends Oaf implements Serializable {
 

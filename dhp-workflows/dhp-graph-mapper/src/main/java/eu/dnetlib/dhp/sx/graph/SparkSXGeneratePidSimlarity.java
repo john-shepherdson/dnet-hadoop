@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.sx.graph;
 
-import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -11,6 +9,9 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+
+import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 /**

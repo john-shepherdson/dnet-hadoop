@@ -5,20 +5,6 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.mycila.xmltool.XMLDoc;
-import com.mycila.xmltool.XMLTag;
-import eu.dnetlib.dhp.oa.provision.model.*;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.MainEntityType;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.Result;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -28,9 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
@@ -40,6 +28,22 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.mycila.xmltool.XMLDoc;
+import com.mycila.xmltool.XMLTag;
+
+import eu.dnetlib.dhp.oa.provision.model.*;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.MainEntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class XmlRecordFactory implements Serializable {
 

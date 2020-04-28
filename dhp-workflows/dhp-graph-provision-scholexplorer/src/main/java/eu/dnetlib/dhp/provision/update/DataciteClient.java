@@ -1,13 +1,15 @@
 
 package eu.dnetlib.dhp.provision.update;
 
-import eu.dnetlib.dhp.provision.scholix.ScholixResource;
 import java.io.IOException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+
+import eu.dnetlib.dhp.provision.scholix.ScholixResource;
 
 public class DataciteClient {
 

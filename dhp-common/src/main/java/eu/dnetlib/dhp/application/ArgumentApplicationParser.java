@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.application;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
@@ -9,9 +8,12 @@ import java.io.StringWriter;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
 import org.apache.commons.cli.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ArgumentApplicationParser implements Serializable {
 

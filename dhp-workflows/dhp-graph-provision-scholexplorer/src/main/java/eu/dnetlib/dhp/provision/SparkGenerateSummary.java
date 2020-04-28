@@ -1,15 +1,16 @@
 
 package eu.dnetlib.dhp.provision;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class SparkGenerateSummary {

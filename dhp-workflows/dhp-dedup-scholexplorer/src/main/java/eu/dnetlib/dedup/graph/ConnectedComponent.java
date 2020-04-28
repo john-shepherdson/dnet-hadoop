@@ -1,14 +1,17 @@
 
 package eu.dnetlib.dedup.graph;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dedup.DedupUtility;
-import eu.dnetlib.pace.util.PaceException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dedup.DedupUtility;
+import eu.dnetlib.pace.util.PaceException;
 
 public class ConnectedComponent implements Serializable {
 

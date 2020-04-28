@@ -4,13 +4,10 @@ package eu.dnetlib.dhp.actionmanager.partition;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static org.apache.spark.sql.functions.*;
 
-import eu.dnetlib.dhp.actionmanager.ISClient;
-import eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJob;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -20,6 +17,11 @@ import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.dnetlib.dhp.actionmanager.ISClient;
+import eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJob;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 
 /** Partitions given set of action sets by payload type. */
 public class PartitionActionSetsByPayloadTypeJob {

@@ -1,11 +1,13 @@
 
 package eu.dnetlib.dhp.transformation.vocabulary;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.charset.Charset;
+
 import org.apache.commons.io.IOUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class VocabularyHelper implements Serializable {
 

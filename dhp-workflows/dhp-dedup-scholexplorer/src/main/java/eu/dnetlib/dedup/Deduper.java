@@ -1,12 +1,9 @@
 
 package eu.dnetlib.dedup;
 
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.MapDocument;
-import eu.dnetlib.pace.util.BlockProcessor;
-import eu.dnetlib.pace.util.MapDocumentUtil;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -16,6 +13,11 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.util.LongAccumulator;
+
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.model.MapDocument;
+import eu.dnetlib.pace.util.BlockProcessor;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Serializable;
 import scala.Tuple2;
 

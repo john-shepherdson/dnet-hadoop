@@ -1,16 +1,18 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
-import eu.dnetlib.dhp.oa.graph.raw.common.MdstoreClient;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.oa.graph.raw.common.MdstoreClient;
 
 public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication
 	implements Closeable {

@@ -1,6 +1,17 @@
 
 package eu.dnetlib.dhp.sx.graph.parser;
 
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
@@ -9,14 +20,6 @@ import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.scholexplorer.relation.RelInfo;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.xml.stream.XMLStreamReader;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public abstract class AbstractScholexplorerParser {
 

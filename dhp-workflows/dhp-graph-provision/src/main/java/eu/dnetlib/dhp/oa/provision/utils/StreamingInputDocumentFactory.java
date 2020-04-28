@@ -1,18 +1,21 @@
 
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import com.google.common.collect.Lists;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.stream.*;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
 import org.apache.solr.common.SolrInputDocument;
+
+import com.google.common.collect.Lists;
 
 /**
  * Optimized version of the document parser, drop in replacement of InputDocumentFactory.

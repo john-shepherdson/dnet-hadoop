@@ -1,14 +1,6 @@
 
 package eu.dnetlib.dedup;
 
-import com.google.common.collect.Sets;
-import com.wcohen.ss.JaroWinkler;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.MapDocument;
-import eu.dnetlib.pace.model.Person;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +8,7 @@ import java.security.MessageDigest;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +20,16 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.util.LongAccumulator;
+
+import com.google.common.collect.Sets;
+import com.wcohen.ss.JaroWinkler;
+
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.model.MapDocument;
+import eu.dnetlib.pace.model.Person;
 import scala.Tuple2;
 
 public class DedupUtility {

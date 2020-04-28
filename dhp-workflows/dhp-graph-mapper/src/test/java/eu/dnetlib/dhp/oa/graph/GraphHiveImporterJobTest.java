@@ -1,11 +1,10 @@
 
 package eu.dnetlib.dhp.oa.graph;
 
-import eu.dnetlib.dhp.oa.graph.hive.GraphHiveImporterJob;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.spark.SparkConf;
@@ -16,6 +15,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.dnetlib.dhp.oa.graph.hive.GraphHiveImporterJob;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 
 public class GraphHiveImporterJobTest {
 

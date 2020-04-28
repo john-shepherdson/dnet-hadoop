@@ -1,14 +1,16 @@
 
 package eu.dnetlib.dhp.schema.action;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-import java.io.IOException;
 
 public class AtomicActionDeserializer extends JsonDeserializer {
 

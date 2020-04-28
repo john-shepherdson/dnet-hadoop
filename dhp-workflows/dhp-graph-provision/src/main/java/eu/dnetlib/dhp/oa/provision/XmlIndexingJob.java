@@ -3,24 +3,18 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import com.lucidworks.spark.util.SolrSupport;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpDocumentNotFoundException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
+
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
@@ -30,6 +24,16 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.lucidworks.spark.util.SolrSupport;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpDocumentNotFoundException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class XmlIndexingJob {
 

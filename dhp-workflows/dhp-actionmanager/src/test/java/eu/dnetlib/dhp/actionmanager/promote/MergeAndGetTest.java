@@ -6,11 +6,13 @@ import static eu.dnetlib.dhp.actionmanager.promote.MergeAndGet.functionFor;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
-import eu.dnetlib.dhp.schema.oaf.*;
 import java.util.function.BiFunction;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class MergeAndGetTest {
 

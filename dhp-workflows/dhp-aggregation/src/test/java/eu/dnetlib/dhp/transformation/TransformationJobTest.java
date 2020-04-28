@@ -3,18 +3,14 @@ package eu.dnetlib.dhp.transformation;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.functions.Cleaner;
-import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
-import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.transform.stream.StreamSource;
-import net.sf.saxon.s9api.*;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
@@ -26,6 +22,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.functions.Cleaner;
+import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
+import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
+import eu.dnetlib.dhp.utils.DHPUtils;
+import net.sf.saxon.s9api.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TransformationJobTest {

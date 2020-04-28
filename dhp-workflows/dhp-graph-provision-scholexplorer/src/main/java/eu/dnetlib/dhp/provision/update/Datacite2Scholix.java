@@ -1,17 +1,20 @@
 
 package eu.dnetlib.dhp.provision.update;
 
-import com.jayway.jsonpath.JsonPath;
-import eu.dnetlib.dhp.provision.scholix.*;
-import eu.dnetlib.dhp.utils.DHPUtils;
-import eu.dnetlib.scholexplorer.relation.RelInfo;
-import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
+import com.jayway.jsonpath.JsonPath;
+
+import eu.dnetlib.dhp.provision.scholix.*;
+import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.scholexplorer.relation.RelInfo;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 
 public class Datacite2Scholix {
 

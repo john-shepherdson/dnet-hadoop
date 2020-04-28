@@ -1,12 +1,6 @@
 
 package eu.dnetlib.dhp.sx.graph;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.sx.graph.parser.DatasetScholexplorerParser;
-import eu.dnetlib.dhp.sx.graph.parser.PublicationScholexplorerParser;
-import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -14,6 +8,14 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.SparkSession;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.sx.graph.parser.DatasetScholexplorerParser;
+import eu.dnetlib.dhp.sx.graph.parser.PublicationScholexplorerParser;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import scala.Tuple2;
 
 /**

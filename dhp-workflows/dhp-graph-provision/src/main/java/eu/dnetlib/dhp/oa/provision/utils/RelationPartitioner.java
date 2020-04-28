@@ -1,9 +1,10 @@
 
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
 import org.apache.spark.Partitioner;
 import org.apache.spark.util.Utils;
+
+import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
 
 /**
  * Used in combination with SortableRelationKey, allows to partition the records by source id, therefore allowing to

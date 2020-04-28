@@ -1,18 +1,20 @@
 
 package eu.dnetlib.dhp.provision.update;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import eu.dnetlib.dhp.provision.scholix.ScholixCollectedFrom;
 import eu.dnetlib.dhp.provision.scholix.ScholixEntityId;
 import eu.dnetlib.dhp.provision.scholix.ScholixIdentifier;
 import eu.dnetlib.dhp.provision.scholix.ScholixResource;
 import eu.dnetlib.dhp.utils.DHPUtils;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class CrossRefParserJSON {
 

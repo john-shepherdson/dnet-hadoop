@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.collection.worker.utils;
 
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
@@ -9,14 +8,18 @@ import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
 
 public class HttpConnector {
 

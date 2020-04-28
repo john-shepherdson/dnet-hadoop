@@ -1,18 +1,21 @@
 
 package eu.dnetlib.dhp.sx.graph;
 
-import com.jayway.jsonpath.JsonPath;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.minidev.json.JSONArray;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
+
+import com.jayway.jsonpath.JsonPath;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import net.minidev.json.JSONArray;
 
 /**
  * This Job extracts a typology of entity and stores it in a new RDD This job is called different times, for each file

@@ -1,19 +1,22 @@
 
 package eu.dnetlib.dedup;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.util.MapDocumentUtil;
 import java.util.Collection;
+
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
 
 public class DedupRecordFactory {

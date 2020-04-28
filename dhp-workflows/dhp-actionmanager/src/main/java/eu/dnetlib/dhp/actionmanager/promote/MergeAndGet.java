@@ -3,11 +3,12 @@ package eu.dnetlib.dhp.actionmanager.promote;
 
 import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
 
+import java.util.function.BiFunction;
+
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import java.util.function.BiFunction;
 
 /** OAF model merging support. */
 public class MergeAndGet {

@@ -1,14 +1,16 @@
 
 package eu.dnetlib.dedup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.pace.config.DedupConfig;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.pace.config.DedupConfig;
 
 public class SparkCreateDedupRecord {
 	public static void main(String[] args) throws Exception {

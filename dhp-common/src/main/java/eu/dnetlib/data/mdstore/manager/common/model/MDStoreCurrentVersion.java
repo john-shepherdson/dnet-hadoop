@@ -2,6 +2,7 @@
 package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;

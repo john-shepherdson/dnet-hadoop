@@ -1,11 +1,13 @@
 
 package eu.dnetlib.dhp.schema.scholexplorer;
 
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Publication;
 import java.io.Serializable;
 import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Publication;
 
 public class DLIPublication extends Publication implements Serializable {
 

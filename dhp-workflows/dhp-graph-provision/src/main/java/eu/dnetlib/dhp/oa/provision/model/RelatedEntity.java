@@ -1,13 +1,15 @@
 
 package eu.dnetlib.dhp.oa.provision.model;
 
+import java.io.Serializable;
+import java.util.List;
+
 import com.google.common.base.Objects;
+
 import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import java.io.Serializable;
-import java.util.List;
 
 public class RelatedEntity implements Serializable {
 

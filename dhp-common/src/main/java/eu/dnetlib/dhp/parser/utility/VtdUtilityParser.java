@@ -1,12 +1,13 @@
 
 package eu.dnetlib.dhp.parser.utility;
 
-import com.ximpleware.AutoPilot;
-import com.ximpleware.VTDNav;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.ximpleware.AutoPilot;
+import com.ximpleware.VTDNav;
 
 /** Created by sandro on 9/29/16. */
 public class VtdUtilityParser {

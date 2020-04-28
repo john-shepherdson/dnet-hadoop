@@ -4,11 +4,12 @@ package eu.dnetlib.dhp.schema.common;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 
 public class ModelSupportTest {
 

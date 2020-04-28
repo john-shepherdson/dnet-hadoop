@@ -3,12 +3,11 @@ package eu.dnetlib.dhp.actionmanager.promote;
 
 import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
 
-import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -16,6 +15,9 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.TypedColumn;
 import org.apache.spark.sql.expressions.Aggregator;
+
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 import scala.Tuple2;
 
 /** Promote action payload functions. */

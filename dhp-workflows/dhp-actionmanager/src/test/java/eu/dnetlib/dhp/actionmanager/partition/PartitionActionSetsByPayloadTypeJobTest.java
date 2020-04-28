@@ -6,16 +6,13 @@ import static org.apache.spark.sql.functions.*;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static scala.collection.JavaConversions.mutableSeqAsJavaList;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.actionmanager.ISClient;
-import eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJobTest;
-import eu.dnetlib.dhp.schema.oaf.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -33,6 +30,12 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.actionmanager.ISClient;
+import eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJobTest;
+import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
 import scala.collection.mutable.Seq;
 

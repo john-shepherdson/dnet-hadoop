@@ -1,9 +1,11 @@
 
 package eu.dnetlib.dhp.schema.oaf;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+
 import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Qualifier implements Serializable {
 

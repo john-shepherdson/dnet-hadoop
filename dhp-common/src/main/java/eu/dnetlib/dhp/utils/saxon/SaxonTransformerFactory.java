@@ -2,9 +2,11 @@
 package eu.dnetlib.dhp.utils.saxon;
 
 import java.io.StringReader;
+
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamSource;
+
 import net.sf.saxon.Configuration;
 import net.sf.saxon.TransformerFactoryImpl;
 

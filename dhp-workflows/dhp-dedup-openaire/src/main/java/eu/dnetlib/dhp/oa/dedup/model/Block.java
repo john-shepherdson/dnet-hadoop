@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.oa.dedup.model;
 
-import com.google.common.collect.Lists;
-import eu.dnetlib.pace.model.MapDocument;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,6 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import com.google.common.collect.Lists;
+
+import eu.dnetlib.pace.model.MapDocument;
 
 public class Block implements Serializable {
 

@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.transformation.functions;
 
-import eu.dnetlib.dhp.transformation.vocabulary.Term;
-import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
 import java.util.Map;
 import java.util.Optional;
+
+import eu.dnetlib.dhp.transformation.vocabulary.Term;
+import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
 import net.sf.saxon.s9api.*;
 import scala.Serializable;
 

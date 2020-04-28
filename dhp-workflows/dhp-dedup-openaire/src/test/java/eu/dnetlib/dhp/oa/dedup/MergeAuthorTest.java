@@ -1,14 +1,16 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import eu.dnetlib.dhp.schema.oaf.Publication;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+
+import eu.dnetlib.dhp.schema.oaf.Publication;
 
 public class MergeAuthorTest {
 

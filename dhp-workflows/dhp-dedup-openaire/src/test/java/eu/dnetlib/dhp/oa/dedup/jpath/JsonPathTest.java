@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.oa.dedup.jpath;
 
+import org.junit.jupiter.api.Test;
+
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
-import org.junit.jupiter.api.Test;
 
 public class JsonPathTest {
 

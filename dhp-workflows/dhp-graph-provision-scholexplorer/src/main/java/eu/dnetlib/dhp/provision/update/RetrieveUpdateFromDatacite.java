@@ -1,12 +1,9 @@
 
 package eu.dnetlib.dhp.provision.update;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.provision.scholix.Scholix;
-import eu.dnetlib.scholexplorer.relation.RelationMapper;
 import java.net.URI;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -14,6 +11,12 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.provision.scholix.Scholix;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 
 public class RetrieveUpdateFromDatacite {
 

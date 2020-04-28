@@ -1,15 +1,13 @@
 
 package eu.dnetlib.dhp.collection.plugin.oai;
 
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
-import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +15,10 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+
+import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
+import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
 
 public class OaiIterator implements Iterator<String> {
 

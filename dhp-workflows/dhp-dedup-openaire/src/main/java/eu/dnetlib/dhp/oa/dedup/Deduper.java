@@ -1,15 +1,17 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.util.LongAccumulator;
+
 import eu.dnetlib.dhp.oa.dedup.model.Block;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.BlockProcessor;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.util.LongAccumulator;
 import scala.Serializable;
 import scala.Tuple2;
 

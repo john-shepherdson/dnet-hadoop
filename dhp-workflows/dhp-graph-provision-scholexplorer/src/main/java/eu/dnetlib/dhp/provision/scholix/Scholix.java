@@ -1,13 +1,15 @@
 
 package eu.dnetlib.dhp.provision.scholix;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class Scholix implements Serializable {
 	private String publicationDate;

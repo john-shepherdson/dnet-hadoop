@@ -1,17 +1,20 @@
 
 package eu.dnetlib.dhp.provision.update;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import eu.dnetlib.dhp.provision.scholix.ScholixResource;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Inflater;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
+import eu.dnetlib.dhp.provision.scholix.ScholixResource;
 
 public class CrossrefClient {
 

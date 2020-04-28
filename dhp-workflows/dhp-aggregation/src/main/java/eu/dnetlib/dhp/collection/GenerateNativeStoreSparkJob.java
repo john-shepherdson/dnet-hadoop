@@ -1,18 +1,12 @@
 
 package eu.dnetlib.dhp.collection;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.model.mdstore.Provenance;
-import eu.dnetlib.message.Message;
-import eu.dnetlib.message.MessageManager;
-import eu.dnetlib.message.MessageType;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +23,15 @@ import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.model.mdstore.Provenance;
+import eu.dnetlib.message.Message;
+import eu.dnetlib.message.MessageManager;
+import eu.dnetlib.message.MessageType;
 
 public class GenerateNativeStoreSparkJob {
 

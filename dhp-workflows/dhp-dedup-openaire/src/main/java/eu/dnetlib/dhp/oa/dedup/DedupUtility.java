@@ -1,8 +1,24 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
+import java.io.StringReader;
+import java.security.MessageDigest;
+import java.text.Normalizer;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.SparkContext;
+import org.apache.spark.util.LongAccumulator;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+
 import com.google.common.collect.Sets;
 import com.wcohen.ss.JaroWinkler;
+
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -12,19 +28,6 @@ import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.model.Person;
-import java.io.StringReader;
-import java.security.MessageDigest;
-import java.text.Normalizer;
-import java.util.*;
-import java.util.stream.Collectors;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.SparkContext;
-import org.apache.spark.util.LongAccumulator;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import scala.Tuple2;
 
 public class DedupUtility {

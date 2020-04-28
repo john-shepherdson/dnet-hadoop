@@ -1,11 +1,13 @@
 
 package eu.dnetlib.dhp.common;
 
-import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.ThrowingConsumer;
 import java.util.Objects;
 import java.util.function.Function;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
+
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.ThrowingConsumer;
 
 /** SparkSession utility methods. */
 public class SparkSessionSupport {

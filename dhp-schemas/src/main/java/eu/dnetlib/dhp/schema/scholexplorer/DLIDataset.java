@@ -1,13 +1,15 @@
 
 package eu.dnetlib.dhp.schema.scholexplorer;
 
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
 public class DLIDataset extends Dataset {
 

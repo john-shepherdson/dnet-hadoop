@@ -1,11 +1,12 @@
 
 package eu.dnetlib.dhp.provision.scholix;
 
-import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 
 public class ScholixResource implements Serializable {
 

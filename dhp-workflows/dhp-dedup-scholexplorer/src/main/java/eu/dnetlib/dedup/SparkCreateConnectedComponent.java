@@ -1,15 +1,9 @@
 
 package eu.dnetlib.dedup;
 
-import com.google.common.hash.Hashing;
-import eu.dnetlib.dedup.graph.ConnectedComponent;
-import eu.dnetlib.dedup.graph.GraphProcessor;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.util.MapDocumentUtil;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -21,6 +15,15 @@ import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
+
+import com.google.common.hash.Hashing;
+
+import eu.dnetlib.dedup.graph.ConnectedComponent;
+import eu.dnetlib.dedup.graph.GraphProcessor;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
 
 public class SparkCreateConnectedComponent {

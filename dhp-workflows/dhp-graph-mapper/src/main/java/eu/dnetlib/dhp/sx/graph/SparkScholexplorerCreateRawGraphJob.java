@@ -1,21 +1,11 @@
 
 package eu.dnetlib.dhp.sx.graph;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
-import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
-import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
-import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.minidev.json.JSONArray;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
@@ -32,6 +22,19 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
+import eu.dnetlib.dhp.utils.DHPUtils;
+import net.minidev.json.JSONArray;
 import scala.Tuple2;
 
 /**

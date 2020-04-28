@@ -1,8 +1,9 @@
 
 package eu.dnetlib.dhp.actionmanager.migration;
 
-import eu.dnetlib.data.proto.FieldTypeProtos.Qualifier;
 import java.util.Comparator;
+
+import eu.dnetlib.data.proto.FieldTypeProtos.Qualifier;
 
 public class LicenseComparator implements Comparator<Qualifier> {
 

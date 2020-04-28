@@ -1,9 +1,11 @@
 
 package eu.dnetlib.dhp.schema.action;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 
 @JsonDeserialize(using = AtomicActionDeserializer.class)
 public class AtomicAction<T extends Oaf> implements Serializable {

@@ -1,11 +1,13 @@
 
 package eu.dnetlib.dhp.oa.provision.model;
 
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Maps;
-import eu.dnetlib.dhp.schema.oaf.Relation;
 import java.io.Serializable;
 import java.util.Map;
+
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Maps;
+
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class SortableRelation extends Relation implements Comparable<Relation>, Serializable {
 

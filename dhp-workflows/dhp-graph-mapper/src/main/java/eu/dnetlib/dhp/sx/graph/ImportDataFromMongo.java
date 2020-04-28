@@ -1,13 +1,6 @@
 
 package eu.dnetlib.dhp.sx.graph;
 
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.QueryBuilder;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -16,6 +9,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -25,6 +19,15 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.QueryBuilder;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**
  * This job is responsible to collect data from mongoDatabase and store in a sequence File on HDFS Mongo database

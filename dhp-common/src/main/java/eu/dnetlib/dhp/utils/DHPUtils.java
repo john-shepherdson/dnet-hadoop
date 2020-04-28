@@ -1,17 +1,20 @@
 
 package eu.dnetlib.dhp.utils;
 
-import com.jayway.jsonpath.JsonPath;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import net.minidev.json.JSONArray;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.codec.binary.Hex;
+
+import com.jayway.jsonpath.JsonPath;
+
+import net.minidev.json.JSONArray;
 
 public class DHPUtils {
 

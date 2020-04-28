@@ -1,15 +1,18 @@
 
 package eu.dnetlib.dhp.provision;
 
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.provision.scholix.Scholix;
 import eu.dnetlib.dhp.provision.scholix.ScholixResource;
 import eu.dnetlib.dhp.provision.update.*;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
-import java.util.List;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 public class DataciteClientTest {
 	@Test

@@ -1,11 +1,13 @@
 
 package eu.dnetlib.dhp.schema.common;
 
-import com.google.common.collect.Maps;
-import eu.dnetlib.dhp.schema.oaf.*;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import com.google.common.collect.Maps;
+
+import eu.dnetlib.dhp.schema.oaf.*;
 
 /** Oaf model utility methods. */
 public class ModelSupport {

@@ -1,12 +1,6 @@
 
 package eu.dnetlib.dhp.collection.plugin.oai;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-import eu.dnetlib.collector.worker.model.ApiDescriptor;
-import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +8,14 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+
+import eu.dnetlib.collector.worker.model.ApiDescriptor;
+import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
 

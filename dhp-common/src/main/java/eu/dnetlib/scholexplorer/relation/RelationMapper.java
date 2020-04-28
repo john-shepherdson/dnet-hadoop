@@ -1,10 +1,12 @@
 
 package eu.dnetlib.scholexplorer.relation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.util.HashMap;
+
 import org.apache.commons.io.IOUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class RelationMapper extends HashMap<String, RelInfo> implements Serializable {
 

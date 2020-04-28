@@ -1,19 +1,21 @@
 
 package eu.dnetlib.dhp.provision.scholix.summary;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.provision.RelatedItemInfo;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ScholixSummary implements Serializable {
 	private String id;

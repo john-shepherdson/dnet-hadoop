@@ -3,14 +3,8 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
-import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
 import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -23,6 +17,15 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
+import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
 import scala.Tuple2;
 
 /**

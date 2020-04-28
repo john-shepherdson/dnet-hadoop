@@ -1,9 +1,10 @@
 
 package eu.dnetlib.dhp.provision;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.sql.*;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**
  * SparkExtractRelationCount is a spark job that takes in input relation RDD and retrieve for each item in relation

@@ -3,12 +3,14 @@ package eu.dnetlib.dhp.common;
 
 import static org.mockito.Mockito.*;
 
-import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.ThrowingConsumer;
 import java.util.function.Function;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.ThrowingConsumer;
 
 public class SparkSessionSupportTest {
 

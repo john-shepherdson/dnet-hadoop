@@ -1,9 +1,10 @@
 
 package eu.dnetlib.dhp.oa.provision.model;
 
-import eu.dnetlib.dhp.schema.oaf.Relation;
 import java.io.Serializable;
 import java.util.Objects;
+
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class Tuple2 implements Serializable {
 

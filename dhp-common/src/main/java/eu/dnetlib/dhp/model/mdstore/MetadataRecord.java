@@ -1,8 +1,9 @@
 
 package eu.dnetlib.dhp.model.mdstore;
 
-import eu.dnetlib.dhp.utils.DHPUtils;
 import java.io.Serializable;
+
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 /** This class models a record inside the new Metadata store collection on HDFS * */
 public class MetadataRecord implements Serializable {

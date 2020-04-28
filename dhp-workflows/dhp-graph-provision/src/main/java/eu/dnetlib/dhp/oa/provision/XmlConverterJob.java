@@ -3,18 +3,11 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.*;
-import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
-import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
-import eu.dnetlib.dhp.schema.oaf.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
@@ -28,6 +21,16 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.provision.model.*;
+import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
+import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
 
 /**

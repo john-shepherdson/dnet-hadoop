@@ -1,9 +1,23 @@
 
 package eu.dnetlib.dhp.actionmanager;
 
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
 import eu.dnetlib.actionmanager.rmi.ActionManagerException;
 import eu.dnetlib.actionmanager.set.ActionManagerSet;
 import eu.dnetlib.actionmanager.set.ActionManagerSet.ImpactTypes;
@@ -11,17 +25,6 @@ import eu.dnetlib.dhp.actionmanager.partition.PartitionActionSetsByPayloadTypeJo
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ISClient implements Serializable {
 

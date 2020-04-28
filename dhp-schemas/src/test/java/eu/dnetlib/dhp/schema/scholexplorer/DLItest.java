@@ -1,16 +1,19 @@
 
 package eu.dnetlib.dhp.schema.scholexplorer;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import org.junit.jupiter.api.Test;
 
 public class DLItest {
 

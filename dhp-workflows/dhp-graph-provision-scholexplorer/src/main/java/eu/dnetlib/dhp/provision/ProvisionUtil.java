@@ -1,9 +1,10 @@
 
 package eu.dnetlib.dhp.provision;
 
+import org.apache.commons.lang3.StringUtils;
+
 import eu.dnetlib.dhp.provision.scholix.summary.Typology;
 import eu.dnetlib.dhp.utils.DHPUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class ProvisionUtil {
 

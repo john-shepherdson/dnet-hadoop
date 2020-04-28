@@ -1,11 +1,13 @@
 
 package eu.dnetlib.dhp.provision;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.provision.scholix.Scholix;
-import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.provision.scholix.Scholix;
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 
 public class ExtractInfoTest {
 	@Test

@@ -6,15 +6,18 @@ import static eu.dnetlib.data.proto.KindProtos.Kind.relation;
 import static eu.dnetlib.data.proto.TypeProtos.*;
 import static eu.dnetlib.data.proto.TypeProtos.Type.*;
 
-import com.google.common.collect.Lists;
-import com.googlecode.protobuf.format.JsonFormat;
-import eu.dnetlib.data.proto.*;
-import eu.dnetlib.dhp.schema.oaf.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Lists;
+import com.googlecode.protobuf.format.JsonFormat;
+
+import eu.dnetlib.data.proto.*;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class ProtoConverter implements Serializable {
 

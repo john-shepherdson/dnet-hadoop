@@ -4,14 +4,16 @@ package eu.dnetlib.dhp.oa.provision.utils;
 import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
 import static eu.dnetlib.dhp.oa.provision.utils.XmlSerializationUtils.escapeXml;
 
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.stringtemplate.v4.ST;
+
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
 public class TemplateFactory {
 

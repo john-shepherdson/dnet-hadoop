@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.ThrowingSupport.rethrowAsRuntimeException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;

@@ -1,18 +1,11 @@
 
 package eu.dnetlib.dhp.transformation;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
-import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
-import eu.dnetlib.dhp.utils.DHPUtils;
-import eu.dnetlib.message.Message;
-import eu.dnetlib.message.MessageManager;
-import eu.dnetlib.message.MessageType;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.sql.Dataset;
@@ -24,6 +17,15 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
+import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
+import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.message.Message;
+import eu.dnetlib.message.MessageManager;
+import eu.dnetlib.message.MessageType;
 
 public class TransformSparkJobNode {
 

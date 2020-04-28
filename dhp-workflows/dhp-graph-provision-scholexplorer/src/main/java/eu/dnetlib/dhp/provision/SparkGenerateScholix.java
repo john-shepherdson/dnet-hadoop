@@ -1,11 +1,6 @@
 
 package eu.dnetlib.dhp.provision;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.provision.scholix.*;
-import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
-import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -15,6 +10,13 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.provision.scholix.*;
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
 public class SparkGenerateScholix {

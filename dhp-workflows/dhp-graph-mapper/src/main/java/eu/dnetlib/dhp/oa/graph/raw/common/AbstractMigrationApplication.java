@@ -1,10 +1,10 @@
 
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
-import eu.dnetlib.dhp.schema.oaf.Oaf;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -12,6 +12,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 
 public class AbstractMigrationApplication implements Closeable {
 

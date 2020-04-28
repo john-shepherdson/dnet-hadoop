@@ -3,9 +3,11 @@ package eu.dnetlib.dhp.oa.provision.utils;
 
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 
-import com.google.common.collect.Sets;
-import eu.dnetlib.dhp.schema.oaf.*;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
+
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class GraphMappingUtils {
 

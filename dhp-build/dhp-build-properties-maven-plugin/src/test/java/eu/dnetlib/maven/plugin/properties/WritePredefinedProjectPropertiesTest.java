@@ -8,6 +8,7 @@ import static org.mockito.Mockito.lenient;
 
 import java.io.*;
 import java.util.Properties;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.*;

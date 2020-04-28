@@ -4,17 +4,20 @@ package eu.dnetlib.dhp.collector.worker;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+import java.io.File;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.collector.worker.model.ApiDescriptor;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.worker.DnetCollectorWorker;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
-import java.io.File;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class DnetCollectorWorkerApplicationTests {
 

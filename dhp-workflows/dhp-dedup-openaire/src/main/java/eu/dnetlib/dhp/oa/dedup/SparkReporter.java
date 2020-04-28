@@ -1,11 +1,13 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import eu.dnetlib.pace.util.Reporter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.spark.util.LongAccumulator;
+
+import eu.dnetlib.pace.util.Reporter;
 import scala.Serializable;
 import scala.Tuple2;
 

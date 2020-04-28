@@ -1,9 +1,10 @@
 
 package eu.dnetlib.dhp.schema.oaf;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
 import java.util.List;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class Dataset extends Result implements Serializable {
 

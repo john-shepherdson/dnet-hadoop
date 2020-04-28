@@ -1,8 +1,9 @@
 
 package eu.dnetlib.dhp.schema.oaf;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import java.io.Serializable;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class Publication extends Result implements Serializable {
 

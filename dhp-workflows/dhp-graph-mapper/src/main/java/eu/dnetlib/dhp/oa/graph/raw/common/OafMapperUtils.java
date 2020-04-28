@@ -1,14 +1,16 @@
 
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class OafMapperUtils {
 

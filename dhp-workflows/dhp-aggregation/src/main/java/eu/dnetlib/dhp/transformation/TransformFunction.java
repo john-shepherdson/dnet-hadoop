@@ -1,16 +1,19 @@
 
 package eu.dnetlib.dhp.transformation;
 
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.functions.Cleaner;
-import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.Map;
+
 import javax.xml.transform.stream.StreamSource;
-import net.sf.saxon.s9api.*;
+
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.util.LongAccumulator;
+
+import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.functions.Cleaner;
+import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
+import net.sf.saxon.s9api.*;
 
 public class TransformFunction implements MapFunction<MetadataRecord, MetadataRecord> {
 

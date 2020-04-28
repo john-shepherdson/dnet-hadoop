@@ -1,15 +1,18 @@
 
 package eu.dnetlib.dhp.sx.graph;
 
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.sx.graph.parser.DatasetScholexplorerParser;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
-import java.util.List;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
 
 public class ScholexplorerParserTest {
 

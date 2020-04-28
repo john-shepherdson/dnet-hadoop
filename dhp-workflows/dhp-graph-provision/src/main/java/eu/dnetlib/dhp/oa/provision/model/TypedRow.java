@@ -1,8 +1,9 @@
 
 package eu.dnetlib.dhp.oa.provision.model;
 
-import com.google.common.base.Objects;
 import java.io.Serializable;
+
+import com.google.common.base.Objects;
 
 public class TypedRow implements Serializable {
 
