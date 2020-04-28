@@ -23,6 +23,7 @@ import org.mortbay.log.Log;
 public class ActivitiesDecompressor {
 
     private static final int MAX_XML_WORKS_PARSED = -1;
+    private static final int XML_WORKS_PARSED_COUNTER_LOG_INTERVAL = 100000;
 
     public static void parseGzActivities(Configuration conf, String inputUri, Path outputPath)
             throws Exception {
@@ -127,7 +128,7 @@ public class ActivitiesDecompressor {
                         Log.warn(e);
                     }
 
-                    if ((counter % 100000) == 0) {
+                    if ((counter % XML_WORKS_PARSED_COUNTER_LOG_INTERVAL) == 0) {
                         Log.info("Current xml works parsed: " + counter);
                     }
 
