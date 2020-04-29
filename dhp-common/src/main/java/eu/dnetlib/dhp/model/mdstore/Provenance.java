@@ -9,41 +9,41 @@ import java.io.Serializable;
  */
 public class Provenance implements Serializable {
 
-    private String datasourceId;
+  private String datasourceId;
 
-    private String datasourceName;
+  private String datasourceName;
 
-    private String nsPrefix;
+  private String nsPrefix;
 
-    public Provenance() {}
+  public Provenance() {}
 
-    public Provenance(String datasourceId, String datasourceName, String nsPrefix) {
-        this.datasourceId = datasourceId;
-        this.datasourceName = datasourceName;
-        this.nsPrefix = nsPrefix;
-    }
+  public Provenance(String datasourceId, String datasourceName, String nsPrefix) {
+    this.datasourceId = datasourceId;
+    this.datasourceName = datasourceName;
+    this.nsPrefix = nsPrefix;
+  }
 
-    public String getDatasourceId() {
-        return datasourceId;
-    }
+  public String getDatasourceId() {
+    return datasourceId;
+  }
 
-    public void setDatasourceId(String datasourceId) {
-        this.datasourceId = datasourceId;
-    }
+  public void setDatasourceId(String datasourceId) {
+    this.datasourceId = datasourceId;
+  }
 
-    public String getDatasourceName() {
-        return datasourceName;
-    }
+  public String getDatasourceName() {
+    return datasourceName;
+  }
 
-    public void setDatasourceName(String datasourceName) {
-        this.datasourceName = datasourceName;
-    }
+  public void setDatasourceName(String datasourceName) {
+    this.datasourceName = datasourceName;
+  }
 
-    public String getNsPrefix() {
-        return nsPrefix;
-    }
+  public String getNsPrefix() {
+    return nsPrefix;
+  }
 
-    public void setNsPrefix(String nsPrefix) {
-        this.nsPrefix = nsPrefix;
-    }
+  public void setNsPrefix(String nsPrefix) {
+    this.nsPrefix = nsPrefix;
+  }
 }

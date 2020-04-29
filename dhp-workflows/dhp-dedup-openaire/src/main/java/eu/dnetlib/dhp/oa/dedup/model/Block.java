@@ -13,65 +13,61 @@ import java.util.stream.StreamSupport;
 
 public class Block implements Serializable {
 
-    private String key;
+  private String key;
 
-    private List<MapDocument> documents;
+  private List<MapDocument> documents;
 
-    public Block() {
-        super();
-    }
+  public Block() {
+    super();
+  }
 
-    public static Block from(String key, MapDocument doc) {
-        Block block = new Block();
-        block.setKey(key);
-        block.setDocuments(Lists.newArrayList(doc));
-        return block;
-    }
+  public static Block from(String key, MapDocument doc) {
+    Block block = new Block();
+    block.setKey(key);
+    block.setDocuments(Lists.newArrayList(doc));
+    return block;
+  }
 
-    public static Block from(String key, Iterator<Block> blocks, String orderField, int maxSize) {
-        Block block = new Block();
-        block.setKey(key);
+  public static Block from(String key, Iterator<Block> blocks, String orderField, int maxSize) {
+    Block block = new Block();
+    block.setKey(key);
 
-        Iterable<Block> it = () -> blocks;
+    Iterable<Block> it = () -> blocks;
 
-        block.setDocuments(
-                StreamSupport.stream(it.spliterator(), false)
-                        .flatMap(b -> b.getDocuments().stream())
-                        .sorted(
-                                Comparator.comparing(
-                                        a -> a.getFieldMap().get(orderField).stringValue()))
-                        .limit(maxSize)
-                        .collect(Collectors.toCollection(ArrayList::new)));
-        return block;
-    }
+    block.setDocuments(
+        StreamSupport.stream(it.spliterator(), false)
+            .flatMap(b -> b.getDocuments().stream())
+            .sorted(Comparator.comparing(a -> a.getFieldMap().get(orderField).stringValue()))
+            .limit(maxSize)
+            .collect(Collectors.toCollection(ArrayList::new)));
+    return block;
+  }
 
-    public static Block from(Block b1, Block b2, String orderField, int maxSize) {
-        Block block = new Block();
-        block.setKey(b1.getKey());
-        block.setDocuments(
-                Stream.concat(b1.getDocuments().stream(), b2.getDocuments().stream())
-                        .sorted(
-                                Comparator.comparing(
-                                        a -> a.getFieldMap().get(orderField).stringValue()))
-                        .limit(maxSize)
-                        .collect(Collectors.toCollection(ArrayList::new)));
+  public static Block from(Block b1, Block b2, String orderField, int maxSize) {
+    Block block = new Block();
+    block.setKey(b1.getKey());
+    block.setDocuments(
+        Stream.concat(b1.getDocuments().stream(), b2.getDocuments().stream())
+            .sorted(Comparator.comparing(a -> a.getFieldMap().get(orderField).stringValue()))
+            .limit(maxSize)
+            .collect(Collectors.toCollection(ArrayList::new)));
 
-        return block;
-    }
+    return block;
+  }
 
-    public String getKey() {
-        return key;
-    }
+  public String getKey() {
+    return key;
+  }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
+  public void setKey(String key) {
+    this.key = key;
+  }
 
-    public List<MapDocument> getDocuments() {
-        return documents;
-    }
+  public List<MapDocument> getDocuments() {
+    return documents;
+  }
 
-    public void setDocuments(List<MapDocument> documents) {
-        this.documents = documents;
-    }
+  public void setDocuments(List<MapDocument> documents) {
+    this.documents = documents;
+  }
 }

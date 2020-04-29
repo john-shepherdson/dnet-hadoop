@@ -11,25 +11,25 @@ import org.junit.jupiter.api.Test;
 
 public class ModelSupportTest {
 
-    @Nested
-    class IsSubClass {
+  @Nested
+  class IsSubClass {
 
-        @Test
-        public void shouldReturnFalseWhenSubClassDoesNotExtendSuperClass() {
-            // when
-            Boolean result = ModelSupport.isSubClass(Relation.class, OafEntity.class);
+    @Test
+    public void shouldReturnFalseWhenSubClassDoesNotExtendSuperClass() {
+      // when
+      Boolean result = ModelSupport.isSubClass(Relation.class, OafEntity.class);
 
-            // then
-            assertFalse(result);
-        }
-
-        @Test
-        public void shouldReturnTrueWhenSubClassExtendsSuperClass() {
-            // when
-            Boolean result = ModelSupport.isSubClass(Result.class, OafEntity.class);
-
-            // then
-            assertTrue(result);
-        }
+      // then
+      assertFalse(result);
     }
+
+    @Test
+    public void shouldReturnTrueWhenSubClassExtendsSuperClass() {
+      // when
+      Boolean result = ModelSupport.isSubClass(Result.class, OafEntity.class);
+
+      // then
+      assertTrue(result);
+    }
+  }
 }

@@ -50,111 +50,111 @@ import scala.Tuple2;
  */
 public class PrepareRelationsJob {
 
-    private static final Logger log = LoggerFactory.getLogger(PrepareRelationsJob.class);
+  private static final Logger log = LoggerFactory.getLogger(PrepareRelationsJob.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static final int MAX_RELS = 100;
+  public static final int MAX_RELS = 100;
 
-    public static void main(String[] args) throws Exception {
-        String jsonConfiguration =
-                IOUtils.toString(
-                        PrepareRelationsJob.class.getResourceAsStream(
-                                "/eu/dnetlib/dhp/oa/provision/input_params_prepare_relations.json"));
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(args);
+  public static void main(String[] args) throws Exception {
+    String jsonConfiguration =
+        IOUtils.toString(
+            PrepareRelationsJob.class.getResourceAsStream(
+                "/eu/dnetlib/dhp/oa/provision/input_params_prepare_relations.json"));
+    final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+    parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged =
-                Optional.ofNullable(parser.get("isSparkSessionManaged"))
-                        .map(Boolean::valueOf)
-                        .orElse(Boolean.TRUE);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+    Boolean isSparkSessionManaged =
+        Optional.ofNullable(parser.get("isSparkSessionManaged"))
+            .map(Boolean::valueOf)
+            .orElse(Boolean.TRUE);
+    log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        String inputRelationsPath = parser.get("inputRelationsPath");
-        log.info("inputRelationsPath: {}", inputRelationsPath);
+    String inputRelationsPath = parser.get("inputRelationsPath");
+    log.info("inputRelationsPath: {}", inputRelationsPath);
 
-        String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+    String outputPath = parser.get("outputPath");
+    log.info("outputPath: {}", outputPath);
 
-        SparkConf conf = new SparkConf();
+    SparkConf conf = new SparkConf();
 
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    removeOutputDir(spark, outputPath);
-                    prepareRelationsFromPaths(spark, inputRelationsPath, outputPath);
-                });
-    }
+    runWithSparkSession(
+        conf,
+        isSparkSessionManaged,
+        spark -> {
+          removeOutputDir(spark, outputPath);
+          prepareRelationsFromPaths(spark, inputRelationsPath, outputPath);
+        });
+  }
 
-    private static void prepareRelationsFromPaths(
-            SparkSession spark, String inputRelationsPath, String outputPath) {
-        readPathRelation(spark, inputRelationsPath)
-                .filter("dataInfo.deletedbyinference == false")
-                .groupByKey(
-                        (MapFunction<SortableRelation, String>) value -> value.getSource(),
-                        Encoders.STRING())
-                .flatMapGroups(
-                        (FlatMapGroupsFunction<String, SortableRelation, SortableRelation>)
-                                (key, values) -> Iterators.limit(values, MAX_RELS),
-                        Encoders.bean(SortableRelation.class))
-                .write()
-                .mode(SaveMode.Overwrite)
-                .parquet(outputPath);
-    }
+  private static void prepareRelationsFromPaths(
+      SparkSession spark, String inputRelationsPath, String outputPath) {
+    readPathRelation(spark, inputRelationsPath)
+        .filter("dataInfo.deletedbyinference == false")
+        .groupByKey(
+            (MapFunction<SortableRelation, String>) value -> value.getSource(), Encoders.STRING())
+        .flatMapGroups(
+            (FlatMapGroupsFunction<String, SortableRelation, SortableRelation>)
+                (key, values) -> Iterators.limit(values, MAX_RELS),
+            Encoders.bean(SortableRelation.class))
+        .write()
+        .mode(SaveMode.Overwrite)
+        .parquet(outputPath);
+  }
 
-    /**
-     * Reads a Dataset of eu.dnetlib.dhp.oa.provision.model.SortableRelation objects from a newline
-     * delimited json text file,
-     *
-     * @param spark
-     * @param inputPath
-     * @return the Dataset<SortableRelation> containing all the relationships
-     */
-    private static Dataset<SortableRelation> readPathRelation(
-            SparkSession spark, final String inputPath) {
-        return spark.read()
-                .textFile(inputPath)
-                .map(
-                        (MapFunction<String, SortableRelation>)
-                                value -> OBJECT_MAPPER.readValue(value, SortableRelation.class),
-                        Encoders.bean(SortableRelation.class));
-    }
+  /**
+   * Reads a Dataset of eu.dnetlib.dhp.oa.provision.model.SortableRelation objects from a newline
+   * delimited json text file,
+   *
+   * @param spark
+   * @param inputPath
+   * @return the Dataset<SortableRelation> containing all the relationships
+   */
+  private static Dataset<SortableRelation> readPathRelation(
+      SparkSession spark, final String inputPath) {
+    return spark
+        .read()
+        .textFile(inputPath)
+        .map(
+            (MapFunction<String, SortableRelation>)
+                value -> OBJECT_MAPPER.readValue(value, SortableRelation.class),
+            Encoders.bean(SortableRelation.class));
+  }
 
-    // TODO work in progress
-    private static void prepareRelationsRDDFromPaths(
-            SparkSession spark, String inputRelationsPath, String outputPath, int numPartitions) {
-        JavaRDD<SortableRelation> rels =
-                readPathRelationRDD(spark, inputRelationsPath).repartition(numPartitions);
+  // TODO work in progress
+  private static void prepareRelationsRDDFromPaths(
+      SparkSession spark, String inputRelationsPath, String outputPath, int numPartitions) {
+    JavaRDD<SortableRelation> rels =
+        readPathRelationRDD(spark, inputRelationsPath).repartition(numPartitions);
 
-        RDD<SortableRelation> d =
-                rels.filter(
-                                rel ->
-                                        !rel.getDataInfo()
-                                                .getDeletedbyinference()) // only consider those
-                        // that are not virtually
-                        // deleted
-                        .mapToPair(
-                                (PairFunction<SortableRelation, SortableRelation, SortableRelation>)
-                                        rel -> new Tuple2<>(rel, rel))
-                        .groupByKey(new RelationPartitioner(rels.getNumPartitions()))
-                        .map(p -> Iterables.limit(p._2(), MAX_RELS))
-                        .flatMap(p -> p.iterator())
-                        .rdd();
+    RDD<SortableRelation> d =
+        rels.filter(rel -> !rel.getDataInfo().getDeletedbyinference()) // only
+            // consider
+            // those
+            // that are not virtually
+            // deleted
+            .mapToPair(
+                (PairFunction<SortableRelation, SortableRelation, SortableRelation>)
+                    rel -> new Tuple2<>(rel, rel))
+            .groupByKey(new RelationPartitioner(rels.getNumPartitions()))
+            .map(p -> Iterables.limit(p._2(), MAX_RELS))
+            .flatMap(p -> p.iterator())
+            .rdd();
 
-        spark.createDataset(d, Encoders.bean(SortableRelation.class))
-                .write()
-                .mode(SaveMode.Overwrite)
-                .parquet(outputPath);
-    }
+    spark
+        .createDataset(d, Encoders.bean(SortableRelation.class))
+        .write()
+        .mode(SaveMode.Overwrite)
+        .parquet(outputPath);
+  }
 
-    private static JavaRDD<SortableRelation> readPathRelationRDD(
-            SparkSession spark, final String inputPath) {
-        JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-        return sc.textFile(inputPath).map(s -> OBJECT_MAPPER.readValue(s, SortableRelation.class));
-    }
+  private static JavaRDD<SortableRelation> readPathRelationRDD(
+      SparkSession spark, final String inputPath) {
+    JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+    return sc.textFile(inputPath).map(s -> OBJECT_MAPPER.readValue(s, SortableRelation.class));
+  }
 
-    private static void removeOutputDir(SparkSession spark, String path) {
-        HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-    }
+  private static void removeOutputDir(SparkSession spark, String path) {
+    HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+  }
 }

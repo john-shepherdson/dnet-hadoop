@@ -11,20 +11,19 @@ import org.apache.spark.util.Utils;
  */
 public class RelationPartitioner extends Partitioner {
 
-    private int numPartitions;
+  private int numPartitions;
 
-    public RelationPartitioner(int numPartitions) {
-        this.numPartitions = numPartitions;
-    }
+  public RelationPartitioner(int numPartitions) {
+    this.numPartitions = numPartitions;
+  }
 
-    @Override
-    public int numPartitions() {
-        return numPartitions;
-    }
+  @Override
+  public int numPartitions() {
+    return numPartitions;
+  }
 
-    @Override
-    public int getPartition(Object key) {
-        return Utils.nonNegativeMod(
-                ((SortableRelation) key).getSource().hashCode(), numPartitions());
-    }
+  @Override
+  public int getPartition(Object key) {
+    return Utils.nonNegativeMod(((SortableRelation) key).getSource().hashCode(), numPartitions());
+  }
 }

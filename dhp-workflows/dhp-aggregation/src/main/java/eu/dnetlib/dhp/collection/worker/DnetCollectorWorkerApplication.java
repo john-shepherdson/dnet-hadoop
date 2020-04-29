@@ -16,33 +16,33 @@ import org.slf4j.LoggerFactory;
  */
 public class DnetCollectorWorkerApplication {
 
-    private static final Logger log = LoggerFactory.getLogger(DnetCollectorWorkerApplication.class);
+  private static final Logger log = LoggerFactory.getLogger(DnetCollectorWorkerApplication.class);
 
-    private static CollectorPluginFactory collectorPluginFactory = new CollectorPluginFactory();
+  private static CollectorPluginFactory collectorPluginFactory = new CollectorPluginFactory();
 
-    private static ArgumentApplicationParser argumentParser;
+  private static ArgumentApplicationParser argumentParser;
 
-    /** @param args */
-    public static void main(final String[] args) throws Exception {
+  /** @param args */
+  public static void main(final String[] args) throws Exception {
 
-        argumentParser =
-                new ArgumentApplicationParser(
-                        IOUtils.toString(
-                                DnetCollectorWorker.class.getResourceAsStream(
-                                        "/eu/dnetlib/collector/worker/collector_parameter.json")));
-        argumentParser.parseArgument(args);
-        log.info("hdfsPath =" + argumentParser.get("hdfsPath"));
-        log.info("json = " + argumentParser.get("apidescriptor"));
-        final MessageManager manager =
-                new MessageManager(
-                        argumentParser.get("rabbitHost"),
-                        argumentParser.get("rabbitUser"),
-                        argumentParser.get("rabbitPassword"),
-                        false,
-                        false,
-                        null);
-        final DnetCollectorWorker worker =
-                new DnetCollectorWorker(collectorPluginFactory, argumentParser, manager);
-        worker.collect();
-    }
+    argumentParser =
+        new ArgumentApplicationParser(
+            IOUtils.toString(
+                DnetCollectorWorker.class.getResourceAsStream(
+                    "/eu/dnetlib/collector/worker/collector_parameter.json")));
+    argumentParser.parseArgument(args);
+    log.info("hdfsPath =" + argumentParser.get("hdfsPath"));
+    log.info("json = " + argumentParser.get("apidescriptor"));
+    final MessageManager manager =
+        new MessageManager(
+            argumentParser.get("rabbitHost"),
+            argumentParser.get("rabbitUser"),
+            argumentParser.get("rabbitPassword"),
+            false,
+            false,
+            null);
+    final DnetCollectorWorker worker =
+        new DnetCollectorWorker(collectorPluginFactory, argumentParser, manager);
+    worker.collect();
+  }
 }
