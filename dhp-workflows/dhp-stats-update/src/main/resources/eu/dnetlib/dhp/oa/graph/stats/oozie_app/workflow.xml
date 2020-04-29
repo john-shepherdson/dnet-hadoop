@@ -10,6 +10,7 @@
         </property>
         <property>
             <name>external_stats_db_name</name>
+            <value>stats_ext</value>
             <description>the external stats that should be added since they are not included in the graph database</description>
         </property>
         <property>
