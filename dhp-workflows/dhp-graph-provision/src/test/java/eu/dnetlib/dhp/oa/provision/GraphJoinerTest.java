@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 public class GraphJoinerTest {
 
-	private ClassLoader cl = getClass().getClassLoader();
+	private final ClassLoader cl = getClass().getClassLoader();
 	private Path workingDir;
 	private Path inputDir;
 	private Path outputDir;

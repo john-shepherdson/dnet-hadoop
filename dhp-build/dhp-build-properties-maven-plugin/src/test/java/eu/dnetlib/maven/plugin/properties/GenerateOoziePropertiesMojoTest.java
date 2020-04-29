@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /** @author mhorst, claudio.atzori */
 public class GenerateOoziePropertiesMojoTest {
 
-	private GenerateOoziePropertiesMojo mojo = new GenerateOoziePropertiesMojo();
+	private final GenerateOoziePropertiesMojo mojo = new GenerateOoziePropertiesMojo();
 
 	@BeforeEach
 	public void clearSystemProperties() {

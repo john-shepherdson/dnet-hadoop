@@ -16,7 +16,7 @@ public class DataciteClient {
 	private String host;
 	private String index = "datacite";
 	private String indexType = "dump";
-	private Datacite2Scholix d2s;
+	private final Datacite2Scholix d2s;
 
 	public DataciteClient(String host) {
 		this.host = host;

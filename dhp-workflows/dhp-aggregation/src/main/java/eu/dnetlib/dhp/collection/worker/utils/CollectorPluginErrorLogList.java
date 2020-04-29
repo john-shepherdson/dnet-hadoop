@@ -9,7 +9,7 @@ public class CollectorPluginErrorLogList extends LinkedList<String> {
 
 	@Override
 	public String toString() {
-		String log = new String();
+		String log = "";
 		int index = 0;
 		for (final String errorMessage : this) {
 			log += String.format("Retry #%s: %s / ", index++, errorMessage);
