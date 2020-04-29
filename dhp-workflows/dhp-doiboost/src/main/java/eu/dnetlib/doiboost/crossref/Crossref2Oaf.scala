@@ -1,5 +1,7 @@
 package eu.dnetlib.doiboost.crossref
 
+import java.util
+
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang.StringUtils
@@ -7,14 +9,21 @@ import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
-import org.slf4j.Logger
-import scala.collection.JavaConverters._
+import org.slf4j.{Logger, LoggerFactory}
 
-case class mappingAffiliation(name: String)
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+import scala.util.matching.Regex
+
+case class mappingAffiliation(name: String) {}
+
 case class mappingAuthor(given: Option[String], family: String, ORCID: Option[String], affiliation: Option[mappingAffiliation]) {}
+
+case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
 
 case object Crossref2Oaf {
+  val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
 
   //STATIC STRING
   val MAG = "MAG"
@@ -83,7 +92,6 @@ case object Crossref2Oaf {
     "report" -> "0017 Report"
   )
 
-
   def mappingResult(result: Result, json: JValue, cobjCategory: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
@@ -143,13 +151,10 @@ case object Crossref2Oaf {
 
 
     //Mapping AUthor
-
     val authorList: List[mappingAuthor] = (json \ "author").extractOrElse[List[mappingAuthor]](List())
-
     result.setAuthor(authorList.map(a => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull)).asJava)
 
     // Mapping instance
-
     val instance = new Instance()
     val license = for {
       JString(lic) <- json \ "license" \ "URL"
@@ -182,28 +187,36 @@ case object Crossref2Oaf {
     a.setFullname(s"${given} ${family}")
     if (StringUtils.isNotBlank(orcid))
       a.setPid(List(createSP(orcid, ORCID, PID_TYPES)).asJava)
+
     a
   }
 
-  def convert(input: String, logger: Logger): Result = {
+  def convert(input: String): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
+
+
+    var resultList: List[Oaf] = List()
 
 
     val objectType = (json \ "type").extractOrElse[String](null)
     val objectSubType = (json \ "subtype").extractOrElse[String](null)
     if (objectType == null)
-      return null
+      return resultList
 
 
     val result = generateItemFromType(objectType, objectSubType)
     if (result == null)
-      return result
+      return List()
     val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"));
-//    logger.debug(mappingCrossrefType(objectType))
-//    logger.debug(cOBJCategory)
-
     mappingResult(result, json, cOBJCategory)
+
+
+    val funderList: List[mappingFunder] = (json \ "funder").extractOrElse[List[mappingFunder]](List())
+
+    if (funderList.nonEmpty) {
+      resultList = resultList ::: mappingFunderToRelations(funderList, result.getId, createCollectedFrom(), result.getDataInfo, result.getLastupdatetimestamp)
+    }
 
 
     result match {
@@ -211,8 +224,109 @@ case object Crossref2Oaf {
       case dataset: Dataset => convertDataset(dataset)
     }
 
+    resultList = resultList ::: List(result)
+    resultList
+  }
 
-    result
+
+  def mappingFunderToRelations(funders: List[mappingFunder], sourceId: String, cf: KeyValue, di: DataInfo, ts: Long): List[Relation] = {
+
+    val queue = new mutable.Queue[Relation]
+
+
+    def extractECAward(award: String): String = {
+      val awardECRegex: Regex = "[0-9]{4,9}".r
+      if (awardECRegex.findAllIn(award).hasNext)
+        return awardECRegex.findAllIn(award).max
+      null
+    }
+
+
+    def generateRelation(sourceId:String, targetId:String, nsPrefix:String) :Relation = {
+
+      val r = new Relation
+      r.setSource(sourceId)
+      r.setTarget(s"$nsPrefix::$targetId")
+      r.setRelType("resultProject")
+      r.setRelClass("isProducedBy")
+      r.setSubRelType("outcome")
+      r.setCollectedfrom(List(cf).asJava)
+      r.setDataInfo(di)
+      r.setLastupdatetimestamp(ts)
+      r
+    }
+
+
+    def generateSimpleRelationFromAward(funder: mappingFunder, nsPrefix: String, extractField: String => String): Unit = {
+      if (funder.award.isDefined && funder.award.get.nonEmpty)
+        funder.award.get.map(extractField).filter(a => a!= null &&  a.nonEmpty).foreach(
+          award => {
+            val targetId = DHPUtils.md5(award)
+            queue += generateRelation(sourceId, targetId, nsPrefix)
+          }
+        )
+    }
+
+    if (funders != null)
+    funders.foreach(funder => {
+      if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
+        funder.DOI.get match {
+          case "10.13039/100010663" |
+               "10.13039/100010661" |
+               "10.13039/501100007601" |
+               "10.13039/501100000780" |
+               "10.13039/100010665" =>      generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+          case "10.13039/100011199" |
+               "10.13039/100004431" |
+               "10.13039/501100004963" |
+               "10.13039/501100000780" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+          case "10.13039/501100000781" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+                                            generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+          case "10.13039/100000001" =>      generateSimpleRelationFromAward(funder, "nsf_________", a => a)
+          case "10.13039/501100001665" =>   generateSimpleRelationFromAward(funder, "anr_________", a => a)
+          case "10.13039/501100002341" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a)
+          case "10.13039/501100001602" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a.replace("SFI", ""))
+          case "10.13039/501100000923" =>   generateSimpleRelationFromAward(funder, "arc_________", a => a)
+          case "10.13039/501100000038"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "nserc_______" )
+          case "10.13039/501100000155"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "sshrc_______" )
+          case "10.13039/501100000024"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "cihr________" )
+          case "10.13039/501100002848" =>   generateSimpleRelationFromAward(funder, "conicytf____", a => a)
+          case "10.13039/501100003448" =>   generateSimpleRelationFromAward(funder, "gsrt________", extractECAward)
+          case "10.13039/501100010198" =>   generateSimpleRelationFromAward(funder, "sgov________", a=>a)
+          case "10.13039/501100004564" =>   generateSimpleRelationFromAward(funder, "mestd_______", extractECAward)
+          case "10.13039/501100003407" =>   generateSimpleRelationFromAward(funder, "miur________", a=>a)
+                                            queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "miur________" )
+          case "10.13039/501100006588" |
+                "10.13039/501100004488" =>  generateSimpleRelationFromAward(funder, "irb_hr______", a=>a.replaceAll("Project No.", "").replaceAll("HRZZ-","") )
+          case "10.13039/501100006769"=>    generateSimpleRelationFromAward(funder, "rsf_________", a=>a)
+          case "10.13039/501100001711"=>    generateSimpleRelationFromAward(funder, "snsf________", extractECAward)
+          case "10.13039/501100004410"=>    generateSimpleRelationFromAward(funder, "tubitakf____", a =>a)
+          case "10.10.13039/100004440"=>    generateSimpleRelationFromAward(funder, "wt__________", a =>a)
+          case "10.13039/100004440"=>       queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "wt__________" )
+          case _ =>                         logger.debug("no match for "+funder.DOI.get )
+
+
+        }
+
+
+      } else {
+        funder.name match {
+          case   "European Union’s Horizon 2020 research and innovation program" => generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+          case "European Union's" =>
+            generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+            generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+          case "The French National Research Agency (ANR)" |
+               "The French National Research Agency" => generateSimpleRelationFromAward(funder, "anr_________", a => a)
+          case "CONICYT, Programa de Formación de Capital Humano Avanzado" => generateSimpleRelationFromAward(funder, "conicytf____", extractECAward)
+          case "Wellcome Trust Masters Fellowship" => queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "wt__________" )
+          case _ =>                         logger.debug("no match for "+funder.name )
+
+        }
+      }
+
+    }
+    )
+    queue.toList
   }
 
   def convertDataset(dataset: Dataset): Unit = {
@@ -247,7 +361,7 @@ case object Crossref2Oaf {
                            JField("value", JString(vl)) <- issn_type
                            } yield Tuple2(tp, vl)
 
-      val volume = (json \ "volume").extractOrElse[String] (null)
+      val volume = (json \ "volume").extractOrElse[String](null)
       if (containerTitles.nonEmpty) {
         val journal = new Journal
         journal.setName(containerTitles.head)
@@ -259,19 +373,15 @@ case object Crossref2Oaf {
               case "print" => journal.setIssnPrinted(tp._2)
             }
           })
-
         }
         journal.setVol(volume)
-
-        val page = (json \ "page").extractOrElse[String] (null)
-        if(page!= null ) {
+        val page = (json \ "page").extractOrElse[String](null)
+        if (page != null) {
           val pp = page.split("-")
           journal.setSp(pp.head)
           if (pp.size > 1)
             journal.setEp(pp(1))
         }
-
-
         publication.setJournal(journal)
       }
 
@@ -337,6 +447,15 @@ case object Crossref2Oaf {
     val sp = new StructuredProperty
     sp.setQualifier(createQualifier(classId, schemeId))
     sp.setValue(value)
+    sp
+
+  }
+
+  def createSP(value: String, classId: String, schemeId: String, dataInfo: DataInfo): StructuredProperty = {
+    val sp = new StructuredProperty
+    sp.setQualifier(createQualifier(classId, schemeId))
+    sp.setValue(value)
+    sp.setDataInfo(dataInfo)
     sp
 
   }
