@@ -48,6 +48,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
+
     implements Closeable {
 
   private static final Log log = LogFactory.getLog(MigrateDbEntitiesApplication.class);
@@ -539,4 +540,5 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
     super.close();
     dbClient.close();
   }
+
 }
