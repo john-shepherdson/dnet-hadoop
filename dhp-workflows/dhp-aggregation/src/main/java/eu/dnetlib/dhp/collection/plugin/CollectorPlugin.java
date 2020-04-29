@@ -6,5 +6,5 @@ import java.util.stream.Stream;
 
 public interface CollectorPlugin {
 
-    Stream<String> collect(ApiDescriptor api) throws DnetCollectorException;
+  Stream<String> collect(ApiDescriptor api) throws DnetCollectorException;
 }

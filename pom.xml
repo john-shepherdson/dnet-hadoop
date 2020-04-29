@@ -461,42 +461,53 @@
 				</plugin>
 
 				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>1.12</version>
+					<groupId>net.revelc.code.formatter</groupId>
+					<artifactId>formatter-maven-plugin</artifactId>
+					<version>2.11.0</version>
+					<dependencies>
+						<dependency>
+							<groupId>eu.dnetlib.dhp</groupId>
+							<artifactId>dhp-code-style</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
 			<plugin>
-				<groupId>com.cosium.code</groupId>
-				<artifactId>git-code-format-maven-plugin</artifactId>
-				<version>${git-code-format-maven-plugin.version}</version>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
 				<executions>
-					<!-- On commit, format the modified java files -->
 					<execution>
-						<id>install-formatter-hook</id>
 						<goals>
-							<goal>install-hooks</goal>
+							<goal>format</goal>
 						</goals>
+						<configuration>
+							<configFile>eclipse/formatter_dnet.xml</configFile>
+						</configuration>
 					</execution>
-					<!-- On Maven verify phase, fail if any file
-                    (including unmodified) is badly formatted -->
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>net.revelc.code</groupId>
+				<artifactId>impsort-maven-plugin</artifactId>
+				<version>1.4.1</version>
+				<configuration>
+					<groups>java.,javax.,org.,com.</groups>
+					<staticGroups>java,*</staticGroups>
+					<excludes>
+						<exclude>**/thrift/*.java</exclude>
+					</excludes>
+				</configuration>
+				<executions>
 					<execution>
-						<id>validate-code-format</id>
+						<id>sort-imports</id>
 						<goals>
-							<goal>validate-code-format</goal>
+							<goal>sort</goal>
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<googleJavaFormatOptions>
-						<aosp>true</aosp>
-						<fixImportsOnly>false</fixImportsOnly>
-						<skipSortingImports>false</skipSortingImports>
-						<skipRemovingUnusedImports>false</skipRemovingUnusedImports>
-					</googleJavaFormatOptions>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -571,7 +582,6 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
-		<git-code-format-maven-plugin.version>2.4</git-code-format-maven-plugin.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
 		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>

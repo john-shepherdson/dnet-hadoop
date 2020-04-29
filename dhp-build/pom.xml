@@ -9,6 +9,7 @@
 	<artifactId>dhp-build</artifactId>
 	<packaging>pom</packaging>
 	<modules>
+		<module>dhp-code-style</module>
 		<module>dhp-build-assembly-resources</module>
 		<module>dhp-build-properties-maven-plugin</module>
 	</modules>

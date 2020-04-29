@@ -21,60 +21,59 @@ import scala.Tuple2;
  */
 public class SparkSXGeneratePidSimlarity {
 
-    static final String IDJSONPATH = "$.id";
-    static final String OBJIDPATH = "$.originalObjIdentifier";
+  static final String IDJSONPATH = "$.id";
+  static final String OBJIDPATH = "$.originalObjIdentifier";
 
-    public static void generateDataFrame(
-            final SparkSession spark,
-            final JavaSparkContext sc,
-            final String inputPath,
-            final String targetPath) {
+  public static void generateDataFrame(
+      final SparkSession spark,
+      final JavaSparkContext sc,
+      final String inputPath,
+      final String targetPath) {
 
-        final JavaPairRDD<String, String> datasetSimRel =
-                sc.textFile(inputPath + "/dataset/*")
-                        .mapToPair(
-                                (PairFunction<String, String, String>)
-                                        k ->
-                                                new Tuple2<>(
-                                                        DHPUtils.getJPathString(IDJSONPATH, k),
-                                                        DHPUtils.getJPathString(OBJIDPATH, k)))
-                        .filter(
-                                t ->
-                                        !StringUtils.substringAfter(t._1(), "|")
-                                                .equalsIgnoreCase(
-                                                        StringUtils.substringAfter(t._2(), "::")))
-                        .distinct();
+    final JavaPairRDD<String, String> datasetSimRel =
+        sc.textFile(inputPath + "/dataset/*")
+            .mapToPair(
+                (PairFunction<String, String, String>)
+                    k ->
+                        new Tuple2<>(
+                            DHPUtils.getJPathString(IDJSONPATH, k),
+                            DHPUtils.getJPathString(OBJIDPATH, k)))
+            .filter(
+                t ->
+                    !StringUtils.substringAfter(t._1(), "|")
+                        .equalsIgnoreCase(StringUtils.substringAfter(t._2(), "::")))
+            .distinct();
 
-        final JavaPairRDD<String, String> publicationSimRel =
-                sc.textFile(inputPath + "/publication/*")
-                        .mapToPair(
-                                (PairFunction<String, String, String>)
-                                        k ->
-                                                new Tuple2<>(
-                                                        DHPUtils.getJPathString(IDJSONPATH, k),
-                                                        DHPUtils.getJPathString(OBJIDPATH, k)))
-                        .filter(
-                                t ->
-                                        !StringUtils.substringAfter(t._1(), "|")
-                                                .equalsIgnoreCase(
-                                                        StringUtils.substringAfter(t._2(), "::")))
-                        .distinct();
+    final JavaPairRDD<String, String> publicationSimRel =
+        sc.textFile(inputPath + "/publication/*")
+            .mapToPair(
+                (PairFunction<String, String, String>)
+                    k ->
+                        new Tuple2<>(
+                            DHPUtils.getJPathString(IDJSONPATH, k),
+                            DHPUtils.getJPathString(OBJIDPATH, k)))
+            .filter(
+                t ->
+                    !StringUtils.substringAfter(t._1(), "|")
+                        .equalsIgnoreCase(StringUtils.substringAfter(t._2(), "::")))
+            .distinct();
 
-        JavaRDD<DLIRelation> simRel =
-                datasetSimRel
-                        .union(publicationSimRel)
-                        .map(
-                                s -> {
-                                    final DLIRelation r = new DLIRelation();
-                                    r.setSource(s._1());
-                                    r.setTarget(s._2());
-                                    r.setRelType("similar");
-                                    return r;
-                                });
-        spark.createDataset(simRel.rdd(), Encoders.bean(DLIRelation.class))
-                .distinct()
-                .write()
-                .mode(SaveMode.Overwrite)
-                .save(targetPath + "/pid_simRel");
-    }
+    JavaRDD<DLIRelation> simRel =
+        datasetSimRel
+            .union(publicationSimRel)
+            .map(
+                s -> {
+                  final DLIRelation r = new DLIRelation();
+                  r.setSource(s._1());
+                  r.setTarget(s._2());
+                  r.setRelType("similar");
+                  return r;
+                });
+    spark
+        .createDataset(simRel.rdd(), Encoders.bean(DLIRelation.class))
+        .distinct()
+        .write()
+        .mode(SaveMode.Overwrite)
+        .save(targetPath + "/pid_simRel");
+  }
 }

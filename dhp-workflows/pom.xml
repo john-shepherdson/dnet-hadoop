@@ -14,8 +14,10 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>dhp-worfklow-profiles</module>
         <module>dhp-aggregation</module>
         <module>dhp-distcp</module>
+        <module>dhp-actionmanager</module>
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup-openaire</module>
         <module>dhp-bulktag</module>
@@ -23,7 +25,6 @@
         <module>dhp-graph-provision</module>
         <module>dhp-dedup-scholexplorer</module>
         <module>dhp-graph-provision-scholexplorer</module>
-        <module>dhp-actionmanager</module>
     </modules>
 
     <pluginRepositories>

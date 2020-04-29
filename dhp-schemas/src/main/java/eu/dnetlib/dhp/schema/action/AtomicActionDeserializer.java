@@ -11,19 +11,19 @@ import java.io.IOException;
 
 public class AtomicActionDeserializer extends JsonDeserializer {
 
-    @Override
-    public Object deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
-        JsonNode node = jp.getCodec().readTree(jp);
-        String classTag = node.get("clazz").asText();
-        JsonNode payload = node.get("payload");
-        ObjectMapper mapper = new ObjectMapper();
+  @Override
+  public Object deserialize(JsonParser jp, DeserializationContext ctxt)
+      throws IOException, JsonProcessingException {
+    JsonNode node = jp.getCodec().readTree(jp);
+    String classTag = node.get("clazz").asText();
+    JsonNode payload = node.get("payload");
+    ObjectMapper mapper = new ObjectMapper();
 
-        try {
-            final Class<?> clazz = Class.forName(classTag);
-            return new AtomicAction(clazz, (Oaf) mapper.readValue(payload.toString(), clazz));
-        } catch (ClassNotFoundException e) {
-            throw new IOException(e);
-        }
+    try {
+      final Class<?> clazz = Class.forName(classTag);
+      return new AtomicAction(clazz, (Oaf) mapper.readValue(payload.toString(), clazz));
+    } catch (ClassNotFoundException e) {
+      throw new IOException(e);
     }
+  }
 }

@@ -12,24 +12,24 @@ import org.junit.jupiter.api.Test;
 
 public class ScholexplorerParserTest {
 
-    @Test
-    public void testDataciteParser() throws Exception {
-        String xml = IOUtils.toString(this.getClass().getResourceAsStream("dmf.xml"));
+  @Test
+  public void testDataciteParser() throws Exception {
+    String xml = IOUtils.toString(this.getClass().getResourceAsStream("dmf.xml"));
 
-        DatasetScholexplorerParser p = new DatasetScholexplorerParser();
-        List<Oaf> oaves = p.parseObject(xml, RelationMapper.load());
+    DatasetScholexplorerParser p = new DatasetScholexplorerParser();
+    List<Oaf> oaves = p.parseObject(xml, RelationMapper.load());
 
-        ObjectMapper m = new ObjectMapper();
-        m.enable(SerializationFeature.INDENT_OUTPUT);
+    ObjectMapper m = new ObjectMapper();
+    m.enable(SerializationFeature.INDENT_OUTPUT);
 
-        oaves.forEach(
-                oaf -> {
-                    try {
-                        System.out.println(m.writeValueAsString(oaf));
-                        System.out.println("----------------------------");
-                    } catch (JsonProcessingException e) {
+    oaves.forEach(
+        oaf -> {
+          try {
+            System.out.println(m.writeValueAsString(oaf));
+            System.out.println("----------------------------");
+          } catch (JsonProcessingException e) {
 
-                    }
-                });
-    }
+          }
+        });
+  }
 }

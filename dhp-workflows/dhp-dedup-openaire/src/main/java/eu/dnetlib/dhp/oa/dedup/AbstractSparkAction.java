@@ -24,71 +24,70 @@ import org.dom4j.io.SAXReader;
 
 abstract class AbstractSparkAction implements Serializable {
 
-    protected static final ObjectMapper OBJECT_MAPPER =
-            new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  protected static final ObjectMapper OBJECT_MAPPER =
+      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    public ArgumentApplicationParser parser; // parameters for the spark action
-    public SparkSession spark; // the spark session
+  public ArgumentApplicationParser parser; // parameters for the spark action
+  public SparkSession spark; // the spark session
 
-    public AbstractSparkAction(ArgumentApplicationParser parser, SparkSession spark) {
+  public AbstractSparkAction(ArgumentApplicationParser parser, SparkSession spark) {
 
-        this.parser = parser;
-        this.spark = spark;
+    this.parser = parser;
+    this.spark = spark;
+  }
+
+  public List<DedupConfig> getConfigurations(ISLookUpService isLookUpService, String orchestrator)
+      throws ISLookUpException, DocumentException, IOException {
+
+    final String xquery =
+        String.format("/RESOURCE_PROFILE[.//DEDUPLICATION/ACTION_SET/@id = '%s']", orchestrator);
+
+    String orchestratorProfile = isLookUpService.getResourceProfileByQuery(xquery);
+
+    final Document doc = new SAXReader().read(new StringReader(orchestratorProfile));
+
+    final String actionSetId = doc.valueOf("//DEDUPLICATION/ACTION_SET/@id");
+
+    final List<DedupConfig> configurations = new ArrayList<>();
+
+    for (final Object o : doc.selectNodes("//SCAN_SEQUENCE/SCAN")) {
+      configurations.add(loadConfig(isLookUpService, actionSetId, o));
     }
 
-    public List<DedupConfig> getConfigurations(ISLookUpService isLookUpService, String orchestrator)
-            throws ISLookUpException, DocumentException, IOException {
+    return configurations;
+  }
 
-        final String xquery =
-                String.format(
-                        "/RESOURCE_PROFILE[.//DEDUPLICATION/ACTION_SET/@id = '%s']", orchestrator);
+  private DedupConfig loadConfig(
+      final ISLookUpService isLookUpService, final String actionSetId, final Object o)
+      throws ISLookUpException, IOException {
+    final Element s = (Element) o;
+    final String configProfileId = s.attributeValue("id");
+    final String conf =
+        isLookUpService.getResourceProfileByQuery(
+            String.format(
+                "for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
+                configProfileId));
 
-        String orchestratorProfile = isLookUpService.getResourceProfileByQuery(xquery);
+    DedupConfig dedupConfig = new ObjectMapper().readValue(conf, DedupConfig.class);
+    dedupConfig.getPace().initModel();
+    dedupConfig.getPace().initTranslationMap();
+    dedupConfig.getWf().setConfigurationId(actionSetId);
 
-        final Document doc = new SAXReader().read(new StringReader(orchestratorProfile));
+    return dedupConfig;
+  }
 
-        final String actionSetId = doc.valueOf("//DEDUPLICATION/ACTION_SET/@id");
+  abstract void run(ISLookUpService isLookUpService)
+      throws DocumentException, IOException, ISLookUpException;
 
-        final List<DedupConfig> configurations = new ArrayList<>();
+  protected static SparkSession getSparkSession(SparkConf conf) {
+    return SparkSession.builder().config(conf).getOrCreate();
+  }
 
-        for (final Object o : doc.selectNodes("//SCAN_SEQUENCE/SCAN")) {
-            configurations.add(loadConfig(isLookUpService, actionSetId, o));
-        }
+  protected static <T> void save(Dataset<T> dataset, String outPath, SaveMode mode) {
+    dataset.write().option("compression", "gzip").mode(mode).json(outPath);
+  }
 
-        return configurations;
-    }
-
-    private DedupConfig loadConfig(
-            final ISLookUpService isLookUpService, final String actionSetId, final Object o)
-            throws ISLookUpException, IOException {
-        final Element s = (Element) o;
-        final String configProfileId = s.attributeValue("id");
-        final String conf =
-                isLookUpService.getResourceProfileByQuery(
-                        String.format(
-                                "for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
-                                configProfileId));
-
-        DedupConfig dedupConfig = new ObjectMapper().readValue(conf, DedupConfig.class);
-        dedupConfig.getPace().initModel();
-        dedupConfig.getPace().initTranslationMap();
-        dedupConfig.getWf().setConfigurationId(actionSetId);
-
-        return dedupConfig;
-    }
-
-    abstract void run(ISLookUpService isLookUpService)
-            throws DocumentException, IOException, ISLookUpException;
-
-    protected static SparkSession getSparkSession(SparkConf conf) {
-        return SparkSession.builder().config(conf).getOrCreate();
-    }
-
-    protected static <T> void save(Dataset<T> dataset, String outPath, SaveMode mode) {
-        dataset.write().option("compression", "gzip").mode(mode).json(outPath);
-    }
-
-    protected static void removeOutputDir(SparkSession spark, String path) {
-        HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-    }
+  protected static void removeOutputDir(SparkSession spark, String path) {
+    HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+  }
 }

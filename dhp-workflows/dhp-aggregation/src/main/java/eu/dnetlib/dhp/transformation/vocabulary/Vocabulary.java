@@ -5,49 +5,49 @@ import java.util.List;
 
 public class Vocabulary implements Serializable {
 
-    private String id;
-    private String name;
-    private String description;
-    private String code;
-    private List<Term> terms;
+  private String id;
+  private String name;
+  private String description;
+  private String code;
+  private List<Term> terms;
 
-    public String getId() {
-        return id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public String getCode() {
-        return code;
-    }
+  public String getCode() {
+    return code;
+  }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+  public void setCode(String code) {
+    this.code = code;
+  }
 
-    public List<Term> getTerms() {
-        return terms;
-    }
+  public List<Term> getTerms() {
+    return terms;
+  }
 
-    public void setTerms(List<Term> terms) {
-        this.terms = terms;
-    }
+  public void setTerms(List<Term> terms) {
+    this.terms = terms;
+  }
 }
