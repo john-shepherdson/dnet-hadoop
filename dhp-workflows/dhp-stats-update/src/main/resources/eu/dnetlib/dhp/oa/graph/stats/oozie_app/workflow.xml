@@ -12,7 +12,26 @@
             <name>external_stats_db_name</name>
             <description>the external stats that should be added since they are not included in the graph database</description>
         </property>
+        <property>
+            <name>hive_metastore_uris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hive_jdbc_url</name>
+            <description>hive server jdbc url</description>
+        </property>
     </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>${hive_metastore_uris}</value>
+            </property>
+        </configuration>
+    </global>
 
     <start to="Step1"/>
 
@@ -22,14 +41,6 @@
 
     <action name="Step1">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -41,14 +52,6 @@
     
     <action name="Step2_1">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -57,16 +60,9 @@
         <ok to="Step2_2"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step2_2">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -75,16 +71,9 @@
         <ok to="Step2_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step2_3">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -93,16 +82,9 @@
         <ok to="Step2_4"/>
         <error to="Kill"/>
     </action>
-        <action name="Step2_4">
+
+    <action name="Step2_4">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_4.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -111,16 +93,9 @@
         <ok to="Step2_5"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step2_5">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_5.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -129,16 +104,9 @@
         <ok to="Step2_6"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step2_6">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_6.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -147,16 +115,9 @@
         <ok to="Step2_7"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step2_7">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_7.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -165,16 +126,9 @@
         <ok to="Step2_8"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step2_8">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_8.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -183,16 +137,9 @@
         <ok to="Step2_9"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step2_9">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step2_9.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -204,14 +151,6 @@
     
     <action name="Step3">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -223,14 +162,6 @@
     
     <action name="Step4_1">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -239,16 +170,9 @@
         <ok to="Step4_2"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_2">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -257,16 +181,9 @@
         <ok to="Step4_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_3">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -275,16 +192,9 @@
         <ok to="Step4_4"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_4">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_4.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -293,16 +203,9 @@
         <ok to="Step4_5"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_5">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_5.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -311,16 +214,9 @@
         <ok to="Step4_6"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_6">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_6.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -329,16 +225,9 @@
         <ok to="Step4_7"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_7">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_7.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -347,16 +236,9 @@
         <ok to="Step4_8"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_8">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_8.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -365,16 +247,9 @@
         <ok to="Step4_9"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_9">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_9.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -383,16 +258,9 @@
         <ok to="Step4_10"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step4_10">
-    <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step4_10.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -404,14 +272,6 @@
     
     <action name="Step5_1">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -420,16 +280,9 @@
         <ok to="Step5_2"/>
         <error to="Kill"/>
     </action>
+
 	<action name="Step5_2">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -438,16 +291,9 @@
         <ok to="Step5_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step5_3">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -456,16 +302,9 @@
         <ok to="Step5_4"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step5_4">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_4.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -474,16 +313,9 @@
         <ok to="Step5_5"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step5_5">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_5.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -492,16 +324,9 @@
         <ok to="Step5_6"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step5_6">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_6.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -510,16 +335,9 @@
         <ok to="Step5_7"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step5_7">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_7.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -528,16 +346,9 @@
         <ok to="Step5_8"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step5_8">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_8.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -546,16 +357,9 @@
         <ok to="Step5_9"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step5_9">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_9.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -564,16 +368,9 @@
         <ok to="Step5_10"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step5_10">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step5_10.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -585,14 +382,6 @@
     
     <action name="Step6_1">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -601,16 +390,9 @@
         <ok to="Step6_2"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_2">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -619,16 +401,9 @@
         <ok to="Step6_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_3">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -637,16 +412,9 @@
         <ok to="Step6_4"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_4">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_4.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -655,16 +423,9 @@
         <ok to="Step6_5"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_5">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_5.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -673,16 +434,9 @@
         <ok to="Step6_6"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_6">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_6.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -691,16 +445,9 @@
         <ok to="Step6_7"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_7">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_7.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -709,16 +456,9 @@
         <ok to="Step6_8"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_8">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_8.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -727,16 +467,9 @@
         <ok to="Step6_9"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_9">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_9.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -745,16 +478,9 @@
         <ok to="Step6_10"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step6_10">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step6_10.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -766,14 +492,6 @@
     
     <action name="Step7_1">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step7_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -782,16 +500,9 @@
         <ok to="Step7_2"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step7_2">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step7_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -800,16 +511,9 @@
         <ok to="Step7_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step7_3">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step7_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -818,16 +522,9 @@
         <ok to="Step7_4"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step7_4">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step7_4.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -836,16 +533,9 @@
         <ok to="Step7_5"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step7_5">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step7_5.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -857,14 +547,6 @@
     
     <action name="Step8_1">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -873,16 +555,9 @@
         <ok to="Step8_2"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_2">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -891,16 +566,9 @@
         <ok to="Step8_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_3">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -909,16 +577,9 @@
         <ok to="Step8_4"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_4">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_4.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -927,16 +588,9 @@
         <ok to="Step8_5"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_5">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_5.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -945,16 +599,9 @@
         <ok to="Step8_6"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_6">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_6.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -963,16 +610,9 @@
         <ok to="Step8_7"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_7">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_7.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -981,16 +621,9 @@
         <ok to="Step8_8"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_8">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_8.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -999,16 +632,9 @@
         <ok to="Step8_9"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_9">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_9.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1017,16 +643,9 @@
         <ok to="Step8_10"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_10">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_10.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1035,16 +654,9 @@
         <ok to="Step8_11"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step8_11">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step8_11.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1056,14 +668,6 @@
     
     <action name="Step9_1">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1072,16 +676,9 @@
         <ok to="Step9_2"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step9_2">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1090,16 +687,9 @@
         <ok to="Step9_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step9_3">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1108,16 +698,9 @@
         <ok to="Step9_4"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step9_4">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_4.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1126,16 +709,9 @@
         <ok to="Step9_5"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step9_5">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_5.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1144,16 +720,9 @@
         <ok to="Step9_6"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step9_6">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_6.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1162,16 +731,9 @@
         <ok to="Step9_7"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step9_7">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_7.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1180,16 +742,9 @@
         <ok to="Step9_8"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step9_8">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_8.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1198,16 +753,9 @@
         <ok to="Step9_9"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step9_9">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step9_9.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1219,14 +767,6 @@
     
     <action name="Step10_1">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step10_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1235,16 +775,9 @@
         <ok to="Step10_2"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step10_2">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step10_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1253,16 +786,9 @@
         <ok to="Step10_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step10_3">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step10_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1274,14 +800,6 @@
     
     <action name="Step11">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step11.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1294,14 +812,6 @@
     
     <action name="Step12_1">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step12_1.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1310,16 +820,9 @@
         <ok to="Step12_2"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step12_2">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step12_2.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1328,16 +831,9 @@
         <ok to="Step12_3"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step12_3">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step12_3.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1346,16 +842,9 @@
         <ok to="Step12_4"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step12_4">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step12_4.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1364,16 +853,9 @@
         <ok to="Step12_5"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step12_5">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step12_5.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1382,16 +864,9 @@
         <ok to="Step12_6"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step12_6">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step12_6.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1400,16 +875,9 @@
         <ok to="Step12_7"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step12_7">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step12_7.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1418,16 +886,9 @@
         <ok to="Step12_8"/>
         <error to="Kill"/>
     </action>
+
     <action name="Step12_8">
     	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step12_8.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1438,15 +899,7 @@
     </action>
     
     <action name="Step13">
-    <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step13.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
@@ -1457,15 +910,7 @@
     </action>
     
     <action name="Step14">
-    <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>hive.metastore.uris</name>
-                    <value>${hive_metastore_uris}</value>
-                </property>
-            </configuration>
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step14.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
