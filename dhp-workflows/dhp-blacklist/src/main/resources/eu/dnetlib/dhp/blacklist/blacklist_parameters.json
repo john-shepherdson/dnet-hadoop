@@ -6,6 +6,12 @@
 		"paramRequired": true
 	},
 	{
+		"paramName": "nn",
+		"paramLongName": "hdfsNameNode",
+		"paramDescription": "the name node on hdfs",
+		"paramRequired": true
+	},
+	{
 		"paramName": "pgurl",
 		"paramLongName": "postgresUrl",
 		"paramDescription": "postgres url, example: jdbc:postgresql://localhost:5432/testdb",
@@ -21,12 +27,6 @@
 		"paramName": "pgpasswd",
 		"paramLongName": "postgresPassword",
 		"paramDescription": "postgres password",
-		"paramRequired": false
-	},
-	{
-		"paramName": "a",
-		"paramLongName": "action",
-		"paramDescription": "process claims",
 		"paramRequired": false
 	}
 ]
