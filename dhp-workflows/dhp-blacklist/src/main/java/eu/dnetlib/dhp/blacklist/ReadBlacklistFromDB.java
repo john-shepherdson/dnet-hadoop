@@ -119,6 +119,7 @@ public class ReadBlacklistFromDB implements Closeable {
 		this.conf.set("fs.defaultFS", hdfsNameNode);
 		FileSystem fileSystem = FileSystem.get(this.conf);
 		Path hdfsWritePath = new Path(hdfsPath);
+		fileSystem.create(hdfsWritePath);
 		FSDataOutputStream fsDataOutputStream = fileSystem.append(hdfsWritePath);
 		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
 	}
