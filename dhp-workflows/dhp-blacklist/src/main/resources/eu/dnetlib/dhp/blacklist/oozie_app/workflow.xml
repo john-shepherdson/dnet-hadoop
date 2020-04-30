@@ -1,5 +1,18 @@
-<workflow-app name="blacklsting" xmlns="uri:oozie:workflow:0.5">
-
+<workflow-app name="blacklisting" xmlns="uri:oozie:workflow:0.5">
+<parameters>
+    <property>
+        <name>postgresURL</name>
+        <description>the url of the postgress server to query</description>
+    </property>
+    <property>
+        <name>postgresUser</name>
+        <description>the username to access the postgres db</description>
+    </property>
+    <property>
+        <name>postgresPassword</name>
+        <description>the postgres password</description>
+    </property>
+</parameters>
 <start to="reset-outputpath"/>
 
 <kill name="Kill">
@@ -8,7 +21,7 @@
 
     <action name="reset-outputpath">
         <fs>
-            <delete path='${hdfsPath}'/>
+            <delete path='${workingDir}/blacklist'/>
         </fs>
         <ok to="read_blacklist"/>
         <error to="Kill"/>
@@ -21,7 +34,7 @@
             <main-class>eu.dnetlib.dhp.blacklist.ReadBlacklistFromDB</main-class>
             <arg>--hdfsPath</arg><arg>${workingDir}/blacklist</arg>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--postgresUrl</arg><arg>${postgresUrl}</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </java>
