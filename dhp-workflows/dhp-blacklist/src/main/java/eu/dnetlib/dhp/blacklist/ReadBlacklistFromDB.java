@@ -34,6 +34,7 @@ public class ReadBlacklistFromDB implements Closeable {
 	private static final Log log = LogFactory.getLog(ReadBlacklistFromDB.class);
 	private final Configuration conf;
 	private final BufferedWriter writer;
+	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private final static String query = "SELECT source_type, unnest(original_source_objects) as source, " +
 		"target_type, unnest(original_target_objects) as target, " +
@@ -119,14 +120,19 @@ public class ReadBlacklistFromDB implements Closeable {
 		this.conf.set("fs.defaultFS", hdfsNameNode);
 		FileSystem fileSystem = FileSystem.get(this.conf);
 		Path hdfsWritePath = new Path(hdfsPath);
-		fileSystem.create(hdfsWritePath);
-		FSDataOutputStream fsDataOutputStream = fileSystem.append(hdfsWritePath);
+		FSDataOutputStream fsDataOutputStream = null;
+		if (fileSystem.exists(hdfsWritePath)) {
+			fsDataOutputStream = fileSystem.append(hdfsWritePath);
+		} else {
+			fsDataOutputStream = fileSystem.create(hdfsWritePath);
+		}
+
 		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
 	}
 
 	protected void writeRelation(final Relation r) {
 		try {
-			writer.write(new ObjectMapper().writeValueAsString(r));
+			writer.write(OBJECT_MAPPER.writeValueAsString(r));
 			writer.newLine();
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
