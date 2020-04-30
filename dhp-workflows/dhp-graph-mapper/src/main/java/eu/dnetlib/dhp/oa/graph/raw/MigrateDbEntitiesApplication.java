@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.asString;
@@ -9,6 +10,23 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listKeyValues;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
@@ -31,24 +49,8 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import java.io.Closeable;
-import java.io.IOException;
-import java.sql.Array;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
-
     implements Closeable {
 
   private static final Log log = LogFactory.getLog(MigrateDbEntitiesApplication.class);
@@ -540,5 +542,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
     super.close();
     dbClient.close();
   }
+
 
 }

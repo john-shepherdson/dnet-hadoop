@@ -1,3 +1,5 @@
+
 package eu.dnetlib.dhp.sx.graph;
 
-public class SparkScholexplorerMergeEntitiesJobTest {}
+public class SparkScholexplorerMergeEntitiesJobTest {
+}

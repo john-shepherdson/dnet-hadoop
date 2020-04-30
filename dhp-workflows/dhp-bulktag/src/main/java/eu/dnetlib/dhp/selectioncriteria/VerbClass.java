@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.selectioncriteria;
 
 import java.lang.annotation.ElementType;
@@ -9,5 +10,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @interface VerbClass {
 
-    String value();
+	String value();
 }

@@ -1,10 +1,10 @@
+
 package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -19,234 +19,242 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+
 public class OrcidPropagationJobTest {
 
-    private static final Logger log = LoggerFactory.getLogger(OrcidPropagationJobTest.class);
+	private static final Logger log = LoggerFactory.getLogger(OrcidPropagationJobTest.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private static final ClassLoader cl = OrcidPropagationJobTest.class.getClassLoader();
+	private static final ClassLoader cl = OrcidPropagationJobTest.class.getClassLoader();
 
-    private static SparkSession spark;
+	private static SparkSession spark;
 
-    private static Path workingDir;
+	private static Path workingDir;
 
-    @BeforeAll
-    public static void beforeAll() throws IOException {
-        workingDir = Files.createTempDirectory(OrcidPropagationJobTest.class.getSimpleName());
-        log.info("using work dir {}", workingDir);
+	@BeforeAll
+	public static void beforeAll() throws IOException {
+		workingDir = Files.createTempDirectory(OrcidPropagationJobTest.class.getSimpleName());
+		log.info("using work dir {}", workingDir);
 
-        SparkConf conf = new SparkConf();
-        conf.setAppName(OrcidPropagationJobTest.class.getSimpleName());
+		SparkConf conf = new SparkConf();
+		conf.setAppName(OrcidPropagationJobTest.class.getSimpleName());
 
-        conf.setMaster("local[*]");
-        conf.set("spark.driver.host", "localhost");
-        conf.set("hive.metastore.local", "true");
-        conf.set("spark.ui.enabled", "false");
-        conf.set("spark.sql.warehouse.dir", workingDir.toString());
-        conf.set("hive.metastore.warehouse.dir", workingDir.resolve("warehouse").toString());
+		conf.setMaster("local[*]");
+		conf.set("spark.driver.host", "localhost");
+		conf.set("hive.metastore.local", "true");
+		conf.set("spark.ui.enabled", "false");
+		conf.set("spark.sql.warehouse.dir", workingDir.toString());
+		conf.set("hive.metastore.warehouse.dir", workingDir.resolve("warehouse").toString());
 
-        spark =
-                SparkSession.builder()
-                        .appName(OrcidPropagationJobTest.class.getSimpleName())
-                        .config(conf)
-                        .getOrCreate();
-    }
+		spark = SparkSession
+			.builder()
+			.appName(OrcidPropagationJobTest.class.getSimpleName())
+			.config(conf)
+			.getOrCreate();
+	}
 
-    @AfterAll
-    public static void afterAll() throws IOException {
-        FileUtils.deleteDirectory(workingDir.toFile());
-        spark.stop();
-    }
+	@AfterAll
+	public static void afterAll() throws IOException {
+		FileUtils.deleteDirectory(workingDir.toFile());
+		spark.stop();
+	}
 
-    @Test
-    public void noUpdateTest() throws Exception {
-        SparkOrcidToResultFromSemRelJob3.main(
-                new String[] {
-                    "-isTest",
-                    Boolean.TRUE.toString(),
-                    "-isSparkSessionManaged",
-                    Boolean.FALSE.toString(),
-                    "-sourcePath",
-                    getClass()
-                            .getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
-                            .getPath(),
-                    "-hive_metastore_uris",
-                    "",
-                    "-saveGraph",
-                    "true",
-                    "-resultTableName",
-                    "eu.dnetlib.dhp.schema.oaf.Dataset",
-                    "-outputPath",
-                    workingDir.toString() + "/dataset",
-                    "-possibleUpdatesPath",
-                    getClass()
-                            .getResource(
-                                    "/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
-                            .getPath()
-                });
+	@Test
+	public void noUpdateTest() throws Exception {
+		SparkOrcidToResultFromSemRelJob3
+			.main(
+				new String[] {
+					"-isTest",
+					Boolean.TRUE.toString(),
+					"-isSparkSessionManaged",
+					Boolean.FALSE.toString(),
+					"-sourcePath",
+					getClass()
+						.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
+						.getPath(),
+					"-hive_metastore_uris",
+					"",
+					"-saveGraph",
+					"true",
+					"-resultTableName",
+					"eu.dnetlib.dhp.schema.oaf.Dataset",
+					"-outputPath",
+					workingDir.toString() + "/dataset",
+					"-possibleUpdatesPath",
+					getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
+						.getPath()
+				});
 
-        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-        JavaRDD<Dataset> tmp =
-                sc.textFile(workingDir.toString() + "/dataset")
-                        .map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+		JavaRDD<Dataset> tmp = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-        // tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
+		// tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
 
-        Assertions.assertEquals(10, tmp.count());
+		Assertions.assertEquals(10, tmp.count());
 
-        org.apache.spark.sql.Dataset<Dataset> verificationDataset =
-                spark.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
+		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
 
-        verificationDataset.createOrReplaceTempView("dataset");
+		verificationDataset.createOrReplaceTempView("dataset");
 
-        String query =
-                "select id "
-                        + "from dataset "
-                        + "lateral view explode(author) a as MyT "
-                        + "lateral view explode(MyT.pid) p as MyP "
-                        + "where MyP.datainfo.inferenceprovenance = 'propagation'";
+		String query = "select id "
+			+ "from dataset "
+			+ "lateral view explode(author) a as MyT "
+			+ "lateral view explode(MyT.pid) p as MyP "
+			+ "where MyP.datainfo.inferenceprovenance = 'propagation'";
 
-        Assertions.assertEquals(0, spark.sql(query).count());
-    }
+		Assertions.assertEquals(0, spark.sql(query).count());
+	}
 
-    @Test
-    public void oneUpdateTest() throws Exception {
-        SparkOrcidToResultFromSemRelJob3.main(
-                new String[] {
-                    "-isTest",
-                    Boolean.TRUE.toString(),
-                    "-isSparkSessionManaged",
-                    Boolean.FALSE.toString(),
-                    "-sourcePath",
-                    getClass()
-                            .getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/oneupdate")
-                            .getPath(),
-                    "-hive_metastore_uris",
-                    "",
-                    "-saveGraph",
-                    "true",
-                    "-resultTableName",
-                    "eu.dnetlib.dhp.schema.oaf.Dataset",
-                    "-outputPath",
-                    workingDir.toString() + "/dataset",
-                    "-possibleUpdatesPath",
-                    getClass()
-                            .getResource(
-                                    "/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
-                            .getPath()
-                });
+	@Test
+	public void oneUpdateTest() throws Exception {
+		SparkOrcidToResultFromSemRelJob3
+			.main(
+				new String[] {
+					"-isTest",
+					Boolean.TRUE.toString(),
+					"-isSparkSessionManaged",
+					Boolean.FALSE.toString(),
+					"-sourcePath",
+					getClass()
+						.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/oneupdate")
+						.getPath(),
+					"-hive_metastore_uris",
+					"",
+					"-saveGraph",
+					"true",
+					"-resultTableName",
+					"eu.dnetlib.dhp.schema.oaf.Dataset",
+					"-outputPath",
+					workingDir.toString() + "/dataset",
+					"-possibleUpdatesPath",
+					getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
+						.getPath()
+				});
 
-        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-        JavaRDD<Dataset> tmp =
-                sc.textFile(workingDir.toString() + "/dataset")
-                        .map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+		JavaRDD<Dataset> tmp = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-        // tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
+		// tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
 
-        Assertions.assertEquals(10, tmp.count());
+		Assertions.assertEquals(10, tmp.count());
 
-        org.apache.spark.sql.Dataset<Dataset> verificationDataset =
-                spark.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
+		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
 
-        verificationDataset.createOrReplaceTempView("dataset");
+		verificationDataset.createOrReplaceTempView("dataset");
 
-        String query =
-                "select id, MyT.name name, MyT.surname surname, MyP.value pid, MyP.qualifier.classid pidType "
-                        + "from dataset "
-                        + "lateral view explode(author) a as MyT "
-                        + "lateral view explode(MyT.pid) p as MyP "
-                        + "where MyP.datainfo.inferenceprovenance = 'propagation'";
+		String query = "select id, MyT.name name, MyT.surname surname, MyP.value pid, MyP.qualifier.classid pidType "
+			+ "from dataset "
+			+ "lateral view explode(author) a as MyT "
+			+ "lateral view explode(MyT.pid) p as MyP "
+			+ "where MyP.datainfo.inferenceprovenance = 'propagation'";
 
-        org.apache.spark.sql.Dataset<Row> propagatedAuthors = spark.sql(query);
+		org.apache.spark.sql.Dataset<Row> propagatedAuthors = spark.sql(query);
 
-        Assertions.assertEquals(1, propagatedAuthors.count());
+		Assertions.assertEquals(1, propagatedAuthors.count());
 
-        Assertions.assertEquals(
-                1,
-                propagatedAuthors
-                        .filter(
-                                "id = '50|dedup_wf_001::95b033c0c3961f6a1cdcd41a99a9632e' "
-                                        + "and name = 'Vajinder' and surname = 'Kumar' and pidType = 'ORCID'")
-                        .count());
+		Assertions
+			.assertEquals(
+				1,
+				propagatedAuthors
+					.filter(
+						"id = '50|dedup_wf_001::95b033c0c3961f6a1cdcd41a99a9632e' "
+							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = 'ORCID'")
+					.count());
 
-        Assertions.assertEquals(1, propagatedAuthors.filter("pid = '0000-0002-8825-3517'").count());
-    }
+		Assertions.assertEquals(1, propagatedAuthors.filter("pid = '0000-0002-8825-3517'").count());
+	}
 
-    @Test
-    public void twoUpdatesTest() throws Exception {
-        SparkOrcidToResultFromSemRelJob3.main(
-                new String[] {
-                    "-isTest",
-                    Boolean.TRUE.toString(),
-                    "-isSparkSessionManaged",
-                    Boolean.FALSE.toString(),
-                    "-sourcePath",
-                    getClass()
-                            .getResource(
-                                    "/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/twoupdates")
-                            .getPath(),
-                    "-hive_metastore_uris",
-                    "",
-                    "-saveGraph",
-                    "true",
-                    "-resultTableName",
-                    "eu.dnetlib.dhp.schema.oaf.Dataset",
-                    "-outputPath",
-                    workingDir.toString() + "/dataset",
-                    "-possibleUpdatesPath",
-                    getClass()
-                            .getResource(
-                                    "/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
-                            .getPath()
-                });
+	@Test
+	public void twoUpdatesTest() throws Exception {
+		SparkOrcidToResultFromSemRelJob3
+			.main(
+				new String[] {
+					"-isTest",
+					Boolean.TRUE.toString(),
+					"-isSparkSessionManaged",
+					Boolean.FALSE.toString(),
+					"-sourcePath",
+					getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/twoupdates")
+						.getPath(),
+					"-hive_metastore_uris",
+					"",
+					"-saveGraph",
+					"true",
+					"-resultTableName",
+					"eu.dnetlib.dhp.schema.oaf.Dataset",
+					"-outputPath",
+					workingDir.toString() + "/dataset",
+					"-possibleUpdatesPath",
+					getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
+						.getPath()
+				});
 
-        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-        JavaRDD<Dataset> tmp =
-                sc.textFile(workingDir.toString() + "/dataset")
-                        .map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+		JavaRDD<Dataset> tmp = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-        Assertions.assertEquals(10, tmp.count());
+		Assertions.assertEquals(10, tmp.count());
 
-        org.apache.spark.sql.Dataset<Dataset> verificationDataset =
-                spark.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
+		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
 
-        verificationDataset.createOrReplaceTempView("dataset");
+		verificationDataset.createOrReplaceTempView("dataset");
 
-        String query =
-                "select id, MyT.name name, MyT.surname surname, MyP.value pid, MyP.qualifier.classid pidType "
-                        + "from dataset "
-                        + "lateral view explode(author) a as MyT "
-                        + "lateral view explode(MyT.pid) p as MyP "
-                        + "where MyP.datainfo.inferenceprovenance = 'propagation'";
+		String query = "select id, MyT.name name, MyT.surname surname, MyP.value pid, MyP.qualifier.classid pidType "
+			+ "from dataset "
+			+ "lateral view explode(author) a as MyT "
+			+ "lateral view explode(MyT.pid) p as MyP "
+			+ "where MyP.datainfo.inferenceprovenance = 'propagation'";
 
-        org.apache.spark.sql.Dataset<Row> propagatedAuthors = spark.sql(query);
+		org.apache.spark.sql.Dataset<Row> propagatedAuthors = spark.sql(query);
 
-        Assertions.assertEquals(2, propagatedAuthors.count());
+		Assertions.assertEquals(2, propagatedAuthors.count());
 
-        Assertions.assertEquals(
-                1, propagatedAuthors.filter("name = 'Marc' and surname = 'Schmidtmann'").count());
-        Assertions.assertEquals(
-                1, propagatedAuthors.filter("name = 'Ruediger' and surname = 'Beckhaus'").count());
+		Assertions
+			.assertEquals(
+				1, propagatedAuthors.filter("name = 'Marc' and surname = 'Schmidtmann'").count());
+		Assertions
+			.assertEquals(
+				1, propagatedAuthors.filter("name = 'Ruediger' and surname = 'Beckhaus'").count());
 
-        query =
-                "select id, MyT.name name, MyT.surname surname, MyP.value pid ,MyP.qualifier.classid pidType "
-                        + "from dataset "
-                        + "lateral view explode(author) a as MyT "
-                        + "lateral view explode(MyT.pid) p as MyP ";
+		query = "select id, MyT.name name, MyT.surname surname, MyP.value pid ,MyP.qualifier.classid pidType "
+			+ "from dataset "
+			+ "lateral view explode(author) a as MyT "
+			+ "lateral view explode(MyT.pid) p as MyP ";
 
-        org.apache.spark.sql.Dataset<Row> authorsExplodedPids = spark.sql(query);
+		org.apache.spark.sql.Dataset<Row> authorsExplodedPids = spark.sql(query);
 
-        Assertions.assertEquals(
-                2, authorsExplodedPids.filter("name = 'Marc' and surname = 'Schmidtmann'").count());
-        Assertions.assertEquals(
-                1,
-                authorsExplodedPids
-                        .filter(
-                                "name = 'Marc' and surname = 'Schmidtmann' and pidType = 'MAG Identifier'")
-                        .count());
-    }
+		Assertions
+			.assertEquals(
+				2, authorsExplodedPids.filter("name = 'Marc' and surname = 'Schmidtmann'").count());
+		Assertions
+			.assertEquals(
+				1,
+				authorsExplodedPids
+					.filter(
+						"name = 'Marc' and surname = 'Schmidtmann' and pidType = 'MAG Identifier'")
+					.count());
+	}
 }

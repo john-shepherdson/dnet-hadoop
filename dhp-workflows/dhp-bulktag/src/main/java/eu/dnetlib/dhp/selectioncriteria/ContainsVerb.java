@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.selectioncriteria;
 
 import java.io.Serializable;
@@ -5,24 +6,25 @@ import java.io.Serializable;
 @VerbClass("contains")
 public class ContainsVerb implements Selection, Serializable {
 
-    private String param;
+	private String param;
 
-    public ContainsVerb() {}
+	public ContainsVerb() {
+	}
 
-    public ContainsVerb(final String param) {
-        this.param = param;
-    }
+	public ContainsVerb(final String param) {
+		this.param = param;
+	}
 
-    @Override
-    public boolean apply(String value) {
-        return value.contains(param);
-    }
+	@Override
+	public boolean apply(String value) {
+		return value.contains(param);
+	}
 
-    public String getParam() {
-        return param;
-    }
+	public String getParam() {
+		return param;
+	}
 
-    public void setParam(String param) {
-        this.param = param;
-    }
+	public void setParam(String param) {
+		this.param = param;
+	}
 }
