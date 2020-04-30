@@ -25,6 +25,7 @@
         <module>dhp-graph-provision</module>
         <module>dhp-dedup-scholexplorer</module>
         <module>dhp-graph-provision-scholexplorer</module>
+        <module>dhp-blacklist</module>
     </modules>
 
     <pluginRepositories>
