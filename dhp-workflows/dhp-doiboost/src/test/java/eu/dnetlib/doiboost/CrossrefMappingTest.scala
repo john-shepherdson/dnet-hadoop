@@ -22,7 +22,7 @@ class CrossrefMappingTest {
 
 
 
-  @Test
+  //@Test
   def testRelSpark() :Unit = {
     val conf: SparkConf = new SparkConf()
     conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
