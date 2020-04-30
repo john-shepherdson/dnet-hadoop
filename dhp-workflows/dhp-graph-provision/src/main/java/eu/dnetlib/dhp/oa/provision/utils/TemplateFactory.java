@@ -17,7 +17,7 @@ import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
 public class TemplateFactory {
 
-	private TemplateResources resources;
+	private final TemplateResources resources;
 
 	private static final char DELIMITER = '$';
 

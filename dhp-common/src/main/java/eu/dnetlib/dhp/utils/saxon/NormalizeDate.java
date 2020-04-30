@@ -17,7 +17,7 @@ public class NormalizeDate extends AbstractExtensionFunction {
 		"yyyy-MM-dd'T'hh:mm:ss", "yyyy-MM-dd", "yyyy/MM/dd", "yyyy"
 	};
 
-	private static final String normalizeOutFormat = new String("yyyy-MM-dd'T'hh:mm:ss'Z'");
+	private static final String normalizeOutFormat = "yyyy-MM-dd'T'hh:mm:ss'Z'";
 
 	@Override
 	public String getName() {

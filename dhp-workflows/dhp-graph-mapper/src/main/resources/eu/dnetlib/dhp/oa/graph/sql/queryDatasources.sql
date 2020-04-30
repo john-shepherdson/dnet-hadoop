@@ -108,7 +108,7 @@ SELECT
 		ELSE 'Other'
 	END || '@@@dnet:datasource_typologies@@@dnet:datasource_typologies'                               AS datasourcetype,
 	'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions' AS provenanceaction,
-	CONCAT(d.issn, '@@@', d.eissn, '@@@', d.lissn)                                                    AS journal
+	CONCAT(d.issn, ' @@@ ', d.eissn, ' @@@ ', d.lissn)                                                    AS journal
 
 FROM dsm_datasources d
 

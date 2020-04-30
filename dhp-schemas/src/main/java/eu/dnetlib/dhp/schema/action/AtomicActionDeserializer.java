@@ -16,7 +16,7 @@ public class AtomicActionDeserializer extends JsonDeserializer {
 
 	@Override
 	public Object deserialize(JsonParser jp, DeserializationContext ctxt)
-		throws IOException, JsonProcessingException {
+		throws IOException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		String classTag = node.get("clazz").asText();
 		JsonNode payload = node.get("payload");

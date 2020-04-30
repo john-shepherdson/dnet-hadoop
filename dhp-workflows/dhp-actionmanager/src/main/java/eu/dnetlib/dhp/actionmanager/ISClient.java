@@ -32,7 +32,7 @@ public class ISClient implements Serializable {
 
 	private static final String INPUT_ACTION_SET_ID_SEPARATOR = ",";
 
-	private ISLookUpService isLookup;
+	private final ISLookUpService isLookup;
 
 	public ISClient(String isLookupUrl) {
 		isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);

@@ -14,7 +14,7 @@ public class DbClient implements Closeable {
 
 	private static final Log log = LogFactory.getLog(DbClient.class);
 
-	private Connection connection;
+	private final Connection connection;
 
 	public DbClient(final String address, final String login, final String password) {
 

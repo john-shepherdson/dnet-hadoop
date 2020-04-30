@@ -40,7 +40,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Writes project properties for the keys listed in specified properties files. Based on:
- * http://site.kuali.org/maven/plugins/properties-maven-plugin/1.3.2/write-project-properties-mojo.html
+ * http://site.kuali.org/maven/plugins/properties-maven-plugin/2.0.1/write-project-properties-mojo.html
  *
  * @author mhorst
  * @goal write-project-properties
