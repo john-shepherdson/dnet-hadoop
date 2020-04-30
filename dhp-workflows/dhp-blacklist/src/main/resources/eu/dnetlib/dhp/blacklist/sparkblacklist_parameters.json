@@ -6,27 +6,21 @@
 		"paramRequired": true
 	},
 	{
-		"paramName": "nn",
-		"paramLongName": "hdfsNameNode",
-		"paramDescription": "the name node on hdfs",
+		"paramName": "s",
+		"paramLongName": "sourcePath",
+		"paramDescription": "the path to the graph used to remove the relations ",
 		"paramRequired": true
 	},
 	{
-		"paramName": "pgurl",
-		"paramLongName": "postgresUrl",
-		"paramDescription": "postgres url, example: jdbc:postgresql://localhost:5432/testdb",
+		"paramName": "out",
+		"paramLongName": "outputPath",
+		"paramDescription": "the path where to store the temporary result ",
 		"paramRequired": true
 	},
 	{
-		"paramName": "pguser",
-		"paramLongName": "postgresUser",
-		"paramDescription": "postgres user",
-		"paramRequired": false
-	},
-	{
-		"paramName": "pgpasswd",
-		"paramLongName": "postgresPassword",
-		"paramDescription": "postgres password",
+		"paramName": "issm",
+		"paramLongName": "isSparkSessionManaged",
+		"paramDescription": "true if the spark session is managed",
 		"paramRequired": false
 	}
 ]

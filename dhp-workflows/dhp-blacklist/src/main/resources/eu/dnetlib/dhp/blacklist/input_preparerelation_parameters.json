@@ -1,11 +1,5 @@
 [
 	{
-		"paramName": "p",
-		"paramLongName": "hdfsPath",
-		"paramDescription": "the path where storing the sequential file",
-		"paramRequired": true
-	},
-	{
 		"paramName": "s",
 		"paramLongName": "sourcePath",
 		"paramDescription": "the path to the graph used to remove the relations ",
@@ -22,5 +16,11 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed",
 		"paramRequired": false
+	},
+	{
+		"paramName":"h",
+		"paramLongName":"hive_metastore_uris",
+		"paramDescription": "the hive metastore uris",
+		"paramRequired": true
 	}
 ]
