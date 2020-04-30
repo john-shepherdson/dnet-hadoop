@@ -58,8 +58,6 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-
-
 		final Boolean saveGraph = Optional
 			.ofNullable(parser.get("saveGraph"))
 			.map(Boolean::valueOf)
@@ -78,7 +76,7 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 				if (isTest(parser)) {
 					removeOutputDir(spark, outputPath);
 				}
-				if(saveGraph)
+				if (saveGraph)
 					execPropagation(
 						spark,
 						datasourceorganization,
@@ -86,7 +84,7 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 						inputPath,
 						outputPath,
 						resultClazz);
-				});
+			});
 	}
 
 	private static void execPropagation(
@@ -112,22 +110,21 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 			broadcast_datasourceorganizationassoc)
 				.as(Encoders.bean(ResultOrganizationSet.class));
 
-
-			getNewRelations(
-				spark
-					.read()
-					.textFile(alreadylinked)
-					.map(
-						value -> OBJECT_MAPPER
-							.readValue(
-								value, ResultOrganizationSet.class),
-						Encoders.bean(ResultOrganizationSet.class)),
-				potentialUpdates)
-					.toJSON()
-					.write()
-					.mode(SaveMode.Append)
-					.option("compression", "gzip")
-					.text(outputPath);
+		getNewRelations(
+			spark
+				.read()
+				.textFile(alreadylinked)
+				.map(
+					value -> OBJECT_MAPPER
+						.readValue(
+							value, ResultOrganizationSet.class),
+					Encoders.bean(ResultOrganizationSet.class)),
+			potentialUpdates)
+				.toJSON()
+				.write()
+				.mode(SaveMode.Append)
+				.option("compression", "gzip")
+				.text(outputPath);
 
 	}
 
