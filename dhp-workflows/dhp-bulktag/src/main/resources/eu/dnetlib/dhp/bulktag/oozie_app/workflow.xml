@@ -123,7 +123,6 @@
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
             <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--saveGraph</arg><archive>${saveGraph}</archive>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -152,7 +151,6 @@
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
             <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--saveGraph</arg><archive>${saveGraph}</archive>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -181,7 +179,6 @@
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
             <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--saveGraph</arg><archive>${saveGraph}</archive>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -210,7 +207,6 @@
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
             <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--saveGraph</arg><archive>${saveGraph}</archive>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
