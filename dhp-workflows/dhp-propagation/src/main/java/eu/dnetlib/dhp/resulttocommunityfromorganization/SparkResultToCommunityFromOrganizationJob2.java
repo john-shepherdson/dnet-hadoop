@@ -70,7 +70,8 @@ public class SparkResultToCommunityFromOrganizationJob2 {
 				if (isTest(parser)) {
 					removeOutputDir(spark, outputPath);
 				}
-				execPropagation(spark, inputPath, outputPath, resultClazz, possibleupdatespath);
+				if(saveGraph)
+					execPropagation(spark, inputPath, outputPath, resultClazz, possibleupdatespath);
 			});
 	}
 

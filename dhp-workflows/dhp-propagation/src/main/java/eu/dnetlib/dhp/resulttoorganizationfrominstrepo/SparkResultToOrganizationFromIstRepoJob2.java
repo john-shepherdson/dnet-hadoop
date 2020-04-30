@@ -58,8 +58,7 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
-		log.info("resultType: {}", resultType);
+
 
 		final Boolean saveGraph = Optional
 			.ofNullable(parser.get("saveGraph"))
@@ -79,16 +78,15 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 				if (isTest(parser)) {
 					removeOutputDir(spark, outputPath);
 				}
-				execPropagation(
-					spark,
-					datasourceorganization,
-					alreadylinked,
-					inputPath,
-					outputPath,
-					resultClazz,
-					resultType,
-					saveGraph);
-			});
+				if(saveGraph)
+					execPropagation(
+						spark,
+						datasourceorganization,
+						alreadylinked,
+						inputPath,
+						outputPath,
+						resultClazz);
+				});
 	}
 
 	private static void execPropagation(
@@ -97,10 +95,7 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 		String alreadylinked,
 		String inputPath,
 		String outputPath,
-		Class<? extends Result> resultClazz,
-		String resultType,
-
-		Boolean saveGraph) {
+		Class<? extends Result> resultClazz) {
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		org.apache.spark.sql.Dataset<DatasourceOrganization> datasourceorganizationassoc = readAssocDatasourceOrganization(
@@ -117,7 +112,7 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 			broadcast_datasourceorganizationassoc)
 				.as(Encoders.bean(ResultOrganizationSet.class));
 
-		if (saveGraph) {
+
 			getNewRelations(
 				spark
 					.read()
@@ -133,7 +128,7 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 					.mode(SaveMode.Append)
 					.option("compression", "gzip")
 					.text(outputPath);
-		}
+
 	}
 
 	private static Dataset<Relation> getNewRelations(
