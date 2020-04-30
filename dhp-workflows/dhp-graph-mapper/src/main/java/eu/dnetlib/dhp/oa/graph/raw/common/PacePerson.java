@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.HashSet;
 import java.util.List;
@@ -141,7 +142,7 @@ public class PacePerson {
 	public String hash() {
 		return Hashing
 			.murmur3_128()
-			.hashString(getNormalisedFullname(), Charset.forName(UTF8))
+			.hashString(getNormalisedFullname(), StandardCharsets.UTF_8)
 			.toString();
 	}
 

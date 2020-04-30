@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.Normalizer;
 import java.util.*;
@@ -73,7 +74,7 @@ public class DedupUtility {
 	public static String md5(final String s) {
 		try {
 			final MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(s.getBytes("UTF-8"));
+			md.update(s.getBytes(StandardCharsets.UTF_8));
 			return new String(Hex.encodeHex(md.digest()));
 		} catch (final Exception e) {
 			System.err.println("Error creating id");

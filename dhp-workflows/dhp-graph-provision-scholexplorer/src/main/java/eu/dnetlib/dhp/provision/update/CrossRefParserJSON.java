@@ -18,7 +18,7 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class CrossRefParserJSON {
 
-	private static List<ScholixCollectedFrom> collectedFrom = generateCrossrefCollectedFrom("complete");
+	private static final List<ScholixCollectedFrom> collectedFrom = generateCrossrefCollectedFrom("complete");
 
 	public static ScholixResource parseRecord(final String record) {
 		if (record == null)

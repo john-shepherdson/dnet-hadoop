@@ -1,1 +1,0 @@
-CREATE OR REPLACE VIEW ${stats_db_name}.result_languages as SELECT * FROM ${stats_db_name}.publication_languages UNION ALL SELECT * FROM ${stats_db_name}.software_languages UNION ALL SELECT * FROM ${stats_db_name}.dataset_languages UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_languages;

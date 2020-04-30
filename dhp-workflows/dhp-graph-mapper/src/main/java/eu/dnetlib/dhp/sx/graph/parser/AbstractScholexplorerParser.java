@@ -25,7 +25,7 @@ public abstract class AbstractScholexplorerParser {
 
 	protected static final Log log = LogFactory.getLog(AbstractScholexplorerParser.class);
 	static final Pattern pattern = Pattern.compile("10\\.\\d{4,9}/[-._;()/:A-Z0-9]+$", Pattern.CASE_INSENSITIVE);
-	private List<String> datasetSubTypes = Arrays
+	private final List<String> datasetSubTypes = Arrays
 		.asList(
 			"dataset",
 			"software",

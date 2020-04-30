@@ -21,8 +21,8 @@ import eu.dnetlib.message.MessageManager;
 
 public class DnetCollectorWorkerApplicationTests {
 
-	private ArgumentApplicationParser argumentParser = mock(ArgumentApplicationParser.class);
-	private MessageManager messageManager = mock(MessageManager.class);
+	private final ArgumentApplicationParser argumentParser = mock(ArgumentApplicationParser.class);
+	private final MessageManager messageManager = mock(MessageManager.class);
 
 	private DnetCollectorWorker worker;
 

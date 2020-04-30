@@ -12,7 +12,7 @@ import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
  */
 public class RelationPartitioner extends Partitioner {
 
-	private int numPartitions;
+	private final int numPartitions;
 
 	public RelationPartitioner(int numPartitions) {
 		this.numPartitions = numPartitions;

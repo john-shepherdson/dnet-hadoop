@@ -8,6 +8,9 @@
 	</parent>
 	<artifactId>dhp-build</artifactId>
 	<packaging>pom</packaging>
+
+	<description>This module is a container for the build tools used in dnet-hadoop</description>
+
 	<modules>
 		<module>dhp-code-style</module>
 		<module>dhp-build-assembly-resources</module>

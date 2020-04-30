@@ -410,14 +410,10 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		final String identifier = n.valueOf("./*[local-name()='identifier']");
 		final String baseURL = n.valueOf("./*[local-name()='baseURL']");
-		;
 		final String metadataNamespace = n.valueOf("./*[local-name()='metadataNamespace']");
-		;
 		final boolean altered = n.valueOf("@altered").equalsIgnoreCase("true");
 		final String datestamp = n.valueOf("./*[local-name()='datestamp']");
-		;
 		final String harvestDate = n.valueOf("@harvestDate");
-		;
 
 		return oaiIProvenance(identifier, baseURL, metadataNamespace, altered, datestamp, harvestDate);
 	}

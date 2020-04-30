@@ -41,7 +41,7 @@ public class XmlSerializationUtils {
 
 	public static String mapStructuredProperty(String name, StructuredProperty t) {
 		return asXmlElement(
-			name, t.getValue(), t.getQualifier(), t.getDataInfo() != null ? t.getDataInfo() : null);
+			name, t.getValue(), t.getQualifier(), t.getDataInfo());
 	}
 
 	public static String mapQualifier(String name, Qualifier q) {
