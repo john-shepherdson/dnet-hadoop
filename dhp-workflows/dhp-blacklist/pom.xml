@@ -11,6 +11,7 @@
 
     <artifactId>dhp-blacklist</artifactId>
     <dependencies>
+
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-graph-mapper</artifactId>

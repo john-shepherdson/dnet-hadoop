@@ -63,7 +63,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/mergesRelation</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
         </spark>
         <ok to="apply_blacklist"/>
@@ -89,6 +89,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/blacklist</arg>
+            <arg>--mergesPath</arg><arg>${workingDir}/mergesRelation</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

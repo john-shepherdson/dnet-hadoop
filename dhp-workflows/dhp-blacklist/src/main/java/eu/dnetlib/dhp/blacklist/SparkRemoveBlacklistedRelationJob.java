@@ -55,19 +55,20 @@ public class SparkRemoveBlacklistedRelationJob {
 		log.info("mergesPath {}: ", mergesPath);
 
 		SparkConf conf = new SparkConf();
-		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
 		runWithSparkSession(
-			conf,
-			isSparkSessionManaged,
-			spark -> {
-				removeBlacklistedRelations(
-					spark,
-					inputPath,
-					blacklistPath,
-					outputPath,
-						mergesPath);
-			});
+				conf,
+				isSparkSessionManaged,
+				spark -> {
+					removeBlacklistedRelations(
+							spark,
+							inputPath,
+							blacklistPath,
+							outputPath,
+							mergesPath);
+				});
+
+
 	}
 
 	private static void removeBlacklistedRelations(SparkSession spark, String blacklistPath, String inputPath,
@@ -78,7 +79,6 @@ public class SparkRemoveBlacklistedRelationJob {
 
 		Dataset<Relation> dedupSource = blackListed
 			.joinWith(mergesRelation, blackListed.col("source").equalTo(mergesRelation.col("target")), "left_outer")
-			// .joinWith(inputRelation,blackListed.col("target").equalTo(inputRelation.col("target")),"left_outer")
 			.map(c -> {
 				Optional<Relation> merged = Optional.ofNullable(c._2());
 				Relation bl = c._1();

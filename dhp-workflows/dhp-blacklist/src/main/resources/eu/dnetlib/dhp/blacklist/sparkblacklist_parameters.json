@@ -22,5 +22,12 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed",
 		"paramRequired": false
+	},
+	{
+		"paramName": "m",
+		"paramLongName": "mergesPath",
+		"paramDescription": "true if the spark session is managed",
+		"paramRequired": true
+
 	}
 ]
