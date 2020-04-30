@@ -88,6 +88,7 @@ public class Result2OrganizationJobTest {
 					"",
 					"-resultTableName",
 					"eu.dnetlib.dhp.schema.oaf.Software",
+
 					"-saveGraph",
 					"true",
 					"-outputPath",
@@ -138,6 +139,7 @@ public class Result2OrganizationJobTest {
 					"",
 					"-resultTableName",
 					"eu.dnetlib.dhp.schema.oaf.Software",
+
 					"-saveGraph",
 					"true",
 					"-outputPath",
@@ -211,6 +213,7 @@ public class Result2OrganizationJobTest {
 					"",
 					"-resultTableName",
 					"eu.dnetlib.dhp.schema.oaf.Software",
+
 					"-saveGraph",
 					"true",
 					"-outputPath",

@@ -99,6 +99,7 @@ public class SparkResultToOrganizationFromIstRepoJob2 {
 		String outputPath,
 		Class<? extends Result> resultClazz,
 		String resultType,
+
 		Boolean saveGraph) {
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
