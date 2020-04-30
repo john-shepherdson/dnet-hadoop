@@ -48,13 +48,13 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 public class XmlRecordFactory implements Serializable {
 
 	public static final String REL_SUBTYPE_DEDUP = "dedup";
-	private Map<String, LongAccumulator> accumulators;
+	private final Map<String, LongAccumulator> accumulators;
 
-	private Set<String> specialDatasourceTypes;
+	private final Set<String> specialDatasourceTypes;
 
-	private ContextMapper contextMapper;
+	private final ContextMapper contextMapper;
 
-	private String schemaLocation;
+	private final String schemaLocation;
 
 	private boolean indent = false;
 

@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class ModelSupport {
 
 	/** Defines the mapping between the actual entity type and the main entity type */
-	private static Map<EntityType, MainEntityType> entityMapping = Maps.newHashMap();
+	private static final Map<EntityType, MainEntityType> entityMapping = Maps.newHashMap();
 
 	static {
 		entityMapping.put(EntityType.publication, MainEntityType.result);

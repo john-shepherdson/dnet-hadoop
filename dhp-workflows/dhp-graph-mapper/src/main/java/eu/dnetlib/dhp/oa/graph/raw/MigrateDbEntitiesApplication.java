@@ -51,7 +51,7 @@ import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
-	implements Closeable {
+		implements Closeable {
 
 	private static final Log log = LogFactory.getLog(MigrateDbEntitiesApplication.class);
 
@@ -61,11 +61,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					MigrateDbEntitiesApplication.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/migrate_db_entities_parameters.json")));
+				IOUtils
+						.toString(MigrateDbEntitiesApplication.class
+								.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_db_entities_parameters.json")));
 
 		parser.parseArgument(args);
 
@@ -78,7 +76,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
 
 		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, dbUrl, dbUser,
-			dbPassword)) {
+				dbPassword)) {
 			if (processClaims) {
 				log.info("Processing claims...");
 				smdbe.execute("queryClaims.sql", smdbe::processClaims);
@@ -109,15 +107,15 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 	}
 
 	public MigrateDbEntitiesApplication(
-		final String hdfsPath, final String dbUrl, final String dbUser, final String dbPassword)
-		throws Exception {
+			final String hdfsPath, final String dbUrl, final String dbUser, final String dbPassword)
+			throws Exception {
 		super(hdfsPath);
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.lastUpdateTimestamp = new Date().getTime();
 	}
 
 	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer)
-		throws Exception {
+			throws Exception {
 		final String sql = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/sql/" + sqlFile));
 
 		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(oaf -> emitOaf(oaf));
@@ -136,10 +134,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
 			ds.setOriginalId(Arrays.asList(rs.getString("datasourceid")));
 			ds
-				.setCollectedfrom(
-					listKeyValues(
-						createOpenaireId(10, rs.getString("collectedfromid"), true),
-						rs.getString("collectedfromname")));
+					.setCollectedfrom(listKeyValues(createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname")));
 			ds.setPid(new ArrayList<>());
 			ds.setDateofcollection(asString(rs.getDate("dateofcollection")));
 			ds.setDateoftransformation(null); // Value not returned by the SQL query
@@ -180,8 +175,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			ds.setCertificates(field(rs.getString("certificates"), info));
 			ds.setPolicies(new ArrayList<>()); // The sql query returns an empty array
 			ds
-				.setJournal(
-					prepareJournal(rs.getString("officialname"), rs.getString("journal"), info)); // Journal
+					.setJournal(prepareJournal(rs.getString("officialname"), rs.getString("journal"), info)); // Journal
 			ds.setDataInfo(info);
 			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -201,10 +195,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			p.setId(createOpenaireId(40, rs.getString("projectid"), true));
 			p.setOriginalId(Arrays.asList(rs.getString("projectid")));
 			p
-				.setCollectedfrom(
-					listKeyValues(
-						createOpenaireId(10, rs.getString("collectedfromid"), true),
-						rs.getString("collectedfromname")));
+					.setCollectedfrom(listKeyValues(createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname")));
 			p.setPid(new ArrayList<>());
 			p.setDateofcollection(asString(rs.getDate("dateofcollection")));
 			p.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
@@ -221,8 +212,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			p.setDuration(field(Integer.toString(rs.getInt("duration")), info));
 			p.setEcsc39(field(Boolean.toString(rs.getBoolean("ecsc39")), info));
 			p
-				.setOamandatepublications(
-					field(Boolean.toString(rs.getBoolean("oamandatepublications")), info));
+					.setOamandatepublications(field(Boolean.toString(rs.getBoolean("oamandatepublications")), info));
 			p.setEcarticle29_3(field(Boolean.toString(rs.getBoolean("ecarticle29_3")), info));
 			p.setSubjects(prepareListOfStructProps(rs.getArray("subjects"), info));
 			p.setFundingtree(prepareListFields(rs.getArray("fundingtree"), info));
@@ -259,10 +249,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			o.setId(createOpenaireId(20, rs.getString("organizationid"), true));
 			o.setOriginalId(Arrays.asList(rs.getString("organizationid")));
 			o
-				.setCollectedfrom(
-					listKeyValues(
-						createOpenaireId(10, rs.getString("collectedfromid"), true),
-						rs.getString("collectedfromname")));
+					.setCollectedfrom(listKeyValues(createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname")));
 			o.setPid(new ArrayList<>());
 			o.setDateofcollection(asString(rs.getDate("dateofcollection")));
 			o.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
@@ -277,15 +264,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			o.setEclegalperson(field(Boolean.toString(rs.getBoolean("eclegalperson")), info));
 			o.setEcnonprofit(field(Boolean.toString(rs.getBoolean("ecnonprofit")), info));
 			o
-				.setEcresearchorganization(
-					field(Boolean.toString(rs.getBoolean("ecresearchorganization")), info));
+					.setEcresearchorganization(field(Boolean.toString(rs.getBoolean("ecresearchorganization")), info));
 			o.setEchighereducation(field(Boolean.toString(rs.getBoolean("echighereducation")), info));
 			o
-				.setEcinternationalorganizationeurinterests(
-					field(Boolean.toString(rs.getBoolean("ecinternationalorganizationeurinterests")), info));
+					.setEcinternationalorganizationeurinterests(field(Boolean.toString(rs.getBoolean("ecinternationalorganizationeurinterests")), info));
 			o
-				.setEcinternationalorganization(
-					field(Boolean.toString(rs.getBoolean("ecinternationalorganization")), info));
+					.setEcinternationalorganization(field(Boolean.toString(rs.getBoolean("ecinternationalorganization")), info));
 			o.setEcenterprise(field(Boolean.toString(rs.getBoolean("ecenterprise")), info));
 			o.setEcsmevalidated(field(Boolean.toString(rs.getBoolean("ecsmevalidated")), info));
 			o.setEcnutscode(field(Boolean.toString(rs.getBoolean("ecnutscode")), info));
@@ -304,9 +288,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			final DataInfo info = prepareDataInfo(rs);
 			final String orgId = createOpenaireId(20, rs.getString("organization"), true);
 			final String dsId = createOpenaireId(10, rs.getString("datasource"), true);
-			final List<KeyValue> collectedFrom = listKeyValues(
-				createOpenaireId(10, rs.getString("collectedfromid"), true),
-				rs.getString("collectedfromname"));
+			final List<KeyValue> collectedFrom = listKeyValues(createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
 			r1.setRelType("datasourceOrganization");
@@ -339,9 +321,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			final DataInfo info = prepareDataInfo(rs);
 			final String orgId = createOpenaireId(20, rs.getString("resporganization"), true);
 			final String projectId = createOpenaireId(40, rs.getString("project"), true);
-			final List<KeyValue> collectedFrom = listKeyValues(
-				createOpenaireId(10, rs.getString("collectedfromid"), true),
-				rs.getString("collectedfromname"));
+			final List<KeyValue> collectedFrom = listKeyValues(createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
 			r1.setRelType("projectOrganization");
@@ -371,17 +351,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 
 	public List<Oaf> processClaims(final ResultSet rs) {
 
-		final DataInfo info = dataInfo(
-			false,
-			null,
-			false,
-			false,
-			qualifier(
-				"user:claim", "user:claim", "dnet:provenanceActions", "dnet:provenanceActions"),
-			"0.9");
+		final DataInfo info =
+				dataInfo(false, null, false, false, qualifier("user:claim", "user:claim", "dnet:provenanceActions", "dnet:provenanceActions"), "0.9");
 
-		final List<KeyValue> collectedFrom = listKeyValues(
-			createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
+		final List<KeyValue> collectedFrom = listKeyValues(createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
 
 		try {
 
@@ -467,19 +440,11 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 		final String inferenceprovenance = rs.getString("inferenceprovenance");
 		final Boolean inferred = rs.getBoolean("inferred");
 		final String trust = rs.getString("trust");
-		return dataInfo(
-			deletedbyinference,
-			inferenceprovenance,
-			inferred,
-			false,
-			MigrationConstants.ENTITYREGISTRY_PROVENANCE_ACTION,
-			trust);
+		return dataInfo(deletedbyinference, inferenceprovenance, inferred, false, MigrationConstants.ENTITYREGISTRY_PROVENANCE_ACTION, trust);
 	}
 
 	private Qualifier prepareQualifierSplitting(final String s) {
-		if (StringUtils.isBlank(s)) {
-			return null;
-		}
+		if (StringUtils.isBlank(s)) { return null; }
 		final String[] arr = s.split("@@@");
 		return arr.length == 4 ? qualifier(arr[0], arr[1], arr[2], arr[3]) : null;
 	}
@@ -493,22 +458,19 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 	}
 
 	private StructuredProperty prepareStructProp(final String s, final DataInfo dataInfo) {
-		if (StringUtils.isBlank(s)) {
-			return null;
-		}
+		if (StringUtils.isBlank(s)) { return null; }
 		final String[] parts = s.split("###");
 		if (parts.length == 2) {
 			final String value = parts[0];
 			final String[] arr = parts[1].split("@@@");
-			if (arr.length == 4) {
-				return structuredProperty(value, arr[0], arr[1], arr[2], arr[3], dataInfo);
-			}
+			if (arr.length == 4) { return structuredProperty(value, arr[0], arr[1], arr[2], arr[3], dataInfo); }
 		}
 		return null;
 	}
 
 	private List<StructuredProperty> prepareListOfStructProps(
-		final Array array, final DataInfo dataInfo) throws SQLException {
+			final Array array,
+			final DataInfo dataInfo) throws SQLException {
 		final List<StructuredProperty> res = new ArrayList<>();
 		if (array != null) {
 			for (final String s : (String[]) array.getArray()) {
@@ -526,11 +488,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 		if (StringUtils.isNotBlank(sj)) {
 			final String[] arr = sj.split("@@@");
 			if (arr.length == 3) {
-				final String issn = StringUtils.isNotBlank(arr[0]) ? arr[0] : null;
-				final String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1] : null;
-				;
-				final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2] : null;
-				;
+				final String issn = StringUtils.isNotBlank(arr[0]) ? arr[0].trim() : null;
+				final String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1].trim() : null;;
+				final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2].trim() : null;;
 				if (issn != null || eissn != null || lissn != null) {
 					return journal(name, issn, eissn, eissn, null, null, null, null, null, null, null, info);
 				}

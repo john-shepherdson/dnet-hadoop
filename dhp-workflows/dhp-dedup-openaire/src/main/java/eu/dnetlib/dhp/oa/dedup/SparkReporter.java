@@ -15,7 +15,7 @@ public class SparkReporter implements Serializable, Reporter {
 
 	private final List<Tuple2<String, String>> relations = new ArrayList<>();
 
-	private Map<String, LongAccumulator> accumulators;
+	private final Map<String, LongAccumulator> accumulators;
 
 	public SparkReporter(Map<String, LongAccumulator> accumulators) {
 		this.accumulators = accumulators;

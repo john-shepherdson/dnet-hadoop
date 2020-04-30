@@ -12,6 +12,8 @@
     <artifactId>dhp-build-assembly-resources</artifactId>
     <packaging>jar</packaging>
 
+    <description>This module contains a set of scripts supporting the build lifecycle for the dnet-hadoop project</description>
+
     <build>
         <plugins>
             <plugin>

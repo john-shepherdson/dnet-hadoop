@@ -366,7 +366,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	private Properties getStoredProperties(File testFolder)
-		throws FileNotFoundException, IOException {
+		throws IOException {
 		Properties properties = new Properties();
 		properties.load(new FileInputStream(getPropertiesFileLocation(testFolder)));
 		return properties;

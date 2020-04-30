@@ -11,22 +11,22 @@ import java.util.regex.Pattern;
 public class XmlCleaner {
 
 	/** Pattern for numeric entities. */
-	private static Pattern validCharacterEntityPattern = Pattern.compile("^&#x?\\d{2,4};"); // $NON-NLS-1$
+	private static final Pattern validCharacterEntityPattern = Pattern.compile("^&#x?\\d{2,4};"); // $NON-NLS-1$
 	// private static Pattern validCharacterEntityPattern = Pattern.compile("^&#?\\d{2,4};");
 	// //$NON-NLS-1$
 
 	// see https://www.w3.org/TR/REC-xml/#charsets , not only limited to &#11;
-	private static Pattern invalidControlCharPattern = Pattern.compile("&#x?1[0-9a-fA-F];");
+	private static final Pattern invalidControlCharPattern = Pattern.compile("&#x?1[0-9a-fA-F];");
 
 	/**
 	 * Pattern that negates the allowable XML 4 byte unicode characters. Valid are: #x9 | #xA | #xD | [#x20-#xD7FF] |
 	 * [#xE000-#xFFFD] | [#x10000-#x10FFFF]
 	 */
-	private static Pattern invalidCharacterPattern = Pattern.compile("[^\t\r\n\u0020-\uD7FF\uE000-\uFFFD]"); // $NON-NLS-1$
+	private static final Pattern invalidCharacterPattern = Pattern.compile("[^\t\r\n\u0020-\uD7FF\uE000-\uFFFD]"); // $NON-NLS-1$
 
 	// Map entities to their unicode equivalent
-	private static Set<String> goodEntities = new HashSet<>();
-	private static Map<String, String> badEntities = new HashMap<>();
+	private static final Set<String> goodEntities = new HashSet<>();
+	private static final Map<String, String> badEntities = new HashMap<>();
 
 	static {
 		// pre-defined XML entities

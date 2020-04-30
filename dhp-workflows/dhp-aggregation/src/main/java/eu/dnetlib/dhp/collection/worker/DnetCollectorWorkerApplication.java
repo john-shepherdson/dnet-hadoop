@@ -20,7 +20,7 @@ public class DnetCollectorWorkerApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(DnetCollectorWorkerApplication.class);
 
-	private static CollectorPluginFactory collectorPluginFactory = new CollectorPluginFactory();
+	private static final CollectorPluginFactory collectorPluginFactory = new CollectorPluginFactory();
 
 	private static ArgumentApplicationParser argumentParser;
 

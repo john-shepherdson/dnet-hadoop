@@ -21,7 +21,7 @@ public class MessageManager {
 
 	private Connection connection;
 
-	private Map<String, Channel> channels = new HashMap<>();
+	private final Map<String, Channel> channels = new HashMap<>();
 
 	private boolean durable;
 

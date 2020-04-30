@@ -123,10 +123,10 @@ public class PromoteActionPayloadFunctions {
 	 * @param <G> Type of graph table row
 	 */
 	public static class TableAggregator<G extends Oaf> extends Aggregator<G, G, G> {
-		private SerializableSupplier<G> zeroFn;
-		private SerializableSupplier<BiFunction<G, G, G>> mergeAndGetFn;
-		private SerializableSupplier<Function<G, Boolean>> isNotZeroFn;
-		private Class<G> rowClazz;
+		private final SerializableSupplier<G> zeroFn;
+		private final SerializableSupplier<BiFunction<G, G, G>> mergeAndGetFn;
+		private final SerializableSupplier<Function<G, Boolean>> isNotZeroFn;
+		private final Class<G> rowClazz;
 
 		public TableAggregator(
 			SerializableSupplier<G> zeroFn,

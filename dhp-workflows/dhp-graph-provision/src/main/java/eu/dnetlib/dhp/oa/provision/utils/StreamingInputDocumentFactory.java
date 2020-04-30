@@ -46,7 +46,7 @@ public class StreamingInputDocumentFactory {
 
 	private static final String INDEX_RECORD_ID = INDEX_FIELD_PREFIX + "indexrecordidentifier";
 
-	private static final String outFormat = new String("yyyy-MM-dd'T'hh:mm:ss'Z'");
+	private static final String outFormat = "yyyy-MM-dd'T'hh:mm:ss'Z'";
 
 	private static final List<String> dateFormats = Arrays
 		.asList("yyyy-MM-dd'T'hh:mm:ss", "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy", "yyyy");
@@ -61,15 +61,18 @@ public class StreamingInputDocumentFactory {
 
 	private static final int MAX_FIELD_LENGTH = 25000;
 
-	private ThreadLocal<XMLInputFactory> inputFactory = ThreadLocal.withInitial(() -> XMLInputFactory.newInstance());
+	private final ThreadLocal<XMLInputFactory> inputFactory = ThreadLocal
+		.withInitial(() -> XMLInputFactory.newInstance());
 
-	private ThreadLocal<XMLOutputFactory> outputFactory = ThreadLocal.withInitial(() -> XMLOutputFactory.newInstance());
+	private final ThreadLocal<XMLOutputFactory> outputFactory = ThreadLocal
+		.withInitial(() -> XMLOutputFactory.newInstance());
 
-	private ThreadLocal<XMLEventFactory> eventFactory = ThreadLocal.withInitial(() -> XMLEventFactory.newInstance());
+	private final ThreadLocal<XMLEventFactory> eventFactory = ThreadLocal
+		.withInitial(() -> XMLEventFactory.newInstance());
 
-	private String version;
+	private final String version;
 
-	private String dsId;
+	private final String dsId;
 
 	private String resultName = DEFAULTDNETRESULT;
 
