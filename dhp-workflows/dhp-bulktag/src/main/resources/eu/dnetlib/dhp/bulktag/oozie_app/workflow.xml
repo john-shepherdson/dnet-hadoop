@@ -5,24 +5,16 @@
         <description>the source path</description>
     </property>
     <property>
-        <name>sparkDriverMemory</name>
-        <description>memory for driver process</description>
-    </property>
-    <property>
-        <name>sparkExecutorMemory</name>
-        <description>memory for individual executor</description>
-    </property>
-    <property>
-        <name>sparkExecutorCores</name>
-        <description>number of cores used by single executor</description>
-    </property>
-    <property>
         <name>isLookupUrl</name>
         <description>the isLookup service endpoint</description>
     </property>
     <property>
         <name>protoMap</name>
         <description>the json path associated to each selection field</description>
+    </property>
+    <property>
+        <name>outputPath</name>
+        <description>the output path</description>
     </property>
 </parameters>
 
@@ -34,26 +26,72 @@
 
     <action name="reset-outputpath">
         <fs>
-            <delete path='${workingDir}/relation'/>
-            <delete path='${workingDir}/publication'/>
-            <delete path='${workingDir}/dataset'/>
-            <delete path='${workingDir}/otherresearchproduct'/>
-            <delete path='${workingDir}/software'/>
+            <delete path='${outputPath}/relation'/>
+            <delete path='${outputPath}/dataset'/>
+            <delete path='${outputPath}/software'/>
+            <delete path='${outputPath}/publication'/>
+            <delete path='${outputPath}/otherresearchproduct'/>
+            <delete path='${outputPath}/project'/>
+            <delete path='${outputPath}/organization'/>
+            <delete path='${outputPath}/datasource'/>
         </fs>
-        <ok to="copy_relation"/>
+        <ok to="copy_entities"/>
         <error to="Kill"/>
     </action>
+
+    <fork name="copy_entities">
+        <path start="copy_relation"/>
+        <path start="copy_organization"/>
+        <path start="copy_projects"/>
+        <path start="copy_datasources"/>
+    </fork>
 
     <action name="copy_relation">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${workingDir}/relation</arg>
+            <arg>${nameNode}/${outputPath}/relation</arg>
         </distcp>
-        <ok to="fork_exec_bulktag"/>
+        <ok to="copy_wait"/>
         <error to="Kill"/>
     </action>
+
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/organization</arg>
+            <arg>${nameNode}/${outputPath}/organization</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_projects">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/project</arg>
+            <arg>${nameNode}/${outputPath}/project</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_datasources">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/datasource</arg>
+            <arg>${nameNode}/${outputPath}/datasource</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="copy_wait" to="fork_exec_bulktag"/>
+
+
 
 <fork name="fork_exec_bulktag">
     <path start="join_bulktag_publication"/>
@@ -81,11 +119,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <!--        <arg>&#45;&#45;hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
             <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--saveGraph</arg><archive>${saveGraph}</archive>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -110,11 +148,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <!--        <arg>&#45;&#45;hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
             <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--saveGraph</arg><archive>${saveGraph}</archive>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -139,11 +177,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <!--        <arg>&#45;&#45;hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
             <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--saveGraph</arg><archive>${saveGraph}</archive>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -168,11 +206,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <!--        <arg>&#45;&#45;hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/software</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
             <arg>--protoMap</arg><arg>${protoMap}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--saveGraph</arg><archive>${saveGraph}</archive>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>

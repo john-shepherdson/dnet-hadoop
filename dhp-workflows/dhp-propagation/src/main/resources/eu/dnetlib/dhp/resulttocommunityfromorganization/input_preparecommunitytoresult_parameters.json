@@ -24,12 +24,6 @@
     "paramRequired": false
   },
   {
-    "paramName":"test",
-    "paramLongName":"isTest",
-    "paramDescription": "true if it is executing a test",
-    "paramRequired": false
-  },
-  {
     "paramName": "out",
     "paramLongName": "outputPath",
     "paramDescription": "the path used to store temporary output files",

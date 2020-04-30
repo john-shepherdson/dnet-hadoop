@@ -275,25 +275,6 @@
             <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-            </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
-            <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
-            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
