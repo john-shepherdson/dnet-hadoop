@@ -47,7 +47,7 @@ public class PropagationConstant {
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID = "authorpid:result";
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME = "Propagation of authors pid to result through semantic relations";
 
-	public static final String RELATION_DATASOURCE_ORGANIZATION_REL_CLASS = "provides";
+	public static final String RELATION_DATASOURCE_ORGANIZATION_REL_CLASS = "isProvidedBy";
 
 	public static final String RELATION_RESULTORGANIZATION_REL_TYPE = "resultOrganization";
 	public static final String RELATION_RESULTORGANIZATION_SUBREL_TYPE = "affiliation";
