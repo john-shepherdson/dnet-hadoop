@@ -187,7 +187,11 @@ public class SparkOrcidToResultFromSemRelJob3 {
 	}
 
 	private static boolean containsAllowedPid(Author a) {
-		for (StructuredProperty pid : a.getPid()) {
+		Optional<List<StructuredProperty>> pids = Optional.ofNullable(a.getPid());
+		if (!pids.isPresent()) {
+			return false;
+		}
+		for (StructuredProperty pid : pids.get()) {
 			if (PROPAGATION_AUTHOR_PID.equals(pid.getQualifier().getClassid())) {
 				return true;
 			}
