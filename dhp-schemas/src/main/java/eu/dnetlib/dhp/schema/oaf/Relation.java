@@ -7,16 +7,37 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Relation models any edge between two nodes in the OpenAIRE graph. It has a source id and a target id
+ * pointing to graph node identifiers and it is further characterised by the semantic of the link through the fields
+ * relType, subRelType and relClass. Provenance information is modeled according to the dataInfo element and collectedFrom,
+ * while individual relationship types can provide extra information via the properties field.
+ */
 public class Relation extends Oaf {
 
+	/**
+	 * Main relationship classifier, values include 'resultResult', 'resultProject', 'resultOrganization', etc.
+	 */
 	private String relType;
 
+	/**
+	 * Further classifies a relationship, values include 'affiliation', 'similarity', 'supplement', etc.
+	 */
 	private String subRelType;
 
+	/**
+	 * Indicates the direction of the relationship, values include 'isSupplementTo', 'isSupplementedBy', 'merges, 'isMergedIn'.
+	 */
 	private String relClass;
 
+	/**
+	 * The source entity id.
+	 */
 	private String source;
 
+	/**
+	 * The target entity id.
+	 */
 	private String target;
 
 	public String getRelType() {
