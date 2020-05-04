@@ -40,6 +40,21 @@ public class Relation extends Oaf {
 	 */
 	private String target;
 
+	/**
+	 * Was this relationship authoritatively validated?
+	 */
+	private Boolean validated;
+
+	/**
+	 * When was this relationship authoritatively validated.
+	 */
+	private String validationDate;
+
+	/**
+	 * List of relation specific properties. Values include 'similarityLevel', indicating the similarity score between a pair of publications.
+	 */
+	private List<KeyValue> properties = new ArrayList<>();
+
 	public String getRelType() {
 		return relType;
 	}
@@ -78,6 +93,30 @@ public class Relation extends Oaf {
 
 	public void setTarget(final String target) {
 		this.target = target;
+	}
+
+	public List<KeyValue> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(List<KeyValue> properties) {
+		this.properties = properties;
+	}
+
+	public Boolean getValidated() {
+		return validated;
+	}
+
+	public void setValidated(Boolean validated) {
+		this.validated = validated;
+	}
+
+	public String getValidationDate() {
+		return validationDate;
+	}
+
+	public void setValidationDate(String validationDate) {
+		this.validationDate = validationDate;
 	}
 
 	public void mergeFrom(final Relation r) {
@@ -122,4 +161,5 @@ public class Relation extends Oaf {
 	public int hashCode() {
 		return Objects.hash(relType, subRelType, relClass, source, target, collectedfrom);
 	}
+
 }
