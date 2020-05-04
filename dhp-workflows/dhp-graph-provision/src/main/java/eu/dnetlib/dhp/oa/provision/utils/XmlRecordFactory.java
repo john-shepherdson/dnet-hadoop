@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.xml.transform.*;
@@ -47,7 +44,7 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class XmlRecordFactory implements Serializable {
 
-	public static final String REL_SUBTYPE_DEDUP = "dedup";
+	private static final String REL_SUBTYPE_DEDUP = "dedup";
 	private final Map<String, LongAccumulator> accumulators;
 
 	private final Set<String> specialDatasourceTypes;
@@ -100,8 +97,8 @@ public class XmlRecordFactory implements Serializable {
 			final List<String> relations = je
 				.getLinks()
 				.stream()
-				.filter(t -> !REL_SUBTYPE_DEDUP.equalsIgnoreCase(t.getRelation().getSubRelType()))
-				.map(link -> mapRelation(link, templateFactory, contexts))
+				.filter(link -> !isDuplicate(link))
+				.map(link -> mapRelation(contexts, templateFactory, type, link))
 				.collect(Collectors.toCollection(ArrayList::new));
 
 			final String mainType = ModelSupport.getMainType(type);
@@ -936,7 +933,7 @@ public class XmlRecordFactory implements Serializable {
 		metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", dsType));
 	}
 
-	private String mapRelation(Tuple2 link, TemplateFactory templateFactory, Set<String> contexts) {
+	private List<String> mapFields(Tuple2 link, Set<String> contexts) {
 		final Relation rel = link.getRelation();
 		final RelatedEntity re = link.getRelatedEntity();
 		final String targetType = link.getRelatedEntity().getType();
@@ -1040,38 +1037,47 @@ public class XmlRecordFactory implements Serializable {
 			default:
 				throw new IllegalArgumentException("invalid target type: " + targetType);
 		}
-		final DataInfo info = rel.getDataInfo();
-		final String scheme = ModelSupport.getScheme(re.getType(), targetType);
-
-		if (StringUtils.isBlank(scheme)) {
-			throw new IllegalArgumentException(
-				String.format("missing scheme for: <%s - %s>", re.getType(), targetType));
-		}
 
 		final String accumulatorName = getRelDescriptor(rel.getRelType(), rel.getSubRelType(), rel.getRelClass());
 		if (accumulators.containsKey(accumulatorName)) {
 			accumulators.get(accumulatorName).add(1);
 		}
 
+		return metadata;
+	}
+
+	private String mapRelation(Set<String> contexts, TemplateFactory templateFactory, EntityType type, Tuple2 link) {
+		final Relation rel = link.getRelation();
+		final String targetType = link.getRelatedEntity().getType();
+		final String scheme = ModelSupport.getScheme(type.toString(), targetType);
+
+		if (StringUtils.isBlank(scheme)) {
+			throw new IllegalArgumentException(
+				String.format("missing scheme for: <%s - %s>", type.toString(), targetType));
+		}
+		final HashSet<String> fields = Sets.newHashSet(mapFields(link, contexts));
 		return templateFactory
 			.getRel(
-				targetType, rel.getTarget(), Sets.newHashSet(metadata), rel.getRelClass(), scheme, info);
+				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, rel.getDataInfo());
 	}
 
 	private List<String> listChildren(
 		final OafEntity entity, JoinedEntity je, TemplateFactory templateFactory) {
 
-		final List<String> children = Lists.newArrayList();
 		EntityType entityType = EntityType.valueOf(je.getEntity().getType());
 
-		children
-			.addAll(
-				je
-					.getLinks()
-					.stream()
-					.filter(link -> REL_SUBTYPE_DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType()))
-					.map(link -> mapRelation(link, templateFactory, null))
-					.collect(Collectors.toCollection(ArrayList::new)));
+		List<String> children = je
+			.getLinks()
+			.stream()
+			.filter(link -> isDuplicate(link))
+			.map(link -> {
+				final String targetType = link.getRelatedEntity().getType();
+				final String name = ModelSupport.getMainType(EntityType.valueOf(targetType));
+				final HashSet<String> fields = Sets.newHashSet(mapFields(link, null));
+				return templateFactory
+					.getChild(name, link.getRelatedEntity().getId(), Lists.newArrayList(fields));
+			})
+			.collect(Collectors.toCollection(ArrayList::new));
 
 		if (MainEntityType.result.toString().equals(ModelSupport.getMainType(entityType))) {
 			final List<Instance> instances = ((Result) entity).getInstance();
@@ -1176,6 +1182,10 @@ public class XmlRecordFactory implements Serializable {
 		}
 
 		return children;
+	}
+
+	private boolean isDuplicate(Tuple2 link) {
+		return REL_SUBTYPE_DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
 	}
 
 	private List<String> listExtraInfo(OafEntity entity) {
