@@ -23,7 +23,7 @@ import org.apache.hadoop.fs.Path;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.raw.common.DbClient;
+import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.Relation;

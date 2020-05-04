@@ -57,17 +57,16 @@ public class SparkRemoveBlacklistedRelationJob {
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
-				conf,
-				isSparkSessionManaged,
-				spark -> {
-					removeBlacklistedRelations(
-							spark,
-							inputPath,
-							blacklistPath,
-							outputPath,
-							mergesPath);
-				});
-
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				removeBlacklistedRelations(
+					spark,
+					inputPath,
+					blacklistPath,
+					outputPath,
+					mergesPath);
+			});
 
 	}
 

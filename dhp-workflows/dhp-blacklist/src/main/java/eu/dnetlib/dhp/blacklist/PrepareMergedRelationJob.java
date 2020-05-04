@@ -69,7 +69,8 @@ public class PrepareMergedRelationJob {
 		relation.createOrReplaceTempView("relation");
 
 		spark
-			.sql("Select * from relation " +
+			.sql(
+				"Select * from relation " +
 					"where relclass = 'merges' " +
 					"and datainfo.deletedbyinference = false")
 			.as(Encoders.bean(Relation.class))
