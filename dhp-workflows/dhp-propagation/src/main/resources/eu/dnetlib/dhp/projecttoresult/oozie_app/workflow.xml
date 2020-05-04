@@ -107,7 +107,7 @@
             <arg>${nameNode}/${sourcePath}/organization</arg>
             <arg>${nameNode}/${outputPath}/organization</arg>
         </distcp>
-        <ok to="copy"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
     <action name="copy_projects">
@@ -117,7 +117,7 @@
             <arg>${nameNode}/${sourcePath}/project</arg>
             <arg>${nameNode}/${outputPath}/project</arg>
         </distcp>
-        <ok to="copy"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
@@ -128,7 +128,7 @@
             <arg>${nameNode}/${sourcePath}/datasource</arg>
             <arg>${nameNode}/${outputPath}/datasource</arg>
         </distcp>
-        <ok to="copy"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
