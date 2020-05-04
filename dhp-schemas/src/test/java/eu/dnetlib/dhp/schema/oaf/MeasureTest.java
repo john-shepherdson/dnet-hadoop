@@ -1,13 +1,14 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MeasureTest {
 
@@ -17,16 +18,22 @@ public class MeasureTest {
     @Test
     public void testMeasureSerialization() throws IOException {
 
-        Measure m = new Measure();
-
-        m.setId("popularity");
-        m.setUnit(Lists.newArrayList(
+        Measure popularity = new Measure();
+        popularity.setId("popularity");
+        popularity.setUnit(Lists.newArrayList(
                 unit("score", "0.5")));
+
+        Measure influence = new Measure();
+        influence.setId("influence");
+        influence.setUnit(Lists.newArrayList(
+                unit("score", "0.3")));
+
+        List<Measure> m = Lists.newArrayList(popularity, influence);
 
         String s = OBJECT_MAPPER.writeValueAsString(m);
         System.out.println(s);
 
-        Measure mm = OBJECT_MAPPER.readValue(s, Measure.class);
+        List<Measure> mm = OBJECT_MAPPER.readValue(s, new TypeReference<List<Measure>>() { });
 
         Assertions.assertNotNull(mm);
     }
