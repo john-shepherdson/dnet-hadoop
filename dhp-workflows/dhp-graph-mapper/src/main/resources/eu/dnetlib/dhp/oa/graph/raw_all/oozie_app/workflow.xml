@@ -115,11 +115,11 @@
                 <delete path="${contentPath}/db_claims"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
-            <arg>-p</arg><arg>${contentPath}/db_claims</arg>
-            <arg>-pgurl</arg><arg>${postgresURL}</arg>
-            <arg>-pguser</arg><arg>${postgresUser}</arg>
-            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
-            <arg>-a</arg><arg>claims</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/db_claims</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--action</arg><arg>claims</arg>
         </java>
         <ok to="ImportODF_claims"/>
         <error to="Kill"/>
@@ -165,10 +165,10 @@
                 <delete path="${contentPath}/db_records"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
-            <arg>-p</arg><arg>${contentPath}/db_records</arg>
-            <arg>-pgurl</arg><arg>${postgresURL}</arg>
-            <arg>-pguser</arg><arg>${postgresUser}</arg>
-            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/db_records</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </java>
         <ok to="ImportODF"/>
         <error to="Kill"/>
@@ -180,12 +180,12 @@
                 <delete path="${contentPath}/odf_records"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${contentPath}/odf_records</arg>
-            <arg>-mongourl</arg><arg>${mongoURL}</arg>
-            <arg>-mongodb</arg><arg>${mongoDb}</arg>
-            <arg>-f</arg><arg>ODF</arg>
-            <arg>-l</arg><arg>store</arg>
-            <arg>-i</arg><arg>cleaned</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/odf_records</arg>
+            <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
+            <arg>--mongoDb</arg><arg>${mongoDb}</arg>
+            <arg>--mdFormat</arg><arg>ODF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>cleaned</arg>
         </java>
         <ok to="ImportOAF"/>
         <error to="Kill"/>
@@ -197,12 +197,12 @@
                 <delete path="${contentPath}/oaf_records"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${contentPath}/oaf_records</arg>
-            <arg>-mongourl</arg><arg>${mongoURL}</arg>
-            <arg>-mongodb</arg><arg>${mongoDb}</arg>
-            <arg>-f</arg><arg>OAF</arg>
-            <arg>-l</arg><arg>store</arg>
-            <arg>-i</arg><arg>cleaned</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_records</arg>
+            <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
+            <arg>--mongoDb</arg><arg>${mongoDb}</arg>
+            <arg>--mdFormat</arg><arg>OAF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>cleaned</arg>
         </java>
         <ok to="wait_import"/>
         <error to="Kill"/>
@@ -231,11 +231,11 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>-s</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
-            <arg>-t</arg><arg>${workingDir}/entities_claim</arg>
-            <arg>-pgurl</arg><arg>${postgresURL}</arg>
-            <arg>-pguser</arg><arg>${postgresUser}</arg>
-            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
+            <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </spark>
         <ok to="GenerateGraph_claims"/>
         <error to="Kill"/>
@@ -257,8 +257,8 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>-s</arg><arg>${workingDir}/entities_claim</arg>
-            <arg>-g</arg><arg>${workingDir}/graph_claims</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/entities_claim</arg>
+            <arg>--graphRawPath</arg><arg>${workingDir}/graph_claims</arg>
         </spark>
         <ok to="wait_graphs"/>
         <error to="Kill"/>
@@ -280,11 +280,11 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>-s</arg><arg>${contentPath}/db_records,${contentPath}/oaf_records,${contentPath}/odf_records</arg>
-            <arg>-t</arg><arg>${workingDir}/entities</arg>
-            <arg>-pgurl</arg><arg>${postgresURL}</arg>
-            <arg>-pguser</arg><arg>${postgresUser}</arg>
-            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_records,${contentPath}/oaf_records,${contentPath}/odf_records</arg>
+            <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </spark>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>
@@ -307,8 +307,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>-s</arg><arg>${workingDir}/entities</arg>
-            <arg>-g</arg><arg>${workingDir}/graph_raw</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/entities</arg>
+            <arg>--graphRawPath</arg><arg>${workingDir}/graph_raw</arg>
         </spark>
         <ok to="wait_graphs"/>
         <error to="Kill"/>
