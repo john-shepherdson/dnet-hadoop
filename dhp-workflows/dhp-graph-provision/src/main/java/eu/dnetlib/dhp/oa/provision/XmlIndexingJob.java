@@ -113,7 +113,7 @@ public class XmlIndexingJob {
 			});
 	}
 
-	private static String toIndexRecord(Transformer tr, final String record) {
+	protected static String toIndexRecord(Transformer tr, final String record) {
 		final StreamResult res = new StreamResult(new StringWriter());
 		try {
 			tr.transform(new StreamSource(new StringReader(record)), res);
@@ -135,7 +135,7 @@ public class XmlIndexingJob {
 	 * @throws IOException could happen
 	 * @throws TransformerException could happen
 	 */
-	private static String getLayoutTransformer(String format, String fields, String xslt)
+	protected static String getLayoutTransformer(String format, String fields, String xslt)
 		throws TransformerException {
 
 		final Transformer layoutTransformer = SaxonTransformerFactory.newInstance(xslt);

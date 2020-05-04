@@ -94,7 +94,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			FieldType.TARGET,
 			getDeletedFn());
 
-		save(newRels.union(updated), outputRelationPath, SaveMode.Overwrite);
+		save(newRels.union(updated).union(mergeRels), outputRelationPath, SaveMode.Overwrite);
 	}
 
 	private static Dataset<Relation> processDataset(
