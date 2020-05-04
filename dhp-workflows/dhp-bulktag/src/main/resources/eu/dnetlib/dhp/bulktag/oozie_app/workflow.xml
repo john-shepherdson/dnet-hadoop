@@ -5,11 +5,11 @@
         <description>the source path</description>
     </property>
     <property>
-        <name>isLookupUrl</name>
+        <name>isLookUpUrl</name>
         <description>the isLookup service endpoint</description>
     </property>
     <property>
-        <name>protoMap</name>
+        <name>pathMap</name>
         <description>the json path associated to each selection field</description>
     </property>
     <property>
@@ -121,8 +121,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
-            <arg>--protoMap</arg><arg>${protoMap}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--pathMap</arg><arg>${pathMap}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -149,8 +149,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--protoMap</arg><arg>${protoMap}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--pathMap</arg><arg>${pathMap}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -177,8 +177,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--protoMap</arg><arg>${protoMap}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--pathMap</arg><arg>${pathMap}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -205,8 +205,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
-            <arg>--protoMap</arg><arg>${protoMap}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--pathMap</arg><arg>${pathMap}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>

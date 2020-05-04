@@ -57,9 +57,9 @@ public class SparkBulkTagJob2 {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		ProtoMap protoMappingParams = new Gson().fromJson(parser.get("protoMap"), ProtoMap.class);
+		ProtoMap protoMappingParams = new Gson().fromJson(parser.get("pathMap"), ProtoMap.class);
 		;
-		log.info("protoMap: {}", new Gson().toJson(protoMappingParams));
+		log.info("pathMap: {}", new Gson().toJson(protoMappingParams));
 
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
@@ -80,7 +80,7 @@ public class SparkBulkTagJob2 {
 		if (isTest) {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
-			cc = QueryInformationSystem.getCommunityConfiguration(parser.get("isLookupUrl"));
+			cc = QueryInformationSystem.getCommunityConfiguration(parser.get("isLookUpUrl"));
 		}
 
 		runWithSparkSession(

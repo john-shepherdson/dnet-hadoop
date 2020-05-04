@@ -1,7 +1,7 @@
 [
   {
     "paramName":"is",
-    "paramLongName":"isLookupUrl",
+    "paramLongName":"isLookUpUrl",
     "paramDescription": "URL of the isLookUp Service",
     "paramRequired": true
   },
@@ -13,7 +13,7 @@
   },
   {
     "paramName": "pm",
-    "paramLongName":"protoMap",
+    "paramLongName":"pathMap",
     "paramDescription": "the json path associated to each selection field",
     "paramRequired": true
   },

@@ -99,9 +99,9 @@ public class BulkTagJobTest {
 					"eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath",
 					workingDir.toString() + "/dataset",
-					"-isLookupUrl",
+					"-isLookUpUrl",
 					"http://beta.services.openaire.eu:8280/is/services/isLookUp",
-					"-protoMap",
+					"-pathMap",
 					"{ \"author\" : \"$['author'][*]['fullname']\","
 						+ "  \"title\" : \"$['title'][*]['value']\","
 						+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
@@ -151,9 +151,9 @@ public class BulkTagJobTest {
 					"eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath",
 					workingDir.toString() + "/dataset",
-					"-isLookupUrl",
+					"-isLookUpUrl",
 					"http://beta.services.openaire.eu:8280/is/services/isLookUp",
-					"-protoMap",
+					"-pathMap",
 					"{ \"author\" : \"$['author'][*]['fullname']\","
 						+ "  \"title\" : \"$['title'][*]['value']\","
 						+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
@@ -258,9 +258,9 @@ public class BulkTagJobTest {
 					"eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath",
 					workingDir.toString() + "/dataset",
-					"-isLookupUrl",
+					"-isLookUpUrl",
 					"http://beta.services.openaire.eu:8280/is/services/isLookUp",
-					"-protoMap",
+					"-pathMap",
 					"{ \"author\" : \"$['author'][*]['fullname']\","
 						+ "  \"title\" : \"$['title'][*]['value']\","
 						+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
@@ -349,9 +349,9 @@ public class BulkTagJobTest {
 					"eu.dnetlib.dhp.schema.oaf.Publication",
 					"-outputPath",
 					workingDir.toString() + "/publication",
-					"-isLookupUrl",
+					"-isLookUpUrl",
 					"http://beta.services.openaire.eu:8280/is/services/isLookUp",
-					"-protoMap",
+					"-pathMap",
 					"{ \"author\" : \"$['author'][*]['fullname']\","
 						+ "  \"title\" : \"$['title'][*]['value']\","
 						+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
@@ -433,9 +433,9 @@ public class BulkTagJobTest {
 					"eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
 					"-outputPath",
 					workingDir.toString() + "/orp",
-					"-isLookupUrl",
+					"-isLookUpUrl",
 					"http://beta.services.openaire.eu:8280/is/services/isLookUp",
-					"-protoMap",
+					"-pathMap",
 					"{ \"author\" : \"$['author'][*]['fullname']\","
 						+ "  \"title\" : \"$['title'][*]['value']\","
 						+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
@@ -565,9 +565,9 @@ public class BulkTagJobTest {
 					"eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath",
 					workingDir.toString() + "/dataset",
-					"-isLookupUrl",
+					"-isLookUpUrl",
 					"http://beta.services.openaire.eu:8280/is/services/isLookUp",
-					"-protoMap",
+					"-pathMap",
 					"{ \"author\" : \"$['author'][*]['fullname']\","
 						+ "  \"title\" : \"$['title'][*]['value']\","
 						+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
@@ -703,9 +703,9 @@ public class BulkTagJobTest {
 					"eu.dnetlib.dhp.schema.oaf.Software",
 					"-outputPath",
 					workingDir.toString() + "/software",
-					"-isLookupUrl",
+					"-isLookUpUrl",
 					"http://beta.services.openaire.eu:8280/is/services/isLookUp",
-					"-protoMap",
+					"-pathMap",
 					"{ \"author\" : \"$['author'][*]['fullname']\","
 						+ "  \"title\" : \"$['title'][*]['value']\","
 						+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
@@ -814,9 +814,9 @@ public class BulkTagJobTest {
 					"eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath",
 					workingDir.toString() + "/dataset",
-					"-isLookupUrl",
+					"-isLookUpUrl",
 					"http://beta.services.openaire.eu:8280/is/services/isLookUp",
-					"-protoMap",
+					"-pathMap",
 					"{ \"author\" : \"$['author'][*]['fullname']\","
 						+ "  \"title\" : \"$['title'][*]['value']\","
 						+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
