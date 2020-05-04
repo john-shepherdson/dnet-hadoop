@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
@@ -6,134 +7,123 @@ import java.util.stream.Collectors;
 
 public abstract class OafEntity extends Oaf implements Serializable {
 
-    private String id;
+	private String id;
 
-    private List<String> originalId;
+	private List<String> originalId;
 
-    private List<KeyValue> collectedfrom;
+	private List<StructuredProperty> pid;
 
-    private List<StructuredProperty> pid;
+	private String dateofcollection;
 
-    private String dateofcollection;
+	private String dateoftransformation;
 
-    private String dateoftransformation;
+	private List<ExtraInfo> extraInfo;
 
-    private List<ExtraInfo> extraInfo;
+	private OAIProvenance oaiprovenance;
 
-    private OAIProvenance oaiprovenance;
+	public String getId() {
+		return id;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public List<String> getOriginalId() {
+		return originalId;
+	}
 
-    public List<String> getOriginalId() {
-        return originalId;
-    }
+	public void setOriginalId(List<String> originalId) {
+		this.originalId = originalId;
+	}
 
-    public void setOriginalId(List<String> originalId) {
-        this.originalId = originalId;
-    }
+	public List<StructuredProperty> getPid() {
+		return pid;
+	}
 
-    public List<KeyValue> getCollectedfrom() {
-        return collectedfrom;
-    }
+	public void setPid(List<StructuredProperty> pid) {
+		this.pid = pid;
+	}
 
-    public void setCollectedfrom(List<KeyValue> collectedfrom) {
-        this.collectedfrom = collectedfrom;
-    }
+	public String getDateofcollection() {
+		return dateofcollection;
+	}
 
-    public List<StructuredProperty> getPid() {
-        return pid;
-    }
+	public void setDateofcollection(String dateofcollection) {
+		this.dateofcollection = dateofcollection;
+	}
 
-    public void setPid(List<StructuredProperty> pid) {
-        this.pid = pid;
-    }
+	public String getDateoftransformation() {
+		return dateoftransformation;
+	}
 
-    public String getDateofcollection() {
-        return dateofcollection;
-    }
+	public void setDateoftransformation(String dateoftransformation) {
+		this.dateoftransformation = dateoftransformation;
+	}
 
-    public void setDateofcollection(String dateofcollection) {
-        this.dateofcollection = dateofcollection;
-    }
+	public List<ExtraInfo> getExtraInfo() {
+		return extraInfo;
+	}
 
-    public String getDateoftransformation() {
-        return dateoftransformation;
-    }
+	public void setExtraInfo(List<ExtraInfo> extraInfo) {
+		this.extraInfo = extraInfo;
+	}
 
-    public void setDateoftransformation(String dateoftransformation) {
-        this.dateoftransformation = dateoftransformation;
-    }
+	public OAIProvenance getOaiprovenance() {
+		return oaiprovenance;
+	}
 
-    public List<ExtraInfo> getExtraInfo() {
-        return extraInfo;
-    }
+	public void setOaiprovenance(OAIProvenance oaiprovenance) {
+		this.oaiprovenance = oaiprovenance;
+	}
 
-    public void setExtraInfo(List<ExtraInfo> extraInfo) {
-        this.extraInfo = extraInfo;
-    }
+	public void mergeFrom(OafEntity e) {
 
-    public OAIProvenance getOaiprovenance() {
-        return oaiprovenance;
-    }
+		if (e == null)
+			return;
 
-    public void setOaiprovenance(OAIProvenance oaiprovenance) {
-        this.oaiprovenance = oaiprovenance;
-    }
+		originalId = mergeLists(originalId, e.getOriginalId());
 
+		collectedfrom = mergeLists(collectedfrom, e.getCollectedfrom());
 
-    public void mergeFrom(OafEntity e) {
+		pid = mergeLists(pid, e.getPid());
 
-        if (e == null)
-            return;
+		if (e.getDateofcollection() != null && compareTrust(this, e) < 0)
+			dateofcollection = e.getDateofcollection();
 
-        originalId = mergeLists(originalId, e.getOriginalId());
+		if (e.getDateoftransformation() != null && compareTrust(this, e) < 0)
+			dateoftransformation = e.getDateoftransformation();
 
-        collectedfrom = mergeLists(collectedfrom, e.getCollectedfrom());
+		extraInfo = mergeLists(extraInfo, e.getExtraInfo());
 
-        pid = mergeLists(pid, e.getPid());
+		if (e.getOaiprovenance() != null && compareTrust(this, e) < 0)
+			oaiprovenance = e.getOaiprovenance();
+	}
 
-        if (e.getDateofcollection() != null && compareTrust(this, e) < 0)
-            dateofcollection = e.getDateofcollection();
+	protected <T> List<T> mergeLists(final List<T>... lists) {
 
-        if (e.getDateoftransformation() != null && compareTrust(this, e) < 0)
-            dateoftransformation = e.getDateoftransformation();
+		return Arrays
+			.stream(lists)
+			.filter(Objects::nonNull)
+			.flatMap(List::stream)
+			.distinct()
+			.collect(Collectors.toList());
+	}
 
-        extraInfo = mergeLists(extraInfo, e.getExtraInfo());
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		if (!super.equals(o))
+			return false;
+		OafEntity oafEntity = (OafEntity) o;
+		return Objects.equals(id, oafEntity.id);
+	}
 
-        if (e.getOaiprovenance() != null && compareTrust(this, e) < 0)
-            oaiprovenance = e.getOaiprovenance();
-
-    }
-
-    protected <T> List<T> mergeLists(final List<T>... lists) {
-
-        return Arrays.stream(lists).filter(Objects::nonNull).flatMap(List::stream).distinct().collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        OafEntity oafEntity = (OafEntity) o;
-        return Objects.equals(id, oafEntity.id) &&
-                Objects.equals(originalId, oafEntity.originalId) &&
-                Objects.equals(collectedfrom, oafEntity.collectedfrom) &&
-                Objects.equals(pid, oafEntity.pid) &&
-                Objects.equals(dateofcollection, oafEntity.dateofcollection) &&
-                Objects.equals(dateoftransformation, oafEntity.dateoftransformation) &&
-                Objects.equals(extraInfo, oafEntity.extraInfo) &&
-                Objects.equals(oaiprovenance, oafEntity.oaiprovenance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), id, originalId, collectedfrom, pid, dateofcollection, dateoftransformation, extraInfo, oaiprovenance);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), id);
+	}
 }

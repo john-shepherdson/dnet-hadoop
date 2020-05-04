@@ -1,18 +1,21 @@
+
 package eu.dnetlib.dhp.oa.graph.raw.common;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.text.WordUtils;
-
-import java.nio.charset.Charset;
-import java.text.Normalizer;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class PacePerson {
 
@@ -137,7 +140,10 @@ public class PacePerson {
 	}
 
 	public String hash() {
-		return Hashing.murmur3_128().hashString(getNormalisedFullname(), Charset.forName(UTF8)).toString();
+		return Hashing
+			.murmur3_128()
+			.hashString(getNormalisedFullname(), StandardCharsets.UTF_8)
+			.toString();
 	}
 
 	public String getNormalisedFirstName() {
@@ -153,11 +159,15 @@ public class PacePerson {
 	}
 
 	public String getNormalisedFullname() {
-		return isAccurate() ? getNormalisedSurname() + ", " + getNormalisedFirstName() : Joiner.on(" ").join(fullname);
+		return isAccurate()
+			? getNormalisedSurname() + ", " + getNormalisedFirstName()
+			: Joiner.on(" ").join(fullname);
 	}
 
 	public List<String> getCapitalFirstnames() {
-		return Lists.newArrayList(Iterables.transform(getNameWithAbbreviations(), PacePerson::capitalize));
+		return Lists
+			.newArrayList(
+				Iterables.transform(getNameWithAbbreviations(), PacePerson::capitalize));
 	}
 
 	public List<String> getCapitalSurname() {
@@ -171,5 +181,4 @@ public class PacePerson {
 	public boolean isAccurate() {
 		return name != null && surname != null && !name.isEmpty() && !surname.isEmpty();
 	}
-
 }

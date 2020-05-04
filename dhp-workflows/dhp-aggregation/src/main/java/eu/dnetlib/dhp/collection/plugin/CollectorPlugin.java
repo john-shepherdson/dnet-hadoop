@@ -1,9 +1,10 @@
+
 package eu.dnetlib.dhp.collection.plugin;
+
+import java.util.stream.Stream;
 
 import eu.dnetlib.collector.worker.model.ApiDescriptor;
 import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
-
-import java.util.stream.Stream;
 
 public interface CollectorPlugin {
 

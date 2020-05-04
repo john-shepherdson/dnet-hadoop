@@ -6,14 +6,14 @@
 	<version>1.1.7-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<url>http://www.d-net.research-infrastructures.eu</url>
-
 	<licenses>
 		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<name>GNU Affero General Public License v3.0 or later</name>
+			<url>https://spdx.org/licenses/AGPL-3.0-or-later.html#licenseText</url>
 			<distribution>repo</distribution>
-			<comments>A business-friendly OSS license</comments>
+			<comments>This program is free software: you can redistribute it and/or modify it under the terms of the
+				GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the
+				License, or (at your option) any later version.</comments>
 		</license>
 	</licenses>
 
@@ -40,6 +40,8 @@
 		<url>https://code-repo.d4science.org/D-Net/dnet-hadoop/</url>
 		<tag>HEAD</tag>
 	</scm>
+
+	<description>This module is the root descriptor for the dnet-hadoop project</description>
 
 	<pluginRepositories>
 	</pluginRepositories>
@@ -292,6 +294,12 @@
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-actionmanager-common</artifactId>
 				<version>6.0.5</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.hadoop</groupId>
+						<artifactId>hadoop-common</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
@@ -307,7 +315,7 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-pace-core</artifactId>
-				<version>4.0.0</version>
+				<version>4.0.1</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
@@ -400,6 +408,18 @@
 		<testOutputDirectory>target/test-classes</testOutputDirectory>
 		<pluginManagement>
 			<plugins>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.7.1</version>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -443,9 +463,10 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>2.10.4</version>
+					<version>3.2.0</version>
 					<configuration>
 						<detectLinks>true</detectLinks>
+						<doclint>none</doclint>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -455,13 +476,62 @@
 				</plugin>
 
 				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>1.12</version>
+					<groupId>net.revelc.code.formatter</groupId>
+					<artifactId>formatter-maven-plugin</artifactId>
+					<version>2.11.0</version>
+					<dependencies>
+						<dependency>
+							<groupId>eu.dnetlib.dhp</groupId>
+							<artifactId>dhp-code-style</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+						<configuration>
+							<configFile>eclipse/formatter_dnet.xml</configFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>net.revelc.code</groupId>
+				<artifactId>impsort-maven-plugin</artifactId>
+				<version>1.4.1</version>
+				<configuration>
+					<groups>java.,javax.,org.,com.</groups>
+					<staticGroups>java,*</staticGroups>
+					<excludes>
+						<exclude>**/thrift/*.java</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>sort-imports</id>
+						<goals>
+							<goal>sort</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
@@ -522,9 +592,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
 				<configuration>
 					<detectLinks>true</detectLinks>
+					<doclint>none</doclint>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -535,6 +605,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
+		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
 		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>

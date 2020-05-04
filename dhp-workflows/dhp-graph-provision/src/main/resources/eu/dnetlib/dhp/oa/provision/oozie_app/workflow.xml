@@ -98,6 +98,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>

@@ -1,27 +1,29 @@
-package eu.dnetlib.dhp.oa.graph.raw.common;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.*;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class DbClient implements Closeable {
 
 	private static final Log log = LogFactory.getLog(DbClient.class);
 
-	private Connection connection;
+	private final Connection connection;
 
 	public DbClient(final String address, final String login, final String password) {
 
 		try {
 			Class.forName("org.postgresql.Driver");
 
-			this.connection =
-					StringUtils.isNoneBlank(login, password) ? DriverManager.getConnection(address, login, password) : DriverManager.getConnection(address);
+			this.connection = StringUtils.isNoneBlank(login, password)
+				? DriverManager.getConnection(address, login, password)
+				: DriverManager.getConnection(address);
 			this.connection.setAutoCommit(false);
 		} catch (final Exception e) {
 			log.error("Connection to postgresDB failed");
@@ -57,5 +59,4 @@ public class DbClient implements Closeable {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

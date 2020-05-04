@@ -113,6 +113,9 @@
 
     <action name="SkipPromoteProjectActionPayloadForProjectTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${outputGraphRootPath}/project"/>
+            </prepare>
             <arg>-pb</arg>
             <arg>${inputGraphRootPath}/project</arg>
             <arg>${outputGraphRootPath}/project</arg>

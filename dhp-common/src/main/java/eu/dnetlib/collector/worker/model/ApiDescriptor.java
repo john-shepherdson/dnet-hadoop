@@ -1,8 +1,8 @@
+
 package eu.dnetlib.collector.worker.model;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class ApiDescriptor {
 
@@ -45,5 +45,4 @@ public class ApiDescriptor {
 	public void setProtocol(final String protocol) {
 		this.protocol = protocol;
 	}
-
 }

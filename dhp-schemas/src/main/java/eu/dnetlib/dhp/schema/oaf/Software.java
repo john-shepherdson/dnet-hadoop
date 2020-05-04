@@ -1,85 +1,78 @@
+
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class Software extends Result implements Serializable {
 
-    private List<Field<String>> documentationUrl;
+	private List<Field<String>> documentationUrl;
 
-    private List<StructuredProperty> license;
+	private List<StructuredProperty> license;
 
-    private Field<String> codeRepositoryUrl;
+	private Field<String> codeRepositoryUrl;
 
-    private Qualifier programmingLanguage;
+	private Qualifier programmingLanguage;
 
-    public List<Field<String>> getDocumentationUrl() {
-        return documentationUrl;
-    }
+	public Software() {
+		setResulttype(ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE);
+	}
 
-    public void setDocumentationUrl(List<Field<String>> documentationUrl) {
-        this.documentationUrl = documentationUrl;
-    }
+	public List<Field<String>> getDocumentationUrl() {
+		return documentationUrl;
+	}
 
-    public List<StructuredProperty> getLicense() {
-        return license;
-    }
+	public void setDocumentationUrl(List<Field<String>> documentationUrl) {
+		this.documentationUrl = documentationUrl;
+	}
 
-    public void setLicense(List<StructuredProperty> license) {
-        this.license = license;
-    }
+	public List<StructuredProperty> getLicense() {
+		return license;
+	}
 
-    public Field<String> getCodeRepositoryUrl() {
-        return codeRepositoryUrl;
-    }
+	public void setLicense(List<StructuredProperty> license) {
+		this.license = license;
+	}
 
-    public void setCodeRepositoryUrl(Field<String> codeRepositoryUrl) {
-        this.codeRepositoryUrl = codeRepositoryUrl;
-    }
+	public Field<String> getCodeRepositoryUrl() {
+		return codeRepositoryUrl;
+	}
 
-    public Qualifier getProgrammingLanguage() {
-        return programmingLanguage;
-    }
+	public void setCodeRepositoryUrl(Field<String> codeRepositoryUrl) {
+		this.codeRepositoryUrl = codeRepositoryUrl;
+	}
 
-    public void setProgrammingLanguage(Qualifier programmingLanguage) {
-        this.programmingLanguage = programmingLanguage;
-    }
+	public Qualifier getProgrammingLanguage() {
+		return programmingLanguage;
+	}
 
-    @Override
-    public void mergeFrom(OafEntity e) {
-        super.mergeFrom(e);
+	public void setProgrammingLanguage(Qualifier programmingLanguage) {
+		this.programmingLanguage = programmingLanguage;
+	}
 
-        if (!Software.class.isAssignableFrom(e.getClass())){
-            return;
-        }
+	@Override
+	public void mergeFrom(OafEntity e) {
+		super.mergeFrom(e);
 
-        final Software s = (Software) e;
-        documentationUrl = mergeLists(documentationUrl, s.getDocumentationUrl());
+		if (!Software.class.isAssignableFrom(e.getClass())) {
+			return;
+		}
 
-        license = mergeLists(license, s.getLicense());
+		final Software s = (Software) e;
+		documentationUrl = mergeLists(documentationUrl, s.getDocumentationUrl());
 
-        codeRepositoryUrl = s.getCodeRepositoryUrl()!= null && compareTrust(this, s)<0?s.getCodeRepositoryUrl():codeRepositoryUrl;
+		license = mergeLists(license, s.getLicense());
 
-        programmingLanguage= s.getProgrammingLanguage()!= null && compareTrust(this, s)<0?s.getProgrammingLanguage():programmingLanguage;
+		codeRepositoryUrl = s.getCodeRepositoryUrl() != null && compareTrust(this, s) < 0
+			? s.getCodeRepositoryUrl()
+			: codeRepositoryUrl;
 
-        mergeOAFDataInfo(e);
-    }
+		programmingLanguage = s.getProgrammingLanguage() != null && compareTrust(this, s) < 0
+			? s.getProgrammingLanguage()
+			: programmingLanguage;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Software software = (Software) o;
-        return Objects.equals(documentationUrl, software.documentationUrl) &&
-                Objects.equals(license, software.license) &&
-                Objects.equals(codeRepositoryUrl, software.codeRepositoryUrl) &&
-                Objects.equals(programmingLanguage, software.programmingLanguage);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), documentationUrl, license, codeRepositoryUrl, programmingLanguage);
-    }
+		mergeOAFDataInfo(e);
+	}
 }

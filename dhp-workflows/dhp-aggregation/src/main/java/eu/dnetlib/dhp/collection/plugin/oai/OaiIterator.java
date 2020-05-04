@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.oai;
 
 import java.io.StringReader;
@@ -7,9 +8,6 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
-import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,10 +16,14 @@ import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
+import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
+import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
 
 public class OaiIterator implements Iterator<String> {
 
-	private static final Log log = LogFactory.getLog(OaiIterator.class); // NOPMD by marko on 11/24/08 5:02 PM
+	private static final Log log = LogFactory.getLog(OaiIterator.class); // NOPMD by marko on
+	// 11/24/08 5:02 PM
 
 	private final Queue<String> queue = new PriorityBlockingQueue<>();
 	private final SAXReader reader = new SAXReader();
@@ -35,8 +37,13 @@ public class OaiIterator implements Iterator<String> {
 	private boolean started;
 	private final HttpConnector httpConnector;
 
-	public OaiIterator(final String baseUrl, final String mdFormat, final String set, final String fromDate, final String untilDate,
-			final HttpConnector httpConnector) {
+	public OaiIterator(
+		final String baseUrl,
+		final String mdFormat,
+		final String set,
+		final String fromDate,
+		final String untilDate,
+		final HttpConnector httpConnector) {
 		this.baseUrl = baseUrl;
 		this.mdFormat = mdFormat;
 		this.set = set;
@@ -82,7 +89,8 @@ public class OaiIterator implements Iterator<String> {
 	}
 
 	@Override
-	public void remove() {}
+	public void remove() {
+	}
 
 	private String firstPage() throws DnetCollectorException {
 		try {
@@ -107,17 +115,23 @@ public class OaiIterator implements Iterator<String> {
 	private String extractResumptionToken(final String xml) {
 
 		final String s = StringUtils.substringAfter(xml, "<resumptionToken");
-		if (s == null) { return null; }
+		if (s == null) {
+			return null;
+		}
 
 		final String result = StringUtils.substringBetween(s, ">", "</");
-		if (result == null) { return null; }
+		if (result == null) {
+			return null;
+		}
 		return result.trim();
-
 	}
 
 	private String otherPages(final String resumptionToken) throws DnetCollectorException {
 		try {
-			return downloadPage(baseUrl + "?verb=ListRecords&resumptionToken=" + URLEncoder.encode(resumptionToken, "UTF-8"));
+			return downloadPage(
+				baseUrl
+					+ "?verb=ListRecords&resumptionToken="
+					+ URLEncoder.encode(resumptionToken, "UTF-8"));
 		} catch (final UnsupportedEncodingException e) {
 			throw new DnetCollectorException(e);
 		}
@@ -136,7 +150,9 @@ public class OaiIterator implements Iterator<String> {
 				doc = reader.read(new StringReader(cleaned));
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
-				if (resumptionToken == null) { throw new DnetCollectorException("Error parsing cleaned document:" + cleaned, e1); }
+				if (resumptionToken == null) {
+					throw new DnetCollectorException("Error parsing cleaned document:" + cleaned, e1);
+				}
 				return resumptionToken;
 			}
 		}
@@ -157,7 +173,5 @@ public class OaiIterator implements Iterator<String> {
 		}
 
 		return doc.valueOf("//*[local-name()='resumptionToken']");
-
 	}
-
 }

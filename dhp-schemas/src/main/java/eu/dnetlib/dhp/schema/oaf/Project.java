@@ -1,347 +1,325 @@
+
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public class Project extends OafEntity implements Serializable {
 
-    private Field<String> websiteurl;
+	private Field<String> websiteurl;
 
-    private Field<String> code;
+	private Field<String> code;
 
-    private Field<String> acronym;
+	private Field<String> acronym;
 
-    private Field<String> title;
+	private Field<String> title;
 
-    private Field<String> startdate;
+	private Field<String> startdate;
 
-    private Field<String> enddate;
+	private Field<String> enddate;
 
-    private Field<String> callidentifier;
+	private Field<String> callidentifier;
 
-    private Field<String> keywords;
+	private Field<String> keywords;
 
-    private Field<String> duration;
+	private Field<String> duration;
 
-    private Field<String> ecsc39;
+	private Field<String> ecsc39;
 
-    private Field<String> oamandatepublications;
+	private Field<String> oamandatepublications;
 
-    private Field<String> ecarticle29_3;
+	private Field<String> ecarticle29_3;
 
-    private List<StructuredProperty> subjects;
+	private List<StructuredProperty> subjects;
 
-    private List<Field<String>> fundingtree;
+	private List<Field<String>> fundingtree;
 
-    private Qualifier contracttype;
+	private Qualifier contracttype;
 
-    private Field<String> optional1;
+	private Field<String> optional1;
 
-    private Field<String> optional2;
+	private Field<String> optional2;
 
-    private Field<String> jsonextrainfo;
+	private Field<String> jsonextrainfo;
 
-    private Field<String> contactfullname;
+	private Field<String> contactfullname;
 
-    private Field<String> contactfax;
+	private Field<String> contactfax;
 
-    private Field<String> contactphone;
+	private Field<String> contactphone;
 
-    private Field<String> contactemail;
+	private Field<String> contactemail;
 
-    private Field<String> summary;
+	private Field<String> summary;
 
-    private Field<String> currency;
+	private Field<String> currency;
 
-    private Float totalcost;
+	private Float totalcost;
 
-    private Float fundedamount;
+	private Float fundedamount;
 
-    public Field<String> getWebsiteurl() {
-        return websiteurl;
-    }
+	public Field<String> getWebsiteurl() {
+		return websiteurl;
+	}
 
-    public void setWebsiteurl(Field<String> websiteurl) {
-        this.websiteurl = websiteurl;
-    }
+	public void setWebsiteurl(Field<String> websiteurl) {
+		this.websiteurl = websiteurl;
+	}
 
-    public Field<String> getCode() {
-        return code;
-    }
+	public Field<String> getCode() {
+		return code;
+	}
 
-    public void setCode(Field<String> code) {
-        this.code = code;
-    }
+	public void setCode(Field<String> code) {
+		this.code = code;
+	}
 
-    public Field<String> getAcronym() {
-        return acronym;
-    }
+	public Field<String> getAcronym() {
+		return acronym;
+	}
 
-    public void setAcronym(Field<String> acronym) {
-        this.acronym = acronym;
-    }
+	public void setAcronym(Field<String> acronym) {
+		this.acronym = acronym;
+	}
 
-    public Field<String> getTitle() {
-        return title;
-    }
+	public Field<String> getTitle() {
+		return title;
+	}
 
-    public void setTitle(Field<String> title) {
-        this.title = title;
-    }
+	public void setTitle(Field<String> title) {
+		this.title = title;
+	}
 
-    public Field<String> getStartdate() {
-        return startdate;
-    }
+	public Field<String> getStartdate() {
+		return startdate;
+	}
 
-    public void setStartdate(Field<String> startdate) {
-        this.startdate = startdate;
-    }
+	public void setStartdate(Field<String> startdate) {
+		this.startdate = startdate;
+	}
 
-    public Field<String> getEnddate() {
-        return enddate;
-    }
+	public Field<String> getEnddate() {
+		return enddate;
+	}
 
-    public void setEnddate(Field<String> enddate) {
-        this.enddate = enddate;
-    }
+	public void setEnddate(Field<String> enddate) {
+		this.enddate = enddate;
+	}
 
-    public Field<String> getCallidentifier() {
-        return callidentifier;
-    }
-
-    public void setCallidentifier(Field<String> callidentifier) {
-        this.callidentifier = callidentifier;
-    }
-
-    public Field<String> getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(Field<String> keywords) {
-        this.keywords = keywords;
-    }
-
-    public Field<String> getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Field<String> duration) {
-        this.duration = duration;
-    }
-
-    public Field<String> getEcsc39() {
-        return ecsc39;
-    }
-
-    public void setEcsc39(Field<String> ecsc39) {
-        this.ecsc39 = ecsc39;
-    }
-
-    public Field<String> getOamandatepublications() {
-        return oamandatepublications;
-    }
-
-    public void setOamandatepublications(Field<String> oamandatepublications) {
-        this.oamandatepublications = oamandatepublications;
-    }
-
-    public Field<String> getEcarticle29_3() {
-        return ecarticle29_3;
-    }
-
-    public void setEcarticle29_3(Field<String> ecarticle29_3) {
-        this.ecarticle29_3 = ecarticle29_3;
-    }
-
-    public List<StructuredProperty> getSubjects() {
-        return subjects;
-    }
-
-    public void setSubjects(List<StructuredProperty> subjects) {
-        this.subjects = subjects;
-    }
-
-    public List<Field<String>> getFundingtree() {
-        return fundingtree;
-    }
-
-    public void setFundingtree(List<Field<String>> fundingtree) {
-        this.fundingtree = fundingtree;
-    }
+	public Field<String> getCallidentifier() {
+		return callidentifier;
+	}
+
+	public void setCallidentifier(Field<String> callidentifier) {
+		this.callidentifier = callidentifier;
+	}
+
+	public Field<String> getKeywords() {
+		return keywords;
+	}
+
+	public void setKeywords(Field<String> keywords) {
+		this.keywords = keywords;
+	}
+
+	public Field<String> getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Field<String> duration) {
+		this.duration = duration;
+	}
+
+	public Field<String> getEcsc39() {
+		return ecsc39;
+	}
+
+	public void setEcsc39(Field<String> ecsc39) {
+		this.ecsc39 = ecsc39;
+	}
+
+	public Field<String> getOamandatepublications() {
+		return oamandatepublications;
+	}
+
+	public void setOamandatepublications(Field<String> oamandatepublications) {
+		this.oamandatepublications = oamandatepublications;
+	}
+
+	public Field<String> getEcarticle29_3() {
+		return ecarticle29_3;
+	}
+
+	public void setEcarticle29_3(Field<String> ecarticle29_3) {
+		this.ecarticle29_3 = ecarticle29_3;
+	}
+
+	public List<StructuredProperty> getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(List<StructuredProperty> subjects) {
+		this.subjects = subjects;
+	}
+
+	public List<Field<String>> getFundingtree() {
+		return fundingtree;
+	}
+
+	public void setFundingtree(List<Field<String>> fundingtree) {
+		this.fundingtree = fundingtree;
+	}
+
+	public Qualifier getContracttype() {
+		return contracttype;
+	}
+
+	public void setContracttype(Qualifier contracttype) {
+		this.contracttype = contracttype;
+	}
 
-    public Qualifier getContracttype() {
-        return contracttype;
-    }
-
-    public void setContracttype(Qualifier contracttype) {
-        this.contracttype = contracttype;
-    }
-
-    public Field<String> getOptional1() {
-        return optional1;
-    }
-
-    public void setOptional1(Field<String> optional1) {
-        this.optional1 = optional1;
-    }
-
-    public Field<String> getOptional2() {
-        return optional2;
-    }
-
-    public void setOptional2(Field<String> optional2) {
-        this.optional2 = optional2;
-    }
-
-    public Field<String> getJsonextrainfo() {
-        return jsonextrainfo;
-    }
-
-    public void setJsonextrainfo(Field<String> jsonextrainfo) {
-        this.jsonextrainfo = jsonextrainfo;
-    }
-
-    public Field<String> getContactfullname() {
-        return contactfullname;
-    }
-
-    public void setContactfullname(Field<String> contactfullname) {
-        this.contactfullname = contactfullname;
-    }
-
-    public Field<String> getContactfax() {
-        return contactfax;
-    }
-
-    public void setContactfax(Field<String> contactfax) {
-        this.contactfax = contactfax;
-    }
-
-    public Field<String> getContactphone() {
-        return contactphone;
-    }
-
-    public void setContactphone(Field<String> contactphone) {
-        this.contactphone = contactphone;
-    }
-
-    public Field<String> getContactemail() {
-        return contactemail;
-    }
-
-    public void setContactemail(Field<String> contactemail) {
-        this.contactemail = contactemail;
-    }
-
-    public Field<String> getSummary() {
-        return summary;
-    }
-
-    public void setSummary(Field<String> summary) {
-        this.summary = summary;
-    }
-
-    public Field<String> getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(Field<String> currency) {
-        this.currency = currency;
-    }
-
-    public Float getTotalcost() {
-        return totalcost;
-    }
-
-    public void setTotalcost(Float totalcost) {
-        this.totalcost = totalcost;
-    }
-
-    public Float getFundedamount() {
-        return fundedamount;
-    }
-
-    public void setFundedamount(Float fundedamount) {
-        this.fundedamount = fundedamount;
-    }
-
-
-    @Override
-    public void mergeFrom(OafEntity e) {
-        super.mergeFrom(e);
-
-        if (!Project.class.isAssignableFrom(e.getClass())){
-            return;
-        }
-
-        Project p = (Project)e;
-
-            websiteurl= p.getWebsiteurl()!= null && compareTrust(this,e)<0?p.getWebsiteurl():websiteurl;
-            code= p.getCode()!=null && compareTrust(this,e)<0?p.getCode():code;
-            acronym= p.getAcronym()!= null && compareTrust(this,e)<0?p.getAcronym():acronym;
-            title= p.getTitle()!= null && compareTrust(this,e)<0?p.getTitle():title;
-            startdate= p.getStartdate()!=null && compareTrust(this,e)<0?p.getStartdate():startdate;
-            enddate= p.getEnddate()!=null && compareTrust(this,e)<0?p.getEnddate():enddate;
-            callidentifier= p.getCallidentifier()!=null && compareTrust(this,e)<0?p.getCallidentifier():callidentifier;
-            keywords= p.getKeywords()!=null && compareTrust(this,e)<0?p.getKeywords():keywords;
-            duration= p.getDuration()!=null && compareTrust(this,e)<0?p.getDuration():duration;
-            ecsc39= p.getEcsc39()!=null && compareTrust(this,e)<0?p.getEcsc39():ecsc39;
-            oamandatepublications= p.getOamandatepublications()!=null && compareTrust(this,e)<0?p.getOamandatepublications():oamandatepublications;
-            ecarticle29_3= p.getEcarticle29_3()!=null && compareTrust(this,e)<0?p.getEcarticle29_3():ecarticle29_3;
-            subjects= mergeLists(subjects, p.getSubjects());
-            fundingtree= mergeLists(fundingtree, p.getFundingtree());
-            contracttype= p.getContracttype()!=null && compareTrust(this,e)<0?p.getContracttype():contracttype;
-            optional1= p.getOptional1()!=null && compareTrust(this,e)<0?p.getOptional1():optional1;
-            optional2= p.getOptional2()!=null && compareTrust(this,e)<0?p.getOptional2():optional2;
-            jsonextrainfo= p.getJsonextrainfo()!=null && compareTrust(this,e)<0?p.getJsonextrainfo():jsonextrainfo;
-            contactfullname= p.getContactfullname()!=null && compareTrust(this,e)<0?p.getContactfullname():contactfullname;
-            contactfax= p.getContactfax()!=null && compareTrust(this,e)<0?p.getContactfax():contactfax;
-            contactphone= p.getContactphone()!=null && compareTrust(this,e)<0?p.getContactphone():contactphone;
-            contactemail= p.getContactemail()!=null && compareTrust(this,e)<0?p.getContactemail():contactemail;
-            summary= p.getSummary()!=null && compareTrust(this,e)<0?p.getSummary():summary;
-            currency= p.getCurrency()!=null && compareTrust(this,e)<0?p.getCurrency():currency;
-            totalcost= p.getTotalcost()!=null && compareTrust(this,e)<0?p.getTotalcost():totalcost;
-            fundedamount= p.getFundedamount()!= null && compareTrust(this,e)<0?p.getFundedamount():fundedamount;
-            mergeOAFDataInfo(e);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Project project = (Project) o;
-        return Objects.equals(websiteurl, project.websiteurl) &&
-                Objects.equals(code, project.code) &&
-                Objects.equals(acronym, project.acronym) &&
-                Objects.equals(title, project.title) &&
-                Objects.equals(startdate, project.startdate) &&
-                Objects.equals(enddate, project.enddate) &&
-                Objects.equals(callidentifier, project.callidentifier) &&
-                Objects.equals(keywords, project.keywords) &&
-                Objects.equals(duration, project.duration) &&
-                Objects.equals(ecsc39, project.ecsc39) &&
-                Objects.equals(oamandatepublications, project.oamandatepublications) &&
-                Objects.equals(ecarticle29_3, project.ecarticle29_3) &&
-                Objects.equals(subjects, project.subjects) &&
-                Objects.equals(fundingtree, project.fundingtree) &&
-                Objects.equals(contracttype, project.contracttype) &&
-                Objects.equals(optional1, project.optional1) &&
-                Objects.equals(optional2, project.optional2) &&
-                Objects.equals(jsonextrainfo, project.jsonextrainfo) &&
-                Objects.equals(contactfullname, project.contactfullname) &&
-                Objects.equals(contactfax, project.contactfax) &&
-                Objects.equals(contactphone, project.contactphone) &&
-                Objects.equals(contactemail, project.contactemail) &&
-                Objects.equals(summary, project.summary) &&
-                Objects.equals(currency, project.currency) &&
-                Objects.equals(totalcost, project.totalcost) &&
-                Objects.equals(fundedamount, project.fundedamount);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), websiteurl, code, acronym, title, startdate, enddate, callidentifier, keywords, duration, ecsc39, oamandatepublications, ecarticle29_3, subjects, fundingtree, contracttype, optional1, optional2, jsonextrainfo, contactfullname, contactfax, contactphone, contactemail, summary, currency, totalcost, fundedamount);
-    }
+	public Field<String> getOptional1() {
+		return optional1;
+	}
+
+	public void setOptional1(Field<String> optional1) {
+		this.optional1 = optional1;
+	}
+
+	public Field<String> getOptional2() {
+		return optional2;
+	}
+
+	public void setOptional2(Field<String> optional2) {
+		this.optional2 = optional2;
+	}
+
+	public Field<String> getJsonextrainfo() {
+		return jsonextrainfo;
+	}
+
+	public void setJsonextrainfo(Field<String> jsonextrainfo) {
+		this.jsonextrainfo = jsonextrainfo;
+	}
+
+	public Field<String> getContactfullname() {
+		return contactfullname;
+	}
+
+	public void setContactfullname(Field<String> contactfullname) {
+		this.contactfullname = contactfullname;
+	}
+
+	public Field<String> getContactfax() {
+		return contactfax;
+	}
+
+	public void setContactfax(Field<String> contactfax) {
+		this.contactfax = contactfax;
+	}
+
+	public Field<String> getContactphone() {
+		return contactphone;
+	}
+
+	public void setContactphone(Field<String> contactphone) {
+		this.contactphone = contactphone;
+	}
+
+	public Field<String> getContactemail() {
+		return contactemail;
+	}
+
+	public void setContactemail(Field<String> contactemail) {
+		this.contactemail = contactemail;
+	}
+
+	public Field<String> getSummary() {
+		return summary;
+	}
+
+	public void setSummary(Field<String> summary) {
+		this.summary = summary;
+	}
+
+	public Field<String> getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(Field<String> currency) {
+		this.currency = currency;
+	}
+
+	public Float getTotalcost() {
+		return totalcost;
+	}
+
+	public void setTotalcost(Float totalcost) {
+		this.totalcost = totalcost;
+	}
+
+	public Float getFundedamount() {
+		return fundedamount;
+	}
+
+	public void setFundedamount(Float fundedamount) {
+		this.fundedamount = fundedamount;
+	}
+
+	@Override
+	public void mergeFrom(OafEntity e) {
+		super.mergeFrom(e);
+
+		if (!Project.class.isAssignableFrom(e.getClass())) {
+			return;
+		}
+
+		Project p = (Project) e;
+
+		websiteurl = p.getWebsiteurl() != null && compareTrust(this, e) < 0 ? p.getWebsiteurl() : websiteurl;
+		code = p.getCode() != null && compareTrust(this, e) < 0 ? p.getCode() : code;
+		acronym = p.getAcronym() != null && compareTrust(this, e) < 0 ? p.getAcronym() : acronym;
+		title = p.getTitle() != null && compareTrust(this, e) < 0 ? p.getTitle() : title;
+		startdate = p.getStartdate() != null && compareTrust(this, e) < 0 ? p.getStartdate() : startdate;
+		enddate = p.getEnddate() != null && compareTrust(this, e) < 0 ? p.getEnddate() : enddate;
+		callidentifier = p.getCallidentifier() != null && compareTrust(this, e) < 0
+			? p.getCallidentifier()
+			: callidentifier;
+		keywords = p.getKeywords() != null && compareTrust(this, e) < 0 ? p.getKeywords() : keywords;
+		duration = p.getDuration() != null && compareTrust(this, e) < 0 ? p.getDuration() : duration;
+		ecsc39 = p.getEcsc39() != null && compareTrust(this, e) < 0 ? p.getEcsc39() : ecsc39;
+		oamandatepublications = p.getOamandatepublications() != null && compareTrust(this, e) < 0
+			? p.getOamandatepublications()
+			: oamandatepublications;
+		ecarticle29_3 = p.getEcarticle29_3() != null && compareTrust(this, e) < 0
+			? p.getEcarticle29_3()
+			: ecarticle29_3;
+		subjects = mergeLists(subjects, p.getSubjects());
+		fundingtree = mergeLists(fundingtree, p.getFundingtree());
+		contracttype = p.getContracttype() != null && compareTrust(this, e) < 0
+			? p.getContracttype()
+			: contracttype;
+		optional1 = p.getOptional1() != null && compareTrust(this, e) < 0 ? p.getOptional1() : optional1;
+		optional2 = p.getOptional2() != null && compareTrust(this, e) < 0 ? p.getOptional2() : optional2;
+		jsonextrainfo = p.getJsonextrainfo() != null && compareTrust(this, e) < 0
+			? p.getJsonextrainfo()
+			: jsonextrainfo;
+		contactfullname = p.getContactfullname() != null && compareTrust(this, e) < 0
+			? p.getContactfullname()
+			: contactfullname;
+		contactfax = p.getContactfax() != null && compareTrust(this, e) < 0 ? p.getContactfax() : contactfax;
+		contactphone = p.getContactphone() != null && compareTrust(this, e) < 0
+			? p.getContactphone()
+			: contactphone;
+		contactemail = p.getContactemail() != null && compareTrust(this, e) < 0
+			? p.getContactemail()
+			: contactemail;
+		summary = p.getSummary() != null && compareTrust(this, e) < 0 ? p.getSummary() : summary;
+		currency = p.getCurrency() != null && compareTrust(this, e) < 0 ? p.getCurrency() : currency;
+		totalcost = p.getTotalcost() != null && compareTrust(this, e) < 0 ? p.getTotalcost() : totalcost;
+		fundedamount = p.getFundedamount() != null && compareTrust(this, e) < 0
+			? p.getFundedamount()
+			: fundedamount;
+		mergeOAFDataInfo(e);
+	}
 }

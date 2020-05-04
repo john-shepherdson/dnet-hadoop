@@ -1,14 +1,16 @@
-package eu.dnetlib.dhp.oa.graph.raw.common;
 
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.utils.DHPUtils;
-import org.apache.commons.lang3.StringUtils;
+package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class OafMapperUtils {
 
@@ -20,7 +22,9 @@ public class OafMapperUtils {
 	}
 
 	public static List<KeyValue> listKeyValues(final String... s) {
-		if (s.length % 2 > 0) { throw new RuntimeException("Invalid number of parameters (k,v,k,v,....)"); }
+		if (s.length % 2 > 0) {
+			throw new RuntimeException("Invalid number of parameters (k,v,k,v,....)");
+		}
 
 		final List<KeyValue> list = new ArrayList<>();
 		for (int i = 0; i < s.length; i += 2) {
@@ -30,7 +34,9 @@ public class OafMapperUtils {
 	}
 
 	public static <T> Field<T> field(final T value, final DataInfo info) {
-		if (value == null || StringUtils.isBlank(value.toString())) { return null; }
+		if (value == null || StringUtils.isBlank(value.toString())) {
+			return null;
+		}
 
 		final Field<T> field = new Field<>();
 		field.setValue(value);
@@ -39,14 +45,26 @@ public class OafMapperUtils {
 	}
 
 	public static List<Field<String>> listFields(final DataInfo info, final String... values) {
-		return Arrays.stream(values).map(v -> field(v, info)).filter(Objects::nonNull).collect(Collectors.toList());
+		return Arrays
+			.stream(values)
+			.map(v -> field(v, info))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
 	}
 
 	public static List<Field<String>> listFields(final DataInfo info, final List<String> values) {
-		return values.stream().map(v -> field(v, info)).filter(Objects::nonNull).collect(Collectors.toList());
+		return values
+			.stream()
+			.map(v -> field(v, info))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
 	}
 
-	public static Qualifier qualifier(final String classid, final String classname, final String schemeid, final String schemename) {
+	public static Qualifier qualifier(
+		final String classid,
+		final String classname,
+		final String schemeid,
+		final String schemename) {
 		final Qualifier q = new Qualifier();
 		q.setClassid(classid);
 		q.setClassname(classname);
@@ -55,18 +73,22 @@ public class OafMapperUtils {
 		return q;
 	}
 
-	public static StructuredProperty structuredProperty(final String value,
-			final String classid,
-			final String classname,
-			final String schemeid,
-			final String schemename,
-			final DataInfo dataInfo) {
+	public static StructuredProperty structuredProperty(
+		final String value,
+		final String classid,
+		final String classname,
+		final String schemeid,
+		final String schemename,
+		final DataInfo dataInfo) {
 
 		return structuredProperty(value, qualifier(classid, classname, schemeid, schemename), dataInfo);
 	}
 
-	public static StructuredProperty structuredProperty(final String value, final Qualifier qualifier, final DataInfo dataInfo) {
-		if (value == null) { return null; }
+	public static StructuredProperty structuredProperty(
+		final String value, final Qualifier qualifier, final DataInfo dataInfo) {
+		if (value == null) {
+			return null;
+		}
 		final StructuredProperty sp = new StructuredProperty();
 		sp.setValue(value);
 		sp.setQualifier(qualifier);
@@ -74,7 +96,12 @@ public class OafMapperUtils {
 		return sp;
 	}
 
-	public static ExtraInfo extraInfo(final String name, final String value, final String typology, final String provenance, final String trust) {
+	public static ExtraInfo extraInfo(
+		final String name,
+		final String value,
+		final String typology,
+		final String provenance,
+		final String trust) {
 		final ExtraInfo info = new ExtraInfo();
 		info.setName(name);
 		info.setValue(value);
@@ -84,12 +111,13 @@ public class OafMapperUtils {
 		return info;
 	}
 
-	public static OAIProvenance oaiIProvenance(final String identifier,
-			final String baseURL,
-			final String metadataNamespace,
-			final Boolean altered,
-			final String datestamp,
-			final String harvestDate) {
+	public static OAIProvenance oaiIProvenance(
+		final String identifier,
+		final String baseURL,
+		final String metadataNamespace,
+		final Boolean altered,
+		final String datestamp,
+		final String harvestDate) {
 
 		final OriginDescription desc = new OriginDescription();
 		desc.setIdentifier(identifier);
@@ -105,20 +133,24 @@ public class OafMapperUtils {
 		return p;
 	}
 
-	public static Journal journal(final String name,
-			final String issnPrinted,
-			final String issnOnline,
-			final String issnLinking,
-			final String ep,
-			final String iss,
-			final String sp,
-			final String vol,
-			final String edition,
-			final String conferenceplace,
-			final String conferencedate,
-			final DataInfo dataInfo) {
+	public static Journal journal(
+		final String name,
+		final String issnPrinted,
+		final String issnOnline,
+		final String issnLinking,
+		final String ep,
+		final String iss,
+		final String sp,
+		final String vol,
+		final String edition,
+		final String conferenceplace,
+		final String conferencedate,
+		final DataInfo dataInfo) {
 
-		if (StringUtils.isNotBlank(name) || StringUtils.isNotBlank(issnPrinted) || StringUtils.isNotBlank(issnOnline) || StringUtils.isNotBlank(issnLinking)) {
+		if (StringUtils.isNotBlank(name)
+			|| StringUtils.isNotBlank(issnPrinted)
+			|| StringUtils.isNotBlank(issnOnline)
+			|| StringUtils.isNotBlank(issnLinking)) {
 			final Journal j = new Journal();
 			j.setName(name);
 			j.setIssnPrinted(issnPrinted);
@@ -138,12 +170,13 @@ public class OafMapperUtils {
 		}
 	}
 
-	public static DataInfo dataInfo(final Boolean deletedbyinference,
-			final String inferenceprovenance,
-			final Boolean inferred,
-			final Boolean invisible,
-			final Qualifier provenanceaction,
-			final String trust) {
+	public static DataInfo dataInfo(
+		final Boolean deletedbyinference,
+		final String inferenceprovenance,
+		final Boolean inferred,
+		final Boolean invisible,
+		final Qualifier provenanceaction,
+		final String trust) {
 		final DataInfo d = new DataInfo();
 		d.setDeletedbyinference(deletedbyinference);
 		d.setInferenceprovenance(inferenceprovenance);
@@ -154,7 +187,8 @@ public class OafMapperUtils {
 		return d;
 	}
 
-	public static String createOpenaireId(final int prefix, final String originalId, final boolean to_md5) {
+	public static String createOpenaireId(
+		final int prefix, final String originalId, final boolean to_md5) {
 		if (to_md5) {
 			final String nsPrefix = StringUtils.substringBefore(originalId, "::");
 			final String rest = StringUtils.substringAfter(originalId, "::");
@@ -164,23 +198,23 @@ public class OafMapperUtils {
 		}
 	}
 
-	public static String createOpenaireId(final String type, final String originalId, final boolean to_md5) {
+	public static String createOpenaireId(
+		final String type, final String originalId, final boolean to_md5) {
 		switch (type) {
-		case "datasource":
-			return createOpenaireId(10, originalId, to_md5);
-		case "organization":
-			return createOpenaireId(20, originalId, to_md5);
-		case "person":
-			return createOpenaireId(30, originalId, to_md5);
-		case "project":
-			return createOpenaireId(40, originalId, to_md5);
-		default:
-			return createOpenaireId(50, originalId, to_md5);
+			case "datasource":
+				return createOpenaireId(10, originalId, to_md5);
+			case "organization":
+				return createOpenaireId(20, originalId, to_md5);
+			case "person":
+				return createOpenaireId(30, originalId, to_md5);
+			case "project":
+				return createOpenaireId(40, originalId, to_md5);
+			default:
+				return createOpenaireId(50, originalId, to_md5);
 		}
 	}
 
 	public static String asString(final Object o) {
 		return o == null ? "" : o.toString();
 	}
-
 }

@@ -1,0 +1,1 @@
+CREATE OR REPLACE VIEW ${stats_db_name}.result_citations as SELECT * FROM ${stats_db_name}.publication_citations UNION ALL SELECT * FROM ${stats_db_name}.software_citations UNION ALL SELECT * FROM ${stats_db_name}.dataset_citations UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_citations;

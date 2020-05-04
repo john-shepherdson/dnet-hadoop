@@ -1,15 +1,9 @@
+
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.sql.Array;
@@ -19,7 +13,24 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
 
 @ExtendWith(MockitoExtension.class)
 public class MigrateDbEntitiesApplicationTest {
@@ -44,13 +55,14 @@ public class MigrateDbEntitiesApplicationTest {
 
 		final Datasource ds = (Datasource) list.get(0);
 		assertValidId(ds.getId());
+		assertValidId(ds.getCollectedfrom().get(0).getKey());
 		assertEquals(ds.getOfficialname().getValue(), getValueAsString("officialname", fields));
 		assertEquals(ds.getEnglishname().getValue(), getValueAsString("englishname", fields));
 		assertEquals(ds.getContactemail().getValue(), getValueAsString("contactemail", fields));
 		assertEquals(ds.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
 		assertEquals(ds.getNamespaceprefix().getValue(), getValueAsString("namespaceprefix", fields));
-		assertEquals(ds.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
-		assertEquals(ds.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(
+			ds.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test
@@ -63,10 +75,11 @@ public class MigrateDbEntitiesApplicationTest {
 
 		final Project p = (Project) list.get(0);
 		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertEquals(p.getAcronym().getValue(), getValueAsString("acronym", fields));
 		assertEquals(p.getTitle().getValue(), getValueAsString("title", fields));
-		assertEquals(p.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
-		assertEquals(p.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(
+			p.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test
@@ -81,15 +94,18 @@ public class MigrateDbEntitiesApplicationTest {
 
 		final Organization o = (Organization) list.get(0);
 		assertValidId(o.getId());
+		assertValidId(o.getCollectedfrom().get(0).getKey());
 		assertEquals(o.getLegalshortname().getValue(), getValueAsString("legalshortname", fields));
 		assertEquals(o.getLegalname().getValue(), getValueAsString("legalname", fields));
 		assertEquals(o.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
 		assertEquals(o.getCountry().getClassid(), getValueAsString("country", fields).split("@@@")[0]);
-		assertEquals(o.getCountry().getClassname(), getValueAsString("country", fields).split("@@@")[1]);
+		assertEquals(
+			o.getCountry().getClassname(), getValueAsString("country", fields).split("@@@")[1]);
 		assertEquals(o.getCountry().getSchemeid(), getValueAsString("country", fields).split("@@@")[2]);
-		assertEquals(o.getCountry().getSchemename(), getValueAsString("country", fields).split("@@@")[3]);
-		assertEquals(o.getCollectedfrom().get(0).getKey(), getValueAsString("collectedfromid", fields));
-		assertEquals(o.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(
+			o.getCountry().getSchemename(), getValueAsString("country", fields).split("@@@")[3]);
+		assertEquals(
+			o.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test
@@ -124,6 +140,8 @@ public class MigrateDbEntitiesApplicationTest {
 		assertValidId(r2.getSource());
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
+		assertValidId(r1.getCollectedfrom().get(0).getKey());
+		assertValidId(r2.getCollectedfrom().get(0).getKey());
 	}
 
 	@Test
@@ -133,7 +151,12 @@ public class MigrateDbEntitiesApplicationTest {
 		final List<Oaf> list = app.processClaims(rs);
 
 		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Result);
+		final Result r = (Result) list.get(0);
+
 		verifyMocks(fields);
+
+		assertValidId(r.getCollectedfrom().get(0).getKey());
 	}
 
 	@Test
@@ -144,68 +167,105 @@ public class MigrateDbEntitiesApplicationTest {
 
 		assertEquals(2, list.size());
 		verifyMocks(fields);
+
+		assertTrue(list.get(0) instanceof Relation);
+		assertTrue(list.get(1) instanceof Relation);
+
+		final Relation r1 = (Relation) list.get(0);
+		final Relation r2 = (Relation) list.get(1);
+
+		assertValidId(r1.getSource());
+		assertValidId(r1.getTarget());
+		assertValidId(r2.getSource());
+		assertValidId(r2.getTarget());
+		assertNotNull(r1.getDataInfo());
+		assertNotNull(r2.getDataInfo());
+		assertNotNull(r1.getDataInfo().getTrust());
+		assertNotNull(r2.getDataInfo().getTrust());
+		assertEquals(r1.getSource(), r2.getTarget());
+		assertEquals(r2.getSource(), r1.getTarget());
+		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
+		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
+		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
+		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+
+		assertValidId(r1.getCollectedfrom().get(0).getKey());
+		assertValidId(r2.getCollectedfrom().get(0).getKey());
+
+		// System.out.println(new ObjectMapper().writeValueAsString(r1));
+		// System.out.println(new ObjectMapper().writeValueAsString(r2));
 	}
 
 	private List<TypedField> prepareMocks(final String jsonFile) throws IOException, SQLException {
 		final String json = IOUtils.toString(getClass().getResourceAsStream(jsonFile));
 		final ObjectMapper mapper = new ObjectMapper();
-		final List<TypedField> list = mapper.readValue(json, new TypeReference<List<TypedField>>() {});
+		final List<TypedField> list = mapper.readValue(json, new TypeReference<List<TypedField>>() {
+		});
 
 		for (final TypedField tf : list) {
 			if (tf.getValue() == null) {
 				switch (tf.getType()) {
-				case "not_used":
-					break;
-				case "boolean":
-					Mockito.when(rs.getBoolean(tf.getField())).thenReturn(false);
-					break;
-				case "date":
-					Mockito.when(rs.getDate(tf.getField())).thenReturn(null);
-					break;
-				case "int":
-					Mockito.when(rs.getInt(tf.getField())).thenReturn(0);
-					break;
-				case "double":
-					Mockito.when(rs.getDouble(tf.getField())).thenReturn(0.0);
-					break;
-				case "array":
-					Mockito.when(rs.getArray(tf.getField())).thenReturn(null);
-					break;
-				case "string":
-				default:
-					Mockito.when(rs.getString(tf.getField())).thenReturn(null);
-					break;
+					case "not_used":
+						break;
+					case "boolean":
+						Mockito.when(rs.getBoolean(tf.getField())).thenReturn(false);
+						break;
+					case "date":
+						Mockito.when(rs.getDate(tf.getField())).thenReturn(null);
+						break;
+					case "int":
+						Mockito.when(rs.getInt(tf.getField())).thenReturn(0);
+						break;
+					case "double":
+						Mockito.when(rs.getDouble(tf.getField())).thenReturn(0.0);
+						break;
+					case "array":
+						Mockito.when(rs.getArray(tf.getField())).thenReturn(null);
+						break;
+					case "string":
+					default:
+						Mockito.when(rs.getString(tf.getField())).thenReturn(null);
+						break;
 				}
 			} else {
 				switch (tf.getType()) {
-				case "not_used":
-					break;
-				case "boolean":
-					Mockito.when(rs.getBoolean(tf.getField())).thenReturn(Boolean.parseBoolean(tf.getValue().toString()));
-					break;
-				case "date":
-					Mockito.when(rs.getDate(tf.getField())).thenReturn(Date.valueOf(tf.getValue().toString()));
-					break;
-				case "int":
-					Mockito.when(rs.getInt(tf.getField())).thenReturn(new Integer(tf.getValue().toString()));
-					break;
-				case "double":
-					Mockito.when(rs.getDouble(tf.getField())).thenReturn(new Double(tf.getValue().toString()));
-					break;
-				case "array":
-					final Array arr = Mockito.mock(Array.class);
-					final String[] values = ((List<?>) tf.getValue()).stream()
+					case "not_used":
+						break;
+					case "boolean":
+						Mockito
+							.when(rs.getBoolean(tf.getField()))
+							.thenReturn(Boolean.parseBoolean(tf.getValue().toString()));
+						break;
+					case "date":
+						Mockito
+							.when(rs.getDate(tf.getField()))
+							.thenReturn(Date.valueOf(tf.getValue().toString()));
+						break;
+					case "int":
+						Mockito
+							.when(rs.getInt(tf.getField()))
+							.thenReturn(new Integer(tf.getValue().toString()));
+						break;
+					case "double":
+						Mockito
+							.when(rs.getDouble(tf.getField()))
+							.thenReturn(new Double(tf.getValue().toString()));
+						break;
+					case "array":
+						final Array arr = Mockito.mock(Array.class);
+						final String[] values = ((List<?>) tf.getValue())
+							.stream()
 							.filter(Objects::nonNull)
 							.map(o -> o.toString())
 							.toArray(String[]::new);
 
-					Mockito.when(arr.getArray()).thenReturn(values);
-					Mockito.when(rs.getArray(tf.getField())).thenReturn(arr);
-					break;
-				case "string":
-				default:
-					Mockito.when(rs.getString(tf.getField())).thenReturn(tf.getValue().toString());
-					break;
+						Mockito.when(arr.getArray()).thenReturn(values);
+						Mockito.when(rs.getArray(tf.getField())).thenReturn(arr);
+						break;
+					case "string":
+					default:
+						Mockito.when(rs.getString(tf.getField())).thenReturn(tf.getValue().toString());
+						break;
 				}
 			}
 		}
@@ -217,27 +277,27 @@ public class MigrateDbEntitiesApplicationTest {
 		for (final TypedField tf : list) {
 
 			switch (tf.getType()) {
-			case "not_used":
-				break;
-			case "boolean":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getBoolean(tf.getField());
-				break;
-			case "date":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getDate(tf.getField());
-				break;
-			case "int":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getInt(tf.getField());
-				break;
-			case "double":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getDouble(tf.getField());
-				break;
-			case "array":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getArray(tf.getField());
-				break;
-			case "string":
-			default:
-				Mockito.verify(rs, Mockito.atLeastOnce()).getString(tf.getField());
-				break;
+				case "not_used":
+					break;
+				case "boolean":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getBoolean(tf.getField());
+					break;
+				case "date":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getDate(tf.getField());
+					break;
+				case "int":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getInt(tf.getField());
+					break;
+				case "double":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getDouble(tf.getField());
+					break;
+				case "array":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getArray(tf.getField());
+					break;
+				case "string":
+				default:
+					Mockito.verify(rs, Mockito.atLeastOnce()).getString(tf.getField());
+					break;
 			}
 		}
 	}
@@ -250,13 +310,14 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	private String getValueAsString(final String name, final List<TypedField> fields) {
-		return fields.stream()
-				.filter(f -> f.getField().equals(name))
-				.map(TypedField::getValue)
-				.filter(Objects::nonNull)
-				.map(o -> o.toString())
-				.findFirst()
-				.get();
+		return fields
+			.stream()
+			.filter(f -> f.getField().equals(name))
+			.map(TypedField::getValue)
+			.filter(Objects::nonNull)
+			.map(o -> o.toString())
+			.findFirst()
+			.get();
 	}
 }
 
@@ -289,5 +350,4 @@ class TypedField {
 	public void setValue(final Object value) {
 		this.value = value;
 	}
-
 }

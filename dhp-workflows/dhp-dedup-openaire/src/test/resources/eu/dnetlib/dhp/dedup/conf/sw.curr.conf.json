@@ -1,0 +1,94 @@
+  {
+    "wf" : {
+      "threshold" : "0.99",
+      "dedupRun" : "001",
+      "entityType" : "result",
+      "subEntityType" : "resulttype",
+      "subEntityValue" : "software",
+      "orderField" : "title",
+      "queueMaxSize" : "2000",
+      "groupMaxSize" : "100",
+      "maxChildren" : "100",
+      "slidingWindowSize" : "200",
+      "rootBuilder" : [ "result", "resultProject_outcome_isProducedBy", "resultResult_publicationDataset_isRelatedTo", "resultResult_similarity_isAmongTopNSimilarDocuments", "resultResult_similarity_hasAmongTopNSimilarDocuments", "resultOrganization_affiliation_hasAuthorInstitution", "resultResult_part_hasPart", "resultResult_part_isPartOf", "resultResult_supplement_isSupplementTo", "resultResult_supplement_isSupplementedBy", "resultResult_version_isVersionOf" ],
+      "includeChildren" : "true",
+      "idPath" : "$.id",
+      "maxIterations" : 20
+    },
+    "pace" : {
+      "clustering" : [
+        { "name" : "ngrampairs", "fields" : [ "title" ], "params" : { "max" : "1", "ngramLen" : "3"} },
+        { "name" : "suffixprefix", "fields" : [ "title" ], "params" : { "max" : "1", "len" : "3" } },
+        { "name" : "lowercase", "fields" : [ "doi", "url" ], "params" : { } }
+      ],
+      "decisionTree": {
+        "start": {
+          "fields": [
+            {
+              "field": "doi",
+              "comparator": "exactMatch",
+              "weight": 1,
+              "countIfUndefined": "false",
+              "params": {}
+            },
+            {
+              "field": "url",
+              "comparator": "exactMatch",
+              "weight": 1,
+              "countIfUndefined": "false",
+              "params": {}
+            }
+          ],
+          "threshold": 1,
+          "aggregation": "OR",
+          "positive": "MATCH",
+          "negative": "layer2",
+          "undefined": "layer2",
+          "ignoreUndefined": "false"
+        },
+    "layer2": {
+      "fields": [
+        {
+          "field": "title",
+          "comparator": "levensteinTitleIgnoreVersion",
+          "weight": 1,
+          "countIfUndefined": "false",
+          "params": {}
+        }
+      ],
+      "threshold": 0.99,
+      "aggregation": "AVG",
+      "positive": "MATCH",
+      "negative": "NO_MATCH",
+      "undefined": "NO_MATCH",
+      "ignoreUndefined": "false"
+    }
+  },
+      "model" : [
+          {
+            "name" : "doi",
+            "type" : "String",
+            "path" : "$.pid[?(@.qualifier.classid == 'doi')].value"
+          },
+          {
+            "name" : "title",
+            "type" : "String",
+            "path" : "$.title[?(@.qualifier.classid == 'main title')].value",
+            "length" : 250,
+            "size" : 5
+          },
+          {
+            "name" : "url",
+            "type" : "String",
+            "path" : "$.instance.url"
+          },
+          {
+            "name" : "resulttype",
+            "type" : "String",
+            "path" : "$.resulttype.classid"
+          }
+      ],
+      "blacklists" : {},
+      "synonyms": {}
+    }
+  }

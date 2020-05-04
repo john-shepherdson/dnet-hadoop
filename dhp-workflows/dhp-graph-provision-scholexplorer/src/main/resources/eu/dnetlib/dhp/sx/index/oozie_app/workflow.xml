@@ -1,0 +1,68 @@
+<workflow-app name="Index graph to ElasticSearch" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>workingDirPath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>index</name>
+            <description>index name</description>
+        </property>
+    </parameters>
+
+    <start to="indexSummary"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="indexSummary">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>index Summary</name>
+            <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
+            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="32" </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${workingDirPath}/summary</arg>
+            <arg>--index</arg><arg>${index}_object</arg>
+            <arg>--idPath</arg><arg>id</arg>
+            <arg>--type</arg><arg>summary</arg>
+        </spark>
+        <ok to="indexScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="indexScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>index scholix</name>
+            <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
+            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
+            <spark-opts>--executor-memory ${sparkExecutorMemory}  --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="8" </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${workingDirPath}/scholix_json</arg>
+            <arg>--index</arg><arg>${index}_scholix</arg>
+            <arg>--idPath</arg><arg>identifier</arg>
+            <arg>--type</arg><arg>scholix</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

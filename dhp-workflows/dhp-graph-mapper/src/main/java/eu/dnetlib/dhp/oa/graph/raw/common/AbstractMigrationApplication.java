@@ -1,6 +1,10 @@
+
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
-import eu.dnetlib.dhp.schema.oaf.Oaf;
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -9,9 +13,7 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 
 public class AbstractMigrationApplication implements Closeable {
 
@@ -35,15 +37,20 @@ public class AbstractMigrationApplication implements Closeable {
 
 		log.info(String.format("Creating SequenceFile Writer, hdfsPath=%s", hdfsPath));
 
-		this.writer = SequenceFile.createWriter(getConf(), SequenceFile.Writer.file(new Path(hdfsPath)), SequenceFile.Writer
-				.keyClass(Text.class), SequenceFile.Writer.valueClass(Text.class));
+		this.writer = SequenceFile
+			.createWriter(
+				getConf(),
+				SequenceFile.Writer.file(new Path(hdfsPath)),
+				SequenceFile.Writer.keyClass(Text.class),
+				SequenceFile.Writer.valueClass(Text.class));
 	}
 
 	private Configuration getConf() throws IOException {
 		final Configuration conf = new Configuration();
 		/*
-		 * conf.set("fs.defaultFS", hdfsNameNode); conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-		 * conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName()); System.setProperty("HADOOP_USER_NAME", hdfsUser);
+		 * conf.set("fs.defaultFS", hdfsNameNode); conf.set("fs.hdfs.impl",
+		 * org.apache.hadoop.hdfs.DistributedFileSystem.class.getName()); conf.set("fs.file.impl",
+		 * org.apache.hadoop.fs.LocalFileSystem.class.getName()); System.setProperty("HADOOP_USER_NAME", hdfsUser);
 		 * System.setProperty("hadoop.home.dir", "/"); FileSystem.get(URI.create(hdfsNameNode), conf);
 		 */
 		return conf;
@@ -76,5 +83,4 @@ public class AbstractMigrationApplication implements Closeable {
 		writer.hflush();
 		writer.close();
 	}
-
 }

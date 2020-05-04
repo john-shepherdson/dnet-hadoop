@@ -1,14 +1,5 @@
-package eu.dnetlib.dhp.oa.graph.raw.common;
 
-import com.google.common.collect.Iterables;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.bson.Document;
+package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -16,6 +7,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.StreamSupport;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bson.Document;
+
+import com.google.common.collect.Iterables;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 
 public class MdstoreClient implements Closeable {
 
@@ -32,7 +34,8 @@ public class MdstoreClient implements Closeable {
 		this.db = getDb(client, dbName);
 	}
 
-	public Map<String, String> validCollections(final String mdFormat, final String mdLayout, final String mdInterpretation) {
+	public Map<String, String> validCollections(
+		final String mdFormat, final String mdLayout, final String mdInterpretation) {
 
 		final Map<String, String> transactions = new HashMap<>();
 		for (final Document entry : getColl(db, COLL_METADATA_MANAGER, true).find()) {
@@ -45,8 +48,10 @@ public class MdstoreClient implements Closeable {
 
 		final Map<String, String> res = new HashMap<>();
 		for (final Document entry : getColl(db, COLL_METADATA, true).find()) {
-			if (entry.getString("format").equals(mdFormat) && entry.getString("layout").equals(mdLayout)
-					&& entry.getString("interpretation").equals(mdInterpretation) && transactions.containsKey(entry.getString("mdId"))) {
+			if (entry.getString("format").equals(mdFormat)
+				&& entry.getString("layout").equals(mdLayout)
+				&& entry.getString("interpretation").equals(mdInterpretation)
+				&& transactions.containsKey(entry.getString("mdId"))) {
 				res.put(entry.getString("mdId"), transactions.get(entry.getString("mdId")));
 			}
 		}
@@ -63,9 +68,12 @@ public class MdstoreClient implements Closeable {
 		return client.getDatabase(dbName);
 	}
 
-	private MongoCollection<Document> getColl(final MongoDatabase db, final String collName, final boolean abortIfMissing) {
+	private MongoCollection<Document> getColl(
+		final MongoDatabase db, final String collName, final boolean abortIfMissing) {
 		if (!Iterables.contains(db.listCollectionNames(), collName)) {
-			final String err = String.format(String.format("Missing collection '%s' in database '%s'", collName, db.getName()));
+			final String err = String
+				.format(
+					String.format("Missing collection '%s' in database '%s'", collName, db.getName()));
 			log.warn(err);
 			if (abortIfMissing) {
 				throw new RuntimeException(err);
@@ -78,16 +86,17 @@ public class MdstoreClient implements Closeable {
 
 	public Iterable<String> listRecords(final String collName) {
 		final MongoCollection<Document> coll = getColl(db, collName, false);
-		return coll == null ? new ArrayList<>()
-				: () -> StreamSupport.stream(coll.find().spliterator(), false)
-						.filter(e -> e.containsKey("body"))
-						.map(e -> e.getString("body"))
-						.iterator();
+		return coll == null
+			? new ArrayList<>()
+			: () -> StreamSupport
+				.stream(coll.find().spliterator(), false)
+				.filter(e -> e.containsKey("body"))
+				.map(e -> e.getString("body"))
+				.iterator();
 	}
 
 	@Override
 	public void close() throws IOException {
 		client.close();
 	}
-
 }

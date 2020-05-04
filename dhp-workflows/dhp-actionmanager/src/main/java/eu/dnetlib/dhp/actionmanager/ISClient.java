@@ -1,20 +1,5 @@
-package eu.dnetlib.dhp.actionmanager;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import eu.dnetlib.actionmanager.rmi.ActionManagerException;
-import eu.dnetlib.actionmanager.set.ActionManagerSet;
-import eu.dnetlib.actionmanager.set.ActionManagerSet.ImpactTypes;
-import eu.dnetlib.dhp.actionmanager.partition.PartitionActionSetsByPayloadTypeJob;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package eu.dnetlib.dhp.actionmanager;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -23,31 +8,59 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+
+import eu.dnetlib.actionmanager.rmi.ActionManagerException;
+import eu.dnetlib.actionmanager.set.ActionManagerSet;
+import eu.dnetlib.actionmanager.set.ActionManagerSet.ImpactTypes;
+import eu.dnetlib.dhp.actionmanager.partition.PartitionActionSetsByPayloadTypeJob;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+
 public class ISClient implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(PartitionActionSetsByPayloadTypeJob.class);
 
 	private static final String INPUT_ACTION_SET_ID_SEPARATOR = ",";
 
-	public static List<String> getLatestRawsetPaths(String isLookupUrl, String setIds) {
+	private final ISLookUpService isLookup;
 
-		ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
-		ISClient isClient = new ISClient();
-		List<String> ids = Lists.newArrayList(Splitter.on(INPUT_ACTION_SET_ID_SEPARATOR)
-				.omitEmptyStrings()
-				.trimResults()
-				.split(setIds));
+	public ISClient(String isLookupUrl) {
+		isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
+	}
 
-		return ids.stream()
-				.map(id -> isClient.getSet(isLookup, id))
-				.map(as -> as.getPathToLatest())
-				.collect(Collectors.toCollection(ArrayList::new));
+	public List<String> getLatestRawsetPaths(String setIds) {
+
+		List<String> ids = Lists
+			.newArrayList(
+				Splitter
+					.on(INPUT_ACTION_SET_ID_SEPARATOR)
+					.omitEmptyStrings()
+					.trimResults()
+					.split(setIds));
+
+		return ids
+			.stream()
+			.map(id -> getSet(isLookup, id))
+			.map(as -> as.getPathToLatest())
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	private ActionManagerSet getSet(ISLookUpService isLookup, final String setId) {
 
 		final String q = "for $x in collection('/db/DRIVER/ActionManagerSetDSResources/ActionManagerSetDSResourceType') "
-				+ "where $x//SET/@id = '" + setId + "' return $x";
+			+ "where $x//SET/@id = '"
+			+ setId
+			+ "' return $x";
 
 		try {
 			final String basePath = getBasePathHDFS(isLookup);
@@ -58,7 +71,8 @@ public class ISClient implements Serializable {
 		}
 	}
 
-	private ActionManagerSet getActionManagerSet(final String basePath, final String profile) throws ActionManagerException {
+	private ActionManagerSet getActionManagerSet(final String basePath, final String profile)
+		throws ActionManagerException {
 		final SAXReader reader = new SAXReader();
 		final ActionManagerSet set = new ActionManagerSet();
 
@@ -68,13 +82,21 @@ public class ISClient implements Serializable {
 			set.setId(doc.valueOf("//SET/@id").trim());
 			set.setName(doc.valueOf("//SET").trim());
 			set.setImpact(ImpactTypes.valueOf(doc.valueOf("//IMPACT").trim()));
-			set.setLatest(doc.valueOf("//RAW_SETS/LATEST/@id"), doc.valueOf("//RAW_SETS/LATEST/@creationDate"), doc.valueOf("//RAW_SETS/LATEST/@lastUpdate"));
+			set
+				.setLatest(
+					doc.valueOf("//RAW_SETS/LATEST/@id"),
+					doc.valueOf("//RAW_SETS/LATEST/@creationDate"),
+					doc.valueOf("//RAW_SETS/LATEST/@lastUpdate"));
 			set.setDirectory(doc.valueOf("//SET/@directory"));
 			final List expiredNodes = doc.selectNodes("//RAW_SETS/EXPIRED");
 			if (expiredNodes != null) {
 				for (int i = 0; i < expiredNodes.size(); i++) {
 					Element ex = (Element) expiredNodes.get(i);
-					set.addExpired(ex.attributeValue("id"), ex.attributeValue("creationDate"), ex.attributeValue("lastUpdate"));
+					set
+						.addExpired(
+							ex.attributeValue("id"),
+							ex.attributeValue("creationDate"),
+							ex.attributeValue("lastUpdate"));
 				}
 			}
 
@@ -96,9 +118,11 @@ public class ISClient implements Serializable {
 		return queryServiceProperty(isLookup, "basePath");
 	}
 
-	private String queryServiceProperty(ISLookUpService isLookup, final String propertyName) throws ActionManagerException {
+	private String queryServiceProperty(ISLookUpService isLookup, final String propertyName)
+		throws ActionManagerException {
 		final String q = "for $x in /RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='ActionManagerServiceResourceType'] return $x//SERVICE_PROPERTIES/PROPERTY[./@ key='"
-				+ propertyName + "']/@value/string()";
+			+ propertyName
+			+ "']/@value/string()";
 		log.debug("quering for service property: " + q);
 		try {
 			final List<String> value = isLookup.quickSearchProfile(q);
@@ -117,6 +141,4 @@ public class ISClient implements Serializable {
 			throw new ActionManagerException(msg, e);
 		}
 	}
-
-
 }

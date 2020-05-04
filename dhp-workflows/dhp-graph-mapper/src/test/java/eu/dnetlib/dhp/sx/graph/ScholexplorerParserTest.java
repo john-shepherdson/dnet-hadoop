@@ -1,38 +1,40 @@
+
 package eu.dnetlib.dhp.sx.graph;
+
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import eu.dnetlib.dhp.sx.graph.parser.DatasetScholexplorerParser;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.scholexplorer.relation.RelationMapper;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.sx.graph.parser.DatasetScholexplorerParser;
+import eu.dnetlib.scholexplorer.relation.RelationMapper;
 
 public class ScholexplorerParserTest {
 
+	@Test
+	public void testDataciteParser() throws Exception {
+		String xml = IOUtils.toString(this.getClass().getResourceAsStream("dmf.xml"));
 
-    @Test
-    public void testDataciteParser() throws Exception {
-        String xml = IOUtils.toString(this.getClass().getResourceAsStream("dmf.xml"));
+		DatasetScholexplorerParser p = new DatasetScholexplorerParser();
+		List<Oaf> oaves = p.parseObject(xml, RelationMapper.load());
 
-        DatasetScholexplorerParser p = new DatasetScholexplorerParser();
-        List<Oaf> oaves = p.parseObject(xml, RelationMapper.load());
+		ObjectMapper m = new ObjectMapper();
+		m.enable(SerializationFeature.INDENT_OUTPUT);
 
-        ObjectMapper m = new ObjectMapper();
-        m.enable(SerializationFeature.INDENT_OUTPUT);
+		oaves
+			.forEach(
+				oaf -> {
+					try {
+						System.out.println(m.writeValueAsString(oaf));
+						System.out.println("----------------------------");
+					} catch (JsonProcessingException e) {
 
-
-        oaves.forEach(oaf -> {
-            try {
-                System.out.println(m.writeValueAsString(oaf));
-                System.out.println("----------------------------");
-            } catch (JsonProcessingException e) {
-
-            }
-        });
-
-    }
+					}
+				});
+	}
 }

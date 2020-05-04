@@ -8,6 +8,9 @@ SELECT
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['openaire-cris_1.1'])
     			THEN
     				'openaire-cris_1.1@@@OpenAIRE CRIS v1.1@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['openaire4.0'])
+                	THEN
+                    		'openaire4.0@@@OpenAIRE 4.0@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['driver', 'openaire2.0'])
 			THEN
 				'driver-openaire2.0@@@OpenAIRE 2.0+ (DRIVER OA, EC funding)@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
@@ -105,7 +108,7 @@ SELECT
 		ELSE 'Other'
 	END || '@@@dnet:datasource_typologies@@@dnet:datasource_typologies'                               AS datasourcetype,
 	'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions' AS provenanceaction,
-	CONCAT(d.issn, '@@@', d.eissn, '@@@', d.lissn)                                                    AS journal
+	CONCAT(d.issn, ' @@@ ', d.eissn, ' @@@ ', d.lissn)                                                    AS journal
 
 FROM dsm_datasources d
 

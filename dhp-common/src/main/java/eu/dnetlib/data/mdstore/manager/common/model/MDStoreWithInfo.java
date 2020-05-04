@@ -1,3 +1,4 @@
+
 package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
@@ -14,9 +15,7 @@ import javax.persistence.TemporalType;
 @Table(name = "mdstores_with_info")
 public class MDStoreWithInfo implements Serializable {
 
-	/**
-	 *
-	 */
+	/** */
 	private static final long serialVersionUID = -8445784770687571492L;
 
 	@Id
@@ -141,5 +140,4 @@ public class MDStoreWithInfo implements Serializable {
 	public void setNumberOfVersions(final long numberOfVersions) {
 		this.numberOfVersions = numberOfVersions;
 	}
-
 }

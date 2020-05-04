@@ -1,87 +1,88 @@
+
 package eu.dnetlib.dhp.schema.oaf;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 public class MergeTest {
 
-    OafEntity oaf;
+	OafEntity oaf;
 
-    @BeforeEach
-    public void setUp() {
-        oaf = new Publication();
-    }
+	@BeforeEach
+	public void setUp() {
+		oaf = new Publication();
+	}
 
-    @Test
-    public void mergeListsTest() {
+	@Test
+	public void mergeListsTest() {
 
-        //string list merge test
-        List<String> a = Arrays.asList("a", "b", "c", "e");
-        List<String> b = Arrays.asList("a", "b", "c", "d");
-        List<String> c = null;
+		// string list merge test
+		List<String> a = Arrays.asList("a", "b", "c", "e");
+		List<String> b = Arrays.asList("a", "b", "c", "d");
+		List<String> c = null;
 
-        System.out.println("merge result 1 = " + oaf.mergeLists(a, b));
+		System.out.println("merge result 1 = " + oaf.mergeLists(a, b));
 
-        System.out.println("merge result 2 = " + oaf.mergeLists(a, c));
+		System.out.println("merge result 2 = " + oaf.mergeLists(a, c));
 
-        System.out.println("merge result 3 = " + oaf.mergeLists(c, c));
-    }
+		System.out.println("merge result 3 = " + oaf.mergeLists(c, c));
+	}
 
-    @Test
-    public void mergePublicationCollectedFromTest() {
+	@Test
+	public void mergePublicationCollectedFromTest() {
 
-        Publication a = new Publication();
-        Publication b = new Publication();
+		Publication a = new Publication();
+		Publication b = new Publication();
 
-        a.setCollectedfrom(Arrays.asList(setKV("a", "open"), setKV("b", "closed")));
-        b.setCollectedfrom(Arrays.asList(setKV("A", "open"), setKV("b", "Open")));
+		a.setCollectedfrom(Arrays.asList(setKV("a", "open"), setKV("b", "closed")));
+		b.setCollectedfrom(Arrays.asList(setKV("A", "open"), setKV("b", "Open")));
 
-        a.mergeFrom(b);
+		a.mergeFrom(b);
 
-        assertNotNull(a.getCollectedfrom());
-        assertEquals(3, a.getCollectedfrom().size());
+		assertNotNull(a.getCollectedfrom());
+		assertEquals(3, a.getCollectedfrom().size());
+	}
 
-    }
+	@Test
+	public void mergePublicationSubjectTest() {
 
-    @Test
-    public void mergePublicationSubjectTest() {
+		Publication a = new Publication();
+		Publication b = new Publication();
 
-        Publication a = new Publication();
-        Publication b = new Publication();
+		a.setSubject(Arrays.asList(setSP("a", "open", "classe"), setSP("b", "open", "classe")));
+		b.setSubject(Arrays.asList(setSP("A", "open", "classe"), setSP("c", "open", "classe")));
 
-        a.setSubject(Arrays.asList(setSP("a", "open", "classe"), setSP("b", "open", "classe")));
-        b.setSubject(Arrays.asList(setSP("A", "open", "classe"), setSP("c", "open", "classe")));
+		a.mergeFrom(b);
 
-        a.mergeFrom(b);
+		assertNotNull(a.getSubject());
+		assertEquals(3, a.getSubject().size());
+	}
 
-        assertNotNull(a.getSubject());
-        assertEquals(3, a.getSubject().size());
+	private KeyValue setKV(final String key, final String value) {
 
-    }
+		KeyValue k = new KeyValue();
 
-    private KeyValue setKV(final String key, final String value) {
+		k.setKey(key);
+		k.setValue(value);
 
-        KeyValue k = new KeyValue();
+		return k;
+	}
 
-        k.setKey(key);
-        k.setValue(value);
-
-        return k;
-    }
-
-    private StructuredProperty setSP(final String value, final String schema, final String classname) {
-        StructuredProperty s = new StructuredProperty();
-        s.setValue(value);
-        Qualifier q = new Qualifier();
-        q.setClassname(classname);
-        q.setClassid(classname);
-        q.setSchemename(schema);
-        q.setSchemeid(schema);
-        s.setQualifier(q);
-        return s;
-    }
+	private StructuredProperty setSP(
+		final String value, final String schema, final String classname) {
+		StructuredProperty s = new StructuredProperty();
+		s.setValue(value);
+		Qualifier q = new Qualifier();
+		q.setClassname(classname);
+		q.setClassid(classname);
+		q.setSchemename(schema);
+		q.setSchemeid(schema);
+		s.setQualifier(q);
+		return s;
+	}
 }

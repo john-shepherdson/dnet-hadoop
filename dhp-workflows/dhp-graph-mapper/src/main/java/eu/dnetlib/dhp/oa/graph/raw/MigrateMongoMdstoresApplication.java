@@ -1,18 +1,21 @@
-package eu.dnetlib.dhp.oa.graph.raw;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
-import eu.dnetlib.dhp.oa.graph.raw.common.MdstoreClient;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package eu.dnetlib.dhp.oa.graph.raw;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication implements Closeable {
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.oa.graph.raw.common.MdstoreClient;
+
+public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication
+	implements Closeable {
 
 	private static final Log log = LogFactory.getLog(MigrateMongoMdstoresApplication.class);
 
@@ -20,7 +23,11 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-				IOUtils.toString(MigrateMongoMdstoresApplication.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_mongo_mstores_parameters.json")));
+			IOUtils
+				.toString(
+					MigrateMongoMdstoresApplication.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/graph/migrate_mongo_mstores_parameters.json")));
 		parser.parseArgument(args);
 
 		final String mongoBaseUrl = parser.get("mongoBaseUrl");
@@ -32,13 +39,14 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 
 		final String hdfsPath = parser.get("hdfsPath");
 
-		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(hdfsPath, mongoBaseUrl, mongoDb)) {
+		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(hdfsPath, mongoBaseUrl,
+			mongoDb)) {
 			app.execute(mdFormat, mdLayout, mdInterpretation);
 		}
-
 	}
 
-	public MigrateMongoMdstoresApplication(final String hdfsPath, final String mongoBaseUrl, final String mongoDb) throws Exception {
+	public MigrateMongoMdstoresApplication(
+		final String hdfsPath, final String mongoBaseUrl, final String mongoDb) throws Exception {
 		super(hdfsPath);
 		this.mdstoreClient = new MdstoreClient(mongoBaseUrl, mongoDb);
 	}
@@ -62,5 +70,4 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 		super.close();
 		mdstoreClient.close();
 	}
-
 }

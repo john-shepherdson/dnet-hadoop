@@ -1,3 +1,4 @@
+
 package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
@@ -11,9 +12,7 @@ import javax.persistence.Table;
 @Table(name = "mdstore_current_versions")
 public class MDStoreCurrentVersion implements Serializable {
 
-	/**
-	 *
-	 */
+	/** */
 	private static final long serialVersionUID = -4757725888593745773L;
 
 	@Id

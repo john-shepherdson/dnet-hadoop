@@ -1,15 +1,6 @@
+
 package eu.dnetlib.dhp.collection.worker.utils;
 
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
@@ -18,6 +9,17 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
 
 public class HttpConnector {
 
@@ -38,11 +40,9 @@ public class HttpConnector {
 	/**
 	 * Given the URL returns the content via HTTP GET
 	 *
-	 * @param requestUrl
-	 *            the URL
+	 * @param requestUrl the URL
 	 * @return the content of the downloaded resource
-	 * @throws DnetCollectorException
-	 *             when retrying more than maxNumberOfRetry times
+	 * @throws DnetCollectorException when retrying more than maxNumberOfRetry times
 	 */
 	public String getInputSource(final String requestUrl) throws DnetCollectorException {
 		return attemptDownlaodAsString(requestUrl, 1, new CollectorPluginErrorLogList());
@@ -51,18 +51,17 @@ public class HttpConnector {
 	/**
 	 * Given the URL returns the content as a stream via HTTP GET
 	 *
-	 * @param requestUrl
-	 *            the URL
+	 * @param requestUrl the URL
 	 * @return the content of the downloaded resource as InputStream
-	 * @throws DnetCollectorException
-	 *             when retrying more than maxNumberOfRetry times
+	 * @throws DnetCollectorException when retrying more than maxNumberOfRetry times
 	 */
 	public InputStream getInputSourceAsStream(final String requestUrl) throws DnetCollectorException {
 		return attemptDownload(requestUrl, 1, new CollectorPluginErrorLogList());
 	}
 
-	private String attemptDownlaodAsString(final String requestUrl, final int retryNumber, final CollectorPluginErrorLogList errorList)
-			throws DnetCollectorException {
+	private String attemptDownlaodAsString(
+		final String requestUrl, final int retryNumber, final CollectorPluginErrorLogList errorList)
+		throws DnetCollectorException {
 		try {
 			final InputStream s = attemptDownload(requestUrl, 1, new CollectorPluginErrorLogList());
 			try {
@@ -80,10 +79,13 @@ public class HttpConnector {
 		}
 	}
 
-	private InputStream attemptDownload(final String requestUrl, final int retryNumber, final CollectorPluginErrorLogList errorList)
-			throws DnetCollectorException {
+	private InputStream attemptDownload(
+		final String requestUrl, final int retryNumber, final CollectorPluginErrorLogList errorList)
+		throws DnetCollectorException {
 
-		if (retryNumber > maxNumberOfRetry) { throw new DnetCollectorException("Max number of retries exceeded. Cause: \n " + errorList); }
+		if (retryNumber > maxNumberOfRetry) {
+			throw new DnetCollectorException("Max number of retries exceeded. Cause: \n " + errorList);
+		}
 
 		log.debug("Downloading " + requestUrl + " - try: " + retryNumber);
 		try {
@@ -106,16 +108,28 @@ public class HttpConnector {
 					errorList.add("503 Service Unavailable");
 					urlConn.disconnect();
 					return attemptDownload(requestUrl, retryNumber + 1, errorList);
-				} else if (urlConn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || urlConn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+				} else if (urlConn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
+					|| urlConn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
 					final String newUrl = obtainNewLocation(urlConn.getHeaderFields());
 					log.debug("The requested url has been moved to " + newUrl);
-					errorList.add(String.format("%s %s. Moved to: %s", urlConn.getResponseCode(), urlConn.getResponseMessage(), newUrl));
+					errorList
+						.add(
+							String
+								.format(
+									"%s %s. Moved to: %s",
+									urlConn.getResponseCode(), urlConn.getResponseMessage(), newUrl));
 					urlConn.disconnect();
 					return attemptDownload(newUrl, retryNumber + 1, errorList);
 				} else if (urlConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-					log.error(String.format("HTTP error: %s %s", urlConn.getResponseCode(), urlConn.getResponseMessage()));
+					log
+						.error(
+							String
+								.format(
+									"HTTP error: %s %s", urlConn.getResponseCode(), urlConn.getResponseMessage()));
 					Thread.sleep(defaultDelay * 1000);
-					errorList.add(String.format("%s %s", urlConn.getResponseCode(), urlConn.getResponseMessage()));
+					errorList
+						.add(
+							String.format("%s %s", urlConn.getResponseCode(), urlConn.getResponseMessage()));
 					urlConn.disconnect();
 					return attemptDownload(requestUrl, retryNumber + 1, errorList);
 				} else {
@@ -148,17 +162,25 @@ public class HttpConnector {
 
 	private int obtainRetryAfter(final Map<String, List<String>> headerMap) {
 		for (final String key : headerMap.keySet()) {
-			if (key != null && key.toLowerCase().equals("retry-after") && headerMap.get(key).size() > 0
-					&& NumberUtils.isNumber(headerMap.get(key).get(0))) { return Integer.parseInt(headerMap.get(key).get(0)) + 10; }
+			if (key != null
+				&& key.toLowerCase().equals("retry-after")
+				&& headerMap.get(key).size() > 0
+				&& NumberUtils.isNumber(headerMap.get(key).get(0))) {
+				return Integer.parseInt(headerMap.get(key).get(0)) + 10;
+			}
 		}
 		return -1;
 	}
 
-	private String obtainNewLocation(final Map<String, List<String>> headerMap) throws DnetCollectorException {
+	private String obtainNewLocation(final Map<String, List<String>> headerMap)
+		throws DnetCollectorException {
 		for (final String key : headerMap.keySet()) {
-			if (key != null && key.toLowerCase().equals("location") && headerMap.get(key).size() > 0) { return headerMap.get(key).get(0); }
+			if (key != null && key.toLowerCase().equals("location") && headerMap.get(key).size() > 0) {
+				return headerMap.get(key).get(0);
+			}
 		}
-		throw new DnetCollectorException("The requested url has been MOVED, but 'location' param is MISSING");
+		throw new DnetCollectorException(
+			"The requested url has been MOVED, but 'location' param is MISSING");
 	}
 
 	/**
@@ -168,10 +190,12 @@ public class HttpConnector {
 		final X509TrustManager tm = new X509TrustManager() {
 
 			@Override
-			public void checkClientTrusted(final X509Certificate[] xcs, final String string) {}
+			public void checkClientTrusted(final X509Certificate[] xcs, final String string) {
+			}
 
 			@Override
-			public void checkServerTrusted(final X509Certificate[] xcs, final String string) {}
+			public void checkServerTrusted(final X509Certificate[] xcs, final String string) {
+			}
 
 			@Override
 			public X509Certificate[] getAcceptedIssuers() {
@@ -180,7 +204,9 @@ public class HttpConnector {
 		};
 		try {
 			final SSLContext ctx = SSLContext.getInstance("TLS");
-			ctx.init(null, new TrustManager[] { tm }, null);
+			ctx.init(null, new TrustManager[] {
+				tm
+			}, null);
 			HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
 		} catch (final GeneralSecurityException e) {
 			log.fatal(e);
@@ -215,5 +241,4 @@ public class HttpConnector {
 	public String getResponseType() {
 		return responseType;
 	}
-
 }

@@ -1,17 +1,29 @@
+
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
-import eu.dnetlib.dhp.schema.oaf.*;
-import org.dom4j.Document;
-import org.dom4j.Node;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.Node;
+
+import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.GeoLocation;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -79,23 +91,39 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<Instance> prepareInstances(final Document doc, final DataInfo info, final KeyValue collectedfrom, final KeyValue hostedby) {
+	protected List<Instance> prepareInstances(
+		final Document doc,
+		final DataInfo info,
+		final KeyValue collectedfrom,
+		final KeyValue hostedby) {
 		final List<Instance> res = new ArrayList<>();
 		for (final Object o : doc.selectNodes("//dc:identifier")) {
 			final String url = ((Node) o).getText().trim();
 			if (url.startsWith("http")) {
 				final Instance instance = new Instance();
 				instance.setUrl(Arrays.asList(url));
-				instance.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", "dnet:publication_resource", "dnet:publication_resource"));
+				instance
+					.setInstancetype(
+						prepareQualifier(
+							doc,
+							"//dr:CobjCategory",
+							"dnet:publication_resource",
+							"dnet:publication_resource"));
 				instance.setCollectedfrom(collectedfrom);
 				instance.setHostedby(hostedby);
 				instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 				instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
-				instance.setAccessright(prepareQualifier(doc, "//oaf:accessrights", "dnet:access_modes", "dnet:access_modes"));
+				instance
+					.setAccessright(
+						prepareQualifier(doc, "//oaf:accessrights", "dnet:access_modes", "dnet:access_modes"));
 				instance.setLicense(field(doc.valueOf("//oaf:license"), info));
 				instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
-				instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
-				instance.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+				instance
+					.setProcessingchargeamount(
+						field(doc.valueOf("//oaf:processingchargeamount"), info));
+				instance
+					.setProcessingchargecurrency(
+						field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 				res.add(instance);
 			}
 		}
@@ -120,17 +148,20 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected Field<String> prepareSoftwareCodeRepositoryUrl(final Document doc, final DataInfo info) {
+	protected Field<String> prepareSoftwareCodeRepositoryUrl(
+		final Document doc, final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSoftwareLicenses(final Document doc, final DataInfo info) {
+	protected List<StructuredProperty> prepareSoftwareLicenses(
+		final Document doc, final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected List<Field<String>> prepareSoftwareDocumentationUrls(final Document doc, final DataInfo info) {
+	protected List<Field<String>> prepareSoftwareDocumentationUrls(
+		final Document doc, final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
@@ -141,12 +172,14 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected Field<String> prepareDatasetMetadataVersionNumber(final Document doc, final DataInfo info) {
+	protected Field<String> prepareDatasetMetadataVersionNumber(
+		final Document doc, final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected Field<String> prepareDatasetLastMetadataUpdate(final Document doc, final DataInfo info) {
+	protected Field<String> prepareDatasetLastMetadataUpdate(
+		final Document doc, final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
 	}
 
@@ -173,53 +206,63 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	// OTHER PRODUCTS
 
 	@Override
-	protected List<Field<String>> prepareOtherResearchProductTools(final Document doc, final DataInfo info) {
+	protected List<Field<String>> prepareOtherResearchProductTools(
+		final Document doc, final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected List<Field<String>> prepareOtherResearchProductContactGroups(final Document doc, final DataInfo info) {
+	protected List<Field<String>> prepareOtherResearchProductContactGroups(
+		final Document doc, final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected List<Field<String>> prepareOtherResearchProductContactPersons(final Document doc, final DataInfo info) {
+	protected List<Field<String>> prepareOtherResearchProductContactPersons(
+		final Document doc, final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected List<Oaf> addOtherResultRels(final Document doc,
-			final KeyValue collectedFrom,
-			final DataInfo info,
-			final long lastUpdateTimestamp) {
+	protected List<Oaf> addOtherResultRels(
+		final Document doc,
+		final KeyValue collectedFrom,
+		final DataInfo info,
+		final long lastUpdateTimestamp) {
 		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
 
 		final List<Oaf> res = new ArrayList<>();
 
 		for (final Object o : doc.selectNodes("//*[local-name()='relatedDataset']")) {
-			final String otherId = createOpenaireId(50, ((Node) o).getText(), false);
 
-			final Relation r1 = new Relation();
-			r1.setRelType("resultResult");
-			r1.setSubRelType("publicationDataset");
-			r1.setRelClass("isRelatedTo");
-			r1.setSource(docId);
-			r1.setTarget(otherId);
-			r1.setCollectedFrom(Arrays.asList(collectedFrom));
-			r1.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
-			res.add(r1);
+			final String originalId = ((Node) o).getText();
 
-			final Relation r2 = new Relation();
-			r2.setRelType("resultResult");
-			r2.setSubRelType("publicationDataset");
-			r2.setRelClass("isRelatedTo");
-			r2.setSource(otherId);
-			r2.setTarget(docId);
-			r2.setCollectedFrom(Arrays.asList(collectedFrom));
-			r2.setDataInfo(info);
-			r2.setLastupdatetimestamp(lastUpdateTimestamp);
-			res.add(r2);
+			if (StringUtils.isNotBlank(originalId)) {
+
+				final String otherId = createOpenaireId(50, originalId, false);
+
+				final Relation r1 = new Relation();
+				r1.setRelType("resultResult");
+				r1.setSubRelType("publicationDataset");
+				r1.setRelClass("isRelatedTo");
+				r1.setSource(docId);
+				r1.setTarget(otherId);
+				r1.setCollectedfrom(Arrays.asList(collectedFrom));
+				r1.setDataInfo(info);
+				r1.setLastupdatetimestamp(lastUpdateTimestamp);
+				res.add(r1);
+
+				final Relation r2 = new Relation();
+				r2.setRelType("resultResult");
+				r2.setSubRelType("publicationDataset");
+				r2.setRelClass("isRelatedTo");
+				r2.setSource(otherId);
+				r2.setTarget(docId);
+				r2.setCollectedfrom(Arrays.asList(collectedFrom));
+				r2.setDataInfo(info);
+				r2.setLastupdatetimestamp(lastUpdateTimestamp);
+				res.add(r2);
+			}
 		}
 		return res;
 	}
@@ -228,5 +271,4 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
 	}
-
 }

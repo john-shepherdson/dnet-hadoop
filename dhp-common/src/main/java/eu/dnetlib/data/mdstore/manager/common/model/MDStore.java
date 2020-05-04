@@ -1,3 +1,4 @@
+
 package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
@@ -12,9 +13,7 @@ import javax.persistence.Table;
 @Table(name = "mdstores")
 public class MDStore implements Serializable {
 
-	/**
-	 *
-	 */
+	/** */
 	private static final long serialVersionUID = 3160530489149700055L;
 
 	@Id
@@ -95,16 +94,18 @@ public class MDStore implements Serializable {
 		this.apiId = apiId;
 	}
 
-	public static MDStore newInstance(final String format, final String layout, final String interpretation) {
+	public static MDStore newInstance(
+		final String format, final String layout, final String interpretation) {
 		return newInstance(format, layout, interpretation, null, null, null);
 	}
 
-	public static MDStore newInstance(final String format,
-			final String layout,
-			final String interpretation,
-			final String dsName,
-			final String dsId,
-			final String apiId) {
+	public static MDStore newInstance(
+		final String format,
+		final String layout,
+		final String interpretation,
+		final String dsName,
+		final String dsId,
+		final String apiId) {
 		final MDStore md = new MDStore();
 		md.setId("md-" + UUID.randomUUID());
 		md.setFormat(format);
@@ -115,5 +116,4 @@ public class MDStore implements Serializable {
 		md.setApiId(apiId);
 		return md;
 	}
-
 }
