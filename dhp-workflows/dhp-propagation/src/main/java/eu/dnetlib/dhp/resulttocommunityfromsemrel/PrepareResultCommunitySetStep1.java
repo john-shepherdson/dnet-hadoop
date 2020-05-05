@@ -61,7 +61,7 @@ public class PrepareResultCommunitySetStep1 {
 		final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
 		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
-		final String isLookupUrl = parser.get("isLookupUrl");
+		final String isLookupUrl = parser.get("isLookUpUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
 		final List<String> communityIdList = QueryInformationSystem.getCommunityList(isLookupUrl);

@@ -9,7 +9,7 @@
         <description>the semantic relationships allowed for propagation</description>
     </property>
     <property>
-        <name>isLookupUrl</name>
+        <name>isLookUpUrl</name>
         <description>the isLookup service endpoint</description>
     </property>
     <property>
@@ -121,7 +121,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -149,7 +149,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -177,7 +177,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -205,7 +205,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -270,7 +270,7 @@
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
-            <arg>--saveGrap</arg><arg>${saveGraph</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -298,7 +298,7 @@
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--saveGrap</arg><arg>${saveGraph</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -326,7 +326,7 @@
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--saveGrap</arg><arg>${saveGraph</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -354,7 +354,7 @@
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
-            <arg>--saveGrap</arg><arg>${saveGraph</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>

@@ -1,7 +1,7 @@
 [
   {
     "paramName":"is",
-    "paramLongName":"isLookupUrl",
+    "paramLongName":"isLookUpUrl",
     "paramDescription": "URL of the isLookUp Service",
     "paramRequired": true
   },
