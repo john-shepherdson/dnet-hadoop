@@ -489,8 +489,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			final String[] arr = sj.split("@@@");
 			if (arr.length == 3) {
 				final String issn = StringUtils.isNotBlank(arr[0]) ? arr[0].trim() : null;
-				final String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1].trim() : null;;
-				final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2].trim() : null;;
+				final String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1].trim() : null;
+				final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2].trim() : null;
+
 				if (issn != null || eissn != null || lissn != null) {
 					return journal(name, issn, eissn, eissn, null, null, null, null, null, null, null, info);
 				}
