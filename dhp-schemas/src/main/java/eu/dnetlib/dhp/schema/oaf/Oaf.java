@@ -7,6 +7,9 @@ import java.util.Objects;
 
 public abstract class Oaf implements Serializable {
 
+	/**
+	 * The list of datasource id/name pairs providing this relationship.
+	 */
 	protected List<KeyValue> collectedfrom;
 
 	private DataInfo dataInfo;
