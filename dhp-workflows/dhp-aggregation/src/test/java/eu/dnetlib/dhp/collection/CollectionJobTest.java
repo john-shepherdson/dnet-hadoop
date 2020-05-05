@@ -9,65 +9,60 @@ import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.SparkSession;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.model.mdstore.Provenance;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 
 public class CollectionJobTest {
 
-	private Path testDir;
+	private static SparkSession spark;
 
-	@BeforeEach
-	public void setup() throws IOException {
-		testDir = Files.createTempDirectory("dhp-collection");
+	@BeforeAll
+	public static void beforeAll() {
+		SparkConf conf = new SparkConf();
+		conf.setAppName(CollectionJobTest.class.getSimpleName());
+		conf.setMaster("local");
+		spark = SparkSession.builder().config(conf).getOrCreate();
 	}
 
-	@AfterEach
-	public void teadDown() throws IOException {
-		FileUtils.deleteDirectory(testDir.toFile());
+	@AfterAll
+	public static void afterAll() {
+		spark.stop();
 	}
 
 	@Test
-	public void tesCollection() throws Exception {
+	public void tesCollection(@TempDir Path testDir) throws Exception {
 		final Provenance provenance = new Provenance("pippo", "puppa", "ns_prefix");
+		Assertions.assertNotNull(new ObjectMapper().writeValueAsString(provenance));
+
 		GenerateNativeStoreSparkJob
 			.main(
 				new String[] {
-					"-mt",
-					"local",
-					"-w",
-					"wid",
-					"-e",
-					"XML",
-					"-d",
-					"" + System.currentTimeMillis(),
-					"-p",
-					new ObjectMapper().writeValueAsString(provenance),
-					"-x",
-					"./*[local-name()='record']/*[local-name()='header']/*[local-name()='identifier']",
-					"-i",
-					this.getClass().getResource("/eu/dnetlib/dhp/collection/native.seq").toString(),
-					"-o",
-					testDir.toString() + "/store",
-					"-t",
-					"true",
-					"-ru",
-					"",
-					"-rp",
-					"",
-					"-rh",
-					"",
-					"-ro",
-					"",
-					"-rr",
-					""
+					"issm", "true",
+					"-w", "wid",
+					"-e", "XML",
+					"-d", "" + System.currentTimeMillis(),
+					"-p", new ObjectMapper().writeValueAsString(provenance),
+					"-x", "./*[local-name()='record']/*[local-name()='header']/*[local-name()='identifier']",
+					"-i", this.getClass().getResource("/eu/dnetlib/dhp/collection/native.seq").toString(),
+					"-o", testDir.toString() + "/store",
+					"-t", "true",
+					"-ru", "",
+					"-rp", "",
+					"-rh", "",
+					"-ro", "",
+					"-rr", ""
 				});
-		System.out.println(new ObjectMapper().writeValueAsString(provenance));
+
+		// TODO introduce useful assertions
+
 	}
 
 	@Test
@@ -85,9 +80,8 @@ public class CollectionJobTest {
 				null,
 				null);
 
-		assert record != null;
-		System.out.println(record.getId());
-		System.out.println(record.getOriginalId());
+		assertNotNull(record.getId());
+		assertNotNull(record.getOriginalId());
 	}
 
 	@Test
@@ -112,10 +106,12 @@ public class CollectionJobTest {
 				System.currentTimeMillis(),
 				null,
 				null);
-		assert record != null;
+
 		record.setBody("ciao");
-		assert record1 != null;
 		record1.setBody("mondo");
+
+		assertNotNull(record);
+		assertNotNull(record1);
 		assertEquals(record, record1);
 	}
 }
