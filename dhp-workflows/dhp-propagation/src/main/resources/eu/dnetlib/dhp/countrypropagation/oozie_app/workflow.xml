@@ -140,6 +140,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -169,6 +170,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -198,6 +200,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -227,6 +230,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>

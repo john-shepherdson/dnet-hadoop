@@ -261,6 +261,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
@@ -289,6 +292,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
@@ -317,6 +323,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
@@ -345,6 +354,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
