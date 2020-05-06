@@ -95,6 +95,7 @@ public class GenerateEntitiesApplication {
 						.sequenceFile(sp, Text.class, Text.class)
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
 						.map(k -> convertToListOaf(k._1(), k._2(), code2name))
+						.filter(Objects::nonNull)
 						.flatMap(list -> list.iterator()));
 		}
 
