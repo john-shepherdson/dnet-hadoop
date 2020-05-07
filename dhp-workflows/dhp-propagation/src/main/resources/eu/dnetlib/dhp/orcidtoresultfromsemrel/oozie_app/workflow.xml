@@ -114,6 +114,10 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -264,6 +268,7 @@
                 --conf spark.speculation=false
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
