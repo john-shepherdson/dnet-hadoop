@@ -97,7 +97,7 @@ public class SparkCountryPropagationJob3 {
 				.read()
 				.json(inputPath)
 				.as(Encoders.bean(resultClazz))
-				.groupByKey((MapFunction<R, String>) result1 -> result1.getId(), Encoders.STRING())
+				.groupByKey((MapFunction<R, String>) r -> r.getId(), Encoders.STRING())
 				.mapGroups(getCountryMergeFn(resultClazz), Encoders.bean(resultClazz))
 				.write()
 				.option("compression", "gzip")
