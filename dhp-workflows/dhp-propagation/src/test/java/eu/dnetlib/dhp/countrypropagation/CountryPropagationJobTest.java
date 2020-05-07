@@ -266,4 +266,5 @@ public class CountryPropagationJobTest {
 			.assertEquals(
 				7, countryExplodedWithCountryProvenance.filter("_2 = 'propagation'").count());
 	}
+
 }
