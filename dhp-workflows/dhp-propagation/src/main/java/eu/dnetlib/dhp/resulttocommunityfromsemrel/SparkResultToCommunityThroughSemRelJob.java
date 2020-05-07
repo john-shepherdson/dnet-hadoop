@@ -9,30 +9,28 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ximpleware.extended.xpath.parser;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
 import eu.dnetlib.dhp.schema.oaf.*;
+import scala.Tuple2;
 
-public class SparkResultToCommunityThroughSemRelJob4 {
+public class SparkResultToCommunityThroughSemRelJob {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkResultToCommunityThroughSemRelJob4.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final Logger log = LoggerFactory.getLogger(SparkResultToCommunityThroughSemRelJob.class);
 
 	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				SparkResultToCommunityThroughSemRelJob4.class
+				SparkResultToCommunityThroughSemRelJob.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/resulttocommunityfromsemrel/input_communitytoresult_parameters.json"));
 
@@ -87,58 +85,59 @@ public class SparkResultToCommunityThroughSemRelJob4 {
 		String preparedInfoPath,
 		Class<R> resultClazz) {
 
-		org.apache.spark.sql.Dataset<ResultCommunityList> possibleUpdates = readResultCommunityList(
-			spark, preparedInfoPath);
-		org.apache.spark.sql.Dataset<R> result = readPathEntity(spark, inputPath, resultClazz);
+		Dataset<ResultCommunityList> possibleUpdates = readPath(spark, preparedInfoPath, ResultCommunityList.class);
+		Dataset<R> result = readPath(spark, inputPath, resultClazz);
 
 		result
 			.joinWith(
 				possibleUpdates,
 				result.col("id").equalTo(possibleUpdates.col("resultId")),
 				"left_outer")
-			.map(
-				value -> {
-					R ret = value._1();
-					Optional<ResultCommunityList> rcl = Optional.ofNullable(value._2());
-					if (rcl.isPresent()) {
-						Set<String> context_set = new HashSet<>();
-						ret.getContext().stream().forEach(c -> context_set.add(c.getId()));
-						List<Context> contextList = rcl
-							.get()
-							.getCommunityList()
-							.stream()
-							.map(
-								c -> {
-									if (!context_set.contains(c)) {
-										Context newContext = new Context();
-										newContext.setId(c);
-										newContext
-											.setDataInfo(
-												Arrays
-													.asList(
-														getDataInfo(
-															PROPAGATION_DATA_INFO_TYPE,
-															PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID,
-															PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME)));
-										return newContext;
-									}
-									return null;
-								})
-							.filter(c -> c != null)
-							.collect(Collectors.toList());
-						Result r = new Result();
-						r.setId(ret.getId());
-						r.setContext(contextList);
-						ret.mergeFrom(r);
-					}
-
-					return ret;
-				},
-				Encoders.bean(resultClazz))
-			.toJSON()
+			.map(contextUpdaterFn(), Encoders.bean(resultClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.text(outputPath);
+			.json(outputPath);
 	}
+
+	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> contextUpdaterFn() {
+		return (MapFunction<Tuple2<R, ResultCommunityList>, R>) value -> {
+			R ret = value._1();
+			Optional<ResultCommunityList> rcl = Optional.ofNullable(value._2());
+			if (rcl.isPresent()) {
+				Set<String> context_set = new HashSet<>();
+				ret.getContext().stream().forEach(c -> context_set.add(c.getId()));
+				List<Context> contextList = rcl
+					.get()
+					.getCommunityList()
+					.stream()
+					.map(
+						c -> {
+							if (!context_set.contains(c)) {
+								Context newContext = new Context();
+								newContext.setId(c);
+								newContext
+									.setDataInfo(
+										Arrays
+											.asList(
+												getDataInfo(
+													PROPAGATION_DATA_INFO_TYPE,
+													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID,
+													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME)));
+								return newContext;
+							}
+							return null;
+						})
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList());
+				Result r = new Result();
+				r.setId(ret.getId());
+				r.setContext(contextList);
+				ret.mergeFrom(r);
+			}
+
+			return ret;
+		};
+	}
+
 }

@@ -25,7 +25,6 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class PrepareProjectResultsAssociation {
 	private static final Logger log = LoggerFactory.getLogger(PrepareDatasourceCountryAssociation.class);
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -61,8 +60,6 @@ public class PrepareProjectResultsAssociation {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				// removeOutputDir(spark, potentialUpdatePath);
-				// removeOutputDir(spark, alreadyLinkedPath);
 				prepareResultProjProjectResults(
 					spark,
 					inputPath,
@@ -78,28 +75,21 @@ public class PrepareProjectResultsAssociation {
 		String potentialUpdatePath,
 		String alreadyLinkedPath,
 		List<String> allowedsemrel) {
-		JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-		Dataset<Relation> relation = spark
-			.createDataset(
-				sc
-					.textFile(inputPath)
-					.map(item -> OBJECT_MAPPER.readValue(item, Relation.class))
-					.rdd(),
-				Encoders.bean(Relation.class));
 
+		Dataset<Relation> relation = readPath(spark, inputPath, Relation.class);
 		relation.createOrReplaceTempView("relation");
 
-		String query = "SELECT source, target "
+		String resproj_relation_query = "SELECT source, target "
 			+ "       FROM relation "
 			+ "       WHERE datainfo.deletedbyinference = false "
 			+ "       AND relClass = '"
 			+ RELATION_RESULT_PROJECT_REL_CLASS
 			+ "'";
 
-		Dataset<Row> resproj_relation = spark.sql(query);
+		Dataset<Row> resproj_relation = spark.sql(resproj_relation_query);
 		resproj_relation.createOrReplaceTempView("resproj_relation");
 
-		query = "SELECT resultId, collect_set(projectId) projectSet "
+		String potential_update_query = "SELECT resultId, collect_set(projectId) projectSet "
 			+ "FROM ( "
 			+ "SELECT r1.target resultId, r2.target projectId "
 			+ "      FROM (SELECT source, target "
@@ -111,46 +101,26 @@ public class PrepareProjectResultsAssociation {
 			+ "      ON r1.source = r2.source "
 			+ "      ) tmp "
 			+ "GROUP BY resultId ";
-		// query =
-		// "SELECT projectId, collect_set(resId) resultSet "
-		// + "FROM ("
-		// + " SELECT r1.target resId, r2.target projectId "
-		// + " FROM (SELECT source, target "
-		// + " FROM relation "
-		// + " WHERE datainfo.deletedbyinference = false "
-		// + getConstraintList(" relClass = '", allowedsemrel)
-		// + ") r1"
-		// + " JOIN resproj_relation r2 "
-		// + " ON r1.source = r2.source "
-		// + " ) tmp "
-		// + "GROUP BY projectId ";
 
 		spark
-			.sql(query)
+			.sql(potential_update_query)
 			.as(Encoders.bean(ResultProjectSet.class))
-			// .toJSON()
-			// .write()
-			// .mode(SaveMode.Overwrite)
-			// .option("compression", "gzip")
-			// .text(potentialUpdatePath);
-			.toJavaRDD()
-			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-			.saveAsTextFile(potentialUpdatePath, GzipCodec.class);
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(potentialUpdatePath);
 
-		query = "SELECT source resultId, collect_set(target) projectSet "
+		String result_projectset_query = "SELECT source resultId, collect_set(target) projectSet "
 			+ "FROM resproj_relation "
 			+ "GROUP BY source";
 
 		spark
-			.sql(query)
+			.sql(result_projectset_query)
 			.as(Encoders.bean(ResultProjectSet.class))
-			// .toJSON()
-			// .write()
-			// .mode(SaveMode.Overwrite)
-			// .option("compression", "gzip")
-			// .text(alreadyLinkedPath);
-			.toJavaRDD()
-			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-			.saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(alreadyLinkedPath);
 	}
+
 }

@@ -59,10 +59,10 @@ public class PrepareResultOrcidAssociationStep2 {
 
 	private static void mergeInfo(SparkSession spark, String inputPath, String outputPath) {
 
-		Dataset<ResultOrcidList> resultOrcidAssoc = readAssocResultOrcidList(spark, inputPath + "/publication")
-			.union(readAssocResultOrcidList(spark, inputPath + "/dataset"))
-			.union(readAssocResultOrcidList(spark, inputPath + "/otherresearchproduct"))
-			.union(readAssocResultOrcidList(spark, inputPath + "/software"));
+		Dataset<ResultOrcidList> resultOrcidAssoc = readPath(spark, inputPath + "/publication", ResultOrcidList.class)
+			.union(readPath(spark, inputPath + "/dataset", ResultOrcidList.class))
+			.union(readPath(spark, inputPath + "/otherresearchproduct", ResultOrcidList.class))
+			.union(readPath(spark, inputPath + "/software", ResultOrcidList.class));
 
 		resultOrcidAssoc
 			.toJavaRDD()
@@ -77,7 +77,6 @@ public class PrepareResultOrcidAssociationStep2 {
 					}
 					Set<String> orcid_set = new HashSet<>();
 					a.getAuthorList().stream().forEach(aa -> orcid_set.add(aa.getOrcid()));
-
 					b
 						.getAuthorList()
 						.stream()
@@ -95,13 +94,4 @@ public class PrepareResultOrcidAssociationStep2 {
 			.saveAsTextFile(outputPath, GzipCodec.class);
 	}
 
-	private static Dataset<ResultOrcidList> readAssocResultOrcidList(
-		SparkSession spark, String relationPath) {
-		return spark
-			.read()
-			.textFile(relationPath)
-			.map(
-				value -> OBJECT_MAPPER.readValue(value, ResultOrcidList.class),
-				Encoders.bean(ResultOrcidList.class));
-	}
 }

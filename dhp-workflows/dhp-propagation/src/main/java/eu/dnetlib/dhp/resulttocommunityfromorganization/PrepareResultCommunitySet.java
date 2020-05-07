@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +23,6 @@ public class PrepareResultCommunitySet {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareResultCommunitySet.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
@@ -32,7 +31,6 @@ public class PrepareResultCommunitySet {
 						"/eu/dnetlib/dhp/resulttocommunityfromorganization/input_preparecommunitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
@@ -69,7 +67,8 @@ public class PrepareResultCommunitySet {
 		String inputPath,
 		String outputPath,
 		OrganizationMap organizationMap) {
-		Dataset<Relation> relation = readRelations(spark, inputPath);
+
+		Dataset<Relation> relation = readPath(spark, inputPath, Relation.class);
 		relation.createOrReplaceTempView("relation");
 
 		String query = "SELECT result_organization.source resultId, result_organization.target orgId, org_set merges "
@@ -88,46 +87,44 @@ public class PrepareResultCommunitySet {
 			+ "      GROUP BY source) organization_organization "
 			+ "ON result_organization.target = organization_organization.source ";
 
-		org.apache.spark.sql.Dataset<ResultOrganizations> result_organizationset = spark
+		Dataset<ResultOrganizations> result_organizationset = spark
 			.sql(query)
 			.as(Encoders.bean(ResultOrganizations.class));
 
 		result_organizationset
-			.map(
-				value -> {
-					String rId = value.getResultId();
-					Optional<List<String>> orgs = Optional.ofNullable(value.getMerges());
-					String oTarget = value.getOrgId();
-					Set<String> communitySet = new HashSet<>();
-					if (organizationMap.containsKey(oTarget)) {
-						communitySet.addAll(organizationMap.get(oTarget));
-					}
-					if (orgs.isPresent())
-						// try{
-						for (String oId : orgs.get()) {
-							if (organizationMap.containsKey(oId)) {
-								communitySet.addAll(organizationMap.get(oId));
-							}
-						}
-					// }catch(Exception e){
-					//
-					// }
-					if (communitySet.size() > 0) {
-						ResultCommunityList rcl = new ResultCommunityList();
-						rcl.setResultId(rId);
-						ArrayList<String> communityList = new ArrayList<>();
-						communityList.addAll(communitySet);
-						rcl.setCommunityList(communityList);
-						return rcl;
-					}
-					return null;
-				},
-				Encoders.bean(ResultCommunityList.class))
-			.filter(r -> r != null)
-			.toJSON()
+			.map(mapResultCommunityFn(organizationMap), Encoders.bean(ResultCommunityList.class))
+			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.text(outputPath);
+			.json(outputPath);
+	}
+
+	private static MapFunction<ResultOrganizations, ResultCommunityList> mapResultCommunityFn(
+		OrganizationMap organizationMap) {
+		return (MapFunction<ResultOrganizations, ResultCommunityList>) value -> {
+			String rId = value.getResultId();
+			Optional<List<String>> orgs = Optional.ofNullable(value.getMerges());
+			String oTarget = value.getOrgId();
+			Set<String> communitySet = new HashSet<>();
+			if (organizationMap.containsKey(oTarget)) {
+				communitySet.addAll(organizationMap.get(oTarget));
+			}
+			if (orgs.isPresent())
+				for (String oId : orgs.get()) {
+					if (organizationMap.containsKey(oId)) {
+						communitySet.addAll(organizationMap.get(oId));
+					}
+				}
+			if (communitySet.size() > 0) {
+				ResultCommunityList rcl = new ResultCommunityList();
+				rcl.setResultId(rId);
+				ArrayList<String> communityList = new ArrayList<>();
+				communityList.addAll(communitySet);
+				rcl.setCommunityList(communityList);
+				return rcl;
+			}
+			return null;
+		};
 	}
 }

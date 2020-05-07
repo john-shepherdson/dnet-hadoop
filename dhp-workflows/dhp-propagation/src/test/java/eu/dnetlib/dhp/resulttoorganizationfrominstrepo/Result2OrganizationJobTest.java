@@ -39,11 +39,11 @@ public class Result2OrganizationJobTest {
 	public static void beforeAll() throws IOException {
 		workingDir = Files
 			.createTempDirectory(
-				SparkResultToOrganizationFromIstRepoJob2.class.getSimpleName());
+				SparkResultToOrganizationFromIstRepoJob.class.getSimpleName());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
-		conf.setAppName(SparkResultToOrganizationFromIstRepoJob2.class.getSimpleName());
+		conf.setAppName(SparkResultToOrganizationFromIstRepoJob.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
@@ -54,7 +54,7 @@ public class Result2OrganizationJobTest {
 
 		spark = SparkSession
 			.builder()
-			.appName(SparkResultToOrganizationFromIstRepoJob2.class.getSimpleName())
+			.appName(SparkResultToOrganizationFromIstRepoJob.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}
@@ -72,7 +72,7 @@ public class Result2OrganizationJobTest {
 	 */
 	@Test
 	public void NoUpdateTest() throws Exception {
-		SparkResultToOrganizationFromIstRepoJob2
+		SparkResultToOrganizationFromIstRepoJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -123,7 +123,7 @@ public class Result2OrganizationJobTest {
 	 */
 	@Test
 	public void UpdateNoMixTest() throws Exception {
-		SparkResultToOrganizationFromIstRepoJob2
+		SparkResultToOrganizationFromIstRepoJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -197,7 +197,7 @@ public class Result2OrganizationJobTest {
 
 	@Test
 	public void UpdateMixTest() throws Exception {
-		SparkResultToOrganizationFromIstRepoJob2
+		SparkResultToOrganizationFromIstRepoJob
 			.main(
 				new String[] {
 					"-isTest",

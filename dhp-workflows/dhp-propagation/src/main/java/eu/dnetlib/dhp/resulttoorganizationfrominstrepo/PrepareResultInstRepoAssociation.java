@@ -7,7 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -58,8 +58,7 @@ public class PrepareResultInstRepoAssociation {
 			isSparkSessionManaged,
 			spark -> {
 				readNeededResources(spark, inputPath);
-				prepareDatasourceOrganizationAssociations(
-					spark, datasourceOrganizationPath, alreadyLinkedPath);
+				prepareDatasourceOrganization(spark, datasourceOrganizationPath);
 				prepareAlreadyLinkedAssociation(spark, alreadyLinkedPath);
 			});
 	}
@@ -77,45 +76,25 @@ public class PrepareResultInstRepoAssociation {
 		spark
 			.sql(query)
 			.as(Encoders.bean(ResultOrganizationSet.class))
+			// TODO retry to stick with datasets
 			.toJavaRDD()
 			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
 			.saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
 	}
 
 	private static void readNeededResources(SparkSession spark, String inputPath) {
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-
-		org.apache.spark.sql.Dataset<Datasource> datasource = spark
-			.createDataset(
-				sc
-					.textFile(inputPath + "/datasource")
-					.map(item -> new ObjectMapper().readValue(item, Datasource.class))
-					.rdd(),
-				Encoders.bean(Datasource.class));
-
-		org.apache.spark.sql.Dataset<Relation> relation = spark
-			.createDataset(
-				sc
-					.textFile(inputPath + "/relation")
-					.map(item -> new ObjectMapper().readValue(item, Relation.class))
-					.rdd(),
-				Encoders.bean(Relation.class));
-
-		org.apache.spark.sql.Dataset<Organization> organization = spark
-			.createDataset(
-				sc
-					.textFile(inputPath + "/organization")
-					.map(item -> new ObjectMapper().readValue(item, Organization.class))
-					.rdd(),
-				Encoders.bean(Organization.class));
-
+		Dataset<Datasource> datasource = readPath(spark, inputPath + "/datasource", Datasource.class);
 		datasource.createOrReplaceTempView("datasource");
+
+		Dataset<Relation> relation = readPath(spark, inputPath + "/relation", Relation.class);
 		relation.createOrReplaceTempView("relation");
+
+		Dataset<Organization> organization = readPath(spark, inputPath + "/organization", Organization.class);
 		organization.createOrReplaceTempView("organization");
 	}
 
-	private static void prepareDatasourceOrganizationAssociations(
-		SparkSession spark, String datasourceOrganizationPath, String alreadyLinkedPath) {
+	private static void prepareDatasourceOrganization(
+		SparkSession spark, String datasourceOrganizationPath) {
 
 		String query = "SELECT source datasourceId, target organizationId "
 			+ "FROM ( SELECT id "
@@ -135,10 +114,9 @@ public class PrepareResultInstRepoAssociation {
 		spark
 			.sql(query)
 			.as(Encoders.bean(DatasourceOrganization.class))
-			.toJSON()
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.text(datasourceOrganizationPath);
+			.json(datasourceOrganizationPath);
 	}
 }

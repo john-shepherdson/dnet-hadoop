@@ -62,11 +62,11 @@ public class PrepareResultCommunitySetStep2 {
 
 	private static void mergeInfo(SparkSession spark, String inputPath, String outputPath) {
 
-		Dataset<ResultCommunityList> resultOrcidAssocCommunityList = readResultCommunityList(
-			spark, inputPath + "/publication")
-				.union(readResultCommunityList(spark, inputPath + "/dataset"))
-				.union(readResultCommunityList(spark, inputPath + "/otherresearchproduct"))
-				.union(readResultCommunityList(spark, inputPath + "/software"));
+		Dataset<ResultCommunityList> resultOrcidAssocCommunityList = readPath(
+			spark, inputPath + "/publication", ResultCommunityList.class)
+				.union(readPath(spark, inputPath + "/dataset", ResultCommunityList.class))
+				.union(readPath(spark, inputPath + "/otherresearchproduct", ResultCommunityList.class))
+				.union(readPath(spark, inputPath + "/software", ResultCommunityList.class));
 
 		resultOrcidAssocCommunityList
 			.toJavaRDD()
@@ -80,9 +80,7 @@ public class PrepareResultCommunitySetStep2 {
 						return a;
 					}
 					Set<String> community_set = new HashSet<>();
-
 					a.getCommunityList().stream().forEach(aa -> community_set.add(aa));
-
 					b
 						.getCommunityList()
 						.stream()
@@ -100,13 +98,4 @@ public class PrepareResultCommunitySetStep2 {
 			.saveAsTextFile(outputPath, GzipCodec.class);
 	}
 
-	private static Dataset<ResultCommunityList> readResultCommunityList(
-		SparkSession spark, String relationPath) {
-		return spark
-			.read()
-			.textFile(relationPath)
-			.map(
-				value -> OBJECT_MAPPER.readValue(value, ResultCommunityList.class),
-				Encoders.bean(ResultCommunityList.class));
-	}
 }

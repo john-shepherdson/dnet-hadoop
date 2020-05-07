@@ -19,27 +19,22 @@
 
     </parameters>
 
-    <start to="reset-outputpath"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="reset-outputpath">
+    <action name="reset_outputpath">
         <fs>
-            <delete path='${workingDir}/preparedInfo'/>
-            <delete path='${workingDir}/publication'/>
-            <delete path='${workingDir}/dataset'/>
-            <delete path='${workingDir}/otherresearchproduct'/>
-            <delete path='${workingDir}/software'/>
-            <delete path='${outputPath}/relation'/>
-            <delete path='${outputPath}/dataset'/>
-            <delete path='${outputPath}/software'/>
-            <delete path='${outputPath}/publication'/>
-            <delete path='${outputPath}/otherresearchproduct'/>
-            <delete path='${outputPath}/project'/>
-            <delete path='${outputPath}/organization'/>
-            <delete path='${outputPath}/datasource'/>
+            <delete path="${outputPath}/relation"/>
+            <delete path="${outputPath}/dataset"/>
+            <delete path="${outputPath}/software"/>
+            <delete path="${outputPath}/publication"/>
+            <delete path="${outputPath}/otherresearchproduct"/>
+            <delete path="${outputPath}/project"/>
+            <delete path="${outputPath}/organization"/>
+            <delete path="${outputPath}/datasource"/>
         </fs>
         <ok to="copy_entities"/>
         <error to="Kill"/>
@@ -50,11 +45,8 @@
         <path start="copy_organization"/>
         <path start="copy_projects"/>
         <path start="copy_datasources"/>
-        <path start="copy_publication"/>
-        <path start="copy_dataset"/>
-        <path start="copy_orp"/>
-        <path start="copy_software"/>
     </fork>
+
     <action name="copy_relation">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -98,50 +90,6 @@
         <error to="Kill"/>
     </action>
 
-    <action name="copy_publication">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/publication</arg>
-            <arg>${nameNode}/${workingDir}/publication</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_dataset">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/dataset</arg>
-            <arg>${nameNode}/${workingDir}/dataset</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_orp">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/otherresearchproduct</arg>
-            <arg>${nameNode}/${workingDir}/otherresearchproduct</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_software">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/software</arg>
-            <arg>${nameNode}/${workingDir}/software</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
     <join name="copy_wait" to="prepare_datasource_country_association"/>
 
     <action name="prepare_datasource_country_association">
@@ -159,7 +107,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=300
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--whitelist</arg><arg>${whitelist}</arg>
@@ -198,7 +146,8 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/publication</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
@@ -227,7 +176,8 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/dataset</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
@@ -256,7 +206,8 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
@@ -285,7 +236,8 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/software</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
@@ -308,7 +260,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>countryPropagationForPublications</name>
-            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob3</class>
+            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -323,7 +275,8 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/publication</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/publication</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
@@ -337,7 +290,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>countryPropagationForDataset</name>
-            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob3</class>
+            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -352,7 +305,8 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/dataset</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/dataset</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
@@ -366,7 +320,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>countryPropagationForORP</name>
-            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob3</class>
+            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -381,7 +335,8 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/otherresearchproduct</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
@@ -395,7 +350,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>countryPropagationForSoftware</name>
-            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob3</class>
+            <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -410,7 +365,8 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/software</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/software</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>

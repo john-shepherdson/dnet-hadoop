@@ -78,7 +78,7 @@ public class ResultToCommunityJobTest {
 
 	@Test
 	public void test1() throws Exception {
-		SparkResultToCommunityThroughSemRelJob4
+		SparkResultToCommunityThroughSemRelJob
 			.main(
 				new String[] {
 					"-isTest", Boolean.TRUE.toString(),

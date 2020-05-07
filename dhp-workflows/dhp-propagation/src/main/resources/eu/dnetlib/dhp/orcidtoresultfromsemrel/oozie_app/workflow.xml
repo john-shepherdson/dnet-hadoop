@@ -253,7 +253,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>ORCIDPropagation-Publication</name>
-            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob3</class>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -285,7 +285,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>ORCIDPropagation-Dataset</name>
-            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob3</class>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -316,7 +316,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>ORCIDPropagation-ORP</name>
-            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob3</class>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -347,7 +347,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>ORCIDPropagation-Software</name>
-            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob3</class>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
