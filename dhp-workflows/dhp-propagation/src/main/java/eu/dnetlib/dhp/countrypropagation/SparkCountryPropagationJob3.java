@@ -4,10 +4,8 @@ package eu.dnetlib.dhp.countrypropagation;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -17,6 +15,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -27,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Country;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -71,6 +71,7 @@ public class SparkCountryPropagationJob3 {
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
+		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
 		runWithSparkSession(
 			conf,
@@ -96,50 +97,51 @@ public class SparkCountryPropagationJob3 {
 		if (saveGraph) {
 			// updateResultTable(spark, potentialUpdates, inputPath, resultClazz, outputPath);
 			log.info("Reading Graph table from: {}", inputPath);
-			final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-			JavaPairRDD<String, R> results = sc
-				.textFile(inputPath)
-				.map(r -> OBJECT_MAPPER.readValue(r, resultClazz))
-				.mapToPair(r -> new Tuple2<>(r.getId(), r));
 
-			JavaPairRDD<String, R> tmp = results.reduceByKey((r1, r2) -> {
-				if (r1 == null) {
-					return r2;
-				}
-				if (r2 == null) {
-					return r1;
-				}
-				if (Optional.ofNullable(r1.getCollectedfrom()).isPresent()) {
-					r1.setCountry(getUnionCountries(r1.getCountry(), r2.getCountry()));
-					return r1;
-				}
-				if (Optional.ofNullable(r2.getCollectedfrom()).isPresent()) {
-					r2.setCountry(getUnionCountries(r1.getCountry(), r2.getCountry()));
-					return r2;
-				}
-				r1.setCountry(getUnionCountries(r1.getCountry(), r2.getCountry()));
-				return r1;
-			});
-
-			tmp
-				.map(c -> c._2())
-				.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-				.saveAsTextFile(outputPath, GzipCodec.class);
+			spark
+				.read()
+				.json(inputPath)
+				.as(Encoders.kryo(resultClazz))
+				.groupByKey((MapFunction<R, String>) result1 -> result1.getId(), Encoders.STRING())
+				.mapGroups(getCountryMergeFn(resultClazz), Encoders.bean(resultClazz))
+				.write()
+				.option("compression", "gzip")
+				.mode(SaveMode.Overwrite)
+				.json(outputPath);
 		}
 	}
 
-	private static List<Country> getUnionCountries(List<Country> country, List<Country> country1) {
-		HashSet<String> countries = country
-			.stream()
-			.map(c -> c.getClassid())
-			.collect(Collectors.toCollection(HashSet::new));
-		country
-			.addAll(
-				country1
-					.stream()
-					.filter(c -> !(countries.contains(c.getClassid())))
-					.collect(Collectors.toList()));
-		return country;
+	private static <R extends Result> MapGroupsFunction<String, R, R> getCountryMergeFn(Class<R> resultClazz) {
+		return (MapGroupsFunction<String, R, R>) (key, values) -> {
+			R res = resultClazz.newInstance();
+			List<Country> countries = new ArrayList<>();
+			values.forEachRemaining(r -> {
+				res.mergeFrom(r);
+				countries.addAll(r.getCountry());
+			});
+			res
+				.setCountry(
+					countries
+						.stream()
+						.collect(
+							Collectors
+								.toMap(
+									Country::getClassid,
+									Function.identity(),
+									(c1, c2) -> {
+										if (Optional
+											.ofNullable(
+												c1.getDataInfo().getInferenceprovenance())
+											.isPresent()) {
+											return c2;
+										}
+										return c1;
+									}))
+						.values()
+						.stream()
+						.collect(Collectors.toList()));
+			return res;
+		};
 	}
 
 }
