@@ -522,7 +522,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 				final String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1].trim() : null;
 
 				final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2].trim() : null;
-				
+
 				if (issn != null || eissn != null || lissn != null) {
 					return journal(name, issn, eissn, eissn, null, null, null, null, null, null, null, info);
 				}
