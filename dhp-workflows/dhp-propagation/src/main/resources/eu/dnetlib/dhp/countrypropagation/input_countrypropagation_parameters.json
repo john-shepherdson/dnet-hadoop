@@ -9,7 +9,7 @@
     "paramName":"h",
     "paramLongName":"hive_metastore_uris",
     "paramDescription": "the hive metastore uris",
-    "paramRequired": true
+    "paramRequired": false
   },
   {
     "paramName":"sg",
@@ -33,7 +33,7 @@
     "paramName": "p",
     "paramLongName": "preparedInfoPath",
     "paramDescription": "the path where prepared info have been stored",
-    "paramRequired": true
+    "paramRequired": false
   },
   {
     "paramName": "ssm",
