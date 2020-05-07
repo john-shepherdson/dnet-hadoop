@@ -28,6 +28,7 @@
         <module>dhp-dedup-scholexplorer</module>
         <module>dhp-graph-provision-scholexplorer</module>
         <module>dhp-stats-update</module>
+        <module>dhp-broker-events</module>
     </modules>
 
     <pluginRepositories>

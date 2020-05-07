@@ -75,11 +75,19 @@
         </configuration>
     </global>
 
-    <start to="CreateSimRel"/>
+    <start to="resetWorkingPath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="resetWorkingPath">
+        <fs>
+            <delete path="${workingPath}"/>
+        </fs>
+        <ok to="CreateSimRel"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="CreateSimRel">
         <spark xmlns="uri:oozie:spark-action:0.2">
