@@ -71,7 +71,6 @@ public class SparkCountryPropagationJob3 {
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
-		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
 		runWithSparkSession(
 			conf,
@@ -101,7 +100,7 @@ public class SparkCountryPropagationJob3 {
 			spark
 				.read()
 				.json(inputPath)
-				.as(Encoders.kryo(resultClazz))
+				.as(Encoders.bean(resultClazz))
 				.groupByKey((MapFunction<R, String>) result1 -> result1.getId(), Encoders.STRING())
 				.mapGroups(getCountryMergeFn(resultClazz), Encoders.bean(resultClazz))
 				.write()
