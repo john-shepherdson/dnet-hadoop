@@ -127,7 +127,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>community2resultfromorganization-Publication</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob2</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -155,7 +155,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>community2resultfromorganization-Dataset</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob2</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -183,7 +183,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>community2resultfromorganization-ORP</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob2</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -211,7 +211,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>community2resultfromorganization-Software</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob2</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}

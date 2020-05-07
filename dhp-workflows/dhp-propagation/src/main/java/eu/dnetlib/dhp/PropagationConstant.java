@@ -1,12 +1,11 @@
 
 package eu.dnetlib.dhp;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -66,6 +65,12 @@ public class PropagationConstant {
 	public static final String PROPAGATION_AUTHOR_PID = "ORCID";
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	private static final String cfHbforResultQuery = "select distinct r.id, inst.collectedfrom.key cf, inst.hostedby.key hb "
+		+
+		"from result r " +
+		"lateral view explode(instance) i as inst " +
+		"where r.datainfo.deletedbyinference=false";
 
 	public static Country getCountry(String classid, String classname) {
 		Country nc = new Country();
@@ -130,13 +135,6 @@ public class PropagationConstant {
 		return ret;
 	}
 
-	public static void createOutputDirs(String outputPath, FileSystem fs) throws IOException {
-		if (fs.exists(new Path(outputPath))) {
-			fs.delete(new Path(outputPath), true);
-		}
-		fs.mkdirs(new Path(outputPath));
-	}
-
 	public static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
@@ -155,50 +153,17 @@ public class PropagationConstant {
 			.orElse(Boolean.FALSE);
 	}
 
-	public static void createCfHbforresult(SparkSession spark) {
-		String query;
-//		query = "SELECT id, inst.collectedfrom.key cf , inst.hostedby.key hb "
-//			+ "FROM ( SELECT id, instance "
-//			+ "FROM result "
-//			+ " WHERE datainfo.deletedbyinference = false)  ds "
-//			+ "LATERAL VIEW EXPLODE(instance) i AS inst";
-		query = "select distinct r.id, inst.collectedfrom.key cf, inst.hostedby.key hb " +
-			"from result r " +
-			"lateral view explode(instance) i as inst " +
-			"where r.datainfo.deletedbyinference=false";
-
-		org.apache.spark.sql.Dataset<Row> cfhb = spark.sql(query);
+	public static void createCfHbforResult(SparkSession spark) {
+		org.apache.spark.sql.Dataset<Row> cfhb = spark.sql(cfHbforResultQuery);
 		cfhb.createOrReplaceTempView("cfhb");
 	}
 
-	public static <R extends Result> org.apache.spark.sql.Dataset<R> readPathEntity(
-		SparkSession spark, String inputEntityPath, Class<R> resultClazz) {
-
-		return spark
-			.read()
-			.textFile(inputEntityPath)
-			.map(
-				(MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, resultClazz),
-				Encoders.bean(resultClazz));
-	}
-
-	public static org.apache.spark.sql.Dataset<Relation> readRelations(
-		SparkSession spark, String inputPath) {
+	public static <R> Dataset<R> readPath(
+		SparkSession spark, String inputPath, Class<R> clazz) {
 		return spark
 			.read()
 			.textFile(inputPath)
-			.map(
-				(MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
-				Encoders.bean(Relation.class));
+			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
-	public static org.apache.spark.sql.Dataset<ResultCommunityList> readResultCommunityList(
-		SparkSession spark, String possibleUpdatesPath) {
-		return spark
-			.read()
-			.textFile(possibleUpdatesPath)
-			.map(
-				value -> OBJECT_MAPPER.readValue(value, ResultCommunityList.class),
-				Encoders.bean(ResultCommunityList.class));
-	}
 }

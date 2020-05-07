@@ -22,21 +22,18 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.community.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 
-public class SparkBulkTagJob2 {
+public class SparkBulkTagJob {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkBulkTagJob2.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final Logger log = LoggerFactory.getLogger(SparkBulkTagJob.class);
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
-				SparkBulkTagJob2.class
+				SparkBulkTagJob.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/bulktag/input_bulkTag_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = Optional
@@ -58,7 +55,6 @@ public class SparkBulkTagJob2 {
 		log.info("outputPath: {}", outputPath);
 
 		ProtoMap protoMappingParams = new Gson().fromJson(parser.get("pathMap"), ProtoMap.class);
-		;
 		log.info("pathMap: {}", new Gson().toJson(protoMappingParams));
 
 		final String resultClassName = parser.get("resultTableName");
@@ -89,45 +85,6 @@ public class SparkBulkTagJob2 {
 			spark -> {
 				execBulkTag(spark, inputPath, outputPath, protoMappingParams, resultClazz, cc);
 			});
-
-		// runWithSparkSession(conf, isSparkSessionManaged,
-		// spark -> {
-		// if(isTest(parser)) {
-		// removeOutputDir(spark, outputPath);
-		// }
-		// if(saveGraph)
-		// execPropagation(spark, possibleUpdates, inputPath, outputPath,
-		// resultClazz);
-		// });
-		//
-		//
-		//
-		//
-		//
-		//
-		// sc.textFile(inputPath + "/publication")
-		// .map(item -> new ObjectMapper().readValue(item, Publication.class))
-		// .map(p -> resultTagger.enrichContextCriteria(p, cc, protoMappingParams))
-		// .map(p -> new ObjectMapper().writeValueAsString(p))
-		// .saveAsTextFile(outputPath+"/publication");
-		// sc.textFile(inputPath + "/dataset")
-		// .map(item -> new ObjectMapper().readValue(item, Dataset.class))
-		// .map(p -> resultTagger.enrichContextCriteria(p, cc, protoMappingParams))
-		// .map(p -> new ObjectMapper().writeValueAsString(p))
-		// .saveAsTextFile(outputPath+"/dataset");
-		// sc.textFile(inputPath + "/software")
-		// .map(item -> new ObjectMapper().readValue(item, Software.class))
-		// .map(p -> resultTagger.enrichContextCriteria(p, cc, protoMappingParams))
-		// .map(p -> new ObjectMapper().writeValueAsString(p))
-		// .saveAsTextFile(outputPath+"/software");
-		// sc.textFile(inputPath + "/otherresearchproduct")
-		// .map(item -> new ObjectMapper().readValue(item,
-		// OtherResearchProduct.class))
-		// .map(p -> resultTagger.enrichContextCriteria(p, cc, protoMappingParams))
-		// .map(p -> new ObjectMapper().writeValueAsString(p))
-		// .saveAsTextFile(outputPath+"/otherresearchproduct");
-		//
-
 	}
 
 	private static <R extends Result> void execBulkTag(
@@ -139,28 +96,23 @@ public class SparkBulkTagJob2 {
 		CommunityConfiguration communityConfiguration) {
 
 		ResultTagger resultTagger = new ResultTagger();
-		Dataset<R> result = readPathEntity(spark, inputPath, resultClazz);
-		result
-			.map(
-				value -> resultTagger
+		readPath(spark, inputPath, resultClazz)
+			.map((MapFunction<R, R>) value -> resultTagger
 					.enrichContextCriteria(
-						value, communityConfiguration, protoMappingParams),
-				Encoders.bean(resultClazz))
-			.toJSON()
+							value, communityConfiguration, protoMappingParams),
+					Encoders.bean(resultClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.text(outputPath);
+			.json(outputPath);
 	}
 
-	private static <R extends Result> org.apache.spark.sql.Dataset<R> readPathEntity(
-		SparkSession spark, String inputEntityPath, Class<R> resultClazz) {
-
+	private static <R> Dataset<R> readPath(
+		SparkSession spark, String inputEntityPath, Class<R> clazz) {
 		return spark
 			.read()
-			.textFile(inputEntityPath)
-			.map(
-				(MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, resultClazz),
-				Encoders.bean(resultClazz));
+			.json(inputEntityPath)
+			.as(Encoders.bean(clazz));
 	}
+
 }

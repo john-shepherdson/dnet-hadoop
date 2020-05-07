@@ -72,7 +72,7 @@ public class ProjectPropagationJobTest {
 	@Test
 	public void NoUpdateTest() throws Exception {
 
-		SparkResultToProjectThroughSemRelJob3
+		SparkResultToProjectThroughSemRelJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -115,7 +115,7 @@ public class ProjectPropagationJobTest {
 	 */
 	@Test
 	public void UpdateTenTest() throws Exception {
-		SparkResultToProjectThroughSemRelJob3
+		SparkResultToProjectThroughSemRelJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -194,7 +194,7 @@ public class ProjectPropagationJobTest {
 	 */
 	@Test
 	public void UpdateMixTest() throws Exception {
-		SparkResultToProjectThroughSemRelJob3
+		SparkResultToProjectThroughSemRelJob
 			.main(
 				new String[] {
 					"-isTest",

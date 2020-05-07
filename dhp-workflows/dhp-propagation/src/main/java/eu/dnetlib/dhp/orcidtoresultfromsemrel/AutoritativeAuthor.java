@@ -2,10 +2,11 @@
 package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
 public class AutoritativeAuthor {
-	String name;
-	String surname;
-	String fullname;
-	String orcid;
+
+	private String name;
+	private String surname;
+	private String fullname;
+	private String orcid;
 
 	public String getName() {
 		return name;
@@ -38,4 +39,5 @@ public class AutoritativeAuthor {
 	public void setOrcid(String orcid) {
 		this.orcid = orcid;
 	}
+
 }

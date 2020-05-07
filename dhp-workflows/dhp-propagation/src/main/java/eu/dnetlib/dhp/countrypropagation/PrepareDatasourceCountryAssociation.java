@@ -13,6 +13,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class PrepareDatasourceCountryAssociation {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareDatasourceCountryAssociation.class);
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -80,31 +80,10 @@ public class PrepareDatasourceCountryAssociation {
 		for (String i : whitelist) {
 			whitelisted += " OR id = '" + i + "'";
 		}
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-		Dataset<Datasource> datasource = spark
-			.createDataset(
-				sc
-					.textFile(inputPath + "/datasource")
-					.map(item -> OBJECT_MAPPER.readValue(item, Datasource.class))
-					.rdd(),
-				Encoders.bean(Datasource.class));
-
-		Dataset<Relation> relation = spark
-			.createDataset(
-				sc
-					.textFile(inputPath + "/relation")
-					.map(item -> OBJECT_MAPPER.readValue(item, Relation.class))
-					.rdd(),
-				Encoders.bean(Relation.class));
-
-		Dataset<Organization> organization = spark
-			.createDataset(
-				sc
-					.textFile(inputPath + "/organization")
-					.map(item -> OBJECT_MAPPER.readValue(item, Organization.class))
-					.rdd(),
-				Encoders.bean(Organization.class));
+		Dataset<Datasource> datasource = readPath(spark, inputPath + "/datasource", Datasource.class);
+		Dataset<Relation> relation = readPath(spark, inputPath + "/relation", Relation.class);
+		Dataset<Organization> organization = readPath(spark, inputPath + "/organization", Organization.class);
 
 		datasource.createOrReplaceTempView("datasource");
 		relation.createOrReplaceTempView("relation");
@@ -128,14 +107,15 @@ public class PrepareDatasourceCountryAssociation {
 			+ "JOIN (SELECT id, country "
 			+ "      FROM organization "
 			+ "      WHERE datainfo.deletedbyinference = false "
-			+ "      AND length(country.classid)>0) o "
+			+ "      AND length(country.classid) > 0) o "
 			+ "ON o.id = rel.target";
 
 		spark
 			.sql(query)
 			.as(Encoders.bean(DatasourceCountry.class))
-			.toJavaRDD()
-			.map(c -> OBJECT_MAPPER.writeValueAsString(c))
-			.saveAsTextFile(outputPath, GzipCodec.class);
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath);
 	}
 }

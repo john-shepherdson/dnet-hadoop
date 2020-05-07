@@ -67,8 +67,8 @@ public class ResultToCommunityJobTest {
 	}
 
 	@Test
-	public void test1() throws Exception {
-		SparkResultToCommunityFromOrganizationJob2
+	public void testSparkResultToCommunityFromOrganizationJob() throws Exception {
+		SparkResultToCommunityFromOrganizationJob
 			.main(
 				new String[] {
 					"-isTest",

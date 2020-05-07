@@ -6,6 +6,12 @@
     "paramRequired": true
   },
   {
+    "paramName":"out",
+    "paramLongName":"outputPath",
+    "paramDescription": "the output path",
+    "paramRequired": true
+  },
+  {
     "paramName":"h",
     "paramLongName":"hive_metastore_uris",
     "paramDescription": "the hive metastore uris",

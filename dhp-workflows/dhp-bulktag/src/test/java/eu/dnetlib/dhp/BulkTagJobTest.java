@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.bulktag.SparkBulkTagJob2;
+import eu.dnetlib.dhp.bulktag.SparkBulkTagJob;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Publication;
@@ -84,7 +84,7 @@ public class BulkTagJobTest {
 
 	@Test
 	public void noUpdatesTest() throws Exception {
-		SparkBulkTagJob2
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -134,7 +134,7 @@ public class BulkTagJobTest {
 
 	@Test
 	public void bulktagBySubjectNoPreviousContextTest() throws Exception {
-		SparkBulkTagJob2
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -240,7 +240,7 @@ public class BulkTagJobTest {
 
 	@Test
 	public void bulktagBySubjectPreviousContextNoProvenanceTest() throws Exception {
-		SparkBulkTagJob2
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -332,7 +332,7 @@ public class BulkTagJobTest {
 
 	@Test
 	public void bulktagByDatasourceTest() throws Exception {
-		SparkBulkTagJob2
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -415,7 +415,7 @@ public class BulkTagJobTest {
 
 	@Test
 	public void bulktagByZenodoCommunityTest() throws Exception {
-		SparkBulkTagJob2
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -548,7 +548,7 @@ public class BulkTagJobTest {
 
 	@Test
 	public void bulktagBySubjectDatasourceTest() throws Exception {
-		SparkBulkTagJob2
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -688,7 +688,7 @@ public class BulkTagJobTest {
 	@Test
 	public void bulktagBySubjectDatasourceZenodoCommunityTest() throws Exception {
 
-		SparkBulkTagJob2
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -796,7 +796,7 @@ public class BulkTagJobTest {
 	@Test
 	public void bulktagDatasourcewithConstraintsTest() throws Exception {
 
-		SparkBulkTagJob2
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isTest",

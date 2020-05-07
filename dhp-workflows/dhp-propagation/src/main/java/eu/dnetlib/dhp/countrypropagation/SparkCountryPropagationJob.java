@@ -5,17 +5,11 @@ import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -26,15 +20,13 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Country;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
 
-public class SparkCountryPropagationJob3 {
+public class SparkCountryPropagationJob {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkCountryPropagationJob3.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkCountryPropagationJob.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -42,7 +34,7 @@ public class SparkCountryPropagationJob3 {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				SparkCountryPropagationJob3.class
+				SparkCountryPropagationJob.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/countrypropagation/input_countrypropagation_parameters.json"));
 
@@ -53,8 +45,11 @@ public class SparkCountryPropagationJob3 {
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		String inputPath = parser.get("sourcePath");
-		log.info("inputPath: {}", inputPath);
+		String sourcePath = parser.get("sourcePath");
+		log.info("sourcePath: {}", sourcePath);
+
+		String preparedInfoPath = parser.get("preparedInfoPath");
+		log.info("preparedInfoPath: {}", preparedInfoPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -76,7 +71,8 @@ public class SparkCountryPropagationJob3 {
 			isSparkSessionManaged,
 			spark -> execPropagation(
 				spark,
-				inputPath,
+				sourcePath,
+				preparedInfoPath,
 				outputPath,
 				resultClazz,
 				saveGraph));
@@ -84,21 +80,26 @@ public class SparkCountryPropagationJob3 {
 
 	private static <R extends Result> void execPropagation(
 		SparkSession spark,
-		String inputPath,
+		String sourcePath,
+		String preparedInfoPath,
 		String outputPath,
 		Class<R> resultClazz,
 		boolean saveGraph) {
 
 		if (saveGraph) {
 			// updateResultTable(spark, potentialUpdates, inputPath, resultClazz, outputPath);
-			log.info("Reading Graph table from: {}", inputPath);
+			log.info("Reading Graph table from: {}", sourcePath);
+			Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
-			spark
+			log.info("Reading prepared info: {}", preparedInfoPath);
+			Dataset<ResultCountrySet> prepared = spark
 				.read()
-				.json(inputPath)
-				.as(Encoders.bean(resultClazz))
-				.groupByKey((MapFunction<R, String>) r -> r.getId(), Encoders.STRING())
-				.mapGroups(getCountryMergeFn(resultClazz), Encoders.bean(resultClazz))
+				.json(preparedInfoPath)
+				.as(Encoders.bean(ResultCountrySet.class));
+
+			res
+				.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
+				.map(getCountryMergeFn(), Encoders.bean(resultClazz))
 				.write()
 				.option("compression", "gzip")
 				.mode(SaveMode.Overwrite)
@@ -106,37 +107,26 @@ public class SparkCountryPropagationJob3 {
 		}
 	}
 
-	private static <R extends Result> MapGroupsFunction<String, R, R> getCountryMergeFn(Class<R> resultClazz) {
-		return (MapGroupsFunction<String, R, R>) (key, values) -> {
-			R res = resultClazz.newInstance();
-			List<Country> countries = new ArrayList<>();
-			values.forEachRemaining(r -> {
-				res.mergeFrom(r);
-				countries.addAll(r.getCountry());
+	private static <R extends Result> MapFunction<Tuple2<R, ResultCountrySet>, R> getCountryMergeFn() {
+		return (MapFunction<Tuple2<R, ResultCountrySet>, R>) t -> {
+			Optional.ofNullable(t._2()).ifPresent(r -> {
+				t._1().getCountry().addAll(merge(t._1().getCountry(), r.getCountrySet()));
 			});
-			res
-				.setCountry(
-					countries
-						.stream()
-						.collect(
-							Collectors
-								.toMap(
-									Country::getClassid,
-									Function.identity(),
-									(c1, c2) -> {
-										if (Optional
-											.ofNullable(
-												c1.getDataInfo().getInferenceprovenance())
-											.isPresent()) {
-											return c2;
-										}
-										return c1;
-									}))
-						.values()
-						.stream()
-						.collect(Collectors.toList()));
-			return res;
+			return t._1();
 		};
+	}
+
+	private static List<Country> merge(List<Country> c1, List<CountrySbs> c2) {
+		HashSet<String> countries = c1
+			.stream()
+			.map(c -> c.getClassid())
+			.collect(Collectors.toCollection(HashSet::new));
+
+		return c2
+			.stream()
+			.filter(c -> !countries.contains(c.getClassid()))
+			.map(c -> getCountry(c.getClassid(), c.getClassname()))
+			.collect(Collectors.toList());
 	}
 
 }

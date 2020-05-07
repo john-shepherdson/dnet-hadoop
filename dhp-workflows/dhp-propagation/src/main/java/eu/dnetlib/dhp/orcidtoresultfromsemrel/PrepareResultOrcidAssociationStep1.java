@@ -13,6 +13,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,17 +28,14 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 public class PrepareResultOrcidAssociationStep1 {
 	private static final Logger log = LoggerFactory.getLogger(PrepareResultOrcidAssociationStep1.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
 	public static void main(String[] args) throws Exception {
-		String jsonConfiguration = IOUtils
+		String jsonConf = IOUtils
 			.toString(
-				SparkOrcidToResultFromSemRelJob3.class
+				PrepareResultOrcidAssociationStep1.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_prepareorcidtoresult_parameters.json"));
 
-		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConf);
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
@@ -63,6 +61,15 @@ public class PrepareResultOrcidAssociationStep1 {
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
+		String inputRelationPath = inputPath + "/relation";
+		log.info("inputRelationPath: {}", inputRelationPath);
+
+		String inputResultPath = inputPath + "/" + resultType;
+		log.info("inputResultPath: {}", inputResultPath);
+
+		String outputResultPath = outputPath + "/" + resultType;
+		log.info("outputResultPath: {}", outputResultPath);
+
 		runWithSparkHiveSession(
 			conf,
 			isSparkSessionManaged,
@@ -71,39 +78,25 @@ public class PrepareResultOrcidAssociationStep1 {
 					removeOutputDir(spark, outputPath);
 				}
 				prepareInfo(
-					spark, inputPath, outputPath, resultClazz, resultType, allowedsemrel);
+					spark, inputRelationPath, inputResultPath, outputResultPath, resultClazz, allowedsemrel);
 			});
 	}
 
 	private static <R extends Result> void prepareInfo(
 		SparkSession spark,
-		String inputPath,
-		String outputPath,
+		String inputRelationPath,
+		String inputResultPath,
+		String outputResultPath,
 		Class<R> resultClazz,
-		String resultType,
 		List<String> allowedsemrel) {
 
-		// read the relation table and the table related to the result it is using
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-		org.apache.spark.sql.Dataset<Relation> relation = spark
-			.createDataset(
-				sc
-					.textFile(inputPath + "/relation")
-					.map(item -> OBJECT_MAPPER.readValue(item, Relation.class))
-					.rdd(),
-				Encoders.bean(Relation.class));
+		Dataset<Relation> relation = readPath(spark, inputRelationPath, Relation.class);
 		relation.createOrReplaceTempView("relation");
 
-		log.info("Reading Graph table from: {}", inputPath + "/" + resultType);
-		Dataset<R> result = readPathEntity(spark, inputPath + "/" + resultType, resultClazz);
-
+		log.info("Reading Graph table from: {}", inputResultPath);
+		Dataset<R> result = readPath(spark, inputResultPath, resultClazz);
 		result.createOrReplaceTempView("result");
 
-		getPossibleResultOrcidAssociation(spark, allowedsemrel, outputPath + "/" + resultType);
-	}
-
-	private static void getPossibleResultOrcidAssociation(
-		SparkSession spark, List<String> allowedsemrel, String outputPath) {
 		String query = " select target resultId, author authorList"
 			+ " from (select id, collect_set(named_struct('name', name, 'surname', surname, 'fullname', fullname, 'orcid', orcid)) author "
 			+ " from ( "
@@ -120,18 +113,13 @@ public class PrepareResultOrcidAssociationStep1 {
 			+ getConstraintList(" relclass = '", allowedsemrel)
 			+ ") rel_rel "
 			+ " on source = id";
-
 		spark
 			.sql(query)
 			.as(Encoders.bean(ResultOrcidList.class))
-			.toJavaRDD()
-			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-			.saveAsTextFile(outputPath, GzipCodec.class);
-		// .toJSON()
-		// .write()
-		// .mode(SaveMode.Append)
-		// .option("compression","gzip")
-		// .text(outputPath)
-		// ;
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputResultPath);
 	}
+
 }

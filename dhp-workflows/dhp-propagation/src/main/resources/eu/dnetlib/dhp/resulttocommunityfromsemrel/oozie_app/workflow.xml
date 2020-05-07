@@ -252,7 +252,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Result2CommunitySemRelPropagation-Publication</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob4</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -280,7 +280,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Result2CommunitySemRelPropagation-Dataset</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob4</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -308,7 +308,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Result2CommunitySemRelPropagation-ORP</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob4</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -336,7 +336,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Result2CommunitySemRelPropagation-Software</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob4</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-propagation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}

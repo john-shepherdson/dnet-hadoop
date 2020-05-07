@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -19,17 +21,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
+import scala.Tuple2;
 
-public class SparkResultToCommunityFromOrganizationJob2 {
+public class SparkResultToCommunityFromOrganizationJob {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkResultToCommunityFromOrganizationJob2.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final Logger log = LoggerFactory.getLogger(SparkResultToCommunityFromOrganizationJob.class);
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
-				SparkResultToCommunityFromOrganizationJob2.class
+				SparkResultToCommunityFromOrganizationJob.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/resulttocommunityfromorganization/input_communitytoresult_parameters.json"));
 
@@ -81,54 +82,56 @@ public class SparkResultToCommunityFromOrganizationJob2 {
 		String outputPath,
 		Class<R> resultClazz,
 		String possibleUpdatesPath) {
-		org.apache.spark.sql.Dataset<ResultCommunityList> possibleUpdates = readResultCommunityList(
-			spark, possibleUpdatesPath);
-		org.apache.spark.sql.Dataset<R> result = readPathEntity(spark, inputPath, resultClazz);
+
+		Dataset<ResultCommunityList> possibleUpdates = readPath(spark, possibleUpdatesPath, ResultCommunityList.class);
+		Dataset<R> result = readPath(spark, inputPath, resultClazz);
 
 		result
 			.joinWith(
 				possibleUpdates,
 				result.col("id").equalTo(possibleUpdates.col("resultId")),
 				"left_outer")
-			.map(
-				value -> {
-					R ret = value._1();
-					Optional<ResultCommunityList> rcl = Optional.ofNullable(value._2());
-					if (rcl.isPresent()) {
-						ArrayList<String> communitySet = rcl.get().getCommunityList();
-						List<String> contextList = ret
-							.getContext()
-							.stream()
-							.map(con -> con.getId())
-							.collect(Collectors.toList());
-						Result res = new Result();
-						res.setId(ret.getId());
-						List<Context> propagatedContexts = new ArrayList<>();
-						for (String cId : communitySet) {
-							if (!contextList.contains(cId)) {
-								Context newContext = new Context();
-								newContext.setId(cId);
-								newContext
-									.setDataInfo(
-										Arrays
-											.asList(
-												getDataInfo(
-													PROPAGATION_DATA_INFO_TYPE,
-													PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID,
-													PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME)));
-								propagatedContexts.add(newContext);
-							}
-						}
-						res.setContext(propagatedContexts);
-						ret.mergeFrom(res);
-					}
-					return ret;
-				},
-				Encoders.bean(resultClazz))
-			.toJSON()
+			.map(resultCommunityFn(), Encoders.bean(resultClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.text(outputPath);
+			.json(outputPath);
 	}
+
+	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> resultCommunityFn() {
+		return (MapFunction<Tuple2<R, ResultCommunityList>, R>) value -> {
+			R ret = value._1();
+			Optional<ResultCommunityList> rcl = Optional.ofNullable(value._2());
+			if (rcl.isPresent()) {
+				ArrayList<String> communitySet = rcl.get().getCommunityList();
+				List<String> contextList = ret
+					.getContext()
+					.stream()
+					.map(con -> con.getId())
+					.collect(Collectors.toList());
+				Result res = new Result();
+				res.setId(ret.getId());
+				List<Context> propagatedContexts = new ArrayList<>();
+				for (String cId : communitySet) {
+					if (!contextList.contains(cId)) {
+						Context newContext = new Context();
+						newContext.setId(cId);
+						newContext
+							.setDataInfo(
+								Arrays
+									.asList(
+										getDataInfo(
+											PROPAGATION_DATA_INFO_TYPE,
+											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID,
+											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME)));
+						propagatedContexts.add(newContext);
+					}
+				}
+				res.setContext(propagatedContexts);
+				ret.mergeFrom(res);
+			}
+			return ret;
+		};
+	}
+
 }

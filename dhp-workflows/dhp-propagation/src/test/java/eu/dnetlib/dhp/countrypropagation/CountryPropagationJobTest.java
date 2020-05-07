@@ -66,30 +66,25 @@ public class CountryPropagationJobTest {
 
 	@Test
 	public void testCountryPropagationSoftware() throws Exception {
-		SparkCountryPropagationJob2
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/countrypropagation/sample/software")
+			.getPath();
+		final String preparedInfoPath = getClass()
+			.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo")
+			.getPath();
+		SparkCountryPropagationJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-sourcePath",
-					getClass()
-						.getResource("/eu/dnetlib/dhp/countrypropagation/sample/software")
-						.getPath(),
-					"-hive_metastore_uris",
-					"",
-					"-saveGraph",
-					"true",
-					"-resultTableName",
-					"eu.dnetlib.dhp.schema.oaf.Software",
-					"-outputPath",
-					workingDir.toString() + "/software",
-					"-preparedInfoPath",
-					getClass()
-						.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo")
-						.getPath(),
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", sourcePath,
+					"--hive_metastore_uris", "",
+					"-saveGraph", "true",
+					"-resultTableName", Software.class.getCanonicalName(),
+					"-outputPath", workingDir.toString() + "/software",
+					"-preparedInfoPath", preparedInfoPath
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Software> tmp = sc
 			.textFile(workingDir.toString() + "/software")

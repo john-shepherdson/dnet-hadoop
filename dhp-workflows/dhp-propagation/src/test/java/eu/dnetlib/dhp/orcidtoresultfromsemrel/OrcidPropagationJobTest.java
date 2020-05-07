@@ -65,33 +65,27 @@ public class OrcidPropagationJobTest {
 
 	@Test
 	public void noUpdateTest() throws Exception {
-		SparkOrcidToResultFromSemRelJob3
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
+			.getPath();
+		final String possibleUpdatesPath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
+			.getPath();
+		SparkOrcidToResultFromSemRelJob
 			.main(
 				new String[] {
-					"-isTest",
-					Boolean.TRUE.toString(),
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-sourcePath",
-					getClass()
-						.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
-						.getPath(),
-					"-hive_metastore_uris",
-					"",
-					"-saveGraph",
-					"true",
-					"-resultTableName",
-					"eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath",
-					workingDir.toString() + "/dataset",
-					"-possibleUpdatesPath",
-					getClass()
-						.getResource(
-							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
-						.getPath()
+					"-isTest", Boolean.TRUE.toString(),
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-hive_metastore_uris", "",
+					"-saveGraph", "true",
+					"-resultTableName", Dataset.class.getCanonicalName(),
+					"-outputPath", workingDir.toString() + "/dataset",
+					"-possibleUpdatesPath", possibleUpdatesPath
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Dataset> tmp = sc
 			.textFile(workingDir.toString() + "/dataset")
@@ -117,7 +111,7 @@ public class OrcidPropagationJobTest {
 
 	@Test
 	public void oneUpdateTest() throws Exception {
-		SparkOrcidToResultFromSemRelJob3
+		SparkOrcidToResultFromSemRelJob
 			.main(
 				new String[] {
 					"-isTest",
@@ -182,7 +176,7 @@ public class OrcidPropagationJobTest {
 
 	@Test
 	public void twoUpdatesTest() throws Exception {
-		SparkOrcidToResultFromSemRelJob3
+		SparkOrcidToResultFromSemRelJob
 			.main(
 				new String[] {
 					"-isTest",

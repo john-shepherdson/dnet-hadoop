@@ -166,7 +166,7 @@
                 <master>yarn</master>
                 <mode>cluster</mode>
                 <name>ProjectToResultPropagation</name>
-                <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob3</class>
+                <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
                 <jar>dhp-propagation-${projectVersion}.jar</jar>
                 <spark-opts>
                     --executor-cores=${sparkExecutorCores}
