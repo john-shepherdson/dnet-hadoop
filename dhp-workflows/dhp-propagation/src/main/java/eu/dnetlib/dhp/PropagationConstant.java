@@ -157,11 +157,16 @@ public class PropagationConstant {
 
 	public static void createCfHbforresult(SparkSession spark) {
 		String query;
-		query = "SELECT id, inst.collectedfrom.key cf , inst.hostedby.key hb "
-			+ "FROM ( SELECT id, instance "
-			+ "FROM result "
-			+ " WHERE datainfo.deletedbyinference = false)  ds "
-			+ "LATERAL VIEW EXPLODE(instance) i AS inst";
+//		query = "SELECT id, inst.collectedfrom.key cf , inst.hostedby.key hb "
+//			+ "FROM ( SELECT id, instance "
+//			+ "FROM result "
+//			+ " WHERE datainfo.deletedbyinference = false)  ds "
+//			+ "LATERAL VIEW EXPLODE(instance) i AS inst";
+		query = "select distinct r.id, inst.collectedfrom.key cf, inst.hostedby.key hb " +
+			"from result r " +
+			"lateral view explode(instance) i as inst " +
+			"where r.datainfo.deletedbyinference=false";
+
 		org.apache.spark.sql.Dataset<Row> cfhb = spark.sql(query);
 		cfhb.createOrReplaceTempView("cfhb");
 	}
