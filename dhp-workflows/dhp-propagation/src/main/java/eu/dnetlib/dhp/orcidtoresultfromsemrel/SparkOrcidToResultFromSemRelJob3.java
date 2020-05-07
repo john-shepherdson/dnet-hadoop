@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Author;
@@ -181,7 +183,14 @@ public class SparkOrcidToResultFromSemRelJob3 {
 						PROPAGATION_DATA_INFO_TYPE,
 						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID,
 						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME));
-			author.addPid(p);
+
+			Optional<List<StructuredProperty>> authorPid = Optional.ofNullable(author.getPid());
+			if (authorPid.isPresent()) {
+				authorPid.get().add(p);
+			} else {
+				author.setPid(Lists.newArrayList(p));
+			}
+
 		}
 		return toaddpid;
 	}
