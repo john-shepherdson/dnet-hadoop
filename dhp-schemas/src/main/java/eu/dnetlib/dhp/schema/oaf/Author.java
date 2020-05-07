@@ -86,15 +86,4 @@ public class Author implements Serializable {
 		return Objects.hash(fullname, name, surname, rank, pid, affiliation);
 	}
 
-	public void addPid(StructuredProperty pid) {
-
-		if (pid == null)
-			return;
-
-		if (this.pid == null) {
-			this.pid = Arrays.asList(pid);
-		} else {
-			this.pid.add(pid);
-		}
-	}
 }
