@@ -25,6 +25,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class SparkBulkTagJob {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkBulkTagJob.class);
+	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -108,12 +109,12 @@ public class SparkBulkTagJob {
 			.json(outputPath);
 	}
 
-	private static <R> Dataset<R> readPath(
-		SparkSession spark, String inputEntityPath, Class<R> clazz) {
+	public static <R> Dataset<R> readPath(
+		SparkSession spark, String inputPath, Class<R> clazz) {
 		return spark
 			.read()
-			.json(inputEntityPath)
-			.as(Encoders.bean(clazz));
+			.textFile(inputPath)
+			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
 }
