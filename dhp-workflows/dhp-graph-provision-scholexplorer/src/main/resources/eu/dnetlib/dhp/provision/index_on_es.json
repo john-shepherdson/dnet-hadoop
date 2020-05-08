@@ -17,6 +17,13 @@
     "paramDescription": "the index name",
     "paramRequired": true
   },
+  {
+    "paramName": "h",
+    "paramLongName": "esHost",
+    "paramDescription": "the index host name",
+    "paramRequired": true
+  },
+
 
   {
     "paramName": "t",

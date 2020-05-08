@@ -1,42 +1,43 @@
+
 package eu.dnetlib.doiboost.orcid.model;
 
 public class WorkData {
 
-    private String oid;
-    private String doi;
-    private boolean doiFound = false;
+	private String oid;
+	private String doi;
+	private boolean doiFound = false;
 
-    public boolean isDoiFound() {
-        return doiFound;
-    }
+	public boolean isDoiFound() {
+		return doiFound;
+	}
 
-    public void setDoiFound(boolean doiFound) {
-        this.doiFound = doiFound;
-    }
+	public void setDoiFound(boolean doiFound) {
+		this.doiFound = doiFound;
+	}
 
-    public String getOid() {
-        return oid;
-    }
+	public String getOid() {
+		return oid;
+	}
 
-    public void setOid(String oid) {
-        this.oid = oid;
-    }
+	public void setOid(String oid) {
+		this.oid = oid;
+	}
 
-    public String getDoi() {
-        return doi;
-    }
+	public String getDoi() {
+		return doi;
+	}
 
-    public void setDoi(String doi) {
-        this.doi = doi;
-    }
+	public void setDoi(String doi) {
+		this.doi = doi;
+	}
 
-    public String getErrorCode() {
-        return errorCode;
-    }
+	public String getErrorCode() {
+		return errorCode;
+	}
 
-    public void setErrorCode(String errorCode) {
-        this.errorCode = errorCode;
-    }
+	public void setErrorCode(String errorCode) {
+		this.errorCode = errorCode;
+	}
 
-    private String errorCode;
+	private String errorCode;
 }

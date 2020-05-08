@@ -1,70 +1,60 @@
+
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class OtherResearchProduct extends Result implements Serializable {
 
-    private List<Field<String>> contactperson;
+	private List<Field<String>> contactperson;
 
-    private List<Field<String>> contactgroup;
+	private List<Field<String>> contactgroup;
 
-    private List<Field<String>> tool;
+	private List<Field<String>> tool;
 
-    public List<Field<String>> getContactperson() {
-        return contactperson;
-    }
+	public OtherResearchProduct() {
+		setResulttype(ModelConstants.ORP_DEFAULT_RESULTTYPE);
+	}
 
-    public void setContactperson(List<Field<String>> contactperson) {
-        this.contactperson = contactperson;
-    }
+	public List<Field<String>> getContactperson() {
+		return contactperson;
+	}
 
-    public List<Field<String>> getContactgroup() {
-        return contactgroup;
-    }
+	public void setContactperson(List<Field<String>> contactperson) {
+		this.contactperson = contactperson;
+	}
 
-    public void setContactgroup(List<Field<String>> contactgroup) {
-        this.contactgroup = contactgroup;
-    }
+	public List<Field<String>> getContactgroup() {
+		return contactgroup;
+	}
 
-    public List<Field<String>> getTool() {
-        return tool;
-    }
+	public void setContactgroup(List<Field<String>> contactgroup) {
+		this.contactgroup = contactgroup;
+	}
 
-    public void setTool(List<Field<String>> tool) {
-        this.tool = tool;
-    }
+	public List<Field<String>> getTool() {
+		return tool;
+	}
 
-    @Override
-    public void mergeFrom(OafEntity e) {
-        super.mergeFrom(e);
+	public void setTool(List<Field<String>> tool) {
+		this.tool = tool;
+	}
 
-        if (!OtherResearchProduct.class.isAssignableFrom(e.getClass())) {
-            return;
-        }
+	@Override
+	public void mergeFrom(OafEntity e) {
+		super.mergeFrom(e);
 
-        OtherResearchProduct o = (OtherResearchProduct) e;
+		if (!OtherResearchProduct.class.isAssignableFrom(e.getClass())) {
+			return;
+		}
 
-        contactperson = mergeLists(contactperson, o.getContactperson());
-        contactgroup = mergeLists(contactgroup, o.getContactgroup());
-        tool = mergeLists(tool, o.getTool());
-        mergeOAFDataInfo(e);
-    }
+		OtherResearchProduct o = (OtherResearchProduct) e;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        OtherResearchProduct that = (OtherResearchProduct) o;
-        return Objects.equals(contactperson, that.contactperson)
-                && Objects.equals(contactgroup, that.contactgroup)
-                && Objects.equals(tool, that.tool);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), contactperson, contactgroup, tool);
-    }
+		contactperson = mergeLists(contactperson, o.getContactperson());
+		contactgroup = mergeLists(contactgroup, o.getContactgroup());
+		tool = mergeLists(tool, o.getTool());
+		mergeOAFDataInfo(e);
+	}
 }

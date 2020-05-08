@@ -1,0 +1,1 @@
+CREATE TABLE ${stats_db_name}.software_classifications AS SELECT substr(p.id, 4) as id, instancetype.classname as type from ${openaire_db_name}.software p LATERAL VIEW explode(p.instance.instancetype) instances as instancetype;

@@ -170,5 +170,6 @@
   "container-title": [
     "Ecl\u00e9tica Qu\u00edmica Journal"
   ],
-  "page": "41-50"
+  "page": "41-50",
+  "funder": [{"DOI": "10.13039/100010663","name": "H2020 European Research Council","doi-asserted-by": "publisher","award": ["677749"]}]
 }

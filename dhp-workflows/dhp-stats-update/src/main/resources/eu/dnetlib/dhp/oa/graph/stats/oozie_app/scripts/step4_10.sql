@@ -1,0 +1,1 @@
+create table ${stats_db_name}.dataset_topics as select substr(p.id, 4) as id, subjects.subject.qualifier.classname as type, subjects.subject.value as topic from ${openaire_db_name}.dataset p lateral view explode(p.subject) subjects as subject;
