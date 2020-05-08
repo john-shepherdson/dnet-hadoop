@@ -66,19 +66,25 @@ public class PrepareMergedRelationJob {
 	private static void selectMergesRelations(SparkSession spark, String inputPath, String outputPath) {
 
 		Dataset<Relation> relation = readRelations(spark, inputPath);
-		relation.createOrReplaceTempView("relation");
 
-		spark
-			.sql(
-				"Select * from relation " +
-					"where relclass = 'merges' " +
-					"and datainfo.deletedbyinference = false")
-			.as(Encoders.bean(Relation.class))
-			.toJSON()
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.text(outputPath);
+		relation.filter("relclass = 'merges' and datainfo.deletedbyinference=false")
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gizp")
+				.json(outputPath);
+//		relation.createOrReplaceTempView("relation");
+//
+//		spark
+//			.sql(
+//				"Select * from relation " +
+//					"where relclass = 'merges' " +
+//					"and datainfo.deletedbyinference = false")
+//			.as(Encoders.bean(Relation.class))
+//			.toJSON()
+//			.write()
+//			.mode(SaveMode.Overwrite)
+//			.option("compression", "gzip")
+//			.text(outputPath);
 	}
 
 	public static org.apache.spark.sql.Dataset<Relation> readRelations(

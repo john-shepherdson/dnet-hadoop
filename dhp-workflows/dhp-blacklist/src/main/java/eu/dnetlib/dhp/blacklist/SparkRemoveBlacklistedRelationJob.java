@@ -72,7 +72,7 @@ public class SparkRemoveBlacklistedRelationJob {
 
 	private static void removeBlacklistedRelations(SparkSession spark, String blacklistPath, String inputPath,
 		String outputPath, String mergesPath) {
-		Dataset<Relation> blackListed = readRelations(spark, blacklistPath);
+		Dataset<Relation> blackListed = readRelations(spark, blacklistPath + "/blacklist");
 		Dataset<Relation> inputRelation = readRelations(spark, inputPath);
 		Dataset<Relation> mergesRelation = readRelations(spark, mergesPath);
 

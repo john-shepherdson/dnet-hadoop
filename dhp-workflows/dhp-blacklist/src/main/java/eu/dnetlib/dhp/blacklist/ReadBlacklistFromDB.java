@@ -53,7 +53,7 @@ public class ReadBlacklistFromDB implements Closeable {
 		final String dbUrl = parser.get("postgresUrl");
 		final String dbUser = parser.get("postgresUser");
 		final String dbPassword = parser.get("postgresPassword");
-		final String hdfsPath = parser.get("hdfsPath");
+		final String hdfsPath = parser.get("hdfsPath") + "/blacklist";
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 
 		try (final ReadBlacklistFromDB rbl = new ReadBlacklistFromDB(hdfsPath, hdfsNameNode, dbUrl, dbUser,
