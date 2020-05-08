@@ -1,3 +1,4 @@
+
 package eu.dnetlib.maven.plugin.properties;
 
 import static eu.dnetlib.maven.plugin.properties.GenerateOoziePropertiesMojo.PROPERTY_NAME_SANDBOX_NAME;
@@ -10,87 +11,87 @@ import org.junit.jupiter.api.Test;
 /** @author mhorst, claudio.atzori */
 public class GenerateOoziePropertiesMojoTest {
 
-  private GenerateOoziePropertiesMojo mojo = new GenerateOoziePropertiesMojo();
+	private final GenerateOoziePropertiesMojo mojo = new GenerateOoziePropertiesMojo();
 
-  @BeforeEach
-  public void clearSystemProperties() {
-    System.clearProperty(PROPERTY_NAME_SANDBOX_NAME);
-    System.clearProperty(PROPERTY_NAME_WF_SOURCE_DIR);
-  }
+	@BeforeEach
+	public void clearSystemProperties() {
+		System.clearProperty(PROPERTY_NAME_SANDBOX_NAME);
+		System.clearProperty(PROPERTY_NAME_WF_SOURCE_DIR);
+	}
 
-  @Test
-  public void testExecuteEmpty() throws Exception {
-    // execute
-    mojo.execute();
+	@Test
+	public void testExecuteEmpty() throws Exception {
+		// execute
+		mojo.execute();
 
-    // assert
-    assertNull(System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
-  }
+		// assert
+		assertNull(System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
+	}
 
-  @Test
-  public void testExecuteSandboxNameAlreadySet() throws Exception {
-    // given
-    String workflowSourceDir = "eu/dnetlib/dhp/wf/transformers";
-    String sandboxName = "originalSandboxName";
-    System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
-    System.setProperty(PROPERTY_NAME_SANDBOX_NAME, sandboxName);
+	@Test
+	public void testExecuteSandboxNameAlreadySet() throws Exception {
+		// given
+		String workflowSourceDir = "eu/dnetlib/dhp/wf/transformers";
+		String sandboxName = "originalSandboxName";
+		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
+		System.setProperty(PROPERTY_NAME_SANDBOX_NAME, sandboxName);
 
-    // execute
-    mojo.execute();
+		// execute
+		mojo.execute();
 
-    // assert
-    assertEquals(sandboxName, System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
-  }
+		// assert
+		assertEquals(sandboxName, System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
+	}
 
-  @Test
-  public void testExecuteEmptyWorkflowSourceDir() throws Exception {
-    // given
-    String workflowSourceDir = "";
-    System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
+	@Test
+	public void testExecuteEmptyWorkflowSourceDir() throws Exception {
+		// given
+		String workflowSourceDir = "";
+		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
 
-    // execute
-    mojo.execute();
+		// execute
+		mojo.execute();
 
-    // assert
-    assertNull(System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
-  }
+		// assert
+		assertNull(System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
+	}
 
-  @Test
-  public void testExecuteNullSandboxNameGenerated() throws Exception {
-    // given
-    String workflowSourceDir = "eu/dnetlib/dhp/";
-    System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
+	@Test
+	public void testExecuteNullSandboxNameGenerated() throws Exception {
+		// given
+		String workflowSourceDir = "eu/dnetlib/dhp/";
+		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
 
-    // execute
-    mojo.execute();
+		// execute
+		mojo.execute();
 
-    // assert
-    assertNull(System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
-  }
+		// assert
+		assertNull(System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
+	}
 
-  @Test
-  public void testExecute() throws Exception {
-    // given
-    String workflowSourceDir = "eu/dnetlib/dhp/wf/transformers";
-    System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
+	@Test
+	public void testExecute() throws Exception {
+		// given
+		String workflowSourceDir = "eu/dnetlib/dhp/wf/transformers";
+		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
 
-    // execute
-    mojo.execute();
+		// execute
+		mojo.execute();
 
-    // assert
-    assertEquals("wf/transformers", System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
-  }
+		// assert
+		assertEquals("wf/transformers", System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
+	}
 
-  @Test
-  public void testExecuteWithoutRoot() throws Exception {
-    // given
-    String workflowSourceDir = "wf/transformers";
-    System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
+	@Test
+	public void testExecuteWithoutRoot() throws Exception {
+		// given
+		String workflowSourceDir = "wf/transformers";
+		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
 
-    // execute
-    mojo.execute();
+		// execute
+		mojo.execute();
 
-    // assert
-    assertEquals("wf/transformers", System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
-  }
+		// assert
+		assertEquals("wf/transformers", System.getProperty(PROPERTY_NAME_SANDBOX_NAME));
+	}
 }

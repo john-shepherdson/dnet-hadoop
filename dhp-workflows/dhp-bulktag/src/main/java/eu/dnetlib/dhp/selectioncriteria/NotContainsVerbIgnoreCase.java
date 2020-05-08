@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.selectioncriteria;
 
 import java.io.Serializable;
@@ -5,24 +6,25 @@ import java.io.Serializable;
 @VerbClass("not_contains_ignorecase")
 public class NotContainsVerbIgnoreCase implements Selection, Serializable {
 
-    private String param;
+	private String param;
 
-    public NotContainsVerbIgnoreCase() {}
+	public NotContainsVerbIgnoreCase() {
+	}
 
-    public NotContainsVerbIgnoreCase(final String param) {
-        this.param = param;
-    }
+	public NotContainsVerbIgnoreCase(final String param) {
+		this.param = param;
+	}
 
-    @Override
-    public boolean apply(String value) {
-        return !(value.toLowerCase().contains(param.toLowerCase()));
-    }
+	@Override
+	public boolean apply(String value) {
+		return !(value.toLowerCase().contains(param.toLowerCase()));
+	}
 
-    public String getParam() {
-        return param;
-    }
+	public String getParam() {
+		return param;
+	}
 
-    public void setParam(String param) {
-        this.param = param;
-    }
+	public void setParam(String param) {
+		this.param = param;
+	}
 }

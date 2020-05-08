@@ -1,9 +1,10 @@
+
 package eu.dnetlib.dhp.selectioncriteria;
 
 public class VerbResolverFactory {
 
-    public static VerbResolver newInstance() {
+	public static VerbResolver newInstance() {
 
-        return new VerbResolver();
-    }
+		return new VerbResolver();
+	}
 }

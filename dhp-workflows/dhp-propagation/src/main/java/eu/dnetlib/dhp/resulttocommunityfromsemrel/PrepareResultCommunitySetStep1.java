@@ -1,176 +1,167 @@
+
 package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
-import eu.dnetlib.dhp.QueryInformationSystem;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
-import java.util.Arrays;
-import java.util.List;
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class PrepareResultCommunitySetStep1 {
-    private static final Logger log = LoggerFactory.getLogger(PrepareResultCommunitySetStep1.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareResultCommunitySetStep1.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final String COMMUNITY_LIST_XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType')"
+		+ "  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri']"
+		+ "  and  $x//CONFIGURATION/context/param[./@name='status']/text() != 'hidden'"
+		+ "  return $x//CONFIGURATION/context/@id/string()";
 
-    public static void main(String[] args) throws Exception {
-        String jsonConfiguration =
-                IOUtils.toString(
-                        PrepareResultCommunitySetStep1.class.getResourceAsStream(
-                                "/eu/dnetlib/dhp/resulttocommunityfromsemrel/input_preparecommunitytoresult_parameters.json"));
+	/**
+	 * associates to each result the set of community contexts they are associated to; associates to each target of a
+	 * relation with allowed semantics the set of community context it could possibly inherit from the source of the
+	 * relation
+	 */
+	// TODO
+	private static final String RESULT_CONTEXT_QUERY_TEMPLATE = "select target resultId, community_context  "
+		+ "from (select id, collect_set(co.id) community_context "
+		+ "       from  result "
+		+ "       lateral view explode (context) c as co "
+		+ "       where datainfo.deletedbyinference = false %s group by id) p "
+		+ " JOIN "
+		+ " (select source, target from relation "
+		+ "  where datainfo.deletedbyinference = false %s ) r ON p.id = r.source";
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+	/**
+	 * a dataset for example could be linked to more than one publication. For each publication linked to that dataset
+	 * the previous query will produce a row: targetId set of community context the target could possibly inherit with
+	 * the following query there will be a single row for each result linked to more than one result of the result type
+	 * currently being used
+	 */
+	// TODO
+	private static final String RESULT_COMMUNITY_LIST_QUERY = "select resultId , collect_set(co) communityList "
+		+ "from result_context "
+		+ "lateral view explode (community_context) c as co "
+		+ "where length(co) > 0 "
+		+ "group by resultId";
 
-        parser.parseArgument(args);
+	public static void main(String[] args) throws Exception {
+		String jsonConfiguration = IOUtils
+			.toString(
+				PrepareResultCommunitySetStep1.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/resulttocommunityfromsemrel/input_preparecommunitytoresult_parameters.json"));
 
-        Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
-        String inputPath = parser.get("sourcePath");
-        log.info("inputPath: {}", inputPath);
+		parser.parseArgument(args);
 
-        final String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        final String resultClassName = parser.get("resultTableName");
-        log.info("resultTableName: {}", resultClassName);
+		String inputPath = parser.get("sourcePath");
+		log.info("inputPath: {}", inputPath);
 
-        SparkConf conf = new SparkConf();
-        conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath: {}", outputPath);
 
-        final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
-        log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
+		final String resultClassName = parser.get("resultTableName");
+		log.info("resultTableName: {}", resultClassName);
 
-        final String isLookupUrl = parser.get("isLookupUrl");
-        log.info("isLookupUrl: {}", isLookupUrl);
+		SparkConf conf = new SparkConf();
+		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-        final List<String> communityIdList = QueryInformationSystem.getCommunityList(isLookupUrl);
-        log.info("communityIdList: {}", new Gson().toJson(communityIdList));
+		final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
+		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
-        final String resultType =
-                resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
-        log.info("resultType: {}", resultType);
+		final String isLookupUrl = parser.get("isLookUpUrl");
+		log.info("isLookupUrl: {}", isLookupUrl);
 
-        Class<? extends Result> resultClazz =
-                (Class<? extends Result>) Class.forName(resultClassName);
+		final List<String> communityIdList = getCommunityList(isLookupUrl);
+		log.info("communityIdList: {}", new Gson().toJson(communityIdList));
 
-        runWithSparkHiveSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    if (isTest(parser)) {
-                        removeOutputDir(spark, outputPath);
-                    }
-                    prepareInfo(
-                            spark,
-                            inputPath,
-                            outputPath,
-                            allowedsemrel,
-                            resultClazz,
-                            resultType,
-                            communityIdList);
-                });
-    }
+		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
+		log.info("resultType: {}", resultType);
 
-    private static <R extends Result> void prepareInfo(
-            SparkSession spark,
-            String inputPath,
-            String outputPath,
-            List<String> allowedsemrel,
-            Class<R> resultClazz,
-            String resultType,
-            List<String> communityIdList) {
-        // read the relation table and the table related to the result it is using
-        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-        org.apache.spark.sql.Dataset<Relation> relation =
-                spark.createDataset(
-                        sc.textFile(inputPath + "/relation")
-                                .map(item -> OBJECT_MAPPER.readValue(item, Relation.class))
-                                .rdd(),
-                        Encoders.bean(Relation.class));
-        relation.createOrReplaceTempView("relation");
+		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
-        log.info("Reading Graph table from: {}", inputPath + "/" + resultType);
-        Dataset<R> result = readPathEntity(spark, inputPath + "/" + resultType, resultClazz);
+		runWithSparkHiveSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				if (isTest(parser)) {
+					removeOutputDir(spark, outputPath);
+				}
+				prepareInfo(
+					spark,
+					inputPath,
+					outputPath,
+					allowedsemrel,
+					resultClazz,
+					resultType,
+					communityIdList);
+			});
+	}
 
-        result.createOrReplaceTempView("result");
+	private static <R extends Result> void prepareInfo(
+		SparkSession spark,
+		String inputPath,
+		String outputPath,
+		List<String> allowedsemrel,
+		Class<R> resultClazz,
+		String resultType,
+		List<String> communityIdList) {
 
-        getPossibleResultcommunityAssociation(
-                spark, allowedsemrel, outputPath + "/" + resultType, communityIdList);
-    }
+		final String inputResultPath = inputPath + "/" + resultType;
+		log.info("Reading Graph table from: {}", inputResultPath);
 
-    private static void getPossibleResultcommunityAssociation(
-            SparkSession spark,
-            List<String> allowedsemrel,
-            String outputPath,
-            List<String> communityIdList) {
+		final String inputRelationPath = inputPath + "/relation";
+		log.info("Reading relation table from: {}", inputResultPath);
 
-        String communitylist = getConstraintList(" co.id = '", communityIdList);
-        String semrellist = getConstraintList(" relClass = '", allowedsemrel);
+		Dataset<Relation> relation = readPath(spark, inputRelationPath, Relation.class);
+		relation.createOrReplaceTempView("relation");
 
-        /*
-        associates to each result the set of community contexts they are associated to
-        select id, collect_set(co.id) community_context " +
-                "       from  result " +
-                "       lateral view explode (context) c as co " +
-                "       where datainfo.deletedbyinference = false "+ communitylist +
-                "       group by id
+		Dataset<R> result = readPath(spark, inputResultPath, resultClazz);
+		result.createOrReplaceTempView("result");
 
-        associates to each target of a relation with allowed semantics the set of community context it could possibly
-        inherit from the source of the relation
-         */
-        String query =
-                "Select target resultId, community_context  "
-                        + "from (select id, collect_set(co.id) community_context "
-                        + "       from  result "
-                        + "       lateral view explode (context) c as co "
-                        + "       where datainfo.deletedbyinference = false "
-                        + communitylist
-                        + "       group by id) p "
-                        + "JOIN "
-                        + "(select source, target "
-                        + "from relation "
-                        + "where datainfo.deletedbyinference = false "
-                        + semrellist
-                        + ") r "
-                        + "ON p.id = r.source";
+		final String outputResultPath = outputPath + "/" + resultType;
+		log.info("writing output results to: {}", outputResultPath);
 
-        org.apache.spark.sql.Dataset<Row> result_context = spark.sql(query);
-        result_context.createOrReplaceTempView("result_context");
+		String resultContextQuery = String
+			.format(
+				RESULT_CONTEXT_QUERY_TEMPLATE,
+				getConstraintList(" co.id = '", communityIdList),
+				getConstraintList(" relClass = '", allowedsemrel));
 
-        // ( target, (mes, dh-ch-, ni))
-        /*
-        a dataset for example could be linked to more than one publication. For each publication linked to that dataset
-        the previous query will produce a row: targetId set of community context the target could possibly inherit
-        with the following query there will be a single row for each result linked to more than one result of the result type
-        currently being used
-         */
-        query =
-                "select resultId , collect_set(co) communityList "
-                        + "from result_context "
-                        + "lateral view explode (community_context) c as co "
-                        + "where length(co) > 0 "
-                        + "group by resultId";
+		Dataset<Row> result_context = spark.sql(resultContextQuery);
+		result_context.createOrReplaceTempView("result_context");
 
-        spark.sql(query)
-                .as(Encoders.bean(ResultCommunityList.class))
-                .toJavaRDD()
-                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
-                .saveAsTextFile(outputPath, GzipCodec.class);
-    }
+		spark
+			.sql(RESULT_COMMUNITY_LIST_QUERY)
+			.as(Encoders.bean(ResultCommunityList.class))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputResultPath);
+	}
+
+	public static List<String> getCommunityList(final String isLookupUrl) throws ISLookUpException {
+		ISLookUpService isLookUp = ISLookupClientFactory.getLookUpService(isLookupUrl);
+		return isLookUp.quickSearchProfile(COMMUNITY_LIST_XQUERY);
+	}
+
 }

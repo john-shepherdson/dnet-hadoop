@@ -1,16 +1,13 @@
+
 package eu.dnetlib.dhp.projecttoresult;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.PropagationConstant.getConstraintList;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation;
-import eu.dnetlib.dhp.schema.oaf.Relation;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -19,134 +16,111 @@ import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+
 public class PrepareProjectResultsAssociation {
-    private static final Logger log =
-            LoggerFactory.getLogger(PrepareDatasourceCountryAssociation.class);
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final Logger log = LoggerFactory.getLogger(PrepareDatasourceCountryAssociation.class);
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
-        String jsonConfiguration =
-                IOUtils.toString(
-                        PrepareProjectResultsAssociation.class.getResourceAsStream(
-                                "/eu/dnetlib/dhp/projecttoresult/input_prepareprojecttoresult_parameters.json"));
+		String jsonConfiguration = IOUtils
+			.toString(
+				PrepareProjectResultsAssociation.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/projecttoresult/input_prepareprojecttoresult_parameters.json"));
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
-        parser.parseArgument(args);
+		parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        String inputPath = parser.get("sourcePath");
-        log.info("inputPath: {}", inputPath);
+		String inputPath = parser.get("sourcePath");
+		log.info("inputPath: {}", inputPath);
 
-        final String potentialUpdatePath = parser.get("potentialUpdatePath");
-        log.info("potentialUpdatePath {}: ", potentialUpdatePath);
+		final String potentialUpdatePath = parser.get("potentialUpdatePath");
+		log.info("potentialUpdatePath {}: ", potentialUpdatePath);
 
-        String alreadyLinkedPath = parser.get("alreadyLinkedPath");
-        log.info("alreadyLinkedPath: {} ", alreadyLinkedPath);
+		String alreadyLinkedPath = parser.get("alreadyLinkedPath");
+		log.info("alreadyLinkedPath: {} ", alreadyLinkedPath);
 
-        final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
-        log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
+		final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
+		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
-        SparkConf conf = new SparkConf();
-        conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
+		SparkConf conf = new SparkConf();
+		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-        runWithSparkHiveSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    //                    removeOutputDir(spark, potentialUpdatePath);
-                    //                    removeOutputDir(spark, alreadyLinkedPath);
-                    prepareResultProjProjectResults(
-                            spark,
-                            inputPath,
-                            potentialUpdatePath,
-                            alreadyLinkedPath,
-                            allowedsemrel);
-                });
-    }
+		runWithSparkHiveSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				prepareResultProjProjectResults(
+					spark,
+					inputPath,
+					potentialUpdatePath,
+					alreadyLinkedPath,
+					allowedsemrel);
+			});
+	}
 
-    private static void prepareResultProjProjectResults(
-            SparkSession spark,
-            String inputPath,
-            String potentialUpdatePath,
-            String alreadyLinkedPath,
-            List<String> allowedsemrel) {
-        JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-        Dataset<Relation> relation =
-                spark.createDataset(
-                        sc.textFile(inputPath)
-                                .map(item -> OBJECT_MAPPER.readValue(item, Relation.class))
-                                .rdd(),
-                        Encoders.bean(Relation.class));
+	private static void prepareResultProjProjectResults(
+		SparkSession spark,
+		String inputPath,
+		String potentialUpdatePath,
+		String alreadyLinkedPath,
+		List<String> allowedsemrel) {
 
-        relation.createOrReplaceTempView("relation");
+		Dataset<Relation> relation = readPath(spark, inputPath, Relation.class);
+		relation.createOrReplaceTempView("relation");
 
-        String query =
-                "SELECT source, target "
-                        + "       FROM relation "
-                        + "       WHERE datainfo.deletedbyinference = false "
-                        + "       AND relClass = '"
-                        + RELATION_RESULT_PROJECT_REL_CLASS
-                        + "'";
+		String resproj_relation_query = "SELECT source, target "
+			+ "       FROM relation "
+			+ "       WHERE datainfo.deletedbyinference = false "
+			+ "       AND relClass = '"
+			+ RELATION_RESULT_PROJECT_REL_CLASS
+			+ "'";
 
-        Dataset<Row> resproj_relation = spark.sql(query);
-        resproj_relation.createOrReplaceTempView("resproj_relation");
+		Dataset<Row> resproj_relation = spark.sql(resproj_relation_query);
+		resproj_relation.createOrReplaceTempView("resproj_relation");
 
-        query =
-                "SELECT resultId, collect_set(projectId) projectSet "
-                        + "FROM ( "
-                        + "SELECT r1.target resultId, r2.target projectId "
-                        + "      FROM (SELECT source, target "
-                        + "            FROM relation "
-                        + "            WHERE datainfo.deletedbyinference = false  "
-                        + getConstraintList(" relClass = '", allowedsemrel)
-                        + "            ) r1"
-                        + "      JOIN resproj_relation r2 "
-                        + "      ON r1.source = r2.source "
-                        + "      ) tmp "
-                        + "GROUP BY resultId ";
-        //        query =
-        //                "SELECT projectId, collect_set(resId) resultSet "
-        //                        + "FROM ("
-        //                        + "      SELECT r1.target resId, r2.target projectId "
-        //                        + "      FROM (SELECT source, target "
-        //                        + "            FROM relation "
-        //                        + "            WHERE datainfo.deletedbyinference = false  "
-        //                        + getConstraintList(" relClass = '", allowedsemrel)
-        //                        + ") r1"
-        //                        + "      JOIN resproj_relation r2 "
-        //                        + "      ON r1.source = r2.source "
-        //                        + "      ) tmp "
-        //                        + "GROUP BY projectId ";
+		String potential_update_query = "SELECT resultId, collect_set(projectId) projectSet "
+			+ "FROM ( "
+			+ "SELECT r1.target resultId, r2.target projectId "
+			+ "      FROM (SELECT source, target "
+			+ "            FROM relation "
+			+ "            WHERE datainfo.deletedbyinference = false  "
+			+ getConstraintList(" relClass = '", allowedsemrel)
+			+ "            ) r1"
+			+ "      JOIN resproj_relation r2 "
+			+ "      ON r1.source = r2.source "
+			+ "      ) tmp "
+			+ "GROUP BY resultId ";
 
-        spark.sql(query)
-                .as(Encoders.bean(ResultProjectSet.class))
-                //                .toJSON()
-                //                .write()
-                //                .mode(SaveMode.Overwrite)
-                //                .option("compression", "gzip")
-                //                .text(potentialUpdatePath);
-                .toJavaRDD()
-                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
-                .saveAsTextFile(potentialUpdatePath, GzipCodec.class);
+		spark
+			.sql(potential_update_query)
+			.as(Encoders.bean(ResultProjectSet.class))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(potentialUpdatePath);
 
-        query =
-                "SELECT source resultId, collect_set(target) projectSet "
-                        + "FROM resproj_relation "
-                        + "GROUP BY source";
+		String result_projectset_query = "SELECT source resultId, collect_set(target) projectSet "
+			+ "FROM resproj_relation "
+			+ "GROUP BY source";
 
-        spark.sql(query)
-                .as(Encoders.bean(ResultProjectSet.class))
-                //                .toJSON()
-                //                .write()
-                //                .mode(SaveMode.Overwrite)
-                //                .option("compression", "gzip")
-                //                .text(alreadyLinkedPath);
-                .toJavaRDD()
-                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
-                .saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
-    }
+		spark
+			.sql(result_projectset_query)
+			.as(Encoders.bean(ResultProjectSet.class))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(alreadyLinkedPath);
+	}
+
 }

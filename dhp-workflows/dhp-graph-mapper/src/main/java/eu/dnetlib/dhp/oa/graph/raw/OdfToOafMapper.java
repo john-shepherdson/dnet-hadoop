@@ -1,9 +1,21 @@
+
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.Node;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -14,338 +26,312 @@ import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.Node;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
-  public OdfToOafMapper(final Map<String, String> code2name) {
-    super(code2name);
-  }
+	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
 
-  @Override
-  protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
-    return prepareListStructProps(doc, "//datacite:title", MAIN_TITLE_QUALIFIER, info);
-  }
+	public OdfToOafMapper(final Map<String, String> code2name) {
+		super(code2name);
+	}
 
-  @Override
-  protected List<Author> prepareAuthors(final Document doc, final DataInfo info) {
-    final List<Author> res = new ArrayList<>();
-    int pos = 1;
-    for (final Object o : doc.selectNodes("//datacite:creator")) {
-      final Node n = (Node) o;
-      final Author author = new Author();
-      author.setFullname(n.valueOf("./datacite:creatorName"));
-      author.setName(n.valueOf("./datacite:givenName"));
-      author.setSurname(n.valueOf("./datacite:familyName"));
-      author.setAffiliation(prepareListFields(doc, "./datacite:affiliation", info));
-      author.setPid(preparePids(doc, info));
-      author.setRank(pos++);
-      res.add(author);
-    }
-    return res;
-  }
+	@Override
+	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
+		return prepareListStructProps(doc, "//datacite:title", MAIN_TITLE_QUALIFIER, info);
+	}
 
-  private List<StructuredProperty> preparePids(final Document doc, final DataInfo info) {
-    final List<StructuredProperty> res = new ArrayList<>();
-    for (final Object o : doc.selectNodes("./datacite:nameIdentifier")) {
-      res.add(
-          structuredProperty(
-              ((Node) o).getText(),
-              prepareQualifier(
-                  (Node) o, "./@nameIdentifierScheme", "dnet:pid_types", "dnet:pid_types"),
-              info));
-    }
-    return res;
-  }
+	@Override
+	protected List<Author> prepareAuthors(final Document doc, final DataInfo info) {
+		final List<Author> res = new ArrayList<>();
+		int pos = 1;
+		for (final Object o : doc.selectNodes("//datacite:creator")) {
+			final Node n = (Node) o;
+			final Author author = new Author();
+			author.setFullname(n.valueOf("./datacite:creatorName"));
+			author.setName(n.valueOf("./datacite:givenName"));
+			author.setSurname(n.valueOf("./datacite:familyName"));
+			author.setAffiliation(prepareListFields(doc, "./datacite:affiliation", info));
+			author.setPid(preparePids(doc, info));
+			author.setRank(pos++);
+			res.add(author);
+		}
+		return res;
+	}
 
-  @Override
-  protected List<Instance> prepareInstances(
-      final Document doc,
-      final DataInfo info,
-      final KeyValue collectedfrom,
-      final KeyValue hostedby) {
+	private List<StructuredProperty> preparePids(final Document doc, final DataInfo info) {
+		final List<StructuredProperty> res = new ArrayList<>();
+		for (final Object o : doc.selectNodes("./datacite:nameIdentifier")) {
+			res
+				.add(
+					structuredProperty(
+						((Node) o).getText(),
+						prepareQualifier(
+							(Node) o, "./@nameIdentifierScheme", DNET_PID_TYPES, DNET_PID_TYPES),
+						info));
+		}
+		return res;
+	}
 
-    final Instance instance = new Instance();
-    instance.setUrl(new ArrayList<>());
-    instance.setInstancetype(
-        prepareQualifier(
-            doc, "//dr:CobjCategory", "dnet:publication_resource", "dnet:publication_resource"));
-    instance.setCollectedfrom(collectedfrom);
-    instance.setHostedby(hostedby);
-    instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
-    instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
-    instance.setAccessright(
-        prepareQualifier(doc, "//oaf:accessrights", "dnet:access_modes", "dnet:access_modes"));
-    instance.setLicense(field(doc.valueOf("//oaf:license"), info));
-    instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
-    instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
-    instance.setProcessingchargecurrency(
-        field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+	@Override
+	protected List<Instance> prepareInstances(
+		final Document doc,
+		final DataInfo info,
+		final KeyValue collectedfrom,
+		final KeyValue hostedby) {
 
-    for (final Object o :
-        doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
-      instance.getUrl().add(((Node) o).getText().trim());
-    }
-    for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='URL']")) {
-      instance.getUrl().add(((Node) o).getText().trim());
-    }
-    for (final Object o :
-        doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='DOI']")) {
-      instance.getUrl().add("http://dx.doi.org/" + ((Node) o).getText().trim());
-    }
-    for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='DOI']")) {
-      instance.getUrl().add("http://dx.doi.org/" + ((Node) o).getText().trim());
-    }
-    return Arrays.asList(instance);
-  }
+		final Instance instance = new Instance();
+		instance.setUrl(new ArrayList<>());
+		instance
+			.setInstancetype(
+				prepareQualifier(
+					doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
+		instance.setCollectedfrom(collectedfrom);
+		instance.setHostedby(hostedby);
+		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
+		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
+		instance
+			.setAccessright(
+				prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
+		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
+		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
+		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
+		instance
+			.setProcessingchargecurrency(
+				field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
-  @Override
-  protected List<Field<String>> prepareSources(final Document doc, final DataInfo info) {
-    return new ArrayList<>(); // Not present in ODF ???
-  }
+		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
+			instance.getUrl().add(((Node) o).getText().trim());
+		}
+		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='URL']")) {
+			instance.getUrl().add(((Node) o).getText().trim());
+		}
+		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='DOI']")) {
+			instance.getUrl().add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
+		}
+		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='DOI']")) {
+			instance.getUrl().add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
+		}
+		return Arrays.asList(instance);
+	}
 
-  @Override
-  protected List<StructuredProperty> prepareRelevantDates(final Document doc, final DataInfo info) {
-    final List<StructuredProperty> res = new ArrayList<>();
-    for (final Object o : doc.selectNodes("//datacite:date")) {
-      final String dateType = ((Node) o).valueOf("@dateType");
-      if (StringUtils.isBlank(dateType)
-          && !dateType.equalsIgnoreCase("Accepted")
-          && !dateType.equalsIgnoreCase("Issued")
-          && !dateType.equalsIgnoreCase("Updated")
-          && !dateType.equalsIgnoreCase("Available")) {
-        res.add(
-            structuredProperty(
-                ((Node) o).getText(),
-                "UNKNOWN",
-                "UNKNOWN",
-                "dnet:dataCite_date",
-                "dnet:dataCite_date",
-                info));
-      }
-    }
-    return res;
-  }
+	@Override
+	protected List<Field<String>> prepareSources(final Document doc, final DataInfo info) {
+		return new ArrayList<>(); // Not present in ODF ???
+	}
 
-  @Override
-  protected List<Field<String>> prepareCoverages(final Document doc, final DataInfo info) {
-    return new ArrayList<>(); // Not present in ODF ???
-  }
+	@Override
+	protected List<StructuredProperty> prepareRelevantDates(final Document doc, final DataInfo info) {
+		final List<StructuredProperty> res = new ArrayList<>();
+		for (final Object o : doc.selectNodes("//datacite:date")) {
+			final String dateType = ((Node) o).valueOf("@dateType");
+			if (StringUtils.isBlank(dateType)
+				&& !dateType.equalsIgnoreCase("Accepted")
+				&& !dateType.equalsIgnoreCase("Issued")
+				&& !dateType.equalsIgnoreCase("Updated")
+				&& !dateType.equalsIgnoreCase("Available")) {
+				res
+					.add(
+						structuredProperty(
+							((Node) o).getText(),
+							"UNKNOWN",
+							"UNKNOWN",
+							DNET_DATA_CITE_DATE,
+							DNET_DATA_CITE_DATE,
+							info));
+			}
+		}
+		return res;
+	}
 
-  @Override
-  protected List<Field<String>> prepareContributors(final Document doc, final DataInfo info) {
-    return prepareListFields(doc, "//datacite:contributorName", info);
-  }
+	@Override
+	protected List<Field<String>> prepareCoverages(final Document doc, final DataInfo info) {
+		return new ArrayList<>(); // Not present in ODF ???
+	}
 
-  @Override
-  protected List<Field<String>> prepareFormats(final Document doc, final DataInfo info) {
-    return prepareListFields(doc, "//datacite:format", info);
-  }
+	@Override
+	protected List<Field<String>> prepareContributors(final Document doc, final DataInfo info) {
+		return prepareListFields(doc, "//datacite:contributorName", info);
+	}
 
-  @Override
-  protected Field<String> preparePublisher(final Document doc, final DataInfo info) {
-    return prepareField(doc, "//datacite:publisher", info);
-  }
+	@Override
+	protected List<Field<String>> prepareFormats(final Document doc, final DataInfo info) {
+		return prepareListFields(doc, "//datacite:format", info);
+	}
 
-  @Override
-  protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-    return prepareListFields(doc, "//datacite:description[@descriptionType='Abstract']", info);
-  }
+	@Override
+	protected Field<String> preparePublisher(final Document doc, final DataInfo info) {
+		return prepareField(doc, "//datacite:publisher", info);
+	}
 
-  @Override
-  protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-    return prepareListStructProps(doc, "//datacite:subject", info);
-  }
+	@Override
+	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
+		return prepareListFields(doc, "//datacite:description[@descriptionType='Abstract']", info);
+	}
 
-  @Override
-  protected Qualifier prepareLanguages(final Document doc) {
-    return prepareQualifier(doc, "//datacite:language", "dnet:languages", "dnet:languages");
-  }
+	@Override
+	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
+		return prepareListStructProps(doc, "//datacite:subject", info);
+	}
 
-  @Override
-  protected List<Field<String>> prepareOtherResearchProductTools(
-      final Document doc, final DataInfo info) {
-    return new ArrayList<>(); // Not present in ODF ???
-  }
+	@Override
+	protected Qualifier prepareLanguages(final Document doc) {
+		return prepareQualifier(doc, "//datacite:language", DNET_LANGUAGES, DNET_LANGUAGES);
+	}
 
-  @Override
-  protected List<Field<String>> prepareOtherResearchProductContactGroups(
-      final Document doc, final DataInfo info) {
-    return prepareListFields(
-        doc,
-        "//datacite:contributor[@contributorType='ContactGroup']/datacite:contributorName",
-        info);
-  }
+	@Override
+	protected List<Field<String>> prepareOtherResearchProductTools(
+		final Document doc, final DataInfo info) {
+		return new ArrayList<>(); // Not present in ODF ???
+	}
 
-  @Override
-  protected List<Field<String>> prepareOtherResearchProductContactPersons(
-      final Document doc, final DataInfo info) {
-    return prepareListFields(
-        doc,
-        "//datacite:contributor[@contributorType='ContactPerson']/datacite:contributorName",
-        info);
-  }
+	@Override
+	protected List<Field<String>> prepareOtherResearchProductContactGroups(
+		final Document doc, final DataInfo info) {
+		return prepareListFields(
+			doc,
+			"//datacite:contributor[@contributorType='ContactGroup']/datacite:contributorName",
+			info);
+	}
 
-  @Override
-  protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
-    return prepareQualifier(
-        doc, "//datacite:format", "dnet:programming_languages", "dnet:programming_languages");
-  }
+	@Override
+	protected List<Field<String>> prepareOtherResearchProductContactPersons(
+		final Document doc, final DataInfo info) {
+		return prepareListFields(
+			doc,
+			"//datacite:contributor[@contributorType='ContactPerson']/datacite:contributorName",
+			info);
+	}
 
-  @Override
-  protected Field<String> prepareSoftwareCodeRepositoryUrl(
-      final Document doc, final DataInfo info) {
-    return null; // Not present in ODF ???
-  }
+	@Override
+	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
+		return prepareQualifier(
+			doc, "//datacite:format", "dnet:programming_languages", "dnet:programming_languages");
+	}
 
-  @Override
-  protected List<StructuredProperty> prepareSoftwareLicenses(
-      final Document doc, final DataInfo info) {
-    return new ArrayList<>(); // Not present in ODF ???
-  }
+	@Override
+	protected Field<String> prepareSoftwareCodeRepositoryUrl(
+		final Document doc, final DataInfo info) {
+		return null; // Not present in ODF ???
+	}
 
-  @Override
-  protected List<Field<String>> prepareSoftwareDocumentationUrls(
-      final Document doc, final DataInfo info) {
-    return prepareListFields(
-        doc,
-        "//datacite:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']",
-        info);
-  }
+	@Override
+	protected List<StructuredProperty> prepareSoftwareLicenses(
+		final Document doc, final DataInfo info) {
+		return new ArrayList<>(); // Not present in ODF ???
+	}
 
-  // DATASETS
+	@Override
+	protected List<Field<String>> prepareSoftwareDocumentationUrls(
+		final Document doc, final DataInfo info) {
+		return prepareListFields(
+			doc,
+			"//datacite:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']",
+			info);
+	}
 
-  @Override
-  protected List<GeoLocation> prepareDatasetGeoLocations(final Document doc, final DataInfo info) {
-    final List<GeoLocation> res = new ArrayList<>();
+	// DATASETS
 
-    for (final Object o : doc.selectNodes("//datacite:geoLocation")) {
-      final GeoLocation loc = new GeoLocation();
-      loc.setBox(((Node) o).valueOf("./datacite:geoLocationBox"));
-      loc.setPlace(((Node) o).valueOf("./datacite:geoLocationPlace"));
-      loc.setPoint(((Node) o).valueOf("./datacite:geoLocationPoint"));
-      res.add(loc);
-    }
-    return res;
-  }
+	@Override
+	protected List<GeoLocation> prepareDatasetGeoLocations(final Document doc, final DataInfo info) {
+		final List<GeoLocation> res = new ArrayList<>();
 
-  @Override
-  protected Field<String> prepareDatasetMetadataVersionNumber(
-      final Document doc, final DataInfo info) {
-    return null; // Not present in ODF ???
-  }
+		for (final Object o : doc.selectNodes("//datacite:geoLocation")) {
+			final GeoLocation loc = new GeoLocation();
+			loc.setBox(((Node) o).valueOf("./datacite:geoLocationBox"));
+			loc.setPlace(((Node) o).valueOf("./datacite:geoLocationPlace"));
+			loc.setPoint(((Node) o).valueOf("./datacite:geoLocationPoint"));
+			res.add(loc);
+		}
+		return res;
+	}
 
-  @Override
-  protected Field<String> prepareDatasetLastMetadataUpdate(
-      final Document doc, final DataInfo info) {
-    return prepareField(doc, "//datacite:date[@dateType='Updated']", info);
-  }
+	@Override
+	protected Field<String> prepareDatasetMetadataVersionNumber(
+		final Document doc, final DataInfo info) {
+		return null; // Not present in ODF ???
+	}
 
-  @Override
-  protected Field<String> prepareDatasetVersion(final Document doc, final DataInfo info) {
-    return prepareField(doc, "//datacite:version", info);
-  }
+	@Override
+	protected Field<String> prepareDatasetLastMetadataUpdate(
+		final Document doc, final DataInfo info) {
+		return prepareField(doc, "//datacite:date[@dateType='Updated']", info);
+	}
 
-  @Override
-  protected Field<String> prepareDatasetSize(final Document doc, final DataInfo info) {
-    return prepareField(doc, "//datacite:size", info);
-  }
+	@Override
+	protected Field<String> prepareDatasetVersion(final Document doc, final DataInfo info) {
+		return prepareField(doc, "//datacite:version", info);
+	}
 
-  @Override
-  protected Field<String> prepareDatasetDevice(final Document doc, final DataInfo info) {
-    return null; // Not present in ODF ???
-  }
+	@Override
+	protected Field<String> prepareDatasetSize(final Document doc, final DataInfo info) {
+		return prepareField(doc, "//datacite:size", info);
+	}
 
-  @Override
-  protected Field<String> prepareDatasetStorageDate(final Document doc, final DataInfo info) {
-    return prepareField(doc, "//datacite:date[@dateType='Issued']", info);
-  }
+	@Override
+	protected Field<String> prepareDatasetDevice(final Document doc, final DataInfo info) {
+		return null; // Not present in ODF ???
+	}
 
-  @Override
-  protected List<Oaf> addOtherResultRels(
-      final Document doc,
-      final KeyValue collectedFrom,
-      final DataInfo info,
-      final long lastUpdateTimestamp) {
+	@Override
+	protected Field<String> prepareDatasetStorageDate(final Document doc, final DataInfo info) {
+		return prepareField(doc, "//datacite:date[@dateType='Issued']", info);
+	}
 
-    final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
+	@Override
+	protected List<Oaf> addOtherResultRels(
+		final Document doc,
+		final KeyValue collectedFrom,
+		final DataInfo info,
+		final long lastUpdateTimestamp) {
 
-    final List<Oaf> res = new ArrayList<>();
+		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
 
-    for (final Object o :
-        doc.selectNodes("//datacite:relatedIdentifier[@relatedIdentifierType='OPENAIRE']")) {
+		final List<Oaf> res = new ArrayList<>();
 
-      final String originalId = ((Node) o).getText();
+		for (final Object o : doc.selectNodes("//datacite:relatedIdentifier[@relatedIdentifierType='OPENAIRE']")) {
 
-      if (StringUtils.isNotBlank(originalId)) {
-        final String otherId = createOpenaireId(50, originalId, false);
-        final String type = ((Node) o).valueOf("@relationType");
+			final String originalId = ((Node) o).getText();
 
-        if (type.equals("IsSupplementTo")) {
-          res.add(
-              prepareOtherResultRel(
-                  collectedFrom,
-                  info,
-                  lastUpdateTimestamp,
-                  docId,
-                  otherId,
-                  "supplement",
-                  "isSupplementTo"));
-          res.add(
-              prepareOtherResultRel(
-                  collectedFrom,
-                  info,
-                  lastUpdateTimestamp,
-                  otherId,
-                  docId,
-                  "supplement",
-                  "isSupplementedBy"));
-        } else if (type.equals("IsPartOf")) {
-          res.add(
-              prepareOtherResultRel(
-                  collectedFrom, info, lastUpdateTimestamp, docId, otherId, "part", "IsPartOf"));
-          res.add(
-              prepareOtherResultRel(
-                  collectedFrom, info, lastUpdateTimestamp, otherId, docId, "part", "HasParts"));
-        } else {
-        }
-      }
-    }
-    return res;
-  }
+			if (StringUtils.isNotBlank(originalId)) {
+				final String otherId = createOpenaireId(50, originalId, false);
+				final String type = ((Node) o).valueOf("@relationType");
 
-  private Relation prepareOtherResultRel(
-      final KeyValue collectedFrom,
-      final DataInfo info,
-      final long lastUpdateTimestamp,
-      final String source,
-      final String target,
-      final String subRelType,
-      final String relClass) {
-    final Relation r = new Relation();
-    r.setRelType("resultResult");
-    r.setSubRelType(subRelType);
-    r.setRelClass(relClass);
-    r.setSource(source);
-    r.setTarget(target);
-    r.setCollectedfrom(Arrays.asList(collectedFrom));
-    r.setDataInfo(info);
-    r.setLastupdatetimestamp(lastUpdateTimestamp);
-    return r;
-  }
+				if (type.equalsIgnoreCase("IsSupplementTo")) {
+					res
+						.add(
+							getRelation(
+								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, collectedFrom, info,
+								lastUpdateTimestamp));
+					res
+						.add(
+							getRelation(
+								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, collectedFrom, info,
+								lastUpdateTimestamp));
+				} else if (type.equals("IsPartOf")) {
 
-  @Override
-  protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
-    return prepareQualifier(
-        doc,
-        "//*[local-name() = 'resource']//*[local-name() = 'resourceType']",
-        "dnet:dataCite_resource",
-        "dnet:dataCite_resource");
-  }
+					res
+						.add(
+							getRelation(
+								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, collectedFrom, info,
+								lastUpdateTimestamp));
+					res
+						.add(
+							getRelation(
+								otherId, docId, RESULT_RESULT, PART, HAS_PARTS, collectedFrom, info,
+								lastUpdateTimestamp));
+				} else {
+				}
+			}
+		}
+		return res;
+	}
+
+	@Override
+	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
+		return prepareQualifier(
+			doc,
+			"//*[local-name() = 'resource']//*[local-name() = 'resourceType']",
+			DNET_DATA_CITE_RESOURCE,
+			DNET_DATA_CITE_RESOURCE);
+	}
 }

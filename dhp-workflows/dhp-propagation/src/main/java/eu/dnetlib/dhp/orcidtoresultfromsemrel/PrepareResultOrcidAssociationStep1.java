@@ -1,134 +1,125 @@
+
 package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
+
 public class PrepareResultOrcidAssociationStep1 {
-    private static final Logger log =
-            LoggerFactory.getLogger(PrepareResultOrcidAssociationStep1.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareResultOrcidAssociationStep1.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	public static void main(String[] args) throws Exception {
+		String jsonConf = IOUtils
+			.toString(
+				PrepareResultOrcidAssociationStep1.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_prepareorcidtoresult_parameters.json"));
 
-    public static void main(String[] args) throws Exception {
-        String jsonConfiguration =
-                IOUtils.toString(
-                        SparkOrcidToResultFromSemRelJob3.class.getResourceAsStream(
-                                "/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_prepareorcidtoresult_parameters.json"));
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConf);
+		parser.parseArgument(args);
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        parser.parseArgument(args);
+		String inputPath = parser.get("sourcePath");
+		log.info("inputPath: {}", inputPath);
 
-        Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath: {}", outputPath);
 
-        String inputPath = parser.get("sourcePath");
-        log.info("inputPath: {}", inputPath);
+		final String resultClassName = parser.get("resultTableName");
+		log.info("resultTableName: {}", resultClassName);
 
-        final String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+		final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
+		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
-        final String resultClassName = parser.get("resultTableName");
-        log.info("resultTableName: {}", resultClassName);
+		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
+		log.info("resultType: {}", resultType);
 
-        final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
-        log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
+		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
-        final String resultType =
-                resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
-        log.info("resultType: {}", resultType);
+		SparkConf conf = new SparkConf();
+		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-        Class<? extends Result> resultClazz =
-                (Class<? extends Result>) Class.forName(resultClassName);
+		String inputRelationPath = inputPath + "/relation";
+		log.info("inputRelationPath: {}", inputRelationPath);
 
-        SparkConf conf = new SparkConf();
-        conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
+		String inputResultPath = inputPath + "/" + resultType;
+		log.info("inputResultPath: {}", inputResultPath);
 
-        runWithSparkHiveSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    if (isTest(parser)) {
-                        removeOutputDir(spark, outputPath);
-                    }
-                    prepareInfo(
-                            spark, inputPath, outputPath, resultClazz, resultType, allowedsemrel);
-                });
-    }
+		String outputResultPath = outputPath + "/" + resultType;
+		log.info("outputResultPath: {}", outputResultPath);
 
-    private static <R extends Result> void prepareInfo(
-            SparkSession spark,
-            String inputPath,
-            String outputPath,
-            Class<R> resultClazz,
-            String resultType,
-            List<String> allowedsemrel) {
+		runWithSparkHiveSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				if (isTest(parser)) {
+					removeOutputDir(spark, outputPath);
+				}
+				prepareInfo(
+					spark, inputRelationPath, inputResultPath, outputResultPath, resultClazz, allowedsemrel);
+			});
+	}
 
-        // read the relation table and the table related to the result it is using
-        final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
-        org.apache.spark.sql.Dataset<Relation> relation =
-                spark.createDataset(
-                        sc.textFile(inputPath + "/relation")
-                                .map(item -> OBJECT_MAPPER.readValue(item, Relation.class))
-                                .rdd(),
-                        Encoders.bean(Relation.class));
-        relation.createOrReplaceTempView("relation");
+	private static <R extends Result> void prepareInfo(
+		SparkSession spark,
+		String inputRelationPath,
+		String inputResultPath,
+		String outputResultPath,
+		Class<R> resultClazz,
+		List<String> allowedsemrel) {
 
-        log.info("Reading Graph table from: {}", inputPath + "/" + resultType);
-        Dataset<R> result = readPathEntity(spark, inputPath + "/" + resultType, resultClazz);
+		Dataset<Relation> relation = readPath(spark, inputRelationPath, Relation.class);
+		relation.createOrReplaceTempView("relation");
 
-        result.createOrReplaceTempView("result");
+		log.info("Reading Graph table from: {}", inputResultPath);
+		Dataset<R> result = readPath(spark, inputResultPath, resultClazz);
+		result.createOrReplaceTempView("result");
 
-        getPossibleResultOrcidAssociation(spark, allowedsemrel, outputPath + "/" + resultType);
-    }
+		String query = " select target resultId, author authorList"
+			+ " from (select id, collect_set(named_struct('name', name, 'surname', surname, 'fullname', fullname, 'orcid', orcid)) author "
+			+ " from ( "
+			+ " select id, MyT.fullname, MyT.name, MyT.surname, MyP.value orcid "
+			+ " from result "
+			+ " lateral view explode (author) a as MyT "
+			+ " lateral view explode (MyT.pid) p as MyP "
+			+ " where MyP.qualifier.classid = 'ORCID') tmp "
+			+ " group by id) r_t "
+			+ " join ("
+			+ " select source, target "
+			+ " from relation "
+			+ " where datainfo.deletedbyinference = false "
+			+ getConstraintList(" relclass = '", allowedsemrel)
+			+ ") rel_rel "
+			+ " on source = id";
+		spark
+			.sql(query)
+			.as(Encoders.bean(ResultOrcidList.class))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputResultPath);
+	}
 
-    private static void getPossibleResultOrcidAssociation(
-            SparkSession spark, List<String> allowedsemrel, String outputPath) {
-        String query =
-                " select target resultId, author authorList"
-                        + " from (select id, collect_set(named_struct('name', name, 'surname', surname, 'fullname', fullname, 'orcid', orcid)) author "
-                        + " from ( "
-                        + " select id, MyT.fullname, MyT.name, MyT.surname, MyP.value orcid "
-                        + " from result "
-                        + " lateral view explode (author) a as MyT "
-                        + " lateral view explode (MyT.pid) p as MyP "
-                        + " where MyP.qualifier.classid = 'ORCID') tmp "
-                        + " group by id) r_t "
-                        + " join ("
-                        + " select source, target "
-                        + " from relation "
-                        + " where datainfo.deletedbyinference = false "
-                        + getConstraintList(" relclass = '", allowedsemrel)
-                        + ") rel_rel "
-                        + " on source = id";
-
-        spark.sql(query)
-                .as(Encoders.bean(ResultOrcidList.class))
-                .toJavaRDD()
-                .map(r -> OBJECT_MAPPER.writeValueAsString(r))
-                .saveAsTextFile(outputPath, GzipCodec.class);
-        //                .toJSON()
-        //        .write()
-        //        .mode(SaveMode.Append)
-        //        .option("compression","gzip")
-        //        .text(outputPath)
-        //        ;
-    }
 }

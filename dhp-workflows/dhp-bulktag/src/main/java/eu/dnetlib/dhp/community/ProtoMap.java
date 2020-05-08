@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.community;
 
 import java.io.Serializable;
@@ -5,7 +6,7 @@ import java.util.HashMap;
 
 public class ProtoMap extends HashMap<String, String> implements Serializable {
 
-    public ProtoMap() {
-        super();
-    }
+	public ProtoMap() {
+		super();
+	}
 }

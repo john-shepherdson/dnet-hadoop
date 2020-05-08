@@ -8,22 +8,10 @@
             <name>allowedsemrels</name>
             <description>the allowed semantics </description>
         </property>
-        <property>
-            <name>sparkDriverMemory</name>
-            <description>memory for driver process</description>
-        </property>
-        <property>
-            <name>sparkExecutorMemory</name>
-            <description>memory for individual executor</description>
-        </property>
-        <property>
-            <name>sparkExecutorCores</name>
-            <description>number of cores used by single executor</description>
-        </property>
-        <property>
-            <name>saveGraph</name>
-            <description>writes new version of the graph after the propagation step</description>
-        </property>
+       <property>
+           <name>outputPath</name>
+           <description>the output path</description>
+       </property>
     </parameters>
 
     <start to="reset-outputpath"/>
@@ -35,21 +23,27 @@
     <action name="reset-outputpath">
         <fs>
             <delete path='${workingDir}/preparedInfo'/>
-            <delete path='${workingDir}/relation'/>
-            <delete path='${workingDir}/dataset'/>
-            <delete path='${workingDir}/software'/>
-            <delete path='${workingDir}/publication'/>
-            <delete path='${workingDir}/otherresearchproduct'/>
+            <delete path='${outputPath}/relation'/>
+            <delete path='${outputPath}/dataset'/>
+            <delete path='${outputPath}/software'/>
+            <delete path='${outputPath}/publication'/>
+            <delete path='${outputPath}/otherresearchproduct'/>
+            <delete path='${outputPath}/project'/>
+            <delete path='${outputPath}/organization'/>
+            <delete path='${outputPath}/datasource'/>
         </fs>
-        <ok to="copy_relations"/>
+        <ok to="copy_entities"/>
         <error to="Kill"/>
     </action>
-    <fork name="copy_relations">
+    <fork name="copy_entities">
         <path start="copy_relation"/>
         <path start="copy_publication"/>
         <path start="copy_dataset"/>
         <path start="copy_orp"/>
         <path start="copy_software"/>
+        <path start="copy_organization"/>
+        <path start="copy_projects"/>
+        <path start="copy_datasources"/>
     </fork>
 
     <action name="copy_relation">
@@ -57,7 +51,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${workingDir}/relation</arg>
+            <arg>${nameNode}/${outputPath}/relation</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -68,7 +62,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/publication</arg>
-            <arg>${nameNode}/${workingDir}/publication</arg>
+            <arg>${nameNode}/${outputPath}/publication</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -79,7 +73,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/dataset</arg>
-            <arg>${nameNode}/${workingDir}/dataset</arg>
+            <arg>${nameNode}/${outputPath}/dataset</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -90,7 +84,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/otherresearchproduct</arg>
-            <arg>${nameNode}/${workingDir}/otherresearchproduct</arg>
+            <arg>${nameNode}/${outputPath}/otherresearchproduct</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -101,7 +95,38 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/software</arg>
-            <arg>${nameNode}/${workingDir}/software</arg>
+            <arg>${nameNode}/${outputPath}/software</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/organization</arg>
+            <arg>${nameNode}/${outputPath}/organization</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_projects">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/project</arg>
+            <arg>${nameNode}/${outputPath}/project</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_datasources">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/datasource</arg>
+            <arg>${nameNode}/${outputPath}/datasource</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -141,7 +166,7 @@
                 <master>yarn</master>
                 <mode>cluster</mode>
                 <name>ProjectToResultPropagation</name>
-                <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob3</class>
+                <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
                 <jar>dhp-propagation-${projectVersion}.jar</jar>
                 <spark-opts>
                     --executor-cores=${sparkExecutorCores}
@@ -156,7 +181,7 @@
                 </spark-opts>
                 <arg>--saveGraph</arg><arg>${saveGraph}</arg>
                 <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-                <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
+                <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
                 <arg>--potentialUpdatePath</arg><arg>${workingDir}/preparedInfo/potentialUpdates</arg>
                 <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
             </spark>
