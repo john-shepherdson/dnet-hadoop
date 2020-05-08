@@ -77,7 +77,6 @@ public class CountryPropagationJobTest {
 				new String[] {
 					"--isSparkSessionManaged", Boolean.FALSE.toString(),
 					"--sourcePath", sourcePath,
-					"--hive_metastore_uris", "",
 					"-saveGraph", "true",
 					"-resultTableName", Software.class.getCanonicalName(),
 					"-outputPath", workingDir.toString() + "/software",
