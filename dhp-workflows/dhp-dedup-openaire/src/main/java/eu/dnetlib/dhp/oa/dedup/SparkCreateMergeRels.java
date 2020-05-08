@@ -137,10 +137,14 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 	}
 
 	private Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
-		Relation r = new Relation();
+
+        String entityType = dedupConf.getWf().getEntityType();
+
+        Relation r = new Relation();
 		r.setSource(source);
 		r.setTarget(target);
 		r.setRelClass(relClass);
+		r.setRelType(entityType + entityType.substring(0, 1).toUpperCase() + entityType.substring(1));
 		r.setSubRelType("dedup");
 
 		DataInfo info = new DataInfo();
