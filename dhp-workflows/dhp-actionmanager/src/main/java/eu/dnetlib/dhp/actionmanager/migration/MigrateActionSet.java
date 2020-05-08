@@ -82,10 +82,9 @@ public class MigrateActionSet {
 		List<Path> targetPaths = new ArrayList<>();
 
 		final List<Path> sourcePaths = getSourcePaths(sourceNN, isLookUp);
-		log
-			.info(
-				"paths to process:\n{}",
-				sourcePaths.stream().map(p -> p.toString()).collect(Collectors.joining("\n")));
+		log.info("paths to process:\n{}", sourcePaths
+				.stream().map(p -> p.toString()).collect(Collectors.joining("\n")));
+
 		for (Path source : sourcePaths) {
 
 			if (!sourceFS.exists(source)) {
@@ -119,9 +118,8 @@ public class MigrateActionSet {
 			}
 		}
 
-		props
-			.setProperty(
-				TARGET_PATHS, targetPaths.stream().map(p -> p.toString()).collect(Collectors.joining(",")));
+		final String targetPathsCsv = targetPaths.stream().map(p -> p.toString()).collect(Collectors.joining(","));
+		props.setProperty(TARGET_PATHS, targetPathsCsv);
 		File file = new File(System.getProperty("oozie.action.output.properties"));
 
 		try (OutputStream os = new FileOutputStream(file)) {
