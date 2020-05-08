@@ -1,32 +1,25 @@
 <workflow-app name="affiliation_from_instrepo_propagation" xmlns="uri:oozie:workflow:0.5">
-<parameters>
-    <property>
-        <name>sourcePath</name>
-        <description>the source path</description>
-    </property>
-    <property>
-        <name>outputPath</name>
-        <description>sets the outputPath</description>
-    </property>
-</parameters>
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>sets the outputPath</description>
+        </property>
+    </parameters>
 
-<start to="reset-outputpath"/>
-<!--<start to="prepare_result_organization_association"/>-->
-<kill name="Kill">
-    <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-</kill>
+    <start to="reset_outputpath"/>
 
-    <action name="reset-outputpath">
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="reset_outputpath">
         <fs>
-            <delete path='${outputPath}/relation'/>
-            <delete path='${outputPath}/datasource'/>
-            <delete path='${outputPath}/organization'/>
-            <delete path='${outputPath}/project'/>
-            <delete path='${outputPath}/publication'/>
-            <delete path='${outputPath}/dataset'/>
-            <delete path='${outputPath}/software'/>
-            <delete path='${outputPath}/otherresearchproduct'/>
-            <delete path='${workingDir}/preparedInfo'/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="copy_entities"/>
         <error to="Kill"/>
@@ -53,6 +46,7 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="copy_publication">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -85,6 +79,7 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="copy_software">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -95,6 +90,7 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="copy_organization">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -151,9 +147,9 @@
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
         </spark>
         <ok to="fork_join_apply_resulttoorganization_propagation"/>
-        <!--        <ok to="End"/>-->
         <error to="Kill"/>
     </action>
+
     <fork name="fork_join_apply_resulttoorganization_propagation">
         <path start="join_propagation_publication"/>
         <path start="join_propagation_dataset"/>
@@ -220,6 +216,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagation_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -281,6 +278,7 @@
     </action>
 
     <join name="wait2" to="End"/>
+
     <end name="End"/>
 
 </workflow-app>

@@ -27,14 +27,8 @@
 
     <action name="reset_outputpath">
         <fs>
-            <delete path="${outputPath}/relation"/>
-            <delete path="${outputPath}/dataset"/>
-            <delete path="${outputPath}/software"/>
-            <delete path="${outputPath}/publication"/>
-            <delete path="${outputPath}/otherresearchproduct"/>
-            <delete path="${outputPath}/project"/>
-            <delete path="${outputPath}/organization"/>
-            <delete path="${outputPath}/datasource"/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="copy_entities"/>
         <error to="Kill"/>

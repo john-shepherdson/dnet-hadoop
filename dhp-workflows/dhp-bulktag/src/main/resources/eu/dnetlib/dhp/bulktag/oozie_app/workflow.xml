@@ -1,39 +1,33 @@
 <workflow-app name="bulk_tagging" xmlns="uri:oozie:workflow:0.5">
-<parameters>
-    <property>
-        <name>sourcePath</name>
-        <description>the source path</description>
-    </property>
-    <property>
-        <name>isLookUpUrl</name>
-        <description>the isLookup service endpoint</description>
-    </property>
-    <property>
-        <name>pathMap</name>
-        <description>the json path associated to each selection field</description>
-    </property>
-    <property>
-        <name>outputPath</name>
-        <description>the output path</description>
-    </property>
-</parameters>
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>isLookUpUrl</name>
+            <description>the isLookup service endpoint</description>
+        </property>
+        <property>
+            <name>pathMap</name>
+            <description>the json path associated to each selection field</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the output path</description>
+        </property>
+    </parameters>
 
-<start to="reset-outputpath"/>
+    <start to="reset_outputpath"/>
 
-<kill name="Kill">
-    <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-</kill>
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
 
-    <action name="reset-outputpath">
+    <action name="reset_outputpath">
         <fs>
-            <delete path='${outputPath}/relation'/>
-            <delete path='${outputPath}/dataset'/>
-            <delete path='${outputPath}/software'/>
-            <delete path='${outputPath}/publication'/>
-            <delete path='${outputPath}/otherresearchproduct'/>
-            <delete path='${outputPath}/project'/>
-            <delete path='${outputPath}/organization'/>
-            <delete path='${outputPath}/datasource'/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="copy_entities"/>
         <error to="Kill"/>
@@ -67,6 +61,7 @@
         <ok to="copy_wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="copy_projects">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -91,14 +86,13 @@
 
     <join name="copy_wait" to="fork_exec_bulktag"/>
 
+    <fork name="fork_exec_bulktag">
+        <path start="join_bulktag_publication"/>
+        <path start="join_bulktag_dataset"/>
+        <path start="join_bulktag_otherresearchproduct"/>
+        <path start="join_bulktag_software"/>
+    </fork>
 
-
-<fork name="fork_exec_bulktag">
-    <path start="join_bulktag_publication"/>
-    <path start="join_bulktag_dataset"/>
-    <path start="join_bulktag_otherresearchproduct"/>
-    <path start="join_bulktag_software"/>
-</fork>
     <action name="join_bulktag_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -127,6 +121,7 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_bulktag_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -155,6 +150,7 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_bulktag_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -183,6 +179,7 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_bulktag_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -211,6 +208,9 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
-<join name="wait" to="End"/>
-<end name="End"/>
+
+    <join name="wait" to="End"/>
+
+    <end name="End"/>
+
 </workflow-app>

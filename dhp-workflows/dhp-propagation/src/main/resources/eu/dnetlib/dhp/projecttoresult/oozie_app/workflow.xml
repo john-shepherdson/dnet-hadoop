@@ -14,27 +14,21 @@
        </property>
     </parameters>
 
-    <start to="reset-outputpath"/>
-<!--    <start to="apply_propagation"/>-->
+    <start to="reset_outputpath"/>
+
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="reset-outputpath">
+    <action name="reset_outputpath">
         <fs>
-            <delete path='${workingDir}/preparedInfo'/>
-            <delete path='${outputPath}/relation'/>
-            <delete path='${outputPath}/dataset'/>
-            <delete path='${outputPath}/software'/>
-            <delete path='${outputPath}/publication'/>
-            <delete path='${outputPath}/otherresearchproduct'/>
-            <delete path='${outputPath}/project'/>
-            <delete path='${outputPath}/organization'/>
-            <delete path='${outputPath}/datasource'/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="copy_entities"/>
         <error to="Kill"/>
     </action>
+
     <fork name="copy_entities">
         <path start="copy_relation"/>
         <path start="copy_publication"/>
@@ -190,4 +184,5 @@
         </action>
 
     <end name="End"/>
+
 </workflow-app>

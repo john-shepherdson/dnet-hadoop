@@ -14,23 +14,16 @@
         </property>
     </parameters>
 
-    <start to="reset-outputpath"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="reset-outputpath">
+    <action name="reset_outputpath">
         <fs>
-            <delete path='${outputPath}/relation'/>
-            <delete path='${outputPath}/datasource'/>
-            <delete path='${outputPath}/organization'/>
-            <delete path='${outputPath}/project'/>
-            <delete path='${outputPath}/publication'/>
-            <delete path='${outputPath}/dataset'/>
-            <delete path='${outputPath}/software'/>
-            <delete path='${outputPath}/otherresearchproduct'/>
-            <delete path='${workingDir}/preparedInfo'/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="copy_entities"/>
         <error to="Kill"/>
@@ -64,6 +57,7 @@
         <ok to="copy_wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="copy_projects">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -85,6 +79,7 @@
         <ok to="copy_wait"/>
         <error to="Kill"/>
     </action>
+
     <join name="copy_wait" to="prepare_result_communitylist"/>
 
     <action name="prepare_result_communitylist">
@@ -111,7 +106,6 @@
             <arg>--organizationtoresultcommunitymap</arg><arg>${organizationtoresultcommunitymap}</arg>
         </spark>
         <ok to="fork-join-exec-propagation"/>
-<!--        <ok to="End"/>-->
         <error to="Kill"/>
     </action>
 
@@ -150,6 +144,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -178,6 +173,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -206,6 +202,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -238,4 +235,5 @@
     <join name="wait2" to="End"/>
 
     <end name="End"/>
+
 </workflow-app>
