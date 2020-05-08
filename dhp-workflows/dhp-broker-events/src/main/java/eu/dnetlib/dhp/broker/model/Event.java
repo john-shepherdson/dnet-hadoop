@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.broker.model;
 
 import java.util.Map;
@@ -20,9 +21,11 @@ public class Event {
 
 	private Map<String, Object> map;
 
-	public Event() {}
+	public Event() {
+	}
 
-	public Event(final String producerId, final String eventId, final String topic, final String payload, final Long creationDate, final Long expiryDate,
+	public Event(final String producerId, final String eventId, final String topic, final String payload,
+		final Long creationDate, final Long expiryDate,
 		final boolean instantMessage,
 		final Map<String, Object> map) {
 		this.producerId = producerId;

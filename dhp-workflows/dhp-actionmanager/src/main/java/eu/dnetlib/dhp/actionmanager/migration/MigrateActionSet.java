@@ -82,8 +82,12 @@ public class MigrateActionSet {
 		List<Path> targetPaths = new ArrayList<>();
 
 		final List<Path> sourcePaths = getSourcePaths(sourceNN, isLookUp);
-		log.info("paths to process:\n{}", sourcePaths
-				.stream().map(p -> p.toString()).collect(Collectors.joining("\n")));
+		log
+			.info(
+				"paths to process:\n{}", sourcePaths
+					.stream()
+					.map(p -> p.toString())
+					.collect(Collectors.joining("\n")));
 
 		for (Path source : sourcePaths) {
 

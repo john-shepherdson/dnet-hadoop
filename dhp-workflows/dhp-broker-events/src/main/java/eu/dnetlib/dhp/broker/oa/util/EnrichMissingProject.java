@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.broker.oa.util;
 
 import java.util.Arrays;
@@ -25,7 +26,8 @@ public class EnrichMissingProject extends UpdateInfo<Project> {
 
 	@Override
 	public String getHighlightValueAsString() {
-		return getHighlightValue().getFunder() + "::" + getHighlightValue().getFundingProgram() + getHighlightValue().getCode();
+		return getHighlightValue().getFunder() + "::" + getHighlightValue().getFundingProgram()
+			+ getHighlightValue().getCode();
 	}
 
 }

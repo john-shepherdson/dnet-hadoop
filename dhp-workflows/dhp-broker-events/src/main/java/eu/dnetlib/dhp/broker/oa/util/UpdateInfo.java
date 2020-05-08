@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.broker.oa.util;
 
 import eu.dnetlib.broker.objects.OpenAireEventPayload;

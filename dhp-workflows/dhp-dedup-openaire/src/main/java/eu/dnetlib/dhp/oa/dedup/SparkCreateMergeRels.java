@@ -138,9 +138,9 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 	private Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
 
-        String entityType = dedupConf.getWf().getEntityType();
+		String entityType = dedupConf.getWf().getEntityType();
 
-        Relation r = new Relation();
+		Relation r = new Relation();
 		r.setSource(source);
 		r.setTarget(target);
 		r.setRelClass(relClass);

@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.broker.model;
 
 import java.text.ParseException;
@@ -38,8 +39,8 @@ public class EventFactory {
 
 		final String payload = createPayload(target, updateInfo);
 
-		final String eventId =
-			calculateEventId(updateInfo.getTopic(), target.getOriginalId().get(0), updateInfo.getHighlightValueAsString());
+		final String eventId = calculateEventId(
+			updateInfo.getTopic(), target.getOriginalId().get(0), updateInfo.getHighlightValueAsString());
 
 		res.setEventId(eventId);
 		res.setProducerId(PRODUCER_ID);
@@ -61,7 +62,8 @@ public class EventFactory {
 		return payload.toJSON();
 	}
 
-	private static Map<String, Object> createMapFromResult(final Result oaf, final Result source, final UpdateInfo<?> updateInfo) {
+	private static Map<String, Object> createMapFromResult(final Result oaf, final Result source,
+		final UpdateInfo<?> updateInfo) {
 		final Map<String, Object> map = new HashMap<>();
 
 		final List<KeyValue> collectedFrom = oaf.getCollectedfrom();
@@ -87,12 +89,18 @@ public class EventFactory {
 
 		final List<StructuredProperty> subjects = oaf.getSubject();
 		if (subjects.size() > 0) {
-			map.put("target_publication_subject_list", subjects.stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
+			map
+				.put(
+					"target_publication_subject_list",
+					subjects.stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
 		}
 
 		final List<Author> authors = oaf.getAuthor();
 		if (authors.size() > 0) {
-			map.put("target_publication_author_list", authors.stream().map(Author::getFullname).collect(Collectors.toList()));
+			map
+				.put(
+					"target_publication_author_list",
+					authors.stream().map(Author::getFullname).collect(Collectors.toList()));
 		}
 
 		// PROVENANCE INFO
@@ -119,7 +127,9 @@ public class EventFactory {
 	}
 
 	private static long parseDateTolong(final String date) {
-		if (StringUtils.isBlank(date)) { return -1; }
+		if (StringUtils.isBlank(date)) {
+			return -1;
+		}
 		try {
 			return DateUtils.parseDate(date, DATE_PATTERNS).getTime();
 		} catch (final ParseException e) {

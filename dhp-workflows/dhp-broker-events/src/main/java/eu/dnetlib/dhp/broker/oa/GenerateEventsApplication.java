@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.broker.oa;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -40,8 +41,10 @@ public class GenerateEventsApplication {
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils.toString(GenerateEventsApplication.class
-				.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json")));
+			IOUtils
+				.toString(
+					GenerateEventsApplication.class
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -78,9 +81,12 @@ public class GenerateEventsApplication {
 		for (final Result source : children) {
 			for (final Result target : children) {
 				if (source != target) {
-					list.addAll(findUpdates(source, target).stream()
-						.map(info -> EventFactory.newBrokerEvent(source, target, info))
-						.collect(Collectors.toList()));
+					list
+						.addAll(
+							findUpdates(source, target)
+								.stream()
+								.map(info -> EventFactory.newBrokerEvent(source, target, info))
+								.collect(Collectors.toList()));
 				}
 			}
 		}
