@@ -97,10 +97,11 @@ public class SparkBulkTagJob {
 
 		ResultTagger resultTagger = new ResultTagger();
 		readPath(spark, inputPath, resultClazz)
-			.map((MapFunction<R, R>) value -> resultTagger
+			.map(
+				(MapFunction<R, R>) value -> resultTagger
 					.enrichContextCriteria(
-							value, communityConfiguration, protoMappingParams),
-					Encoders.bean(resultClazz))
+						value, communityConfiguration, protoMappingParams),
+				Encoders.bean(resultClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
