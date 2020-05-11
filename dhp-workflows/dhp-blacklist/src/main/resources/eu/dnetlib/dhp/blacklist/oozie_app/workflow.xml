@@ -30,7 +30,6 @@
 
     <action name="reset_outputpath">
         <fs>
-            <delete path="${workingDir}/blacklist"/>
             <delete path="${outputPath}"/>
             <mkdir path="${outputPath}"/>
         </fs>
