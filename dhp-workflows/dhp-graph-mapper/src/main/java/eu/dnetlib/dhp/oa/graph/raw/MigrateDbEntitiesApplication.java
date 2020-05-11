@@ -30,8 +30,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
-import eu.dnetlib.dhp.oa.graph.raw.common.DbClient;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -94,7 +94,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 				log.info("Processing orgs...");
 				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization);
 
-				log.info("Processing relations ds <-> orgs ...");
+				log.info("Processing relationsNoRemoval ds <-> orgs ...");
 				smdbe.execute("queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization);
 
 				log.info("Processing projects <-> orgs ...");
