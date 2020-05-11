@@ -2,7 +2,9 @@ package eu.dnetlib.doiboost
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import eu.dnetlib.dhp.schema.oaf.{Dataset, KeyValue, Oaf, Publication, Relation, Result}
+import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.crossref.{Crossref2Oaf, SparkMapDumpIntoOAF}
+import eu.dnetlib.doiboost.mag.SparkImportMagIntoDataset
 import org.apache.spark.{SparkConf, sql}
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.codehaus.jackson.map.ObjectMapper
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Assertions._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
+import scala.util.matching.Regex
 
 
 class CrossrefMappingTest {
@@ -22,30 +25,8 @@ class CrossrefMappingTest {
 
 
 
-  //@Test
-  def testRelSpark() :Unit = {
-    val conf: SparkConf = new SparkConf()
-    conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-
-    val spark: SparkSession =
-      SparkSession
-        .builder()
-        .config(conf)
-        .appName(SparkMapDumpIntoOAF.getClass.getSimpleName)
-        .master("local[*]").getOrCreate()
-
-    import spark.implicits._
-    implicit val mapEncoderRelations: Encoder[Relation] = Encoders.kryo(classOf[Relation])
-    implicit val mapEncoderPublication: Encoder[Publication] = Encoders.kryo(classOf[Publication])
-    implicit val mapEncoderTupleJoinPubs: Encoder[(String, Publication)] = Encoders.tuple(Encoders.STRING, mapEncoderPublication)
-    implicit val mapEncoderTupleJoinRels: Encoder[(String, Relation)] = Encoders.tuple(Encoders.STRING, mapEncoderRelations)
-
-    val relations:sql.Dataset[Relation] = spark.read.load("/data/doiboost/relations").as[Relation]
-    val publications :sql.Dataset[Publication] = spark.read.load("/data/doiboost/publication").as[Publication]
-    val ds1 = publications.map(p => Tuple2(p.getId, p))
-    val ds2 = relations.map(p => Tuple2(p.getSource, p))
-    val total =ds1.joinWith(ds2, ds1.col("_1")===ds2.col("_1")).count()
-    println(s"total : $total")
+  def testMAGCSV() :Unit = {
+    SparkImportMagIntoDataset.main(null)
    }
 
 
@@ -85,6 +66,45 @@ class CrossrefMappingTest {
       assertFalse(relation.getSubRelType.isEmpty, s"SubRelType is empty: $relJson")
 
     })
+
+  }
+
+  def extractECAward(award: String): String = {
+    val awardECRegex: Regex = "[0-9]{4,9}".r
+    if (awardECRegex.findAllIn(award).hasNext)
+      return awardECRegex.findAllIn(award).max
+    null
+  }
+
+
+  @Test
+  def extractECTest(): Unit = {
+    val s =  "FP7/2007-2013"
+    val awardExtracted = extractECAward(s)
+    println(awardExtracted)
+
+    println(DHPUtils.md5(awardExtracted))
+
+
+  }
+
+  @Test
+  def testJournalRelation(): Unit = {
+    val json = Source.fromInputStream(getClass.getResourceAsStream("awardTest.json")).mkString
+    assertNotNull(json)
+
+    assertFalse(json.isEmpty)
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+    val rels:List[Relation] = resultList.filter(p => p.isInstanceOf[Relation]).map(r=> r.asInstanceOf[Relation])
+
+
+    assertEquals(rels.size, 4)
+    rels.foreach(s => logger.info(s.getTarget))
+
+
 
   }
 

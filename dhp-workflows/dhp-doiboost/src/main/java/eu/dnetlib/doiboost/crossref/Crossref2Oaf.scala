@@ -378,13 +378,13 @@ case object Crossref2Oaf {
         val page = (json \ "page").extractOrElse[String](null)
         if (page != null) {
           val pp = page.split("-")
-          journal.setSp(pp.head)
+          if (pp.nonEmpty)
+            journal.setSp(pp.head)
           if (pp.size > 1)
             journal.setEp(pp(1))
         }
         publication.setJournal(journal)
       }
-
     }
 
 

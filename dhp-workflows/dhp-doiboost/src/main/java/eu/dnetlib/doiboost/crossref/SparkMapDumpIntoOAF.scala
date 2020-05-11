@@ -28,9 +28,9 @@ object SparkMapDumpIntoOAF {
         .appName(SparkMapDumpIntoOAF.getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
 
-    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo(classOf[Publication])
-    implicit val mapEncoderRelatons: Encoder[Relation] = Encoders.kryo(classOf[Relation])
-    implicit val mapEncoderDatasets: Encoder[oaf.Dataset] = Encoders.kryo(classOf[eu.dnetlib.dhp.schema.oaf.Dataset])
+    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.bean(classOf[Publication])
+    implicit val mapEncoderRelatons: Encoder[Relation] = Encoders.bean(classOf[Relation])
+    implicit val mapEncoderDatasets: Encoder[oaf.Dataset] = Encoders.bean(classOf[eu.dnetlib.dhp.schema.oaf.Dataset])
 
     val sc = spark.sparkContext
     val targetPath = parser.get("targetPath")
@@ -42,17 +42,7 @@ object SparkMapDumpIntoOAF {
 
 
     val inputRDD = sc.objectFile[Oaf](s"${targetPath}/mixObject").filter(p=> p!= null)
-    val total = inputRDD.count()
 
-    val totalPub = inputRDD.filter(p => p.isInstanceOf[Publication]).count()
-    val totalDat = inputRDD.filter(p => p.isInstanceOf[eu.dnetlib.dhp.schema.oaf.Dataset]).count()
-    val totalRel = inputRDD.filter(p => p.isInstanceOf[eu.dnetlib.dhp.schema.oaf.Relation]).count()
-
-
-    logger.info(s"Created     $total")
-    logger.info(s"totalPub    $totalPub")
-    logger.info(s"totalDat    $totalDat")
-    logger.info(s"totalRel    $totalRel")
     val pubs: Dataset[Publication] = spark.createDataset(inputRDD.filter(k => k != null && k.isInstanceOf[Publication])
       .map(k => k.asInstanceOf[Publication]))
     pubs.write.mode(SaveMode.Overwrite).save(s"${targetPath}/publication")
@@ -64,10 +54,6 @@ object SparkMapDumpIntoOAF {
     val rels: Dataset[Relation] = spark.createDataset(inputRDD.filter(k => k != null && k.isInstanceOf[Relation])
       .map(k => k.asInstanceOf[Relation]))
     rels.write.mode(SaveMode.Overwrite).save(s"${targetPath}/relations")
-
-
-
-
   }
 
 
