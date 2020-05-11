@@ -10,6 +10,7 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.oaiIProvenance;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +25,6 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
-import eu.dnetlib.dhp.oa.graph.raw.common.MigrationConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -48,6 +48,21 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected final Map<String, String> code2name;
 
+	protected static final String DATACITE_SCHEMA_KERNEL_4 = "http://datacite.org/schema/kernel-4";
+	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
+
+	protected static final Map<String, String> nsContext = new HashMap<>();
+
+	static {
+		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
+		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
+		nsContext.put("oaf", "http://namespace.openaire.eu/oaf");
+		nsContext.put("oai", "http://www.openarchives.org/OAI/2.0/");
+		nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
+		nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
+		nsContext.put("datacite", DATACITE_SCHEMA_KERNEL_3);
+	}
+
 	protected static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
 		"main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
 
@@ -57,31 +72,27 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	public List<Oaf> processMdRecord(final String xml) {
 		try {
-			final Map<String, String> nsContext = new HashMap<>();
-			nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
-			nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
-			nsContext.put("oaf", "http://namespace.openaire.eu/oaf");
-			nsContext.put("oai", "http://www.openarchives.org/OAI/2.0/");
-			nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
-			nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
-			nsContext.put("datacite", "http://datacite.org/schema/kernel-3");
 			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
 			final Document doc = DocumentHelper
 				.parseText(
-					xml
-						.replaceAll(
-							"http://datacite.org/schema/kernel-4", "http://datacite.org/schema/kernel-3"));
+					xml.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3));
 
 			final String type = doc.valueOf("//dr:CobjCategory/@type");
-			final KeyValue collectedFrom = keyValue(
-				createOpenaireId(10, doc.valueOf("//oaf:collectedFrom/@id"), true),
-				doc.valueOf("//oaf:collectedFrom/@name"));
+			final KeyValue collectedFrom = getProvenanceDatasource(
+				doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
+
+			if (collectedFrom == null) {
+				return null;
+			}
+
 			final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
 				? collectedFrom
-				: keyValue(
-					createOpenaireId(10, doc.valueOf("//oaf:hostedBy/@id"), true),
-					doc.valueOf("//oaf:hostedBy/@name"));
+				: getProvenanceDatasource(doc, "//oaf:hostedBy/@id", "//oaf:hostedBy/@name");
+
+			if (hostedBy == null) {
+				return null;
+			}
 
 			final DataInfo info = prepareDataInfo(doc);
 			final long lastUpdateTimestamp = new Date().getTime();
@@ -90,6 +101,19 @@ public abstract class AbstractMdRecordToOafMapper {
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private KeyValue getProvenanceDatasource(Document doc, String xpathId, String xpathName) {
+		final String dsId = doc.valueOf(xpathId);
+		final String dsName = doc.valueOf(xpathName);
+
+		if (StringUtils.isBlank(dsId) | StringUtils.isBlank(dsName)) {
+			return null;
+		}
+
+		return keyValue(
+			createOpenaireId(10, dsId, true),
+			dsName);
 	}
 
 	protected List<Oaf> createOafs(
@@ -107,14 +131,14 @@ public abstract class AbstractMdRecordToOafMapper {
 			case "publication":
 				final Publication p = new Publication();
 				populateResultFields(p, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-				p.setResulttype(MigrationConstants.PUBLICATION_RESULTTYPE_QUALIFIER);
+				p.setResulttype(PUBLICATION_DEFAULT_RESULTTYPE);
 				p.setJournal(prepareJournal(doc, info));
 				oafs.add(p);
 				break;
 			case "dataset":
 				final Dataset d = new Dataset();
 				populateResultFields(d, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-				d.setResulttype(MigrationConstants.DATASET_RESULTTYPE_QUALIFIER);
+				d.setResulttype(PUBLICATION_DEFAULT_RESULTTYPE);
 				d.setStoragedate(prepareDatasetStorageDate(doc, info));
 				d.setDevice(prepareDatasetDevice(doc, info));
 				d.setSize(prepareDatasetSize(doc, info));
@@ -127,7 +151,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			case "software":
 				final Software s = new Software();
 				populateResultFields(s, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-				s.setResulttype(MigrationConstants.SOFTWARE_RESULTTYPE_QUALIFIER);
+				s.setResulttype(SOFTWARE_DEFAULT_RESULTTYPE);
 				s.setDocumentationUrl(prepareSoftwareDocumentationUrls(doc, info));
 				s.setLicense(prepareSoftwareLicenses(doc, info));
 				s.setCodeRepositoryUrl(prepareSoftwareCodeRepositoryUrl(doc, info));
@@ -138,7 +162,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			default:
 				final OtherResearchProduct o = new OtherResearchProduct();
 				populateResultFields(o, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-				o.setResulttype(MigrationConstants.OTHER_RESULTTYPE_QUALIFIER);
+				o.setResulttype(ORP_DEFAULT_RESULTTYPE);
 				o.setContactperson(prepareOtherResearchProductContactPersons(doc, info));
 				o.setContactgroup(prepareOtherResearchProductContactGroups(doc, info));
 				o.setTool(prepareOtherResearchProductTools(doc, info));
@@ -171,31 +195,34 @@ public abstract class AbstractMdRecordToOafMapper {
 			if (StringUtils.isNotBlank(originalId)) {
 				final String projectId = createOpenaireId(40, originalId, true);
 
-				final Relation r1 = new Relation();
-				r1.setRelType("resultProject");
-				r1.setSubRelType("outcome");
-				r1.setRelClass("isProducedBy");
-				r1.setSource(docId);
-				r1.setTarget(projectId);
-				r1.setCollectedfrom(Arrays.asList(collectedFrom));
-				r1.setDataInfo(info);
-				r1.setLastupdatetimestamp(lastUpdateTimestamp);
-				res.add(r1);
-
-				final Relation r2 = new Relation();
-				r2.setRelType("resultProject");
-				r2.setSubRelType("outcome");
-				r2.setRelClass("produces");
-				r2.setSource(projectId);
-				r2.setTarget(docId);
-				r2.setCollectedfrom(Arrays.asList(collectedFrom));
-				r2.setDataInfo(info);
-				r2.setLastupdatetimestamp(lastUpdateTimestamp);
-				res.add(r2);
+				res
+					.add(
+						getRelation(
+							docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, collectedFrom, info,
+							lastUpdateTimestamp));
+				res
+					.add(
+						getRelation(
+							projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, collectedFrom, info,
+							lastUpdateTimestamp));
 			}
 		}
 
 		return res;
+	}
+
+	protected Relation getRelation(String source, String target, String relType, String subRelType, String relClass,
+		KeyValue collectedFrom, DataInfo info, long lastUpdateTimestamp) {
+		final Relation rel = new Relation();
+		rel.setRelType(relType);
+		rel.setSubRelType(subRelType);
+		rel.setRelClass(relClass);
+		rel.setSource(source);
+		rel.setTarget(target);
+		rel.setCollectedfrom(Arrays.asList(collectedFrom));
+		rel.setDataInfo(info);
+		rel.setLastupdatetimestamp(lastUpdateTimestamp);
+		return rel;
 	}
 
 	protected abstract List<Oaf> addOtherResultRels(
@@ -423,7 +450,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		if (n == null) {
 			return dataInfo(
-				false, null, false, false, MigrationConstants.REPOSITORY_PROVENANCE_ACTIONS, "0.9");
+				false, null, false, false, REPOSITORY_PROVENANCE_ACTIONS, "0.9");
 		}
 
 		final String paClassId = n.valueOf("./oaf:provenanceaction/@classid");

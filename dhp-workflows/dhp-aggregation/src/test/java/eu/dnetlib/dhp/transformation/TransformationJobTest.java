@@ -12,10 +12,14 @@ import java.util.Map;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +27,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import eu.dnetlib.dhp.collection.CollectionJobTest;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.transformation.functions.Cleaner;
 import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
@@ -32,6 +37,21 @@ import net.sf.saxon.s9api.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TransformationJobTest {
+
+	private static SparkSession spark;
+
+	@BeforeAll
+	public static void beforeAll() {
+		SparkConf conf = new SparkConf();
+		conf.setAppName(CollectionJobTest.class.getSimpleName());
+		conf.setMaster("local");
+		spark = SparkSession.builder().config(conf).getOrCreate();
+	}
+
+	@AfterAll
+	public static void afterAll() {
+		spark.stop();
+	}
 
 	@Mock
 	private LongAccumulator accumulator;
@@ -78,31 +98,21 @@ public class TransformationJobTest {
 		TransformSparkJobNode
 			.main(
 				new String[] {
-					"-mt",
-					"local",
-					"-i",
-					mdstore_input,
-					"-o",
-					mdstore_output,
-					"-d",
-					"1",
-					"-w",
-					"1",
-					"-tr",
-					xslt,
-					"-t",
-					"true",
-					"-ru",
-					"",
-					"-rp",
-					"",
-					"-rh",
-					"",
-					"-ro",
-					"",
-					"-rr",
-					""
+					"-issm", "true",
+					"-i", mdstore_input,
+					"-o", mdstore_output,
+					"-d", "1",
+					"-w", "1",
+					"-tr", xslt,
+					"-t", "true",
+					"-ru", "",
+					"-rp", "",
+					"-rh", "",
+					"-ro", "",
+					"-rr", ""
 				});
+
+		// TODO introduce useful assertions
 	}
 
 	@Test

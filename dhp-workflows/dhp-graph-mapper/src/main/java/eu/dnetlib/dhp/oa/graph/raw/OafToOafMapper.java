@@ -3,27 +3,19 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
+import com.google.common.collect.Lists;
+
 import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -52,7 +44,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareLanguages(final Document doc) {
-		return prepareQualifier(doc, "//dc:language", "dnet:languages", "dnet:languages");
+		return prepareQualifier(doc, "//dc:language", DNET_LANGUAGES, DNET_LANGUAGES);
 	}
 
 	@Override
@@ -96,38 +88,43 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		final DataInfo info,
 		final KeyValue collectedfrom,
 		final KeyValue hostedby) {
-		final List<Instance> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes("//dc:identifier")) {
-			final String url = ((Node) o).getText().trim();
-			if (url.startsWith("http")) {
-				final Instance instance = new Instance();
-				instance.setUrl(Arrays.asList(url));
-				instance
-					.setInstancetype(
-						prepareQualifier(
-							doc,
-							"//dr:CobjCategory",
-							"dnet:publication_resource",
-							"dnet:publication_resource"));
-				instance.setCollectedfrom(collectedfrom);
-				instance.setHostedby(hostedby);
-				instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
-				instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
-				instance
-					.setAccessright(
-						prepareQualifier(doc, "//oaf:accessrights", "dnet:access_modes", "dnet:access_modes"));
-				instance.setLicense(field(doc.valueOf("//oaf:license"), info));
-				instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
-				instance
-					.setProcessingchargeamount(
-						field(doc.valueOf("//oaf:processingchargeamount"), info));
-				instance
-					.setProcessingchargecurrency(
-						field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
-				res.add(instance);
-			}
-		}
-		return res;
+
+		final Instance instance = new Instance();
+		instance
+			.setInstancetype(
+				prepareQualifier(
+					doc,
+					"//dr:CobjCategory",
+					DNET_PUBLICATION_RESOURCE,
+					DNET_PUBLICATION_RESOURCE));
+		instance.setCollectedfrom(collectedfrom);
+		instance.setHostedby(hostedby);
+		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
+		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
+		instance
+			.setAccessright(
+				prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
+		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
+		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
+		instance
+			.setProcessingchargeamount(
+				field(doc.valueOf("//oaf:processingchargeamount"), info));
+		instance
+			.setProcessingchargecurrency(
+				field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+
+		List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
+		instance
+			.setUrl(
+				nodes
+					.stream()
+					.filter(n -> StringUtils.isNotBlank(n.getText()))
+					.map(n -> n.getText().trim())
+					.filter(u -> u.startsWith("http"))
+					.distinct()
+					.collect(Collectors.toCollection(ArrayList::new)));
+
+		return Lists.newArrayList(instance);
 	}
 
 	@Override
@@ -241,27 +238,16 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 				final String otherId = createOpenaireId(50, originalId, false);
 
-				final Relation r1 = new Relation();
-				r1.setRelType("resultResult");
-				r1.setSubRelType("publicationDataset");
-				r1.setRelClass("isRelatedTo");
-				r1.setSource(docId);
-				r1.setTarget(otherId);
-				r1.setCollectedfrom(Arrays.asList(collectedFrom));
-				r1.setDataInfo(info);
-				r1.setLastupdatetimestamp(lastUpdateTimestamp);
-				res.add(r1);
-
-				final Relation r2 = new Relation();
-				r2.setRelType("resultResult");
-				r2.setSubRelType("publicationDataset");
-				r2.setRelClass("isRelatedTo");
-				r2.setSource(otherId);
-				r2.setTarget(docId);
-				r2.setCollectedfrom(Arrays.asList(collectedFrom));
-				r2.setDataInfo(info);
-				r2.setLastupdatetimestamp(lastUpdateTimestamp);
-				res.add(r2);
+				res
+					.add(
+						getRelation(
+							docId, otherId, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO, collectedFrom, info,
+							lastUpdateTimestamp));
+				res
+					.add(
+						getRelation(
+							otherId, docId, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO, collectedFrom, info,
+							lastUpdateTimestamp));
 			}
 		}
 		return res;
