@@ -482,7 +482,7 @@
             </NODE>
 
             <NODE name="communityOrganizationPropagation" type="SubmitHadoopJob">
-                <DESCRIPTION>marks as belonging to communities the result collected from datasources related to the organizations specified in the organizationCommunityMap</DESCRIPTION>
+                <DESCRIPTION>marks as belonging to communities the result collected from providers related to the organizations specified in the organizationCommunityMap</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
                     <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>

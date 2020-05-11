@@ -22,8 +22,7 @@
         <module>dhp-actionmanager</module>
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup-openaire</module>
-        <module>dhp-bulktag</module>
-        <module>dhp-propagation</module>
+        <module>dhp-enrichment</module>
         <module>dhp-graph-provision</module>
         <module>dhp-dedup-scholexplorer</module>
         <module>dhp-graph-provision-scholexplorer</module>

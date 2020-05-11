@@ -1,31 +1,38 @@
 <workflow-app name="blacklisting" xmlns="uri:oozie:workflow:0.5">
-<parameters>
-    <property>
-        <name>postgresURL</name>
-        <description>the url of the postgress server to query</description>
-    </property>
-    <property>
-        <name>postgresUser</name>
-        <description>the username to access the postgres db</description>
-    </property>
-    <property>
-        <name>postgresPassword</name>
-        <description>the postgres password</description>
-    </property>
-    <property>
-        <name>sourcePath</name>
-        <description>the source path</description>
-    </property>
-</parameters>
-<start to="reset-outputpath"/>
+    <parameters>
+        <property>
+            <name>postgresURL</name>
+            <description>the url of the postgress server to query</description>
+        </property>
+        <property>
+            <name>postgresUser</name>
+            <description>the username to access the postgres db</description>
+        </property>
+        <property>
+            <name>postgresPassword</name>
+            <description>the postgres password</description>
+        </property>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the graph output path</description>
+        </property>
+    </parameters>
 
-<kill name="Kill">
-    <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-</kill>
+    <start to="reset_outputpath"/>
 
-    <action name="reset-outputpath">
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="reset_outputpath">
         <fs>
-            <delete path='${workingDir}/blacklist'/>
+            <delete path="${workingDir}/blacklist"/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="read_blacklist"/>
         <error to="Kill"/>
@@ -87,12 +94,14 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/blacklist</arg>
             <arg>--mergesPath</arg><arg>${workingDir}/mergesRelation</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-<end name="End"/>
+
+    <end name="End"/>
+
 </workflow-app>
