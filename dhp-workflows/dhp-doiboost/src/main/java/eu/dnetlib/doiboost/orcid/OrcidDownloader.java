@@ -57,6 +57,7 @@ public class OrcidDownloader extends OrcidDSManager {
 
 		} catch (Throwable e) {
 			Log.warn("Downloading " + orcidId, e.getMessage());
+
 		}
 		return new String("");
 	}
@@ -147,6 +148,9 @@ public class OrcidDownloader extends OrcidDSManager {
 									+ downloadedRecordsCounter
 									+ " saved: "
 									+ savedRecordsCounter);
+						if (parsedRecordsCounter > REQ_MAX_TEST) {
+							break;
+						}
 					}
 				}
 				long endDownload = System.currentTimeMillis();
@@ -194,7 +198,6 @@ public class OrcidDownloader extends OrcidDSManager {
 			Log.warn("[" + orcidId + "] Parsing date: ", e.getMessage());
 			return true;
 		}
-
 		return modifiedDateDt.after(lastUpdateDt);
 	}
 }
