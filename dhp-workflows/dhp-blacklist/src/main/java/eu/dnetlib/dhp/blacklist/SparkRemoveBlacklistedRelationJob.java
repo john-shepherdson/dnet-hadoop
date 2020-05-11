@@ -80,8 +80,6 @@ public class SparkRemoveBlacklistedRelationJob {
 
 		log.info("InputRelationCount: {}", inputRelation.count());
 
-		log.info("NumberOfBlacklistedRelations: {}", blackListed.count());
-
 		Dataset<Relation> dedupSource = blackListed
 			.joinWith(
 				mergesRelation, blackListed.col("source").equalTo(mergesRelation.col("target")),
@@ -109,9 +107,8 @@ public class SparkRemoveBlacklistedRelationJob {
 			.mode(SaveMode.Overwrite)
 			.json(blacklistPath + "/deduped");
 
-		log.info("number of dedupedBL: {}", dedupBL.count());
 
-		Dataset<Tuple2<Relation, Relation>> tmp = inputRelation
+		inputRelation
 			.joinWith(
 				dedupBL, (inputRelation
 					.col("source")
@@ -120,26 +117,19 @@ public class SparkRemoveBlacklistedRelationJob {
 						inputRelation
 							.col("target")
 							.equalTo(dedupBL.col("target")))),
-				"left_outer");
-
-		log.info("numberOfRelationAfterJoin: {}", tmp.count());
-
-		Dataset<Relation> tmp1 = tmp.map(c -> {
+				"left_outer")
+		.map(c -> {
 			Relation ir = c._1();
 			Optional<Relation> obl = Optional.ofNullable(c._2());
 			if (obl.isPresent()) {
-				if (areEquals(ir, obl.get())) {
+				if (ir.equals(obl.get())) {
 					return null;
 				}
 			}
 			return ir;
 
 		}, Encoders.bean(Relation.class))
-			.filter(Objects::nonNull);
-
-		log.info("NumberOfRelationAfterBlacklisting: {} ", tmp1.count());
-
-		tmp1
+			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -147,12 +137,6 @@ public class SparkRemoveBlacklistedRelationJob {
 
 	}
 
-	private static boolean areEquals(Relation ir, Relation bl) {
-		return ir.getRelClass().equals(bl.getRelClass()) &&
-			ir.getRelType().equals(bl.getRelType()) &&
-			ir.getSubRelType().equals(bl.getSubRelType()) &&
-			ir.getRelClass().equals(bl.getRelClass());
-	}
 
 	public static org.apache.spark.sql.Dataset<Relation> readRelations(
 		SparkSession spark, String inputPath) {
