@@ -1,13 +1,15 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
+import java.util.List;
+
+import org.dom4j.DocumentException;
+
 import com.google.common.base.Joiner;
+
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import org.dom4j.DocumentException;
-
-import java.util.List;
 
 public class QueryInformationSystem {
 	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "

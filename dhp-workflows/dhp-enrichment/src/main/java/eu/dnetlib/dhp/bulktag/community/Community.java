@@ -1,13 +1,14 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import com.google.gson.Gson;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.google.gson.Gson;
 
 /** Created by miriam on 01/08/2018. */
 public class Community implements Serializable {

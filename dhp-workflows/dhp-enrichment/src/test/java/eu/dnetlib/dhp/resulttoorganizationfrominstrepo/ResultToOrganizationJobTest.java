@@ -69,15 +69,17 @@ public class ResultToOrganizationJobTest {
 	@Test
 	public void NoUpdateTest() throws Exception {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/noupdate_updatenomix")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/noupdate_updatenomix")
+			.getPath();
 		final String datasourceOrganizationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/noupdate/preparedInfo/datasourceOrganization")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/noupdate/preparedInfo/datasourceOrganization")
+			.getPath();
 		final String alreadyLinkedPath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/noupdate/preparedInfo/alreadyLinked")
-				.getPath();
-		SparkResultToOrganizationFromIstRepoJob.main(
+			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/noupdate/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToOrganizationFromIstRepoJob
+			.main(
 				new String[] {
 					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -109,15 +111,17 @@ public class ResultToOrganizationJobTest {
 	@Test
 	public void UpdateNoMixTest() throws Exception {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/noupdate_updatenomix")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/noupdate_updatenomix")
+			.getPath();
 		final String datasourceOrganizationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/updatenomix/preparedInfo/datasourceOrganization")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/updatenomix/preparedInfo/datasourceOrganization")
+			.getPath();
 		final String alreadyLinkedPath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/updatenomix/preparedInfo/alreadyLinked")
-				.getPath();
-		SparkResultToOrganizationFromIstRepoJob.main(
+			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/updatenomix/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToOrganizationFromIstRepoJob
+			.main(
 				new String[] {
 					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -172,15 +176,17 @@ public class ResultToOrganizationJobTest {
 	@Test
 	public void UpdateMixTest() throws Exception {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/updatemix")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/updatemix")
+			.getPath();
 		final String datasourceOrganizationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/updatemix/preparedInfo/datasourceOrganization")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/updatemix/preparedInfo/datasourceOrganization")
+			.getPath();
 		final String alreadyLinkedPath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/updatemix/preparedInfo/alreadyLinked")
-				.getPath();
-		SparkResultToOrganizationFromIstRepoJob.main(
+			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/updatemix/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToOrganizationFromIstRepoJob
+			.main(
 				new String[] {
 					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),

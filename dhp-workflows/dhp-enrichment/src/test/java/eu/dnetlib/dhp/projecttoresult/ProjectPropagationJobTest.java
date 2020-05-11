@@ -72,14 +72,15 @@ public class ProjectPropagationJobTest {
 	public void NoUpdateTest() throws Exception {
 
 		final String potentialUpdateDate = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/projecttoresult/preparedInfo/noupdates/potentialUpdates")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/noupdates/potentialUpdates")
+			.getPath();
 		final String alreadyLinkedPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
-				.getPath();
-		SparkResultToProjectThroughSemRelJob.main(
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToProjectThroughSemRelJob
+			.main(
 				new String[] {
 					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -107,14 +108,15 @@ public class ProjectPropagationJobTest {
 	@Test
 	public void UpdateTenTest() throws Exception {
 		final String potentialUpdatePath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/projecttoresult/preparedInfo/tenupdates/potentialUpdates")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/tenupdates/potentialUpdates")
+			.getPath();
 		final String alreadyLinkedPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
-				.getPath();
-		SparkResultToProjectThroughSemRelJob.main(
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToProjectThroughSemRelJob
+			.main(
 				new String[] {
 					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -143,8 +145,8 @@ public class ProjectPropagationJobTest {
 			.assertEquals(
 				5,
 				verificationDs
-					.filter((FilterFunction<Relation>) r ->
-							r.getSource().startsWith("50")
+					.filter(
+						(FilterFunction<Relation>) r -> r.getSource().startsWith("50")
 							&& r.getTarget().startsWith("40")
 							&& r.getRelClass().equals("isProducedBy"))
 					.count());
@@ -152,8 +154,8 @@ public class ProjectPropagationJobTest {
 			.assertEquals(
 				5,
 				verificationDs
-					.filter((FilterFunction<Relation>) r ->
-							r.getSource().startsWith("40")
+					.filter(
+						(FilterFunction<Relation>) r -> r.getSource().startsWith("40")
 							&& r.getTarget().startsWith("50")
 							&& r.getRelClass().equals("produces"))
 					.count());
@@ -178,14 +180,15 @@ public class ProjectPropagationJobTest {
 	@Test
 	public void UpdateMixTest() throws Exception {
 		final String potentialUpdatepath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/projecttoresult/preparedInfo/updatesmixed/potentialUpdates")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/updatesmixed/potentialUpdates")
+			.getPath();
 		final String alreadyLinkedPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
-				.getPath();
-		SparkResultToProjectThroughSemRelJob.main(
+			.getResource(
+				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
+			.getPath();
+		SparkResultToProjectThroughSemRelJob
+			.main(
 				new String[] {
 					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -217,8 +220,8 @@ public class ProjectPropagationJobTest {
 			.assertEquals(
 				4,
 				verificationDs
-					.filter((FilterFunction<Relation>) r ->
-							r.getSource().startsWith("50")
+					.filter(
+						(FilterFunction<Relation>) r -> r.getSource().startsWith("50")
 							&& r.getTarget().startsWith("40")
 							&& r.getRelClass().equals("isProducedBy"))
 					.count());
@@ -226,8 +229,8 @@ public class ProjectPropagationJobTest {
 			.assertEquals(
 				4,
 				verificationDs
-					.filter((FilterFunction<Relation>) r ->
-							r.getSource().startsWith("40")
+					.filter(
+						(FilterFunction<Relation>) r -> r.getSource().startsWith("40")
 							&& r.getTarget().startsWith("50")
 							&& r.getRelClass().equals("produces"))
 					.count());

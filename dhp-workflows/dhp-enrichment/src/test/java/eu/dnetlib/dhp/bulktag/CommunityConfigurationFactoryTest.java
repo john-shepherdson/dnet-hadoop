@@ -1,21 +1,23 @@
 
 package eu.dnetlib.dhp.bulktag;
 
-import com.google.gson.Gson;
-import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
-import eu.dnetlib.dhp.bulktag.community.CommunityConfigurationFactory;
-import eu.dnetlib.dhp.bulktag.community.Constraint;
-import eu.dnetlib.dhp.bulktag.community.SelectionConstraints;
-import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import com.google.gson.Gson;
+
+import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
+import eu.dnetlib.dhp.bulktag.community.CommunityConfigurationFactory;
+import eu.dnetlib.dhp.bulktag.community.Constraint;
+import eu.dnetlib.dhp.bulktag.community.SelectionConstraints;
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 
 /** Created by miriam on 03/08/2018. */
 public class CommunityConfigurationFactoryTest {

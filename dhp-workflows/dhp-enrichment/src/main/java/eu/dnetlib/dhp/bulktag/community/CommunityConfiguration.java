@@ -1,21 +1,23 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import eu.dnetlib.dhp.bulktag.criteria.InterfaceAdapter;
-import eu.dnetlib.dhp.bulktag.criteria.Selection;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import eu.dnetlib.dhp.bulktag.criteria.InterfaceAdapter;
+import eu.dnetlib.dhp.bulktag.criteria.Selection;
 
 /** Created by miriam on 02/08/2018. */
 public class CommunityConfiguration implements Serializable {

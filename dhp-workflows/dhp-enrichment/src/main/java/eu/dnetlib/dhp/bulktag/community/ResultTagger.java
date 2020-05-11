@@ -1,19 +1,21 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import com.google.gson.Gson;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.commons.lang3.StringUtils;
+import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.*;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.gson.Gson;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+
+import eu.dnetlib.dhp.schema.oaf.*;
 
 /** Created by miriam on 02/08/2018. */
 public class ResultTagger implements Serializable {
@@ -50,7 +52,7 @@ public class ResultTagger implements Serializable {
 	}
 
 	public <R extends Result> R enrichContextCriteria(
-            final R result, final CommunityConfiguration conf, final Map<String, String> criteria) {
+		final R result, final CommunityConfiguration conf, final Map<String, String> criteria) {
 
 		// }
 		// public Result enrichContextCriteria(final Result result, final CommunityConfiguration

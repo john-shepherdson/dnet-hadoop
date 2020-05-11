@@ -84,7 +84,7 @@ public class SparkRemoveBlacklistedRelationJob {
 			.joinWith(
 				mergesRelation, blackListed.col("source").equalTo(mergesRelation.col("target")),
 				"left_outer")
-			.map(c -> {
+			.map((MapFunction<Tuple2<Relation, Relation>, Relation>) c -> {
 				Optional
 					.ofNullable(c._2())
 					.ifPresent(mr -> c._1().setSource(mr.getSource()));
@@ -95,7 +95,7 @@ public class SparkRemoveBlacklistedRelationJob {
 			.joinWith(
 				mergesRelation, dedupSource.col("target").equalTo(mergesRelation.col("target")),
 				"left_outer")
-			.map(c -> {
+			.map((MapFunction<Tuple2<Relation, Relation>, Relation>) c -> {
 				Optional
 					.ofNullable(c._2())
 					.ifPresent(mr -> c._1().setTarget(mr.getSource()));
@@ -107,7 +107,6 @@ public class SparkRemoveBlacklistedRelationJob {
 			.mode(SaveMode.Overwrite)
 			.json(blacklistPath + "/deduped");
 
-
 		inputRelation
 			.joinWith(
 				dedupBL, (inputRelation
@@ -118,25 +117,22 @@ public class SparkRemoveBlacklistedRelationJob {
 							.col("target")
 							.equalTo(dedupBL.col("target")))),
 				"left_outer")
-		.map(c -> {
-			Relation ir = c._1();
-			Optional<Relation> obl = Optional.ofNullable(c._2());
-			if (obl.isPresent()) {
-				if (ir.equals(obl.get())) {
-					return null;
+			.map((MapFunction<Tuple2<Relation, Relation>, Relation>) c -> {
+				Relation ir = c._1();
+				Optional<Relation> obl = Optional.ofNullable(c._2());
+				if (obl.isPresent()) {
+					if (ir.equals(obl.get())) {
+						return null;
+					}
 				}
-			}
-			return ir;
-
-		}, Encoders.bean(Relation.class))
+				return ir;
+			}, Encoders.bean(Relation.class))
 			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
-
 	}
-
 
 	public static org.apache.spark.sql.Dataset<Relation> readRelations(
 		SparkSession spark, String inputPath) {

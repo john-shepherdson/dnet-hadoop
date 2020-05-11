@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import com.google.gson.Gson;
+import java.io.Serializable;
+
 import org.dom4j.Node;
 
-import java.io.Serializable;
+import com.google.gson.Gson;
 
 /** Created by miriam on 01/08/2018. */
 public class ZenodoCommunity implements Serializable {

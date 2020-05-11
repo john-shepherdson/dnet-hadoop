@@ -1,18 +1,20 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 
 /** Created by miriam on 02/08/2018. */
 public class Constraints implements Serializable {

@@ -1,9 +1,9 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import com.google.gson.Gson;
-
 import java.io.Serializable;
+
+import com.google.gson.Gson;
 
 /** Created by miriam on 03/08/2018. */
 public class Pair<A, B> implements Serializable {

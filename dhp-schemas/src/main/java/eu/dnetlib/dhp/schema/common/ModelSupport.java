@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.schema.common;
 
 import java.util.Map;
@@ -65,216 +66,216 @@ public class ModelSupport {
 
 	static {
 		relationInverseMap
-				.put(
-						"personResult_authorship_isAuthorOf", new RelationInverse()
-								.setRelation("isAuthorOf")
-								.setInverse("hasAuthor")
-								.setRelType("personResult")
-								.setSubReltype("authorship"));
+			.put(
+				"personResult_authorship_isAuthorOf", new RelationInverse()
+					.setRelation("isAuthorOf")
+					.setInverse("hasAuthor")
+					.setRelType("personResult")
+					.setSubReltype("authorship"));
 		relationInverseMap
-				.put(
-						"personResult_authorship_hasAuthor", new RelationInverse()
-								.setInverse("isAuthorOf")
-								.setRelation("hasAuthor")
-								.setRelType("personResult")
-								.setSubReltype("authorship"));
+			.put(
+				"personResult_authorship_hasAuthor", new RelationInverse()
+					.setInverse("isAuthorOf")
+					.setRelation("hasAuthor")
+					.setRelType("personResult")
+					.setSubReltype("authorship"));
 		relationInverseMap
-				.put(
-						"projectOrganization_participation_isParticipant", new RelationInverse()
-								.setRelation("isParticipant")
-								.setInverse("hasParticipant")
-								.setRelType("projectOrganization")
-								.setSubReltype("participation"));
+			.put(
+				"projectOrganization_participation_isParticipant", new RelationInverse()
+					.setRelation("isParticipant")
+					.setInverse("hasParticipant")
+					.setRelType("projectOrganization")
+					.setSubReltype("participation"));
 		relationInverseMap
-				.put(
-						"projectOrganization_participation_hasParticipant", new RelationInverse()
-								.setInverse("isParticipant")
-								.setRelation("hasParticipant")
-								.setRelType("projectOrganization")
-								.setSubReltype("participation"));
+			.put(
+				"projectOrganization_participation_hasParticipant", new RelationInverse()
+					.setInverse("isParticipant")
+					.setRelation("hasParticipant")
+					.setRelType("projectOrganization")
+					.setSubReltype("participation"));
 		relationInverseMap
-				.put(
-						"resultOrganization_affiliation_hasAuthorInstitution", new RelationInverse()
-								.setRelation("hasAuthorInstitution")
-								.setInverse("isAuthorInstitutionOf")
-								.setRelType("resultOrganization")
-								.setSubReltype("affiliation"));
+			.put(
+				"resultOrganization_affiliation_hasAuthorInstitution", new RelationInverse()
+					.setRelation("hasAuthorInstitution")
+					.setInverse("isAuthorInstitutionOf")
+					.setRelType("resultOrganization")
+					.setSubReltype("affiliation"));
 		relationInverseMap
-				.put(
-						"resultOrganization_affiliation_isAuthorInstitutionOf", new RelationInverse()
-								.setInverse("hasAuthorInstitution")
-								.setRelation("isAuthorInstitutionOf")
-								.setRelType("resultOrganization")
-								.setSubReltype("affiliation"));
+			.put(
+				"resultOrganization_affiliation_isAuthorInstitutionOf", new RelationInverse()
+					.setInverse("hasAuthorInstitution")
+					.setRelation("isAuthorInstitutionOf")
+					.setRelType("resultOrganization")
+					.setSubReltype("affiliation"));
 		relationInverseMap
-				.put(
-						"organizationOrganization_dedup_merges", new RelationInverse()
-								.setRelation("merges")
-								.setInverse("isMergedIn")
-								.setRelType("organizationOrganization")
-								.setSubReltype("dedup"));
+			.put(
+				"organizationOrganization_dedup_merges", new RelationInverse()
+					.setRelation("merges")
+					.setInverse("isMergedIn")
+					.setRelType("organizationOrganization")
+					.setSubReltype("dedup"));
 		relationInverseMap
-				.put(
-						"organizationOrganization_dedup_isMergedIn", new RelationInverse()
-								.setInverse("merges")
-								.setRelation("isMergedIn")
-								.setRelType("organizationOrganization")
-								.setSubReltype("dedup"));
+			.put(
+				"organizationOrganization_dedup_isMergedIn", new RelationInverse()
+					.setInverse("merges")
+					.setRelation("isMergedIn")
+					.setRelType("organizationOrganization")
+					.setSubReltype("dedup"));
 		relationInverseMap
-				.put(
-						"organizationOrganization_dedupSimilarity_isSimilarTo", new RelationInverse()
-								.setInverse("isSimilarTo")
-								.setRelation("isSimilarTo")
-								.setRelType("organizationOrganization")
-								.setSubReltype("dedupSimilarity"));
+			.put(
+				"organizationOrganization_dedupSimilarity_isSimilarTo", new RelationInverse()
+					.setInverse("isSimilarTo")
+					.setRelation("isSimilarTo")
+					.setRelType("organizationOrganization")
+					.setSubReltype("dedupSimilarity"));
 
 		relationInverseMap
-				.put(
-						"resultProject_outcome_isProducedBy", new RelationInverse()
-								.setRelation("isProducedBy")
-								.setInverse("produces")
-								.setRelType("resultProject")
-								.setSubReltype("outcome"));
+			.put(
+				"resultProject_outcome_isProducedBy", new RelationInverse()
+					.setRelation("isProducedBy")
+					.setInverse("produces")
+					.setRelType("resultProject")
+					.setSubReltype("outcome"));
 		relationInverseMap
-				.put(
-						"resultProject_outcome_produces", new RelationInverse()
-								.setInverse("isProducedBy")
-								.setRelation("produces")
-								.setRelType("resultProject")
-								.setSubReltype("outcome"));
+			.put(
+				"resultProject_outcome_produces", new RelationInverse()
+					.setInverse("isProducedBy")
+					.setRelation("produces")
+					.setRelType("resultProject")
+					.setSubReltype("outcome"));
 		relationInverseMap
-				.put(
-						"projectPerson_contactPerson_isContact", new RelationInverse()
-								.setRelation("isContact")
-								.setInverse("hasContact")
-								.setRelType("projectPerson")
-								.setSubReltype("contactPerson"));
+			.put(
+				"projectPerson_contactPerson_isContact", new RelationInverse()
+					.setRelation("isContact")
+					.setInverse("hasContact")
+					.setRelType("projectPerson")
+					.setSubReltype("contactPerson"));
 		relationInverseMap
-				.put(
-						"projectPerson_contactPerson_hasContact", new RelationInverse()
-								.setInverse("isContact")
-								.setRelation("hasContact")
-								.setRelType("personPerson")
-								.setSubReltype("coAuthorship"));
+			.put(
+				"projectPerson_contactPerson_hasContact", new RelationInverse()
+					.setInverse("isContact")
+					.setRelation("hasContact")
+					.setRelType("personPerson")
+					.setSubReltype("coAuthorship"));
 		relationInverseMap
-				.put(
-						"personPerson_coAuthorship_isCoauthorOf", new RelationInverse()
-								.setInverse("isCoAuthorOf")
-								.setRelation("isCoAuthorOf")
-								.setRelType("personPerson")
-								.setSubReltype("coAuthorship"));
+			.put(
+				"personPerson_coAuthorship_isCoauthorOf", new RelationInverse()
+					.setInverse("isCoAuthorOf")
+					.setRelation("isCoAuthorOf")
+					.setRelType("personPerson")
+					.setSubReltype("coAuthorship"));
 		relationInverseMap
-				.put(
-						"personPerson_dedup_merges", new RelationInverse()
-								.setInverse("isMergedIn")
-								.setRelation("merges")
-								.setRelType("personPerson")
-								.setSubReltype("dedup"));
+			.put(
+				"personPerson_dedup_merges", new RelationInverse()
+					.setInverse("isMergedIn")
+					.setRelation("merges")
+					.setRelType("personPerson")
+					.setSubReltype("dedup"));
 		relationInverseMap
-				.put(
-						"personPerson_dedup_isMergedIn", new RelationInverse()
-								.setInverse("merges")
-								.setRelation("isMergedIn")
-								.setRelType("personPerson")
-								.setSubReltype("dedup"));
+			.put(
+				"personPerson_dedup_isMergedIn", new RelationInverse()
+					.setInverse("merges")
+					.setRelation("isMergedIn")
+					.setRelType("personPerson")
+					.setSubReltype("dedup"));
 		relationInverseMap
-				.put(
-						"personPerson_dedupSimilarity_isSimilarTo", new RelationInverse()
-								.setInverse("isSimilarTo")
-								.setRelation("isSimilarTo")
-								.setRelType("personPerson")
-								.setSubReltype("dedupSimilarity"));
+			.put(
+				"personPerson_dedupSimilarity_isSimilarTo", new RelationInverse()
+					.setInverse("isSimilarTo")
+					.setRelation("isSimilarTo")
+					.setRelType("personPerson")
+					.setSubReltype("dedupSimilarity"));
 		relationInverseMap
-				.put(
-						"datasourceOrganization_provision_isProvidedBy", new RelationInverse()
-								.setInverse("provides")
-								.setRelation("isProvidedBy")
-								.setRelType("datasourceOrganization")
-								.setSubReltype("provision"));
+			.put(
+				"datasourceOrganization_provision_isProvidedBy", new RelationInverse()
+					.setInverse("provides")
+					.setRelation("isProvidedBy")
+					.setRelType("datasourceOrganization")
+					.setSubReltype("provision"));
 		relationInverseMap
-				.put(
-						"datasourceOrganization_provision_provides", new RelationInverse()
-								.setInverse("isProvidedBy")
-								.setRelation("provides")
-								.setRelType("datasourceOrganization")
-								.setSubReltype("provision"));
+			.put(
+				"datasourceOrganization_provision_provides", new RelationInverse()
+					.setInverse("isProvidedBy")
+					.setRelation("provides")
+					.setRelType("datasourceOrganization")
+					.setSubReltype("provision"));
 		relationInverseMap
-				.put(
-						"resultResult_similarity_hasAmongTopNSimilarDocuments", new RelationInverse()
-								.setInverse("isAmongTopNSimilarDocuments")
-								.setRelation("hasAmongTopNSimilarDocuments")
-								.setRelType("resultResult")
-								.setSubReltype("similarity"));
+			.put(
+				"resultResult_similarity_hasAmongTopNSimilarDocuments", new RelationInverse()
+					.setInverse("isAmongTopNSimilarDocuments")
+					.setRelation("hasAmongTopNSimilarDocuments")
+					.setRelType("resultResult")
+					.setSubReltype("similarity"));
 		relationInverseMap
-				.put(
-						"resultResult_similarity_isAmongTopNSimilarDocuments", new RelationInverse()
-								.setInverse("hasAmongTopNSimilarDocuments")
-								.setRelation("isAmongTopNSimilarDocuments")
-								.setRelType("resultResult")
-								.setSubReltype("similarity"));
+			.put(
+				"resultResult_similarity_isAmongTopNSimilarDocuments", new RelationInverse()
+					.setInverse("hasAmongTopNSimilarDocuments")
+					.setRelation("isAmongTopNSimilarDocuments")
+					.setRelType("resultResult")
+					.setSubReltype("similarity"));
 		relationInverseMap
-				.put(
-						"resultResult_relationship_isRelatedTo", new RelationInverse()
-								.setInverse("isRelatedTo")
-								.setRelation("isRelatedTo")
-								.setRelType("resultResult")
-								.setSubReltype("relationship"));
+			.put(
+				"resultResult_relationship_isRelatedTo", new RelationInverse()
+					.setInverse("isRelatedTo")
+					.setRelation("isRelatedTo")
+					.setRelType("resultResult")
+					.setSubReltype("relationship"));
 		relationInverseMap
-				.put(
-						"resultResult_similarity_isAmongTopNSimilarDocuments", new RelationInverse()
-								.setInverse("hasAmongTopNSimilarDocuments")
-								.setRelation("isAmongTopNSimilarDocuments")
-								.setRelType("resultResult")
-								.setSubReltype("similarity"));
+			.put(
+				"resultResult_similarity_isAmongTopNSimilarDocuments", new RelationInverse()
+					.setInverse("hasAmongTopNSimilarDocuments")
+					.setRelation("isAmongTopNSimilarDocuments")
+					.setRelType("resultResult")
+					.setSubReltype("similarity"));
 		relationInverseMap
-				.put(
-						"resultResult_supplement_isSupplementTo", new RelationInverse()
-								.setInverse("isSupplementedBy")
-								.setRelation("isSupplementTo")
-								.setRelType("resultResult")
-								.setSubReltype("supplement"));
+			.put(
+				"resultResult_supplement_isSupplementTo", new RelationInverse()
+					.setInverse("isSupplementedBy")
+					.setRelation("isSupplementTo")
+					.setRelType("resultResult")
+					.setSubReltype("supplement"));
 		relationInverseMap
-				.put(
-						"resultResult_supplement_isSupplementedBy", new RelationInverse()
-								.setInverse("isSupplementTo")
-								.setRelation("isSupplementedBy")
-								.setRelType("resultResult")
-								.setSubReltype("supplement"));
+			.put(
+				"resultResult_supplement_isSupplementedBy", new RelationInverse()
+					.setInverse("isSupplementTo")
+					.setRelation("isSupplementedBy")
+					.setRelType("resultResult")
+					.setSubReltype("supplement"));
 		relationInverseMap
-				.put(
-						"resultResult_part_isPartOf", new RelationInverse()
-								.setInverse("hasPart")
-								.setRelation("isPartOf")
-								.setRelType("resultResult")
-								.setSubReltype("part"));
+			.put(
+				"resultResult_part_isPartOf", new RelationInverse()
+					.setInverse("hasPart")
+					.setRelation("isPartOf")
+					.setRelType("resultResult")
+					.setSubReltype("part"));
 		relationInverseMap
-				.put(
-						"resultResult_part_hasPart", new RelationInverse()
-								.setInverse("isPartOf")
-								.setRelation("hasPart")
-								.setRelType("resultResult")
-								.setSubReltype("part"));
+			.put(
+				"resultResult_part_hasPart", new RelationInverse()
+					.setInverse("isPartOf")
+					.setRelation("hasPart")
+					.setRelType("resultResult")
+					.setSubReltype("part"));
 		relationInverseMap
-				.put(
-						"resultResult_dedup_merges", new RelationInverse()
-								.setInverse("isMergedIn")
-								.setRelation("merges")
-								.setRelType("resultResult")
-								.setSubReltype("dedup"));
+			.put(
+				"resultResult_dedup_merges", new RelationInverse()
+					.setInverse("isMergedIn")
+					.setRelation("merges")
+					.setRelType("resultResult")
+					.setSubReltype("dedup"));
 		relationInverseMap
-				.put(
-						"resultResult_dedup_isMergedIn", new RelationInverse()
-								.setInverse("merges")
-								.setRelation("isMergedIn")
-								.setRelType("resultResult")
-								.setSubReltype("dedup"));
+			.put(
+				"resultResult_dedup_isMergedIn", new RelationInverse()
+					.setInverse("merges")
+					.setRelation("isMergedIn")
+					.setRelType("resultResult")
+					.setSubReltype("dedup"));
 		relationInverseMap
-				.put(
-						"resultResult_dedupSimilarity_isSimilarTo", new RelationInverse()
-								.setInverse("isSimilarTo")
-								.setRelation("isSimilarTo")
-								.setRelType("resultResult")
-								.setSubReltype("dedupSimilarity"));
+			.put(
+				"resultResult_dedupSimilarity_isSimilarTo", new RelationInverse()
+					.setInverse("isSimilarTo")
+					.setRelation("isSimilarTo")
+					.setRelType("resultResult")
+					.setSubReltype("dedupSimilarity"));
 
 	}
 
@@ -293,7 +294,7 @@ public class ModelSupport {
 	 * @return True if X is a subclass of Y
 	 */
 	public static <X extends Oaf, Y extends Oaf> Boolean isSubClass(
-			X subClazzObject, Y superClazzObject) {
+		X subClazzObject, Y superClazzObject) {
 		return isSubClass(subClazzObject.getClass(), superClazzObject.getClass());
 	}
 
@@ -307,7 +308,7 @@ public class ModelSupport {
 	 * @return True if X is a subclass of Y
 	 */
 	public static <X extends Oaf, Y extends Oaf> Boolean isSubClass(
-			X subClazzObject, Class<Y> superClazz) {
+		X subClazzObject, Class<Y> superClazz) {
 		return isSubClass(subClazzObject.getClass(), superClazz);
 	}
 
@@ -321,7 +322,7 @@ public class ModelSupport {
 	 * @return True if X is a subclass of Y
 	 */
 	public static <X extends Oaf, Y extends Oaf> Boolean isSubClass(
-			Class<X> subClazz, Class<Y> superClazz) {
+		Class<X> subClazz, Class<Y> superClazz) {
 		return superClazz.isAssignableFrom(subClazz);
 	}
 
@@ -333,32 +334,32 @@ public class ModelSupport {
 	 */
 	public static <T extends Oaf> Class<T>[] getOafModelClasses() {
 		return new Class[] {
-				Author.class,
-				Context.class,
-				Country.class,
-				DataInfo.class,
-				Dataset.class,
-				Datasource.class,
-				ExternalReference.class,
-				ExtraInfo.class,
-				Field.class,
-				GeoLocation.class,
-				Instance.class,
-				Journal.class,
-				KeyValue.class,
-				Oaf.class,
-				OafEntity.class,
-				OAIProvenance.class,
-				Organization.class,
-				OriginDescription.class,
-				OtherResearchProduct.class,
-				Project.class,
-				Publication.class,
-				Qualifier.class,
-				Relation.class,
-				Result.class,
-				Software.class,
-				StructuredProperty.class
+			Author.class,
+			Context.class,
+			Country.class,
+			DataInfo.class,
+			Dataset.class,
+			Datasource.class,
+			ExternalReference.class,
+			ExtraInfo.class,
+			Field.class,
+			GeoLocation.class,
+			Instance.class,
+			Journal.class,
+			KeyValue.class,
+			Oaf.class,
+			OafEntity.class,
+			OAIProvenance.class,
+			Organization.class,
+			OriginDescription.class,
+			OtherResearchProduct.class,
+			Project.class,
+			Publication.class,
+			Qualifier.class,
+			Relation.class,
+			Result.class,
+			Software.class,
+			StructuredProperty.class
 		};
 	}
 
@@ -372,10 +373,10 @@ public class ModelSupport {
 
 	public static String getScheme(final String sourceType, final String targetType) {
 		return String
-				.format(
-						schemeTemplate,
-						entityMapping.get(EntityType.valueOf(sourceType)).name(),
-						entityMapping.get(EntityType.valueOf(targetType)).name());
+			.format(
+				schemeTemplate,
+				entityMapping.get(EntityType.valueOf(sourceType)).name(),
+				entityMapping.get(EntityType.valueOf(targetType)).name());
 	}
 
 	public static <T extends Oaf> Function<T, String> idFn() {
@@ -390,38 +391,38 @@ public class ModelSupport {
 	private static <T extends Oaf> String idFnForRelation(T t) {
 		Relation r = (Relation) t;
 		return Optional
-				.ofNullable(r.getSource())
-				.map(
-						source -> Optional
-								.ofNullable(r.getTarget())
-								.map(
-										target -> Optional
-												.ofNullable(r.getRelType())
-												.map(
-														relType -> Optional
-																.ofNullable(r.getSubRelType())
-																.map(
-																		subRelType -> Optional
-																				.ofNullable(r.getRelClass())
-																				.map(
-																						relClass -> String
-																								.join(
-																										source,
-																										target,
-																										relType,
-																										subRelType,
-																										relClass))
-																				.orElse(
-																						String
-																								.join(
-																										source,
-																										target,
-																										relType,
-																										subRelType)))
-																.orElse(String.join(source, target, relType)))
-												.orElse(String.join(source, target)))
-								.orElse(source))
-				.orElse(null);
+			.ofNullable(r.getSource())
+			.map(
+				source -> Optional
+					.ofNullable(r.getTarget())
+					.map(
+						target -> Optional
+							.ofNullable(r.getRelType())
+							.map(
+								relType -> Optional
+									.ofNullable(r.getSubRelType())
+									.map(
+										subRelType -> Optional
+											.ofNullable(r.getRelClass())
+											.map(
+												relClass -> String
+													.join(
+														source,
+														target,
+														relType,
+														subRelType,
+														relClass))
+											.orElse(
+												String
+													.join(
+														source,
+														target,
+														relType,
+														subRelType)))
+									.orElse(String.join(source, target, relType)))
+							.orElse(String.join(source, target)))
+					.orElse(source))
+			.orElse(null);
 	}
 
 	private static <T extends Oaf> String idFnForOafEntity(T t) {

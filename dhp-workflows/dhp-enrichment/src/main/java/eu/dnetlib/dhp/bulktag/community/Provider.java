@@ -1,13 +1,15 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import com.google.gson.Gson;
-import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
+import java.io.Serializable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Node;
 
-import java.io.Serializable;
+import com.google.gson.Gson;
+
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 
 /** Created by miriam on 01/08/2018. */
 public class Provider implements Serializable {

@@ -103,7 +103,8 @@ public class CountryPropagationJobTest {
 		Assertions.assertEquals(0, verificationDs.filter("size(country) > 2").count());
 
 		Dataset<String> countryExploded = verificationDs
-			.flatMap((FlatMapFunction<Software, Country>) row -> row.getCountry().iterator(), Encoders.bean(Country.class))
+			.flatMap(
+				(FlatMapFunction<Software, Country>) row -> row.getCountry().iterator(), Encoders.bean(Country.class))
 			.map((MapFunction<Country, String>) c -> c.getClassid(), Encoders.STRING());
 
 		Assertions.assertEquals(9, countryExploded.count());
@@ -123,10 +124,10 @@ public class CountryPropagationJobTest {
 				country_list
 					.stream()
 					.forEach(
-							c -> prova
-								.add(
-									new Tuple2<>(
-										row.getId(), c.getClassid())));
+						c -> prova
+							.add(
+								new Tuple2<>(
+									row.getId(), c.getClassid())));
 				return prova.iterator();
 			}, Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
@@ -178,20 +179,20 @@ public class CountryPropagationJobTest {
 
 		Dataset<Tuple2<String, String>> countryExplodedWithCountryclassname = verificationDs
 			.flatMap(
-					(FlatMapFunction<Software, Tuple2<String, String>>) row -> {
-						List<Tuple2<String, String>> prova = new ArrayList();
-						List<Country> country_list = row.getCountry();
-						country_list
-							.stream()
-							.forEach(
-								c -> prova
-									.add(
-										new Tuple2<>(
-											row.getId(),
-											c.getClassname())));
-						return prova.iterator();
-					},
-					Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
+				(FlatMapFunction<Software, Tuple2<String, String>>) row -> {
+					List<Tuple2<String, String>> prova = new ArrayList();
+					List<Country> country_list = row.getCountry();
+					country_list
+						.stream()
+						.forEach(
+							c -> prova
+								.add(
+									new Tuple2<>(
+										row.getId(),
+										c.getClassname())));
+					return prova.iterator();
+				},
+				Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
 		countryExplodedWithCountryclassname.show(false);
 		Assertions
@@ -239,22 +240,22 @@ public class CountryPropagationJobTest {
 
 		Dataset<Tuple2<String, String>> countryExplodedWithCountryProvenance = verificationDs
 			.flatMap(
-					(FlatMapFunction<Software, Tuple2<String, String>>) row -> {
-						List<Tuple2<String, String>> prova = new ArrayList();
-						List<Country> country_list = row.getCountry();
-						country_list
-							.stream()
-							.forEach(
-								c -> prova
-									.add(
-										new Tuple2<>(
-											row.getId(),
-											c
-												.getDataInfo()
-												.getInferenceprovenance())));
-						return prova.iterator();
-					},
-					Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
+				(FlatMapFunction<Software, Tuple2<String, String>>) row -> {
+					List<Tuple2<String, String>> prova = new ArrayList();
+					List<Country> country_list = row.getCountry();
+					country_list
+						.stream()
+						.forEach(
+							c -> prova
+								.add(
+									new Tuple2<>(
+										row.getId(),
+										c
+											.getDataInfo()
+											.getInferenceprovenance())));
+					return prova.iterator();
+				},
+				Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
 		Assertions
 			.assertEquals(

@@ -67,9 +67,10 @@ public class ResultToCommunityJobTest {
 	@Test
 	public void testSparkResultToCommunityFromOrganizationJob() throws Exception {
 		final String preparedInfoPath = getClass()
-				.getResource("/eu/dnetlib/dhp/resulttocommunityfromorganization/preparedInfo")
-				.getPath();
-		SparkResultToCommunityFromOrganizationJob.main(
+			.getResource("/eu/dnetlib/dhp/resulttocommunityfromorganization/preparedInfo")
+			.getPath();
+		SparkResultToCommunityFromOrganizationJob
+			.main(
 				new String[] {
 					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),

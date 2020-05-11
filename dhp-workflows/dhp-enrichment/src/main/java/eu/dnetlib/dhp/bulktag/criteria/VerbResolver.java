@@ -1,15 +1,15 @@
 
 package eu.dnetlib.dhp.bulktag.criteria;
 
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfo;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.ScanResult;
-
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 
 public class VerbResolver implements Serializable {
 	private Map<String, Class<Selection>> map = null; // = new HashMap<>();

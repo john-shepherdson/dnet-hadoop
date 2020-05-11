@@ -1,11 +1,11 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import eu.dnetlib.dhp.bulktag.criteria.Selection;
-import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
-
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+
+import eu.dnetlib.dhp.bulktag.criteria.Selection;
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 
 public class Constraint implements Serializable {
 	private String verb;

@@ -1,14 +1,11 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import eu.dnetlib.dhp.bulktag.criteria.InterfaceAdapter;
-import eu.dnetlib.dhp.bulktag.criteria.Selection;
-import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
-import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,10 +14,15 @@ import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import eu.dnetlib.dhp.bulktag.criteria.InterfaceAdapter;
+import eu.dnetlib.dhp.bulktag.criteria.Selection;
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
 
 /** Created by miriam on 03/08/2018. */
 public class CommunityConfigurationFactory {
