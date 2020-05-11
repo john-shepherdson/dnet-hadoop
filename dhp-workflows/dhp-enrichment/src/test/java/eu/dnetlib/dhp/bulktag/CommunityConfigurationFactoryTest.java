@@ -11,12 +11,9 @@ import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.google.gson.Gson;
-
 import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.CommunityConfigurationFactory;
 import eu.dnetlib.dhp.bulktag.community.Constraint;
-import eu.dnetlib.dhp.bulktag.community.SelectionConstraints;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 
 /** Created by miriam on 03/08/2018. */
@@ -30,7 +27,7 @@ public class CommunityConfigurationFactoryTest {
 			.toString(
 				getClass()
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/communityconfiguration/community_configuration.xml"));
+						"/eu/dnetlib/dhp/bulktag/communityconfiguration/community_configuration.xml"));
 		final CommunityConfiguration cc = CommunityConfigurationFactory.newInstance(xml);
 		Assertions.assertEquals(5, cc.size());
 		cc
@@ -57,7 +54,7 @@ public class CommunityConfigurationFactoryTest {
 			.toString(
 				getClass()
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/communityconfiguration/community_configuration_selcrit.xml"));
+						"/eu/dnetlib/dhp/bulktag/communityconfiguration/community_configuration_selcrit.xml"));
 		final CommunityConfiguration cc = CommunityConfigurationFactory.newInstance(xml);
 		Map<String, List<String>> param = new HashMap<>();
 		param.put("author", new ArrayList<>(Collections.singletonList("Pippo Pippi")));
@@ -82,85 +79,4 @@ public class CommunityConfigurationFactoryTest {
 		Assertions.assertEquals("dariah", comm.get(0));
 	}
 
-	@Test
-	public void test4() throws DocumentException, IOException {
-		final CommunityConfiguration cc = CommunityConfigurationFactory
-			.fromJson(
-				IOUtils
-					.toString(
-						getClass()
-							.getResourceAsStream(
-								"/eu/dnetlib/dhp/communityconfiguration/community_configuration_selcrit.json")));
-		cc.toString();
-	}
-
-	@Test
-	public void test5() throws IOException, DocumentException {
-
-		// final CommunityConfiguration cc =
-		// CommunityConfigurationFactory.newInstance(IOUtils.toString(getClass().getResourceAsStream("test.xml")));
-		final CommunityConfiguration cc = CommunityConfigurationFactory
-			.fromJson(
-				IOUtils
-					.toString(
-						getClass()
-							.getResourceAsStream(
-								"/eu/dnetlib/dhp/communityconfiguration/community_configuration.json")));
-
-		System.out.println(cc.toJson());
-	}
-
-	@Test
-	public void test6() {
-		String json = "{\"criteria\":[{\"constraint\":[{\"verb\":\"contains\",\"field\":\"contributor\",\"value\":\"DARIAH\"}]}]}";
-
-		String step1 = "{\"verb\":\"contains\",\"field\":\"contributor\",\"value\":\"DARIAH\"}";
-
-		Constraint c = new Gson().fromJson(step1, Constraint.class);
-		//
-		// String step2 =
-		// "{\"constraint\":[{\"verb\":\"contains\",\"field\":\"contributor\",\"value\":\"DARIAH\"}]}";
-		//
-		// ConstraintEncapsulator ce = new
-		// Gson().fromJson(step2,ConstraintEncapsulator.class);
-		//
-		//
-		// String step3 =
-		// "{\"ce\":{\"constraint\":[{\"verb\":\"contains\",\"field\":\"contributor\",\"value\":\"DARIAH\"}]}}";
-		//
-		// Constraints cons = new Gson().fromJson(step3,Constraints.class);
-		//
-		// String step4 =
-		// "{\"criteria\":[{\"ce\":{\"constraint\":[{\"verb\":\"contains\",\"field\":\"contributor\",\"value\":\"DARIAH\"}]}}]}";
-		//
-		// ConstraintsList cl = new Gson().fromJson(step4,ConstraintsList.class);
-		//
-		// String step5 =
-		// "{\"cl\":{\"criteria\":[{\"ce\":{\"constraint\":[{\"verb\":\"contains\",\"field\":\"contributor\",\"value\":\"DARIAH\"}]}}]}}";
-		SelectionConstraints sl = new Gson().fromJson(json, SelectionConstraints.class);
-	}
-
-	@Test
-	public void test7() throws IOException {
-		final CommunityConfiguration cc = CommunityConfigurationFactory
-			.fromJson(
-				IOUtils
-					.toString(
-						getClass()
-							.getResourceAsStream(
-								"/eu/dnetlib/dhp/communityconfiguration/tagging_conf.json")));
-
-		System.out.println(cc.toJson());
-	}
-
-	@Test
-	public void temporaneo() throws Exception {
-		String xml = IOUtils
-			.toString(
-				getClass()
-					.getResourceAsStream(
-						"/eu/dnetlib/dhp/communityconfiguration/tagging_conf.xml"));
-		final CommunityConfiguration cc = CommunityConfigurationFactory.newInstance(xml);
-		System.out.println(cc.toJson());
-	}
 }
