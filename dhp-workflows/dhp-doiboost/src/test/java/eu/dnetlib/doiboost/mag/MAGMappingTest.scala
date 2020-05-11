@@ -16,7 +16,7 @@ class MAGMappingTest {
   val mapper = new ObjectMapper()
 
 
-  @Test
+  //@Test
   def testMAGCSV(): Unit = {
 
     val conf: SparkConf = new SparkConf()
@@ -31,7 +31,7 @@ class MAGMappingTest {
     import spark.implicits._
     val d: Dataset[Papers] = spark.read.load("/data/doiboost/mag/datasets/Papers").as[Papers]
     logger.info(s"Total number of element: ${d.where(col("Doi").isNotNull).count()}")
-    implicit val mapEncoder = org.apache.spark.sql.Encoders.kryo[Papers]
+    //implicit val mapEncoder = org.apache.spark.sql.Encoders.bean[Papers]
     val result: RDD[Papers] = d.where(col("Doi").isNotNull).rdd.map { p: Papers => Tuple2(p.Doi, p) }.reduceByKey {case (p1:Papers, p2:Papers)  =>
       var r = if (p1==null) p2 else p1
       if (p1!=null && p2!=null ) if (p1.CreatedDate.before(p2.CreatedDate))
