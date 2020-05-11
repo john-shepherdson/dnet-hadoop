@@ -27,6 +27,7 @@
         <module>dhp-graph-provision-scholexplorer</module>
         <module>dhp-stats-update</module>
         <module>dhp-broker-events</module>
+        <module>dhp-doiboost</module>
     </modules>
 
     <pluginRepositories>

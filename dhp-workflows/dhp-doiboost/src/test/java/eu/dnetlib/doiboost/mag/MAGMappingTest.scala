@@ -16,7 +16,7 @@ class MAGMappingTest {
   val mapper = new ObjectMapper()
 
 
-  //@Test
+  @Test
   def testMAGCSV(): Unit = {
 
     val conf: SparkConf = new SparkConf()
