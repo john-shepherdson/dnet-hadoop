@@ -86,7 +86,8 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			mergedIds,
 			FieldType.TARGET,
 			getFixRelFn(FieldType.TARGET))
-				.filter(SparkPropagateRelation::containsDedup);
+				.filter(SparkPropagateRelation::containsDedup)
+				.distinct();
 
 		Dataset<Relation> updated = processDataset(
 			processDataset(rels, mergedIds, FieldType.SOURCE, getDeletedFn()),

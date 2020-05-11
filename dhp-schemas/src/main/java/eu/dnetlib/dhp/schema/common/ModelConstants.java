@@ -49,6 +49,9 @@ public class ModelConstants {
 	public static final String HAS_PARTICIPANT = "hasParticipant";
 	public static final String IS_PARTICIPANT = "isParticipant";
 
+	public static final String UNKNOWN = "UNKNOWN";
+	public static final String NOT_AVAILABLE = "not available";
+
 	public static final Qualifier PUBLICATION_DEFAULT_RESULTTYPE = qualifier(
 		PUBLICATION_RESULTTYPE_CLASSID, PUBLICATION_RESULTTYPE_CLASSID,
 		DNET_RESULT_TYPOLOGIES, DNET_RESULT_TYPOLOGIES);

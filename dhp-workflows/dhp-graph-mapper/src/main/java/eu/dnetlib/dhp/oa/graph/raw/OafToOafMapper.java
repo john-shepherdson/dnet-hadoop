@@ -5,10 +5,8 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -115,12 +113,17 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			.setProcessingchargecurrency(
 				field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
-		for (final Object o : doc.selectNodes("//dc:identifier")) {
-			final String url = ((Node) o).getText().trim();
-			if (url.startsWith("http")) {
-				instance.setUrl(Arrays.asList(url));
-			}
-		}
+		List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
+		instance
+			.setUrl(
+				nodes
+					.stream()
+					.filter(n -> StringUtils.isNotBlank(n.getText()))
+					.map(n -> n.getText().trim())
+					.filter(u -> u.startsWith("http"))
+					.distinct()
+					.collect(Collectors.toCollection(ArrayList::new)));
+
 		return Lists.newArrayList(instance);
 	}
 
