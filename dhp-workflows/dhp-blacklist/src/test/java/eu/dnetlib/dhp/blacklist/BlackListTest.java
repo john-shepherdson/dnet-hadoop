@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class BlackListTest {
@@ -60,12 +61,7 @@ public class BlackListTest {
 		spark.stop();
 	}
 
-	/*
-	 * String inputPath = parser.get("sourcePath"); log.info("inputPath: {}", inputPath); final String outputPath =
-	 * parser.get("outputPath"); log.info("outputPath {}: ", outputPath); final String blacklistPath =
-	 * parser.get("hdfsPath"); log.info("blacklistPath {}: ", blacklistPath); final String mergesPath =
-	 * parser.get("mergesPath"); log.info("mergesPath {}: ", mergesPath);
-	 */
+
 	@Test
 	public void noRemoveTest() throws Exception {
 		SparkRemoveBlacklistedRelationJob
