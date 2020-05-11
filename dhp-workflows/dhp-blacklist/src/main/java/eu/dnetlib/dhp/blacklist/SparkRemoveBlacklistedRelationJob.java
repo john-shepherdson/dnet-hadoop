@@ -119,8 +119,7 @@ public class SparkRemoveBlacklistedRelationJob {
 					.and(
 						inputRelation
 							.col("target")
-							.equalTo(dedupBL.col("target"))
-							.and(inputRelation.col("relclass").equalTo(dedupBL.col("relclass"))))),
+							.equalTo(dedupBL.col("target")))),
 				"left_outer");
 
 		log.info("numberOfRelationAfterJoin: {}", tmp.count());
@@ -151,7 +150,8 @@ public class SparkRemoveBlacklistedRelationJob {
 	private static boolean areEquals(Relation ir, Relation bl) {
 		return ir.getRelClass().equals(bl.getRelClass()) &&
 			ir.getRelType().equals(bl.getRelType()) &&
-			ir.getSubRelType().equals(bl.getSubRelType());
+			ir.getSubRelType().equals(bl.getSubRelType()) &&
+			ir.getRelClass().equals(bl.getRelClass());
 	}
 
 	public static org.apache.spark.sql.Dataset<Relation> readRelations(
