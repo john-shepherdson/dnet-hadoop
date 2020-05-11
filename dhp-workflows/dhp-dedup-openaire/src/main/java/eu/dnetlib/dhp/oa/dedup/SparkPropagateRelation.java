@@ -86,7 +86,8 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			mergedIds,
 			FieldType.TARGET,
 			getFixRelFn(FieldType.TARGET))
-				.filter(SparkPropagateRelation::containsDedup);
+				.filter(SparkPropagateRelation::containsDedup)
+				.distinct();
 
 		Dataset<Relation> updated = processDataset(
 			processDataset(rels, mergedIds, FieldType.SOURCE, getDeletedFn()),
@@ -94,7 +95,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			FieldType.TARGET,
 			getDeletedFn());
 
-		save(newRels.union(updated), outputRelationPath, SaveMode.Overwrite);
+		save(newRels.union(updated).union(mergeRels), outputRelationPath, SaveMode.Overwrite);
 	}
 
 	private static Dataset<Relation> processDataset(

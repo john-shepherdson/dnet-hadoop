@@ -1,12 +1,10 @@
 
 package eu.dnetlib.dhp.actionmanager.migration;
 
-import static eu.dnetlib.data.proto.KindProtos.Kind.entity;
-import static eu.dnetlib.data.proto.KindProtos.Kind.relation;
-import static eu.dnetlib.data.proto.TypeProtos.*;
-import static eu.dnetlib.data.proto.TypeProtos.Type.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,10 +18,6 @@ import eu.dnetlib.data.proto.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class ProtoConverter implements Serializable {
-
-	public static final String UNKNOWN = "UNKNOWN";
-	public static final String NOT_AVAILABLE = "not available";
-	public static final String DNET_ACCESS_MODES = "dnet:access_modes";
 
 	public static Oaf convert(OafProtos.Oaf oaf) {
 		try {
@@ -64,6 +58,7 @@ public class ProtoConverter implements Serializable {
 			case result:
 				final Result r = convertResult(oaf);
 				r.setInstance(convertInstances(oaf));
+				r.setExternalReference(convertExternalRefs(oaf));
 				return r;
 			case project:
 				return convertProject(oaf);
@@ -94,11 +89,42 @@ public class ProtoConverter implements Serializable {
 		i.setHostedby(mapKV(ri.getHostedby()));
 		i.setInstancetype(mapQualifier(ri.getInstancetype()));
 		i.setLicense(mapStringField(ri.getLicense()));
-		i.setUrl(ri.getUrlList());
+		i
+			.setUrl(
+				ri.getUrlList() != null ? ri
+					.getUrlList()
+					.stream()
+					.distinct()
+					.collect(Collectors.toCollection(ArrayList::new)) : null);
 		i.setRefereed(mapStringField(ri.getRefereed()));
 		i.setProcessingchargeamount(mapStringField(ri.getProcessingchargeamount()));
 		i.setProcessingchargecurrency(mapStringField(ri.getProcessingchargecurrency()));
 		return i;
+	}
+
+	private static List<ExternalReference> convertExternalRefs(OafProtos.Oaf oaf) {
+		ResultProtos.Result r = oaf.getEntity().getResult();
+		if (r.getExternalReferenceCount() > 0) {
+			return r
+				.getExternalReferenceList()
+				.stream()
+				.map(e -> convertExtRef(e))
+				.collect(Collectors.toList());
+		}
+		return Lists.newArrayList();
+	}
+
+	private static ExternalReference convertExtRef(ResultProtos.Result.ExternalReference e) {
+		ExternalReference ex = new ExternalReference();
+		ex.setUrl(e.getUrl());
+		ex.setSitename(e.getSitename());
+		ex.setRefidentifier(e.getRefidentifier());
+		ex.setQuery(e.getQuery());
+		ex.setQualifier(mapQualifier(e.getQualifier()));
+		ex.setLabel(e.getLabel());
+		ex.setDescription(e.getDescription());
+		ex.setDataInfo(ex.getDataInfo());
+		return ex;
 	}
 
 	private static Organization convertOrganization(OafProtos.Oaf oaf) {

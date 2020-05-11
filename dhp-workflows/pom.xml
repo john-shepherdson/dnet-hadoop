@@ -6,7 +6,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.1.7-SNAPSHOT</version>
+        <version>1.1.8-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
@@ -26,7 +26,7 @@
         <module>dhp-dedup-scholexplorer</module>
         <module>dhp-graph-provision-scholexplorer</module>
         <module>dhp-stats-update</module>
-        <module>dhp-doiboost</module>
+        <module>dhp-broker-events</module>
     </modules>
 
     <pluginRepositories>

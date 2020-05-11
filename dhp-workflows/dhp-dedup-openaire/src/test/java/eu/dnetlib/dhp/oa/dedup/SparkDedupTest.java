@@ -18,6 +18,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -28,6 +29,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -420,7 +423,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(826, relations);
+		assertEquals(5022, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
@@ -448,6 +451,25 @@ public class SparkDedupTest implements Serializable {
 		long updated = toCheck.count();
 
 		assertEquals(updated, deletedbyinference);
+	}
+
+	@Test
+	@Order(6)
+	public void testRelations() throws Exception {
+		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_1.json", 12, 10);
+		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_2.json", 10, 2);
+	}
+
+	private void testUniqueness(String path, int expected_total, int expected_unique) {
+		Dataset<Relation> rel = spark
+			.read()
+			.textFile(getClass().getResource(path).getPath())
+			.map(
+				(MapFunction<String, Relation>) s -> new ObjectMapper().readValue(s, Relation.class),
+				Encoders.bean(Relation.class));
+
+		assertEquals(expected_total, rel.count());
+		assertEquals(expected_unique, rel.distinct().count());
 	}
 
 	@AfterAll
