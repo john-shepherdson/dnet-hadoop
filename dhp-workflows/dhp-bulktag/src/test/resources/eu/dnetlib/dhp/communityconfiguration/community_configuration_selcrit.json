@@ -1,0 +1,37 @@
+{
+  "communities": {
+    "dariah": {
+      "id": "dariah",
+      "subjects": [
+
+      ],
+      "datasources": [
+        {
+          "openaireId": "opendoar____::7e7757b1e12abcb736ab9a754ffb617a",
+          "sc": {
+            "cl": {
+              "criteria": [
+                {
+                  "ce": {
+                    "constraint": [
+                      {
+                        "verb": "contains",
+                        "field": "contributor",
+                        "value": "DARIAH"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "dimpo"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,98 @@
+<workflow-app name="blacklisting" xmlns="uri:oozie:workflow:0.5">
+<parameters>
+    <property>
+        <name>postgresURL</name>
+        <description>the url of the postgress server to query</description>
+    </property>
+    <property>
+        <name>postgresUser</name>
+        <description>the username to access the postgres db</description>
+    </property>
+    <property>
+        <name>postgresPassword</name>
+        <description>the postgres password</description>
+    </property>
+    <property>
+        <name>sourcePath</name>
+        <description>the source path</description>
+    </property>
+</parameters>
+<start to="reset-outputpath"/>
+
+<kill name="Kill">
+    <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+</kill>
+
+    <action name="reset-outputpath">
+        <fs>
+            <delete path='${workingDir}/blacklist'/>
+        </fs>
+        <ok to="read_blacklist"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="read_blacklist">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.blacklist.ReadBlacklistFromDB</main-class>
+            <arg>--hdfsPath</arg><arg>${workingDir}/blacklist</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+        </java>
+        <ok to="prepare_merged_relation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="prepare_merged_relation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareMergedRelation</name>
+            <class>eu.dnetlib.dhp.blacklist.PrepareMergedRelationJob</class>
+            <jar>dhp-blacklist-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/mergesRelation</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+        </spark>
+        <ok to="apply_blacklist"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="apply_blacklist">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ApplyBlacklist</name>
+            <class>eu.dnetlib.dhp.blacklist.SparkRemoveBlacklistedRelationJob</class>
+            <jar>dhp-blacklist-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/blacklist</arg>
+            <arg>--mergesPath</arg><arg>${workingDir}/mergesRelation</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+<end name="End"/>
+</workflow-app>
