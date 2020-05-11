@@ -67,11 +67,12 @@ public class PrepareMergedRelationJob {
 
 		Dataset<Relation> relation = readRelations(spark, inputPath);
 
-		relation.filter("relclass = 'merges' and datainfo.deletedbyinference=false")
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression","gizp")
-				.json(outputPath);
+		relation
+			.filter("relclass = 'merges' and datainfo.deletedbyinference=false")
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
 //		relation.createOrReplaceTempView("relation");
 //
 //		spark

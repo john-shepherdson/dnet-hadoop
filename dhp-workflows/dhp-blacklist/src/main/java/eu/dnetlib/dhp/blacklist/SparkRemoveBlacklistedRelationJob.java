@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.blacklist;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import scala.Tuple2;
 
 public class SparkRemoveBlacklistedRelationJob {
 	private static final Logger log = LoggerFactory.getLogger(SparkRemoveBlacklistedRelationJob.class);
@@ -78,8 +80,12 @@ public class SparkRemoveBlacklistedRelationJob {
 
 		log.info("InputRelationCount: {}", inputRelation.count());
 
+		log.info("NumberOfBlacklistedRelations: {}", blackListed.count());
+
 		Dataset<Relation> dedupSource = blackListed
-			.joinWith(mergesRelation, blackListed.col("source").equalTo(mergesRelation.col("target")), "left_outer")
+			.joinWith(
+				mergesRelation, blackListed.col("source").equalTo(mergesRelation.col("target")),
+				"left_outer")
 			.map(c -> {
 				Optional
 					.ofNullable(c._2())
@@ -88,7 +94,9 @@ public class SparkRemoveBlacklistedRelationJob {
 			}, Encoders.bean(Relation.class));
 
 		Dataset<Relation> dedupBL = dedupSource
-			.joinWith(mergesRelation, dedupSource.col("target").equalTo(mergesRelation.col("target")), "left_outer")
+			.joinWith(
+				mergesRelation, dedupSource.col("target").equalTo(mergesRelation.col("target")),
+				"left_outer")
 			.map(c -> {
 				Optional
 					.ofNullable(c._2())
@@ -98,33 +106,52 @@ public class SparkRemoveBlacklistedRelationJob {
 
 		dedupBL
 			.write()
+			.mode(SaveMode.Overwrite)
 			.json(blacklistPath + "/deduped");
 
-		Dataset<Relation> tmp = inputRelation
+		log.info("number of dedupedBL: {}", dedupBL.count());
+
+		Dataset<Tuple2<Relation, Relation>> tmp = inputRelation
 			.joinWith(
-				dedupBL, inputRelation.col("source").equalTo(dedupBL.col("source")),
-				"left_outer")
-			.map(c -> {
-				Relation ir = c._1();
-				Optional<Relation> obl = Optional.ofNullable(c._2());
-				if (obl.isPresent()) {
-					if (ir.equals(obl.get())) {
-						return null;
-					}
+				dedupBL, (inputRelation
+					.col("source")
+					.equalTo(dedupBL.col("source"))
+					.and(
+						inputRelation
+							.col("target")
+							.equalTo(dedupBL.col("target"))
+							.and(inputRelation.col("relclass").equalTo(dedupBL.col("relclass"))))),
+				"left_outer");
+
+		log.info("numberOfRelationAfterJoin: {}", tmp.count());
+
+		Dataset<Relation> tmp1 = tmp.map(c -> {
+			Relation ir = c._1();
+			Optional<Relation> obl = Optional.ofNullable(c._2());
+			if (obl.isPresent()) {
+				if (areEquals(ir, obl.get())) {
+					return null;
 				}
-				return ir;
+			}
+			return ir;
 
-			}, Encoders.bean(Relation.class))
-			.filter(r -> r != null);
+		}, Encoders.bean(Relation.class))
+			.filter(Objects::nonNull);
 
-		log.info("NumberOfRelationAfterBlacklisting: {} ", tmp.count());
+		log.info("NumberOfRelationAfterBlacklisting: {} ", tmp1.count());
 
-		tmp
+		tmp1
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 
+	}
+
+	private static boolean areEquals(Relation ir, Relation bl) {
+		return ir.getRelClass().equals(bl.getRelClass()) &&
+			ir.getRelType().equals(bl.getRelType()) &&
+			ir.getSubRelType().equals(bl.getSubRelType());
 	}
 
 	public static org.apache.spark.sql.Dataset<Relation> readRelations(
