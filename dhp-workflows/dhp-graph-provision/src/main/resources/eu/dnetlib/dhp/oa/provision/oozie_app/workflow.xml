@@ -405,6 +405,9 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/xml</arg>
             <arg>--isLookupUrl</arg> <arg>${isLookupUrl}</arg>

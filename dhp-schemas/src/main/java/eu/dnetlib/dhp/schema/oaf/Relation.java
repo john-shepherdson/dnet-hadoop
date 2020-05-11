@@ -41,6 +41,12 @@ public class Relation extends Oaf {
 	 */
 	private String target;
 
+	/**
+	 * List of relation specific properties. Values include 'similarityLevel', indicating the similarity score between a
+	 * pair of publications.
+	 */
+	private List<KeyValue> properties = new ArrayList<>();
+
 	public String getRelType() {
 		return relType;
 	}
@@ -79,6 +85,14 @@ public class Relation extends Oaf {
 
 	public void setTarget(final String target) {
 		this.target = target;
+	}
+
+	public List<KeyValue> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(List<KeyValue> properties) {
+		this.properties = properties;
 	}
 
 	public void mergeFrom(final Relation r) {

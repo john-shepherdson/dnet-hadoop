@@ -1,43 +1,38 @@
 <workflow-app name="result_to_community_from_semrel_propagation" xmlns="uri:oozie:workflow:0.5">
-<parameters>
-    <property>
-        <name>sourcePath</name>
-        <description>the source path</description>
-    </property>
-    <property>
-        <name>allowedsemrels</name>
-        <description>the semantic relationships allowed for propagation</description>
-    </property>
-    <property>
-        <name>isLookUpUrl</name>
-        <description>the isLookup service endpoint</description>
-    </property>
-    <property>
-        <name>outputPath</name>
-        <description>the output path</description>
-    </property>
-</parameters>
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>allowedsemrels</name>
+            <description>the semantic relationships allowed for propagation</description>
+        </property>
+        <property>
+            <name>isLookUpUrl</name>
+            <description>the isLookup service endpoint</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the output path</description>
+        </property>
+    </parameters>
 
-    <start to="reset-outputpath"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-    <action name="reset-outputpath">
+
+    <action name="reset_outputpath">
         <fs>
-            <delete path='${outputPath}/relation'/>
-            <delete path='${outputPath}/datasource'/>
-            <delete path='${outputPath}/organization'/>
-            <delete path='${outputPath}/project'/>
-            <delete path='${outputPath}/publication'/>
-            <delete path='${outputPath}/dataset'/>
-            <delete path='${outputPath}/software'/>
-            <delete path='${outputPath}/otherresearchproduct'/>
-            <delete path='${workingDir}/preparedInfo'/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="copy_entities"/>
         <error to="Kill"/>
     </action>
+
     <fork name="copy_entities">
         <path start="copy_relation"/>
         <path start="copy_organization"/>
@@ -126,6 +121,7 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_prepare_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -182,6 +178,7 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_prepare_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -214,29 +211,29 @@
     <join name="wait" to="prepare_assoc_step2"/>
 
     <action name="prepare_assoc_step2">
-     <spark xmlns="uri:oozie:spark-action:0.2">
-        <master>yarn</master>
-        <mode>cluster</mode>
-        <name>ResultToCommunityEmRelPropagation-PreparePhase2</name>
-        <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep2</class>
-        <jar>dhp-propagation-${projectVersion}.jar</jar>
-        <spark-opts>
-            --executor-cores=${sparkExecutorCores}
-            --executor-memory=${sparkExecutorMemory}
-            --driver-memory=${sparkDriverMemory}
-            --conf spark.extraListeners=${spark2ExtraListeners}
-            --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-            --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-            --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-            --conf spark.dynamicAllocation.enabled=true
-            --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-        </spark-opts>
-        <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
-        <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
-    </spark>
-    <ok to="fork-join-exec-propagation"/>
-<!--            <ok to="End"/>-->
-    <error to="Kill"/>
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ResultToCommunityEmRelPropagation-PreparePhase2</name>
+            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep2</class>
+            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+        </spark>
+        <ok to="fork-join-exec-propagation"/>
+        <!--            <ok to="End"/>-->
+        <error to="Kill"/>
 
     </action>
 
@@ -275,6 +272,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -303,6 +301,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -331,6 +330,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -362,5 +362,6 @@
 
     <join name="wait2" to="End"/>
 
-<end name="End"/>
+    <end name="End"/>
+
 </workflow-app>

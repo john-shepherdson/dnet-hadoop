@@ -6,10 +6,7 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -80,6 +77,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final KeyValue hostedby) {
 
 		final Instance instance = new Instance();
+		final Set<String> url = new HashSet<>();
 		instance.setUrl(new ArrayList<>());
 		instance
 			.setInstancetype(
@@ -100,17 +98,18 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
 		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
-			instance.getUrl().add(((Node) o).getText().trim());
+			url.add(((Node) o).getText().trim());
 		}
 		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='URL']")) {
-			instance.getUrl().add(((Node) o).getText().trim());
+			url.add(((Node) o).getText().trim());
 		}
 		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='DOI']")) {
-			instance.getUrl().add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
+			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
 		}
 		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='DOI']")) {
-			instance.getUrl().add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
+			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
 		}
+		instance.getUrl().addAll(url);
 		return Arrays.asList(instance);
 	}
 

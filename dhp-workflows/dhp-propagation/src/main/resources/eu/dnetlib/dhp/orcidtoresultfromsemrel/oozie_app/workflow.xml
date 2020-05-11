@@ -1,37 +1,29 @@
 <workflow-app name="orcid_to_result_from_semrel_propagation" xmlns="uri:oozie:workflow:0.5">
-<parameters>
-    <property>
-        <name>sourcePath</name>
-        <description>the source path</description>
-    </property>
-    <property>
-        <name>allowedsemrels</name>
-        <description>the semantic relationships allowed for propagation</description>
-    </property>
-    <property>
-        <name>outputPath</name>
-        <description>the output path</description>
-    </property>
-</parameters>
-    <start to="reset-outputpath"/>
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>allowedsemrels</name>
+            <description>the semantic relationships allowed for propagation</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the output path</description>
+        </property>
+    </parameters>
 
+    <start to="reset_outputpath"/>
 
-<!--    <start to="fork_prepare_assoc_step1"/>-->
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
 
-<kill name="Kill">
-    <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-</kill>
-    <action name="reset-outputpath">
+    <action name="reset_outputpath">
         <fs>
-            <delete path='${workingDir}/preparedInfo'/>
-            <delete path='${outputPath}/relation'/>
-            <delete path='${outputPath}/dataset'/>
-            <delete path='${outputPath}/software'/>
-            <delete path='${outputPath}/publication'/>
-            <delete path='${outputPath}/otherresearchproduct'/>
-            <delete path='${outputPath}/project'/>
-            <delete path='${outputPath}/organization'/>
-            <delete path='${outputPath}/datasource'/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="copy_entities"/>
         <error to="Kill"/>
@@ -119,11 +111,16 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
-            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--sourcePath</arg>
+            <arg>${sourcePath}</arg>
+            <arg>--hive_metastore_uris</arg>
+            <arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg>
+            <arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg>
+            <arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--allowedsemrels</arg>
+            <arg>${allowedsemrels}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -147,11 +144,16 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
-            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--sourcePath</arg>
+            <arg>${sourcePath}</arg>
+            <arg>--hive_metastore_uris</arg>
+            <arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg>
+            <arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--outputPath</arg>
+            <arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--allowedsemrels</arg>
+            <arg>${allowedsemrels}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -175,11 +177,16 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
-            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--sourcePath</arg>
+            <arg>${sourcePath}</arg>
+            <arg>--hive_metastore_uris</arg>
+            <arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg>
+            <arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--outputPath</arg>
+            <arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--allowedsemrels</arg>
+            <arg>${allowedsemrels}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -203,11 +210,16 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
-            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--sourcePath</arg>
+            <arg>${sourcePath}</arg>
+            <arg>--hive_metastore_uris</arg>
+            <arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg>
+            <arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--outputPath</arg>
+            <arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--allowedsemrels</arg>
+            <arg>${allowedsemrels}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -233,11 +245,13 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg>
+            <arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--outputPath</arg>
+            <arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
         </spark>
         <ok to="fork-join-exec-propagation"/>
-<!--        <ok to="End"/>-->
+        <!--        <ok to="End"/>-->
         <error to="Kill"/>
 
     </action>
@@ -270,12 +284,18 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--possibleUpdatesPath</arg>
+            <arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg>
+            <arg>${sourcePath}/publication</arg>
+            <arg>--hive_metastore_uris</arg>
+            <arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg>
+            <arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg>
+            <arg>${outputPath}/publication</arg>
+            <arg>--saveGraph</arg>
+            <arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -301,12 +321,18 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--possibleUpdatesPath</arg>
+            <arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg>
+            <arg>${sourcePath}/dataset</arg>
+            <arg>--hive_metastore_uris</arg>
+            <arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg>
+            <arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--outputPath</arg>
+            <arg>${outputPath}/dataset</arg>
+            <arg>--saveGraph</arg>
+            <arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -332,12 +358,18 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--possibleUpdatesPath</arg>
+            <arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg>
+            <arg>${sourcePath}/otherresearchproduct</arg>
+            <arg>--hive_metastore_uris</arg>
+            <arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg>
+            <arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--outputPath</arg>
+            <arg>${outputPath}/otherresearchproduct</arg>
+            <arg>--saveGraph</arg>
+            <arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -363,16 +395,22 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--possibleUpdatesPath</arg>
+            <arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg>
+            <arg>${sourcePath}/software</arg>
+            <arg>--hive_metastore_uris</arg>
+            <arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg>
+            <arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--outputPath</arg>
+            <arg>${outputPath}/software</arg>
+            <arg>--saveGraph</arg>
+            <arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
     <join name="wait2" to="End"/>
-<end name="End"/>
+    <end name="End"/>
 </workflow-app>
