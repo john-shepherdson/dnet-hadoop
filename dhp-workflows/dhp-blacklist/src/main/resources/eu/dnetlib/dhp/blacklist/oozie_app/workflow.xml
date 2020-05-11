@@ -16,6 +16,10 @@
         <name>sourcePath</name>
         <description>the source path</description>
     </property>
+    <property>
+        <name>outputPath</name>
+        <description>the path were to store the graph without the blacklisted relations</description>
+    </property>
 </parameters>
 <start to="reset-outputpath"/>
 
@@ -25,7 +29,8 @@
 
     <action name="reset-outputpath">
         <fs>
-            <delete path='${workingDir}/blacklist'/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
         </fs>
         <ok to="read_blacklist"/>
         <error to="Kill"/>
@@ -87,7 +92,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/blacklist</arg>
             <arg>--mergesPath</arg><arg>${workingDir}/mergesRelation</arg>
         </spark>
