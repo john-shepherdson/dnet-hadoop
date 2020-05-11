@@ -373,7 +373,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 
 			qualifier(USER_CLAIM, USER_CLAIM, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), "0.9");
 
-
 		final List<KeyValue> collectedFrom = listKeyValues(
 			createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
 
