@@ -131,7 +131,7 @@
             <mode>cluster</mode>
             <name>PrepareResultOrganizationAssociation</name>
             <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.PrepareResultInstRepoAssociation</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -163,7 +163,7 @@
             <mode>cluster</mode>
             <name>resultToOrganizationFromInstRepoPropagationForPublications</name>
             <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -193,7 +193,7 @@
             <mode>cluster</mode>
             <name>resultToOrganizationFromInstRepoPropagationForDataset</name>
             <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -223,7 +223,7 @@
             <mode>cluster</mode>
             <name>resultToOrganizationFromInstRepoPropagationForORP</name>
             <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -253,7 +253,7 @@
             <mode>cluster</mode>
             <name>resultToOrganizationFromInstRepoPropagationForSoftware</name>
             <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}

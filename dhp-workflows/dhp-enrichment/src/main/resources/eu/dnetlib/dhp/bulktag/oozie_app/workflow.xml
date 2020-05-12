@@ -101,7 +101,7 @@
             <mode>cluster</mode>
             <name>bulkTagging-publication</name>
             <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob</class>
-            <jar>dhp-bulktag-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
                 --executor-memory=${sparkExecutorMemory}
@@ -130,7 +130,7 @@
             <mode>cluster</mode>
             <name>bulkTagging-dataset</name>
             <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob</class>
-            <jar>dhp-bulktag-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
                 --executor-memory=${sparkExecutorMemory}
@@ -159,7 +159,7 @@
             <mode>cluster</mode>
             <name>bulkTagging-orp</name>
             <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob</class>
-            <jar>dhp-bulktag-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
                 --executor-memory=${sparkExecutorMemory}
@@ -188,7 +188,7 @@
             <mode>cluster</mode>
             <name>bulkTagging-software</name>
             <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob</class>
-            <jar>dhp-bulktag-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
                 --executor-memory=${sparkExecutorMemory}

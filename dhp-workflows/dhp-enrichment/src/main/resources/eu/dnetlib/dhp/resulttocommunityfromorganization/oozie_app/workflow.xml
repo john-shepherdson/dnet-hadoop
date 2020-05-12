@@ -88,7 +88,7 @@
             <mode>cluster</mode>
             <name>Prepare-Community-Result-Organization</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.PrepareResultCommunitySet</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -122,7 +122,7 @@
             <mode>cluster</mode>
             <name>community2resultfromorganization-Publication</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -151,7 +151,7 @@
             <mode>cluster</mode>
             <name>community2resultfromorganization-Dataset</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -180,7 +180,7 @@
             <mode>cluster</mode>
             <name>community2resultfromorganization-ORP</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -209,7 +209,7 @@
             <mode>cluster</mode>
             <name>community2resultfromorganization-Software</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}

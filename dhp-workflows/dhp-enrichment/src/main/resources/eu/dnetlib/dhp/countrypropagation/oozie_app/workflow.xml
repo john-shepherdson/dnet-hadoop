@@ -92,7 +92,7 @@
             <mode>cluster</mode>
             <name>PrepareDatasourceCountryAssociation</name>
             <class>eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -126,7 +126,7 @@
             <mode>cluster</mode>
             <name>prepareResultCountry-Publication</name>
             <class>eu.dnetlib.dhp.countrypropagation.PrepareResultCountrySet</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -156,7 +156,7 @@
             <mode>cluster</mode>
             <name>prepareResultCountry-Dataset</name>
             <class>eu.dnetlib.dhp.countrypropagation.PrepareResultCountrySet</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -186,7 +186,7 @@
             <mode>cluster</mode>
             <name>prepareResultCountry-ORP</name>
             <class>eu.dnetlib.dhp.countrypropagation.PrepareResultCountrySet</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -216,7 +216,7 @@
             <mode>cluster</mode>
             <name>prepareResultCountry-Software</name>
             <class>eu.dnetlib.dhp.countrypropagation.PrepareResultCountrySet</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -255,7 +255,7 @@
             <mode>cluster</mode>
             <name>countryPropagationForPublications</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -285,7 +285,7 @@
             <mode>cluster</mode>
             <name>countryPropagationForDataset</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -315,7 +315,7 @@
             <mode>cluster</mode>
             <name>countryPropagationForORP</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -345,7 +345,7 @@
             <mode>cluster</mode>
             <name>countryPropagationForSoftware</name>
             <class>eu.dnetlib.dhp.countrypropagation.SparkCountryPropagationJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}

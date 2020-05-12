@@ -99,7 +99,7 @@
             <mode>cluster</mode>
             <name>ResultToCommunitySemRel-PreparePhase1-Publications</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -128,7 +128,7 @@
             <mode>cluster</mode>
             <name>ResultToCommunitySemRel-PreparePhase1-Dataset</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -150,13 +150,14 @@
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_prepare_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
             <name>ResultToCommunitySemRel-PreparePhase1-ORP</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -185,7 +186,7 @@
             <mode>cluster</mode>
             <name>ResultToCommunitySemRel-PreparePhase1-Software</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -216,7 +217,7 @@
             <mode>cluster</mode>
             <name>ResultToCommunityEmRelPropagation-PreparePhase2</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep2</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -232,9 +233,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
         </spark>
         <ok to="fork-join-exec-propagation"/>
-        <!--            <ok to="End"/>-->
         <error to="Kill"/>
-
     </action>
 
     <fork name="fork-join-exec-propagation">
@@ -250,7 +249,7 @@
             <mode>cluster</mode>
             <name>Result2CommunitySemRelPropagation-Publication</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -279,7 +278,7 @@
             <mode>cluster</mode>
             <name>Result2CommunitySemRelPropagation-Dataset</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -308,7 +307,7 @@
             <mode>cluster</mode>
             <name>Result2CommunitySemRelPropagation-ORP</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
@@ -337,7 +336,7 @@
             <mode>cluster</mode>
             <name>Result2CommunitySemRelPropagation-Software</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
