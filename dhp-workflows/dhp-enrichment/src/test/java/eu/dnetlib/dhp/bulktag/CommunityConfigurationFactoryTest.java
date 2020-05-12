@@ -74,7 +74,7 @@ public class CommunityConfigurationFactoryTest {
 				new ArrayList<>(
 					Collections
 						.singletonList(
-							"Pallino ha aiutato a scrivere il paper. Pallino lavora per DARIAH")));
+							"Author X helped to write the paper. X works for DARIAH")));
 		List<String> comm = cc
 			.getCommunityForDatasource(
 				"openaire____::1cfdb2e14977f31a98e0118283401f32", param);
