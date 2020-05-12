@@ -1,7 +1,7 @@
 <communities>
     <community id="egi">
         <subjects/>
-        <providers/>
+        <datasources/>
         <zenodocommunities>
             <zenodocommunity>
                 <zenodoid>zenodo</zenodoid>
@@ -9,29 +9,33 @@
             </zenodocommunity>
         </zenodocommunities>
         <organizations/>
-    </community> Result: 2 <community id="fet-fp7">
+    </community>
+    <community id="fet-fp7">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 3 <community id="fet-h2020">
+</community>
+    <community id="fet-h2020">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 4 <community id="clarin">
+</community>
+    <community id="clarin">
     <subjects/>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>re3data_____::a507cdacc5bbcc08761c92185dee5cab</openaireId>
             <selcriteria/>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 5 <community id="rda">
+</community>
+    <community id="rda">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>rda</zenodoid>
@@ -39,7 +43,8 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 6 <community id="ee">
+</community>
+    <community id="ee">
     <subjects>
         <subject>SDG13 - Climate action</subject>
         <subject>SDG8 - Decent work and economic growth</subject>
@@ -59,10 +64,11 @@
         <subject>SDG9 - Industry innovation and infrastructure</subject>
         <subject>SDG16 - Peace justice and strong institutions</subject>
     </subjects>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 7 <community id="dh-ch">
+</community>
+    <community id="dh-ch">
     <subjects>
         <subject>modern art</subject>
         <subject>monuments</subject>
@@ -132,7 +138,7 @@
         <subject>architectural</subject>
         <subject>vessels</subject>
     </subjects>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>re3data_____::9ebe127e5f3a0bf401875690f3bb6b81</openaireId>
             <selcriteria/>
@@ -169,7 +175,7 @@
             <openaireId>opendoar____::97275a23ca44226c9964043c8462be96</openaireId>
             <selcriteria/>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>storm</zenodoid>
@@ -253,7 +259,8 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 8 <community id="fam">
+</community>
+    <community id="fam">
     <subjects>
         <subject>Stock Assessment</subject>
         <subject>pelagic</subject>
@@ -275,7 +282,7 @@
         <subject>Fishing fleet</subject>
         <subject>Aquaculture</subject>
     </subjects>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>doajarticles::8cec81178926caaca531afbd8eb5d64c</openaireId>
             <selcriteria/>
@@ -328,7 +335,7 @@
             <openaireId>doajarticles::dd70e44479f0ade25aa106aef3e87a0a</openaireId>
             <selcriteria/>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>discardless</zenodoid>
@@ -372,7 +379,8 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 9 <community id="ni">
+</community>
+    <community id="ni">
     <subjects>
         <subject>brain mapping</subject>
         <subject>brain imaging</subject>
@@ -393,7 +401,7 @@
         <subject>brain magnetic resonance imaging</subject>
         <subject>brain abnormalities</subject>
     </subjects>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>re3data_____::5b9bf9171d92df854cf3c520692e9122</openaireId>
             <selcriteria/>
@@ -418,7 +426,7 @@
             <openaireId>rest________::fb1a3d4523c95e63496e3bc7ba36244b</openaireId>
             <selcriteria/>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>neuroinformatics</zenodoid>
@@ -486,7 +494,8 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 10 <community id="mes">
+</community>
+    <community id="mes">
     <subjects>
         <subject>marine</subject>
         <subject>ocean</subject>
@@ -494,7 +503,7 @@
         <subject>aqua</subject>
         <subject>sea</subject>
     </subjects>
-    <providers/>
+    <datasources/>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>adriplan</zenodoid>
@@ -686,9 +695,10 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 11 <community id="instruct">
+</community>
+    <community id="instruct">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>instruct</zenodoid>
@@ -700,12 +710,14 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 12 <community id="elixir-gr">
+</community>
+    <community id="elixir-gr">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 13 <community id="aginfra">
+</community>
+    <community id="aginfra">
     <subjects>
         <subject>animal production and health</subject>
         <subject>fisheries and aquaculture</subject>
@@ -726,7 +738,7 @@
         <subject>food distribution</subject>
         <subject>forestry</subject>
     </subjects>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>opendoar____::1a551829d50f1400b0dab21fdd969c04</openaireId>
             <selcriteria/>
@@ -751,7 +763,7 @@
             <openaireId>opendoar____::87ae6fb631f7c8a627e8e28785d9992d</openaireId>
             <selcriteria/>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>edenis</zenodoid>
@@ -827,9 +839,10 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 14 <community id="dariah">
+</community>
+    <community id="dariah">
     <subjects/>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>opendoar____::7e7757b1e12abcb736ab9a754ffb617a</openaireId>
             <selcriteria>{"criteria":[{"constraint":[{"verb":"contains","field":"contributor","value":"DARIAH"}]}]}</selcriteria>
@@ -838,7 +851,7 @@
             <openaireId>opendoar____::96da2f590cd7246bbde0051047b0d6f7</openaireId>
             <selcriteria>{"criteria":[{"constraint":[{"verb":"contains","field":"contributor","value":"DARIAH"}]}]}</selcriteria>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>dimpo</zenodoid>
@@ -846,17 +859,20 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 15 <community id="risis">
+</community>
+    <community id="risis">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 16 <community id="epos">
+</community>
+    <community id="epos">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 17 <community id="beopen">
+</community>
+    <community id="beopen">
     <subjects>
         <subject>Green Transport</subject>
         <subject>City mobility systems</subject>
@@ -1009,7 +1025,7 @@
         <subject>Innovative freight delivery systems</subject>
         <subject>urban freight delivery infrastructures</subject>
     </subjects>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>doajarticles::1c5bdf8fca58937894ad1441cca99b76</openaireId>
             <selcriteria/>
@@ -1094,7 +1110,7 @@
             <openaireId>doajarticles::fba6191177ede7c51ea1cdf58eae7f8b</openaireId>
             <selcriteria/>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>jsdtl</zenodoid>
@@ -1154,22 +1170,26 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 18 <community id="euromarine">
+</community>
+    <community id="euromarine">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 19 <community id="ifremer">
+</community>
+    <community id="ifremer">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 20 <community id="oa-pg">
+</community>
+    <community id="oa-pg">
     <subjects/>
-    <providers/>
+    <datasources/>
     <zenodocommunities/>
     <organizations/>
-</community> Result: 21 <community id="science-innovation-policy">
+</community>
+    <community id="science-innovation-policy">
     <subjects>
         <subject>Sustainability-oriented science policy</subject>
         <subject> STI policies</subject>
@@ -1179,7 +1199,7 @@
         <subject>science policy</subject>
         <subject>Policy and Law</subject>
     </subjects>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>doajarticles::c6f0ed5fa41e98863e7c73501fe4bd6d</openaireId>
             <selcriteria/>
@@ -1264,7 +1284,7 @@
             <openaireId>doajarticles::7ffc35ac5133da01d421ccf8af5b70bc</openaireId>
             <selcriteria/>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>risis</zenodoid>
@@ -1272,7 +1292,8 @@
         </zenodocommunity>
     </zenodocommunities>
     <organizations/>
-</community> Result: 22 <community id="covid-19">
+</community>
+    <community id="covid-19">
     <subjects>
         <subject>COVID-19</subject>
         <subject>Severe acute respiratory syndrome coronavirus 2</subject>
@@ -1287,7 +1308,7 @@
         <subject>mesh:COVID-19</subject>
         <subject>COVID2019</subject>
     </subjects>
-    <providers>
+    <datasources>
         <datasource>
             <openaireId>opendoar____::358aee4cc897452c00244351e4d91f69</openaireId>
             <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
@@ -1366,7 +1387,7 @@
             <openaireId>re3data_____::978378def740bbf2bfb420de868c460b</openaireId>
             <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCov"}]}]}</selcriteria>
         </datasource>
-    </providers>
+    </datasources>
     <zenodocommunities>
         <zenodocommunity>
             <zenodoid>chicago-covid-19</zenodoid>
