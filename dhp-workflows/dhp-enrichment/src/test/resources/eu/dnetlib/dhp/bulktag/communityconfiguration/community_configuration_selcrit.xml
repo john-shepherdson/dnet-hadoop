@@ -35,7 +35,7 @@
             <subject>SDG9 - Industry innovation and infrastructure</subject>
             <subject>SDG16 - Peace justice and strong institutions</subject>
         </subjects>
-        <providers/>
+        <datasources/>
         <zenodocommunities>
             <zenodocommunity>
                 <zenodoid>123</zenodoid>
@@ -50,7 +50,7 @@
     </community>
     <community id="fam">
         <subjects/>
-        <providers/>
+        <datasources/>
         <zenodocommunities/>
     </community>
     <community id="ni">
@@ -74,7 +74,7 @@
             <subject>brain magnetic resonance imaging</subject>
             <subject>brain abnormalities</subject>
         </subjects>
-        <providers>
+        <datasources>
             <datasource>
                 <openaireId>re3data_____::5b9bf9171d92df854cf3c520692e9122</openaireId>
                 <selcriteria/>
@@ -95,7 +95,7 @@
                 <openaireId>doajarticles::0c0e74daa5d95504eade9c81ebbd5b8a</openaireId>
                 <selcriteria/>
             </datasource>
-        </providers>
+        </datasources>
         <zenodocommunities/>
     </community>
     <community id="mes">
@@ -106,12 +106,12 @@
             <subject>aqua</subject>
             <subject>sea</subject>
         </subjects>
-        <providers>
+        <datasources>
             <datasource>
                 <openaireId>re3data_____::9633d1e8c4309c833c2c442abeb0cfeb</openaireId>
                 <selcriteria/>
             </datasource>
-        </providers>
+        </datasources>
         <zenodocommunities/>
     </community>
     <community id="aginfra">
@@ -134,7 +134,7 @@
             <subject>food distribution</subject>
             <subject>forestry</subject>
         </subjects>
-        <providers>
+        <datasources>
             <datasource>
                 <openaireId>opendoar____::1a551829d50f1400b0dab21fdd969c04</openaireId>
                 <selcriteria/>
@@ -159,30 +159,30 @@
                 <openaireId>opendoar____::87ae6fb631f7c8a627e8e28785d9992d</openaireId>
                 <selcriteria/>
             </datasource>
-        </providers>
+        </datasources>
         <zenodocommunities/>
     </community>
     <community id="clarin">
         <oacommunity>oac_clarin</oacommunity>
         <subjects/>
-        <providers>
+        <datasources>
             <datasource>
                 <openaireId>re3data_____::a507cdacc5bbcc08761c92185dee5cab</openaireId>
                 <selcriteria/>
             </datasource>
-        </providers>
+        </datasources>
         <zenodocommunities/>
     </community>
     <community id="dariah">
         <oacommunity>oaa_dariah</oacommunity>
         <subjects/>
-        <providers>
+        <datasources>
             <datasource>
                 <openaireId>openaire____::1cfdb2e14977f31a98e0118283401f32</openaireId>
                 <selcriteria>{"criteria":[{"constraint":[{"verb":"contains","field":"contributor","value":"DARIAH"}]}]}
                 </selcriteria>
             </datasource>
-        </providers>
+        </datasources>
         <zenodocommunities>
             <zenodocommunity>
                 <zenodoid>dimpo</zenodoid>
