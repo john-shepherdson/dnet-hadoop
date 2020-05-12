@@ -22,12 +22,12 @@ public class VerbResolver implements Serializable {
 				.verbose() // If you want to enable logging to stderr
 				.enableAllInfo() // Scan classes, methods, fields, annotations
 				.whitelistPackages(
-					"eu.dnetlib.dhp.selectioncriteria") // Scan com.xyz and subpackages
+					"eu.dnetlib.dhp.bulktag.criteria") // Scan com.xyz and subpackages
 				.scan()) { // Perform the scan and return a ScanResult
 
 			ClassInfoList routeClassInfoList = scanResult
 				.getClassesWithAnnotation(
-					"eu.dnetlib.dhp.selectioncriteria.VerbClass");
+					"eu.dnetlib.dhp.bulktag.criteria.VerbClass");
 
 			this.map = routeClassInfoList
 				.stream()
