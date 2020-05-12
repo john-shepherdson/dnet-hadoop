@@ -81,5 +81,5 @@ public class CommunityConfigurationFactoryTest {
 		Assertions.assertEquals(1, comm.size());
 		Assertions.assertEquals("dariah", comm.get(0));
 	}
-	
+
 }
