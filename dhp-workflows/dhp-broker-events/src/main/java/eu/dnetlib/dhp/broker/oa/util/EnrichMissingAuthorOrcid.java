@@ -4,28 +4,30 @@ package eu.dnetlib.dhp.broker.oa.util;
 import java.util.Arrays;
 import java.util.List;
 
-import eu.dnetlib.broker.objects.OpenAireEventPayload;
+import org.apache.commons.lang3.tuple.Pair;
+
+import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingAuthorOrcid extends UpdateInfo<String> {
+public class EnrichMissingAuthorOrcid extends UpdateMatcher<Pair<String, String>> {
 
-	public static List<EnrichMissingAuthorOrcid> findUpdates(final Result source, final Result target) {
+	public EnrichMissingAuthorOrcid() {
+		super(true);
+	}
+
+	@Override
+	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target) {
 		// return Arrays.asList(new EnrichMissingAbstract("xxxxxxx", 0.9f));
 		return Arrays.asList();
 	}
 
-	private EnrichMissingAuthorOrcid(final String highlightValue, final float trust) {
-		super("ENRICH/MISSING/AUTHOR/ORCID", highlightValue, trust);
-	}
-
 	@Override
-	public void compileHighlight(final OpenAireEventPayload payload) {
-		// TODO
+	public UpdateInfo<Pair<String, String>> generateUpdateInfo(final Pair<String, String> highlightValue,
+		final Result source, final Result target) {
+		return new UpdateInfo<>(
+			Topic.ENRICH_MISSING_AUTHOR_ORCID,
+			highlightValue, source, target,
+			(p, pair) -> p.getCreators().add(pair.getLeft() + " - ORCID: " + pair.getRight()),
+			pair -> pair.getLeft() + "::" + pair.getRight());
 	}
-
-	@Override
-	public String getHighlightValueAsString() {
-		return getHighlightValue();
-	}
-
 }
