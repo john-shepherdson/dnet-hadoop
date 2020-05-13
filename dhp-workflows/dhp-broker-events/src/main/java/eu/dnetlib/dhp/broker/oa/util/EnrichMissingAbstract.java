@@ -1,31 +1,35 @@
 
 package eu.dnetlib.dhp.broker.oa.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import eu.dnetlib.broker.objects.OpenAireEventPayload;
+import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingAbstract extends UpdateInfo<String> {
+public class EnrichMissingAbstract extends UpdateMatcher<String> {
 
-	public static List<EnrichMissingAbstract> findUpdates(final Result source, final Result target) {
-		// return Arrays.asList(new EnrichMissingAbstract("xxxxxxx", 0.9f));
-		return Arrays.asList();
-	}
-
-	private EnrichMissingAbstract(final String highlightValue, final float trust) {
-		super("ENRICH/MISSING/ABSTRACT", highlightValue, trust);
+	public EnrichMissingAbstract() {
+		super(false);
 	}
 
 	@Override
-	public void compileHighlight(final OpenAireEventPayload payload) {
-		payload.getHighlight().getAbstracts().add(getHighlightValue());
+	protected List<UpdateInfo<String>> findUpdates(final Result source, final Result target) {
+		if (isMissing(target.getDescription()) && !isMissing(source.getDescription())) {
+			return Arrays.asList(generateUpdateInfo(source.getDescription().get(0).getValue(), source, target));
+		}
+		return new ArrayList<>();
 	}
 
 	@Override
-	public String getHighlightValueAsString() {
-		return getHighlightValue();
+	public UpdateInfo<String> generateUpdateInfo(final String highlightValue, final Result source,
+		final Result target) {
+		return new UpdateInfo<>(
+			Topic.ENRICH_MISSING_ABSTRACT,
+			highlightValue, source, target,
+			(p, s) -> p.getAbstracts().add(s),
+			s -> s);
 	}
 
 }
