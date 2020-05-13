@@ -1,20 +1,15 @@
 package eu.dnetlib.doiboost
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import eu.dnetlib.dhp.schema.oaf.{Dataset, KeyValue, Oaf, Publication, Relation, Result}
+import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
-import eu.dnetlib.doiboost.crossref.{Crossref2Oaf, SparkMapDumpIntoOAF}
-import eu.dnetlib.doiboost.mag.SparkImportMagIntoDataset
-import org.apache.spark.{SparkConf, sql}
-import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
+import eu.dnetlib.doiboost.crossref.Crossref2Oaf
 import org.codehaus.jackson.map.ObjectMapper
-import org.junit.jupiter.api.Test
-
-import scala.io.Source
 import org.junit.jupiter.api.Assertions._
+import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
+import scala.io.Source
 import scala.util.matching.Regex
 
 
@@ -22,12 +17,6 @@ class CrossrefMappingTest {
 
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
   val mapper = new ObjectMapper()
-
-
-
-  def testMAGCSV() :Unit = {
-    SparkImportMagIntoDataset.main(null)
-   }
 
 
   @Test
