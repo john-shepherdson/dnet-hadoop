@@ -134,7 +134,7 @@
             <mode>cluster</mode>
             <name>PrepareProjectResultsAssociation</name>
             <class>eu.dnetlib.dhp.projecttoresult.PrepareProjectResultsAssociation</class>
-            <jar>dhp-propagation-${projectVersion}.jar</jar>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
