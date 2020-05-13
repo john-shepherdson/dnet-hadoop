@@ -1,0 +1,694 @@
+{"communities": {
+    "clarin": {
+      "id": "clarin",
+      "subjects": [],
+      "datasources": [
+        {
+          "openaireId": "re3data_____::a507cdacc5bbcc08761c92185dee5cab"
+        }
+      ],
+      "zenodoCommunities": [
+
+      ]
+    },
+    "ee": {
+      "id": "ee",
+      "subjects": [
+        "SDG13 - Climate action",
+        "SDG8 - Decent work and economic\n\t\t\t\t\tgrowth",
+        "SDG15 - Life on land",
+        "SDG2 - Zero hunger",
+        "SDG17 - Partnerships for the\n\t\t\t\t\tgoals",
+        "SDG10 - Reduced inequalities",
+        "SDG5 - Gender equality",
+        "SDG12 - Responsible\n\t\t\t\t\tconsumption and production",
+        "SDG14 - Life below water",
+        "SDG6 - Clean water and\n\t\t\t\t\tsanitation",
+        "SDG11 - Sustainable cities and communities",
+        "SDG1 - No poverty",
+        "SDG3 -\n\t\t\t\t\tGood health and well being",
+        "SDG7 - Affordable and clean energy",
+        "SDG4 - Quality\n\t\t\t\t\teducation",
+        "SDG9 - Industry innovation and infrastructure",
+        "SDG16 - Peace justice\n\t\t\t\t\tand strong institutions"
+      ],
+      "datasources": [
+
+      ],
+      "zenodoCommunities": [
+
+      ]
+    },
+    "aginfra": {
+      "id": "aginfra",
+      "subjects": [
+        "animal production and health",
+        "fisheries and aquaculture",
+        "food safety and human nutrition",
+        "information management",
+        "food technology",
+        "agri-food education and extension",
+        "natural resources and environment",
+        "food system",
+        "engineering technology and Research",
+        "agriculture",
+        "food safety risk assessment",
+        "food security",
+        "farming practices and systems",
+        "plant production and protection",
+        "agri-food economics and policy",
+        "food distribution",
+        "forestry"
+      ],
+      "datasources": [
+        {
+          "openaireId": "opendoar____::1a551829d50f1400b0dab21fdd969c04"
+        },
+        {
+          "openaireId": "opendoar____::49af6c4e558a7569d80eee2e035e2bd7"
+        },
+        {
+          "openaireId": "opendoar____::0266e33d3f546cb5436a10798e657d97"
+        },
+        {
+          "openaireId": "opendoar____::fd4c2dc64ccb8496e6f1f94c85f30d06"
+        },
+        {
+          "openaireId": "opendoar____::41bfd20a38bb1b0bec75acf0845530a7"
+        },
+        {
+          "openaireId": "opendoar____::87ae6fb631f7c8a627e8e28785d9992d"
+        }
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "edenis"
+        },
+        {
+          "zenodoCommunityId": "efsa-pilot"
+        },
+        {
+          "zenodoCommunityId": "egene3"
+        },
+        {
+          "zenodoCommunityId": "efsa-kj"
+        },
+        {
+          "zenodoCommunityId": "euromixproject"
+        },
+        {
+          "zenodoCommunityId": "discardless"
+        },
+        {
+          "zenodoCommunityId": "sedinstcjfst"
+        },
+        {
+          "zenodoCommunityId": "afinet-kc"
+        },
+        {
+          "zenodoCommunityId": "2231-4784"
+        },
+        {
+          "zenodoCommunityId": "2231-0606"
+        },
+        {
+          "zenodoCommunityId": "solace"
+        },
+        {
+          "zenodoCommunityId": "pa17"
+        },
+        {
+          "zenodoCommunityId": "smartakis"
+        },
+        {
+          "zenodoCommunityId": "sedinstcjae"
+        },
+        {
+          "zenodoCommunityId": "phenology_camera"
+        },
+        {
+          "zenodoCommunityId": "aginfra"
+        },
+        {
+          "zenodoCommunityId": "erosa"
+        },
+        {
+          "zenodoCommunityId": "bigdatagrapes"
+        }
+      ]
+    },
+    "fam": {
+      "id": "fam",
+      "subjects": [
+        "Stock Assessment",
+        "pelagic",
+        "Fish farming",
+        "EMFF",
+        "Fisheries",
+        "Fishermen",
+        "maximum sustainable yield",
+        "trawler",
+        "Fishing vessel",
+        "Fisherman",
+        "Fishing gear",
+        "RFMO",
+        "Fish Aggregating Device",
+        "Bycatch",
+        "Fishery",
+        "common fisheries policy",
+        "Fishing fleet",
+        "Aquaculture"
+      ],
+      "datasources": [
+        {
+          "openaireId": "doajarticles::8cec81178926caaca531afbd8eb5d64c"
+        },
+        {
+          "openaireId": "doajarticles::0f7a7f30b5400615cae1829f3e743982"
+        },
+        {
+          "openaireId": "doajarticles::9740f7f5af3e506d2ad2c215cdccd51a"
+        },
+        {
+          "openaireId": "doajarticles::9f3fbaae044fa33cb7069b72935a3254"
+        },
+        {
+          "openaireId": "doajarticles::cb67f33eb9819f5c624ce0313957f6b3"
+        },
+        {
+          "openaireId": "doajarticles::e21c97cbb7a209afc75703681c462906"
+        },
+        {
+          "openaireId": "doajarticles::554cde3be9e5c4588b4c4f9f503120cb"
+        },
+        {
+          "openaireId": "tubitakulakb::11e22f49e65b9fd11d5b144b93861a1b"
+        },
+        {
+          "openaireId": "doajarticles::57c5d3837da943e93b28ec4db82ec7a5"
+        },
+        {
+          "openaireId": "doajarticles::a186f5ddb8e8c7ecc992ef51cf3315b1"
+        },
+        {
+          "openaireId": "doajarticles::e21c97cbb7a209afc75703681c462906"
+        },
+        {
+          "openaireId": "doajarticles::dca64612dfe0963fffc119098a319957"
+        },
+        {
+          "openaireId": "doajarticles::dd70e44479f0ade25aa106aef3e87a0a"
+        }
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "discardless"
+        },
+        {
+          "zenodoCommunityId": "farfish2020"
+        },
+        {
+          "zenodoCommunityId": "facts"
+        },
+        {
+          "zenodoCommunityId": "climefish"
+        },
+        {
+          "zenodoCommunityId": "proeel"
+        },
+        {
+          "zenodoCommunityId": "primefish"
+        },
+        {
+          "zenodoCommunityId": "h2020_vicinaqua"
+        },
+        {
+          "zenodoCommunityId": "meece"
+        },
+        {
+          "zenodoCommunityId": "rlsadb"
+        }
+      ]
+    },
+    "instruct": {
+      "id": "instruct",
+      "subjects": [
+
+      ],
+      "datasources": [
+
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "instruct"
+        },
+        {
+          "zenodoCommunityId": "west-life"
+        }
+      ]
+    },
+    "mes": {
+      "id": "mes",
+      "subjects": [
+        "marine",
+        "ocean",
+        "fish",
+        "aqua",
+        "sea"
+      ],
+      "datasources": [
+
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "adriplan"
+        },
+        {
+          "zenodoCommunityId": "devotes-project"
+        },
+        {
+          "zenodoCommunityId": "euro-basin"
+        },
+        {
+          "zenodoCommunityId": "naclim"
+        },
+        {
+          "zenodoCommunityId": "discardless"
+        },
+        {
+          "zenodoCommunityId": "assisibf"
+        },
+        {
+          "zenodoCommunityId": "meece"
+        },
+        {
+          "zenodoCommunityId": "facts"
+        },
+        {
+          "zenodoCommunityId": "proeel"
+        },
+        {
+          "zenodoCommunityId": "aquatrace"
+        },
+        {
+          "zenodoCommunityId": "myfish"
+        },
+        {
+          "zenodoCommunityId": "atlas"
+        },
+        {
+          "zenodoCommunityId": "blue-actionh2020"
+        },
+        {
+          "zenodoCommunityId": "sponges"
+        },
+        {
+          "zenodoCommunityId": "merces_project"
+        },
+        {
+          "zenodoCommunityId": "bigdataocean"
+        },
+        {
+          "zenodoCommunityId": "columbus"
+        },
+        {
+          "zenodoCommunityId": "h2020-aquainvad-ed"
+        },
+        {
+          "zenodoCommunityId": "aquarius"
+        },
+        {
+          "zenodoCommunityId": "southern-ocean-observing-system"
+        },
+        {
+          "zenodoCommunityId": "eawag"
+        },
+        {
+          "zenodoCommunityId": "mossco"
+        },
+        {
+          "zenodoCommunityId": "onc"
+        },
+        {
+          "zenodoCommunityId": "oceanbiogeochemistry"
+        },
+        {
+          "zenodoCommunityId": "oceanliteracy"
+        },
+        {
+          "zenodoCommunityId": "openearth"
+        },
+        {
+          "zenodoCommunityId": "ocean"
+        },
+        {
+          "zenodoCommunityId": "calcifierraman"
+        },
+        {
+          "zenodoCommunityId": "bermudabream"
+        },
+        {
+          "zenodoCommunityId": "brcorp1"
+        },
+        {
+          "zenodoCommunityId": "mce"
+        },
+        {
+          "zenodoCommunityId": "biogeochem"
+        },
+        {
+          "zenodoCommunityId": "ecc2014"
+        },
+        {
+          "zenodoCommunityId": "fisheries"
+        },
+        {
+          "zenodoCommunityId": "sedinstcjfas"
+        },
+        {
+          "zenodoCommunityId": "narmada"
+        },
+        {
+          "zenodoCommunityId": "umr-entropie"
+        },
+        {
+          "zenodoCommunityId": "farfish2020"
+        },
+        {
+          "zenodoCommunityId": "primefish"
+        },
+        {
+          "zenodoCommunityId": "zf-ilcs"
+        },
+        {
+          "zenodoCommunityId": "climefish"
+        },
+        {
+          "zenodoCommunityId": "afrimed_eu"
+        },
+        {
+          "zenodoCommunityId": "spi-ace"
+        },
+        {
+          "zenodoCommunityId": "cice-consortium"
+        },
+        {
+          "zenodoCommunityId": "nemo-ocean"
+        },
+        {
+          "zenodoCommunityId": "mesopp-h2020"
+        },
+        {
+          "zenodoCommunityId": "marxiv"
+        }
+      ]
+    },
+    "ni": {
+      "id": "ni",
+      "subjects": [
+        "brain mapping",
+        "brain imaging",
+        "electroencephalography",
+        "arterial spin labelling",
+        "brain fingerprinting",
+        "brain",
+        "neuroimaging",
+        "Multimodal Brain Image Analysis",
+        "fMRI",
+        "neuroinformatics",
+        "fetal brain",
+        "brain ultrasonic imaging",
+        "topographic brain mapping",
+        "diffusion tensor imaging",
+        "computerized knowledge assessment",
+        "connectome mapping",
+        "brain magnetic resonance imaging",
+        "brain abnormalities"
+      ],
+      "datasources": [
+        {
+          "openaireId": "re3data_____::5b9bf9171d92df854cf3c520692e9122"
+        },
+        {
+          "openaireId": "doajarticles::c7d3de67dc77af72f6747157441252ec"
+        },
+        {
+          "openaireId": "re3data_____::8515794670370f49c1d176c399c714f5"
+        },
+        {
+          "openaireId": "doajarticles::d640648c84b10d425f96f11c3de468f3"
+        },
+        {
+          "openaireId": "doajarticles::0c0e74daa5d95504eade9c81ebbd5b8a"
+        },
+        {
+          "openaireId": "rest________::fb1a3d4523c95e63496e3bc7ba36244b"
+        }
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "neuroinformatics"
+        },
+        {
+          "zenodoCommunityId": "hbp"
+        },
+        {
+          "zenodoCommunityId": "from_neuroscience_to_machine_learning"
+        },
+        {
+          "zenodoCommunityId": "ci2c"
+        },
+        {
+          "zenodoCommunityId": "opensourcebrain"
+        },
+        {
+          "zenodoCommunityId": "brainspeak"
+        },
+        {
+          "zenodoCommunityId": "braincom"
+        },
+        {
+          "zenodoCommunityId": "nextgenvis"
+        },
+        {
+          "zenodoCommunityId": "meso-brain"
+        },
+        {
+          "zenodoCommunityId": "neuroplasticity-workshop"
+        },
+        {
+          "zenodoCommunityId": "bionics"
+        },
+        {
+          "zenodoCommunityId": "brainmattrain-676408"
+        },
+        {
+          "zenodoCommunityId": "repronim"
+        },
+        {
+          "zenodoCommunityId": "affectiveneuro"
+        },
+        {
+          "zenodoCommunityId": "con"
+        },
+        {
+          "zenodoCommunityId": "lab_neurol_sperim_irfmn_irccs_milano_it"
+        }
+      ]
+    },
+    "dariah": {
+      "id": "dariah",
+      "subjects": [
+
+      ],
+      "datasources": [
+        {
+          "openaireId": "opendoar____::7e7757b1e12abcb736ab9a754ffb617a",
+          "sc": {
+            "cl": {
+              "criteria": [
+                {
+                  "ce": {
+                    "constraint": [
+                      {
+                        "verb": "contains",
+                        "field": "contributor",
+                        "value": "DARIAH"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "dimpo"
+        }
+      ]
+    },
+    "rda": {
+      "id": "rda",
+      "subjects": [
+
+      ],
+      "datasources": [
+
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "rda"
+        }
+      ]
+    },
+    "dh-ch": {
+      "id": "dh-ch",
+      "subjects": [
+        "modern art",
+        "metadata",
+        "monuments",
+        "sites",
+        "field walking",
+        "frescoes",
+        "excavation",
+        "ontologies",
+        "mapping",
+        "cities",
+        "temples",
+        "lithics",
+        "roads",
+        "digital cultural heritage",
+        "interoperability",
+        "archaeological reports",
+        "churches",
+        "standards",
+        "archaeological stratigraphy",
+        "buidings",
+        "digital humanities",
+        "survey",
+        "archaeological sites",
+        "CIDOC CRM",
+        "decorations",
+        "classic art",
+        "stratigraphy",
+        "digital archaeology",
+        "walls",
+        "data science",
+        "chapels",
+        "paintings",
+        "archaeology",
+        "fair data",
+        "mosaics",
+        "data visualization",
+        "burials",
+        "medieval art",
+        "castles",
+        "statues",
+        "natural language processing",
+        "inscriptions",
+        "vaults",
+        "open data",
+        "contemporary art",
+        "3D",
+        "pottery",
+        "site",
+        "metadata schema",
+        "architectural",
+        "vessels"
+      ],
+      "datasources": [
+        {
+          "openaireId": "re3data_____::9ebe127e5f3a0bf401875690f3bb6b81"
+        },
+        {
+          "openaireId": "doajarticles::c6cd4b532e12868c1d760a8d7cda6815"
+        },
+        {
+          "openaireId": "doajarticles::a6de4499bb87bf3c01add0a9e2c9ed0b"
+        },
+        {
+          "openaireId": "doajarticles::6eb31d13b12bc06bbac06aef63cf33c9"
+        },
+        {
+          "openaireId": "doajarticles::0da84e9dfdc8419576169e027baa8028"
+        },
+        {
+          "openaireId": "re3data_____::84e123776089ce3c7a33db98d9cd15a8"
+        },
+        {
+          "openaireId": "openaire____::c5502a43e76feab55dd00cf50f519125"
+        },
+        {
+          "openaireId": "re3data_____::a48f09c562b247a9919acfe195549b47"
+        },
+        {
+          "openaireId": "opendoar____::97275a23ca44226c9964043c8462be96"
+        }
+      ],
+      "zenodoCommunities": [
+        {
+          "zenodoCommunityId": "storm"
+        },
+        {
+          "zenodoCommunityId": "crosscult"
+        },
+        {
+          "zenodoCommunityId": "wholodance_eu"
+        },
+        {
+          "zenodoCommunityId": "digcur2013"
+        },
+        {
+          "zenodoCommunityId": "gravitate"
+        },
+        {
+          "zenodoCommunityId": "dipp2014"
+        },
+        {
+          "zenodoCommunityId": "digitalhumanities"
+        },
+        {
+          "zenodoCommunityId": "dimpo"
+        },
+        {
+          "zenodoCommunityId": "adho"
+        },
+        {
+          "zenodoCommunityId": "chc"
+        },
+        {
+          "zenodoCommunityId": "wahr"
+        },
+        {
+          "zenodoCommunityId": "ibe"
+        },
+        {
+          "zenodoCommunityId": "ariadne"
+        },
+        {
+          "zenodoCommunityId": "parthenos-hub"
+        },
+        {
+          "zenodoCommunityId": "parthenos-training"
+        },
+        {
+          "zenodoCommunityId": "gandhara"
+        },
+        {
+          "zenodoCommunityId": "cmsouthasia"
+        },
+        {
+          "zenodoCommunityId": "nilgirihills"
+        },
+        {
+          "zenodoCommunityId": "shamsa_mustecio"
+        },
+        {
+          "zenodoCommunityId": "bodhgaya"
+        }
+      ]
+    }
+  }
+}

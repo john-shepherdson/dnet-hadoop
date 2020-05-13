@@ -1,0 +1,33 @@
+[
+	{
+		"paramName": "p",
+		"paramLongName": "hdfsPath",
+		"paramDescription": "the path where storing the sequential file",
+		"paramRequired": true
+	},
+	{
+		"paramName": "s",
+		"paramLongName": "sourcePath",
+		"paramDescription": "the path to the graph used to remove the relations ",
+		"paramRequired": true
+	},
+	{
+		"paramName": "out",
+		"paramLongName": "outputPath",
+		"paramDescription": "the path where to store the temporary result ",
+		"paramRequired": true
+	},
+	{
+		"paramName": "issm",
+		"paramLongName": "isSparkSessionManaged",
+		"paramDescription": "true if the spark session is managed",
+		"paramRequired": false
+	},
+	{
+		"paramName": "m",
+		"paramLongName": "mergesPath",
+		"paramDescription": "true if the spark session is managed",
+		"paramRequired": true
+
+	}
+]
