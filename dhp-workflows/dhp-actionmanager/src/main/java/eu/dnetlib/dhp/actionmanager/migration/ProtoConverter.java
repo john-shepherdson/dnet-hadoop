@@ -523,7 +523,9 @@ public class ProtoConverter implements Serializable {
 	}
 
 	private static Context mapContext(ResultProtos.Result.Context context) {
-
+		if (context == null || StringUtils.isBlank(context.getId())) {
+			return null;
+		}
 		final Context entity = new Context();
 		entity.setId(context.getId());
 		entity
@@ -537,6 +539,10 @@ public class ProtoConverter implements Serializable {
 	}
 
 	public static KeyValue mapKV(FieldTypeProtos.KeyValue kv) {
+		if (kv == null || StringUtils.isBlank(kv.getKey()) & StringUtils.isBlank(kv.getValue())) {
+			return null;
+		}
+
 		final KeyValue keyValue = new KeyValue();
 		keyValue.setKey(kv.getKey());
 		keyValue.setValue(kv.getValue());
@@ -575,6 +581,10 @@ public class ProtoConverter implements Serializable {
 	}
 
 	public static StructuredProperty mapStructuredProperty(FieldTypeProtos.StructuredProperty sp) {
+		if (sp == null | StringUtils.isBlank(sp.getValue())) {
+			return null;
+		}
+
 		final StructuredProperty structuredProperty = new StructuredProperty();
 		structuredProperty.setValue(sp.getValue());
 		structuredProperty.setQualifier(mapQualifier(sp.getQualifier()));
@@ -611,6 +621,10 @@ public class ProtoConverter implements Serializable {
 	}
 
 	public static Field<String> mapStringField(FieldTypeProtos.StringField s) {
+		if (s == null || StringUtils.isBlank(s.getValue())) {
+			return null;
+		}
+
 		final Field<String> stringField = new Field<>();
 		stringField.setValue(s.getValue());
 		stringField.setDataInfo(mapDataInfo(s.getDataInfo()));
@@ -618,17 +632,14 @@ public class ProtoConverter implements Serializable {
 	}
 
 	public static Field<Boolean> mapBoolField(FieldTypeProtos.BoolField b) {
+		if (b == null) {
+			return null;
+		}
+
 		final Field<Boolean> booleanField = new Field<>();
 		booleanField.setValue(b.getValue());
 		booleanField.setDataInfo(mapDataInfo(b.getDataInfo()));
 		return booleanField;
-	}
-
-	public static Field<Integer> mapIntField(FieldTypeProtos.IntField b) {
-		final Field<Integer> entity = new Field<>();
-		entity.setValue(b.getValue());
-		entity.setDataInfo(mapDataInfo(b.getDataInfo()));
-		return entity;
 	}
 
 	public static Journal mapJournal(FieldTypeProtos.Journal j) {
