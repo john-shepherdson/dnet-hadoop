@@ -132,16 +132,16 @@ public class SparkOrcidToResultFromSemRelJob {
 	private static boolean enrichAuthor(AutoritativeAuthor autoritative_author, Author author) {
 		boolean toaddpid = false;
 
-		if (StringUtils.isNoneEmpty(autoritative_author.getSurname())) {
-			if (StringUtils.isNoneEmpty(author.getSurname())) {
+		if (StringUtils.isNotEmpty(autoritative_author.getSurname())) {
+			if (StringUtils.isNotEmpty(author.getSurname())) {
 				if (autoritative_author
 					.getSurname()
 					.trim()
 					.equalsIgnoreCase(author.getSurname().trim())) {
 
 					// have the same surname. Check the name
-					if (StringUtils.isNoneEmpty(autoritative_author.getName())) {
-						if (StringUtils.isNoneEmpty(author.getName())) {
+					if (StringUtils.isNotEmpty(autoritative_author.getName())) {
+						if (StringUtils.isNotEmpty(author.getName())) {
 							if (autoritative_author
 								.getName()
 								.trim()
@@ -150,12 +150,14 @@ public class SparkOrcidToResultFromSemRelJob {
 							}
 							// they could be differently written (i.e. only the initials of the name
 							// in one of the two
-							if (autoritative_author
-								.getName()
-								.trim()
-								.substring(0, 0)
-								.equalsIgnoreCase(author.getName().trim().substring(0, 0))) {
-								toaddpid = true;
+							else {
+								if (autoritative_author
+										.getName()
+										.trim()
+										.substring(0, 0)
+										.equalsIgnoreCase(author.getName().trim().substring(0, 0))) {
+									toaddpid = true;
+								}
 							}
 						}
 					}
