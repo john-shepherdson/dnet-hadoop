@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -100,7 +101,7 @@ public class PrepareDatasourceCountryAssociation {
 			+ "JOIN ( SELECT source, target "
 			+ "       FROM relation "
 			+ "       WHERE relclass = '"
-			+ RELATION_DATASOURCE_ORGANIZATION_REL_CLASS
+			+ ModelConstants.IS_PROVIDED_BY
 			+ "' "
 			+ "       AND datainfo.deletedbyinference = false ) rel "
 			+ "ON d.id = rel.source "

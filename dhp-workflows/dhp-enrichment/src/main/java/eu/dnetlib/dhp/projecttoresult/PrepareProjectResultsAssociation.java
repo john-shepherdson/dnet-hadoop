@@ -8,6 +8,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -85,7 +86,7 @@ public class PrepareProjectResultsAssociation {
 			+ "       FROM relation "
 			+ "       WHERE datainfo.deletedbyinference = false "
 			+ "       AND relClass = '"
-			+ RELATION_RESULT_PROJECT_REL_CLASS
+			+ ModelConstants.IS_PRODUCED_BY
 			+ "'";
 
 		Dataset<Row> resproj_relation = spark.sql(resproj_relation_query);

@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.resulttoorganizationfrominstrepo;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -91,7 +92,7 @@ public class PrepareResultInstRepoAssociation {
 			+ "JOIN ( SELECT source, target "
 			+ "FROM relation "
 			+ "WHERE relclass = '"
-			+ RELATION_DATASOURCE_ORGANIZATION_REL_CLASS
+			+ ModelConstants.IS_PROVIDED_BY
 			+ "' "
 			+ "AND datainfo.deletedbyinference = false ) rel "
 			+ "ON d.id = rel.source ";
@@ -111,7 +112,7 @@ public class PrepareResultInstRepoAssociation {
 			+ "from relation "
 			+ "where datainfo.deletedbyinference = false "
 			+ "and relClass = '"
-			+ RELATION_RESULT_ORGANIZATION_REL_CLASS
+			+ ModelConstants.HAS_AUTHOR_INSTITUTION
 			+ "' "
 			+ "group by source";
 

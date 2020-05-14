@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.*;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -74,13 +75,13 @@ public class PrepareResultCommunitySet {
 			+ "      FROM relation "
 			+ "      WHERE datainfo.deletedbyinference = false "
 			+ "      AND relClass = '"
-			+ RELATION_RESULT_ORGANIZATION_REL_CLASS
+			+ ModelConstants.HAS_AUTHOR_INSTITUTION
 			+ "') result_organization "
 			+ "LEFT JOIN (SELECT source, collect_set(target) org_set "
 			+ "      FROM relation "
 			+ "      WHERE datainfo.deletedbyinference = false "
 			+ "      AND relClass = '"
-			+ RELATION_REPRESENTATIVERESULT_RESULT_CLASS
+			+ ModelConstants.MERGES
 			+ "' "
 			+ "      GROUP BY source) organization_organization "
 			+ "ON result_organization.target = organization_organization.source ";
