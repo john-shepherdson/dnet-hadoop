@@ -60,6 +60,8 @@ public class PrepareProjectResultsAssociation {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, potentialUpdatePath);
+				removeOutputDir(spark, alreadyLinkedPath);
 				prepareResultProjProjectResults(
 					spark,
 					inputPath,

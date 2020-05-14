@@ -1,4 +1,4 @@
-<workflow-app name="blacklisting" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="blacklist_relations" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>postgresURL</name>
@@ -102,7 +102,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="copy_projects">
+    <action name="copy_project">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
@@ -113,7 +113,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="copy_datasources">
+    <action name="copy_datasource">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>

@@ -58,28 +58,13 @@ public class PrepareResultInstRepoAssociation {
 			isSparkSessionManaged,
 			spark -> {
 				readNeededResources(spark, inputPath);
+
+				removeOutputDir(spark, datasourceOrganizationPath);
 				prepareDatasourceOrganization(spark, datasourceOrganizationPath);
+
+				removeOutputDir(spark, alreadyLinkedPath);
 				prepareAlreadyLinkedAssociation(spark, alreadyLinkedPath);
 			});
-	}
-
-	private static void prepareAlreadyLinkedAssociation(
-		SparkSession spark, String alreadyLinkedPath) {
-		String query = "Select source resultId, collect_set(target) organizationSet "
-			+ "from relation "
-			+ "where datainfo.deletedbyinference = false "
-			+ "and relClass = '"
-			+ RELATION_RESULT_ORGANIZATION_REL_CLASS
-			+ "' "
-			+ "group by source";
-
-		spark
-			.sql(query)
-			.as(Encoders.bean(ResultOrganizationSet.class))
-			// TODO retry to stick with datasets
-			.toJavaRDD()
-			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-			.saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
 	}
 
 	private static void readNeededResources(SparkSession spark, String inputPath) {
@@ -119,4 +104,24 @@ public class PrepareResultInstRepoAssociation {
 			.option("compression", "gzip")
 			.json(datasourceOrganizationPath);
 	}
+
+	private static void prepareAlreadyLinkedAssociation(
+		SparkSession spark, String alreadyLinkedPath) {
+		String query = "Select source resultId, collect_set(target) organizationSet "
+			+ "from relation "
+			+ "where datainfo.deletedbyinference = false "
+			+ "and relClass = '"
+			+ RELATION_RESULT_ORGANIZATION_REL_CLASS
+			+ "' "
+			+ "group by source";
+
+		spark
+			.sql(query)
+			.as(Encoders.bean(ResultOrganizationSet.class))
+			// TODO retry to stick with datasets
+			.toJavaRDD()
+			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
+			.saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
+	}
+
 }

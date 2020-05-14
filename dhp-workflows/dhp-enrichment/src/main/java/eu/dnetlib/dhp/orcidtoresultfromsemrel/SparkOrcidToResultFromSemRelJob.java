@@ -70,11 +70,10 @@ public class SparkOrcidToResultFromSemRelJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
-				if (saveGraph)
+				removeOutputDir(spark, outputPath);
+				if (saveGraph) {
 					execPropagation(spark, possibleUpdates, inputPath, outputPath, resultClazz);
+				}
 			});
 	}
 

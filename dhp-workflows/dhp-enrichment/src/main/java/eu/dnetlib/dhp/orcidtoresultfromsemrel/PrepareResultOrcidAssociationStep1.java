@@ -74,9 +74,7 @@ public class PrepareResultOrcidAssociationStep1 {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
+				removeOutputDir(spark, outputPath);
 				prepareInfo(
 					spark, inputRelationPath, inputResultPath, outputResultPath, resultClazz, allowedsemrel);
 			});

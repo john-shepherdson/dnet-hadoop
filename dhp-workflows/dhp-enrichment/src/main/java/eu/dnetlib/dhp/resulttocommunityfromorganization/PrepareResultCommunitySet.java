@@ -55,9 +55,7 @@ public class PrepareResultCommunitySet {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
+				removeOutputDir(spark, outputPath);
 				prepareInfo(spark, inputPath, outputPath, organizationMap);
 			});
 	}

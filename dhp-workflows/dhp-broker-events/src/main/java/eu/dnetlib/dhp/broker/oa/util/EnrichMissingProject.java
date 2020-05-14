@@ -4,30 +4,30 @@ package eu.dnetlib.dhp.broker.oa.util;
 import java.util.Arrays;
 import java.util.List;
 
-import eu.dnetlib.broker.objects.OpenAireEventPayload;
 import eu.dnetlib.broker.objects.Project;
+import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingProject extends UpdateInfo<Project> {
+public class EnrichMissingProject extends UpdateMatcher<Project> {
 
-	public static List<EnrichMissingProject> findUpdates(final Result source, final Result target) {
+	public EnrichMissingProject() {
+		super(true);
+	}
+
+	@Override
+	protected List<UpdateInfo<Project>> findUpdates(final Result source, final Result target) {
 		// return Arrays.asList(new EnrichMissingAbstract("xxxxxxx", 0.9f));
 		return Arrays.asList();
 	}
 
-	private EnrichMissingProject(final Project highlightValue, final float trust) {
-		super("ENRICH/MISSING/PROJECT", highlightValue, trust);
-	}
-
 	@Override
-	public void compileHighlight(final OpenAireEventPayload payload) {
-		payload.getHighlight().getProjects().add(getHighlightValue());
-	}
-
-	@Override
-	public String getHighlightValueAsString() {
-		return getHighlightValue().getFunder() + "::" + getHighlightValue().getFundingProgram()
-			+ getHighlightValue().getCode();
+	public UpdateInfo<Project> generateUpdateInfo(final Project highlightValue, final Result source,
+		final Result target) {
+		return new UpdateInfo<>(
+			Topic.ENRICH_MISSING_PROJECT,
+			highlightValue, source, target,
+			(p, prj) -> p.getProjects().add(prj),
+			prj -> prj.getFunder() + "::" + prj.getFundingProgram() + prj.getCode());
 	}
 
 }

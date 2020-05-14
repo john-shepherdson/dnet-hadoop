@@ -83,10 +83,8 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
-				if (saveGraph)
+				removeOutputDir(spark, outputPath);
+				if (saveGraph) {
 					execPropagation(
 						spark,
 						datasourceorganization,
@@ -94,6 +92,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 						inputPath,
 						outputPath,
 						resultClazz);
+				}
 			});
 	}
 
