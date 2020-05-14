@@ -69,13 +69,16 @@ public class SparkCountryPropagationJob {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> execPropagation(
-				spark,
-				sourcePath,
-				preparedInfoPath,
-				outputPath,
-				resultClazz,
-				saveGraph));
+			spark -> {
+				removeOutputDir(spark, outputPath);
+				execPropagation(
+					spark,
+					sourcePath,
+					preparedInfoPath,
+					outputPath,
+					resultClazz,
+					saveGraph);
+			});
 	}
 
 	private static <R extends Result> void execPropagation(

@@ -57,6 +57,7 @@
         <ok to="copy_wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="copy_projects">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -80,7 +81,6 @@
     </action>
 
     <join name="copy_wait" to="fork_prepare_assoc_step1"/>
-
 
     <fork name="fork_prepare_assoc_step1">
         <path start="join_prepare_publication"/>
@@ -230,8 +230,8 @@
         </spark>
         <ok to="fork-join-exec-propagation"/>
         <error to="Kill"/>
-
     </action>
+
     <fork name="fork-join-exec-propagation">
         <path start="join_propagate_publication"/>
         <path start="join_propagate_dataset"/>
@@ -271,6 +271,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -302,6 +303,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -333,6 +335,7 @@
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+
     <action name="join_propagate_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>

@@ -10,6 +10,17 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to="reset_outputpath"/>
 
     <kill name="Kill">
@@ -38,8 +49,6 @@
 
     <action name="copy_relation">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/relation</arg>
             <arg>${nameNode}/${outputPath}/relation</arg>
         </distcp>
@@ -49,8 +58,6 @@
 
     <action name="copy_publication">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/publication</arg>
             <arg>${nameNode}/${outputPath}/publication</arg>
         </distcp>
@@ -60,8 +67,6 @@
 
     <action name="copy_dataset">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/dataset</arg>
             <arg>${nameNode}/${outputPath}/dataset</arg>
         </distcp>
@@ -71,8 +76,6 @@
 
     <action name="copy_orp">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/otherresearchproduct</arg>
             <arg>${nameNode}/${outputPath}/otherresearchproduct</arg>
         </distcp>
@@ -82,8 +85,6 @@
 
     <action name="copy_software">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/software</arg>
             <arg>${nameNode}/${outputPath}/software</arg>
         </distcp>
@@ -93,8 +94,6 @@
 
     <action name="copy_organization">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/organization</arg>
             <arg>${nameNode}/${outputPath}/organization</arg>
         </distcp>
@@ -104,8 +103,6 @@
 
     <action name="copy_projects">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/project</arg>
             <arg>${nameNode}/${outputPath}/project</arg>
         </distcp>
@@ -115,8 +112,6 @@
 
     <action name="copy_datasources">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/datasource</arg>
             <arg>${nameNode}/${outputPath}/datasource</arg>
         </distcp>
@@ -125,6 +120,7 @@
     </action>
 
     <join name="wait" to="prepare_result_organization_association"/>
+
     <action name="prepare_result_organization_association">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -176,12 +172,12 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -206,12 +202,12 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -236,12 +232,12 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -266,12 +262,12 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
