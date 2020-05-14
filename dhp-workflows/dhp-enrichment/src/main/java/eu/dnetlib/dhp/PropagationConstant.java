@@ -4,6 +4,8 @@ package eu.dnetlib.dhp;
 import java.util.List;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -24,10 +26,6 @@ public class PropagationConstant {
 
 	public static final String TRUE = "true";
 
-	public static final String DNET_COUNTRY_SCHEMA = "dnet:countries";
-	public static final String DNET_SCHEMA_NAME = "dnet:provenanceActions";
-	public static final String DNET_SCHEMA_ID = "dnet:provenanceActions";
-
 	public static final String PROPAGATION_COUNTRY_INSTREPO_CLASS_ID = "country:instrepos";
 	public static final String PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME = "Propagation of country to result collected from datasources of type institutional repositories";
 
@@ -46,22 +44,6 @@ public class PropagationConstant {
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID = "authorpid:result";
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME = "Propagation of authors pid to result through semantic relations";
 
-	public static final String RELATION_DATASOURCE_ORGANIZATION_REL_CLASS = "isProvidedBy";
-
-	public static final String RELATION_RESULTORGANIZATION_REL_TYPE = "resultOrganization";
-	public static final String RELATION_RESULTORGANIZATION_SUBREL_TYPE = "affiliation";
-	public static final String RELATION_ORGANIZATION_RESULT_REL_CLASS = "isAuthorInstitutionOf";
-	public static final String RELATION_RESULT_ORGANIZATION_REL_CLASS = "hasAuthorInstitution";
-
-	public static final String RELATION_RESULTRESULT_REL_TYPE = "resultResult";
-
-	public static final String RELATION_RESULTPROJECT_REL_TYPE = "resultProject";
-	public static final String RELATION_RESULTPROJECT_SUBREL_TYPE = "outcome";
-	public static final String RELATION_RESULT_PROJECT_REL_CLASS = "isProducedBy";
-	public static final String RELATION_PROJECT_RESULT_REL_CLASS = "produces";
-
-	public static final String RELATION_REPRESENTATIVERESULT_RESULT_CLASS = "merges";
-
 	public static final String PROPAGATION_AUTHOR_PID = "ORCID";
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -76,8 +58,8 @@ public class PropagationConstant {
 		Country nc = new Country();
 		nc.setClassid(classid);
 		nc.setClassname(classname);
-		nc.setSchemename(DNET_COUNTRY_SCHEMA);
-		nc.setSchemeid(DNET_COUNTRY_SCHEMA);
+		nc.setSchemename(ModelConstants.DNET_COUNTRY_TYPE);
+		nc.setSchemeid(ModelConstants.DNET_COUNTRY_TYPE);
 		nc
 			.setDataInfo(
 				getDataInfo(
@@ -102,8 +84,8 @@ public class PropagationConstant {
 		Qualifier pa = new Qualifier();
 		pa.setClassid(inference_class_id);
 		pa.setClassname(inference_class_name);
-		pa.setSchemeid(DNET_SCHEMA_ID);
-		pa.setSchemename(DNET_SCHEMA_NAME);
+		pa.setSchemeid(ModelConstants.DNET_PID_TYPES);
+		pa.setSchemename(ModelConstants.DNET_PID_TYPES);
 		return pa;
 	}
 
