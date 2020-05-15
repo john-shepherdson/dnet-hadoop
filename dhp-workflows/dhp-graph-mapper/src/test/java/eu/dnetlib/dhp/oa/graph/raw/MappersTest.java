@@ -10,7 +10,10 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,12 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Software;
 
 @ExtendWith(MockitoExtension.class)
 public class MappersTest {
@@ -54,7 +51,26 @@ public class MappersTest {
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
 		assertTrue(p.getAuthor().size() > 0);
+		Optional<Author> author = p.getAuthor()
+				.stream()
+				.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+				.findFirst();
+		assertTrue(author.isPresent());
+		StructuredProperty pid = author.get().getPid()
+				.stream()
+				.findFirst()
+				.get();
+		assertEquals("0000-0001-6651-1178", pid.getValue());
+		assertEquals("ORCID", pid.getQualifier().getClassid());
+		assertEquals("ORCID", pid.getQualifier().getClassname());
+		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
+		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
+		assertEquals("Votsi,Nefta", author.get().getFullname());
+		assertEquals("Votsi", author.get().getSurname());
+		assertEquals("Nefta", author.get().getName());
+
 		assertTrue(p.getSubject().size() > 0);
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
@@ -100,6 +116,33 @@ public class MappersTest {
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
+
+		Optional<Author> author = d.getAuthor()
+				.stream()
+				.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+				.findFirst();
+		assertTrue(author.isPresent());
+		StructuredProperty pid = author.get().getPid()
+				.stream()
+				.findFirst()
+				.get();
+		assertEquals("0000-0001-9074-1619", pid.getValue());
+		assertEquals("ORCID", pid.getQualifier().getClassid());
+		assertEquals("ORCID", pid.getQualifier().getClassname());
+		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
+		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
+		assertEquals("Baracchini, Theo", author.get().getFullname());
+		assertEquals("Baracchini", author.get().getSurname());
+		assertEquals("Theo", author.get().getName());
+
+		assertEquals(1, author.get().getAffiliation().size());
+		Optional<Field<String>> opAff = author.get().getAffiliation()
+				.stream()
+				.findFirst();
+		assertTrue(opAff.isPresent());
+		Field<String> affiliation = opAff.get();
+		assertEquals("ISTI-CNR", affiliation.getValue());
+
 		assertTrue(d.getSubject().size() > 0);
 		assertTrue(d.getInstance().size() > 0);
 		assertTrue(d.getContext().size() > 0);
