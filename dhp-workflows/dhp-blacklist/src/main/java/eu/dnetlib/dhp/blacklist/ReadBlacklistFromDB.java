@@ -65,8 +65,7 @@ public class ReadBlacklistFromDB implements Closeable {
 		}
 	}
 
-	public void execute(final String sql, final Function<ResultSet, List<Relation>> producer)
-		throws Exception {
+	public void execute(final String sql, final Function<ResultSet, List<Relation>> producer) throws Exception {
 
 		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(r -> writeRelation(r));
 

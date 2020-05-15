@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class PrepareMergedRelationJob {
@@ -56,6 +57,7 @@ public class PrepareMergedRelationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, outputPath);
 				selectMergesRelations(
 					spark,
 					inputPath,
@@ -73,19 +75,6 @@ public class PrepareMergedRelationJob {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
-//		relation.createOrReplaceTempView("relation");
-//
-//		spark
-//			.sql(
-//				"Select * from relation " +
-//					"where relclass = 'merges' " +
-//					"and datainfo.deletedbyinference = false")
-//			.as(Encoders.bean(Relation.class))
-//			.toJSON()
-//			.write()
-//			.mode(SaveMode.Overwrite)
-//			.option("compression", "gzip")
-//			.text(outputPath);
 	}
 
 	public static org.apache.spark.sql.Dataset<Relation> readRelations(
@@ -97,4 +86,9 @@ public class PrepareMergedRelationJob {
 				(MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
 				Encoders.bean(Relation.class));
 	}
+
+	private static void removeOutputDir(SparkSession spark, String path) {
+		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+	}
+
 }

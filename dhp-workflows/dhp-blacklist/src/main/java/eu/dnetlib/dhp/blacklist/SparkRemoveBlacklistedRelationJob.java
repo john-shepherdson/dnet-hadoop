@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -62,6 +63,7 @@ public class SparkRemoveBlacklistedRelationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, outputPath);
 				removeBlacklistedRelations(
 					spark,
 					blacklistPath,
@@ -69,7 +71,6 @@ public class SparkRemoveBlacklistedRelationJob {
 					outputPath,
 					mergesPath);
 			});
-
 	}
 
 	private static void removeBlacklistedRelations(SparkSession spark, String blacklistPath, String inputPath,
@@ -84,7 +85,7 @@ public class SparkRemoveBlacklistedRelationJob {
 			.joinWith(
 				mergesRelation, blackListed.col("source").equalTo(mergesRelation.col("target")),
 				"left_outer")
-			.map(c -> {
+			.map((MapFunction<Tuple2<Relation, Relation>, Relation>) c -> {
 				Optional
 					.ofNullable(c._2())
 					.ifPresent(mr -> c._1().setSource(mr.getSource()));
@@ -95,7 +96,7 @@ public class SparkRemoveBlacklistedRelationJob {
 			.joinWith(
 				mergesRelation, dedupSource.col("target").equalTo(mergesRelation.col("target")),
 				"left_outer")
-			.map(c -> {
+			.map((MapFunction<Tuple2<Relation, Relation>, Relation>) c -> {
 				Optional
 					.ofNullable(c._2())
 					.ifPresent(mr -> c._1().setTarget(mr.getSource()));
@@ -107,7 +108,6 @@ public class SparkRemoveBlacklistedRelationJob {
 			.mode(SaveMode.Overwrite)
 			.json(blacklistPath + "/deduped");
 
-
 		inputRelation
 			.joinWith(
 				dedupBL, (inputRelation
@@ -118,25 +118,22 @@ public class SparkRemoveBlacklistedRelationJob {
 							.col("target")
 							.equalTo(dedupBL.col("target")))),
 				"left_outer")
-		.map(c -> {
-			Relation ir = c._1();
-			Optional<Relation> obl = Optional.ofNullable(c._2());
-			if (obl.isPresent()) {
-				if (ir.equals(obl.get())) {
-					return null;
+			.map((MapFunction<Tuple2<Relation, Relation>, Relation>) c -> {
+				Relation ir = c._1();
+				Optional<Relation> obl = Optional.ofNullable(c._2());
+				if (obl.isPresent()) {
+					if (ir.equals(obl.get())) {
+						return null;
+					}
 				}
-			}
-			return ir;
-
-		}, Encoders.bean(Relation.class))
+				return ir;
+			}, Encoders.bean(Relation.class))
 			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
-
 	}
-
 
 	public static org.apache.spark.sql.Dataset<Relation> readRelations(
 		SparkSession spark, String inputPath) {
@@ -146,6 +143,10 @@ public class SparkRemoveBlacklistedRelationJob {
 			.map(
 				(MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
 				Encoders.bean(Relation.class));
+	}
+
+	private static void removeOutputDir(SparkSession spark, String path) {
+		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 
 }
