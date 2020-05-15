@@ -151,10 +151,10 @@ public class SparkOrcidToResultFromSemRelJob {
 							// in one of the two
 							else {
 								if (autoritative_author
-										.getName()
-										.trim()
-										.substring(0, 0)
-										.equalsIgnoreCase(author.getName().trim().substring(0, 0))) {
+									.getName()
+									.trim()
+									.substring(0, 0)
+									.equalsIgnoreCase(author.getName().trim().substring(0, 0))) {
 									toaddpid = true;
 								}
 							}

@@ -6,7 +6,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.*;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -20,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
 
@@ -151,7 +151,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 								getRelation(
 									orgId,
 									resultId,
-										ModelConstants.IS_AUTHOR_INSTITUTION_OF,
+									ModelConstants.IS_AUTHOR_INSTITUTION_OF,
 									ModelConstants.RESULT_ORGANIZATION,
 									ModelConstants.AFFILIATION,
 									PROPAGATION_DATA_INFO_TYPE,
@@ -163,8 +163,8 @@ public class SparkResultToOrganizationFromIstRepoJob {
 									resultId,
 									orgId,
 									ModelConstants.HAS_AUTHOR_INSTITUTION,
-										ModelConstants.RESULT_ORGANIZATION,
-										ModelConstants.AFFILIATION,
+									ModelConstants.RESULT_ORGANIZATION,
+									ModelConstants.AFFILIATION,
 									PROPAGATION_DATA_INFO_TYPE,
 									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
 									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));

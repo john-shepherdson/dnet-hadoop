@@ -95,8 +95,7 @@ public class PrepareResultOrcidAssociationStep1 {
 		Dataset<R> result = readPath(spark, inputResultPath, resultClazz);
 		result.createOrReplaceTempView("result");
 
-		String query =
-				"SELECT target resultId, author authorList"
+		String query = "SELECT target resultId, author authorList"
 			+ "  FROM (SELECT id, collect_set(named_struct('name', name, 'surname', surname, 'fullname', fullname, 'orcid', orcid)) author "
 			+ "        FROM ( "
 			+ "               SELECT DISTINCT id, MyT.fullname, MyT.name, MyT.surname, MyP.value orcid "
@@ -109,7 +108,7 @@ public class PrepareResultOrcidAssociationStep1 {
 			+ "        SELECT source, target "
 			+ "        FROM relation "
 			+ "        WHERE datainfo.deletedbyinference = false "
-			+                getConstraintList(" relclass = '", allowedsemrel)
+			+ getConstraintList(" relclass = '", allowedsemrel)
 			+ "              ) rel_rel "
 			+ " ON source = id";
 		spark

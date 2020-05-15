@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -21,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -124,7 +124,7 @@ public class SparkResultToProjectThroughSemRelJob {
 									resId,
 									projectId,
 									ModelConstants.IS_PRODUCED_BY,
-										ModelConstants.RESULT_PROJECT ,
+									ModelConstants.RESULT_PROJECT,
 									ModelConstants.OUTCOME,
 									PROPAGATION_DATA_INFO_TYPE,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
@@ -135,7 +135,7 @@ public class SparkResultToProjectThroughSemRelJob {
 									projectId,
 									resId,
 									ModelConstants.PRODUCES,
-										ModelConstants.RESULT_PROJECT,
+									ModelConstants.RESULT_PROJECT,
 									ModelConstants.OUTCOME,
 									PROPAGATION_DATA_INFO_TYPE,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,

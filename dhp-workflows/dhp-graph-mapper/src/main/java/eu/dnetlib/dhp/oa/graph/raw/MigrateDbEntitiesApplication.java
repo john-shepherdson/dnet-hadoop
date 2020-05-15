@@ -453,12 +453,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final Boolean inferred = rs.getBoolean("inferred");
 		final String trust = rs.getString("trust");
 		return dataInfo(
-				deletedbyinference,
-				inferenceprovenance,
-				inferred,
-				false,
-				ENTITYREGISTRY_PROVENANCE_ACTION,
-				trust);
+			deletedbyinference,
+			inferenceprovenance,
+			inferred,
+			false,
+			ENTITYREGISTRY_PROVENANCE_ACTION,
+			trust);
 	}
 
 	private Qualifier prepareQualifierSplitting(final String s) {
