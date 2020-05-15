@@ -1,11 +1,12 @@
 
-package eu.dnetlib.dhp.broker.oa.util;
+package eu.dnetlib.dhp.broker.oa.matchers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class EnrichMissingAbstract extends UpdateMatcher<String> {
