@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "in",
+    "paramLongName": "inputPath",
+    "paramDescription": "the path to the graph data dump to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "db",
+    "paramLongName": "hiveDbName",
+    "paramDescription": "the target hive database name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "tn",
+    "paramLongName": "className",
+    "paramDescription": "the class modelling the target table",
+    "paramRequired": true
+  }
+]
