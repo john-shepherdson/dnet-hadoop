@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.util.Objects;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.common.HdfsSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -62,6 +63,7 @@ public class SparkRemoveBlacklistedRelationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, outputPath);
 				removeBlacklistedRelations(
 					spark,
 					blacklistPath,
@@ -69,7 +71,6 @@ public class SparkRemoveBlacklistedRelationJob {
 					outputPath,
 					mergesPath);
 			});
-
 	}
 
 	private static void removeBlacklistedRelations(SparkSession spark, String blacklistPath, String inputPath,
@@ -142,6 +143,10 @@ public class SparkRemoveBlacklistedRelationJob {
 			.map(
 				(MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
 				Encoders.bean(Relation.class));
+	}
+
+	private static void removeOutputDir(SparkSession spark, String path) {
+		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 
 }

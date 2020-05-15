@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.Optional;
 
+import eu.dnetlib.dhp.common.HdfsSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -56,6 +57,7 @@ public class PrepareMergedRelationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, outputPath);
 				selectMergesRelations(
 					spark,
 					inputPath,
@@ -84,4 +86,9 @@ public class PrepareMergedRelationJob {
 				(MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
 				Encoders.bean(Relation.class));
 	}
+
+	private static void removeOutputDir(SparkSession spark, String path) {
+		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+	}
+
 }
