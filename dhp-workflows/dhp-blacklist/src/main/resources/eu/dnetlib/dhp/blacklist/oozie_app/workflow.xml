@@ -1,0 +1,200 @@
+<workflow-app name="blacklist_relations" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>postgresURL</name>
+            <description>the url of the postgress server to query</description>
+        </property>
+        <property>
+            <name>postgresUser</name>
+            <description>the username to access the postgres db</description>
+        </property>
+        <property>
+            <name>postgresPassword</name>
+            <description>the postgres password</description>
+        </property>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the graph output path</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="reset_outputpath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
+        </fs>
+        <ok to="copy_entities"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="copy_entities">
+        <path start="copy_publication"/>
+        <path start="copy_dataset"/>
+        <path start="copy_orp"/>
+        <path start="copy_software"/>
+        <path start="copy_datasource"/>
+        <path start="copy_project"/>
+        <path start="copy_organization"/>
+    </fork>
+
+    <action name="copy_publication">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/publication</arg>
+            <arg>${nameNode}/${outputPath}/publication</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_dataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/dataset</arg>
+            <arg>${nameNode}/${outputPath}/dataset</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_orp">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/otherresearchproduct</arg>
+            <arg>${nameNode}/${outputPath}/otherresearchproduct</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_software">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/software</arg>
+            <arg>${nameNode}/${outputPath}/software</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/organization</arg>
+            <arg>${nameNode}/${outputPath}/organization</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_project">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/project</arg>
+            <arg>${nameNode}/${outputPath}/project</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_datasource">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/datasource</arg>
+            <arg>${nameNode}/${outputPath}/datasource</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait" to="read_blacklist"/>
+
+    <action name="read_blacklist">
+        <java>
+            <main-class>eu.dnetlib.dhp.blacklist.ReadBlacklistFromDB</main-class>
+            <arg>--hdfsPath</arg><arg>${workingDir}/blacklist</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+        </java>
+        <ok to="prepare_merged_relation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="prepare_merged_relation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareMergedRelation</name>
+            <class>eu.dnetlib.dhp.blacklist.PrepareMergedRelationJob</class>
+            <jar>dhp-blacklist-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/mergesRelation</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+        </spark>
+        <ok to="apply_blacklist"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="apply_blacklist">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ApplyBlacklist</name>
+            <class>eu.dnetlib.dhp.blacklist.SparkRemoveBlacklistedRelationJob</class>
+            <jar>dhp-blacklist-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/blacklist</arg>
+            <arg>--mergesPath</arg><arg>${workingDir}/mergesRelation</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+
+</workflow-app>

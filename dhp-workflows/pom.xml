@@ -22,9 +22,11 @@
         <module>dhp-actionmanager</module>
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup-openaire</module>
+        <module>dhp-enrichment</module>
         <module>dhp-graph-provision</module>
         <module>dhp-dedup-scholexplorer</module>
         <module>dhp-graph-provision-scholexplorer</module>
+        <module>dhp-blacklist</module>
         <module>dhp-stats-update</module>
         <module>dhp-broker-events</module>
     </modules>

@@ -1,8 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.util.*;
@@ -10,11 +9,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.Node;
 
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
@@ -28,15 +29,26 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<Author> res = new ArrayList<>();
 		int pos = 1;
 		for (final Object o : doc.selectNodes("//dc:creator")) {
-			final Node n = (Node) o;
+			final Element e = (Element) o;
 			final Author author = new Author();
-			author.setFullname(n.getText());
+			author.setFullname(e.getText());
 			author.setRank(pos++);
-			final PacePerson p = new PacePerson(n.getText(), false);
+			final PacePerson p = new PacePerson(e.getText(), false);
 			if (p.isAccurate()) {
 				author.setName(p.getNormalisedFirstName());
 				author.setSurname(p.getNormalisedSurname());
 			}
+
+			final String pid = e.attributeValue("nameIdentifier");
+			final String pidType = e.attributeValue("nameIdentifierScheme");
+
+			if (StringUtils.isNotBlank(pid) && StringUtils.isNotBlank(pidType)) {
+				author.setPid(new ArrayList<>());
+				author
+					.getPid()
+					.add(structuredProperty(pid, qualifier(pidType, pidType, DNET_PID_TYPES, DNET_PID_TYPES), info));
+			}
+
 			res.add(author);
 		}
 		return res;
