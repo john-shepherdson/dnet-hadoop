@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.broker.oa.util;
+package eu.dnetlib.dhp.broker.oa.matchers;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Result;
 

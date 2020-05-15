@@ -1,12 +1,15 @@
 
-package eu.dnetlib.dhp.broker.oa.util;
+package eu.dnetlib.dhp.broker.oa.matchers;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
+import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class EnrichMoreSubject extends UpdateMatcher<Pair<String, String>> {
@@ -17,18 +20,25 @@ public class EnrichMoreSubject extends UpdateMatcher<Pair<String, String>> {
 
 	@Override
 	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target) {
-		// MESHEUROPMC
-		// ARXIV
-		// JEL
-		// DDC
-		// ACM
+		final Set<String> existingSubjects = target
+			.getSubject()
+			.stream()
+			.map(pid -> pid.getQualifier().getClassid() + "::" + pid.getValue())
+			.collect(Collectors.toSet());
 
-		return Arrays.asList();
+		return source
+			.getPid()
+			.stream()
+			.filter(pid -> !existingSubjects.contains(pid.getQualifier().getClassid() + "::" + pid.getValue()))
+			.map(ConversionUtils::oafSubjectToPair)
+			.map(i -> generateUpdateInfo(i, source, target))
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public UpdateInfo<Pair<String, String>> generateUpdateInfo(final Pair<String, String> highlightValue,
-		final Result source, final Result target) {
+		final Result source,
+		final Result target) {
 
 		return new UpdateInfo<>(
 			Topic.fromPath("ENRICH/MORE/SUBJECT/" + highlightValue.getLeft()),

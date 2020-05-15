@@ -25,7 +25,7 @@ public final class UpdateInfo<T> {
 
 	private final float trust;
 
-	protected UpdateInfo(final Topic topic, final T highlightValue, final Result source, final Result target,
+	public UpdateInfo(final Topic topic, final T highlightValue, final Result source, final Result target,
 		final BiConsumer<Publication, T> compileHighlight,
 		final Function<T, String> highlightToString) {
 		this.topic = topic;
