@@ -30,8 +30,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
-import eu.dnetlib.dhp.oa.graph.raw.common.DbClient;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -50,8 +50,7 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
-	implements Closeable {
+public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
 	private static final Log log = LogFactory.getLog(MigrateDbEntitiesApplication.class);
 
@@ -94,7 +93,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 				log.info("Processing orgs...");
 				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization);
 
-				log.info("Processing relations ds <-> orgs ...");
+				log.info("Processing relationsNoRemoval ds <-> orgs ...");
 				smdbe.execute("queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization);
 
 				log.info("Processing projects <-> orgs ...");
@@ -128,9 +127,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 	}
 
 	public List<Oaf> processDatasource(final ResultSet rs) {
-
 		try {
-
 			final DataInfo info = prepareDataInfo(rs);
 
 			final Datasource ds = new Datasource();
@@ -194,7 +191,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 
 	public List<Oaf> processProject(final ResultSet rs) {
 		try {
-
 			final DataInfo info = prepareDataInfo(rs);
 
 			final Project p = new Project();
@@ -249,9 +245,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 	}
 
 	public List<Oaf> processOrganization(final ResultSet rs) {
-
 		try {
-
 			final DataInfo info = prepareDataInfo(rs);
 
 			final Organization o = new Organization();
@@ -376,7 +370,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
 
 		try {
-
 			if (rs.getString(SOURCE_TYPE).equals("context")) {
 				final Result r;
 
@@ -460,7 +453,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 		final Boolean inferred = rs.getBoolean("inferred");
 		final String trust = rs.getString("trust");
 		return dataInfo(
-			deletedbyinference, inferenceprovenance, inferred, false, ENTITYREGISTRY_PROVENANCE_ACTION, trust);
+			deletedbyinference,
+			inferenceprovenance,
+			inferred,
+			false,
+			ENTITYREGISTRY_PROVENANCE_ACTION,
+			trust);
 	}
 
 	private Qualifier prepareQualifierSplitting(final String s) {
@@ -516,6 +514,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 			if (arr.length == 3) {
 				final String issn = StringUtils.isNotBlank(arr[0]) ? arr[0].trim() : null;
 				final String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1].trim() : null;
+
 				final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2].trim() : null;
 
 				if (issn != null || eissn != null || lissn != null) {
@@ -531,4 +530,5 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 		super.close();
 		dbClient.close();
 	}
+
 }

@@ -2,8 +2,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Author implements Serializable {
 
@@ -86,4 +85,5 @@ public class Author implements Serializable {
 	public int hashCode() {
 		return Objects.hash(fullname, name, surname, rank, pid, affiliation);
 	}
+
 }

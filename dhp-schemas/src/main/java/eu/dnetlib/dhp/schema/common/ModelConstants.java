@@ -13,6 +13,7 @@ public class ModelConstants {
 	public static final String DNET_DATA_CITE_DATE = "dnet:dataCite_date";
 	public static final String DNET_DATA_CITE_RESOURCE = "dnet:dataCite_resource";
 	public static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
+	public static final String DNET_COUNTRY_TYPE = "dnet:countries";
 
 	public static final String SYSIMPORT_CROSSWALK_REPOSITORY = "sysimport:crosswalk:repository";
 	public static final String SYSIMPORT_CROSSWALK_ENTITYREGISTRY = "sysimport:crosswalk:entityregistry";
@@ -48,6 +49,13 @@ public class ModelConstants {
 	public static final String PARTICIPATION = "participation";
 	public static final String HAS_PARTICIPANT = "hasParticipant";
 	public static final String IS_PARTICIPANT = "isParticipant";
+
+	public static final String RESULT_ORGANIZATION = "resultOrganization";
+	public static final String AFFILIATION = "affiliation";
+	public static final String IS_AUTHOR_INSTITUTION_OF = "isAuthorInstitutionOf";
+	public static final String HAS_AUTHOR_INSTITUTION = "hasAuthorInstitution";
+
+	public static final String MERGES = "merges";
 
 	public static final String UNKNOWN = "UNKNOWN";
 	public static final String NOT_AVAILABLE = "not available";

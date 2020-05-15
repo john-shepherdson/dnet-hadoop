@@ -29,31 +29,32 @@ public class EventFactory {
 		"yyyy-MM-dd"
 	};
 
-	public static Event newBrokerEvent(final Result source, final Result target, final UpdateInfo<?> updateInfo) {
+	public static Event newBrokerEvent(final UpdateInfo<?> updateInfo) {
 
 		final long now = new Date().getTime();
 
 		final Event res = new Event();
 
-		final Map<String, Object> map = createMapFromResult(target, source, updateInfo);
+		final Map<String, Object> map = createMapFromResult(updateInfo);
 
-		final String payload = createPayload(target, updateInfo);
+		final String payload = createPayload(updateInfo);
 
 		final String eventId = calculateEventId(
-			updateInfo.getTopic(), target.getOriginalId().get(0), updateInfo.getHighlightValueAsString());
+			updateInfo.getTopicPath(), updateInfo.getTarget().getOriginalId().get(0),
+			updateInfo.getHighlightValueAsString());
 
 		res.setEventId(eventId);
 		res.setProducerId(PRODUCER_ID);
 		res.setPayload(payload);
 		res.setMap(map);
-		res.setTopic(updateInfo.getTopic());
+		res.setTopic(updateInfo.getTopicPath());
 		res.setCreationDate(now);
 		res.setExpiryDate(calculateExpiryDate(now));
 		res.setInstantMessage(false);
 		return res;
 	}
 
-	private static String createPayload(final Result result, final UpdateInfo<?> updateInfo) {
+	private static String createPayload(final UpdateInfo<?> updateInfo) {
 		final OpenAireEventPayload payload = new OpenAireEventPayload();
 		// TODO
 
@@ -62,32 +63,34 @@ public class EventFactory {
 		return payload.toJSON();
 	}
 
-	private static Map<String, Object> createMapFromResult(final Result oaf, final Result source,
-		final UpdateInfo<?> updateInfo) {
+	private static Map<String, Object> createMapFromResult(final UpdateInfo<?> updateInfo) {
 		final Map<String, Object> map = new HashMap<>();
 
-		final List<KeyValue> collectedFrom = oaf.getCollectedfrom();
+		final Result source = updateInfo.getSource();
+		final Result target = updateInfo.getTarget();
+
+		final List<KeyValue> collectedFrom = target.getCollectedfrom();
 		if (collectedFrom.size() == 1) {
 			map.put("target_datasource_id", collectedFrom.get(0).getKey());
 			map.put("target_datasource_name", collectedFrom.get(0).getValue());
 		}
 
-		final List<String> ids = oaf.getOriginalId();
+		final List<String> ids = target.getOriginalId();
 		if (ids.size() > 0) {
 			map.put("target_publication_id", ids.get(0));
 		}
 
-		final List<StructuredProperty> titles = oaf.getTitle();
+		final List<StructuredProperty> titles = target.getTitle();
 		if (titles.size() > 0) {
 			map.put("target_publication_title", titles.get(0));
 		}
 
-		final long date = parseDateTolong(oaf.getDateofacceptance().getValue());
+		final long date = parseDateTolong(target.getDateofacceptance().getValue());
 		if (date > 0) {
 			map.put("target_dateofacceptance", date);
 		}
 
-		final List<StructuredProperty> subjects = oaf.getSubject();
+		final List<StructuredProperty> subjects = target.getSubject();
 		if (subjects.size() > 0) {
 			map
 				.put(
@@ -95,7 +98,7 @@ public class EventFactory {
 					subjects.stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
 		}
 
-		final List<Author> authors = oaf.getAuthor();
+		final List<Author> authors = target.getAuthor();
 		if (authors.size() > 0) {
 			map
 				.put(
