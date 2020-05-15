@@ -7,7 +7,6 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -16,6 +15,7 @@ import org.dom4j.Node;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
@@ -44,7 +44,9 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 			if (StringUtils.isNotBlank(pid) && StringUtils.isNotBlank(pidType)) {
 				author.setPid(new ArrayList<>());
-				author.getPid().add(structuredProperty(pid, qualifier(pidType, pidType, DNET_PID_TYPES, DNET_PID_TYPES), info));
+				author
+					.getPid()
+					.add(structuredProperty(pid, qualifier(pidType, pidType, DNET_PID_TYPES, DNET_PID_TYPES), info));
 			}
 
 			res.add(author);
