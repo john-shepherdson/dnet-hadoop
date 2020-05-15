@@ -1,4 +1,4 @@
-[{"paramName": "mt","paramLongName": "master","paramDescription": "should be local or yarn","paramRequired": true},
- {"paramName":"d",   "paramLongName":"workingPath_orcid",	"paramDescription": "the default work path",	"paramRequired": true},
- {"paramName":"o",   "paramLongName":"outputAuthorsPath",	"paramDescription": "the relative folder of the sequencial file to write",	"paramRequired": true}
+[{"paramName":"w",   "paramLongName":"workingPath",	"paramDescription": "the working path",	"paramRequired": true},
+ {"paramName":"t",   "paramLongName":"token",	"paramDescription": "token to grant access",	"paramRequired": true},
+ {"paramName":"o",   "paramLongName":"outputAuthorsPath",	"paramDescription": "the relative folder of the sequencial file to write the authors data",	"paramRequired": true}
 ]

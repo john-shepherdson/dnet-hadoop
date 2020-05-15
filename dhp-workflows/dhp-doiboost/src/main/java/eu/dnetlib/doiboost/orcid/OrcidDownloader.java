@@ -27,8 +27,8 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 public class OrcidDownloader extends OrcidDSManager {
 
 	static final int REQ_LIMIT = 24;
-	static final int REQ_MAX_TEST = 100;
-	static final int RECORD_PARSED_COUNTER_LOG_INTERVAL = 10;
+//	static final int REQ_MAX_TEST = 100;
+	static final int RECORD_PARSED_COUNTER_LOG_INTERVAL = 10000;
 	static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	static final String lastUpdate = "2019-09-30 00:00:00";
 	private String lambdaFileName;
@@ -136,9 +136,9 @@ public class OrcidDownloader extends OrcidDSManager {
 						}
 					}
 
-					if (parsedRecordsCounter > REQ_MAX_TEST) {
-						break;
-					}
+//					if (parsedRecordsCounter > REQ_MAX_TEST) {
+//						break;
+//					}
 					if ((parsedRecordsCounter % RECORD_PARSED_COUNTER_LOG_INTERVAL) == 0) {
 						Log
 							.info(
@@ -148,9 +148,9 @@ public class OrcidDownloader extends OrcidDSManager {
 									+ downloadedRecordsCounter
 									+ " saved: "
 									+ savedRecordsCounter);
-						if (parsedRecordsCounter > REQ_MAX_TEST) {
-							break;
-						}
+//						if (parsedRecordsCounter > REQ_MAX_TEST) {
+//							break;
+//						}
 					}
 				}
 				long endDownload = System.currentTimeMillis();
