@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -20,6 +21,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
+import org.apache.spark.util.LongAccumulator;
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,23 +63,53 @@ public class SparkOrcidGenerateAuthors {
 			isSparkSessionManaged,
 			spark -> {
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-				JavaRDD<String> lamdaFileRDD = sc.textFile(workingPath + "last_modified.csv");
+
+				LongAccumulator parsedRecordsAcc = sc.sc().longAccumulator("parsedRecords");
+				LongAccumulator modifiedRecordsAcc = sc.sc().longAccumulator("modifiedRecords");
+				LongAccumulator downloadedRecordsAcc = sc.sc().longAccumulator("downloadedRecords");
+				LongAccumulator alreadyDownloadedRecords = sc.sc().longAccumulator("alreadyDownloadedRecords");
+				JavaRDD<String> lamdaFileRDD = sc.textFile(workingPath + "lamdafiles");
+
+				JavaRDD<String> downloadedRDD = sc.textFile(workingPath + "downloaded");
+				Function<String, String> getOrcidIdFunction = line -> {
+					try {
+						String[] values = line.split(",");
+						return values[0].substring(1);
+					} catch (Exception e) {
+						return new String("");
+					}
+				};
+				List<String> downloadedRecords = downloadedRDD.map(getOrcidIdFunction).collect();
+
 				Function<String, Boolean> isModifiedAfterFilter = line -> {
 					String[] values = line.split(",");
 					String orcidId = values[0];
+					parsedRecordsAcc.add(1);
 					if (isModified(orcidId, values[3])) {
+						modifiedRecordsAcc.add(1);
 						return true;
 					}
 					return false;
 				};
+				Function<String, Boolean> isNotDownloadedFilter = line -> {
+					String[] values = line.split(",");
+					String orcidId = values[0];
+					if (downloadedRecords.contains(orcidId)) {
+						alreadyDownloadedRecords.add(1);
+						return false;
+					}
+					return true;
+				};
 				Function<String, Tuple2<String, String>> downloadRecordFunction = line -> {
 					String[] values = line.split(",");
 					String orcidId = values[0];
-					return downloadRecord(orcidId, token);
+					String modifiedDate = values[3];
+					return downloadRecord(orcidId, modifiedDate, token, downloadedRecordsAcc);
 				};
 
 				lamdaFileRDD
 					.filter(isModifiedAfterFilter)
+					.filter(isNotDownloadedFilter)
 					.map(downloadRecordFunction)
 					.rdd()
 					.saveAsTextFile(workingPath.concat(outputAuthorsPath));
@@ -101,9 +133,11 @@ public class SparkOrcidGenerateAuthors {
 		return modifiedDateDt.after(lastUpdateDt);
 	}
 
-	private static Tuple2<String, String> downloadRecord(String orcidId, String token) {
+	private static Tuple2<String, String> downloadRecord(String orcidId, String modifiedDate, String token,
+		LongAccumulator downloadedRecordsAcc) {
 		final DownloadedRecordData data = new DownloadedRecordData();
 		data.setOrcidId(orcidId);
+		data.setModifiedDate(modifiedDate);
 		try (CloseableHttpClient client = HttpClients.createDefault()) {
 			HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/record");
 			httpGet.addHeader("Accept", "application/vnd.orcid+xml");
@@ -117,6 +151,7 @@ public class SparkOrcidGenerateAuthors {
 						"Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
 				return data.toTuple2();
 			}
+			downloadedRecordsAcc.add(1);
 			data
 				.setCompressedData(
 					ArgumentApplicationParser.compressArgument(IOUtils.toString(response.getEntity().getContent())));

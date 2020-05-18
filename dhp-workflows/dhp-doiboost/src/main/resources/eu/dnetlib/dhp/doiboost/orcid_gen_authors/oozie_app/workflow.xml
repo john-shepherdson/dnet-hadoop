@@ -37,6 +37,25 @@
         <error to="Kill"/>
     </action>
 	
+	<action name="Split_Lambda_File">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+        	<job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Split_Lambda_File</name>
+            <class>eu.dnetlib.doiboost.orcid.SparkPartitionLambdaFile</class>
+            <jar>dhp-doiboost-1.2.1-SNAPSHOT.jar</jar>
+            <spark-opts>--num-executors 24 --conf spark.yarn.jars=&quot;hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2&quot; --executor-memory=${sparkExecutorMemory} --executor-cores=${sparkExecutorCores} --driver-memory=${sparkDriverMemory}
+            </spark-opts>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-o</arg><arg>authors/</arg>
+            <arg>-t</arg><arg>${token}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    
 	<action name="Gen_Orcid_Authors">
         <spark xmlns="uri:oozie:spark-action:0.2">
         	<job-tracker>${jobTracker}</job-tracker>
@@ -46,7 +65,7 @@
             <name>Gen_Orcid_Authors</name>
             <class>eu.dnetlib.doiboost.orcid.SparkOrcidGenerateAuthors</class>
             <jar>dhp-doiboost-1.2.1-SNAPSHOT.jar</jar>
-            <spark-opts>--num-executors 24 --conf spark.yarn.jars=&quot;hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2&quot; --executor-memory=${sparkExecutorMemory} --executor-cores=${sparkExecutorCores} --driver-memory=${sparkDriverMemory}
+            <spark-opts>--num-executors 20 --conf spark.yarn.jars=&quot;hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2&quot; --executor-memory=${sparkExecutorMemory} --executor-cores=${sparkExecutorCores} --driver-memory=${sparkDriverMemory}
             </spark-opts>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-o</arg><arg>authors/</arg>

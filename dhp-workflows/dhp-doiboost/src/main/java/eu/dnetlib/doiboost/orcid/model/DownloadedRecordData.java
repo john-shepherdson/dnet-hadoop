@@ -12,6 +12,7 @@ import scala.Tuple2;
 public class DownloadedRecordData implements Serializable {
 
 	private String orcidId;
+	private String modifiedDate;
 	private String statusCode;
 	private String compressedData;
 	private String errorMessage;
@@ -19,6 +20,7 @@ public class DownloadedRecordData implements Serializable {
 	public Tuple2<String, String> toTuple2() {
 		JsonObject data = new JsonObject();
 		data.addProperty("statusCode", getStatusCode());
+		data.addProperty("modifiedDate", getModifiedDate());
 		if (getCompressedData() != null) {
 			data.addProperty("compressedData", getCompressedData());
 		}
@@ -45,7 +47,11 @@ public class DownloadedRecordData implements Serializable {
 	}
 
 	public int getStatusCode() {
-		return Integer.parseInt(statusCode);
+		try {
+			return Integer.parseInt(statusCode);
+		} catch (Exception e) {
+			return -2;
+		}
 	}
 
 	public void setStatusCode(int statusCode) {
@@ -60,4 +66,11 @@ public class DownloadedRecordData implements Serializable {
 		this.compressedData = compressedData;
 	}
 
+	public String getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(String modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
 }
