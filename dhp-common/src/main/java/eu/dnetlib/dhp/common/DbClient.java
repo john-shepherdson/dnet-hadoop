@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.raw.common;
+package eu.dnetlib.dhp.common;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class DbClient implements Closeable {
 
 	private static final Log log = LogFactory.getLog(DbClient.class);
 
-	private final Connection connection;
+	private Connection connection;
 
 	public DbClient(final String address, final String login, final String password) {
 
