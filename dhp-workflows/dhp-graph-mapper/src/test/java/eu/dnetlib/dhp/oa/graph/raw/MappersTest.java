@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MappersTest {
@@ -53,15 +54,18 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 
 		assertTrue(p.getAuthor().size() > 0);
-		Optional<Author> author = p.getAuthor()
-				.stream()
-				.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
-				.findFirst();
+		Optional<Author> author = p
+			.getAuthor()
+			.stream()
+			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+			.findFirst();
 		assertTrue(author.isPresent());
-		StructuredProperty pid = author.get().getPid()
-				.stream()
-				.findFirst()
-				.get();
+		StructuredProperty pid = author
+			.get()
+			.getPid()
+			.stream()
+			.findFirst()
+			.get();
 		assertEquals("0000-0001-6651-1178", pid.getValue());
 		assertEquals("ORCID", pid.getQualifier().getClassid());
 		assertEquals("ORCID", pid.getQualifier().getClassname());
@@ -117,15 +121,18 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
 
-		Optional<Author> author = d.getAuthor()
-				.stream()
-				.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
-				.findFirst();
+		Optional<Author> author = d
+			.getAuthor()
+			.stream()
+			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+			.findFirst();
 		assertTrue(author.isPresent());
-		StructuredProperty pid = author.get().getPid()
-				.stream()
-				.findFirst()
-				.get();
+		StructuredProperty pid = author
+			.get()
+			.getPid()
+			.stream()
+			.findFirst()
+			.get();
 		assertEquals("0000-0001-9074-1619", pid.getValue());
 		assertEquals("ORCID", pid.getQualifier().getClassid());
 		assertEquals("ORCID", pid.getQualifier().getClassname());
@@ -136,9 +143,11 @@ public class MappersTest {
 		assertEquals("Theo", author.get().getName());
 
 		assertEquals(1, author.get().getAffiliation().size());
-		Optional<Field<String>> opAff = author.get().getAffiliation()
-				.stream()
-				.findFirst();
+		Optional<Field<String>> opAff = author
+			.get()
+			.getAffiliation()
+			.stream()
+			.findFirst();
 		assertTrue(opAff.isPresent());
 		Field<String> affiliation = opAff.get();
 		assertEquals("ISTI-CNR", affiliation.getValue());
