@@ -38,48 +38,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>eu.dnetlib</groupId>
-            <artifactId>dnet-actionmanager-common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>eu.dnetlib</groupId>
-                    <artifactId>dnet-openaireplus-mapping-utils</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>saxonica</groupId>
-                    <artifactId>saxon</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>saxonica</groupId>
-                    <artifactId>saxon-dom</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jgrapht</groupId>
-                    <artifactId>jgrapht</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-test</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>apache</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>eu.dnetlib</groupId>
-            <artifactId>dnet-openaire-data-protos</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>net.sf.saxon</groupId>
@@ -100,10 +58,14 @@
             <artifactId>jaxen</artifactId>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-distcp</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.8</version>
         </dependency>
+
+
 
     </dependencies>
 
