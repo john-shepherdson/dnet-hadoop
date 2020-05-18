@@ -84,7 +84,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				// removeOutputDir(spark, outputPath);
 				if (saveGraph) {
 					execPropagation(
 						spark,
