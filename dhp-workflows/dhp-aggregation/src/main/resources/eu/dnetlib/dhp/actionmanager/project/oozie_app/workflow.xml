@@ -31,7 +31,7 @@
 
     <action name="get_project_file">
         <java>
-            <main-class>eu.dnetlib.dhp.actionset.h2020programme.GetFile</main-class>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.GetFile</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${projectFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/projects.csv</arg>
@@ -42,7 +42,7 @@
 
     <action name="shell_get_programme_file">
         <java>
-            <main-class>eu.dnetlib.dhp.actionset.h2020programme.GetFile</main-class>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.GetFile</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${programmeFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/programme.csv</arg>
@@ -56,7 +56,7 @@
 <!--            <master>yarn</master>-->
 <!--            <mode>cluster</mode>-->
 <!--            <name>ProjectProgrammeAS</name>-->
-<!--            <class>eu.dnetlib.dhp.actionset.h2020programme</class>-->
+<!--            <class>eu.dnetlib.dhp.actionmanager.project</class>-->
 <!--            <jar>dhp-aggregation-${projectVersion}.jar</jar>-->
 <!--            <spark-opts>-->
 <!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->

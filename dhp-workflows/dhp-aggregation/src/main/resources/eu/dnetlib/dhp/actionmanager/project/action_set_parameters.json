@@ -6,14 +6,14 @@
   "paramRequired": false
 },
 {
-"paramName": "pjfu",
-"paramLongName": "projectsFileURL",
+"paramName": "pjp",
+"paramLongName": "projectPath",
 "paramDescription": "the URL from where to get the projects file",
 "paramRequired": true
 },
 {
-"paramName": "pfu",
-"paramLongName": "programmeFileURL",
+"paramName": "pp",
+"paramLongName": "programmePath",
 "paramDescription": "the URL from where to get the programme file",
 "paramRequired": true
 },
