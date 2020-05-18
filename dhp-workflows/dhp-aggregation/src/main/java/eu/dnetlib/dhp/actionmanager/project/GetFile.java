@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionset.h2020programme;
+package eu.dnetlib.dhp.actionmanager.project;
 
 import java.io.*;
 import java.net.URL;
@@ -24,7 +24,7 @@ public class GetFile {
 				.toString(
 					GetFile.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/actionset/h2020programme/parameters.json")));
+							"/eu/dnetlib/dhp/actionmanager/project/parameters.json")));
 
 		Configuration conf = new Configuration();
 

@@ -33,7 +33,7 @@
         <java>
             <main-class>eu.dnetlib.dhp.actionset.h2020programme.GetFile</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileUrl</arg><arg>${projectFileURL}</arg>
+            <arg>--fileURL</arg><arg>${projectFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/projects.csv</arg>
         </java>
         <ok to="shell_get_programme_file"/>
@@ -44,7 +44,7 @@
         <java>
             <main-class>eu.dnetlib.dhp.actionset.h2020programme.GetFile</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileUrl</arg><arg>${programmeFileURL}</arg>
+            <arg>--fileURL</arg><arg>${programmeFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/programme.csv</arg>
         </java>
         <ok to="End"/>
