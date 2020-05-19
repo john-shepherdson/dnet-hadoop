@@ -1,9 +1,9 @@
 
-package eu.dnetlib.dhp.actionmanager.project;
+package eu.dnetlib.dhp.actionmanager.project.csvutils;
 
 import java.io.Serializable;
 
-public class Project implements Serializable {
+public class CSVProject implements Serializable {
 	private String rcn;
 	private String id;
 	private String acronym;
@@ -193,4 +193,5 @@ public class Project implements Serializable {
 	public void setSubjects(String subjects) {
 		this.subjects = subjects;
 	}
+
 }

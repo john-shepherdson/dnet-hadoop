@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.project;
+package eu.dnetlib.dhp.actionmanager.project.httpconnector;
 
 import java.io.IOException;
 import java.io.InputStream;

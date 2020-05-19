@@ -1,9 +1,9 @@
 
-package eu.dnetlib.dhp.actionmanager.project;
+package eu.dnetlib.dhp.actionmanager.project.csvutils;
 
 import java.io.Serializable;
 
-public class Programme implements Serializable {
+public class CSVProgramme implements Serializable {
 	private String rcn;
 	private String code;
 	private String title;
