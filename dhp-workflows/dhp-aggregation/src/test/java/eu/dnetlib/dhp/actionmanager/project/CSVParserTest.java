@@ -1,43 +1,41 @@
+
 package eu.dnetlib.dhp.actionmanager.project;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVParser;
 
-public class ReadCSVTest {
+public class CSVParserTest {
 
-    private static Path workingDir;
+	private static Path workingDir;
 
-    @BeforeAll
-    public static void beforeAll() throws IOException {
-        workingDir = Files.createTempDirectory(eu.dnetlib.dhp.actionmanager.project.ReadCSVTest.class.getSimpleName());
+	@BeforeAll
+	public static void beforeAll() throws IOException {
+		workingDir = Files.createTempDirectory(CSVParserTest.class.getSimpleName());
 
+	}
 
-    }
-        @Test
-    public  void readProgrammeTest() throws Exception {
+	@Test
+	public void readProgrammeTest() throws Exception {
 
-        String programmecsv = IOUtils.toString(getClass()
-                .getClassLoader().getResourceAsStream("eu/dnetlib/dhp/actionmanager/project/programme.csv"));
-        ReadCSV
-                .main(
-                        new String[] {
-                                "-fileURL",
-                                "http://cordis.europa.eu/data/reference/cordisref-H2020programmes.csv",
-                                "-outputPath",
-                                workingDir.toString() + "/project",
-                                "-hdfsPath",
-                                getClass().getResource("/eu/dnetlib/dhp/blacklist/blacklist").getPath(),
-                                "-mergesPath",
-                                getClass().getResource("/eu/dnetlib/dhp/blacklist/mergesRelOneMerge").getPath(),
-                        });
+		String programmecsv = IOUtils
+			.toString(
+				getClass()
+					.getClassLoader()
+					.getResourceAsStream("eu/dnetlib/dhp/actionmanager/project/programme.csv"));
 
+		CSVParser csvParser = new CSVParser();
 
+		List<Object> pl = csvParser.parse(programmecsv, "eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme");
 
+		System.out.println(pl.size());
 
-    }
+	}
 }
