@@ -21,6 +21,18 @@
     "paramName": "rp",
     "paramLongName": "relPartitions",
     "paramDescription": "number or partitions for the relations Dataset",
-    "paramRequired": true
+    "paramRequired": false
+  },
+  {
+    "paramName": "rf",
+    "paramLongName": "relationFilter",
+    "paramDescription": "filter applied reading relations (by relClass)",
+    "paramRequired": false
+  },
+  {
+    "paramName": "mr",
+    "paramLongName": "maxRelations",
+    "paramDescription": "maximum number of relations applied reading relations (by relClass)",
+    "paramRequired": false
   }
 ]

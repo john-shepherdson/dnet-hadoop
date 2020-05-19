@@ -3,7 +3,9 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -15,17 +17,21 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.sources.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
 import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
+import scala.Int;
 import scala.Tuple2;
 
 /**
@@ -58,6 +64,8 @@ public class PrepareRelationsJob {
 
 	public static final int MAX_RELS = 100;
 
+	public static final int DEFAULT_NUM_PARTITIONS = 3000;
+
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
@@ -79,6 +87,24 @@ public class PrepareRelationsJob {
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
+		int relPartitions = Optional
+			.ofNullable(parser.get("relPartitions"))
+			.map(Integer::valueOf)
+			.orElse(DEFAULT_NUM_PARTITIONS);
+		log.info("relPartitions: {}", relPartitions);
+
+		Set<String> relationFilter = Optional
+			.ofNullable(parser.get("relationFilter"))
+			.map(s -> Sets.newHashSet(Splitter.on(",").split(s)))
+			.orElse(new HashSet<>());
+		log.info("relationFilter: {}", relationFilter);
+
+		int maxRelations = Optional
+			.ofNullable(parser.get("maxRelations"))
+			.map(Integer::valueOf)
+			.orElse(MAX_RELS);
+		log.info("maxRelations: {}", maxRelations);
+
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
@@ -86,12 +112,13 @@ public class PrepareRelationsJob {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareRelationsFromPaths(spark, inputRelationsPath, outputPath);
+				prepareRelationsRDDFromPaths(
+					spark, inputRelationsPath, outputPath, relationFilter, relPartitions, maxRelations);
 			});
 	}
 
 	private static void prepareRelationsFromPaths(
-		SparkSession spark, String inputRelationsPath, String outputPath) {
+		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter) {
 		readPathRelation(spark, inputRelationsPath)
 			.filter("dataInfo.deletedbyinference == false")
 			.groupByKey(
@@ -125,20 +152,19 @@ public class PrepareRelationsJob {
 
 	// TODO work in progress
 	private static void prepareRelationsRDDFromPaths(
-		SparkSession spark, String inputRelationsPath, String outputPath, int numPartitions) {
-		JavaRDD<SortableRelation> rels = readPathRelationRDD(spark, inputRelationsPath).repartition(numPartitions);
+		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter, int relPartitions,
+		int maxRelations) {
+		JavaRDD<SortableRelation> rels = readPathRelationRDD(spark, inputRelationsPath).repartition(relPartitions);
 
+		// only consider those that are not virtually deleted
 		RDD<SortableRelation> d = rels
-			.filter(rel -> !rel.getDataInfo().getDeletedbyinference()) // only
-			// consider
-			// those
-			// that are not virtually
-			// deleted
+			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
+			.filter(rel -> !relationFilter.contains(rel.getRelClass()))
 			.mapToPair(
 				(PairFunction<SortableRelation, SortableRelation, SortableRelation>) rel -> new Tuple2<>(rel, rel))
 			.groupByKey(new RelationPartitioner(rels.getNumPartitions()))
-			.map(p -> Iterables.limit(p._2(), MAX_RELS))
-			.flatMap(p -> p.iterator())
+			.map(group -> Iterables.limit(group._2(), maxRelations))
+			.flatMap(group -> group.iterator())
 			.rdd();
 
 		spark

@@ -102,7 +102,9 @@
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--relPartitions</arg><arg>3000</arg>
+            <arg>--relPartitions</arg><arg>${relPartitions}</arg>
+            <arg>--relationFilter</arg><arg>${relationFilter}</arg>
+            <arg>--maxRelations</arg><arg>${maxRelations}</arg>
         </spark>
         <ok to="fork_join_related_entities"/>
         <error to="Kill"/>
