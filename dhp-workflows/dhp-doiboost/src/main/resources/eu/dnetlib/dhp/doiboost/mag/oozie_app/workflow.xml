@@ -72,6 +72,7 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=3840
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>

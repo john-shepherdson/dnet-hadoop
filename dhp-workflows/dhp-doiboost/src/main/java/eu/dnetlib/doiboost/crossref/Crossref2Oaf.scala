@@ -14,6 +14,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
+import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 
 case class mappingAffiliation(name: String) {}
 
@@ -25,18 +26,7 @@ case class mappingFunder(name: String, DOI: Option[String], award: Option[List[S
 case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
 
-  //STATIC STRING
-  val MAG = "MAG"
-  val ORCID = "ORCID"
-  val CROSSREF = "Crossref"
-  val UNPAYWALL = "UnpayWall"
-  val GRID_AC = "grid.ac"
-  val WIKPEDIA = "wikpedia"
-  val doiBoostNSPREFIX = "doiboost____"
-  val OPENAIRE_PREFIX = "openaire____"
-  val SEPARATOR = "::"
-  val DNET_LANGUAGES = "dnet:languages"
-  val PID_TYPES = "dnet:pid_types"
+
 
   val mappingCrossrefType = Map(
     "book-section" -> "publication",
@@ -116,7 +106,7 @@ case object Crossref2Oaf {
     result.setLastupdatetimestamp((json \ "indexed" \ "timestamp").extract[Long])
     result.setDateofcollection((json \ "indexed" \ "date-time").extract[String])
 
-    result.setCollectedfrom(List(createCollectedFrom()).asJava)
+    result.setCollectedfrom(List(createCrossrefCollectedFrom()).asJava)
 
     // Publisher ( Name of work's publisher mapped into  Result/Publisher)
     val publisher = (json \ "publisher").extractOrElse[String](null)
@@ -168,7 +158,7 @@ case object Crossref2Oaf {
     result.setInstance(List(instance).asJava)
     instance.setInstancetype(createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
 
-    instance.setCollectedfrom(createCollectedFrom())
+    instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
       instance.setDateofacceptance(asField(issuedDate))
     }
@@ -215,7 +205,7 @@ case object Crossref2Oaf {
     val funderList: List[mappingFunder] = (json \ "funder").extractOrElse[List[mappingFunder]](List())
 
     if (funderList.nonEmpty) {
-      resultList = resultList ::: mappingFunderToRelations(funderList, result.getId, createCollectedFrom(), result.getDataInfo, result.getLastupdatetimestamp)
+      resultList = resultList ::: mappingFunderToRelations(funderList, result.getId, createCrossrefCollectedFrom(), result.getDataInfo, result.getLastupdatetimestamp)
     }
 
 
@@ -416,71 +406,8 @@ case object Crossref2Oaf {
   }
 
 
-  def generateIdentifier(oaf: Result, doi: String): String = {
-    val id = DHPUtils.md5(doi.toLowerCase)
-    if (oaf.isInstanceOf[Dataset])
-      return s"60|${doiBoostNSPREFIX}${SEPARATOR}${id}"
-    s"50|${doiBoostNSPREFIX}${SEPARATOR}${id}"
-  }
-
-  def asField[T](value: T): Field[T] = {
-    val tmp = new Field[T]
-    tmp.setValue(value)
-    tmp
 
 
-  }
-
-
-  def generateDataInfo(): DataInfo = {
-    val di = new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust("0.9")
-    di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
-    di
-  }
-
-
-  def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
-    val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
-    sp.setValue(value)
-    sp
-
-  }
-
-  def createSP(value: String, classId: String, schemeId: String, dataInfo: DataInfo): StructuredProperty = {
-    val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
-    sp.setValue(value)
-    sp.setDataInfo(dataInfo)
-    sp
-
-  }
-
-  def createCollectedFrom(): KeyValue = {
-
-    val cf = new KeyValue
-    cf.setValue(CROSSREF)
-    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5("crossref"))
-    cf
-
-  }
-
-  def createQualifier(clsName: String, clsValue: String, schName: String, schValue: String): Qualifier = {
-    val q = new Qualifier
-    q.setClassid(clsName)
-    q.setClassname(clsValue)
-    q.setSchemeid(schName)
-    q.setSchemename(schValue)
-    q
-  }
-
-  def createQualifier(cls: String, sch: String): Qualifier = {
-    createQualifier(cls, cls, sch, sch)
-  }
 
 
   def generateItemFromType(objectType: String, objectSubType: String): Result = {

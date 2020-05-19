@@ -16,6 +16,10 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
+        <property>
+            <name>outputPath</name>
+            <description>the working dir base path</description>
+        </property>
     </parameters>
     
     <start to="ResetWorkingPath"/>
@@ -47,6 +51,7 @@
             </spark-opts>
             <arg>-mt</arg> <arg>yarn</arg>
             <arg>--workingPath_orcid</arg><arg>${workingPath_activities}/</arg>
+            <arg>-o</arg><arg>${outputPath}/</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
