@@ -20,6 +20,10 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
+        <property>
+            <name>outputPath</name>
+            <description>the working dir base path</description>
+        </property>
     </parameters>
     
     <start to="ResetWorkingPath"/>

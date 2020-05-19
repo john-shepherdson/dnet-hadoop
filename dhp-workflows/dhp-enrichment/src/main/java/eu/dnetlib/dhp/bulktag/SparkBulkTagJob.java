@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.bulktag;
 
+import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.Optional;
@@ -84,6 +85,7 @@ public class SparkBulkTagJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, outputPath);
 				execBulkTag(spark, inputPath, outputPath, protoMappingParams, resultClazz, cc);
 			});
 	}

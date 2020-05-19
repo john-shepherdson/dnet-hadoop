@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 /**
@@ -100,7 +101,7 @@ public class PrepareDatasourceCountryAssociation {
 			+ "JOIN ( SELECT source, target "
 			+ "       FROM relation "
 			+ "       WHERE relclass = '"
-			+ RELATION_DATASOURCE_ORGANIZATION_REL_CLASS
+			+ ModelConstants.IS_PROVIDED_BY
 			+ "' "
 			+ "       AND datainfo.deletedbyinference = false ) rel "
 			+ "ON d.id = rel.source "

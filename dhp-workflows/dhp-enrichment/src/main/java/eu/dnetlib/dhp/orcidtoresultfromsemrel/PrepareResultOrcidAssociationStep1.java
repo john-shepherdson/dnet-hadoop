@@ -74,9 +74,7 @@ public class PrepareResultOrcidAssociationStep1 {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
+				removeOutputDir(spark, outputPath);
 				prepareInfo(
 					spark, inputRelationPath, inputResultPath, outputResultPath, resultClazz, allowedsemrel);
 			});
@@ -97,22 +95,22 @@ public class PrepareResultOrcidAssociationStep1 {
 		Dataset<R> result = readPath(spark, inputResultPath, resultClazz);
 		result.createOrReplaceTempView("result");
 
-		String query = " select target resultId, author authorList"
-			+ " from (select id, collect_set(named_struct('name', name, 'surname', surname, 'fullname', fullname, 'orcid', orcid)) author "
-			+ " from ( "
-			+ " select id, MyT.fullname, MyT.name, MyT.surname, MyP.value orcid "
-			+ " from result "
-			+ " lateral view explode (author) a as MyT "
-			+ " lateral view explode (MyT.pid) p as MyP "
-			+ " where MyP.qualifier.classid = 'ORCID') tmp "
-			+ " group by id) r_t "
-			+ " join ("
-			+ " select source, target "
-			+ " from relation "
-			+ " where datainfo.deletedbyinference = false "
+		String query = "SELECT target resultId, author authorList"
+			+ "  FROM (SELECT id, collect_set(named_struct('name', name, 'surname', surname, 'fullname', fullname, 'orcid', orcid)) author "
+			+ "        FROM ( "
+			+ "               SELECT DISTINCT id, MyT.fullname, MyT.name, MyT.surname, MyP.value orcid "
+			+ "               FROM result "
+			+ "               LATERAL VIEW EXPLODE (author) a AS MyT "
+			+ "               LATERAL VIEW EXPLODE (MyT.pid) p AS MyP "
+			+ "               WHERE MyP.qualifier.classid = 'ORCID') tmp "
+			+ "               GROUP BY id) r_t "
+			+ " JOIN ("
+			+ "        SELECT source, target "
+			+ "        FROM relation "
+			+ "        WHERE datainfo.deletedbyinference = false "
 			+ getConstraintList(" relclass = '", allowedsemrel)
-			+ ") rel_rel "
-			+ " on source = id";
+			+ "              ) rel_rel "
+			+ " ON source = id";
 		spark
 			.sql(query)
 			.as(Encoders.bean(ResultOrcidList.class))

@@ -50,9 +50,7 @@ public class PrepareResultOrcidAssociationStep2 {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
+				removeOutputDir(spark, outputPath);
 				mergeInfo(spark, inputPath, outputPath);
 			});
 	}

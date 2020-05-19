@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -62,6 +63,7 @@ public class SparkRemoveBlacklistedRelationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, outputPath);
 				removeBlacklistedRelations(
 					spark,
 					blacklistPath,
@@ -69,7 +71,6 @@ public class SparkRemoveBlacklistedRelationJob {
 					outputPath,
 					mergesPath);
 			});
-
 	}
 
 	private static void removeBlacklistedRelations(SparkSession spark, String blacklistPath, String inputPath,
@@ -77,8 +78,6 @@ public class SparkRemoveBlacklistedRelationJob {
 		Dataset<Relation> blackListed = readRelations(spark, blacklistPath + "/blacklist");
 		Dataset<Relation> inputRelation = readRelations(spark, inputPath);
 		Dataset<Relation> mergesRelation = readRelations(spark, mergesPath);
-
-		log.info("InputRelationCount: {}", inputRelation.count());
 
 		Dataset<Relation> dedupSource = blackListed
 			.joinWith(
@@ -101,11 +100,6 @@ public class SparkRemoveBlacklistedRelationJob {
 					.ifPresent(mr -> c._1().setTarget(mr.getSource()));
 				return c._1();
 			}, Encoders.bean(Relation.class));
-
-		dedupBL
-			.write()
-			.mode(SaveMode.Overwrite)
-			.json(blacklistPath + "/deduped");
 
 		inputRelation
 			.joinWith(
@@ -142,6 +136,10 @@ public class SparkRemoveBlacklistedRelationJob {
 			.map(
 				(MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
 				Encoders.bean(Relation.class));
+	}
+
+	private static void removeOutputDir(SparkSession spark, String path) {
+		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 
 }

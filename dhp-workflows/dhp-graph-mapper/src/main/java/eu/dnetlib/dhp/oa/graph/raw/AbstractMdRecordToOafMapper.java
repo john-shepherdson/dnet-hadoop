@@ -127,7 +127,6 @@ public abstract class AbstractMdRecordToOafMapper {
 		final List<Oaf> oafs = new ArrayList<>();
 
 		switch (type.toLowerCase()) {
-			case "":
 			case "publication":
 				final Publication p = new Publication();
 				populateResultFields(p, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
@@ -138,7 +137,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			case "dataset":
 				final Dataset d = new Dataset();
 				populateResultFields(d, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
-				d.setResulttype(PUBLICATION_DEFAULT_RESULTTYPE);
+				d.setResulttype(DATASET_DEFAULT_RESULTTYPE);
 				d.setStoragedate(prepareDatasetStorageDate(doc, info));
 				d.setDevice(prepareDatasetDevice(doc, info));
 				d.setSize(prepareDatasetSize(doc, info));
@@ -158,6 +157,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				s.setProgrammingLanguage(prepareSoftwareProgrammingLanguage(doc, info));
 				oafs.add(s);
 				break;
+			case "":
 			case "otherresearchproducts":
 			default:
 				final OtherResearchProduct o = new OtherResearchProduct();
