@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -122,9 +123,9 @@ public class SparkResultToProjectThroughSemRelJob {
 								getRelation(
 									resId,
 									projectId,
-									RELATION_RESULT_PROJECT_REL_CLASS,
-									RELATION_RESULTPROJECT_REL_TYPE,
-									RELATION_RESULTPROJECT_SUBREL_TYPE,
+									ModelConstants.IS_PRODUCED_BY,
+									ModelConstants.RESULT_PROJECT,
+									ModelConstants.OUTCOME,
 									PROPAGATION_DATA_INFO_TYPE,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
@@ -133,9 +134,9 @@ public class SparkResultToProjectThroughSemRelJob {
 								getRelation(
 									projectId,
 									resId,
-									RELATION_PROJECT_RESULT_REL_CLASS,
-									RELATION_RESULTPROJECT_REL_TYPE,
-									RELATION_RESULTPROJECT_SUBREL_TYPE,
+									ModelConstants.PRODUCES,
+									ModelConstants.RESULT_PROJECT,
+									ModelConstants.OUTCOME,
 									PROPAGATION_DATA_INFO_TYPE,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));

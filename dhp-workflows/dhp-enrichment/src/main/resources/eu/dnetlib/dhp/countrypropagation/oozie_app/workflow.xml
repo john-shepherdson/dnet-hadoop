@@ -19,6 +19,17 @@
 
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
     <start to="reset_outputpath"/>
 
     <kill name="Kill">
@@ -43,8 +54,6 @@
 
     <action name="copy_relation">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/relation</arg>
             <arg>${nameNode}/${outputPath}/relation</arg>
         </distcp>
@@ -54,18 +63,15 @@
 
     <action name="copy_organization">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/organization</arg>
             <arg>${nameNode}/${outputPath}/organization</arg>
         </distcp>
         <ok to="copy_wait"/>
         <error to="Kill"/>
     </action>
+
     <action name="copy_projects">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/project</arg>
             <arg>${nameNode}/${outputPath}/project</arg>
         </distcp>
@@ -75,8 +81,6 @@
 
     <action name="copy_datasources">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/datasource</arg>
             <arg>${nameNode}/${outputPath}/datasource</arg>
         </distcp>

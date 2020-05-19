@@ -129,6 +129,9 @@ public class DedupUtility {
 						.max(Comparator.comparing(Tuple2::_1));
 					if (simAuhtor.isPresent() && simAuhtor.get()._1() > THRESHOLD) {
 						Author r = simAuhtor.get()._2();
+						if (r.getPid() == null) {
+							r.setPid(new ArrayList<>());
+						}
 						r.getPid().add(a._1());
 					}
 				});

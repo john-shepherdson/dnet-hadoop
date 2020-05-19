@@ -50,8 +50,7 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
-	implements Closeable {
+public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
 	private static final Log log = LogFactory.getLog(MigrateDbEntitiesApplication.class);
 
@@ -128,9 +127,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 	}
 
 	public List<Oaf> processDatasource(final ResultSet rs) {
-
 		try {
-
 			final DataInfo info = prepareDataInfo(rs);
 
 			final Datasource ds = new Datasource();
@@ -194,7 +191,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 
 	public List<Oaf> processProject(final ResultSet rs) {
 		try {
-
 			final DataInfo info = prepareDataInfo(rs);
 
 			final Project p = new Project();
@@ -249,9 +245,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 	}
 
 	public List<Oaf> processOrganization(final ResultSet rs) {
-
 		try {
-
 			final DataInfo info = prepareDataInfo(rs);
 
 			final Organization o = new Organization();
@@ -370,14 +364,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 
 		final DataInfo info = dataInfo(
 			false, null, false, false,
-
 			qualifier(USER_CLAIM, USER_CLAIM, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), "0.9");
 
 		final List<KeyValue> collectedFrom = listKeyValues(
 			createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
 
 		try {
-
 			if (rs.getString(SOURCE_TYPE).equals("context")) {
 				final Result r;
 
@@ -461,9 +453,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 		final Boolean inferred = rs.getBoolean("inferred");
 		final String trust = rs.getString("trust");
 		return dataInfo(
-
-			deletedbyinference, inferenceprovenance, inferred, false, ENTITYREGISTRY_PROVENANCE_ACTION, trust);
-
+			deletedbyinference,
+			inferenceprovenance,
+			inferred,
+			false,
+			ENTITYREGISTRY_PROVENANCE_ACTION,
+			trust);
 	}
 
 	private Qualifier prepareQualifierSplitting(final String s) {
@@ -535,4 +530,5 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication
 		super.close();
 		dbClient.close();
 	}
+
 }

@@ -14,21 +14,20 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.model.EventFactory;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMissingAbstract;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMissingAuthorOrcid;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMissingOpenAccess;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMissingPid;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMissingProject;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMissingPublicationDate;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMissingSubject;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMoreOpenAccess;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMorePid;
-import eu.dnetlib.dhp.broker.oa.util.EnrichMoreSubject;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMissingAbstract;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMissingAuthorOrcid;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMissingOpenAccess;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMissingPid;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMissingProject;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMissingPublicationDate;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMissingSubject;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMoreOpenAccess;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMorePid;
+import eu.dnetlib.dhp.broker.oa.matchers.EnrichMoreSubject;
+import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -37,7 +36,16 @@ public class GenerateEventsApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(GenerateEventsApplication.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final UpdateMatcher<?> enrichMissingAbstract = new EnrichMissingAbstract();
+	private static final UpdateMatcher<?> enrichMissingAuthorOrcid = new EnrichMissingAuthorOrcid();
+	private static final UpdateMatcher<?> enrichMissingOpenAccess = new EnrichMissingOpenAccess();
+	private static final UpdateMatcher<?> enrichMissingPid = new EnrichMissingPid();
+	private static final UpdateMatcher<?> enrichMissingProject = new EnrichMissingProject();
+	private static final UpdateMatcher<?> enrichMissingPublicationDate = new EnrichMissingPublicationDate();
+	private static final UpdateMatcher<?> enrichMissingSubject = new EnrichMissingSubject();
+	private static final UpdateMatcher<?> enrichMoreOpenAccess = new EnrichMoreOpenAccess();
+	private static final UpdateMatcher<?> enrichMorePid = new EnrichMorePid();
+	private static final UpdateMatcher<?> enrichMoreSubject = new EnrichMoreSubject();
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -76,37 +84,22 @@ public class GenerateEventsApplication {
 	}
 
 	private List<Event> generateEvents(final Result... children) {
-		final List<Event> list = new ArrayList<>();
+		final List<UpdateInfo<?>> list = new ArrayList<>();
 
-		for (final Result source : children) {
-			for (final Result target : children) {
-				if (source != target) {
-					list
-						.addAll(
-							findUpdates(source, target)
-								.stream()
-								.map(info -> EventFactory.newBrokerEvent(source, target, info))
-								.collect(Collectors.toList()));
-				}
-			}
+		for (final Result target : children) {
+			list.addAll(enrichMissingAbstract.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMissingAuthorOrcid.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMissingOpenAccess.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMissingPid.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMissingProject.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMissingPublicationDate.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMissingSubject.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMoreOpenAccess.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMorePid.searchUpdatesForRecord(target, children));
+			list.addAll(enrichMoreSubject.searchUpdatesForRecord(target, children));
 		}
 
-		return list;
-	}
-
-	private List<UpdateInfo<?>> findUpdates(final Result source, final Result target) {
-		final List<UpdateInfo<?>> list = new ArrayList<>();
-		list.addAll(EnrichMissingAbstract.findUpdates(source, target));
-		list.addAll(EnrichMissingAuthorOrcid.findUpdates(source, target));
-		list.addAll(EnrichMissingOpenAccess.findUpdates(source, target));
-		list.addAll(EnrichMissingPid.findUpdates(source, target));
-		list.addAll(EnrichMissingProject.findUpdates(source, target));
-		list.addAll(EnrichMissingPublicationDate.findUpdates(source, target));
-		list.addAll(EnrichMissingSubject.findUpdates(source, target));
-		list.addAll(EnrichMoreOpenAccess.findUpdates(source, target));
-		list.addAll(EnrichMorePid.findUpdates(source, target));
-		list.addAll(EnrichMoreSubject.findUpdates(source, target));
-		return list;
+		return list.stream().map(EventFactory::newBrokerEvent).collect(Collectors.toList());
 	}
 
 }

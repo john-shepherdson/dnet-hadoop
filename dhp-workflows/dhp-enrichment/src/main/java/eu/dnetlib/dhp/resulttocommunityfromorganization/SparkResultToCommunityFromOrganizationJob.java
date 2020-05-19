@@ -68,11 +68,10 @@ public class SparkResultToCommunityFromOrganizationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
-				if (saveGraph)
+				removeOutputDir(spark, outputPath);
+				if (saveGraph) {
 					execPropagation(spark, inputPath, outputPath, resultClazz, possibleupdatespath);
+				}
 			});
 	}
 

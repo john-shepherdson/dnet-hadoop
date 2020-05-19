@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class PrepareProjectResultsAssociation {
@@ -60,6 +61,8 @@ public class PrepareProjectResultsAssociation {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, potentialUpdatePath);
+				removeOutputDir(spark, alreadyLinkedPath);
 				prepareResultProjProjectResults(
 					spark,
 					inputPath,
@@ -83,7 +86,7 @@ public class PrepareProjectResultsAssociation {
 			+ "       FROM relation "
 			+ "       WHERE datainfo.deletedbyinference = false "
 			+ "       AND relClass = '"
-			+ RELATION_RESULT_PROJECT_REL_CLASS
+			+ ModelConstants.IS_PRODUCED_BY
 			+ "'";
 
 		Dataset<Row> resproj_relation = spark.sql(resproj_relation_query);

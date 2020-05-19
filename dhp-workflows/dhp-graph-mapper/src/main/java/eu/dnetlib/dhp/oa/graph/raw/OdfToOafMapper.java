@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
+import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -44,20 +45,35 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//datacite:creator")) {
 			final Node n = (Node) o;
 			final Author author = new Author();
-			author.setFullname(n.valueOf("./datacite:creatorName"));
-			author.setName(n.valueOf("./datacite:givenName"));
-			author.setSurname(n.valueOf("./datacite:familyName"));
-			author.setAffiliation(prepareListFields(doc, "./datacite:affiliation", info));
-			author.setPid(preparePids(doc, info));
+			final String fullname = n.valueOf("./datacite:creatorName");
+			author.setFullname(fullname);
+
+			PacePerson pp = new PacePerson(fullname, false);
+			final String name = n.valueOf("./datacite:givenName");
+			if (StringUtils.isBlank(name) & pp.isAccurate()) {
+				author.setName(pp.getNormalisedFirstName());
+			} else {
+				author.setName(name);
+			}
+
+			final String surname = n.valueOf("./datacite:familyName");
+			if (StringUtils.isBlank(surname) & pp.isAccurate()) {
+				author.setSurname(pp.getNormalisedSurname());
+			} else {
+				author.setSurname(surname);
+			}
+
+			author.setAffiliation(prepareListFields(n, "./datacite:affiliation", info));
+			author.setPid(preparePids(n, info));
 			author.setRank(pos++);
 			res.add(author);
 		}
 		return res;
 	}
 
-	private List<StructuredProperty> preparePids(final Document doc, final DataInfo info) {
+	private List<StructuredProperty> preparePids(final Node n, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes("./datacite:nameIdentifier")) {
+		for (final Object o : n.selectNodes("./datacite:nameIdentifier")) {
 			res
 				.add(
 					structuredProperty(
@@ -77,8 +93,6 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final KeyValue hostedby) {
 
 		final Instance instance = new Instance();
-		final Set<String> url = new HashSet<>();
-		instance.setUrl(new ArrayList<>());
 		instance
 			.setInstancetype(
 				prepareQualifier(
@@ -97,6 +111,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			.setProcessingchargecurrency(
 				field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
+		final Set<String> url = new HashSet<>();
 		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
 			url.add(((Node) o).getText().trim());
 		}
@@ -109,7 +124,10 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='DOI']")) {
 			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
 		}
-		instance.getUrl().addAll(url);
+		if (!url.isEmpty()) {
+			instance.setUrl(new ArrayList<>());
+			instance.getUrl().addAll(url);
+		}
 		return Arrays.asList(instance);
 	}
 
