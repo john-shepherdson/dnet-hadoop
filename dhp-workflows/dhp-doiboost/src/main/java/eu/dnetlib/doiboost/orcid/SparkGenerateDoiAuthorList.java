@@ -2,6 +2,8 @@
 package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.collect_list;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -22,7 +24,9 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.RelationalGroupedDataset;
 import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.TypedColumn;
 import org.apache.spark.util.LongAccumulator;
 import org.mortbay.log.Log;
 import org.slf4j.Logger;
@@ -60,7 +64,6 @@ public class SparkGenerateDoiAuthorList {
 		logger.info("workingPath: ", workingPath);
 		final String outputDoiAuthorListPath = parser.get("outputDoiAuthorListPath");
 		logger.info("outputDoiAuthorListPath: ", outputDoiAuthorListPath);
-		
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -69,20 +72,31 @@ public class SparkGenerateDoiAuthorList {
 			spark -> {
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-				JavaPairRDD<Text, Text> summariesRDD = sc.sequenceFile(workingPath + "../orcid_summaries/output/authors.seq", Text.class, Text.class);
+				JavaPairRDD<Text, Text> summariesRDD = sc
+					.sequenceFile(workingPath + "../orcid_summaries/output/authors.seq", Text.class, Text.class);
 				Dataset<AuthorData> summariesDataset = spark
-				.createDataset(summariesRDD.map(seq -> loadAuthorFromJson(seq._1(), seq._2())).rdd(), 
+					.createDataset(
+						summariesRDD.map(seq -> loadAuthorFromJson(seq._1(), seq._2())).rdd(),
 						Encoders.bean(AuthorData.class));
-				
-				JavaPairRDD<Text, Text> activitiesRDD = sc.sequenceFile(workingPath + "/output/*.seq", Text.class, Text.class);
+
+				JavaPairRDD<Text, Text> activitiesRDD = sc
+					.sequenceFile(workingPath + "/output/*.seq", Text.class, Text.class);
 				Dataset<WorkData> activitiesDataset = spark
-						.createDataset(activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(), 
-								Encoders.bean(WorkData.class));
+					.createDataset(
+						activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(),
+						Encoders.bean(WorkData.class));
+
+				RelationalGroupedDataset group = activitiesDataset
+					.where("oid='0000-0002-9710-779X'")
+					.joinWith(
+						summariesDataset,
+						activitiesDataset.col("oid").equalTo(summariesDataset.col("oid")), "inner")
+					.groupBy(col("doi"));
 
 			});
 
 	}
-	
+
 	private static AuthorData loadAuthorFromJson(Text orcidId, Text json) {
 		AuthorData authorData = new AuthorData();
 		authorData.setOid(orcidId.toString());
@@ -92,7 +106,7 @@ public class SparkGenerateDoiAuthorList {
 		authorData.setCreditName(getJsonValue(jElement, "creditname"));
 		return authorData;
 	}
-	
+
 	private static WorkData loadWorkFromJson(Text orcidId, Text json) {
 		WorkData workData = new WorkData();
 		workData.setOid(orcidId.toString());
@@ -100,7 +114,7 @@ public class SparkGenerateDoiAuthorList {
 		workData.setDoi(getJsonValue(jElement, "doi"));
 		return workData;
 	}
-	
+
 	private static String getJsonValue(JsonElement jElement, String property) {
 		if (jElement.getAsJsonObject().has(property)) {
 			JsonElement name = null;
