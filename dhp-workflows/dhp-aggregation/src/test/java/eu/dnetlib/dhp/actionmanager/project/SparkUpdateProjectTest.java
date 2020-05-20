@@ -9,8 +9,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -72,7 +70,7 @@ public class SparkUpdateProjectTest {
 					"-isSparkSessionManaged",
 					Boolean.FALSE.toString(),
 					"-programmePath",
-					getClass().getResource("/eu/dnetlib/dhp/actionmanager/preparedProgramme_whole.json").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/preparedProgramme_whole.json.gz").getPath(),
 					"-projectPath",
 					getClass().getResource("/eu/dnetlib/dhp/actionmanager/projects_subset.json").getPath(),
 					"-outputPath",
@@ -85,7 +83,7 @@ public class SparkUpdateProjectTest {
 			.textFile(workingDir.toString() + "/actionSet")
 			.map(item -> OBJECT_MAPPER.readValue(item, Project.class));
 
-		Assertions.assertEquals(14, tmp.count());
+		Assertions.assertEquals(16, tmp.count());
 
 //        Dataset<CSVProgramme> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(CSVProgramme.class));
 //
