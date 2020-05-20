@@ -6,8 +6,8 @@
   "paramRequired": false
 },
 {
-"paramName": "pp",
-"paramLongName": "programmePath",
+"paramName": "pjp",
+"paramLongName": "projectPath",
 "paramDescription": "the URL from where to get the programme file",
 "paramRequired": true
 },

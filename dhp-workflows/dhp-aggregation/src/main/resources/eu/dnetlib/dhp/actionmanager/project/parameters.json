@@ -17,5 +17,13 @@
     "paramLongName" : "hdfsNameNode",
     "paramDescription" : "the name node",
     "paramRequired" : true
-  }
+  },
+  {
+  "paramName": "cfn",
+  "paramLongName" : "classForName",
+  "paramDescription" : "the name of the class to deserialize the csv to",
+  "paramRequired" : true
+}
+
+
 ]

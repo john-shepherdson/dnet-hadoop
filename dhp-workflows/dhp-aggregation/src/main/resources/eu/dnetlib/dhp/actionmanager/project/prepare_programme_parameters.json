@@ -6,12 +6,6 @@
   "paramRequired": false
 },
 {
-"paramName": "pjp",
-"paramLongName": "projectPath",
-"paramDescription": "the URL from where to get the projects file",
-"paramRequired": true
-},
-{
 "paramName": "pp",
 "paramLongName": "programmePath",
 "paramDescription": "the URL from where to get the programme file",
