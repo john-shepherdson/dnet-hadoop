@@ -24,45 +24,19 @@ class MAGMappingTest {
   val mapper = new ObjectMapper()
 
 
+
+
   @Test
-  def testMAGCSV(): Unit = {
-    // SparkPreProcessMAG.main("-m local[*] -s /data/doiboost/mag/datasets -t /data/doiboost/mag/datasets/preprocess".split(" "))
-
-    val sparkConf: SparkConf = new SparkConf
-
-    val spark: SparkSession = SparkSession.builder()
-      .config(sparkConf)
-      .appName(getClass.getSimpleName)
-      .master("local[*]")
-      .getOrCreate()
-
-    import spark.implicits._
+  def testSplitter():Unit = {
+    val s = "sports.team"
 
 
-    implicit val mapEncoderPubs: Encoder[Publication] = org.apache.spark.sql.Encoders.kryo[Publication]
-    implicit val longBarEncoder = Encoders.tuple(Encoders.STRING, mapEncoderPubs)
-
-    val sourcePath = "/data/doiboost/mag/input"
-
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-
-
-   val magOAF = spark.read.load("$sourcePath/merge_step_4").as[Publication]
-
-   println(magOAF.first().getOriginalId)
-
-
-   magOAF.map(k => (ConversionUtil.extractMagIdentifier(k.getOriginalId.asScala),k)).as[(String,Publication)].show()
-
-
-    println((ConversionUtil.extractMagIdentifier(magOAF.first().getOriginalId.asScala)))
-
-    val magIDRegex: Regex = "^[0-9]+$".r
-
-
-    println(magIDRegex.findFirstMatchIn("suca").isDefined)
+    if (s.contains(".")) {
+      println(s.split("\\.")head)
+    }
 
   }
+
 
 
   @Test

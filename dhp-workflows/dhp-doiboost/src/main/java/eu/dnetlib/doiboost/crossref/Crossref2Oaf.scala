@@ -140,6 +140,15 @@ case object Crossref2Oaf {
     result.setRelevantdate(List(createdDate, postedDate, acceptedDate, publishedOnlineDate, publishedPrintDate).filter(p => p != null).asJava)
 
 
+    //Mapping Subject
+    val subjectList:List[String] = (json \ "subject").extractOrElse[List[String]](List())
+
+    if (subjectList.nonEmpty) {
+      result.setSubject(subjectList.map(s=> createSP(s, "keywords", "dnet:subject_classification_typologies")).asJava)
+    }
+
+
+
     //Mapping AUthor
     val authorList: List[mappingAuthor] = (json \ "author").extractOrElse[List[mappingAuthor]](List())
     result.setAuthor(authorList.map(a => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull)).asJava)
