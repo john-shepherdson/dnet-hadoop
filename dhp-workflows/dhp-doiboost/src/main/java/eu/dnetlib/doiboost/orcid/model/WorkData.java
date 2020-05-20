@@ -1,7 +1,9 @@
 
 package eu.dnetlib.doiboost.orcid.model;
 
-public class WorkData {
+import java.io.Serializable;
+
+public class WorkData implements Serializable {
 
 	private String oid;
 	private String doi;

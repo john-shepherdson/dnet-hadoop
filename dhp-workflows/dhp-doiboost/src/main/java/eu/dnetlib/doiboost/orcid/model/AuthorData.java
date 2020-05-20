@@ -1,7 +1,9 @@
 
 package eu.dnetlib.doiboost.orcid.model;
 
-public class AuthorData {
+import java.io.Serializable;
+
+public class AuthorData implements Serializable {
 
 	private String oid;
 	private String name;
