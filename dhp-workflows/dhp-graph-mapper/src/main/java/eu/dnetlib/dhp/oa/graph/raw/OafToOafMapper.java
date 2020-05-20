@@ -42,8 +42,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			final String pid = e.attributeValue("nameIdentifier");
 			final String pidType = e.attributeValue("nameIdentifierScheme");
 
+			author.setPid(new ArrayList<>());
 			if (StringUtils.isNotBlank(pid) && StringUtils.isNotBlank(pidType)) {
-				author.setPid(new ArrayList<>());
 				author
 					.getPid()
 					.add(structuredProperty(pid, qualifier(pidType, pidType, DNET_PID_TYPES, DNET_PID_TYPES), info));

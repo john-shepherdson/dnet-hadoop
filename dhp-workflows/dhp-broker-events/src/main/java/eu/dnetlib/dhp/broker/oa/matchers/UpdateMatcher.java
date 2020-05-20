@@ -30,8 +30,7 @@ public abstract class UpdateMatcher<T> {
 			if (source != res) {
 				for (final UpdateInfo<T> info : findUpdates(source, res)) {
 					final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
-					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {
-					} else {
+					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {} else {
 						infoMap.put(s, info);
 					}
 				}
@@ -54,11 +53,16 @@ public abstract class UpdateMatcher<T> {
 
 	protected abstract List<UpdateInfo<T>> findUpdates(Result source, Result target);
 
-	protected abstract UpdateInfo<T> generateUpdateInfo(final T highlightValue, final Result source,
+	protected abstract UpdateInfo<T> generateUpdateInfo(final T highlightValue,
+		final Result source,
 		final Result target);
 
 	protected static boolean isMissing(final List<Field<String>> list) {
 		return list == null || list.isEmpty() || StringUtils.isBlank(list.get(0).getValue());
+	}
+
+	protected boolean isMissing(final Field<String> field) {
+		return field == null || StringUtils.isBlank(field.getValue());
 	}
 
 }
