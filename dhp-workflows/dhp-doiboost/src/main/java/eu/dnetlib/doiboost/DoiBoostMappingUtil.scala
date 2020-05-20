@@ -21,11 +21,15 @@ object DoiBoostMappingUtil {
 
 
   def generateDataInfo(): DataInfo = {
+    generateDataInfo("0.9")
+  }
+
+  def generateDataInfo(trust:String): DataInfo = {
     val di = new DataInfo
     di.setDeletedbyinference(false)
     di.setInferred(false)
     di.setInvisible(false)
-    di.setTrust("0.9")
+    di.setTrust(trust)
     di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
     di
   }

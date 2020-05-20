@@ -179,12 +179,13 @@
   ],
   "funder": [
     {
+      "DOI": "10.13039/501100001711",
+      "name": "Swiss National Science Foundation (Schweizerische Nationalfonds)",
       "doi-asserted-by": "publisher",
-      "DOI": "10.13039/501100000781",
-      "name": "European Research Council",
       "award": [
-        "284236-REPCOLLAB",
-        "FP7/2007-2013"
+        "CR32I3_156724",
+        "31003A_173281/1",
+        "200021_165850"
       ]
     }
   ],

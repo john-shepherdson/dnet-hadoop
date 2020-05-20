@@ -90,9 +90,9 @@ class CrossrefMappingTest {
     val rels:List[Relation] = resultList.filter(p => p.isInstanceOf[Relation]).map(r=> r.asInstanceOf[Relation])
 
 
-    assertEquals(rels.size, 4)
-    rels.foreach(s => logger.info(s.getTarget))
 
+    rels.foreach(s => logger.info(s.getTarget))
+    assertEquals(rels.size, 3 )
 
 
   }

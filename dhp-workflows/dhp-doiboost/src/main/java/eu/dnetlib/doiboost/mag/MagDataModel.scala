@@ -40,6 +40,9 @@ case class MagPaperUrl(PaperId: Long, SourceType: Option[Int], SourceUrl: Option
 
 case class MagUrl(PaperId: Long, instances: List[String])
 
+case class MagSubject(FieldOfStudyId:Long, DisplayName:String, MainType:Option[String], Score:Float){}
+
+case class MagFieldOfStudy(PaperId:Long, subjects:List[MagSubject]) {}
 
 case class MagJournal(JournalId: Long, Rank: Option[Int], NormalizedName: Option[String], DisplayName: Option[String], Issn: Option[String], Publisher: Option[String], Webpage: Option[String], PaperCount: Option[Long], CitationCount: Option[Long], CreatedDate: Option[java.sql.Timestamp]) {}
 
@@ -135,6 +138,8 @@ case object ConversionUtil {
         j.setIssnPrinted(journal.Issn.get)
       pub.setJournal(j)
     }
+    pub.setCollectedfrom(List(createMAGCollectedFrom()).asJava)
+    pub.setDataInfo(generateDataInfo())
     pub
   }
 
