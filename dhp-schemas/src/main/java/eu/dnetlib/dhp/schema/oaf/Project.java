@@ -58,6 +58,8 @@ public class Project extends OafEntity implements Serializable {
 
 	private Float fundedamount;
 
+	private List<Programme> programme;
+
 	public Field<String> getWebsiteurl() {
 		return websiteurl;
 	}
@@ -264,6 +266,14 @@ public class Project extends OafEntity implements Serializable {
 
 	public void setFundedamount(Float fundedamount) {
 		this.fundedamount = fundedamount;
+	}
+
+	public List<Programme> getProgramme() {
+		return programme;
+	}
+
+	public void setProgramme(List<Programme> programme) {
+		this.programme = programme;
 	}
 
 	@Override
