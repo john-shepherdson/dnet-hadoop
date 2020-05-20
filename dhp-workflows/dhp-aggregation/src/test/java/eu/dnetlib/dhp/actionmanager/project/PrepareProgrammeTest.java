@@ -73,7 +73,7 @@ public class PrepareProgrammeTest {
 					"-isSparkSessionManaged",
 					Boolean.FALSE.toString(),
 					"-programmePath",
-					getClass().getResource("/eu/dnetlib/dhp/actionmanager/whole_programme.json.gz").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/whole_programme.json.gz").getPath(),
 					"-outputPath",
 					workingDir.toString() + "/preparedProgramme"
 				});

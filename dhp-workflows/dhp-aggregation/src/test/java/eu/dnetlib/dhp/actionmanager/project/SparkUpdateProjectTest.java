@@ -70,9 +70,9 @@ public class SparkUpdateProjectTest {
 					"-isSparkSessionManaged",
 					Boolean.FALSE.toString(),
 					"-programmePath",
-					getClass().getResource("/eu/dnetlib/dhp/actionmanager/preparedProgramme_whole.json.gz").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/preparedProgramme_whole.json.gz").getPath(),
 					"-projectPath",
-					getClass().getResource("/eu/dnetlib/dhp/actionmanager/projects_subset.json").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/prepared_projects.json").getPath(),
 					"-outputPath",
 					workingDir.toString() + "/actionSet"
 				});
