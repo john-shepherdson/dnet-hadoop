@@ -79,8 +79,6 @@ public class SparkRemoveBlacklistedRelationJob {
 		Dataset<Relation> inputRelation = readRelations(spark, inputPath);
 		Dataset<Relation> mergesRelation = readRelations(spark, mergesPath);
 
-		log.info("InputRelationCount: {}", inputRelation.count());
-
 		Dataset<Relation> dedupSource = blackListed
 			.joinWith(
 				mergesRelation, blackListed.col("source").equalTo(mergesRelation.col("target")),
@@ -102,11 +100,6 @@ public class SparkRemoveBlacklistedRelationJob {
 					.ifPresent(mr -> c._1().setTarget(mr.getSource()));
 				return c._1();
 			}, Encoders.bean(Relation.class));
-
-		dedupBL
-			.write()
-			.mode(SaveMode.Overwrite)
-			.json(blacklistPath + "/deduped");
 
 		inputRelation
 			.joinWith(
