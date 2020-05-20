@@ -82,9 +82,11 @@ public class PrepareProjects {
 				List<CSVProject> csvProjectList = new ArrayList<>();
 				String[] programme = p.getProgramme().split(";");
 				if (programme.length > 1) {
+					String id = p.getId();
 					for (int i = 0; i < programme.length; i++) {
 						CSVProject csvProject = new CSVProject();
 						csvProject.setProgramme(programme[i]);
+						csvProject.setId(id);
 						csvProjectList.add(csvProject);
 					}
 				} else {
