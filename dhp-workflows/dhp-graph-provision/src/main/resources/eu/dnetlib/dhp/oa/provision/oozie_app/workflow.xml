@@ -9,6 +9,30 @@
             <name>isLookupUrl</name>
             <description>URL for the isLookup service</description>
         </property>
+        <property>
+            <name>relPartitions</name>
+            <description>number or partitions for the relations Dataset</description>
+        </property>
+        <property>
+            <name>relationFilter</name>
+            <description>filter applied reading relations (by relClass)</description>
+        </property>
+        <property>
+            <name>maxRelations</name>
+            <description>maximum number of relations allowed for a each entity</description>
+        </property>
+        <property>
+            <name>otherDsTypeId</name>
+            <description>mapping used to populate datasourceTypeUi field</description>
+        </property>
+        <property>
+            <name>format</name>
+            <description>metadata format name (DMF|TMF)</description>
+        </property>
+        <property>
+            <name>batchSize</name>
+            <description>number of records to be included in each indexing request</description>
+        </property>
 
         <property>
             <name>sparkDriverMemoryForJoining</name>
@@ -421,4 +445,5 @@
     </action>
 
     <end name="End"/>
+
 </workflow-app>

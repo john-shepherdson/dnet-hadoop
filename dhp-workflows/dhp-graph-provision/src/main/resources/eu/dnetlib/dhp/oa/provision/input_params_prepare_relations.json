@@ -32,7 +32,7 @@
   {
     "paramName": "mr",
     "paramLongName": "maxRelations",
-    "paramDescription": "maximum number of relations applied reading relations (by relClass)",
+    "paramDescription": "maximum number of relations allowed for a each entity",
     "paramRequired": false
   }
 ]
