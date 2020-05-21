@@ -63,17 +63,17 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				author.setSurname(surname);
 			}
 
-			author.setAffiliation(prepareListFields(doc, "./datacite:affiliation", info));
-			author.setPid(preparePids(doc, info));
+			author.setAffiliation(prepareListFields(n, "./datacite:affiliation", info));
+			author.setPid(preparePids(n, info));
 			author.setRank(pos++);
 			res.add(author);
 		}
 		return res;
 	}
 
-	private List<StructuredProperty> preparePids(final Document doc, final DataInfo info) {
+	private List<StructuredProperty> preparePids(final Node n, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes("./datacite:nameIdentifier")) {
+		for (final Object o : n.selectNodes("./datacite:nameIdentifier")) {
 			res
 				.add(
 					structuredProperty(

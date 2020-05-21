@@ -1,11 +1,14 @@
 
-package eu.dnetlib.dhp.broker.oa.util;
+package eu.dnetlib.dhp.broker.oa.matchers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import eu.dnetlib.broker.objects.Pid;
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
+import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class EnrichMissingPid extends UpdateMatcher<Pid> {
@@ -16,8 +19,18 @@ public class EnrichMissingPid extends UpdateMatcher<Pid> {
 
 	@Override
 	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target) {
-		// return Arrays.asList(new EnrichMissingAbstract("xxxxxxx", 0.9f));
-		return Arrays.asList();
+		final long count = target.getPid().size();
+
+		if (count > 0) {
+			return Arrays.asList();
+		}
+
+		return source
+			.getPid()
+			.stream()
+			.map(ConversionUtils::oafPidToBrokerPid)
+			.map(i -> generateUpdateInfo(i, source, target))
+			.collect(Collectors.toList());
 	}
 
 	@Override

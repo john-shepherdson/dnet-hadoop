@@ -1,11 +1,12 @@
 
-package eu.dnetlib.dhp.broker.oa.util;
+package eu.dnetlib.dhp.broker.oa.matchers;
 
 import java.util.Arrays;
 import java.util.List;
 
 import eu.dnetlib.broker.objects.Project;
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class EnrichMissingProject extends UpdateMatcher<Project> {
@@ -21,7 +22,8 @@ public class EnrichMissingProject extends UpdateMatcher<Project> {
 	}
 
 	@Override
-	public UpdateInfo<Project> generateUpdateInfo(final Project highlightValue, final Result source,
+	public UpdateInfo<Project> generateUpdateInfo(final Project highlightValue,
+		final Result source,
 		final Result target) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MISSING_PROJECT,
