@@ -1,8 +1,9 @@
-
 package eu.dnetlib.dhp.oa.dedup;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
@@ -67,16 +68,18 @@ public class DedupRecordFactory {
 				(MapFunction<Tuple2<String, T>, String>) entity -> entity._1(), Encoders.STRING())
 			.mapGroups(
 				(MapGroupsFunction<String, Tuple2<String, T>, T>) (key,
-					values) -> entityMerger(key, values, ts, dataInfo),
+					values) -> entityMerger(key, values, ts, dataInfo, clazz),
 				Encoders.bean(clazz));
 	}
 
-	private static <T extends OafEntity> T entityMerger(
-		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo) {
+	public static <T extends OafEntity> T entityMerger(
+		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo, Class<T> clazz) throws IllegalAccessException, InstantiationException {
 
-		T entity = entities.next()._2();
+		T entity = clazz.newInstance();
 
 		final Collection<String> dates = Lists.newArrayList();
+		final List<List<Author>> authors = Lists.newArrayList();
+
 		entities
 			.forEachRemaining(
 				t -> {
@@ -84,17 +87,17 @@ public class DedupRecordFactory {
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
 						Result r1 = (Result) duplicate;
-						Result er = (Result) entity;
-						er.setAuthor(DedupUtility.mergeAuthor(er.getAuthor(), r1.getAuthor()));
-
-						if (r1.getDateofacceptance() != null) {
+						if (r1.getAuthor() != null && r1.getAuthor().size()>0)
+							authors.add(r1.getAuthor());
+						if (r1.getDateofacceptance() != null)
 							dates.add(r1.getDateofacceptance().getValue());
-						}
 					}
 				});
 
+		//set authors and date
 		if (ModelSupport.isSubClass(entity, Result.class)) {
 			((Result) entity).setDateofacceptance(DatePicker.pick(dates));
+			((Result) entity).setAuthor(AuthorMerger.merge(authors));
 		}
 
 		entity.setId(id);
