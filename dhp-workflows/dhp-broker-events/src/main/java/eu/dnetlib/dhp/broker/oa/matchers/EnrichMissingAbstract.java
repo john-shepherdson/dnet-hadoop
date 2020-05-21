@@ -9,7 +9,7 @@ import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingAbstract extends UpdateMatcher<String> {
+public class EnrichMissingAbstract extends UpdateMatcher<Result, String> {
 
 	public EnrichMissingAbstract() {
 		super(false);
@@ -24,7 +24,8 @@ public class EnrichMissingAbstract extends UpdateMatcher<String> {
 	}
 
 	@Override
-	public UpdateInfo<String> generateUpdateInfo(final String highlightValue, final Result source,
+	public UpdateInfo<String> generateUpdateInfo(final String highlightValue,
+		final Result source,
 		final Result target) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MISSING_ABSTRACT,

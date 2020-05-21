@@ -9,7 +9,7 @@ import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingPublicationDate extends UpdateMatcher<String> {
+public class EnrichMissingPublicationDate extends UpdateMatcher<Result, String> {
 
 	public EnrichMissingPublicationDate() {
 		super(false);
