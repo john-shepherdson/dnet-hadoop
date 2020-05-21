@@ -24,7 +24,6 @@
         <fs>
             <delete path='${outputPath}'/>
             <mkdir path='${outputPath}'/>
-            <delete path="/tmp/h2020programme"/>
         </fs>
         <ok to="get_project_file"/>
         <error to="Kill"/>
