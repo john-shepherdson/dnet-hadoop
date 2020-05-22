@@ -105,11 +105,7 @@ public class SparkResultToProjectThroughSemRelJob {
 					.stream()
 					.forEach(
 						(p -> {
-							if (potential_update
-								.getProjectSet()
-								.contains(p)) {
-								potential_update.getProjectSet().remove(p);
-							}
+                            potential_update.getProjectSet().remove(p);
 						}));
 			}
 			String resId = potential_update.getResultId();
