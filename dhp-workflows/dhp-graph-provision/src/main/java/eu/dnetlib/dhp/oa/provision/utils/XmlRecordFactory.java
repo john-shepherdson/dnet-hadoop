@@ -174,6 +174,7 @@ public class XmlRecordFactory implements Serializable {
 					entity
 						.getCollectedfrom()
 						.stream()
+						.filter(XmlRecordFactory::kvNotBlank)
 						.map(kv -> XmlSerializationUtils.mapKeyValue("collectedfrom", kv))
 						.collect(Collectors.toList()));
 		}
@@ -183,6 +184,7 @@ public class XmlRecordFactory implements Serializable {
 					entity
 						.getOriginalId()
 						.stream()
+						.filter(Objects::nonNull)
 						.map(s -> XmlSerializationUtils.asXmlElement("originalId", s))
 						.collect(Collectors.toList()));
 		}
@@ -192,6 +194,7 @@ public class XmlRecordFactory implements Serializable {
 					entity
 						.getPid()
 						.stream()
+						.filter(Objects::nonNull)
 						.map(p -> XmlSerializationUtils.mapStructuredProperty("pid", p))
 						.collect(Collectors.toList()));
 		}
@@ -213,6 +216,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getTitle()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(t -> XmlSerializationUtils.mapStructuredProperty("title", t))
 							.collect(Collectors.toList()));
 			}
@@ -225,6 +229,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getAuthor()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(
 								a -> {
 									final StringBuilder sb = new StringBuilder("<creator rank=\"" + a.getRank() + "\"");
@@ -240,24 +245,26 @@ public class XmlRecordFactory implements Serializable {
 										a
 											.getPid()
 											.stream()
+											.filter(Objects::nonNull)
 											.filter(
 												sp -> isNotBlank(sp.getQualifier().getClassid())
 													&& isNotBlank(sp.getValue()))
+											.collect(
+												Collectors
+													.toMap(
+														p -> getAuthorPidType(p.getQualifier().getClassid()),
+														p -> p,
+														(p1, p2) -> p1))
+											.values()
 											.forEach(
 												sp -> {
-													String pidType = XmlSerializationUtils
-														.escapeXml(
-															sp.getQualifier().getClassid())
-														.replaceAll("\\W", "");
+													String pidType = getAuthorPidType(sp.getQualifier().getClassid());
 													String pidValue = XmlSerializationUtils.escapeXml(sp.getValue());
 
-													// ugly hack: some records
-													// provide swapped pidtype and
-													// pidvalue
+													// ugly hack: some records provide swapped pidtype and pidvalue
 													if (authorPidTypes.contains(pidValue.toLowerCase().trim())) {
 														sb.append(String.format(" %s=\"%s\"", pidValue, pidType));
 													} else {
-														pidType = pidType.replaceAll("\\W", "").replaceAll("\\d", "");
 														if (isNotBlank(pidType)) {
 															sb
 																.append(
@@ -285,6 +292,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getContributor()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("contributor", c.getValue()))
 							.collect(Collectors.toList()));
 			}
@@ -294,6 +302,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getCountry()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.mapQualifier("country", c))
 							.collect(Collectors.toList()));
 			}
@@ -303,6 +312,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getCoverage()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("coverage", c.getValue()))
 							.collect(Collectors.toList()));
 			}
@@ -319,6 +329,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getDescription()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("description", c.getValue()))
 							.collect(Collectors.toList()));
 			}
@@ -333,6 +344,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getSubject()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(s -> XmlSerializationUtils.mapStructuredProperty("subject", s))
 							.collect(Collectors.toList()));
 			}
@@ -345,6 +357,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getRelevantdate()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(s -> XmlSerializationUtils.mapStructuredProperty("relevantdate", s))
 							.collect(Collectors.toList()));
 			}
@@ -357,6 +370,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getSource()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("source", c.getValue()))
 							.collect(Collectors.toList()));
 			}
@@ -366,6 +380,7 @@ public class XmlRecordFactory implements Serializable {
 						r
 							.getFormat()
 							.stream()
+							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("format", c.getValue()))
 							.collect(Collectors.toList()));
 			}
@@ -429,6 +444,7 @@ public class XmlRecordFactory implements Serializable {
 							orp
 								.getContactperson()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("contactperson", c.getValue()))
 								.collect(Collectors.toList()));
 				}
@@ -439,6 +455,7 @@ public class XmlRecordFactory implements Serializable {
 							orp
 								.getContactgroup()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("contactgroup", c.getValue()))
 								.collect(Collectors.toList()));
 				}
@@ -448,6 +465,7 @@ public class XmlRecordFactory implements Serializable {
 							orp
 								.getTool()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("tool", c.getValue()))
 								.collect(Collectors.toList()));
 				}
@@ -461,6 +479,7 @@ public class XmlRecordFactory implements Serializable {
 							s
 								.getDocumentationUrl()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("documentationUrl", c.getValue()))
 								.collect(Collectors.toList()));
 				}
@@ -470,6 +489,7 @@ public class XmlRecordFactory implements Serializable {
 							s
 								.getLicense()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(l -> XmlSerializationUtils.mapStructuredProperty("license", l))
 								.collect(Collectors.toList()));
 				}
@@ -576,6 +596,7 @@ public class XmlRecordFactory implements Serializable {
 							ds
 								.getOdlanguages()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("odlanguages", c.getValue()))
 								.collect(Collectors.toList()));
 				}
@@ -585,6 +606,7 @@ public class XmlRecordFactory implements Serializable {
 							ds
 								.getOdcontenttypes()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("odcontenttypes", c.getValue()))
 								.collect(Collectors.toList()));
 				}
@@ -697,6 +719,7 @@ public class XmlRecordFactory implements Serializable {
 							ds
 								.getPolicies()
 								.stream()
+								.filter(XmlRecordFactory::kvNotBlank)
 								.map(kv -> XmlSerializationUtils.mapKeyValue("policies", kv))
 								.collect(Collectors.toList()));
 				}
@@ -709,6 +732,7 @@ public class XmlRecordFactory implements Serializable {
 							ds
 								.getSubjects()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(sp -> XmlSerializationUtils.mapStructuredProperty("subjects", sp))
 								.collect(Collectors.toList()));
 				}
@@ -735,6 +759,7 @@ public class XmlRecordFactory implements Serializable {
 							o
 								.getAlternativeNames()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("alternativeNames", c.getValue()))
 								.collect(Collectors.toList()));
 				}
@@ -862,6 +887,7 @@ public class XmlRecordFactory implements Serializable {
 							p
 								.getSubjects()
 								.stream()
+								.filter(Objects::nonNull)
 								.map(sp -> XmlSerializationUtils.mapStructuredProperty("subject", sp))
 								.collect(Collectors.toList()));
 				}
@@ -912,7 +938,12 @@ public class XmlRecordFactory implements Serializable {
 				if (p.getFundingtree() != null) {
 					metadata
 						.addAll(
-							p.getFundingtree().stream().map(ft -> ft.getValue()).collect(Collectors.toList()));
+							p
+								.getFundingtree()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(ft -> ft.getValue())
+								.collect(Collectors.toList()));
 				}
 
 				break;
@@ -921,6 +952,17 @@ public class XmlRecordFactory implements Serializable {
 		}
 
 		return metadata;
+	}
+
+	private String getAuthorPidType(String s) {
+		return XmlSerializationUtils
+			.escapeXml(s)
+			.replaceAll("\\W", "")
+			.replaceAll("\\d", "");
+	}
+
+	private static boolean kvNotBlank(KeyValue kv) {
+		return kv != null && StringUtils.isNotBlank(kv.getKey()) && StringUtils.isNotBlank(kv.getValue());
 	}
 
 	private void mapDatasourceType(List<String> metadata, final Qualifier dsType) {
@@ -960,7 +1002,7 @@ public class XmlRecordFactory implements Serializable {
 						.add(
 							XmlSerializationUtils.asXmlElement("coderepositoryurl", re.getCodeRepositoryUrl()));
 				}
-				if (re.getResulttype() != null & re.getResulttype().isBlank()) {
+				if (re.getResulttype() != null && re.getResulttype().isBlank()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("resulttype", re.getResulttype()));
 				}
 				if (re.getCollectedfrom() != null) {
@@ -969,6 +1011,7 @@ public class XmlRecordFactory implements Serializable {
 							re
 								.getCollectedfrom()
 								.stream()
+								.filter(XmlRecordFactory::kvNotBlank)
 								.map(kv -> XmlSerializationUtils.mapKeyValue("collectedfrom", kv))
 								.collect(Collectors.toList()));
 				}
@@ -986,10 +1029,10 @@ public class XmlRecordFactory implements Serializable {
 				if (isNotBlank(re.getOfficialname())) {
 					metadata.add(XmlSerializationUtils.asXmlElement("officialname", re.getOfficialname()));
 				}
-				if (re.getDatasourcetype() != null & !re.getDatasourcetype().isBlank()) {
+				if (re.getDatasourcetype() != null && !re.getDatasourcetype().isBlank()) {
 					mapDatasourceType(metadata, re.getDatasourcetype());
 				}
-				if (re.getOpenairecompatibility() != null & !re.getOpenairecompatibility().isBlank()) {
+				if (re.getOpenairecompatibility() != null && !re.getOpenairecompatibility().isBlank()) {
 					metadata
 						.add(
 							XmlSerializationUtils
@@ -1006,7 +1049,7 @@ public class XmlRecordFactory implements Serializable {
 						.add(
 							XmlSerializationUtils.asXmlElement("legalshortname", re.getLegalshortname()));
 				}
-				if (re.getCountry() != null & !re.getCountry().isBlank()) {
+				if (re.getCountry() != null && !re.getCountry().isBlank()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("country", re.getCountry()));
 				}
 				break;
@@ -1020,10 +1063,10 @@ public class XmlRecordFactory implements Serializable {
 				if (isNotBlank(re.getAcronym())) {
 					metadata.add(XmlSerializationUtils.asXmlElement("acronym", re.getAcronym()));
 				}
-				if (re.getContracttype() != null & !re.getContracttype().isBlank()) {
+				if (re.getContracttype() != null && !re.getContracttype().isBlank()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("contracttype", re.getContracttype()));
 				}
-				if (re.getFundingtree() != null & contexts != null) {
+				if (re.getFundingtree() != null && contexts != null) {
 					metadata
 						.addAll(
 							re
@@ -1091,12 +1134,12 @@ public class XmlRecordFactory implements Serializable {
 							.add(
 								XmlSerializationUtils.mapQualifier("accessright", instance.getAccessright()));
 					}
-					if (instance.getCollectedfrom() != null) {
+					if (instance.getCollectedfrom() != null && kvNotBlank(instance.getCollectedfrom())) {
 						fields
 							.add(
 								XmlSerializationUtils.mapKeyValue("collectedfrom", instance.getCollectedfrom()));
 					}
-					if (instance.getHostedby() != null) {
+					if (instance.getHostedby() != null && kvNotBlank(instance.getHostedby())) {
 						fields.add(XmlSerializationUtils.mapKeyValue("hostedby", instance.getHostedby()));
 					}
 					if (instance.getDateofacceptance() != null

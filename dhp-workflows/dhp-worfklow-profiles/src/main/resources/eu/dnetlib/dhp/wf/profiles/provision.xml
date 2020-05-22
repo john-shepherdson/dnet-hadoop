@@ -521,6 +521,8 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/country/oozie_app',
+                        'sparkExecutorCores' : '3',
+                        'sparkExecutorMemory' : '10G',
                         'workingDir' : '/tmp/beta_provision/working_dir/country',
                         'allowedtypes' : 'pubsrepository::institutional',
                         'whitelist' : '10|opendoar____::300891a62162b960cf02ce3827bb363c',

@@ -12,7 +12,7 @@ import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMoreOpenAccess extends UpdateMatcher<Instance> {
+public class EnrichMoreOpenAccess extends UpdateMatcher<Result, Instance> {
 
 	public EnrichMoreOpenAccess() {
 		super(true);

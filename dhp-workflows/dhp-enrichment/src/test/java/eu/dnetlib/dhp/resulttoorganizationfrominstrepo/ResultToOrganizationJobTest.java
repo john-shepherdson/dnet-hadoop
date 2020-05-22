@@ -99,6 +99,7 @@ public class ResultToOrganizationJobTest {
 			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
 		Assertions.assertEquals(0, tmp.count());
+		FileUtils.deleteDirectory(workingDir.toFile());
 	}
 
 	/**
@@ -171,6 +172,7 @@ public class ResultToOrganizationJobTest {
 							+ "(target = '20|opendoar____::124266ebc4ece2934eb80edfda3f2091' "
 							+ "or target = '20|dedup_wf_001::5168917a6aeeea55269daeac1af2ecd2')")
 					.count());
+		FileUtils.deleteDirectory(workingDir.toFile());
 	}
 
 	@Test
@@ -266,5 +268,6 @@ public class ResultToOrganizationJobTest {
 						"relclass = 'isAuthorInstitutionOf' and "
 							+ "substring(source, 1,2) = '20' and substring(target, 1, 2) = '50'")
 					.count());
+		FileUtils.deleteDirectory(workingDir.toFile());
 	}
 }
