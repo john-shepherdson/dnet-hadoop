@@ -21,6 +21,7 @@ import scala.Tuple2;
 public class EntityMergerTest implements Serializable {
 
 	List<Tuple2<String, Publication>> publications;
+	List<Tuple2<String, Publication>> publications2;
 
 	String testEntityBasePath;
 	DataInfo dataInfo;
@@ -36,6 +37,7 @@ public class EntityMergerTest implements Serializable {
 			.getAbsolutePath();
 
 		publications = readSample(testEntityBasePath + "/publication_merge.json", Publication.class);
+		publications2 = readSample(testEntityBasePath + "/publication_merge2.json", Publication.class);
 
 		pub_top = getTopPub(publications);
 
@@ -88,6 +90,17 @@ public class EntityMergerTest implements Serializable {
 		// verify authors
 		assertEquals(pub_merged.getAuthor().size(), 9);
 		assertEquals(AuthorMerger.countAuthorsPids(pub_merged.getAuthor()), 4);
+	}
+
+	@Test
+	public void publicationMergerTest2() throws InstantiationException, IllegalAccessException, IOException {
+
+		Publication pub_merged = DedupRecordFactory
+				.entityMerger(dedupId, publications2.iterator(), 0, dataInfo, Publication.class);
+
+		assertEquals(pub_merged.getAuthor().size(), 27);
+		// insert assertions here
+
 	}
 
 	public DataInfo setDI() {
