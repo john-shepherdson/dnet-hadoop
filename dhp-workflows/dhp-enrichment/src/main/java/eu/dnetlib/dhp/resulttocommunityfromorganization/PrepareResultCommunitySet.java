@@ -95,20 +95,20 @@ public class PrepareResultCommunitySet {
 		result_organizationset
 			.map(mapResultCommunityFn(organizationMap), Encoders.bean(ResultCommunityList.class))
 			.filter(Objects::nonNull)
-				.toJavaRDD()
-				.mapToPair(value -> new Tuple2<>(value.getResultId(), value))
-				.reduceByKey((a, b) -> {
-					ArrayList<String> cl = a.getCommunityList();
-					b.getCommunityList().stream().forEach(s -> {
-						if (!cl.contains(s)) {
-							cl.add(s);
-						}
-					});
-					a.setCommunityList(cl);
-					return a;
-				})
-				.map(value -> OBJECT_MAPPER.writeValueAsString(value._2()))
-				.saveAsTextFile(outputPath, GzipCodec.class);
+			.toJavaRDD()
+			.mapToPair(value -> new Tuple2<>(value.getResultId(), value))
+			.reduceByKey((a, b) -> {
+				ArrayList<String> cl = a.getCommunityList();
+				b.getCommunityList().stream().forEach(s -> {
+					if (!cl.contains(s)) {
+						cl.add(s);
+					}
+				});
+				a.setCommunityList(cl);
+				return a;
+			})
+			.map(value -> OBJECT_MAPPER.writeValueAsString(value._2()))
+			.saveAsTextFile(outputPath, GzipCodec.class);
 //                      .write()
 //                      .mode(SaveMode.Overwrite)
 //                      .option("compression", "gzip")
