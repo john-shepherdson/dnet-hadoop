@@ -40,7 +40,7 @@
 
 
 
-    <start to="ResetWorkingPath"/>
+    <start to="CreateDOIBoost"/>
 
 
     <kill name="Kill">
