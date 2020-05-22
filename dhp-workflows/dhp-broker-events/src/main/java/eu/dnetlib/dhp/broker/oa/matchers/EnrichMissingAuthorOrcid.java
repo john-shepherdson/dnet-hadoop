@@ -10,7 +10,7 @@ import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingAuthorOrcid extends UpdateMatcher<Pair<String, String>> {
+public class EnrichMissingAuthorOrcid extends UpdateMatcher<Result, Pair<String, String>> {
 
 	public EnrichMissingAuthorOrcid() {
 		super(true);
@@ -24,7 +24,8 @@ public class EnrichMissingAuthorOrcid extends UpdateMatcher<Pair<String, String>
 
 	@Override
 	public UpdateInfo<Pair<String, String>> generateUpdateInfo(final Pair<String, String> highlightValue,
-		final Result source, final Result target) {
+		final Result source,
+		final Result target) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MISSING_AUTHOR_ORCID,
 			highlightValue, source, target,

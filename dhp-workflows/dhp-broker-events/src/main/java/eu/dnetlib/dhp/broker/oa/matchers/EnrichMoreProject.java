@@ -11,10 +11,9 @@ import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingProject
-	extends UpdateMatcher<Pair<Result, List<Project>>, eu.dnetlib.broker.objects.Project> {
+public class EnrichMoreProject extends UpdateMatcher<Pair<Result, List<Project>>, eu.dnetlib.broker.objects.Project> {
 
-	public EnrichMissingProject() {
+	public EnrichMoreProject() {
 		super(true);
 	}
 
@@ -31,7 +30,7 @@ public class EnrichMissingProject
 		final Pair<Result, List<Project>> source,
 		final Pair<Result, List<Project>> target) {
 		return new UpdateInfo<>(
-			Topic.ENRICH_MISSING_PROJECT,
+			Topic.ENRICH_MORE_PROJECT,
 			highlightValue, source.getLeft(), target.getLeft(),
 			(p, prj) -> p.getProjects().add(prj),
 			prj -> prj.getFunder() + "::" + prj.getFundingProgram() + prj.getCode());

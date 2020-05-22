@@ -1,10 +1,19 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_LANGUAGES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PUBLICATION_RESOURCE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_RELATED_TO;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DATASET;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +24,15 @@ import org.dom4j.Node;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.GeoLocation;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -39,14 +55,25 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				author.setSurname(p.getNormalisedSurname());
 			}
 
-			final String pid = e.attributeValue("nameIdentifier");
-			final String pidType = e.attributeValue("nameIdentifierScheme");
+			final String pid = e.valueOf("./@nameIdentifier");
+			final String type = e
+				.valueOf("./@nameIdentifierScheme")
+				.trim()
+				.toUpperCase()
+				.replaceAll(" ", "")
+				.replaceAll("_", "");
 
 			author.setPid(new ArrayList<>());
-			if (StringUtils.isNotBlank(pid) && StringUtils.isNotBlank(pidType)) {
-				author
-					.getPid()
-					.add(structuredProperty(pid, qualifier(pidType, pidType, DNET_PID_TYPES, DNET_PID_TYPES), info));
+
+			if (StringUtils.isNotBlank(pid)) {
+				if (type.startsWith("ORCID")) {
+					final String cleanedId = pid
+						.replaceAll("http://orcid.org/", "")
+						.replaceAll("https://orcid.org/", "");
+					author.getPid().add(structuredProperty(cleanedId, ORCID_PID_TYPE, info));
+				} else if (type.startsWith("MAGID")) {
+					author.getPid().add(structuredProperty(pid, MAG_PID_TYPE, info));
+				}
 			}
 
 			res.add(author);
@@ -104,28 +131,21 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		final Instance instance = new Instance();
 		instance
 			.setInstancetype(
-				prepareQualifier(
-					doc,
-					"//dr:CobjCategory",
-					DNET_PUBLICATION_RESOURCE,
-					DNET_PUBLICATION_RESOURCE));
+				prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
-			.setAccessright(
-				prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
+			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
 		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
 		instance
-			.setProcessingchargeamount(
-				field(doc.valueOf("//oaf:processingchargeamount"), info));
+			.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance
-			.setProcessingchargecurrency(
-				field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
-		List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
+		final List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
 		instance
 			.setUrl(
 				nodes
@@ -158,19 +178,22 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Field<String> prepareSoftwareCodeRepositoryUrl(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<StructuredProperty> prepareSoftwareLicenses(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<Field<String>> prepareSoftwareDocumentationUrls(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
@@ -182,13 +205,15 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Field<String> prepareDatasetMetadataVersionNumber(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected Field<String> prepareDatasetLastMetadataUpdate(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
 	}
 
@@ -216,19 +241,22 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductTools(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactGroups(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactPersons(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 

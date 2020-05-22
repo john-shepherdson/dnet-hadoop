@@ -12,9 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Result;
 
-public abstract class UpdateMatcher<T> {
+public abstract class UpdateMatcher<K, T> {
 
 	private final boolean multipleUpdate;
 
@@ -22,15 +21,16 @@ public abstract class UpdateMatcher<T> {
 		this.multipleUpdate = multipleUpdate;
 	}
 
-	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final Result res, final Result... others) {
+	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final K res, final Collection<K> others) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
 
-		for (final Result source : others) {
+		for (final K source : others) {
 			if (source != res) {
 				for (final UpdateInfo<T> info : findUpdates(source, res)) {
 					final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
-					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {} else {
+					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {
+					} else {
 						infoMap.put(s, info);
 					}
 				}
@@ -51,11 +51,11 @@ public abstract class UpdateMatcher<T> {
 		}
 	}
 
-	protected abstract List<UpdateInfo<T>> findUpdates(Result source, Result target);
+	protected abstract List<UpdateInfo<T>> findUpdates(K source, K target);
 
 	protected abstract UpdateInfo<T> generateUpdateInfo(final T highlightValue,
-		final Result source,
-		final Result target);
+		final K source,
+		final K target);
 
 	protected static boolean isMissing(final List<Field<String>> list) {
 		return list == null || list.isEmpty() || StringUtils.isBlank(list.get(0).getValue());
