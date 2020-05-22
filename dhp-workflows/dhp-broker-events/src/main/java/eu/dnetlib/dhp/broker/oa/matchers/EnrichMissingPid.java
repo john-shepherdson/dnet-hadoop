@@ -11,7 +11,7 @@ import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingPid extends UpdateMatcher<Pid> {
+public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
 
 	public EnrichMissingPid() {
 		super(true);

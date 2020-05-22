@@ -12,7 +12,7 @@ import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMoreSubject extends UpdateMatcher<Pair<String, String>> {
+public class EnrichMoreSubject extends UpdateMatcher<Result, Pair<String, String>> {
 
 	public EnrichMoreSubject() {
 		super(true);

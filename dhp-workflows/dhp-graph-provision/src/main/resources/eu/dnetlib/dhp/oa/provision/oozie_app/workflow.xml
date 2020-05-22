@@ -9,6 +9,30 @@
             <name>isLookupUrl</name>
             <description>URL for the isLookup service</description>
         </property>
+        <property>
+            <name>relPartitions</name>
+            <description>number or partitions for the relations Dataset</description>
+        </property>
+        <property>
+            <name>relationFilter</name>
+            <description>filter applied reading relations (by relClass)</description>
+        </property>
+        <property>
+            <name>maxRelations</name>
+            <description>maximum number of relations allowed for a each entity</description>
+        </property>
+        <property>
+            <name>otherDsTypeId</name>
+            <description>mapping used to populate datasourceTypeUi field</description>
+        </property>
+        <property>
+            <name>format</name>
+            <description>metadata format name (DMF|TMF)</description>
+        </property>
+        <property>
+            <name>batchSize</name>
+            <description>number of records to be included in each indexing request</description>
+        </property>
 
         <property>
             <name>sparkDriverMemoryForJoining</name>
@@ -56,6 +80,10 @@
             <name>spark2EventLogDir</name>
             <description>spark 2.* event log dir location</description>
         </property>
+        <property>
+            <name>sparkNetworkTimeout</name>
+            <description>configures spark.network.timeout</description>
+        </property>
     </parameters>
 
     <global>
@@ -69,12 +97,16 @@
         </configuration>
     </global>
 
-    <start to="reuse_records"/>
+    <start to="resume_from"/>
 
-    <decision name="reuse_records">
+    <decision name="resume_from">
         <switch>
-            <case to="prepare_relations">${wf:conf('reuseRecords') eq false}</case>
-            <case to="to_solr_index">${wf:conf('reuseRecords') eq true}</case>
+            <case to="prepare_relations">${wf:conf('resumeFrom') eq 'prepare_relations'}</case>
+            <case to="fork_join_related_entities">${wf:conf('resumeFrom') eq 'fork_join_related_entities'}</case>
+            <case to="join_all_entities">${wf:conf('resumeFrom') eq 'join_all_entities'}</case>
+            <case to="adjancency_lists">${wf:conf('resumeFrom') eq 'adjancency_lists'}</case>
+            <case to="convert_to_xml">${wf:conf('resumeFrom') eq 'convert_to_xml'}</case>
+            <case to="to_solr_index">${wf:conf('resumeFrom') eq 'to_solr_index'}</case>
             <default to="prepare_relations"/>
         </switch>
     </decision>
@@ -309,7 +341,6 @@
 
     <join name="wait_joins" to="join_all_entities"/>
 
-
     <action name="join_all_entities">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -419,4 +450,5 @@
     </action>
 
     <end name="End"/>
+
 </workflow-app>

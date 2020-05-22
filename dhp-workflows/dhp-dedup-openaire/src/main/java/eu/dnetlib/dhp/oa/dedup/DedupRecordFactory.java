@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.Serializable;
@@ -73,7 +74,8 @@ public class DedupRecordFactory {
 	}
 
 	public static <T extends OafEntity> T entityMerger(
-		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo, Class<T> clazz) throws IllegalAccessException, InstantiationException {
+		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo, Class<T> clazz)
+		throws IllegalAccessException, InstantiationException {
 
 		T entity = clazz.newInstance();
 
@@ -87,14 +89,14 @@ public class DedupRecordFactory {
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
 						Result r1 = (Result) duplicate;
-						if (r1.getAuthor() != null && r1.getAuthor().size()>0)
+						if (r1.getAuthor() != null && r1.getAuthor().size() > 0)
 							authors.add(r1.getAuthor());
 						if (r1.getDateofacceptance() != null)
 							dates.add(r1.getDateofacceptance().getValue());
 					}
 				});
 
-		//set authors and date
+		// set authors and date
 		if (ModelSupport.isSubClass(entity, Result.class)) {
 			((Result) entity).setDateofacceptance(DatePicker.pick(dates));
 			((Result) entity).setAuthor(AuthorMerger.merge(authors));
