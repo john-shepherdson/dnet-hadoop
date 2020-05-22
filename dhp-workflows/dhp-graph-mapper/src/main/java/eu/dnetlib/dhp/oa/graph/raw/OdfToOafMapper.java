@@ -102,7 +102,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			final String type = ((Node) o).valueOf("./@nameIdentifierScheme")
 				.trim()
 				.toUpperCase()
-				.replaceAll(" ", "");
+				.replaceAll(" ", "")
+				.replaceAll("_", "");
 
 			if (type.startsWith("ORCID")) {
 				final String cleanedId = id.replaceAll("http://orcid.org/", "").replaceAll("https://orcid.org/", "");
