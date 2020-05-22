@@ -1,9 +1,10 @@
 
 package eu.dnetlib.dhp.actionmanager.project;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme;
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -18,9 +19,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProject;
 
 public class PrepareProjectTest {
 
