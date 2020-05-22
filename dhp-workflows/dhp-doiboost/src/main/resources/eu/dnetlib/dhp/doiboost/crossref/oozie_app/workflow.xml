@@ -63,8 +63,8 @@
                 --driver-memory=${sparkDriverMemory}
                 ${sparkExtraOPT}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingPath}/index_dump</arg>
-            <arg>--targetPath</arg><arg>${workingPath}</arg>
+            <arg>--sourcePath</arg><arg>${workingPath}/crossref/index_dump</arg>
+            <arg>--targetPath</arg><arg>${workingPath}/input/crossref</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="End"/>

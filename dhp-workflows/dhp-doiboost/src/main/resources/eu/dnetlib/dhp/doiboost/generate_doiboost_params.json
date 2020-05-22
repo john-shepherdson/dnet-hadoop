@@ -1,0 +1,9 @@
+[
+  {"paramName": "m",    "paramLongName":"master",                    "paramDescription": "the master name",                "paramRequired": true},
+  {"paramName": "cp",   "paramLongName":"crossrefPublicationPath",   "paramDescription": "the Crossref Publication Path",  "paramRequired": true},
+  {"paramName": "cd",   "paramLongName":"crossrefDatasetPath",       "paramDescription": "the Crossref Dataset Path",      "paramRequired": true},
+  {"paramName": "up",   "paramLongName":"uwPublicationPath",         "paramDescription": "the UnpayWall Publication Path", "paramRequired": true},
+  {"paramName": "mp",   "paramLongName":"magPublicationPath",        "paramDescription": "the MAG Publication Path",       "paramRequired": true},
+  {"paramName": "op",   "paramLongName":"orcidPublicationPath",      "paramDescription": "the ORCID Publication Path",     "paramRequired": true},
+  {"paramName": "w",    "paramLongName":"workingDirPath",            "paramDescription": "the Working Path",               "paramRequired": true}
+]

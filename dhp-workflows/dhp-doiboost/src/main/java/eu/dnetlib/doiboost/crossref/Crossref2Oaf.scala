@@ -165,6 +165,13 @@ case object Crossref2Oaf {
     if (l.nonEmpty)
       instance.setLicense(l.head)
 
+
+    val has_review = (json \ "relation" \"has-review" \ "id")
+
+    if(has_review != JNothing)
+      instance.setRefereed(asField("peerReviewed"))
+
+
     instance.setAccessright(createQualifier("Restricted", "dnet:access_modes"))
 
     result.setInstance(List(instance).asJava)
@@ -186,7 +193,7 @@ case object Crossref2Oaf {
     val a = new Author
     a.setName(given)
     a.setSurname(family)
-    a.setFullname(s"${given} ${family}")
+    a.setFullname(s"$given $family")
     if (StringUtils.isNotBlank(orcid))
       a.setPid(List(createSP(orcid, ORCID, PID_TYPES)).asJava)
 

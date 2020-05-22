@@ -1,7 +1,7 @@
 package eu.dnetlib.doiboost.mag
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Publication, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{Journal, Publication, StructuredProperty}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil.{asField, createSP}
 import org.apache.commons.io.IOUtils
@@ -10,6 +10,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 import org.apache.spark.sql.functions._
+
 import scala.collection.JavaConverters._
 
 object SparkPreProcessMAG {
@@ -51,7 +52,6 @@ object SparkPreProcessMAG {
     }.map(_._2)
 
 
-
     val distinctPaper: Dataset[MagPapers] = spark.createDataset(result)
     distinctPaper.write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/Papers_distinct")
     logger.info(s"Total number of element: ${result.count()}")
@@ -89,6 +89,36 @@ object SparkPreProcessMAG {
 
 
     var magPubs: Dataset[(String, Publication)] = spark.read.load(s"${parser.get("targetPath")}/merge_step_2").as[Publication].map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+
+
+    val conference = spark.read.load(s"$sourcePath/ConferenceInstances").select($"ConferenceInstanceId".as("ci"), $"DisplayName", $"Location", $"StartDate",$"EndDate" )
+    val conferenceInstance = conference.joinWith(papers, papers("ConferenceInstanceId").equalTo(conference("ci"))).select($"_1.ci", $"_1.DisplayName", $"_1.Location", $"_1.StartDate",$"_1.EndDate", $"_2.PaperId").as[MagConferenceInstance]
+
+
+    magPubs.joinWith(conferenceInstance, col("_1").equalTo(conferenceInstance("PaperId")), "left")
+      .map(p => {
+        val publication:Publication= p._1._2
+        val ci:MagConferenceInstance = p._2
+
+        if (ci!= null){
+
+          val j:Journal = new Journal
+          if (ci.Location.isDefined)
+            j.setConferenceplace(ci.Location.get)
+          j.setName(ci.DisplayName.get)
+          if (ci.StartDate.isDefined && ci.EndDate.isDefined)
+            {
+              j.setConferencedate(s"${ci.StartDate.get.toString} - ${ci.EndDate.get.toString}")
+            }
+
+          publication.setJournal(j)
+        }
+        publication
+
+      }).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/merge_step_2_conference")
+
+
+    magPubs= spark.read.load(s"${parser.get("targetPath")}/merge_step_2_conference").as[Publication].map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
 
     val paperUrlDataset = spark.read.load(s"$sourcePath/PaperUrls").as[MagPaperUrl].groupBy("PaperId").agg(collect_list(struct("sourceUrl")).as("instances")).as[MagUrl]
 
@@ -159,6 +189,6 @@ object SparkPreProcessMAG {
           publication.setSubject(p.asJava)
         }
         publication
-      }).map{s:Publication => s}(Encoders.bean(classOf[Publication])).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/mag_publication")
+      }).map { s: Publication => s }(Encoders.bean(classOf[Publication])).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/mag_publication")
   }
 }

@@ -1,9 +1,8 @@
-package eu.dnetlib.doiboost
+package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
-import eu.dnetlib.doiboost.crossref.Crossref2Oaf
-import org.codehaus.jackson.map.ObjectMapper
+import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
@@ -55,6 +54,29 @@ class CrossrefMappingTest {
       assertFalse(relation.getSubRelType.isEmpty, s"SubRelType is empty: $relJson")
 
     })
+
+  }
+
+
+  @Test
+  def testPeerReviewed(): Unit = {
+    val json = Source.fromInputStream(getClass.getResourceAsStream("prwTest.json")).mkString
+    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
+
+    assertNotNull(json)
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Result])
+
+
+    items.foreach(p => logger.info(mapper.writeValueAsString(p)))
+
+
+
 
   }
 

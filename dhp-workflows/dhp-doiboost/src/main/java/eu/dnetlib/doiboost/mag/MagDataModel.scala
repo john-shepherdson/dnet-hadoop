@@ -38,7 +38,9 @@ case class MagPaperAuthorDenormalized(PaperId: Long, author: MagAuthor, affiliat
 
 case class MagPaperUrl(PaperId: Long, SourceType: Option[Int], SourceUrl: Option[String], LanguageCode: Option[String]) {}
 
-case class MagUrl(PaperId: Long, instances: List[String])
+case class MagUrlInstance(SourceUrl:String){}
+
+case class MagUrl(PaperId: Long, instances: List[MagUrlInstance])
 
 case class MagSubject(FieldOfStudyId:Long, DisplayName:String, MainType:Option[String], Score:Float){}
 
@@ -46,6 +48,8 @@ case class MagFieldOfStudy(PaperId:Long, subjects:List[MagSubject]) {}
 
 case class MagJournal(JournalId: Long, Rank: Option[Int], NormalizedName: Option[String], DisplayName: Option[String], Issn: Option[String], Publisher: Option[String], Webpage: Option[String], PaperCount: Option[Long], CitationCount: Option[Long], CreatedDate: Option[java.sql.Timestamp]) {}
 
+
+case class MagConferenceInstance(ci:Long, DisplayName:Option[String], Location:Option[String], StartDate:Option[java.sql.Timestamp],   EndDate:Option[java.sql.Timestamp],  PaperId:Long){}
 
 case object ConversionUtil {
 
@@ -70,7 +74,7 @@ case object ConversionUtil {
 
     if (urls!= null) {
 
-      val l:List[String] = urls.instances.filter(k=>k.nonEmpty):::List(s"https://academic.microsoft.com/#/detail/${extractMagIdentifier(pub.getOriginalId.asScala)}")
+      val l:List[String] = urls.instances.filter(k=>k.SourceUrl.nonEmpty).map(k=>k.SourceUrl):::List(s"https://academic.microsoft.com/#/detail/${extractMagIdentifier(pub.getOriginalId.asScala)}")
 
       i.setUrl(l.asJava)
     }
@@ -133,7 +137,7 @@ case object ConversionUtil {
       j.setSp(paper.FirstPage)
       j.setEp(paper.LastPage)
       if (journal.Publisher.isDefined)
-        j.setEdition(journal.Publisher.get)
+        pub.setPublisher(asField(journal.Publisher.get))
       if (journal.Issn.isDefined)
         j.setIssnPrinted(journal.Issn.get)
       pub.setJournal(j)

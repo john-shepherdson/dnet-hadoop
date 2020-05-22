@@ -7,6 +7,7 @@ object DoiBoostMappingUtil {
 
   //STATIC STRING
   val MAG = "microsoft"
+  val MAG_NAME= "Microsoft Academic Graph"
   val ORCID = "ORCID"
   val CROSSREF = "Crossref"
   val UNPAYWALL = "UnpayWall"
@@ -56,10 +57,31 @@ object DoiBoostMappingUtil {
 
     val cf = new KeyValue
     cf.setValue(CROSSREF)
-    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5("crossref"))
+    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(CROSSREF.toLowerCase))
     cf
 
   }
+
+
+  def createUnpayWallCollectedFrom(): KeyValue = {
+
+    val cf = new KeyValue
+    cf.setValue(UNPAYWALL)
+    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(UNPAYWALL.toLowerCase))
+    cf
+
+  }
+
+  def createORIDCollectedFrom(): KeyValue = {
+
+    val cf = new KeyValue
+    cf.setValue(ORCID)
+    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(ORCID.toLowerCase))
+    cf
+
+  }
+
+
 
   def generateIdentifier(oaf: Result, doi: String): String = {
     val id = DHPUtils.md5(doi.toLowerCase)
