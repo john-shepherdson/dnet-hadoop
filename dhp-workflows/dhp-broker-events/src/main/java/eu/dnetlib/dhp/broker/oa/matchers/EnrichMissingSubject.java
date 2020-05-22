@@ -14,7 +14,7 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class EnrichMissingSubject extends UpdateMatcher<Pair<String, String>> {
+public class EnrichMissingSubject extends UpdateMatcher<Result, Pair<String, String>> {
 
 	public EnrichMissingSubject() {
 		super(true);
