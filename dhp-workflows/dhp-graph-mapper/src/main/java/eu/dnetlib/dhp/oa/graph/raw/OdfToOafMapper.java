@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_DATE;
@@ -43,6 +44,9 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
+
+	public static final Qualifier ORCID_PID_TYPE = qualifier("ORCID", "Open Researcher and Contributor ID", DNET_PID_TYPES, DNET_PID_TYPES);
+	public static final Qualifier MAG_PID_TYPE = qualifier("MAGIdentifier", "Microsoft Academic Graph Identifier", DNET_PID_TYPES, DNET_PID_TYPES);
 
 	public OdfToOafMapper(final Map<String, String> code2name) {
 		super(code2name);
@@ -93,8 +97,19 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	private List<StructuredProperty> preparePids(final Node n, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
 		for (final Object o : n.selectNodes("./datacite:nameIdentifier")) {
-			res
-				.add(structuredProperty(((Node) o).getText(), prepareQualifier((Node) o, "./@nameIdentifierScheme", DNET_PID_TYPES, DNET_PID_TYPES), info));
+
+			final String id = ((Node) o).getText();
+			final String type = ((Node) o).valueOf("./@nameIdentifierScheme")
+				.trim()
+				.toUpperCase()
+				.replaceAll(" ", "");
+
+			if (type.startsWith("ORCID")) {
+				final String cleanedId = id.replaceAll("http://orcid.org/", "").replaceAll("https://orcid.org/", "");
+				res.add(structuredProperty(cleanedId, ORCID_PID_TYPE, info));
+			} else if (type.startsWith("MAGID")) {
+				res.add(structuredProperty(id, MAG_PID_TYPE, info));
+			}
 		}
 		return res;
 	}
