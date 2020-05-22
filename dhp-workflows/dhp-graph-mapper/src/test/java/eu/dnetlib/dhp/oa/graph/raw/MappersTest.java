@@ -75,7 +75,7 @@ public class MappersTest {
 			.get();
 		assertEquals("0000-0001-6651-1178", pid.getValue());
 		assertEquals("ORCID", pid.getQualifier().getClassid());
-		assertEquals("ORCID", pid.getQualifier().getClassname());
+		assertEquals("Open Researcher and Contributor ID", pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Votsi,Nefta", author.get().getFullname());

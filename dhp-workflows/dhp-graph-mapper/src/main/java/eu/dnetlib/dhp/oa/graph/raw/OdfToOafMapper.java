@@ -3,13 +3,11 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_DATE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_RESOURCE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_LANGUAGES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PUBLICATION_RESOURCE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTS;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PART_OF;
@@ -44,9 +42,6 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
-
-	public static final Qualifier ORCID_PID_TYPE = qualifier("ORCID", "Open Researcher and Contributor ID", DNET_PID_TYPES, DNET_PID_TYPES);
-	public static final Qualifier MAG_PID_TYPE = qualifier("MAGIdentifier", "Microsoft Academic Graph Identifier", DNET_PID_TYPES, DNET_PID_TYPES);
 
 	public OdfToOafMapper(final Map<String, String> code2name) {
 		super(code2name);
