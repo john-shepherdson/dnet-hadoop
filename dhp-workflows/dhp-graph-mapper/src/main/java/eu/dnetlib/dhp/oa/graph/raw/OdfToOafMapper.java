@@ -94,7 +94,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : n.selectNodes("./datacite:nameIdentifier")) {
 
 			final String id = ((Node) o).getText();
-			final String type = ((Node) o).valueOf("./@nameIdentifierScheme")
+			final String type = ((Node) o)
+				.valueOf("./@nameIdentifierScheme")
 				.trim()
 				.toUpperCase()
 				.replaceAll(" ", "")
@@ -119,7 +120,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 		final Instance instance = new Instance();
 		instance
-			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
+			.setInstancetype(
+				prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
@@ -168,7 +170,10 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				&& !dateType.equalsIgnoreCase("Updated")
 				&& !dateType.equalsIgnoreCase("Available")) {
 				res
-					.add(structuredProperty(((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATA_CITE_DATE, DNET_DATA_CITE_DATE, info));
+					.add(
+						structuredProperty(
+							((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATA_CITE_DATE, DNET_DATA_CITE_DATE,
+							info));
 			}
 		}
 		return res;
@@ -220,14 +225,16 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	protected List<Field<String>> prepareOtherResearchProductContactGroups(
 		final Document doc,
 		final DataInfo info) {
-		return prepareListFields(doc, "//datacite:contributor[@contributorType='ContactGroup']/datacite:contributorName", info);
+		return prepareListFields(
+			doc, "//datacite:contributor[@contributorType='ContactGroup']/datacite:contributorName", info);
 	}
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactPersons(
 		final Document doc,
 		final DataInfo info) {
-		return prepareListFields(doc, "//datacite:contributor[@contributorType='ContactPerson']/datacite:contributorName", info);
+		return prepareListFields(
+			doc, "//datacite:contributor[@contributorType='ContactPerson']/datacite:contributorName", info);
 	}
 
 	@Override
@@ -253,7 +260,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	protected List<Field<String>> prepareSoftwareDocumentationUrls(
 		final Document doc,
 		final DataInfo info) {
-		return prepareListFields(doc, "//datacite:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']", info);
+		return prepareListFields(
+			doc, "//datacite:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']", info);
 	}
 
 	// DATASETS
@@ -327,16 +335,29 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 				if (type.equalsIgnoreCase("IsSupplementTo")) {
 					res
-						.add(getRelation(docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, collectedFrom, info, lastUpdateTimestamp));
+						.add(
+							getRelation(
+								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, collectedFrom, info,
+								lastUpdateTimestamp));
 					res
-						.add(getRelation(otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, collectedFrom, info, lastUpdateTimestamp));
+						.add(
+							getRelation(
+								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, collectedFrom, info,
+								lastUpdateTimestamp));
 				} else if (type.equals("IsPartOf")) {
 
 					res
-						.add(getRelation(docId, otherId, RESULT_RESULT, PART, IS_PART_OF, collectedFrom, info, lastUpdateTimestamp));
+						.add(
+							getRelation(
+								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, collectedFrom, info,
+								lastUpdateTimestamp));
 					res
-						.add(getRelation(otherId, docId, RESULT_RESULT, PART, HAS_PARTS, collectedFrom, info, lastUpdateTimestamp));
-				} else {}
+						.add(
+							getRelation(
+								otherId, docId, RESULT_RESULT, PART, HAS_PARTS, collectedFrom, info,
+								lastUpdateTimestamp));
+				} else {
+				}
 			}
 		}
 		return res;
@@ -344,6 +365,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
-		return prepareQualifier(doc, "//*[local-name() = 'resource']//*[local-name() = 'resourceType']", DNET_DATA_CITE_RESOURCE, DNET_DATA_CITE_RESOURCE);
+		return prepareQualifier(
+			doc, "//*[local-name() = 'resource']//*[local-name() = 'resourceType']", DNET_DATA_CITE_RESOURCE,
+			DNET_DATA_CITE_RESOURCE);
 	}
 }
