@@ -2,43 +2,38 @@
 package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static org.apache.spark.sql.functions.col;
-import static org.apache.spark.sql.functions.collect_list;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.RelationalGroupedDataset;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.TypedColumn;
-import org.apache.spark.util.LongAccumulator;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.esotericsoftware.minlog.Log;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
 import eu.dnetlib.doiboost.orcid.model.AuthorData;
-import eu.dnetlib.doiboost.orcid.model.DownloadedRecordData;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 import scala.Tuple2;
 
@@ -86,13 +81,70 @@ public class SparkGenerateDoiAuthorList {
 						activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(),
 						Encoders.bean(WorkData.class));
 
-				RelationalGroupedDataset group = activitiesDataset
-					.where("oid='0000-0002-9710-779X'")
+				Function<Tuple2<String, AuthorData>, Tuple2<String, List<AuthorData>>> toAuthorListFunction = data -> {
+					try {
+						String doi = data._1();
+						if (doi == null) {
+							return null;
+						}
+						AuthorData author = data._2();
+						if (author == null) {
+							return null;
+						}
+						List<AuthorData> toAuthorList = Arrays.asList(author);
+						return new Tuple2<>(doi, toAuthorList);
+					} catch (Exception e) {
+						Log.error("toAuthorListFunction ERROR", e);
+						return null;
+					}
+				};
+
+				JavaRDD<Tuple2<String, List<AuthorData>>> doisRDD = activitiesDataset
 					.joinWith(
 						summariesDataset,
 						activitiesDataset.col("oid").equalTo(summariesDataset.col("oid")), "inner")
-					.groupBy(col("doi"));
+					.map(
+						(MapFunction<Tuple2<WorkData, AuthorData>, Tuple2<String, AuthorData>>) value -> {
+							WorkData w = value._1;
+							AuthorData a = value._2;
+							return new Tuple2<>(w.getDoi(), a);
+						},
+						Encoders.tuple(Encoders.STRING(), Encoders.bean(AuthorData.class)))
+					.filter(Objects::nonNull)
+					.toJavaRDD()
+					.map(toAuthorListFunction);
 
+				JavaPairRDD
+					.fromJavaRDD(doisRDD)
+					.reduceByKey((d1, d2) -> {
+						try {
+							if (d1 != null && d2 != null) {
+								Stream<AuthorData> mergedStream = Stream
+									.concat(
+										d1.stream(),
+										d2.stream());
+								List<AuthorData> mergedAuthors = mergedStream.collect(Collectors.toList());
+								return mergedAuthors;
+							}
+							if (d1 != null) {
+								return d1;
+							}
+							if (d2 != null) {
+								return d2;
+							}
+						} catch (Exception e) {
+							Log.error("mergeAuthorsFunction ERROR", e);
+							return null;
+						}
+						return null;
+					})
+					.mapToPair(
+						s -> {
+							ObjectMapper mapper = new ObjectMapper();
+							return new Tuple2<>(s._1(), mapper.writeValueAsString(s._2()));
+						})
+					.repartition(10)
+					.saveAsTextFile(workingPath + outputDoiAuthorListPath);
 			});
 
 	}
@@ -119,7 +171,7 @@ public class SparkGenerateDoiAuthorList {
 		if (jElement.getAsJsonObject().has(property)) {
 			JsonElement name = null;
 			name = jElement.getAsJsonObject().get(property);
-			if (name != null && name.isJsonObject()) {
+			if (name != null && !name.isJsonNull()) {
 				return name.getAsString();
 			}
 		}
