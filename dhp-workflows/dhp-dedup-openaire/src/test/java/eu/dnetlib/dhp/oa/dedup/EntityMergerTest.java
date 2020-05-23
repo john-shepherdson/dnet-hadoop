@@ -96,7 +96,7 @@ public class EntityMergerTest implements Serializable {
 	public void publicationMergerTest2() throws InstantiationException, IllegalAccessException, IOException {
 
 		Publication pub_merged = DedupRecordFactory
-				.entityMerger(dedupId, publications2.iterator(), 0, dataInfo, Publication.class);
+			.entityMerger(dedupId, publications2.iterator(), 0, dataInfo, Publication.class);
 
 		assertEquals(pub_merged.getAuthor().size(), 27);
 		// insert assertions here
