@@ -82,10 +82,11 @@ public class AuthorMerger {
 						.map(ba -> new Tuple2<>(sim(ba, a._2()), ba))
 						.max(Comparator.comparing(Tuple2::_1));
 
-					if(simAuthor.isPresent()) {
+					if (simAuthor.isPresent()) {
 						double th = THRESHOLD;
-						//increase the threshold if the surname is too short
-						if (simAuthor.get()._2().getSurname() != null && simAuthor.get()._2().getSurname().length()<=3)
+						// increase the threshold if the surname is too short
+						if (simAuthor.get()._2().getSurname() != null
+							&& simAuthor.get()._2().getSurname().length() <= 3)
 							th = 0.99;
 
 						if (simAuthor.get()._1() > th) {
@@ -100,9 +101,10 @@ public class AuthorMerger {
 	}
 
 	public static String pidToComparableString(StructuredProperty pid) {
-		return (pid.getQualifier() != null ?
-						pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase() : "" : "")
-				+ (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
+		return (pid.getQualifier() != null
+			? pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase() : ""
+			: "")
+			+ (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
 	}
 
 	public static int countAuthorsPids(List<Author> authors) {
@@ -123,14 +125,13 @@ public class AuthorMerger {
 		final Person pa = parse(a);
 		final Person pb = parse(b);
 
-		//if both are accurate (e.g. they have name and surname)
+		// if both are accurate (e.g. they have name and surname)
 		if (pa.isAccurate() & pb.isAccurate()) {
-			return
-					new JaroWinkler().score(normalize(pa.getSurnameString()), normalize(pb.getSurnameString()))*0.5
-							+ new JaroWinkler().score(normalize(pa.getNameString()), normalize(pb.getNameString()))*0.5;
+			return new JaroWinkler().score(normalize(pa.getSurnameString()), normalize(pb.getSurnameString())) * 0.5
+				+ new JaroWinkler().score(normalize(pa.getNameString()), normalize(pb.getNameString())) * 0.5;
 		} else {
-			return
-					new JaroWinkler().score(normalize(pa.getNormalisedFullname()), normalize(pb.getNormalisedFullname()));
+			return new JaroWinkler()
+				.score(normalize(pa.getNormalisedFullname()), normalize(pb.getNormalisedFullname()));
 		}
 	}
 

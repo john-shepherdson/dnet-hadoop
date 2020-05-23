@@ -1,13 +1,22 @@
 package eu.dnetlib.doiboost
 
-import eu.dnetlib.dhp.schema.oaf.{DataInfo, Dataset, Field, KeyValue, Qualifier, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{DataInfo, Dataset, Field, Instance, KeyValue, Publication, Qualifier, Result, StructuredProperty}
 import eu.dnetlib.dhp.utils.DHPUtils
+import org.json4s
+import org.json4s.DefaultFormats
+import org.json4s.jackson.JsonMethods.parse
+
+import scala.collection.JavaConverters._
+import scala.io.Source
+
+
+case class HostedByItemType(id: String, officialName: String, issn: String, eissn: String, lissn: String, openAccess: Boolean) {}
 
 object DoiBoostMappingUtil {
 
   //STATIC STRING
   val MAG = "microsoft"
-  val MAG_NAME= "Microsoft Academic Graph"
+  val MAG_NAME = "Microsoft Academic Graph"
   val ORCID = "ORCID"
   val CROSSREF = "Crossref"
   val UNPAYWALL = "UnpayWall"
@@ -19,112 +28,234 @@ object DoiBoostMappingUtil {
   val DNET_LANGUAGES = "dnet:languages"
   val PID_TYPES = "dnet:pid_types"
 
+  val invalidName = List(",", "none none", "none, none", "none &na;", "(:null)", "test test test", "test test", "test", "&na; &na;")
 
 
-  def generateDataInfo(): DataInfo = {
-    generateDataInfo("0.9")
+  def retrieveHostedByMap(): Map[String, HostedByItemType] = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    val jsonMap = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/hbMap.json")).mkString
+    lazy val json: json4s.JValue = parse(jsonMap)
+    json.extract[Map[String, HostedByItemType]]
   }
 
-  def generateDataInfo(trust:String): DataInfo = {
-    val di = new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust(trust)
-    di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
-    di
-  }
+  def retrieveHostedByItem(issn: String, eissn: String, lissn: String, hostedByMap: Map[String, HostedByItemType]): HostedByItemType = {
+    if (issn != null && issn.nonEmpty && hostedByMap.contains(issn))
+      return hostedByMap(issn)
 
+    if (eissn != null && eissn.nonEmpty && hostedByMap.contains(eissn))
+      return hostedByMap(eissn)
 
-  def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
-    val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
-    sp.setValue(value)
-    sp
+    if (lissn != null && lissn.nonEmpty && hostedByMap.contains(lissn))
+      return hostedByMap(lissn)
 
-  }
-
-  def createSP(value: String, classId: String, schemeId: String, dataInfo: DataInfo): StructuredProperty = {
-    val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
-    sp.setValue(value)
-    sp.setDataInfo(dataInfo)
-    sp
-
-  }
-
-  def createCrossrefCollectedFrom(): KeyValue = {
-
-    val cf = new KeyValue
-    cf.setValue(CROSSREF)
-    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(CROSSREF.toLowerCase))
-    cf
-
-  }
-
-
-  def createUnpayWallCollectedFrom(): KeyValue = {
-
-    val cf = new KeyValue
-    cf.setValue(UNPAYWALL)
-    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(UNPAYWALL.toLowerCase))
-    cf
-
-  }
-
-  def createORIDCollectedFrom(): KeyValue = {
-
-    val cf = new KeyValue
-    cf.setValue(ORCID)
-    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(ORCID.toLowerCase))
-    cf
+    null
 
   }
 
 
 
-  def generateIdentifier(oaf: Result, doi: String): String = {
-    val id = DHPUtils.md5(doi.toLowerCase)
-    if (oaf.isInstanceOf[Dataset])
-      return s"60|${doiBoostNSPREFIX}${SEPARATOR}${id}"
-    s"50|${doiBoostNSPREFIX}${SEPARATOR}${id}"
-  }
+
+  def fixPublication(publication: Publication, hostedByMap: Map[String, HostedByItemType]): Publication = {
+    if (publication.getJournal == null)
+      return publication
+
+    val issn = publication.getJournal.getIssnPrinted
+    val eissn = publication.getJournal.getIssnOnline
+    val lissn = publication.getJournal.getIssnLinking
+
+    val item = retrieveHostedByItem(issn, eissn, lissn, hostedByMap)
+    if (item!= null) {
+      val l = publication.getInstance().asScala.map(i =>{
+        val hb = new KeyValue
+        hb.setValue (item.officialName)
+        hb.setKey (s"10|${item.id}" )
+        i.setHostedby(hb)
+        if(item.openAccess)
+          i.setAccessright(createQualifier("Open", "dnet:access_modes"))
+        i
+      }).asJava
+
+      publication.setInstance(l)
+    }
+    publication
+}
 
 
+def generateDataInfo (): DataInfo = {
+  generateDataInfo ("0.9")
+}
 
 
+  def filterPublication (publication: Publication): Boolean = {
 
-  def createMAGCollectedFrom(): KeyValue = {
+  //Case empty publication
+  if (publication == null)
+  return false
 
-    val cf = new KeyValue
-    cf.setValue(MAG)
-    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(MAG))
-    cf
-
-  }
-
-  def createQualifier(clsName: String, clsValue: String, schName: String, schValue: String): Qualifier = {
-    val q = new Qualifier
-    q.setClassid(clsName)
-    q.setClassname(clsValue)
-    q.setSchemeid(schName)
-    q.setSchemename(schValue)
-    q
-  }
-
-  def createQualifier(cls: String, sch: String): Qualifier = {
-    createQualifier(cls, cls, sch, sch)
-  }
+  //Case publication with no title
+  if (publication.getTitle == null || publication.getTitle.size == 0)
+  return false
 
 
-  def asField[T](value: T): Field[T] = {
-    val tmp = new Field[T]
-    tmp.setValue(value)
-    tmp
+  val s = publication.getTitle.asScala.count (p => p.getValue != null
+  && p.getValue.nonEmpty && ! p.getValue.equalsIgnoreCase ("[NO TITLE AVAILABLE]") )
+
+  if (s == 0)
+  return false
+
+  // fixes #4360 (test publisher)
+  val publisher = if (publication.getPublisher != null) publication.getPublisher.getValue else null
+
+  if (publisher != null && (publisher.equalsIgnoreCase ("Test accounts") || publisher.equalsIgnoreCase ("CrossRef Test Account") ) ) {
+  return false;
+}
+
+  //Publication with no Author
+  if (publication.getAuthor == null || publication.getAuthor.size () == 0)
+  return false
 
 
-  }
+  //filter invalid author
+  val authors = publication.getAuthor.asScala.map (s => {
+  if (s.getFullname.nonEmpty) {
+  s.getFullname
+}
+  else
+  s"${
+  s.getName
+} ${
+  s.getSurname
+}"
+})
 
+  val c = authors.count (isValidAuthorName)
+  if (c == 0)
+  return false
+
+  // fixes #4368
+  if (authors.count (s => s.equalsIgnoreCase ("Addie Jackson") ) > 0 && "Elsevier BV".equalsIgnoreCase (publication.getPublisher.getValue) )
+  return false
+
+  true
+}
+
+
+  def isValidAuthorName (fullName: String): Boolean = {
+  if (fullName == null || fullName.isEmpty)
+  return false
+  if (invalidName.contains (fullName.toLowerCase.trim) )
+  return false
+  true
+}
+
+
+  def generateDataInfo (trust: String): DataInfo = {
+  val di = new DataInfo
+  di.setDeletedbyinference (false)
+  di.setInferred (false)
+  di.setInvisible (false)
+  di.setTrust (trust)
+  di.setProvenanceaction (createQualifier ("sysimport:actionset", "dnet:provenanceActions") )
+  di
+}
+
+
+  def createSP (value: String, classId: String, schemeId: String): StructuredProperty = {
+  val sp = new StructuredProperty
+  sp.setQualifier (createQualifier (classId, schemeId) )
+  sp.setValue (value)
+  sp
+
+}
+
+  def createSP (value: String, classId: String, schemeId: String, dataInfo: DataInfo): StructuredProperty = {
+  val sp = new StructuredProperty
+  sp.setQualifier (createQualifier (classId, schemeId) )
+  sp.setValue (value)
+  sp.setDataInfo (dataInfo)
+  sp
+
+}
+
+  def createCrossrefCollectedFrom (): KeyValue = {
+
+  val cf = new KeyValue
+  cf.setValue (CROSSREF)
+  cf.setKey ("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5 (CROSSREF.toLowerCase) )
+  cf
+
+}
+
+
+  def createUnpayWallCollectedFrom (): KeyValue = {
+
+  val cf = new KeyValue
+  cf.setValue (UNPAYWALL)
+  cf.setKey ("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5 (UNPAYWALL.toLowerCase) )
+  cf
+
+}
+
+  def createORIDCollectedFrom (): KeyValue = {
+
+  val cf = new KeyValue
+  cf.setValue (ORCID)
+  cf.setKey ("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5 (ORCID.toLowerCase) )
+  cf
+
+}
+
+
+  def generateIdentifier (oaf: Result, doi: String): String = {
+  val id = DHPUtils.md5 (doi.toLowerCase)
+  if (oaf.isInstanceOf[Dataset] )
+  return s"60|${
+  doiBoostNSPREFIX
+}${
+  SEPARATOR
+}${
+  id
+}"
+  s"50|${
+  doiBoostNSPREFIX
+}${
+  SEPARATOR
+}${
+  id
+}"
+}
+
+
+  def createMAGCollectedFrom (): KeyValue = {
+
+  val cf = new KeyValue
+  cf.setValue (MAG)
+  cf.setKey ("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5 (MAG) )
+  cf
+
+}
+
+  def createQualifier (clsName: String, clsValue: String, schName: String, schValue: String): Qualifier = {
+  val q = new Qualifier
+  q.setClassid (clsName)
+  q.setClassname (clsValue)
+  q.setSchemeid (schName)
+  q.setSchemename (schValue)
+  q
+}
+
+  def createQualifier (cls: String, sch: String): Qualifier = {
+  createQualifier (cls, cls, sch, sch)
+}
+
+
+  def asField[T] (value: T): Field[T] = {
+  val tmp = new Field[T]
+  tmp.setValue (value)
+  tmp
+
+
+}
 
 
 }
