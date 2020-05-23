@@ -88,12 +88,13 @@ public class MappersTest {
 
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
-		p.getInstance()
-				.stream()
-				.forEach(i -> {
-					assertNotNull(i.getAccessright());
-					assertEquals("OPEN", i.getAccessright().getClassid());
-				});
+		p
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
@@ -176,12 +177,13 @@ public class MappersTest {
 
 		assertNotNull(d.getInstance());
 		assertTrue(d.getInstance().size() > 0);
-		d.getInstance()
-				.stream()
-				.forEach(i -> {
-					assertNotNull(i.getAccessright());
-					assertEquals("OPEN", i.getAccessright().getClassid());
-				});
+		d
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
 
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());

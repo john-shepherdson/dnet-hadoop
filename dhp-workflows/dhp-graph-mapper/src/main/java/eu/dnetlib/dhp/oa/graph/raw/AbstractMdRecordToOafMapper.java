@@ -15,13 +15,13 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
 
 import java.util.*;
 
-import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
+import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -361,9 +361,9 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static Qualifier getBestAccessRights(List<Instance> instanceList) {
 		if (instanceList != null) {
 			final Optional<Qualifier> min = instanceList
-					.stream()
-					.map(i -> i.getAccessright())
-					.min(new LicenseComparator());
+				.stream()
+				.map(i -> i.getAccessright())
+				.min(new LicenseComparator());
 
 			final Qualifier rights = min.isPresent() ? min.get() : new Qualifier();
 
@@ -371,7 +371,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				rights.setClassid(UNKNOWN);
 			}
 			if (StringUtils.isBlank(rights.getClassname())
-					|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
+				|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
 				rights.setClassname(NOT_AVAILABLE);
 			}
 			if (StringUtils.isBlank(rights.getSchemeid())) {

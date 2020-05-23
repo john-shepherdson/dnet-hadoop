@@ -1,9 +1,9 @@
 
 package eu.dnetlib.dhp.schema.common;
 
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-
 import java.util.Comparator;
+
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class LicenseComparator implements Comparator<Qualifier> {
 
