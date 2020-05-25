@@ -8,7 +8,7 @@ public class DataInfo implements Serializable {
 
 	private Boolean invisible = false;
 	private Boolean inferred;
-	private Boolean deletedbyinference;
+	private Boolean deletedbyinference = false;
 	private String trust;
 	private String inferenceprovenance;
 	private Qualifier provenanceaction;
