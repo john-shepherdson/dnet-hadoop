@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.util.List;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.common.PacePerson;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -129,61 +130,74 @@ public class SparkOrcidToResultFromSemRelJob {
 	}
 
 	private static boolean enrichAuthor(AutoritativeAuthor autoritative_author, Author author) {
-		boolean toaddpid = false;
+			boolean toaddpid = false;
 
-		if (StringUtils.isNotEmpty(autoritative_author.getSurname())) {
-			if (StringUtils.isNotEmpty(author.getSurname())) {
-				if (autoritative_author
-					.getSurname()
-					.trim()
-					.equalsIgnoreCase(author.getSurname().trim())) {
+			String author_name = author.getName();
+			String author_surname = author.getSurname();
 
-					// have the same surname. Check the name
-					if (StringUtils.isNotEmpty(autoritative_author.getName())) {
-						if (StringUtils.isNotEmpty(author.getName())) {
-							if (autoritative_author
-								.getName()
-								.trim()
-								.equalsIgnoreCase(author.getName().trim())) {
-								toaddpid = true;
-							}
-							// they could be differently written (i.e. only the initials of the name
-							// in one of the two
-							else {
+			if(StringUtils.isEmpty(author_name) || StringUtils.isEmpty(author_surname)){
+				PacePerson pp = new PacePerson(author.getFullname(), false);
+				if (pp.isAccurate()){
+					author_name = pp.getNormalisedFirstName();
+					author_surname = pp.getNormalisedSurname();
+
+				}
+			}
+
+			if (StringUtils.isNotEmpty(autoritative_author.getSurname())) {
+				if (StringUtils.isNotEmpty(author_surname)) {
+					if (autoritative_author
+							.getSurname()
+							.trim()
+							.equalsIgnoreCase(author_surname.trim())) {
+
+						// have the same surname. Check the name
+						if (StringUtils.isNotEmpty(autoritative_author.getName())) {
+							if (StringUtils.isNotEmpty(author_name)) {
 								if (autoritative_author
-									.getName()
-									.trim()
-									.substring(0, 0)
-									.equalsIgnoreCase(author.getName().trim().substring(0, 0))) {
+										.getName()
+										.trim()
+										.equalsIgnoreCase(author_name.trim())) {
 									toaddpid = true;
+								}
+								// they could be differently written (i.e. only the initials of the name
+								// in one of the two
+								else {
+									if (autoritative_author
+											.getName()
+											.trim()
+											.substring(0, 0)
+											.equalsIgnoreCase(author_name.trim().substring(0, 0))) {
+										toaddpid = true;
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-		}
-		if (toaddpid) {
-			StructuredProperty p = new StructuredProperty();
-			p.setValue(autoritative_author.getOrcid());
-			p.setQualifier(getQualifier(PROPAGATION_AUTHOR_PID, PROPAGATION_AUTHOR_PID));
-			p
-				.setDataInfo(
-					getDataInfo(
-						PROPAGATION_DATA_INFO_TYPE,
-						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID,
-						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME));
+			if (toaddpid) {
+				StructuredProperty p = new StructuredProperty();
+				p.setValue(autoritative_author.getOrcid());
+				p.setQualifier(getQualifier(PROPAGATION_AUTHOR_PID, PROPAGATION_AUTHOR_PID));
+				p
+						.setDataInfo(
+								getDataInfo(
+										PROPAGATION_DATA_INFO_TYPE,
+										PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID,
+										PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME));
 
-			Optional<List<StructuredProperty>> authorPid = Optional.ofNullable(author.getPid());
-			if (authorPid.isPresent()) {
-				authorPid.get().add(p);
-			} else {
-				author.setPid(Lists.newArrayList(p));
+				Optional<List<StructuredProperty>> authorPid = Optional.ofNullable(author.getPid());
+				if (authorPid.isPresent()) {
+					authorPid.get().add(p);
+				} else {
+					author.setPid(Lists.newArrayList(p));
+				}
+
 			}
-
+			return toaddpid;
 		}
-		return toaddpid;
-	}
+
 
 	private static boolean containsAllowedPid(Author a) {
 		Optional<List<StructuredProperty>> pids = Optional.ofNullable(a.getPid());
