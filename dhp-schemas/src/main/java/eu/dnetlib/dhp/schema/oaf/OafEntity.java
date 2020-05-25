@@ -106,6 +106,7 @@ public abstract class OafEntity extends Oaf implements Serializable {
 			.stream(lists)
 			.filter(Objects::nonNull)
 			.flatMap(List::stream)
+			.filter(Objects::nonNull)
 			.distinct()
 			.collect(Collectors.toList());
 	}
