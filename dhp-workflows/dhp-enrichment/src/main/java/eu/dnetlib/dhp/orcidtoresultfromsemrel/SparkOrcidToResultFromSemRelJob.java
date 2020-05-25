@@ -122,29 +122,24 @@ public class SparkOrcidToResultFromSemRelJob {
 	}
 
 	private static void enrichAuthor(Author a, List<AutoritativeAuthor> au) {
+		PacePerson pp = new PacePerson(a.getFullname(), false);
 		for (AutoritativeAuthor aa : au) {
-			if (enrichAuthor(aa, a)) {
+			if (enrichAuthor(aa, a, pp.getNormalisedFirstName(), pp.getNormalisedSurname() )) {
 				return;
 			}
 		}
 	}
 
-	private static boolean enrichAuthor(AutoritativeAuthor autoritative_author, Author author) {
+	private static boolean enrichAuthor(AutoritativeAuthor autoritative_author, Author author,
+										String author_name,
+										String author_surname) {
 			boolean toaddpid = false;
 
-			String author_name = author.getName();
-			String author_surname = author.getSurname();
-
-			if(StringUtils.isEmpty(author_name) || StringUtils.isEmpty(author_surname)){
-				PacePerson pp = new PacePerson(author.getFullname(), false);
-				if (pp.isAccurate()){
-					author_name = pp.getNormalisedFirstName();
-					author_surname = pp.getNormalisedSurname();
-
-				}
-			}
 
 			if (StringUtils.isNotEmpty(autoritative_author.getSurname())) {
+				if (StringUtils.isNotEmpty(author.getSurname())){
+					author_surname = author.getSurname();
+				}
 				if (StringUtils.isNotEmpty(author_surname)) {
 					if (autoritative_author
 							.getSurname()
@@ -153,6 +148,9 @@ public class SparkOrcidToResultFromSemRelJob {
 
 						// have the same surname. Check the name
 						if (StringUtils.isNotEmpty(autoritative_author.getName())) {
+							if(StringUtils.isNotEmpty(author.getName())){
+								author_name = author.getName();
+							}
 							if (StringUtils.isNotEmpty(author_name)) {
 								if (autoritative_author
 										.getName()
