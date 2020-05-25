@@ -77,9 +77,15 @@ public class PrepareDatasourceCountryAssociation {
 		List<String> allowedtypes,
 		String inputPath,
 		String outputPath) {
-		String whitelisted = "";
-		for (String i : whitelist) {
-			whitelisted += " OR id = '" + i + "'";
+		String whitelisted = " d.id = '" + whitelist.get(0) + "'";
+		for (int i = 1; i < whitelist.size(); i++) {
+			whitelisted += " OR d.id = '" + whitelist.get(i) + "'";
+		}
+
+		String allowed = "d.datasourcetype.classid = '" + allowedtypes.get(0) + "'";
+
+		for (int i = 1; i < allowedtypes.size(); i++) {
+			allowed += " OR d.datasourcetype.classid = '" + allowedtypes.get(i) + "'";
 		}
 
 		Dataset<Datasource> datasource = readPath(spark, inputPath + "/datasource", Datasource.class);
@@ -90,26 +96,39 @@ public class PrepareDatasourceCountryAssociation {
 		relation.createOrReplaceTempView("relation");
 		organization.createOrReplaceTempView("organization");
 
-		String query = "SELECT source dataSourceId, named_struct('classid', country.classid, 'classname', country.classname) country "
-			+ "FROM ( SELECT id "
-			+ "       FROM datasource "
-			+ "       WHERE (datainfo.deletedbyinference = false "
-			+ whitelisted
-			+ ") "
-			+ getConstraintList("datasourcetype.classid = '", allowedtypes)
-			+ ") d "
-			+ "JOIN ( SELECT source, target "
-			+ "       FROM relation "
-			+ "       WHERE relclass = '"
-			+ ModelConstants.IS_PROVIDED_BY
-			+ "' "
-			+ "       AND datainfo.deletedbyinference = false ) rel "
-			+ "ON d.id = rel.source "
-			+ "JOIN (SELECT id, country "
-			+ "      FROM organization "
-			+ "      WHERE datainfo.deletedbyinference = false "
-			+ "      AND length(country.classid) > 0) o "
-			+ "ON o.id = rel.target";
+//		String query = "SELECT source dataSourceId, named_struct('classid', country.classid, 'classname', country.classname) country "
+//			+ "FROM ( SELECT id "
+//			+ "       FROM datasource "
+//			+ "       WHERE (datainfo.deletedbyinference = false "
+//			+ whitelisted
+//			+ ") "
+//			+ getConstraintList("datasourcetype.classid = '", allowedtypes)
+//			+ ") d "
+//			+ "JOIN ( SELECT source, target "
+//			+ "       FROM relation "
+//			+ "       WHERE relclass = '"
+//			+ ModelConstants.IS_PROVIDED_BY
+//			+ "' "
+//			+ "       AND datainfo.deletedbyinference = false ) rel "
+//			+ "ON d.id = rel.source "
+//			+ "JOIN (SELECT id, country "
+//			+ "      FROM organization "
+//			+ "      WHERE datainfo.deletedbyinference = false "
+//			+ "      AND length(country.classid) > 0) o "
+//			+ "ON o.id = rel.target";
+
+		String query = "SELECT source dataSourceId, " +
+			"named_struct('classid', country.classid, 'classname', country.classname) country " +
+			"FROM datasource d " +
+			"JOIN relation rel " +
+			"ON d.id = rel.source " +
+			"JOIN organization o " +
+			"ON o.id = rel.target " +
+			"WHERE rel.datainfo.deletedbyinference = false  " +
+			"and rel.relclass = '" + ModelConstants.IS_PROVIDED_BY + "'" +
+			"and o.datainfo.deletedbyinference = false  " +
+			"and length(o.country.classid) > 0 " +
+			"and (" + allowed + " or " + whitelisted + ")";
 
 		spark
 			.sql(query)
