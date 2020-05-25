@@ -23,7 +23,7 @@ import org.dom4j.Node;
 
 import com.google.common.collect.Lists;
 
-import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
+import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
