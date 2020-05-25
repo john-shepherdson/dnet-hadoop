@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.dnetlib.dhp</groupId>
 	<artifactId>dhp</artifactId>
-	<version>1.2.1</version>
+	<version>1.2.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<licenses>
@@ -38,7 +38,7 @@
 		<connection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</connection>
 		<developerConnection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</developerConnection>
 		<url>https://code-repo.d4science.org/D-Net/dnet-hadoop/</url>
-		<tag>dhp-1.2.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<description>This module is the root descriptor for the dnet-hadoop project</description>
