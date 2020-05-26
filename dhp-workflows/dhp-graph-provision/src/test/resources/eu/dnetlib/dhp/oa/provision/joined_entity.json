@@ -1,0 +1,1551 @@
+{
+  "links": [
+    {
+      "relatedEntity": {
+        "code": null,
+        "codeRepositoryUrl": null,
+        "pid": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "sysimport:crosswalk",
+                "classname": "sysimport:crosswalk",
+                "schemename": "dnet:provenanceActions",
+                "schemeid": "dnet:provenanceActions"
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": "0.9"
+            },
+            "qualifier": {
+              "classid": "pmc",
+              "classname": "pmc",
+              "schemename": "dnet:pid_types",
+              "schemeid": "dnet:pid_types"
+            },
+            "value": "PMC17177"
+          },
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "sysimport:crosswalk",
+                "classname": "sysimport:crosswalk",
+                "schemename": "dnet:provenanceActions",
+                "schemeid": "dnet:provenanceActions"
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": "0.9"
+            },
+            "qualifier": {
+              "classid": "pmid",
+              "classname": "pmid",
+              "schemename": "dnet:pid_types",
+              "schemeid": "dnet:pid_types"
+            },
+            "value": "11005843"
+          }
+        ],
+        "projectTitle": null,
+        "websiteurl": null,
+        "resulttype": {
+          "classid": "publication",
+          "classname": "publication",
+          "schemename": "dnet:result_typologies",
+          "schemeid": "dnet:result_typologies"
+        },
+        "legalname": null,
+        "collectedfrom": [
+          {
+            "dataInfo": null,
+            "value": "PubMed Central",
+            "key": "10|opendoar____::eda80a3d5b344bc40f3bc04f65b7a357"
+          }
+        ],
+        "id": "50|od_______267::4d85ada0191a351f529d1e8ace1a7117",
+        "title": {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk",
+              "classname": "sysimport:crosswalk",
+              "schemename": "dnet:provenanceActions",
+              "schemeid": "dnet:provenanceActions"
+            },
+            "inferred": false,
+            "inferenceprovenance": "",
+            "invisible": false,
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "main title",
+            "classname": "main title",
+            "schemename": "dnet:dataCite_title",
+            "schemeid": "dnet:dataCite_title"
+          },
+          "value": "Induction of ribosomal genes and hepatocyte hypertrophy by adenovirus-mediated expression of c-Myc in vivo"
+        },
+        "fundingtree": null,
+        "contracttype": null,
+        "type": "publication",
+        "acronym": null,
+        "openairecompatibility": null,
+        "publisher": "The National Academy of Sciences",
+        "instances": [
+          {
+            "refereed": null,
+            "hostedby": {
+              "dataInfo": null,
+              "value": "Europe PubMed Central",
+              "key": "10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c"
+            },
+            "processingchargeamount": null,
+            "license": null,
+            "processingchargecurrency": null,
+            "distributionlocation": "",
+            "url": [
+              "https://europepmc.org/articles/PMC17177/"
+            ],
+            "dateofacceptance": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "sysimport:crosswalk",
+                  "classname": "sysimport:crosswalk",
+                  "schemename": "dnet:provenanceActions",
+                  "schemeid": "dnet:provenanceActions"
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": "0.9"
+              },
+              "value": "2000-09-26"
+            },
+            "collectedfrom": {
+              "dataInfo": null,
+              "value": "PubMed Central",
+              "key": "10|opendoar____::eda80a3d5b344bc40f3bc04f65b7a357"
+            },
+            "accessright": {
+              "classid": "OPEN",
+              "classname": "Open Access",
+              "schemename": "dnet:access_modes",
+              "schemeid": "dnet:access_modes"
+            },
+            "instancetype": {
+              "classid": "0038",
+              "classname": "Other literature type",
+              "schemename": "dnet:publication_resource",
+              "schemeid": "dnet:publication_resource"
+            }
+          }
+        ],
+        "legalshortname": null,
+        "country": null,
+        "dateofacceptance": "2000-09-26",
+        "datasourcetype": null,
+        "datasourcetypeui": null,
+        "officialname": null
+      },
+      "relation": {
+        "subRelType": "dedup",
+        "relClass": "merges",
+        "dataInfo": {
+          "deletedbyinference": false,
+          "provenanceaction": {
+            "classid": "sysimport:dedup",
+            "classname": "sysimport:dedup",
+            "schemename": "dnet:provenanceActions",
+            "schemeid": "dnet:provenanceActions"
+          },
+          "inferred": true,
+          "inferenceprovenance": "decisiontree-dedup-test",
+          "invisible": false,
+          "trust": null
+        },
+        "target": "50|od_______267::4d85ada0191a351f529d1e8ace1a7117",
+        "lastupdatetimestamp": null,
+        "relType": "resultResult",
+        "source": "50|dedup_wf_001::00f53f19cfaf4dde8d316e9e71f16a10",
+        "collectedfrom": null,
+        "properties": []
+      }
+    },
+    {
+      "relatedEntity": {
+        "code": null,
+        "codeRepositoryUrl": null,
+        "pid": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "qualifier": {
+              "classid": "pmid",
+              "classname": "pmid",
+              "schemename": "dnet:pid_types",
+              "schemeid": "dnet:pid_types"
+            },
+            "value": "11005843"
+          }
+        ],
+        "projectTitle": null,
+        "websiteurl": null,
+        "resulttype": {
+          "classid": "publication",
+          "classname": "publication",
+          "schemename": "dnet:result_typologies",
+          "schemeid": "dnet:result_typologies"
+        },
+        "legalname": null,
+        "collectedfrom": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "value": "scholExplorer",
+            "key": "10|openaire____::e034d6a11054f5ade9221ebac484e864"
+          }
+        ],
+        "id": "50|scholexplore::ef20f9d1cd983037b45cccce4e3f5f8a",
+        "title": {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "provenanceaction": {
+              "classid": "",
+              "classname": "",
+              "schemename": "",
+              "schemeid": ""
+            },
+            "inferred": false,
+            "inferenceprovenance": "",
+            "invisible": false,
+            "trust": ""
+          },
+          "qualifier": {
+            "classid": "main title",
+            "classname": "main title",
+            "schemename": "dnet:dataCite_title",
+            "schemeid": "dnet:dataCite_title"
+          },
+          "value": "Induction of ribosomal genes and hepatocyte hypertrophy by adenovirus-mediated expression of c-Myc in vivo."
+        },
+        "fundingtree": null,
+        "contracttype": null,
+        "type": "publication",
+        "acronym": null,
+        "openairecompatibility": null,
+        "publisher": "",
+        "instances": [
+          {
+            "refereed": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "hostedby": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Unknown Repository",
+              "key": "10|openaire____::55045bd2a65019fd8e6741a755395c8c"
+            },
+            "processingchargeamount": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "license": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "processingchargecurrency": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "distributionlocation": "",
+            "url": [
+              "https://www.ncbi.nlm.nih.gov/pubmed/11005843"
+            ],
+            "dateofacceptance": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "collectedfrom": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "scholExplorer",
+              "key": "10|openaire____::e034d6a11054f5ade9221ebac484e864"
+            },
+            "accessright": {
+              "classid": "UNKNOWN",
+              "classname": "not available",
+              "schemename": "dnet:access_modes",
+              "schemeid": "dnet:access_modes"
+            },
+            "instancetype": {
+              "classid": "0000",
+              "classname": "Unknown",
+              "schemename": "dnet:publication_resource",
+              "schemeid": "dnet:publication_resource"
+            }
+          }
+        ],
+        "legalshortname": null,
+        "country": null,
+        "dateofacceptance": "",
+        "datasourcetype": null,
+        "datasourcetypeui": null,
+        "officialname": null
+      },
+      "relation": {
+        "subRelType": "dedup",
+        "relClass": "merges",
+        "dataInfo": {
+          "deletedbyinference": false,
+          "provenanceaction": {
+            "classid": "sysimport:dedup",
+            "classname": "sysimport:dedup",
+            "schemename": "dnet:provenanceActions",
+            "schemeid": "dnet:provenanceActions"
+          },
+          "inferred": true,
+          "inferenceprovenance": "decisiontree-dedup-test",
+          "invisible": false,
+          "trust": null
+        },
+        "target": "50|scholexplore::ef20f9d1cd983037b45cccce4e3f5f8a",
+        "lastupdatetimestamp": null,
+        "relType": "resultResult",
+        "source": "50|dedup_wf_001::00f53f19cfaf4dde8d316e9e71f16a10",
+        "collectedfrom": null,
+        "properties": []
+      }
+    },
+    {
+      "relatedEntity": {
+        "code": null,
+        "codeRepositoryUrl": null,
+        "pid": [],
+        "projectTitle": null,
+        "websiteurl": null,
+        "resulttype": {
+          "classid": "publication",
+          "classname": "publication",
+          "schemename": "dnet:result_typologies",
+          "schemeid": "dnet:result_typologies"
+        },
+        "legalname": null,
+        "collectedfrom": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "value": "ORCID",
+            "key": "10|openaire____::806360c771262b4d6770e7cdf04b5c5a"
+          }
+        ],
+        "id": "50|orcid_______::631fd913d925af01a94ea70aa3cec3d6",
+        "title": {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "provenanceaction": {
+              "classid": "",
+              "classname": "",
+              "schemename": "",
+              "schemeid": ""
+            },
+            "inferred": false,
+            "inferenceprovenance": "",
+            "invisible": false,
+            "trust": ""
+          },
+          "qualifier": {
+            "classid": "main title",
+            "classname": "main title",
+            "schemename": "dnet:dataCite_title",
+            "schemeid": "dnet:dataCite_title"
+          },
+          "value": "Induction of ribosomal genes and hepatocyte hypertrophy by adenovirus-mediated expression of c-Myc in vivo"
+        },
+        "fundingtree": null,
+        "contracttype": null,
+        "type": "publication",
+        "acronym": null,
+        "openairecompatibility": null,
+        "publisher": "",
+        "instances": [
+          {
+            "refereed": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "hostedby": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Unknown Repository",
+              "key": "10|openaire____::55045bd2a65019fd8e6741a755395c8c"
+            },
+            "processingchargeamount": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "license": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "processingchargecurrency": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "distributionlocation": "",
+            "url": [],
+            "dateofacceptance": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "2000-01-01"
+            },
+            "collectedfrom": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "ORCID",
+              "key": "10|openaire____::806360c771262b4d6770e7cdf04b5c5a"
+            },
+            "accessright": {
+              "classid": "UNKNOWN",
+              "classname": "UNKNOWN",
+              "schemename": "dnet:access_modes",
+              "schemeid": "dnet:access_modes"
+            },
+            "instancetype": {
+              "classid": "0001",
+              "classname": "Article",
+              "schemename": "dnet:publication_resource",
+              "schemeid": "dnet:publication_resource"
+            }
+          }
+        ],
+        "legalshortname": null,
+        "country": null,
+        "dateofacceptance": "2000-01-01",
+        "datasourcetype": null,
+        "datasourcetypeui": null,
+        "officialname": null
+      },
+      "relation": {
+        "subRelType": "dedup",
+        "relClass": "merges",
+        "dataInfo": {
+          "deletedbyinference": false,
+          "provenanceaction": {
+            "classid": "sysimport:dedup",
+            "classname": "sysimport:dedup",
+            "schemename": "dnet:provenanceActions",
+            "schemeid": "dnet:provenanceActions"
+          },
+          "inferred": true,
+          "inferenceprovenance": "decisiontree-dedup-test",
+          "invisible": false,
+          "trust": null
+        },
+        "target": "50|orcid_______::631fd913d925af01a94ea70aa3cec3d6",
+        "lastupdatetimestamp": null,
+        "relType": "resultResult",
+        "source": "50|dedup_wf_001::00f53f19cfaf4dde8d316e9e71f16a10",
+        "collectedfrom": null,
+        "properties": []
+      }
+    },
+    {
+      "relatedEntity": {
+        "code": null,
+        "codeRepositoryUrl": null,
+        "pid": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "qualifier": {
+              "classid": "mag_id",
+              "classname": "Microsoft Academic Graph Identifier",
+              "schemename": "dnet:pid_types",
+              "schemeid": "dnet:pid_types"
+            },
+            "value": "https://academic.microsoft.com/#/detail/145311948"
+          },
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "qualifier": {
+              "classid": "urn",
+              "classname": "urn",
+              "schemename": "dnet:pid_types",
+              "schemeid": "dnet:pid_types"
+            },
+            "value": "http://en.wikipedia.org/wiki/Johns_Hopkins_University"
+          },
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "qualifier": {
+              "classid": "grid",
+              "classname": "grid",
+              "schemename": "dnet:pid_types",
+              "schemeid": "dnet:pid_types"
+            },
+            "value": "grid.21107.35"
+          }
+        ],
+        "projectTitle": null,
+        "websiteurl": "http://www.jhu.edu/",
+        "resulttype": null,
+        "legalname": "Johns Hopkins University",
+        "collectedfrom": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "value": "Microsoft Academic Graph",
+            "key": "10|openaire____::5f532a3fc4f1ea403f37070f59a7a53a"
+          },
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "value": "GRID - Global Research Identifier Database",
+            "key": "10|openaire____::ff4a008470319a22d9cf3d14af485977"
+          },
+          {
+            "dataInfo": null,
+            "value": "Registry of Research Data Repository",
+            "key": "10|openaire____::21f8a223b9925c2f87c404096080b046"
+          },
+          {
+            "dataInfo": null,
+            "value": "Research Councils UK",
+            "key": "10|openaire____::ab2d3310741ea80d3b8726f651502858"
+          },
+          {
+            "dataInfo": null,
+            "value": "CORDA - COmmon Research DAta Warehouse",
+            "key": "10|openaire____::b30dac7baac631f3da7c2bb18dd9891f"
+          },
+          {
+            "dataInfo": null,
+            "value": "CORDA - COmmon Research DAta Warehouse - Horizon 2020",
+            "key": "10|openaire____::a55eb91348674d853191f4f4fd73d078"
+          },
+          {
+            "dataInfo": null,
+            "value": "NSF - National Science Foundation",
+            "key": "10|openaire____::dd69b4a1513c9de9f46faf24048da1e8"
+          },
+          {
+            "dataInfo": null,
+            "value": "DOAJ-Articles",
+            "key": "10|driver______::bee53aa31dc2cbb538c10c2b65fa5824"
+          },
+          {
+            "dataInfo": null,
+            "value": "OpenDOAR",
+            "key": "10|openaire____::47ce9e9f4fad46e732cff06419ecaabb"
+          }
+        ],
+        "id": "20|dedup_wf_001::8c05abe4d8f889305207a845e9e31d9d",
+        "title": null,
+        "fundingtree": null,
+        "contracttype": null,
+        "type": "organization",
+        "acronym": null,
+        "openairecompatibility": null,
+        "publisher": null,
+        "instances": null,
+        "legalshortname": "JHU",
+        "country": {
+          "classid": "US",
+          "classname": "United States",
+          "schemename": "dnet:countries",
+          "schemeid": "dnet:countries"
+        },
+        "dateofacceptance": null,
+        "datasourcetype": null,
+        "datasourcetypeui": null,
+        "officialname": null
+      },
+      "relation": {
+        "subRelType": "affiliation",
+        "relClass": "hasAuthorInstitution",
+        "dataInfo": {
+          "deletedbyinference": false,
+          "provenanceaction": {
+            "classid": "sysimport:actionset",
+            "classname": "sysimport:actionset",
+            "schemename": "dnet:provenanceActions",
+            "schemeid": "dnet:provenanceActions"
+          },
+          "inferred": false,
+          "inferenceprovenance": "",
+          "invisible": false,
+          "trust": "0.9"
+        },
+        "target": "20|dedup_wf_001::8c05abe4d8f889305207a845e9e31d9d",
+        "lastupdatetimestamp": 0,
+        "relType": "resultOrganization",
+        "source": "50|dedup_wf_001::00f53f19cfaf4dde8d316e9e71f16a10",
+        "collectedfrom": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "value": "Microsoft Academic Graph",
+            "key": "10|openaire____::5f532a3fc4f1ea403f37070f59a7a53a"
+          }
+        ],
+        "properties": []
+      }
+    },
+    {
+      "relatedEntity": {
+        "code": null,
+        "codeRepositoryUrl": null,
+        "pid": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "qualifier": {
+              "classid": "doi",
+              "classname": "doi",
+              "schemename": "dnet:pid_types",
+              "schemeid": "dnet:pid_types"
+            },
+            "value": "10.1073/pnas.200372597"
+          }
+        ],
+        "projectTitle": null,
+        "websiteurl": null,
+        "resulttype": {
+          "classid": "publication",
+          "classname": "publication",
+          "schemename": "dnet:result_typologies",
+          "schemeid": "dnet:result_typologies"
+        },
+        "legalname": null,
+        "collectedfrom": [
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "value": "Crossref",
+            "key": "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2"
+          },
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "value": "Microsoft Academic Graph",
+            "key": "10|openaire____::5f532a3fc4f1ea403f37070f59a7a53a"
+          },
+          {
+            "dataInfo": {
+              "deletedbyinference": false,
+              "provenanceaction": {
+                "classid": "",
+                "classname": "",
+                "schemename": "",
+                "schemeid": ""
+              },
+              "inferred": false,
+              "inferenceprovenance": "",
+              "invisible": false,
+              "trust": ""
+            },
+            "value": "UnpayWall",
+            "key": "10|openaire____::8ac8380272269217cb09a928c8caa993"
+          }
+        ],
+        "id": "50|doiboost____::4317e3fa670267960efa09c1fd8339c9",
+        "title": {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "provenanceaction": {
+              "classid": "",
+              "classname": "",
+              "schemename": "",
+              "schemeid": ""
+            },
+            "inferred": false,
+            "inferenceprovenance": "",
+            "invisible": false,
+            "trust": ""
+          },
+          "qualifier": {
+            "classid": "main title",
+            "classname": "main title",
+            "schemename": "dnet:dataCite_title",
+            "schemeid": "dnet:dataCite_title"
+          },
+          "value": "Induction of ribosomal genes and hepatocyte hypertrophy by adenovirus-mediated expression of c-Myc in vivo"
+        },
+        "fundingtree": null,
+        "contracttype": null,
+        "type": "publication",
+        "acronym": null,
+        "openairecompatibility": null,
+        "publisher": "",
+        "instances": [
+          {
+            "refereed": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "hostedby": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Unknown Repository",
+              "key": "10|openaire____::55045bd2a65019fd8e6741a755395c8c"
+            },
+            "processingchargeamount": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "license": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "processingchargecurrency": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "distributionlocation": "",
+            "url": [
+              "http://www.pnas.org/content/97/21/11198.full.pdf"
+            ],
+            "dateofacceptance": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "collectedfrom": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "UnpayWall",
+              "key": "10|openaire____::8ac8380272269217cb09a928c8caa993"
+            },
+            "accessright": {
+              "classid": "OPEN",
+              "classname": "Open Access",
+              "schemename": "dnet:access_modes",
+              "schemeid": "dnet:access_modes"
+            },
+            "instancetype": {
+              "classid": "0001",
+              "classname": "Article",
+              "schemename": "dnet:publication_resource",
+              "schemeid": "dnet:publication_resource"
+            }
+          },
+          {
+            "refereed": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "hostedby": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Unknown Repository",
+              "key": "10|openaire____::55045bd2a65019fd8e6741a755395c8c"
+            },
+            "processingchargeamount": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "license": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "processingchargecurrency": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "distributionlocation": "",
+            "url": [
+              "https://syndication.highwire.org/content/doi/10.1073/pnas.200372597"
+            ],
+            "dateofacceptance": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "collectedfrom": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Crossref",
+              "key": "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2"
+            },
+            "accessright": {
+              "classid": "UNKNOWN",
+              "classname": "not available",
+              "schemename": "dnet:access_modes",
+              "schemeid": "dnet:access_modes"
+            },
+            "instancetype": {
+              "classid": "0001",
+              "classname": "Article",
+              "schemename": "dnet:publication_resource",
+              "schemeid": "dnet:publication_resource"
+            }
+          },
+          {
+            "refereed": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "hostedby": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Unknown Repository",
+              "key": "10|openaire____::55045bd2a65019fd8e6741a755395c8c"
+            },
+            "processingchargeamount": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "license": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "processingchargecurrency": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "distributionlocation": "",
+            "url": [
+              "https://academic.microsoft.com/#/detail/2045899555"
+            ],
+            "dateofacceptance": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "collectedfrom": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Microsoft Academic Graph",
+              "key": "10|openaire____::5f532a3fc4f1ea403f37070f59a7a53a"
+            },
+            "accessright": {
+              "classid": "UNKNOWN",
+              "classname": "not available",
+              "schemename": "dnet:access_modes",
+              "schemeid": "dnet:access_modes"
+            },
+            "instancetype": {
+              "classid": "0001",
+              "classname": "Article",
+              "schemename": "dnet:publication_resource",
+              "schemeid": "dnet:publication_resource"
+            }
+          },
+          {
+            "refereed": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "hostedby": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Unknown Repository",
+              "key": "10|openaire____::55045bd2a65019fd8e6741a755395c8c"
+            },
+            "processingchargeamount": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "license": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "processingchargecurrency": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "distributionlocation": "",
+            "url": [
+              "http://dx.doi.org/10.1073/pnas.200372597"
+            ],
+            "dateofacceptance": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": ""
+            },
+            "collectedfrom": {
+              "dataInfo": {
+                "deletedbyinference": false,
+                "provenanceaction": {
+                  "classid": "",
+                  "classname": "",
+                  "schemename": "",
+                  "schemeid": ""
+                },
+                "inferred": false,
+                "inferenceprovenance": "",
+                "invisible": false,
+                "trust": ""
+              },
+              "value": "Crossref",
+              "key": "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2"
+            },
+            "accessright": {
+              "classid": "RESTRICTED",
+              "classname": "Restricted",
+              "schemename": "dnet:access_modes",
+              "schemeid": "dnet:access_modes"
+            },
+            "instancetype": {
+              "classid": "0001",
+              "classname": "Article",
+              "schemename": "dnet:publication_resource",
+              "schemeid": "dnet:publication_resource"
+            }
+          }
+        ],
+        "legalshortname": null,
+        "country": null,
+        "dateofacceptance": "2000-9-26",
+        "datasourcetype": null,
+        "datasourcetypeui": null,
+        "officialname": null
+      },
+      "relation": {
+        "subRelType": "dedup",
+        "relClass": "merges",
+        "dataInfo": {
+          "deletedbyinference": false,
+          "provenanceaction": {
+            "classid": "sysimport:dedup",
+            "classname": "sysimport:dedup",
+            "schemename": "dnet:provenanceActions",
+            "schemeid": "dnet:provenanceActions"
+          },
+          "inferred": true,
+          "inferenceprovenance": "decisiontree-dedup-test",
+          "invisible": false,
+          "trust": null
+        },
+        "target": "50|doiboost____::4317e3fa670267960efa09c1fd8339c9",
+        "lastupdatetimestamp": null,
+        "relType": "resultResult",
+        "source": "50|dedup_wf_001::00f53f19cfaf4dde8d316e9e71f16a10",
+        "collectedfrom": null,
+        "properties": []
+      }
+    }
+  ],
+  "entity": {
+    "deleted": false,
+    "oaf": "{\"collectedfrom\":[{\"key\":\"10|opendoar____::eda80a3d5b344bc40f3bc04f65b7a357\",\"value\":\"PubMed Central\",\"dataInfo\":null},{\"key\":\"10|openaire____::e034d6a11054f5ade9221ebac484e864\",\"value\":\"scholExplorer\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},{\"key\":\"10|openaire____::806360c771262b4d6770e7cdf04b5c5a\",\"value\":\"ORCID\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},{\"key\":\"10|openaire____::081b82f96300b6a6e3d282bad31cb6e2\",\"value\":\"Crossref\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},{\"key\":\"10|openaire____::5f532a3fc4f1ea403f37070f59a7a53a\",\"value\":\"Microsoft Academic Graph\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},{\"key\":\"10|openaire____::8ac8380272269217cb09a928c8caa993\",\"value\":\"UnpayWall\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}],\"dataInfo\":{\"invisible\":false,\"inferred\":true,\"deletedbyinference\":false,\"trust\":\"0.8\",\"inferenceprovenance\":\"decisiontree-dedup-test\",\"provenanceaction\":{\"classid\":\"sysimport:dedup\",\"classname\":\"sysimport:dedup\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"}},\"lastupdatetimestamp\":1589967085191,\"id\":\"50|dedup_wf_001::00f53f19cfaf4dde8d316e9e71f16a10\",\"originalId\":[\"od_______267::4d85ada0191a351f529d1e8ace1a7117\",\"38908045\",\"10.1073/pnas.200372597\"],\"pid\":[{\"value\":\"PMC17177\",\"qualifier\":{\"classid\":\"pmc\",\"classname\":\"pmc\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"0.9\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"sysimport:crosswalk\",\"classname\":\"sysimport:crosswalk\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"}}},{\"value\":\"11005843\",\"qualifier\":{\"classid\":\"pmid\",\"classname\":\"pmid\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"0.9\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"sysimport:crosswalk\",\"classname\":\"sysimport:crosswalk\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"}}},{\"value\":\"10.1073/pnas.200372597\",\"qualifier\":{\"classid\":\"doi\",\"classname\":\"doi\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}],\"dateofcollection\":\"2019-07-01T18:50:57Z\",\"dateoftransformation\":\"\",\"extraInfo\":[],\"oaiprovenance\":{\"originDescription\":{\"harvestDate\":\"2020-05-10T12:23:13.896Z\",\"altered\":true,\"baseURL\":\"mongodb%3A%2F%2Fservices.openaire.eu\",\"identifier\":\"\",\"datestamp\":\"\",\"metadataNamespace\":\"\"}},\"author\":[{\"fullname\":\"S. Kim\",\"name\":\"S.\",\"surname\":\"Kim\",\"rank\":1,\"pid\":[],\"affiliation\":[]},{\"fullname\":\"Q. Li\",\"name\":\"Q.\",\"surname\":\"Li\",\"rank\":2,\"pid\":[{\"value\":\"2719402459\",\"qualifier\":{\"classid\":\"MAG Identifier\",\"classname\":\"MAG Identifier\",\"schemeid\":null,\"schemename\":null},\"dataInfo\":null}],\"affiliation\":[{\"value\":\"Johns Hopkins University\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}]},{\"fullname\":\"C. V. Dang\",\"name\":\"C. V.\",\"surname\":\"Dang\",\"rank\":3,\"pid\":[{\"value\":\"2250822210\",\"qualifier\":{\"classid\":\"MAG Identifier\",\"classname\":\"MAG Identifier\",\"schemeid\":null,\"schemename\":null},\"dataInfo\":null},{\"value\":\"0000-0002-4031-2522\",\"qualifier\":{\"classid\":\"ORCID\",\"classname\":\"ORCID\",\"schemeid\":null,\"schemename\":null},\"dataInfo\":null}],\"affiliation\":[]},{\"fullname\":\"L. A. Lee\",\"name\":\"L. A.\",\"surname\":\"Lee\",\"rank\":4,\"pid\":[],\"affiliation\":[]}],\"resulttype\":{\"classid\":\"publication\",\"classname\":\"publication\",\"schemeid\":\"dnet:result_typologies\",\"schemename\":\"dnet:result_typologies\"},\"language\":{\"classid\":\"eng\",\"classname\":\"English\",\"schemeid\":\"dnet:languages\",\"schemename\":\"dnet:languages\"},\"country\":[],\"subject\":[{\"value\":\"Biological Sciences\",\"qualifier\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"0.9\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"sysimport:crosswalk\",\"classname\":\"sysimport:crosswalk\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"}}},{\"value\":\"Multidisciplinary\",\"qualifier\":{\"classid\":\"keyword\",\"classname\":\"keyword\",\"schemeid\":\"dnet:subject\",\"schemename\":\"dnet:subject\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}],\"title\":[{\"value\":\"Induction of ribosomal genes and hepatocyte hypertrophy by adenovirus-mediated expression of c-Myc in vivo\",\"qualifier\":{\"classid\":\"main title\",\"classname\":\"main title\",\"schemeid\":\"dnet:dataCite_title\",\"schemename\":\"dnet:dataCite_title\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"0.9\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"sysimport:crosswalk\",\"classname\":\"sysimport:crosswalk\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"}}},{\"value\":\"Induction of ribosomal genes and hepatocyte hypertrophy by adenovirus-mediated expression of c-Myc in vivo.\",\"qualifier\":{\"classid\":\"main title\",\"classname\":\"main title\",\"schemeid\":\"dnet:dataCite_title\",\"schemename\":\"dnet:dataCite_title\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}],\"relevantdate\":[{\"value\":\"2018-11-13\",\"qualifier\":{\"classid\":\"dnet:date\",\"classname\":\"dnet:date\",\"schemeid\":\"dnet:date\",\"schemename\":\"dnet:date\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},{\"value\":\"2000-01-01\",\"qualifier\":{\"classid\":\"issued\",\"classname\":\"issued\",\"schemeid\":\"dnet:dataCite_date\",\"schemename\":\"dnet:dataCite_date\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},{\"value\":\"2000-9-26\",\"qualifier\":{\"classid\":\"published-online\",\"classname\":\"published-online\",\"schemeid\":\"dnet:dataCite_date\",\"schemename\":\"dnet:dataCite_date\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},{\"value\":\"2000-10-10\",\"qualifier\":{\"classid\":\"published-print\",\"classname\":\"published-print\",\"schemeid\":\"dnet:dataCite_date\",\"schemename\":\"dnet:dataCite_date\"},\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}],\"description\":[{\"value\":\"Overexpression of c-Myc in immortalized cells increases cell\\n proliferation, inhibits cell differentiation, and promotes cell\\n transformation. Recent evidence suggests that these effects, however,\\n do not necessarily occur when c-Myc is overexpressed in primary\\n mammalian cells. We sought to determine the immediate effects of\\n transient overexpression of c-Myc in primary cells in\\n vivo by using recombinant adenovirus to overexpress human\\n MYC in mouse liver. Mice were intravenously injected\\n with adenoviruses encoding MYC (Ad/Myc), E2F-1\\n (Ad/E2F-1), or \u03b2-galactosidase (Ad/LacZ). Transgene expression\\n was detectable 4 days after injection. Expression of ectopic c-Myc was\\n immediately accompanied by enlarged and dysmorphic hepatocytes in the\\n absence of significant cell proliferation or apoptosis. These\\n findings were not present in the livers of mice injected with\\n Ad/E2F-1 or Ad/LacZ. Prominent hepatocyte nuclei and nucleoli were\\n associated with the up-regulation of large- and small-subunit ribosomal\\n and nucleolar genes, suggesting that c-Myc may induce their expression\\n to increase cell mass. Our studies support a role for c-Myc in the\\n in vivo control of vertebrate cell size and metabolism\\n independent of cell proliferation.\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"0.9\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"sysimport:crosswalk\",\"classname\":\"sysimport:crosswalk\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"}}}],\"dateofacceptance\":{\"value\":\"2000-01-01\",\"dataInfo\":null},\"publisher\":{\"value\":\"The National Academy of Sciences\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"0.9\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"sysimport:crosswalk\",\"classname\":\"sysimport:crosswalk\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"}}},\"embargoenddate\":null,\"source\":[{\"value\":\"Scopus - Elsevier\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}],\"fulltext\":[],\"format\":[],\"contributor\":[],\"resourcetype\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"},\"coverage\":[],\"bestaccessright\":null,\"context\":[],\"externalReference\":[{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"membrane\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"membrane\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"tek\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"tek\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"ribosome biogenesis\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"ribosome biogenesis\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"bn51\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"bn51\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"c-myc\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"c-myc\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"nucleolin\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"nucleolin\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"uptake\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"uptake\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell growth\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell growth\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"\u03b2-galactosidase\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"\u03b2-galactosidase\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"estrogen receptor\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"estrogen receptor\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell differentiation\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell differentiation\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"pathogenesis\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"pathogenesis\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"localization\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"localization\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"p19arf\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"p19arf\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"glucose metabolism\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"glucose metabolism\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell cycle regulation\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell cycle regulation\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"mrdb\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"mrdb\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"gene expression\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"gene expression\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"eif-2a\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"eif-2a\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"cyclin d2\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"cyclin d2\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"pseudouridylation\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"pseudouridylation\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"e2f-1\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"e2f-1\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"keratinocyte proliferation\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"keratinocyte proliferation\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"biosynthesis\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"biosynthesis\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"nucleolus\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"nucleolus\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"metabolism\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"metabolism\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"dihydroorotase\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"dihydroorotase\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"liver regeneration\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"liver regeneration\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"ribosome assembly\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"ribosome assembly\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"protein translation\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"protein translation\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"translation initiation\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"translation initiation\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"nucleus\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"nucleus\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"mdm2\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"mdm2\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell cycle\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell cycle\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"ornithine decarboxylase\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"ornithine decarboxylase\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"https://www.targetvalidation.org\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"https://www.targetvalidation.org\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"mfl\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"mfl\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell proliferation\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell proliferation\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"chromatin\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"chromatin\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"eif-4e\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"eif-4e\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"e2a\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"e2a\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell development\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell development\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"myc\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"myc\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell-cycle phase\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"cell-cycle phase\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"cyclins d1\\\")\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=name:(\\\"cyclins d1\\\")\",\"query\":\"\",\"dataInfo\":null},{\"sitename\":\"Europe PMC\",\"label\":\"\",\"url\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"ribosomal subunit\\\")&sort=score\",\"description\":\"\",\"qualifier\":{\"classid\":\"url\",\"classname\":\"url\",\"schemeid\":\"dnet:externalReference_typologies\",\"schemename\":\"dnet:externalReference_typologies\"},\"refidentifier\":\"http://www.uniprot.org/uniprot/?query=go:(\\\"ribosomal subunit\\\")&sort=score\",\"query\":\"\",\"dataInfo\":null}],\"instance\":[{\"license\":null,\"accessright\":{\"classid\":\"OPEN\",\"classname\":\"Open Access\",\"schemeid\":\"dnet:access_modes\",\"schemename\":\"dnet:access_modes\"},\"instancetype\":{\"classid\":\"0038\",\"classname\":\"Other literature type\",\"schemeid\":\"dnet:publication_resource\",\"schemename\":\"dnet:publication_resource\"},\"hostedby\":{\"key\":\"10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c\",\"value\":\"Europe PubMed Central\",\"dataInfo\":null},\"url\":[\"https://europepmc.org/articles/PMC17177/\"],\"distributionlocation\":\"\",\"collectedfrom\":{\"key\":\"10|opendoar____::eda80a3d5b344bc40f3bc04f65b7a357\",\"value\":\"PubMed Central\",\"dataInfo\":null},\"dateofacceptance\":{\"value\":\"2000-09-26\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"0.9\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"sysimport:crosswalk\",\"classname\":\"sysimport:crosswalk\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"}}},\"processingchargeamount\":null,\"processingchargecurrency\":null,\"refereed\":null},{\"license\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"accessright\":{\"classid\":\"UNKNOWN\",\"classname\":\"not available\",\"schemeid\":\"dnet:access_modes\",\"schemename\":\"dnet:access_modes\"},\"instancetype\":{\"classid\":\"0000\",\"classname\":\"Unknown\",\"schemeid\":\"dnet:publication_resource\",\"schemename\":\"dnet:publication_resource\"},\"hostedby\":{\"key\":\"10|openaire____::55045bd2a65019fd8e6741a755395c8c\",\"value\":\"Unknown Repository\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"url\":[\"https://www.ncbi.nlm.nih.gov/pubmed/11005843\"],\"distributionlocation\":\"\",\"collectedfrom\":{\"key\":\"10|openaire____::e034d6a11054f5ade9221ebac484e864\",\"value\":\"scholExplorer\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"dateofacceptance\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargeamount\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargecurrency\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"refereed\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}},{\"license\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"accessright\":{\"classid\":\"UNKNOWN\",\"classname\":\"UNKNOWN\",\"schemeid\":\"dnet:access_modes\",\"schemename\":\"dnet:access_modes\"},\"instancetype\":{\"classid\":\"0001\",\"classname\":\"Article\",\"schemeid\":\"dnet:publication_resource\",\"schemename\":\"dnet:publication_resource\"},\"hostedby\":{\"key\":\"10|openaire____::55045bd2a65019fd8e6741a755395c8c\",\"value\":\"Unknown Repository\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"url\":[],\"distributionlocation\":\"\",\"collectedfrom\":{\"key\":\"10|openaire____::806360c771262b4d6770e7cdf04b5c5a\",\"value\":\"ORCID\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"dateofacceptance\":{\"value\":\"2000-01-01\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargeamount\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargecurrency\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"refereed\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}},{\"license\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"accessright\":{\"classid\":\"OPEN\",\"classname\":\"Open Access\",\"schemeid\":\"dnet:access_modes\",\"schemename\":\"dnet:access_modes\"},\"instancetype\":{\"classid\":\"0001\",\"classname\":\"Article\",\"schemeid\":\"dnet:publication_resource\",\"schemename\":\"dnet:publication_resource\"},\"hostedby\":{\"key\":\"10|openaire____::55045bd2a65019fd8e6741a755395c8c\",\"value\":\"Unknown Repository\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"url\":[\"http://www.pnas.org/content/97/21/11198.full.pdf\"],\"distributionlocation\":\"\",\"collectedfrom\":{\"key\":\"10|openaire____::8ac8380272269217cb09a928c8caa993\",\"value\":\"UnpayWall\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"dateofacceptance\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargeamount\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargecurrency\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"refereed\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}},{\"license\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"accessright\":{\"classid\":\"UNKNOWN\",\"classname\":\"not available\",\"schemeid\":\"dnet:access_modes\",\"schemename\":\"dnet:access_modes\"},\"instancetype\":{\"classid\":\"0001\",\"classname\":\"Article\",\"schemeid\":\"dnet:publication_resource\",\"schemename\":\"dnet:publication_resource\"},\"hostedby\":{\"key\":\"10|openaire____::55045bd2a65019fd8e6741a755395c8c\",\"value\":\"Unknown Repository\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"url\":[\"https://syndication.highwire.org/content/doi/10.1073/pnas.200372597\"],\"distributionlocation\":\"\",\"collectedfrom\":{\"key\":\"10|openaire____::081b82f96300b6a6e3d282bad31cb6e2\",\"value\":\"Crossref\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"dateofacceptance\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargeamount\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargecurrency\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"refereed\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}},{\"license\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"accessright\":{\"classid\":\"UNKNOWN\",\"classname\":\"not available\",\"schemeid\":\"dnet:access_modes\",\"schemename\":\"dnet:access_modes\"},\"instancetype\":{\"classid\":\"0001\",\"classname\":\"Article\",\"schemeid\":\"dnet:publication_resource\",\"schemename\":\"dnet:publication_resource\"},\"hostedby\":{\"key\":\"10|openaire____::55045bd2a65019fd8e6741a755395c8c\",\"value\":\"Unknown Repository\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"url\":[\"https://academic.microsoft.com/#/detail/2045899555\"],\"distributionlocation\":\"\",\"collectedfrom\":{\"key\":\"10|openaire____::5f532a3fc4f1ea403f37070f59a7a53a\",\"value\":\"Microsoft Academic Graph\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"dateofacceptance\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargeamount\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargecurrency\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"refereed\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}},{\"license\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"accessright\":{\"classid\":\"RESTRICTED\",\"classname\":\"Restricted\",\"schemeid\":\"dnet:access_modes\",\"schemename\":\"dnet:access_modes\"},\"instancetype\":{\"classid\":\"0001\",\"classname\":\"Article\",\"schemeid\":\"dnet:publication_resource\",\"schemename\":\"dnet:publication_resource\"},\"hostedby\":{\"key\":\"10|openaire____::55045bd2a65019fd8e6741a755395c8c\",\"value\":\"Unknown Repository\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"url\":[\"http://dx.doi.org/10.1073/pnas.200372597\"],\"distributionlocation\":\"\",\"collectedfrom\":{\"key\":\"10|openaire____::081b82f96300b6a6e3d282bad31cb6e2\",\"value\":\"Crossref\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"dateofacceptance\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargeamount\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"processingchargecurrency\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}},\"refereed\":{\"value\":\"\",\"dataInfo\":{\"invisible\":false,\"inferred\":false,\"deletedbyinference\":false,\"trust\":\"\",\"inferenceprovenance\":\"\",\"provenanceaction\":{\"classid\":\"\",\"classname\":\"\",\"schemeid\":\"\",\"schemename\":\"\"}}}}],\"journal\":null}",
+    "type": "publication",
+    "id": "50|dedup_wf_001::00f53f19cfaf4dde8d316e9e71f16a10"
+  }
+}
