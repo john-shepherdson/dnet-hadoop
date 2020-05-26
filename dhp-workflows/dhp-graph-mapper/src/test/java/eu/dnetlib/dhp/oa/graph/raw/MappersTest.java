@@ -85,8 +85,19 @@ public class MappersTest {
 		assertTrue(p.getSubject().size() > 0);
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
-		assertTrue(p.getInstance().size() > 0);
 
+		assertNotNull(p.getInstance());
+		assertTrue(p.getInstance().size() > 0);
+		p
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
+
+		assertNotNull(p.getBestaccessright());
+		assertEquals("OPEN", p.getBestaccessright().getClassid());
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());
 		assertValidId(r2.getSource());
@@ -163,6 +174,16 @@ public class MappersTest {
 		assertTrue(d.getInstance().size() > 0);
 		assertTrue(d.getContext().size() > 0);
 		assertTrue(d.getContext().get(0).getId().length() > 0);
+
+		assertNotNull(d.getInstance());
+		assertTrue(d.getInstance().size() > 0);
+		d
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
 
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());
