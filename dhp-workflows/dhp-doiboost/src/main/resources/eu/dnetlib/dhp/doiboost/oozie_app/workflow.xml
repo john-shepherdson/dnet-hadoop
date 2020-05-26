@@ -20,6 +20,18 @@
             <name>orcidPublicationPath</name>
             <description>the ORCID Publication Path</description>
         </property>
+
+        <property>
+            <name>affiliationPath</name>
+            <description>the Affliation Path</description>
+        </property>
+
+        <property>
+            <name>paperAffiliationPath</name>
+            <description>the paperAffiliation Path</description>
+        </property>
+
+
         <property>
             <name>workingDirPath</name>
             <description>the Working Path</description>
@@ -40,7 +52,7 @@
 
 
 
-    <start to="CreateDOIBoost"/>
+    <start to="GenerateActionSet"/>
 
 
     <kill name="Kill">
@@ -75,36 +87,40 @@
             <arg>--uwPublicationPath</arg><arg>${uwPublicationPath}</arg>
             <arg>--magPublicationPath</arg><arg>${magPublicationPath}</arg>
             <arg>--orcidPublicationPath</arg><arg>${orcidPublicationPath}</arg>
+            <arg>--affiliationPath</arg><arg>${affiliationPath}</arg>
+            <arg>--paperAffiliationPath</arg><arg>${paperAffiliationPath}</arg>
             <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="GenerateActionSet"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="GenerateActionSet">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Generate DOIBoost ActionSet</name>
+            <class>eu.dnetlib.doiboost.SparkGenerateDOIBoostActionSet</class>
+            <jar>dhp-doiboost-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=3840
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>--dbPublicationPath</arg><arg>${workingDirPath}/doiBoostPublicationFiltered</arg>
+            <arg>--dbDatasetPath</arg><arg>${workingDirPath}/crossrefDataset</arg>
+            <arg>--crossRefRelation</arg><arg>/data/doiboost/input/crossref/relations</arg>
+            <arg>--dbaffiliationRelationPath</arg><arg>${workingDirPath}/doiBoostPublicationAffiliation</arg>
+            <arg>--targetPath</arg><arg>${workingDirPath}/actionDataSet</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
-
-
-<!--    <action name="PreprocessMag">-->
-<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
-<!--            <master>yarn-cluster</master>-->
-<!--            <mode>cluster</mode>-->
-<!--            <name>Convert Mag to Dataset</name>-->
-<!--            <class>eu.dnetlib.doiboost.mag.SparkPreProcessMAG</class>-->
-<!--            <jar>dhp-doiboost-${projectVersion}.jar</jar>-->
-<!--            <spark-opts>-->
-<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
-<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
-<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
-<!--                &#45;&#45;conf spark.sql.shuffle.partitions=3840-->
-<!--                ${sparkExtraOPT}-->
-<!--            </spark-opts>-->
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}</arg>-->
-<!--            <arg>&#45;&#45;targetPath</arg><arg>${targetPath}</arg>-->
-<!--            <arg>&#45;&#45;master</arg><arg>yarn-cluster</arg>-->
-<!--        </spark>-->
-<!--        <ok to="End"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
 
     <end name="End"/>
 </workflow-app>
