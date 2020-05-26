@@ -61,7 +61,6 @@ public class BlackListTest {
 		spark.stop();
 	}
 
-
 	@Test
 	public void noRemoveTest() throws Exception {
 		SparkRemoveBlacklistedRelationJob
