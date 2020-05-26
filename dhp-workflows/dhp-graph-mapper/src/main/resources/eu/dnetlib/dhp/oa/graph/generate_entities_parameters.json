@@ -34,6 +34,11 @@
 		"paramLongName": "postgresPassword",
 		"paramDescription": "postgres password",
 		"paramRequired": false
+	},
+	{
+		"paramName": "islookup",
+		"paramLongName": "isLookupUrl",
+		"paramDescription": "the url of the ISLookupService",
+		"paramRequired": true
 	}
-
 ]
