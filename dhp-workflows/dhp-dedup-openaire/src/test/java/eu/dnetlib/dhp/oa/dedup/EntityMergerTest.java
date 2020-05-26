@@ -90,10 +90,18 @@ public class EntityMergerTest implements Serializable {
 		// verify authors
 		assertEquals(pub_merged.getAuthor().size(), 9);
 		assertEquals(AuthorMerger.countAuthorsPids(pub_merged.getAuthor()), 4);
+
+		//verify title
+		int count = 0;
+		for (StructuredProperty title: pub_merged.getTitle()){
+			if (title.getQualifier().getClassid().equals("main title"))
+				count++;
+		}
+		assertEquals(count, 1);
 	}
 
 	@Test
-	public void publicationMergerTest2() throws InstantiationException, IllegalAccessException, IOException {
+	public void publicationMergerTest2() throws InstantiationException, IllegalAccessException {
 
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications2.iterator(), 0, dataInfo, Publication.class);

@@ -53,8 +53,7 @@ public abstract class AbstractEnrichMissingPublication
 		return new UpdateInfo<>(
 			getTopic(),
 			highlightValue, source.getLeft(), target.getLeft(),
-			(p, rel) -> {
-			}, // p.getPublications().add(rel), //TODO available in the future release of dnet-openaire-broker-common
+			(p, rel) -> p.getPublications().add(rel),
 			rel -> rel.getInstances().get(0).getUrl());
 	}
 
