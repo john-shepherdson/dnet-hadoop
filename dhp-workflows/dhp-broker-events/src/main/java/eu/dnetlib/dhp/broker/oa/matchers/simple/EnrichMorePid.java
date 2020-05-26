@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.broker.oa.matchers;
+package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
 import java.util.List;
 import java.util.Set;
@@ -7,11 +7,12 @@ import java.util.stream.Collectors;
 
 import eu.dnetlib.broker.objects.Pid;
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMorePid extends UpdateMatcher<Pid> {
+public class EnrichMorePid extends UpdateMatcher<Result, Pid> {
 
 	public EnrichMorePid() {
 		super(true);

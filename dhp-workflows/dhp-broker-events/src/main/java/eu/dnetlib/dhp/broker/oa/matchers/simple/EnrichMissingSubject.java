@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.broker.oa.matchers;
+package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
 import java.util.List;
 import java.util.Set;
@@ -8,13 +8,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class EnrichMissingSubject extends UpdateMatcher<Pair<String, String>> {
+public class EnrichMissingSubject extends UpdateMatcher<Result, Pair<String, String>> {
 
 	public EnrichMissingSubject() {
 		super(true);

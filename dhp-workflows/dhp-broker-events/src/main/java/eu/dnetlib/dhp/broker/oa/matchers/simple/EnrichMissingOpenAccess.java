@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.broker.oa.matchers;
+package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,12 +7,13 @@ import java.util.stream.Collectors;
 
 import eu.dnetlib.broker.objects.Instance;
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingOpenAccess extends UpdateMatcher<Instance> {
+public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
 
 	public EnrichMissingOpenAccess() {
 		super(true);

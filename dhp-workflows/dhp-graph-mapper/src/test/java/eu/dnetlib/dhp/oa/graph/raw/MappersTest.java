@@ -21,7 +21,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 @ExtendWith(MockitoExtension.class)
 public class MappersTest {
@@ -54,13 +61,13 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 
 		assertTrue(p.getAuthor().size() > 0);
-		Optional<Author> author = p
+		final Optional<Author> author = p
 			.getAuthor()
 			.stream()
 			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.findFirst();
 		assertTrue(author.isPresent());
-		StructuredProperty pid = author
+		final StructuredProperty pid = author
 			.get()
 			.getPid()
 			.stream()
@@ -68,7 +75,7 @@ public class MappersTest {
 			.get();
 		assertEquals("0000-0001-6651-1178", pid.getValue());
 		assertEquals("ORCID", pid.getQualifier().getClassid());
-		assertEquals("ORCID", pid.getQualifier().getClassname());
+		assertEquals("Open Researcher and Contributor ID", pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Votsi,Nefta", author.get().getFullname());
@@ -78,8 +85,19 @@ public class MappersTest {
 		assertTrue(p.getSubject().size() > 0);
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
-		assertTrue(p.getInstance().size() > 0);
 
+		assertNotNull(p.getInstance());
+		assertTrue(p.getInstance().size() > 0);
+		p
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
+
+		assertNotNull(p.getBestaccessright());
+		assertEquals("OPEN", p.getBestaccessright().getClassid());
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());
 		assertValidId(r2.getSource());
@@ -121,13 +139,13 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
 
-		Optional<Author> author = d
+		final Optional<Author> author = d
 			.getAuthor()
 			.stream()
 			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.findFirst();
 		assertTrue(author.isPresent());
-		StructuredProperty pid = author
+		final StructuredProperty pid = author
 			.get()
 			.getPid()
 			.stream()
@@ -135,7 +153,7 @@ public class MappersTest {
 			.get();
 		assertEquals("0000-0001-9074-1619", pid.getValue());
 		assertEquals("ORCID", pid.getQualifier().getClassid());
-		assertEquals("ORCID", pid.getQualifier().getClassname());
+		assertEquals("Open Researcher and Contributor ID", pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Baracchini, Theo", author.get().getFullname());
@@ -143,19 +161,29 @@ public class MappersTest {
 		assertEquals("Theo", author.get().getName());
 
 		assertEquals(1, author.get().getAffiliation().size());
-		Optional<Field<String>> opAff = author
+		final Optional<Field<String>> opAff = author
 			.get()
 			.getAffiliation()
 			.stream()
 			.findFirst();
 		assertTrue(opAff.isPresent());
-		Field<String> affiliation = opAff.get();
+		final Field<String> affiliation = opAff.get();
 		assertEquals("ISTI-CNR", affiliation.getValue());
 
 		assertTrue(d.getSubject().size() > 0);
 		assertTrue(d.getInstance().size() > 0);
 		assertTrue(d.getContext().size() > 0);
 		assertTrue(d.getContext().get(0).getId().length() > 0);
+
+		assertNotNull(d.getInstance());
+		assertTrue(d.getInstance().size() > 0);
+		d
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
 
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());

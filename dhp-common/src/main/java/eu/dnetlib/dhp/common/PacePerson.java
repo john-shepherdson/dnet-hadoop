@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.raw.common;
+package eu.dnetlib.dhp.common;
 
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;

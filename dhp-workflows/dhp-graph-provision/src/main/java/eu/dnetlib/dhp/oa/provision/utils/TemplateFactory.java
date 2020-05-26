@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
 import static eu.dnetlib.dhp.oa.provision.utils.XmlSerializationUtils.escapeXml;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -95,7 +96,7 @@ public class TemplateFactory {
 			.add("metadata", instancemetadata)
 			.add(
 				"webresources",
-				webresources
+				(webresources != null ? webresources : new ArrayList<String>())
 					.stream()
 					.filter(StringUtils::isNotBlank)
 					.map(w -> getWebResource(w))

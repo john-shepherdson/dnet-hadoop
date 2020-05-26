@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Field<T> implements Serializable {
 
@@ -39,6 +40,6 @@ public class Field<T> implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Field<T> other = (Field<T>) obj;
-		return getValue().equals(other.getValue());
+		return Objects.equals(getValue(), other.getValue());
 	}
 }
