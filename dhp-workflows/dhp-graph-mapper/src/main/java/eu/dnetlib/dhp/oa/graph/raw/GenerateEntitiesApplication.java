@@ -5,7 +5,12 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -27,7 +32,19 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
+import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
 public class GenerateEntitiesApplication {
@@ -39,14 +56,12 @@ public class GenerateEntitiesApplication {
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					MigrateMongoMdstoresApplication.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/generate_entities_parameters.json")));
+				.toString(GenerateEntitiesApplication.class
+					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/generate_entities_parameters.json")));
 
 		parser.parseArgument(args);
 
-		Boolean isSparkSessionManaged = Optional
+		final Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
@@ -58,17 +73,17 @@ public class GenerateEntitiesApplication {
 		final String dbUrl = parser.get("postgresUrl");
 		final String dbUser = parser.get("postgresUser");
 		final String dbPassword = parser.get("postgresPassword");
+		final String isLookupUrl = parser.get("isLookupUrl");
 
-		final Map<String, String> code2name = loadClassNames(dbUrl, dbUser, dbPassword);
+		final Map<String, String> code2name = loadVocsFromDB(dbUrl, dbUser, dbPassword);
 
-		SparkConf conf = new SparkConf();
-		runWithSparkSession(
-			conf,
-			isSparkSessionManaged,
-			spark -> {
-				removeOutputDir(spark, targetPath);
-				generateEntities(spark, code2name, sourcePaths, targetPath);
-			});
+		code2name.putAll(loadVocsFromIS(isLookupUrl));
+
+		final SparkConf conf = new SparkConf();
+		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
+			removeOutputDir(spark, targetPath);
+			generateEntities(spark, code2name, sourcePaths, targetPath);
+		});
 	}
 
 	private static void generateEntities(
@@ -77,7 +92,7 @@ public class GenerateEntitiesApplication {
 		final String sourcePaths,
 		final String targetPath) {
 
-		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		final List<String> existingSourcePaths = Arrays
 			.stream(sourcePaths.split(","))
 			.filter(p -> exists(sc, p))
@@ -90,27 +105,25 @@ public class GenerateEntitiesApplication {
 
 		for (final String sp : existingSourcePaths) {
 			inputRdd = inputRdd
-				.union(
-					sc
-						.sequenceFile(sp, Text.class, Text.class)
-						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
-						.map(k -> convertToListOaf(k._1(), k._2(), code2name))
-						.filter(Objects::nonNull)
-						.flatMap(list -> list.iterator()));
+				.union(sc
+					.sequenceFile(sp, Text.class, Text.class)
+					.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
+					.map(k -> convertToListOaf(k._1(), k._2(), code2name))
+					.filter(Objects::nonNull)
+					.flatMap(list -> list.iterator()));
 		}
 
 		inputRdd
 			.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
 			.reduceByKey((o1, o2) -> merge(o1, o2))
 			.map(Tuple2::_2)
-			.map(
-				oaf -> oaf.getClass().getSimpleName().toLowerCase()
-					+ "|"
-					+ OBJECT_MAPPER.writeValueAsString(oaf))
+			.map(oaf -> oaf.getClass().getSimpleName().toLowerCase()
+				+ "|"
+				+ OBJECT_MAPPER.writeValueAsString(oaf))
 			.saveAsTextFile(targetPath, GzipCodec.class);
 	}
 
-	private static Oaf merge(Oaf o1, Oaf o2) {
+	private static Oaf merge(final Oaf o1, final Oaf o2) {
 		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
 			((OafEntity) o1).mergeFrom((OafEntity) o2);
 		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
@@ -122,37 +135,41 @@ public class GenerateEntitiesApplication {
 	}
 
 	private static List<Oaf> convertToListOaf(
-		final String id, final String s, final Map<String, String> code2name) {
+		final String id,
+		final String s,
+		final Map<String, String> code2name) {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
-			case "native_oaf":
-				return new OafToOafMapper(code2name).processMdRecord(s);
-			case "native_odf":
-				return new OdfToOafMapper(code2name).processMdRecord(s);
-			case "datasource":
-				return Arrays.asList(convertFromJson(s, Datasource.class));
-			case "organization":
-				return Arrays.asList(convertFromJson(s, Organization.class));
-			case "project":
-				return Arrays.asList(convertFromJson(s, Project.class));
-			case "relation":
-				return Arrays.asList(convertFromJson(s, Relation.class));
-			case "publication":
-				return Arrays.asList(convertFromJson(s, Publication.class));
-			case "dataset":
-				return Arrays.asList(convertFromJson(s, Dataset.class));
-			case "software":
-				return Arrays.asList(convertFromJson(s, Software.class));
-			case "otherresearchproduct":
-				return Arrays.asList(convertFromJson(s, OtherResearchProduct.class));
-			default:
-				throw new RuntimeException("type not managed: " + type.toLowerCase());
+		case "native_oaf":
+			return new OafToOafMapper(code2name).processMdRecord(s);
+		case "native_odf":
+			return new OdfToOafMapper(code2name).processMdRecord(s);
+		case "datasource":
+			return Arrays.asList(convertFromJson(s, Datasource.class));
+		case "organization":
+			return Arrays.asList(convertFromJson(s, Organization.class));
+		case "project":
+			return Arrays.asList(convertFromJson(s, Project.class));
+		case "relation":
+			return Arrays.asList(convertFromJson(s, Relation.class));
+		case "publication":
+			return Arrays.asList(convertFromJson(s, Publication.class));
+		case "dataset":
+			return Arrays.asList(convertFromJson(s, Dataset.class));
+		case "software":
+			return Arrays.asList(convertFromJson(s, Software.class));
+		case "otherresearchproduct":
+			return Arrays.asList(convertFromJson(s, OtherResearchProduct.class));
+		default:
+			throw new RuntimeException("type not managed: " + type.toLowerCase());
 		}
 	}
 
-	private static Map<String, String> loadClassNames(
-		final String dbUrl, final String dbUser, final String dbPassword) throws IOException {
+	private static Map<String, String> loadVocsFromDB(
+		final String dbUrl,
+		final String dbUser,
+		final String dbPassword) throws IOException {
 
 		log.info("Loading vocabulary terms from db...");
 
@@ -160,18 +177,34 @@ public class GenerateEntitiesApplication {
 
 		try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
 			dbClient
-				.processResults(
-					"select code, name from class",
-					rs -> {
-						try {
-							map.put(rs.getString("code"), rs.getString("name"));
-						} catch (final SQLException e) {
-							e.printStackTrace();
-						}
-					});
+				.processResults("select code, name from class", rs -> {
+					try {
+						map.put(rs.getString("code"), rs.getString("name"));
+					} catch (final SQLException e) {
+						e.printStackTrace();
+					}
+				});
 		}
 
 		log.info("Found " + map.size() + " terms.");
+
+		return map;
+	}
+
+	private static Map<String, String> loadVocsFromIS(final String isLookupUrl) throws IOException, ISLookUpException {
+		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+
+		final String xquery =
+			IOUtils.toString(GenerateEntitiesApplication.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/xquery/load_vocabularies.xquery"));
+
+		final Map<String, String> map = new HashMap<>();
+
+		for (final String s : isLookUpService.quickSearchProfile(xquery)) {
+			final String[] arr = s.split("@=@");
+			if (arr.length == 4) {
+				map.put(arr[2].trim(), arr[3].trim());
+			}
+		}
 
 		return map;
 	}
@@ -196,7 +229,7 @@ public class GenerateEntitiesApplication {
 		}
 	}
 
-	private static void removeOutputDir(SparkSession spark, String path) {
+	private static void removeOutputDir(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 }

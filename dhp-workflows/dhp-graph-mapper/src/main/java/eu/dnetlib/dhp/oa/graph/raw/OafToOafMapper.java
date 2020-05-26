@@ -130,8 +130,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 		final Instance instance = new Instance();
 		instance
-			.setInstancetype(
-				prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
+			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
@@ -147,14 +146,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 		final List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
 		instance
-			.setUrl(
-				nodes
-					.stream()
-					.filter(n -> StringUtils.isNotBlank(n.getText()))
-					.map(n -> n.getText().trim())
-					.filter(u -> u.startsWith("http"))
-					.distinct()
-					.collect(Collectors.toCollection(ArrayList::new)));
+			.setUrl(nodes
+				.stream()
+				.filter(n -> StringUtils.isNotBlank(n.getText()))
+				.map(n -> n.getText().trim())
+				.filter(u -> u.startsWith("http"))
+				.distinct()
+				.collect(Collectors.toCollection(ArrayList::new)));
 
 		return Lists.newArrayList(instance);
 	}
@@ -279,15 +277,9 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				final String otherId = createOpenaireId(50, originalId, false);
 
 				res
-					.add(
-						getRelation(
-							docId, otherId, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO, collectedFrom, info,
-							lastUpdateTimestamp));
+					.add(getRelation(docId, otherId, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO, collectedFrom, info, lastUpdateTimestamp));
 				res
-					.add(
-						getRelation(
-							otherId, docId, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO, collectedFrom, info,
-							lastUpdateTimestamp));
+					.add(getRelation(otherId, docId, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO, collectedFrom, info, lastUpdateTimestamp));
 			}
 		}
 		return res;
@@ -296,5 +288,10 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
+	}
+
+	@Override
+	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
+		return prepareListStructProps(doc, "//oaf:identifier", "@identifierType", "dnet:pid_types", "dnet:pid_types", info);
 	}
 }
