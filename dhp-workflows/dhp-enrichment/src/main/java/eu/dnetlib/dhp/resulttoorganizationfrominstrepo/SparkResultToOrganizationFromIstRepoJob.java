@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
 
@@ -83,10 +84,8 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
-				if (saveGraph)
+				// removeOutputDir(spark, outputPath);
+				if (saveGraph) {
 					execPropagation(
 						spark,
 						datasourceorganization,
@@ -94,6 +93,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 						inputPath,
 						outputPath,
 						resultClazz);
+				}
 			});
 	}
 
@@ -136,9 +136,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 					.stream()
 					.forEach(
 						rId -> {
-							if (organization_list.contains(rId)) {
-								organization_list.remove(rId);
-							}
+							organization_list.remove(rId);
 						});
 			}
 			String resultId = potential_update.getResultId();
@@ -151,9 +149,9 @@ public class SparkResultToOrganizationFromIstRepoJob {
 								getRelation(
 									orgId,
 									resultId,
-									RELATION_ORGANIZATION_RESULT_REL_CLASS,
-									RELATION_RESULTORGANIZATION_REL_TYPE,
-									RELATION_RESULTORGANIZATION_SUBREL_TYPE,
+									ModelConstants.IS_AUTHOR_INSTITUTION_OF,
+									ModelConstants.RESULT_ORGANIZATION,
+									ModelConstants.AFFILIATION,
 									PROPAGATION_DATA_INFO_TYPE,
 									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
 									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));
@@ -162,9 +160,9 @@ public class SparkResultToOrganizationFromIstRepoJob {
 								getRelation(
 									resultId,
 									orgId,
-									RELATION_RESULT_ORGANIZATION_REL_CLASS,
-									RELATION_RESULTORGANIZATION_REL_TYPE,
-									RELATION_RESULTORGANIZATION_SUBREL_TYPE,
+									ModelConstants.HAS_AUTHOR_INSTITUTION,
+									ModelConstants.RESULT_ORGANIZATION,
+									ModelConstants.AFFILIATION,
 									PROPAGATION_DATA_INFO_TYPE,
 									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
 									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));

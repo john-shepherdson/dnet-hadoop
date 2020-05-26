@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
@@ -70,11 +71,10 @@ public class SparkOrcidToResultFromSemRelJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
-				if (saveGraph)
+				removeOutputDir(spark, outputPath);
+				if (saveGraph) {
 					execPropagation(spark, possibleUpdates, inputPath, outputPath, resultClazz);
+				}
 			});
 	}
 
@@ -122,40 +122,51 @@ public class SparkOrcidToResultFromSemRelJob {
 	}
 
 	private static void enrichAuthor(Author a, List<AutoritativeAuthor> au) {
+		PacePerson pp = new PacePerson(a.getFullname(), false);
 		for (AutoritativeAuthor aa : au) {
-			if (enrichAuthor(aa, a)) {
+			if (enrichAuthor(aa, a, pp.getNormalisedFirstName(), pp.getNormalisedSurname())) {
 				return;
 			}
 		}
 	}
 
-	private static boolean enrichAuthor(AutoritativeAuthor autoritative_author, Author author) {
+	private static boolean enrichAuthor(AutoritativeAuthor autoritative_author, Author author,
+		String author_name,
+		String author_surname) {
 		boolean toaddpid = false;
 
-		if (StringUtils.isNoneEmpty(autoritative_author.getSurname())) {
-			if (StringUtils.isNoneEmpty(author.getSurname())) {
+		if (StringUtils.isNotEmpty(autoritative_author.getSurname())) {
+			if (StringUtils.isNotEmpty(author.getSurname())) {
+				author_surname = author.getSurname();
+			}
+			if (StringUtils.isNotEmpty(author_surname)) {
 				if (autoritative_author
 					.getSurname()
 					.trim()
-					.equalsIgnoreCase(author.getSurname().trim())) {
+					.equalsIgnoreCase(author_surname.trim())) {
 
 					// have the same surname. Check the name
-					if (StringUtils.isNoneEmpty(autoritative_author.getName())) {
-						if (StringUtils.isNoneEmpty(author.getName())) {
+					if (StringUtils.isNotEmpty(autoritative_author.getName())) {
+						if (StringUtils.isNotEmpty(author.getName())) {
+							author_name = author.getName();
+						}
+						if (StringUtils.isNotEmpty(author_name)) {
 							if (autoritative_author
 								.getName()
 								.trim()
-								.equalsIgnoreCase(author.getName().trim())) {
+								.equalsIgnoreCase(author_name.trim())) {
 								toaddpid = true;
 							}
 							// they could be differently written (i.e. only the initials of the name
 							// in one of the two
-							if (autoritative_author
-								.getName()
-								.trim()
-								.substring(0, 0)
-								.equalsIgnoreCase(author.getName().trim().substring(0, 0))) {
-								toaddpid = true;
+							else {
+								if (autoritative_author
+									.getName()
+									.trim()
+									.substring(0, 0)
+									.equalsIgnoreCase(author_name.trim().substring(0, 0))) {
+									toaddpid = true;
+								}
 							}
 						}
 					}

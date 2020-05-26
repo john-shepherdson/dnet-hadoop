@@ -4,15 +4,31 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_DATE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_RESOURCE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_LANGUAGES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PUBLICATION_RESOURCE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PART_OF;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_SUPPLEMENTED_BY;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_SUPPLEMENT_TO;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PART;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.SUPPLEMENT;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -21,7 +37,6 @@ import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
@@ -44,27 +59,54 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//datacite:creator")) {
 			final Node n = (Node) o;
 			final Author author = new Author();
-			author.setFullname(n.valueOf("./datacite:creatorName"));
-			author.setName(n.valueOf("./datacite:givenName"));
-			author.setSurname(n.valueOf("./datacite:familyName"));
-			author.setAffiliation(prepareListFields(doc, "./datacite:affiliation", info));
-			author.setPid(preparePids(doc, info));
+			final String fullname = n.valueOf("./datacite:creatorName");
+			author.setFullname(fullname);
+
+			final PacePerson pp = new PacePerson(fullname, false);
+			final String name = n.valueOf("./datacite:givenName");
+			if (StringUtils.isBlank(name) & pp.isAccurate()) {
+				author.setName(pp.getNormalisedFirstName());
+			} else {
+				author.setName(name);
+			}
+
+			final String surname = n.valueOf("./datacite:familyName");
+			if (StringUtils.isBlank(surname) & pp.isAccurate()) {
+				author.setSurname(pp.getNormalisedSurname());
+			} else {
+				author.setSurname(surname);
+			}
+
+			if (StringUtils.isBlank(author.getFullname())) {
+				author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
+			}
+
+			author.setAffiliation(prepareListFields(n, "./datacite:affiliation", info));
+			author.setPid(preparePids(n, info));
 			author.setRank(pos++);
 			res.add(author);
 		}
 		return res;
 	}
 
-	private List<StructuredProperty> preparePids(final Document doc, final DataInfo info) {
+	private List<StructuredProperty> preparePids(final Node n, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes("./datacite:nameIdentifier")) {
-			res
-				.add(
-					structuredProperty(
-						((Node) o).getText(),
-						prepareQualifier(
-							(Node) o, "./@nameIdentifierScheme", DNET_PID_TYPES, DNET_PID_TYPES),
-						info));
+		for (final Object o : n.selectNodes("./datacite:nameIdentifier")) {
+
+			final String id = ((Node) o).getText();
+			final String type = ((Node) o)
+				.valueOf("./@nameIdentifierScheme")
+				.trim()
+				.toUpperCase()
+				.replaceAll(" ", "")
+				.replaceAll("_", "");
+
+			if (type.startsWith("ORCID")) {
+				final String cleanedId = id.replaceAll("http://orcid.org/", "").replaceAll("https://orcid.org/", "");
+				res.add(structuredProperty(cleanedId, ORCID_PID_TYPE, info));
+			} else if (type.startsWith("MAGID")) {
+				res.add(structuredProperty(id, MAG_PID_TYPE, info));
+			}
 		}
 		return res;
 	}
@@ -77,26 +119,22 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final KeyValue hostedby) {
 
 		final Instance instance = new Instance();
-		final Set<String> url = new HashSet<>();
-		instance.setUrl(new ArrayList<>());
 		instance
 			.setInstancetype(
-				prepareQualifier(
-					doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
+				prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
-			.setAccessright(
-				prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
+			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
 		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
 		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance
-			.setProcessingchargecurrency(
-				field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
+		final Set<String> url = new HashSet<>();
 		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
 			url.add(((Node) o).getText().trim());
 		}
@@ -109,7 +147,10 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='DOI']")) {
 			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
 		}
-		instance.getUrl().addAll(url);
+		if (!url.isEmpty()) {
+			instance.setUrl(new ArrayList<>());
+			instance.getUrl().addAll(url);
+		}
 		return Arrays.asList(instance);
 	}
 
@@ -131,11 +172,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						structuredProperty(
-							((Node) o).getText(),
-							"UNKNOWN",
-							"UNKNOWN",
-							DNET_DATA_CITE_DATE,
-							DNET_DATA_CITE_DATE,
+							((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATA_CITE_DATE, DNET_DATA_CITE_DATE,
 							info));
 			}
 		}
@@ -179,53 +216,52 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductTools(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return new ArrayList<>(); // Not present in ODF ???
 	}
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactGroups(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return prepareListFields(
-			doc,
-			"//datacite:contributor[@contributorType='ContactGroup']/datacite:contributorName",
-			info);
+			doc, "//datacite:contributor[@contributorType='ContactGroup']/datacite:contributorName", info);
 	}
 
 	@Override
 	protected List<Field<String>> prepareOtherResearchProductContactPersons(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return prepareListFields(
-			doc,
-			"//datacite:contributor[@contributorType='ContactPerson']/datacite:contributorName",
-			info);
+			doc, "//datacite:contributor[@contributorType='ContactPerson']/datacite:contributorName", info);
 	}
 
 	@Override
 	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
-		return prepareQualifier(
-			doc, "//datacite:format", "dnet:programming_languages", "dnet:programming_languages");
+		return prepareQualifier(doc, "//datacite:format", "dnet:programming_languages", "dnet:programming_languages");
 	}
 
 	@Override
 	protected Field<String> prepareSoftwareCodeRepositoryUrl(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return null; // Not present in ODF ???
 	}
 
 	@Override
 	protected List<StructuredProperty> prepareSoftwareLicenses(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return new ArrayList<>(); // Not present in ODF ???
 	}
 
 	@Override
 	protected List<Field<String>> prepareSoftwareDocumentationUrls(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return prepareListFields(
-			doc,
-			"//datacite:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']",
-			info);
+			doc, "//datacite:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']", info);
 	}
 
 	// DATASETS
@@ -246,13 +282,15 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Field<String> prepareDatasetMetadataVersionNumber(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return null; // Not present in ODF ???
 	}
 
 	@Override
 	protected Field<String> prepareDatasetLastMetadataUpdate(
-		final Document doc, final DataInfo info) {
+		final Document doc,
+		final DataInfo info) {
 		return prepareField(doc, "//datacite:date[@dateType='Updated']", info);
 	}
 
@@ -328,9 +366,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
 		return prepareQualifier(
-			doc,
-			"//*[local-name() = 'resource']//*[local-name() = 'resourceType']",
-			DNET_DATA_CITE_RESOURCE,
+			doc, "//*[local-name() = 'resource']//*[local-name() = 'resourceType']", DNET_DATA_CITE_RESOURCE,
 			DNET_DATA_CITE_RESOURCE);
 	}
 }

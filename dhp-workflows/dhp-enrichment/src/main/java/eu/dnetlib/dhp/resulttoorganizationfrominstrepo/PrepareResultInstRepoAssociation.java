@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -58,28 +59,13 @@ public class PrepareResultInstRepoAssociation {
 			isSparkSessionManaged,
 			spark -> {
 				readNeededResources(spark, inputPath);
+
+				removeOutputDir(spark, datasourceOrganizationPath);
 				prepareDatasourceOrganization(spark, datasourceOrganizationPath);
+
+				removeOutputDir(spark, alreadyLinkedPath);
 				prepareAlreadyLinkedAssociation(spark, alreadyLinkedPath);
 			});
-	}
-
-	private static void prepareAlreadyLinkedAssociation(
-		SparkSession spark, String alreadyLinkedPath) {
-		String query = "Select source resultId, collect_set(target) organizationSet "
-			+ "from relation "
-			+ "where datainfo.deletedbyinference = false "
-			+ "and relClass = '"
-			+ RELATION_RESULT_ORGANIZATION_REL_CLASS
-			+ "' "
-			+ "group by source";
-
-		spark
-			.sql(query)
-			.as(Encoders.bean(ResultOrganizationSet.class))
-			// TODO retry to stick with datasets
-			.toJavaRDD()
-			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-			.saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
 	}
 
 	private static void readNeededResources(SparkSession spark, String inputPath) {
@@ -106,7 +92,7 @@ public class PrepareResultInstRepoAssociation {
 			+ "JOIN ( SELECT source, target "
 			+ "FROM relation "
 			+ "WHERE relclass = '"
-			+ RELATION_DATASOURCE_ORGANIZATION_REL_CLASS
+			+ ModelConstants.IS_PROVIDED_BY
 			+ "' "
 			+ "AND datainfo.deletedbyinference = false ) rel "
 			+ "ON d.id = rel.source ";
@@ -119,4 +105,24 @@ public class PrepareResultInstRepoAssociation {
 			.option("compression", "gzip")
 			.json(datasourceOrganizationPath);
 	}
+
+	private static void prepareAlreadyLinkedAssociation(
+		SparkSession spark, String alreadyLinkedPath) {
+		String query = "Select source resultId, collect_set(target) organizationSet "
+			+ "from relation "
+			+ "where datainfo.deletedbyinference = false "
+			+ "and relClass = '"
+			+ ModelConstants.HAS_AUTHOR_INSTITUTION
+			+ "' "
+			+ "group by source";
+
+		spark
+			.sql(query)
+			.as(Encoders.bean(ResultOrganizationSet.class))
+			// TODO retry to stick with datasets
+			.toJavaRDD()
+			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
+			.saveAsTextFile(alreadyLinkedPath, GzipCodec.class);
+	}
+
 }

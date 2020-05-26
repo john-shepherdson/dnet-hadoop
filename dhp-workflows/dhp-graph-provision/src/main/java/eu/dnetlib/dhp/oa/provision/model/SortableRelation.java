@@ -16,10 +16,10 @@ public class SortableRelation extends Relation implements Comparable<Relation>, 
 	static {
 		weights.put("outcome", 0);
 		weights.put("supplement", 1);
-		weights.put("publicationDataset", 2);
+		weights.put("affiliation", 2);
 		weights.put("relationship", 3);
-		weights.put("similarity", 4);
-		weights.put("affiliation", 5);
+		weights.put("publicationDataset", 4);
+		weights.put("similarity", 5);
 
 		weights.put("provision", 6);
 		weights.put("participation", 7);

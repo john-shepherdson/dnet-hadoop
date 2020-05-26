@@ -1,9 +1,14 @@
 
 package eu.dnetlib.dhp.schema.common;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
@@ -377,6 +382,21 @@ public class ModelSupport {
 				schemeTemplate,
 				entityMapping.get(EntityType.valueOf(sourceType)).name(),
 				entityMapping.get(EntityType.valueOf(targetType)).name());
+	}
+
+	public static <T extends Oaf> String tableIdentifier(String dbName, String tableName) {
+
+		checkArgument(StringUtils.isNotBlank(dbName), "DB name cannot be empty");
+		checkArgument(StringUtils.isNotBlank(tableName), "table name cannot be empty");
+
+		return String.format("%s.%s", dbName, tableName);
+	}
+
+	public static <T extends Oaf> String tableIdentifier(String dbName, Class<T> clazz) {
+
+		checkArgument(Objects.nonNull(clazz), "clazz is needed to derive the table name, thus cannot be null");
+
+		return tableIdentifier(dbName, clazz.getSimpleName().toLowerCase());
 	}
 
 	public static <T extends Oaf> Function<T, String> idFn() {

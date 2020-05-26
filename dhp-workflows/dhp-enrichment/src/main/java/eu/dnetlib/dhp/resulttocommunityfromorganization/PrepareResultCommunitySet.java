@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.util.*;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
@@ -17,7 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import scala.Tuple2;
 
 public class PrepareResultCommunitySet {
 
@@ -55,9 +58,7 @@ public class PrepareResultCommunitySet {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
+				removeOutputDir(spark, outputPath);
 				prepareInfo(spark, inputPath, outputPath, organizationMap);
 			});
 	}
@@ -76,13 +77,13 @@ public class PrepareResultCommunitySet {
 			+ "      FROM relation "
 			+ "      WHERE datainfo.deletedbyinference = false "
 			+ "      AND relClass = '"
-			+ RELATION_RESULT_ORGANIZATION_REL_CLASS
+			+ ModelConstants.HAS_AUTHOR_INSTITUTION
 			+ "') result_organization "
 			+ "LEFT JOIN (SELECT source, collect_set(target) org_set "
 			+ "      FROM relation "
 			+ "      WHERE datainfo.deletedbyinference = false "
 			+ "      AND relClass = '"
-			+ RELATION_REPRESENTATIVERESULT_RESULT_CLASS
+			+ ModelConstants.MERGES
 			+ "' "
 			+ "      GROUP BY source) organization_organization "
 			+ "ON result_organization.target = organization_organization.source ";
@@ -94,10 +95,24 @@ public class PrepareResultCommunitySet {
 		result_organizationset
 			.map(mapResultCommunityFn(organizationMap), Encoders.bean(ResultCommunityList.class))
 			.filter(Objects::nonNull)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+			.toJavaRDD()
+			.mapToPair(value -> new Tuple2<>(value.getResultId(), value))
+			.reduceByKey((a, b) -> {
+				ArrayList<String> cl = a.getCommunityList();
+				b.getCommunityList().stream().forEach(s -> {
+					if (!cl.contains(s)) {
+						cl.add(s);
+					}
+				});
+				a.setCommunityList(cl);
+				return a;
+			})
+			.map(value -> OBJECT_MAPPER.writeValueAsString(value._2()))
+			.saveAsTextFile(outputPath, GzipCodec.class);
+//                      .write()
+//                      .mode(SaveMode.Overwrite)
+//                      .option("compression", "gzip")
+//                      .json(outputPath);
 	}
 
 	private static MapFunction<ResultOrganizations, ResultCommunityList> mapResultCommunityFn(

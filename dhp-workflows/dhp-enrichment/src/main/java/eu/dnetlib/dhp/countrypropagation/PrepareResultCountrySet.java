@@ -4,7 +4,12 @@ package eu.dnetlib.dhp.countrypropagation;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
@@ -13,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
+import scala.Tuple2;
 
 public class PrepareResultCountrySet {
 	private static final Logger log = LoggerFactory.getLogger(PrepareResultCountrySet.class);
@@ -60,6 +66,7 @@ public class PrepareResultCountrySet {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				removeOutputDir(spark, outputPath);
 				getPotentialResultToUpdate(
 					spark,
 					inputPath,
@@ -89,10 +96,33 @@ public class PrepareResultCountrySet {
 		spark
 			.sql(RESULT_COUNTRYSET_QUERY)
 			.as(Encoders.bean(ResultCountrySet.class))
-			.write()
-			.option("compression", "gzip")
-			.mode(SaveMode.Append)
-			.json(outputPath);
+			.toJavaRDD()
+			.mapToPair(value -> new Tuple2<>(value.getResultId(), value))
+			.reduceByKey((a, b) -> {
+				ArrayList<CountrySbs> countryList = a.getCountrySet();
+				Set<String> countryCodes = countryList
+					.stream()
+					.map(country -> country.getClassid())
+					.collect(Collectors.toSet());
+				b
+					.getCountrySet()
+					.stream()
+					.forEach(c -> {
+						if (!countryCodes.contains(c.getClassid())) {
+							countryList.add(c);
+							countryCodes.add(c.getClassid());
+						}
+
+					});
+				a.setCountrySet(countryList);
+				return a;
+			})
+			.map(couple -> OBJECT_MAPPER.writeValueAsString(couple._2()))
+			.saveAsTextFile(outputPath, GzipCodec.class);
+//			.write()
+//			.option("compression", "gzip")
+//			.mode(SaveMode.Append)
+//			.json(outputPath);
 	}
 
 }
