@@ -10,23 +10,10 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.oaiIProvenance;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -34,6 +21,7 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
+import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -285,7 +273,9 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setCoverage(prepareCoverages(doc, info));
 		r.setContext(prepareContexts(doc, info));
 		r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
-		r.setInstance(prepareInstances(doc, info, collectedFrom, hostedBy));
+		final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+		r.setInstance(instances);
+		r.setBestaccessright(getBestAccessRights(instances));
 	}
 
 	private List<Context> prepareContexts(final Document doc, final DataInfo info) {
@@ -367,6 +357,34 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected abstract Field<String> prepareDatasetDevice(Document doc, DataInfo info);
 
 	protected abstract Field<String> prepareDatasetStorageDate(Document doc, DataInfo info);
+
+	protected static Qualifier getBestAccessRights(List<Instance> instanceList) {
+		if (instanceList != null) {
+			final Optional<Qualifier> min = instanceList
+				.stream()
+				.map(i -> i.getAccessright())
+				.min(new LicenseComparator());
+
+			final Qualifier rights = min.isPresent() ? min.get() : new Qualifier();
+
+			if (StringUtils.isBlank(rights.getClassid())) {
+				rights.setClassid(UNKNOWN);
+			}
+			if (StringUtils.isBlank(rights.getClassname())
+				|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
+				rights.setClassname(NOT_AVAILABLE);
+			}
+			if (StringUtils.isBlank(rights.getSchemeid())) {
+				rights.setSchemeid(DNET_ACCESS_MODES);
+			}
+			if (StringUtils.isBlank(rights.getSchemename())) {
+				rights.setSchemename(DNET_ACCESS_MODES);
+			}
+
+			return rights;
+		}
+		return null;
+	}
 
 	private Journal prepareJournal(final Document doc, final DataInfo info) {
 		final Node n = doc.selectSingleNode("//oaf:journal");
