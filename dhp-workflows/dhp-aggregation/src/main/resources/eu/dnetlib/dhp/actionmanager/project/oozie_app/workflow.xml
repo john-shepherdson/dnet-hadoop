@@ -120,7 +120,7 @@
             </spark-opts>
             <arg>--projectPath</arg><arg>${workingDir}/preparedProjects</arg>
             <arg>--programmePath</arg><arg>${workingDir}/preparedProgramme</arg>
-            <arg>--outputPath</arg><arg>/tmp/h2020programme</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
