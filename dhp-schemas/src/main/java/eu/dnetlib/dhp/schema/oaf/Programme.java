@@ -1,7 +1,10 @@
 
 package eu.dnetlib.dhp.schema.oaf;
 
-public class Programme {
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Programme implements Serializable {
 	private String code;
 	private String description;
 
@@ -20,4 +23,17 @@ public class Programme {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		Programme programme = (Programme) o;
+		return Objects.equals(code, programme.code);
+	}
+
+
 }
