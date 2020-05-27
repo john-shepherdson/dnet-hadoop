@@ -330,6 +330,9 @@ public class Project extends OafEntity implements Serializable {
 		fundedamount = p.getFundedamount() != null && compareTrust(this, e) < 0
 			? p.getFundedamount()
 			: fundedamount;
+
+		programme = mergeLists(programme, p.getProgramme());
+
 		mergeOAFDataInfo(e);
 	}
 }
