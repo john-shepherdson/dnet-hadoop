@@ -38,6 +38,7 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Context;
@@ -60,7 +61,7 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public abstract class AbstractMdRecordToOafMapper {
 
-	protected final Map<String, String> code2name;
+	protected final VocabularyGroup vocs;
 
 	protected static final String DATACITE_SCHEMA_KERNEL_4 = "http://datacite.org/schema/kernel-4";
 	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
@@ -84,8 +85,8 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
 		"main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
 
-	protected AbstractMdRecordToOafMapper(final Map<String, String> code2name) {
-		this.code2name = code2name;
+	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs) {
+		this.vocs = vocs;
 	}
 
 	public List<Oaf> processMdRecord(final String xml) {
@@ -421,14 +422,12 @@ public abstract class AbstractMdRecordToOafMapper {
 		return null;
 	}
 
-	protected Qualifier prepareQualifier(
-		final Node node,
-		final String xpath,
-		final String schemeId,
-		final String schemeName) {
-		final String classId = node.valueOf(xpath);
-		final String className = code2name.get(classId);
-		return qualifier(classId, className, schemeId, schemeName);
+	protected Qualifier prepareQualifier(final Node node, final String xpath, final String schemeId) {
+		return prepareQualifier(node.valueOf(xpath).trim(), schemeId);
+	}
+
+	protected Qualifier prepareQualifier(final String classId, final String schemeId) {
+		return vocs.getTermAsQualifier(schemeId, classId);
 	}
 
 	protected List<StructuredProperty> prepareListStructProps(
@@ -436,14 +435,31 @@ public abstract class AbstractMdRecordToOafMapper {
 		final String xpath,
 		final String xpathClassId,
 		final String schemeId,
-		final String schemeName,
 		final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
+
 		for (final Object o : node.selectNodes(xpath)) {
 			final Node n = (Node) o;
-			final String classId = n.valueOf(xpathClassId);
-			final String className = code2name.get(classId);
-			res.add(structuredProperty(n.getText(), classId, className, schemeId, schemeName, info));
+			final String classId = n.valueOf(xpathClassId).trim();
+			res.add(structuredProperty(n.getText(), prepareQualifier(classId, schemeId), info));
+		}
+		return res;
+	}
+
+	protected List<StructuredProperty> prepareListStructPropsWithValidQualifier(
+		final Node node,
+		final String xpath,
+		final String xpathClassId,
+		final String schemeId,
+		final DataInfo info) {
+		final List<StructuredProperty> res = new ArrayList<>();
+
+		for (final Object o : node.selectNodes(xpath)) {
+			final Node n = (Node) o;
+			final String classId = n.valueOf(xpathClassId).trim();
+			if (vocs.termExists(schemeId, classId)) {
+				res.add(structuredProperty(n.getText(), vocs.getTermAsQualifier(schemeId, classId), info));
+			}
 		}
 		return res;
 	}

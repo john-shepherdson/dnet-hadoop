@@ -8,6 +8,7 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_DATE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_RESOURCE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_LANGUAGES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PUBLICATION_RESOURCE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTS;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PART_OF;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +29,7 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.PacePerson;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -43,8 +44,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
 
-	public OdfToOafMapper(final Map<String, String> code2name) {
-		super(code2name);
+	public OdfToOafMapper(final VocabularyGroup vocs) {
+		super(vocs);
 	}
 
 	@Override
@@ -120,14 +121,13 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 		final Instance instance = new Instance();
 		instance
-			.setInstancetype(
-				prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
+			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
-			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
+			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
 		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
 		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
@@ -211,7 +211,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareLanguages(final Document doc) {
-		return prepareQualifier(doc, "//datacite:language", DNET_LANGUAGES, DNET_LANGUAGES);
+		return prepareQualifier(doc, "//datacite:language", DNET_LANGUAGES);
 	}
 
 	@Override
@@ -239,7 +239,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
-		return prepareQualifier(doc, "//datacite:format", "dnet:programming_languages", "dnet:programming_languages");
+		return prepareQualifier(doc, "//datacite:format", "dnet:programming_languages");
 	}
 
 	@Override
@@ -366,8 +366,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
 		return prepareQualifier(
-			doc, "//*[local-name() = 'resource']//*[local-name() = 'resourceType']", DNET_DATA_CITE_RESOURCE,
-			DNET_DATA_CITE_RESOURCE);
+			doc, "//*[local-name() = 'resource']//*[local-name() = 'resourceType']", DNET_DATA_CITE_RESOURCE);
 	}
 
 	@Override
@@ -375,18 +374,17 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> res = new ArrayList<>();
 		res
 			.addAll(
-				prepareListStructProps(
-					doc, "//oaf:identifier", "@identifierType", "dnet:pid_types", "dnet:pid_types", info));
+				prepareListStructPropsWithValidQualifier(
+					doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info));
 		res
 			.addAll(
-				prepareListStructProps(
-					doc, "//datacite:identifier[@identifierType != 'URL']", "@identifierType", "dnet:pid_types",
-					"dnet:pid_types", info));
+				prepareListStructPropsWithValidQualifier(
+					doc, "//datacite:identifier[@identifierType != 'URL']", "@identifierType", DNET_PID_TYPES, info));
 		res
 			.addAll(
-				prepareListStructProps(
+				prepareListStructPropsWithValidQualifier(
 					doc, "//datacite:alternateIdentifier[@alternateIdentifierType != 'URL']",
-					"@alternateIdentifierType", "dnet:pid_types", "dnet:pid_types", info));
+					"@alternateIdentifierType", DNET_PID_TYPES, info));
 		return res;
 	}
 
