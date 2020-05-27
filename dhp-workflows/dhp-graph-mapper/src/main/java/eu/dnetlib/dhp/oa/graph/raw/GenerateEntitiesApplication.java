@@ -4,11 +4,8 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,8 +26,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -71,25 +68,24 @@ public class GenerateEntitiesApplication {
 		final String sourcePaths = parser.get("sourcePaths");
 		final String targetPath = parser.get("targetPath");
 
-		final String dbUrl = parser.get("postgresUrl");
-		final String dbUser = parser.get("postgresUser");
-		final String dbPassword = parser.get("postgresPassword");
+		// final String dbUrl = parser.get("postgresUrl");
+		// final String dbUser = parser.get("postgresUser");
+		// final String dbPassword = parser.get("postgresPassword");
+
 		final String isLookupUrl = parser.get("isLookupUrl");
 
-		final Map<String, String> code2name = loadVocsFromDB(dbUrl, dbUser, dbPassword);
-
-		code2name.putAll(loadVocsFromIS(isLookupUrl));
+		final VocabularyGroup vocs = loadVocsFromIS(isLookupUrl); // MAP: vocId -> voc
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, targetPath);
-			generateEntities(spark, code2name, sourcePaths, targetPath);
+			generateEntities(spark, vocs, sourcePaths, targetPath);
 		});
 	}
 
 	private static void generateEntities(
 		final SparkSession spark,
-		final Map<String, String> code2name,
+		final VocabularyGroup vocs,
 		final String sourcePaths,
 		final String targetPath) {
 
@@ -110,7 +106,7 @@ public class GenerateEntitiesApplication {
 					sc
 						.sequenceFile(sp, Text.class, Text.class)
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
-						.map(k -> convertToListOaf(k._1(), k._2(), code2name))
+						.map(k -> convertToListOaf(k._1(), k._2(), vocs))
 						.filter(Objects::nonNull)
 						.flatMap(list -> list.iterator()));
 		}
@@ -140,14 +136,14 @@ public class GenerateEntitiesApplication {
 	private static List<Oaf> convertToListOaf(
 		final String id,
 		final String s,
-		final Map<String, String> code2name) {
+		final VocabularyGroup vocs) {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
 			case "native_oaf":
-				return new OafToOafMapper(code2name).processMdRecord(s);
+				return new OafToOafMapper(vocs).processMdRecord(s);
 			case "native_odf":
-				return new OdfToOafMapper(code2name).processMdRecord(s);
+				return new OdfToOafMapper(vocs).processMdRecord(s);
 			case "datasource":
 				return Arrays.asList(convertFromJson(s, Datasource.class));
 			case "organization":
@@ -169,32 +165,7 @@ public class GenerateEntitiesApplication {
 		}
 	}
 
-	private static Map<String, String> loadVocsFromDB(
-		final String dbUrl,
-		final String dbUser,
-		final String dbPassword) throws IOException {
-
-		log.info("Loading vocabulary terms from db...");
-
-		final Map<String, String> map = new HashMap<>();
-
-		try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
-			dbClient
-				.processResults("select code, name from class", rs -> {
-					try {
-						map.put(rs.getString("code"), rs.getString("name"));
-					} catch (final SQLException e) {
-						e.printStackTrace();
-					}
-				});
-		}
-
-		log.info("Found " + map.size() + " terms.");
-
-		return map;
-	}
-
-	private static Map<String, String> loadVocsFromIS(final String isLookupUrl) throws IOException, ISLookUpException {
+	private static VocabularyGroup loadVocsFromIS(final String isLookupUrl) throws IOException, ISLookUpException {
 		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
 
 		final String xquery = IOUtils
@@ -202,16 +173,25 @@ public class GenerateEntitiesApplication {
 				GenerateEntitiesApplication.class
 					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/xquery/load_vocabularies.xquery"));
 
-		final Map<String, String> map = new HashMap<>();
+		final VocabularyGroup vocs = new VocabularyGroup();
 
 		for (final String s : isLookUpService.quickSearchProfile(xquery)) {
 			final String[] arr = s.split("@=@");
 			if (arr.length == 4) {
-				map.put(arr[2].trim(), arr[3].trim());
+				final String vocId = arr[0].trim();
+				final String vocName = arr[1].trim();
+				final String termId = arr[2].trim();
+				final String termName = arr[3].trim();
+
+				if (!vocs.vocabularyExists(vocId)) {
+					vocs.addVocabulary(vocId, vocName);
+				}
+
+				vocs.addTerm(vocId, termId, termName);
 			}
 		}
 
-		return map;
+		return vocs;
 	}
 
 	private static Oaf convertFromJson(final String s, final Class<? extends Oaf> clazz) {

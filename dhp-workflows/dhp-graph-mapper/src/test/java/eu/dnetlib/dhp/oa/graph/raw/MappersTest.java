@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -20,6 +19,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -34,18 +35,27 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 public class MappersTest {
 
 	@Mock
-	private Map<String, String> code2name;
+	private VocabularyGroup vocs;
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		when(code2name.get(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+		when(vocs.getTermAsQualifier(anyString(), anyString()))
+			.thenAnswer(
+				invocation -> OafMapperUtils
+					.qualifier(
+						invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0),
+						invocation.getArgument(0)));
+
+		when(vocs.termExists(anyString(), anyString())).thenReturn(true);
+
 	}
 
 	@Test
 	void testPublication() throws IOException {
+
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
 
-		final List<Oaf> list = new OafToOafMapper(code2name).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs).processMdRecord(xml);
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Publication);
@@ -86,6 +96,10 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
 
+		assertTrue(p.getPid().size() > 0);
+		assertEquals(p.getPid().get(0).getValue(), "10.3897/oneeco.2.e13718");
+		assertEquals(p.getPid().get(0).getQualifier().getClassid(), "doi");
+
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
 		p
@@ -115,6 +129,7 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
 
+		// System.out.println(new ObjectMapper().writeValueAsString(p));
 		// System.out.println(new ObjectMapper().writeValueAsString(r1));
 		// System.out.println(new ObjectMapper().writeValueAsString(r2));
 	}
@@ -123,7 +138,7 @@ public class MappersTest {
 	void testDataset() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(code2name).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs).processMdRecord(xml);
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Dataset);
@@ -205,7 +220,7 @@ public class MappersTest {
 	void testSoftware() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_software.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(code2name).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs).processMdRecord(xml);
 
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof Software);
