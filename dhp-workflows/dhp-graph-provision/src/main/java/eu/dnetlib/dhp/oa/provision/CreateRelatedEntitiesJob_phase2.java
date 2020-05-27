@@ -3,8 +3,10 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +60,8 @@ public class CreateRelatedEntitiesJob_phase2 {
 	private static final Logger log = LoggerFactory.getLogger(CreateRelatedEntitiesJob_phase2.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	private static final int MAX_EXTERNAL_ENTITIES = 50;
 
 	public static void main(String[] args) throws Exception {
 
@@ -190,6 +194,20 @@ public class CreateRelatedEntitiesJob_phase2 {
 				(MapFunction<String, E>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
 				Encoders.bean(entityClazz))
 			.filter("dataInfo.invisible == false")
+			.map((MapFunction<E, E>) e -> {
+				if (ModelSupport.isSubClass(entityClazz, Result.class)) {
+					Result r = (Result) e;
+					if (r.getExternalReference() != null) {
+						List<ExternalReference> refs = r
+							.getExternalReference()
+							.stream()
+							.limit(MAX_EXTERNAL_ENTITIES)
+							.collect(Collectors.toList());
+						r.setExternalReference(refs);
+					}
+				}
+				return e;
+			}, Encoders.bean(entityClazz))
 			.map(
 				(MapFunction<E, TypedRow>) value -> getTypedRow(
 					StringUtils.substringAfterLast(inputEntityPath, "/"), value),
