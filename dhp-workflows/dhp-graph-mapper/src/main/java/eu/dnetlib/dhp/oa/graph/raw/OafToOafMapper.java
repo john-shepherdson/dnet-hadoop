@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_LANGUAGES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PUBLICATION_RESOURCE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_RELATED_TO;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DATASET;
@@ -13,7 +14,6 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +24,7 @@ import org.dom4j.Node;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -36,8 +37,8 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
-	public OafToOafMapper(final Map<String, String> code2name) {
-		super(code2name);
+	public OafToOafMapper(final VocabularyGroup vocs) {
+		super(vocs);
 	}
 
 	@Override
@@ -83,7 +84,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareLanguages(final Document doc) {
-		return prepareQualifier(doc, "//dc:language", DNET_LANGUAGES, DNET_LANGUAGES);
+		return prepareQualifier(doc, "//dc:language", DNET_LANGUAGES);
 	}
 
 	@Override
@@ -130,14 +131,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 		final Instance instance = new Instance();
 		instance
-			.setInstancetype(
-				prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
+			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
-			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
+			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
 		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
 		instance
@@ -296,5 +296,11 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
 		return null; // NOT PRESENT IN OAF
+	}
+
+	@Override
+	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
+		return prepareListStructPropsWithValidQualifier(
+			doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info);
 	}
 }
