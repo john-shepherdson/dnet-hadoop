@@ -45,6 +45,6 @@ public class XmlRecordFactoryTest {
 
 		assertNotNull(doc);
 
-		//TODO add assertions based of values extracted from the XML record
+		// TODO add assertions based of values extracted from the XML record
 	}
 }
