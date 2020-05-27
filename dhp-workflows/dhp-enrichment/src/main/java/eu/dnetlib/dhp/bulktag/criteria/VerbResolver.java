@@ -34,7 +34,7 @@ public class VerbResolver implements Serializable {
 				.collect(
 					Collectors
 						.toMap(
-							value -> (String) ((ClassInfo) value)
+							value -> (String) value
 								.getAnnotationInfo()
 								.get(0)
 								.getParameterValues()

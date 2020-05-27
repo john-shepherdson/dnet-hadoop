@@ -769,7 +769,7 @@ public class XmlRecordFactory implements Serializable {
 							XmlSerializationUtils.asXmlElement("websiteurl", o.getWebsiteurl().getValue()));
 				}
 				if (o.getLogourl() != null) {
-					metadata.add(XmlSerializationUtils.asXmlElement("websiteurl", o.getLogourl().getValue()));
+					metadata.add(XmlSerializationUtils.asXmlElement("logourl", o.getLogourl().getValue()));
 				}
 
 				if (o.getEclegalbody() != null) {
@@ -801,13 +801,13 @@ public class XmlRecordFactory implements Serializable {
 								.asXmlElement(
 									"echighereducation", o.getEchighereducation().getValue()));
 				}
-				if (o.getEcinternationalorganization() != null) {
+				if (o.getEcinternationalorganizationeurinterests() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
 								.asXmlElement(
 									"ecinternationalorganizationeurinterests",
-									o.getEcinternationalorganization().getValue()));
+									o.getEcinternationalorganizationeurinterests().getValue()));
 				}
 				if (o.getEcinternationalorganization() != null) {
 					metadata

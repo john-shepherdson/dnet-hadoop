@@ -131,7 +131,7 @@ public class CommunityConfiguration implements Serializable {
 				p -> {
 					if (p.getSnd() == null)
 						return p.getFst();
-					if (((SelectionConstraints) p.getSnd()).verifyCriteria(param))
+					if (p.getSnd().verifyCriteria(param))
 						return p.getFst();
 					else
 						return null;
