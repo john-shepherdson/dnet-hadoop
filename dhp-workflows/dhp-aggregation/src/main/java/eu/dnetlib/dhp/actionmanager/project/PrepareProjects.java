@@ -3,10 +3,7 @@ package eu.dnetlib.dhp.actionmanager.project;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -81,17 +78,14 @@ public class PrepareProjects {
 			.flatMap(p -> {
 				List<CSVProject> csvProjectList = new ArrayList<>();
 				String[] programme = p.getProgramme().split(";");
-				if (programme.length > 1) {
-					String id = p.getId();
-					for (int i = 0; i < programme.length; i++) {
+				Arrays
+					.stream(programme)
+					.forEach(value -> {
 						CSVProject csvProject = new CSVProject();
-						csvProject.setProgramme(programme[i]);
-						csvProject.setId(id);
+						csvProject.setProgramme(value);
+						csvProject.setId(p.getId());
 						csvProjectList.add(csvProject);
-					}
-				} else {
-					csvProjectList.add(p);
-				}
+					});
 
 				return csvProjectList.iterator();
 			})
