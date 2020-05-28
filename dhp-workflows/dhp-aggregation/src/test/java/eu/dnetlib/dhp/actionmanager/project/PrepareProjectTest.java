@@ -67,7 +67,7 @@ public class PrepareProjectTest {
 	}
 
 	@Test
-	public void numberDistinctProgrammeTest() throws Exception {
+	public void numberDistinctProjectTest() throws Exception {
 		PrepareProjects
 			.main(
 				new String[] {
@@ -76,7 +76,10 @@ public class PrepareProjectTest {
 					"-projectPath",
 					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/projects_subset.json").getPath(),
 					"-outputPath",
-					workingDir.toString() + "/preparedProjects"
+					workingDir.toString() + "/preparedProjects",
+					"-dbProjectPath",
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/dbProject").getPath(),
+
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -85,7 +88,7 @@ public class PrepareProjectTest {
 			.textFile(workingDir.toString() + "/preparedProjects")
 			.map(item -> OBJECT_MAPPER.readValue(item, CSVProject.class));
 
-		Assertions.assertEquals(20, tmp.count());
+		Assertions.assertEquals(8, tmp.count());
 
 		Dataset<CSVProject> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(CSVProject.class));
 
