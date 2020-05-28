@@ -16,5 +16,11 @@
 "paramLongName": "outputPath",
 "paramDescription": "the path of the new ActionSet",
 "paramRequired": true
-}
+},
+  {
+    "paramName": "dbp",
+    "paramLongName": "dbProjectPath",
+    "paramDescription": "the path of the project code read from db",
+    "paramRequired": true
+  }
 ]
