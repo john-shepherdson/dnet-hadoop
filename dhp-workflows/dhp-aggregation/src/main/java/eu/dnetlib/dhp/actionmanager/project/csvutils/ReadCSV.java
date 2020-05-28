@@ -76,10 +76,9 @@ public class ReadCSV implements Closeable {
 		Path hdfsWritePath = new Path(hdfsPath);
 		FSDataOutputStream fsDataOutputStream = null;
 		if (fileSystem.exists(hdfsWritePath)) {
-			fsDataOutputStream = fileSystem.append(hdfsWritePath);
-		} else {
-			fsDataOutputStream = fileSystem.create(hdfsWritePath);
+			fileSystem.delete(hdfsWritePath, false);
 		}
+		fsDataOutputStream = fileSystem.create(hdfsWritePath);
 
 		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
 		this.csvFile = httpConnector.getInputSource(fileURL);
