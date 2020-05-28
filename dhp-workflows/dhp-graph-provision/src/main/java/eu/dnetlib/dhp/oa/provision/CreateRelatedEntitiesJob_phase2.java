@@ -3,11 +3,9 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -65,8 +63,10 @@ public class CreateRelatedEntitiesJob_phase2 {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private static final int MAX_EXTERNAL_ENTITIES = 50;
-
 	private static final int MAX_AUTHORS = 200;
+	private static final int MAX_AUTHOR_FULLNAME_LENGTH = 1000;
+	private static final int MAX_TITLE_LENGTH = 5000;
+	private static final int MAX_ABSTRACT_LENGTH = 100000;
 
 	public static void main(String[] args) throws Exception {
 
@@ -199,34 +199,60 @@ public class CreateRelatedEntitiesJob_phase2 {
 				(MapFunction<String, E>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
 				Encoders.bean(entityClazz))
 			.filter("dataInfo.invisible == false")
-			.map((MapFunction<E, E>) e -> {
-				if (ModelSupport.isSubClass(entityClazz, Result.class)) {
-					Result r = (Result) e;
-					if (r.getExternalReference() != null) {
-						List<ExternalReference> refs = r
-							.getExternalReference()
-							.stream()
-							.limit(MAX_EXTERNAL_ENTITIES)
-							.collect(Collectors.toList());
-						r.setExternalReference(refs);
-					}
-					if (r.getAuthor() != null && r.getAuthor().size() > MAX_AUTHORS) {
-						List<Author> authors = Lists.newArrayList();
-						for (int i = 0; i < r.getAuthor().size(); i++) {
-							final Author a = r.getAuthor().get(i);
-							if (authors.size() < MAX_AUTHORS || hasORCID(a)) {
-								authors.add(a);
-							}
-						}
-						r.setAuthor(authors);
-					}
-				}
-				return e;
-			}, Encoders.bean(entityClazz))
+			.map((MapFunction<E, E>) e -> pruneOutliers(entityClazz, e), Encoders.bean(entityClazz))
 			.map(
 				(MapFunction<E, TypedRow>) value -> getTypedRow(
 					StringUtils.substringAfterLast(inputEntityPath, "/"), value),
 				Encoders.bean(TypedRow.class));
+	}
+
+	private static <E extends OafEntity> E pruneOutliers(Class<E> entityClazz, E e) {
+		if (ModelSupport.isSubClass(entityClazz, Result.class)) {
+			Result r = (Result) e;
+			if (r.getExternalReference() != null) {
+				List<ExternalReference> refs = r
+					.getExternalReference()
+					.stream()
+					.limit(MAX_EXTERNAL_ENTITIES)
+					.collect(Collectors.toList());
+				r.setExternalReference(refs);
+			}
+			if (r.getAuthor() != null) {
+				List<Author> authors = Lists.newArrayList();
+				for (Author a : r.getAuthor()) {
+					a.setFullname(StringUtils.left(a.getFullname(), MAX_AUTHOR_FULLNAME_LENGTH));
+					if (authors.size() < MAX_AUTHORS || hasORCID(a)) {
+						authors.add(a);
+					}
+				}
+				r.setAuthor(authors);
+			}
+			if (r.getDescription() != null) {
+				List<Field<String>> desc = r
+					.getDescription()
+					.stream()
+					.filter(Objects::nonNull)
+					.map(d -> {
+						d.setValue(StringUtils.left(d.getValue(), MAX_ABSTRACT_LENGTH));
+						return d;
+					})
+					.collect(Collectors.toList());
+				r.setDescription(desc);
+			}
+			if (r.getTitle() != null) {
+				List<StructuredProperty> titles = r
+					.getTitle()
+					.stream()
+					.filter(Objects::nonNull)
+					.map(t -> {
+						t.setValue(StringUtils.left(t.getValue(), MAX_TITLE_LENGTH));
+						return t;
+					})
+					.collect(Collectors.toList());
+				r.setTitle(titles);
+			}
+		}
+		return e;
 	}
 
 	private static boolean hasORCID(Author a) {
