@@ -24,6 +24,8 @@
         <fs>
             <delete path='${outputPath}'/>
             <mkdir path='${outputPath}'/>
+            <delete path='${workingDir}'/>
+            <mkdir path='${workingDir}'/>
         </fs>
         <ok to="get_project_file"/>
         <error to="Kill"/>
