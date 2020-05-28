@@ -10,7 +10,19 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.oaiIProvenance;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.NOT_AVAILABLE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -25,6 +38,8 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -46,10 +61,14 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public abstract class AbstractMdRecordToOafMapper {
 
-	protected final Map<String, String> code2name;
+	protected final VocabularyGroup vocs;
 
 	protected static final String DATACITE_SCHEMA_KERNEL_4 = "http://datacite.org/schema/kernel-4";
 	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
+	protected static final Qualifier ORCID_PID_TYPE = qualifier(
+		"ORCID", "Open Researcher and Contributor ID", DNET_PID_TYPES, DNET_PID_TYPES);
+	protected static final Qualifier MAG_PID_TYPE = qualifier(
+		"MAGIdentifier", "Microsoft Academic Graph Identifier", DNET_PID_TYPES, DNET_PID_TYPES);
 
 	protected static final Map<String, String> nsContext = new HashMap<>();
 
@@ -66,8 +85,8 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
 		"main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
 
-	protected AbstractMdRecordToOafMapper(final Map<String, String> code2name) {
-		this.code2name = code2name;
+	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs) {
+		this.vocs = vocs;
 	}
 
 	public List<Oaf> processMdRecord(final String xml) {
@@ -75,8 +94,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
 			final Document doc = DocumentHelper
-				.parseText(
-					xml.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3));
+				.parseText(xml.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3));
 
 			final String type = doc.valueOf("//dr:CobjCategory/@type");
 			final KeyValue collectedFrom = getProvenanceDatasource(
@@ -103,7 +121,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		}
 	}
 
-	private KeyValue getProvenanceDatasource(Document doc, String xpathId, String xpathName) {
+	private KeyValue getProvenanceDatasource(final Document doc, final String xpathId, final String xpathName) {
 		final String dsId = doc.valueOf(xpathId);
 		final String dsName = doc.valueOf(xpathName);
 
@@ -111,9 +129,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			return null;
 		}
 
-		return keyValue(
-			createOpenaireId(10, dsId, true),
-			dsName);
+		return keyValue(createOpenaireId(10, dsId, true), dsName);
 	}
 
 	protected List<Oaf> createOafs(
@@ -211,8 +227,14 @@ public abstract class AbstractMdRecordToOafMapper {
 		return res;
 	}
 
-	protected Relation getRelation(String source, String target, String relType, String subRelType, String relClass,
-		KeyValue collectedFrom, DataInfo info, long lastUpdateTimestamp) {
+	protected Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final KeyValue collectedFrom,
+		final DataInfo info,
+		final long lastUpdateTimestamp) {
 		final Relation rel = new Relation();
 		rel.setRelType(relType);
 		rel.setSubRelType(subRelType);
@@ -243,10 +265,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
 		r.setOriginalId(Arrays.asList(doc.valueOf("//dri:objIdentifier")));
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
-		r
-			.setPid(
-				prepareListStructProps(
-					doc, "//oaf:identifier", "@identifierType", "dnet:pid_types", "dnet:pid_types", info));
+		r.setPid(prepareResultPids(doc, info));
 		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection"));
 		r.setDateoftransformation(doc.valueOf("//dr:dateOfTransformation"));
 		r.setExtraInfo(new ArrayList<>()); // NOT PRESENT IN MDSTORES
@@ -269,8 +288,12 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setCoverage(prepareCoverages(doc, info));
 		r.setContext(prepareContexts(doc, info));
 		r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
-		r.setInstance(prepareInstances(doc, info, collectedFrom, hostedBy));
+		final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+		r.setInstance(instances);
+		r.setBestaccessright(getBestAccessRights(instances));
 	}
+
+	protected abstract List<StructuredProperty> prepareResultPids(Document doc, DataInfo info);
 
 	private List<Context> prepareContexts(final Document doc, final DataInfo info) {
 		final List<Context> list = new ArrayList<>();
@@ -289,7 +312,10 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected abstract Qualifier prepareResourceType(Document doc, DataInfo info);
 
 	protected abstract List<Instance> prepareInstances(
-		Document doc, DataInfo info, KeyValue collectedfrom, KeyValue hostedby);
+		Document doc,
+		DataInfo info,
+		KeyValue collectedfrom,
+		KeyValue hostedby);
 
 	protected abstract List<Field<String>> prepareSources(Document doc, DataInfo info);
 
@@ -314,13 +340,16 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected abstract List<Author> prepareAuthors(Document doc, DataInfo info);
 
 	protected abstract List<Field<String>> prepareOtherResearchProductTools(
-		Document doc, DataInfo info);
+		Document doc,
+		DataInfo info);
 
 	protected abstract List<Field<String>> prepareOtherResearchProductContactGroups(
-		Document doc, DataInfo info);
+		Document doc,
+		DataInfo info);
 
 	protected abstract List<Field<String>> prepareOtherResearchProductContactPersons(
-		Document doc, DataInfo info);
+		Document doc,
+		DataInfo info);
 
 	protected abstract Qualifier prepareSoftwareProgrammingLanguage(Document doc, DataInfo info);
 
@@ -329,7 +358,8 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected abstract List<StructuredProperty> prepareSoftwareLicenses(Document doc, DataInfo info);
 
 	protected abstract List<Field<String>> prepareSoftwareDocumentationUrls(
-		Document doc, DataInfo info);
+		Document doc,
+		DataInfo info);
 
 	protected abstract List<GeoLocation> prepareDatasetGeoLocations(Document doc, DataInfo info);
 
@@ -345,6 +375,34 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected abstract Field<String> prepareDatasetStorageDate(Document doc, DataInfo info);
 
+	protected static Qualifier getBestAccessRights(final List<Instance> instanceList) {
+		if (instanceList != null) {
+			final Optional<Qualifier> min = instanceList
+				.stream()
+				.map(i -> i.getAccessright())
+				.min(new LicenseComparator());
+
+			final Qualifier rights = min.isPresent() ? min.get() : new Qualifier();
+
+			if (StringUtils.isBlank(rights.getClassid())) {
+				rights.setClassid(UNKNOWN);
+			}
+			if (StringUtils.isBlank(rights.getClassname())
+				|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
+				rights.setClassname(NOT_AVAILABLE);
+			}
+			if (StringUtils.isBlank(rights.getSchemeid())) {
+				rights.setSchemeid(DNET_ACCESS_MODES);
+			}
+			if (StringUtils.isBlank(rights.getSchemename())) {
+				rights.setSchemename(DNET_ACCESS_MODES);
+			}
+
+			return rights;
+		}
+		return null;
+	}
+
 	private Journal prepareJournal(final Document doc, final DataInfo info) {
 		final Node n = doc.selectSingleNode("//oaf:journal");
 		if (n != null) {
@@ -358,29 +416,18 @@ public abstract class AbstractMdRecordToOafMapper {
 			final String vol = n.valueOf("@vol");
 			final String edition = n.valueOf("@edition");
 			if (StringUtils.isNotBlank(name)) {
-				return journal(
-					name,
-					issnPrinted,
-					issnOnline,
-					issnLinking,
-					ep,
-					iss,
-					sp,
-					vol,
-					edition,
-					null,
-					null,
-					info);
+				return journal(name, issnPrinted, issnOnline, issnLinking, ep, iss, sp, vol, edition, null, null, info);
 			}
 		}
 		return null;
 	}
 
-	protected Qualifier prepareQualifier(
-		final Node node, final String xpath, final String schemeId, final String schemeName) {
-		final String classId = node.valueOf(xpath);
-		final String className = code2name.get(classId);
-		return qualifier(classId, className, schemeId, schemeName);
+	protected Qualifier prepareQualifier(final Node node, final String xpath, final String schemeId) {
+		return prepareQualifier(node.valueOf(xpath).trim(), schemeId);
+	}
+
+	protected Qualifier prepareQualifier(final String classId, final String schemeId) {
+		return vocs.getTermAsQualifier(schemeId, classId);
 	}
 
 	protected List<StructuredProperty> prepareListStructProps(
@@ -388,20 +435,40 @@ public abstract class AbstractMdRecordToOafMapper {
 		final String xpath,
 		final String xpathClassId,
 		final String schemeId,
-		final String schemeName,
 		final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
+
 		for (final Object o : node.selectNodes(xpath)) {
 			final Node n = (Node) o;
-			final String classId = n.valueOf(xpathClassId);
-			final String className = code2name.get(classId);
-			res.add(structuredProperty(n.getText(), classId, className, schemeId, schemeName, info));
+			final String classId = n.valueOf(xpathClassId).trim();
+			res.add(structuredProperty(n.getText(), prepareQualifier(classId, schemeId), info));
+		}
+		return res;
+	}
+
+	protected List<StructuredProperty> prepareListStructPropsWithValidQualifier(
+		final Node node,
+		final String xpath,
+		final String xpathClassId,
+		final String schemeId,
+		final DataInfo info) {
+		final List<StructuredProperty> res = new ArrayList<>();
+
+		for (final Object o : node.selectNodes(xpath)) {
+			final Node n = (Node) o;
+			final String classId = n.valueOf(xpathClassId).trim();
+			if (vocs.termExists(schemeId, classId)) {
+				res.add(structuredProperty(n.getText(), vocs.getTermAsQualifier(schemeId, classId), info));
+			}
 		}
 		return res;
 	}
 
 	protected List<StructuredProperty> prepareListStructProps(
-		final Node node, final String xpath, final Qualifier qualifier, final DataInfo info) {
+		final Node node,
+		final String xpath,
+		final Qualifier qualifier,
+		final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
 		for (final Object o : node.selectNodes(xpath)) {
 			final Node n = (Node) o;
@@ -411,19 +478,17 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	protected List<StructuredProperty> prepareListStructProps(
-		final Node node, final String xpath, final DataInfo info) {
+		final Node node,
+		final String xpath,
+		final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
 		for (final Object o : node.selectNodes(xpath)) {
 			final Node n = (Node) o;
 			res
 				.add(
 					structuredProperty(
-						n.getText(),
-						n.valueOf("@classid"),
-						n.valueOf("@classname"),
-						n.valueOf("@schemeid"),
-						n.valueOf("@schemename"),
-						info));
+						n.getText(), n.valueOf("@classid"), n.valueOf("@classname"), n.valueOf("@schemeid"),
+						n.valueOf("@schemename"), info));
 		}
 		return res;
 	}
@@ -449,8 +514,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		final Node n = doc.selectSingleNode("//oaf:datainfo");
 
 		if (n == null) {
-			return dataInfo(
-				false, null, false, false, REPOSITORY_PROVENANCE_ACTIONS, "0.9");
+			return dataInfo(false, null, false, false, REPOSITORY_PROVENANCE_ACTIONS, "0.9");
 		}
 
 		final String paClassId = n.valueOf("./oaf:provenanceaction/@classid");
@@ -464,12 +528,8 @@ public abstract class AbstractMdRecordToOafMapper {
 		final String trust = n.valueOf("./oaf:trust");
 
 		return dataInfo(
-			deletedbyinference,
-			inferenceprovenance,
-			inferred,
-			false,
-			qualifier(paClassId, paClassName, paSchemeId, paSchemeName),
-			trust);
+			deletedbyinference, inferenceprovenance, inferred, false,
+			qualifier(paClassId, paClassName, paSchemeId, paSchemeName), trust);
 	}
 
 	protected Field<String> prepareField(final Node node, final String xpath, final DataInfo info) {
@@ -477,7 +537,9 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	protected List<Field<String>> prepareListFields(
-		final Node node, final String xpath, final DataInfo info) {
+		final Node node,
+		final String xpath,
+		final DataInfo info) {
 		return listFields(info, prepareListString(node, xpath));
 	}
 
