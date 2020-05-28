@@ -5,7 +5,9 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
@@ -62,6 +65,8 @@ public class CreateRelatedEntitiesJob_phase2 {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private static final int MAX_EXTERNAL_ENTITIES = 50;
+
+	private static final int MAX_AUTHORS = 200;
 
 	public static void main(String[] args) throws Exception {
 
@@ -205,6 +210,16 @@ public class CreateRelatedEntitiesJob_phase2 {
 							.collect(Collectors.toList());
 						r.setExternalReference(refs);
 					}
+					if (r.getAuthor() != null && r.getAuthor().size() > MAX_AUTHORS) {
+						List<Author> authors = Lists.newArrayList();
+						for (int i = 0; i < r.getAuthor().size(); i++) {
+							final Author a = r.getAuthor().get(i);
+							if (authors.size() < MAX_AUTHORS || hasORCID(a)) {
+								authors.add(a);
+							}
+						}
+						r.setAuthor(authors);
+					}
 				}
 				return e;
 			}, Encoders.bean(entityClazz))
@@ -212,6 +227,18 @@ public class CreateRelatedEntitiesJob_phase2 {
 				(MapFunction<E, TypedRow>) value -> getTypedRow(
 					StringUtils.substringAfterLast(inputEntityPath, "/"), value),
 				Encoders.bean(TypedRow.class));
+	}
+
+	private static boolean hasORCID(Author a) {
+		return a.getPid() != null && a
+			.getPid()
+			.stream()
+			.filter(Objects::nonNull)
+			.map(StructuredProperty::getQualifier)
+			.filter(Objects::nonNull)
+			.map(Qualifier::getClassid)
+			.filter(StringUtils::isNotBlank)
+			.anyMatch(c -> "orcid".equals(c.toLowerCase()));
 	}
 
 	private static TypedRow getTypedRow(String type, OafEntity entity)
