@@ -2,13 +2,14 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JoinedEntity implements Serializable {
 
 	private TypedRow entity;
 
-	private List<Tuple2> links;
+	private List<Tuple2> links = new ArrayList<>();
 
 	public JoinedEntity() {
 	}
