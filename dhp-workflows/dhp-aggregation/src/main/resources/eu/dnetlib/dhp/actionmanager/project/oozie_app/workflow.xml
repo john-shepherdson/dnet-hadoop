@@ -51,6 +51,19 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/programme</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme</arg>
         </java>
+        <ok to="read_projects"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="read_projects">
+        <java>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.ReadProjectsFromDB</main-class>
+            <arg>--hdfsPath</arg><arg>${workingDir}/dbProjects</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+        </java>
         <ok to="prepare_programme"/>
         <error to="Kill"/>
     </action>
