@@ -136,9 +136,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 					.stream()
 					.forEach(
 						rId -> {
-							if (organization_list.contains(rId)) {
-								organization_list.remove(rId);
-							}
+							organization_list.remove(rId);
 						});
 			}
 			String resultId = potential_update.getResultId();
