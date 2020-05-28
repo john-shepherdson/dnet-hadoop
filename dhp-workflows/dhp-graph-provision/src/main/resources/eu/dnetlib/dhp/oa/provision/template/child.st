@@ -1,3 +1,3 @@
 <$name$$if(hasId)$ objidentifier="$id$"$else$$endif$>
-	$metadata:{$it$}$
+	$metadata:{ it | $it$ }$
 </$name$>
