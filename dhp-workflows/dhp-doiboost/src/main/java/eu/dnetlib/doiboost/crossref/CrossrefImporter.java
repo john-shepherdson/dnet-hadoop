@@ -27,20 +27,20 @@ public class CrossrefImporter {
 					CrossrefImporter.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/doiboost/import_from_es.json")));
-		Logger logger = LoggerFactory.getLogger(CrossrefImporter.class);
+
 		parser.parseArgument(args);
 
 		final String hdfsuri = parser.get("namenode");
-		logger.info("HDFS URI" + hdfsuri);
+		System.out.println("HDFS URI" + hdfsuri);
 		Path hdfswritepath = new Path(parser.get("targetPath"));
-		logger.info("TargetPath: " + hdfsuri);
+		System.out.println("TargetPath: " + hdfsuri);
 
 		final Long timestamp = StringUtils.isNotBlank(parser.get("timestamp"))
 			? Long.parseLong(parser.get("timestamp"))
 			: -1;
 
 		if (timestamp > 0)
-			logger.info("Timestamp added " + timestamp);
+			System.out.println("Timestamp added " + timestamp);
 
 		// ====== Init HDFS File System Object
 		Configuration conf = new Configuration();
@@ -70,11 +70,11 @@ public class CrossrefImporter {
 				key.set(i++);
 				value.set(client.next());
 				writer.append(key, value);
-				if (i % 1000000 == 0) {
+				if (i % 100000 == 0) {
 					end = System.currentTimeMillis();
 					final float time = (end - start) / 1000.0F;
-					logger
-						.info(
+					System.out
+						.println(
 							String.format("Imported %d records last 100000 imported in %f seconds", i, time));
 					start = System.currentTimeMillis();
 				}

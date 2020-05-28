@@ -244,20 +244,20 @@ public class Result extends OafEntity implements Serializable {
 
 		subject = mergeLists(subject, r.getSubject());
 
-		//merge title lists: main title with higher trust and distinct between the others
+		// merge title lists: main title with higher trust and distinct between the others
 		StructuredProperty baseMainTitle = null;
-		if(title != null) {
+		if (title != null) {
 			baseMainTitle = getMainTitle(title);
 			title.remove(baseMainTitle);
 		}
 
 		StructuredProperty newMainTitle = null;
-		if(r.getTitle() != null) {
+		if (r.getTitle() != null) {
 			newMainTitle = getMainTitle(r.getTitle());
 			r.getTitle().remove(newMainTitle);
 		}
 
-		if (newMainTitle != null && compareTrust(this, r) < 0 )
+		if (newMainTitle != null && compareTrust(this, r) < 0)
 			baseMainTitle = newMainTitle;
 
 		title = mergeLists(title, r.getTitle());
@@ -314,8 +314,9 @@ public class Result extends OafEntity implements Serializable {
 	}
 
 	private StructuredProperty getMainTitle(List<StructuredProperty> titles) {
-		//need to check if the list of titles contains more than 1 main title? (in that case, we should chose which main title select in the list)
-		for (StructuredProperty title: titles) {
+		// need to check if the list of titles contains more than 1 main title? (in that case, we should chose which
+		// main title select in the list)
+		for (StructuredProperty title : titles) {
 			if (title.getQualifier() != null && title.getQualifier().getClassid() != null)
 				if (title.getQualifier().getClassid().equals("main title"))
 					return title;

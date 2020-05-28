@@ -1,7 +1,8 @@
 package eu.dnetlib.doiboost.mag
 
 
-import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication}
+import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty}
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -63,10 +64,96 @@ case object ConversionUtil {
   }
 
 
+  def mergePublication(a: Publication, b:Publication) : Publication = {
+    if ((a != null) && (b != null)) {
+      a.mergeFrom(b)
+      a
+    } else {
+      if (a == null) b else a
+    }
+  }
+
+  def choiceLatestMagArtitcle(p1: MagPapers, p2:MagPapers) :MagPapers = {
+    var r = if (p1 == null) p2 else p1
+    if (p1 != null && p2 != null) {
+      if (p1.CreatedDate != null && p2.CreatedDate != null) {
+        if (p1.CreatedDate.before(p2.CreatedDate))
+          r = p2
+        else
+          r = p1
+      } else {
+        r = if (p1.CreatedDate == null) p2 else p1
+      }
+    }
+    r
+
+  }
+
+
+  def updatePubsWithDescription(inputItem:((String, Publication), MagPaperAbstract)) : Publication = {
+    val pub = inputItem._1._2
+    val abst = inputItem._2
+    if (abst != null) {
+      pub.setDescription(List(asField(abst.IndexedAbstract)).asJava)
+    }
+    pub
+
+  }
+
+
+  def updatePubsWithConferenceInfo(inputItem:((String, Publication), MagConferenceInstance)) : Publication = {
+    val publication:Publication= inputItem._1._2
+    val ci:MagConferenceInstance = inputItem._2
+
+    if (ci!= null){
+
+      val j:Journal = new Journal
+      if (ci.Location.isDefined)
+        j.setConferenceplace(ci.Location.get)
+      j.setName(ci.DisplayName.get)
+      if (ci.StartDate.isDefined && ci.EndDate.isDefined)
+      {
+        j.setConferencedate(s"${ci.StartDate.get.toString} - ${ci.EndDate.get.toString}")
+      }
+
+      publication.setJournal(j)
+    }
+    publication
+  }
+
+  def updatePubsWithSubject(item:((String, Publication), MagFieldOfStudy)) : Publication = {
+
+    val publication = item._1._2
+    val fieldOfStudy = item._2
+    if (fieldOfStudy != null && fieldOfStudy.subjects != null && fieldOfStudy.subjects.nonEmpty) {
+      val p: List[StructuredProperty] = fieldOfStudy.subjects.flatMap(s => {
+        val s1 = createSP(s.DisplayName, "keywords", "dnet:subject_classification_typologies")
+        val di = DoiBoostMappingUtil.generateDataInfo(s.Score.toString)
+        var resList: List[StructuredProperty] = List(s1)
+        if (s.MainType.isDefined) {
+          val maintp = s.MainType.get
+          val s2 = createSP(s.MainType.get, "keywords", "dnet:subject_classification_typologies")
+          s2.setDataInfo(di)
+          resList = resList ::: List(s2)
+          if (maintp.contains(".")) {
+            val s3 = createSP(maintp.split("\\.").head, "keywords", "dnet:subject_classification_typologies")
+            s3.setDataInfo(di)
+            resList = resList ::: List(s3)
+          }
+        }
+        resList
+      })
+      publication.setSubject(p.asJava)
+    }
+    publication
+  }
+
+
 
   def addInstances(a: (Publication, MagUrl)): Publication = {
     val pub = a._1
     val urls = a._2
+
 
 
     val i = new Instance

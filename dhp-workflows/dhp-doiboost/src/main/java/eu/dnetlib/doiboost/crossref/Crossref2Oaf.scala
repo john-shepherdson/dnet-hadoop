@@ -1,9 +1,8 @@
 package eu.dnetlib.doiboost.crossref
 
-import java.util
-
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
+import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.lang.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
@@ -14,7 +13,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
-import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 
 case class mappingAffiliation(name: String) {}
 
@@ -25,8 +23,6 @@ case class mappingFunder(name: String, DOI: Option[String], award: Option[List[S
 
 case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
-
-
 
   val mappingCrossrefType = Map(
     "book-section" -> "publication",
@@ -113,17 +109,18 @@ case object Crossref2Oaf {
     result.setPublisher(asField(publisher))
 
     // TITLE
-    val mainTitles = for {JString(title) <- json \ "title"} yield createSP(title, "main title", "dnet:dataCite_title")
-    val originalTitles = for {JString(title) <- json \ "original-title"} yield createSP(title, "alternative title", "dnet:dataCite_title")
-    val shortTitles = for {JString(title) <- json \ "short-title"} yield createSP(title, "alternative title", "dnet:dataCite_title")
-    val subtitles = for {JString(title) <- json \ "subtitle"} yield createSP(title, "subtitle", "dnet:dataCite_title")
+    val mainTitles = for {JString(title) <- json \ "title" if title.nonEmpty} yield createSP(title, "main title", "dnet:dataCite_title")
+    val originalTitles = for {JString(title) <- json \ "original-title" if title.nonEmpty} yield createSP(title, "alternative title", "dnet:dataCite_title")
+    val shortTitles = for {JString(title) <- json \ "short-title" if title.nonEmpty} yield createSP(title, "alternative title", "dnet:dataCite_title")
+    val subtitles = for {JString(title) <- json \ "subtitle" if title.nonEmpty} yield createSP(title, "subtitle", "dnet:dataCite_title")
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
     // DESCRIPTION
     val descriptionList = for {JString(description) <- json \ "abstract"} yield asField(description)
     result.setDescription(descriptionList.asJava)
+
     // Source
-    val sourceList = for {JString(source) <- json \ "source"} yield asField(source)
+    val sourceList = for {JString(source) <- json \ "source" if source.nonEmpty} yield asField(source)
     result.setSource(sourceList.asJava)
 
     //RELEVANT DATE Mapping
@@ -142,7 +139,6 @@ case object Crossref2Oaf {
     }
     result.setRelevantdate(List(createdDate, postedDate, acceptedDate, publishedOnlineDate, publishedPrintDate).filter(p => p != null).asJava)
 
-
     //Mapping Subject
     val subjectList:List[String] = (json \ "subject").extractOrElse[List[String]](List())
 
@@ -152,7 +148,7 @@ case object Crossref2Oaf {
 
 
 
-    //Mapping AUthor
+    //Mapping Author
     val authorList: List[mappingAuthor] = (json \ "author").extractOrElse[List[mappingAuthor]](List())
     result.setAuthor(authorList.map(a => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull)).asJava)
 
@@ -173,7 +169,6 @@ case object Crossref2Oaf {
 
 
     instance.setAccessright(createQualifier("Restricted", "dnet:access_modes"))
-
     result.setInstance(List(instance).asJava)
     instance.setInstancetype(createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
 
@@ -405,10 +400,7 @@ case object Crossref2Oaf {
         publication.setJournal(journal)
       }
     }
-
-
   }
-
 
   def extractDate(dt: String, datePart: List[List[Int]]): String = {
     if (StringUtils.isNotBlank(dt))
@@ -427,17 +419,11 @@ case object Crossref2Oaf {
   }
 
   def generateDate(dt: String, datePart: List[List[Int]], classId: String, schemeId: String): StructuredProperty = {
-
     val dp = extractDate(dt, datePart)
     if (StringUtils.isNotBlank(dp))
       return createSP(dp, classId, schemeId)
     null
   }
-
-
-
-
-
 
   def generateItemFromType(objectType: String, objectSubType: String): Result = {
     if (mappingCrossrefType.contains(objectType)) {

@@ -91,9 +91,9 @@ public class EntityMergerTest implements Serializable {
 		assertEquals(pub_merged.getAuthor().size(), 9);
 		assertEquals(AuthorMerger.countAuthorsPids(pub_merged.getAuthor()), 4);
 
-		//verify title
+		// verify title
 		int count = 0;
-		for (StructuredProperty title: pub_merged.getTitle()){
+		for (StructuredProperty title : pub_merged.getTitle()) {
 			if (title.getQualifier().getClassid().equals("main title"))
 				count++;
 		}

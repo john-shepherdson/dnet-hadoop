@@ -1,15 +1,13 @@
 package eu.dnetlib.doiboost.mag
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Journal, Publication, StructuredProperty}
-import eu.dnetlib.doiboost.DoiBoostMappingUtil
-import eu.dnetlib.doiboost.DoiBoostMappingUtil.{asField, createSP}
+import eu.dnetlib.dhp.schema.oaf.Publication
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
-import org.slf4j.{Logger, LoggerFactory}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql._
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 
@@ -36,25 +34,15 @@ object SparkPreProcessMAG {
     val d: Dataset[MagPapers] = spark.read.load(s"${parser.get("sourcePath")}/Papers").as[MagPapers]
 
     // Filtering Papers with DOI, and since for the same DOI we have multiple version of item with different PapersId we get the last one
-    val result: RDD[MagPapers] = d.where(col("Doi").isNotNull).rdd.map { p: MagPapers => Tuple2(p.Doi, p) }.reduceByKey { case (p1: MagPapers, p2: MagPapers) =>
-      var r = if (p1 == null) p2 else p1
-      if (p1 != null && p2 != null) {
-        if (p1.CreatedDate != null && p2.CreatedDate != null) {
-          if (p1.CreatedDate.before(p2.CreatedDate))
-            r = p1
-          else
-            r = p2
-        } else {
-          r = if (p1.CreatedDate == null) p2 else p1
-        }
-      }
-      r
-    }.map(_._2)
-
+    val result: RDD[MagPapers] = d.where(col("Doi").isNotNull)
+      .rdd
+      .map{ p: MagPapers => Tuple2(p.Doi, p) }
+      .reduceByKey((p1:MagPapers,p2:MagPapers) => ConversionUtil.choiceLatestMagArtitcle(p1,p2))
+      .map(_._2)
 
     val distinctPaper: Dataset[MagPapers] = spark.createDataset(result)
     distinctPaper.write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/Papers_distinct")
-    logger.info(s"Total number of element: ${result.count()}")
+
 
     logger.info("Phase 3) Group Author by PaperId")
     val authors = spark.read.load(s"$sourcePath/Authors").as[MagAuthor]
@@ -85,46 +73,35 @@ object SparkPreProcessMAG {
 
     val firstJoin = papers.joinWith(journals, papers("JournalId").equalTo(journals("JournalId")), "left")
     firstJoin.joinWith(paperWithAuthors, firstJoin("_1.PaperId").equalTo(paperWithAuthors("PaperId")), "left")
-      .map { a: ((MagPapers, MagJournal), MagPaperWithAuthorList) => ConversionUtil.createOAFFromJournalAuthorPaper(a) }.write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/merge_step_2")
+      .map { a => ConversionUtil.createOAFFromJournalAuthorPaper(a) }
+      .write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/merge_step_2")
 
 
-    var magPubs: Dataset[(String, Publication)] = spark.read.load(s"${parser.get("targetPath")}/merge_step_2").as[Publication].map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+    var magPubs: Dataset[(String, Publication)] =
+      spark.read.load(s"${parser.get("targetPath")}/merge_step_2").as[Publication]
+      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
 
 
-    val conference = spark.read.load(s"$sourcePath/ConferenceInstances").select($"ConferenceInstanceId".as("ci"), $"DisplayName", $"Location", $"StartDate",$"EndDate" )
-    val conferenceInstance = conference.joinWith(papers, papers("ConferenceInstanceId").equalTo(conference("ci"))).select($"_1.ci", $"_1.DisplayName", $"_1.Location", $"_1.StartDate",$"_1.EndDate", $"_2.PaperId").as[MagConferenceInstance]
+    val conference = spark.read.load(s"$sourcePath/ConferenceInstances")
+      .select($"ConferenceInstanceId".as("ci"), $"DisplayName", $"Location", $"StartDate",$"EndDate" )
+    val conferenceInstance = conference.joinWith(papers, papers("ConferenceInstanceId").equalTo(conference("ci")))
+      .select($"_1.ci", $"_1.DisplayName", $"_1.Location", $"_1.StartDate",$"_1.EndDate", $"_2.PaperId").as[MagConferenceInstance]
 
 
     magPubs.joinWith(conferenceInstance, col("_1").equalTo(conferenceInstance("PaperId")), "left")
-      .map(p => {
-        val publication:Publication= p._1._2
-        val ci:MagConferenceInstance = p._2
-
-        if (ci!= null){
-
-          val j:Journal = new Journal
-          if (ci.Location.isDefined)
-            j.setConferenceplace(ci.Location.get)
-          j.setName(ci.DisplayName.get)
-          if (ci.StartDate.isDefined && ci.EndDate.isDefined)
-            {
-              j.setConferencedate(s"${ci.StartDate.get.toString} - ${ci.EndDate.get.toString}")
-            }
-
-          publication.setJournal(j)
-        }
-        publication
-
-      }).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/merge_step_2_conference")
+      .map(item => ConversionUtil.updatePubsWithConferenceInfo(item))
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"${parser.get("targetPath")}/merge_step_2_conference")
 
 
-    magPubs= spark.read.load(s"${parser.get("targetPath")}/merge_step_2_conference").as[Publication].map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+    magPubs= spark.read.load(s"${parser.get("targetPath")}/merge_step_2_conference").as[Publication]
+      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
 
     val paperUrlDataset = spark.read.load(s"$sourcePath/PaperUrls").as[MagPaperUrl].groupBy("PaperId").agg(collect_list(struct("sourceUrl")).as("instances")).as[MagUrl]
 
 
     logger.info("Phase 5) enrich publication with URL and Instances")
-
     magPubs.joinWith(paperUrlDataset, col("_1").equalTo(paperUrlDataset("PaperId")), "left")
       .map { a: ((String, Publication), MagUrl) => ConversionUtil.addInstances((a._1._2, a._2)) }
       .write.mode(SaveMode.Overwrite)
@@ -138,22 +115,18 @@ object SparkPreProcessMAG {
     val paperAbstract = spark.read.load((s"${parser.get("targetPath")}/PaperAbstract")).as[MagPaperAbstract]
 
 
-    magPubs = spark.read.load(s"${parser.get("targetPath")}/merge_step_3").as[Publication].map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+    magPubs = spark.read.load(s"${parser.get("targetPath")}/merge_step_3").as[Publication]
+      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
 
-    magPubs.joinWith(paperAbstract, col("_1").equalTo(paperAbstract("PaperId")), "left").map(p => {
-      val pub = p._1._2
-      val abst = p._2
-      if (abst != null) {
-        pub.setDescription(List(asField(abst.IndexedAbstract)).asJava)
-      }
-      pub
-    }
+    magPubs.joinWith(paperAbstract, col("_1").equalTo(paperAbstract("PaperId")), "left")
+      .map(item => ConversionUtil.updatePubsWithDescription(item)
     ).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/merge_step_4")
 
 
     logger.info("Phase 7) Enrich Publication with FieldOfStudy")
 
-    magPubs = spark.read.load(s"${parser.get("targetPath")}/merge_step_4").as[Publication].map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+    magPubs = spark.read.load(s"${parser.get("targetPath")}/merge_step_4").as[Publication]
+      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
 
     val fos = spark.read.load(s"$sourcePath/FieldsOfStudy").select($"FieldOfStudyId".alias("fos"), $"DisplayName", $"MainType")
 
@@ -164,31 +137,18 @@ object SparkPreProcessMAG {
       .groupBy($"PaperId").agg(collect_list(struct($"FieldOfStudyId", $"DisplayName", $"MainType", $"Score")).as("subjects"))
       .as[MagFieldOfStudy]
 
-    magPubs.joinWith(paperField, col("_1").equalTo(paperField("PaperId")), "left").
-      map(item => {
-        val publication = item._1._2
-        val fieldOfStudy = item._2
-        if (fieldOfStudy != null && fieldOfStudy.subjects != null && fieldOfStudy.subjects.nonEmpty) {
-          val p: List[StructuredProperty] = fieldOfStudy.subjects.flatMap(s => {
-            val s1 = createSP(s.DisplayName, "keywords", "dnet:subject_classification_typologies")
-            val di = DoiBoostMappingUtil.generateDataInfo(s.Score.toString)
-            var resList: List[StructuredProperty] = List(s1)
-            if (s.MainType.isDefined) {
-              val maintp = s.MainType.get
-              val s2 = createSP(s.MainType.get, "keywords", "dnet:subject_classification_typologies")
-              s2.setDataInfo(di)
-              resList = resList ::: List(s2)
-              if (maintp.contains(".")) {
-                val s3 = createSP(maintp.split("\\.").head, "keywords", "dnet:subject_classification_typologies")
-                s3.setDataInfo(di)
-                resList = resList ::: List(s3)
-              }
-            }
-            resList
-          })
-          publication.setSubject(p.asJava)
-        }
-        publication
-      }).map { s: Publication => s }(Encoders.bean(classOf[Publication])).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/mag_publication")
+    magPubs.joinWith(paperField, col("_1")
+      .equalTo(paperField("PaperId")), "left")
+      .map(item => ConversionUtil.updatePubsWithSubject(item))
+      .write.mode(SaveMode.Overwrite)
+      .save(s"${parser.get("targetPath")}/mag_publication")
+
+
+    val s:RDD[Publication] = spark.read.load(s"${parser.get("targetPath")}/mag_publication").as[Publication]
+      .map(p=>Tuple2(p.getId, p)).rdd.reduceByKey((a:Publication, b:Publication) => ConversionUtil.mergePublication(a,b))
+    .map(_._2)
+
+    spark.createDataset(s).as[Publication].write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/mag_publication_u")
+
   }
 }

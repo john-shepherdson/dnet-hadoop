@@ -16,6 +16,11 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
+        <property>
+            <name>timestamp</name>
+            <description>Timestamp for incremental Harvesting</description>
+        </property>
+
     </parameters>
 
     <start to="ExtractCrossrefToOAF"/>
@@ -27,8 +32,8 @@
 
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${workingPath}'/>
-            <mkdir path='${workingPath}/input/crossref'/>
+            <delete path='${workingPath}/input/crossref/index_dump'/>
+<!--            <mkdir path='${workingPath}/input/crossref'/>-->
         </fs>
         <ok to="ImportCrossRef"/>
         <error to="Kill"/>
@@ -43,11 +48,11 @@
             <main-class>eu.dnetlib.doiboost.crossref.CrossrefImporter</main-class>
             <arg>-t</arg><arg>${workingPath}/input/crossref/index_dump</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-ts</arg><arg>${timestamp}</arg>
         </java>
-        <ok to="End"/>
+        <ok to="ExtractCrossrefToOAF"/>
         <error to="Kill"/>
     </action>
-
 
 
     <action name="ExtractCrossrefToOAF">
@@ -63,7 +68,7 @@
                 --driver-memory=${sparkDriverMemory}
                 ${sparkExtraOPT}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingPath}/crossref/index_dump</arg>
+            <arg>--sourcePath</arg><arg>${workingPath}/input/crossref/index_dump,${workingPath}/crossref/index_dump</arg>
             <arg>--targetPath</arg><arg>${workingPath}/input/crossref</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>

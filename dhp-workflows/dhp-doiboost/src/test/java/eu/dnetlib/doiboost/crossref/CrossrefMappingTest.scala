@@ -59,6 +59,28 @@ class CrossrefMappingTest {
 
 
   @Test
+  def testEmptyTitle() :Unit = {
+    val json = Source.fromInputStream(getClass.getResourceAsStream("empty_title.json")).mkString
+
+
+    assertNotNull(json)
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Result])
+
+
+    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
+    items.foreach(p => println(mapper.writeValueAsString(p)))
+
+
+  }
+
+
+  @Test
   def testPeerReviewed(): Unit = {
     val json = Source.fromInputStream(getClass.getResourceAsStream("prwTest.json")).mkString
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
