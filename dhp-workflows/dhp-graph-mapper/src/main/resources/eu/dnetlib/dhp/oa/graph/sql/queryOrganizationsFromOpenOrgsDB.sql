@@ -11,8 +11,8 @@ SELECT
 	''                                                                                                                            AS inferenceprovenance,
 	'openaire____::openorgs'                                                                                                      AS collectedfromid,
 	'OpenOrgs Database'                                                                                                           AS collectedfromname,
-	o.country || '@@@' || o.country || '@@@dnet:countries@@@dnet:countries'                                                       AS country,
-	'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions' AS provenanceaction,
+	o.country || '@@@dnet:countries'                                                       AS country,
+	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
 	array_agg(DISTINCT i.otherid || '###' || i.type || '@@@dnet:pid_types')                                                       AS pid
 FROM organizations o
 	LEFT OUTER JOIN acronyms a    ON (a.id = o.id)
@@ -40,8 +40,8 @@ SELECT
 	''                                                                                                                            AS inferenceprovenance,
 	'openaire____::openorgs'                                                                                                      AS collectedfromid,
 	'OpenOrgs Database'                                                                                                           AS collectedfromname,
-	o.country || '@@@' || o.country || '@@@dnet:countries@@@dnet:countries'                                                       AS country,
-	'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions' AS provenanceaction,
+	o.country || '@@@dnet:countries'                                                       AS country,
+	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
 	array_agg(DISTINCT i.otherid || '###' || i.type || '@@@dnet:pid_types')                                                       AS pid
 FROM other_names n
 	LEFT OUTER JOIN organizations o ON (n.id = o.id)

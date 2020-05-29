@@ -25,6 +25,10 @@
             <description>mongo database</description>
         </property>
         <property>
+            <name>isLookupUrl</name>
+            <description>the address of the lookUp service</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -62,6 +66,7 @@
             <arg>-pgurl</arg><arg>${postgresURL}</arg>
             <arg>-pguser</arg><arg>${postgresUser}</arg>
             <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+            <arg>-islookup</arg><arg>${isLookupUrl}</arg>
         </java>
         <ok to="ImportODF"/>
         <error to="Kill"/>

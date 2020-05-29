@@ -10,7 +10,28 @@ import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listKeyValues;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASOURCE_ORGANIZATION;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTICIPANT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PARTICIPANT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PROVIDED_BY;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_RELATED_TO;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PARTICIPATION;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PROJECT_ORGANIZATION;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVIDES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVISION;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.RELATIONSHIP;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -32,6 +53,7 @@ import org.apache.commons.logging.LogFactory;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -61,6 +83,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	private final long lastUpdateTimestamp;
 
+	private final VocabularyGroup vocs;
+
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -73,13 +97,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final String dbUrl = parser.get("postgresUrl");
 		final String dbUser = parser.get("postgresUser");
 		final String dbPassword = parser.get("postgresPassword");
+		final String isLookupUrl = parser.get("islookup");
 
 		final String hdfsPath = parser.get("hdfsPath");
 
 		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
 
 		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, dbUrl, dbUser,
-			dbPassword)) {
+			dbPassword, isLookupUrl)) {
 			if (processClaims) {
 				log.info("Processing claims...");
 				smdbe.execute("queryClaims.sql", smdbe::processClaims);
@@ -103,18 +128,21 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		}
 	}
 
-	protected MigrateDbEntitiesApplication() { // ONLY FOR UNIT TEST
+	protected MigrateDbEntitiesApplication(final VocabularyGroup vocs) { // ONLY FOR UNIT TEST
 		super();
 		this.dbClient = null;
 		this.lastUpdateTimestamp = new Date().getTime();
+		this.vocs = vocs;
 	}
 
 	public MigrateDbEntitiesApplication(
-		final String hdfsPath, final String dbUrl, final String dbUser, final String dbPassword)
+		final String hdfsPath, final String dbUrl, final String dbUser, final String dbPassword,
+		final String isLookupUrl)
 		throws Exception {
 		super(hdfsPath);
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.lastUpdateTimestamp = new Date().getTime();
+		this.vocs = VocabularyGroup.loadVocsFromIS(isLookupUrl);
 	}
 
 	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer)
@@ -453,12 +481,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final Boolean inferred = rs.getBoolean("inferred");
 		final String trust = rs.getString("trust");
 		return dataInfo(
-			deletedbyinference,
-			inferenceprovenance,
-			inferred,
-			false,
-			ENTITYREGISTRY_PROVENANCE_ACTION,
-			trust);
+			deletedbyinference, inferenceprovenance, inferred, false, ENTITYREGISTRY_PROVENANCE_ACTION, trust);
 	}
 
 	private Qualifier prepareQualifierSplitting(final String s) {
@@ -466,7 +489,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			return null;
 		}
 		final String[] arr = s.split("@@@");
-		return arr.length == 4 ? qualifier(arr[0], arr[1], arr[2], arr[3]) : null;
+		return arr.length == 2 ? vocs.getTermAsQualifier(arr[1], arr[0]) : null;
 	}
 
 	private List<Field<String>> prepareListFields(final Array array, final DataInfo info) {
@@ -485,8 +508,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		if (parts.length == 2) {
 			final String value = parts[0];
 			final String[] arr = parts[1].split("@@@");
-			if (arr.length == 4) {
-				return structuredProperty(value, arr[0], arr[1], arr[2], arr[3], dataInfo);
+			if (arr.length == 2) {
+				return structuredProperty(value, vocs.getTermAsQualifier(arr[1], arr[0]), dataInfo);
 			}
 		}
 		return null;

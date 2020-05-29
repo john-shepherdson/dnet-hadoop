@@ -22,13 +22,12 @@ SELECT
 		''                                                        AS inferenceprovenance,
 		d.id                                                      AS collectedfromid,
 		d.officialname                                            AS collectedfromname,
-		o.country || '@@@' || COALESCE(cntr.name,o.country) || '@@@dnet:countries@@@dnet:countries' AS country,
-		'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions' AS provenanceaction,
+		o.country || '@@@dnet:countries'                          AS country,
+		'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
 		ARRAY[]::text[]                                           AS pid
 
 FROM dsm_organizations o
 	LEFT OUTER JOIN dsm_datasources d ON (d.id = o.collectedfrom)
-	LEFT OUTER JOIN class cntr ON (cntr.code = o.country)
 
 
 
