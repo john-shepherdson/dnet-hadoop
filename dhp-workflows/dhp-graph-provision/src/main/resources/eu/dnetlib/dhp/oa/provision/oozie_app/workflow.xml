@@ -499,8 +499,8 @@
             <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=2
-                --executor-memory=12G
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
