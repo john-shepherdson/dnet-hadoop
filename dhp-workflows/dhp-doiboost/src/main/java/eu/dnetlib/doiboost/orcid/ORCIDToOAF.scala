@@ -17,6 +17,10 @@ import scala.collection.JavaConverters._
 
 
 case class ORCIDItem(oid:String,name:String,surname:String,creditName:String,errorCode:String){}
+
+
+
+case class ORCIDElement(doi:String, authors:List[ORCIDItem]) {}
 object ORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
   val mapper = new ObjectMapper
@@ -45,45 +49,24 @@ object ORCIDToOAF {
   }
 
 
-  def convertTOOAF(input:String) :Publication = {
-    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-
-    val item:(String, String) = extractValueFromInputString(input)
-
-    if (item== null) {
-      return  null
-    }
-
-    val json_str = item._2
-    lazy val json: json4s.JValue = parse(json_str)
-
-    val doi = item._1
-
+  def convertTOOAF(input:ORCIDElement) :Publication = {
+    val doi = input.doi
     val pub:Publication = new Publication
     pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
     pub.setId(generateIdentifier(pub, doi.toLowerCase))
-
-
-
-
     try{
-      val authorList:List[ORCIDItem] = json.extract[List[ORCIDItem]]
-
-
-      pub.setAuthor(authorList.map(a=> {
+      pub.setAuthor(input.authors.map(a=> {
         generateAuhtor(a.name, a.surname, a.creditName, a.oid)
       }).asJava)
-
-
       pub.setCollectedfrom(List(DoiBoostMappingUtil.createORIDCollectedFrom()).asJava)
+      pub.setDataInfo(DoiBoostMappingUtil.generateDataInfo())
       pub
     } catch {
       case e: Throwable =>
         logger.info(s"ERROR ON GENERATE Publication from $input")
         null
     }
-
   }
 
   def generateAuhtor(given: String, family: String, fullName:String, orcid: String): Author = {

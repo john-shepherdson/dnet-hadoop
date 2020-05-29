@@ -43,6 +43,9 @@ object SparkPreProcessMAG {
     val distinctPaper: Dataset[MagPapers] = spark.createDataset(result)
     distinctPaper.write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/Papers_distinct")
 
+    logger.info("Phase 6) Enrich Publication with description")
+    val pa = spark.read.load(s"${parser.get("sourcePath")}/PaperAbstractsInvertedIndex").as[MagPaperAbstract]
+    pa.map(ConversionUtil.transformPaperAbstract).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/PaperAbstract")
 
     logger.info("Phase 3) Group Author by PaperId")
     val authors = spark.read.load(s"$sourcePath/Authors").as[MagAuthor]
@@ -108,9 +111,9 @@ object SparkPreProcessMAG {
       .save(s"${parser.get("targetPath")}/merge_step_3")
 
 
-    logger.info("Phase 6) Enrich Publication with description")
-    val pa = spark.read.load(s"${parser.get("sourcePath")}/PaperAbstractsInvertedIndex").as[MagPaperAbstract]
-    pa.map(ConversionUtil.transformPaperAbstract).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/PaperAbstract")
+//    logger.info("Phase 6) Enrich Publication with description")
+//    val pa = spark.read.load(s"${parser.get("sourcePath")}/PaperAbstractsInvertedIndex").as[MagPaperAbstract]
+//    pa.map(ConversionUtil.transformPaperAbstract).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/PaperAbstract")
 
     val paperAbstract = spark.read.load((s"${parser.get("targetPath")}/PaperAbstract")).as[MagPaperAbstract]
 

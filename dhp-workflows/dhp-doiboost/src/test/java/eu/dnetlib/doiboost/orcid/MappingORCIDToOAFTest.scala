@@ -24,28 +24,6 @@ class MappingORCIDToOAFTest {
   }
 
 
-  @Test
-  def testConvertOrcidToOAF():Unit ={
-    val json = Source.fromInputStream(getClass.getResourceAsStream("dataOutput")).mkString
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-
-    assertNotNull(json)
-    assertFalse(json.isEmpty)
-//    json.lines.foreach(s => {
-//
-//    })
-
-
-    val p :Publication = ORCIDToOAF.convertTOOAF(json.lines.next())
-
-
-    logger.info(mapper.writeValueAsString(p))
-  }
-
-
-
-
-
 
 
 

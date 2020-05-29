@@ -3,10 +3,15 @@ package eu.dnetlib.dhp.doiboost
 import eu.dnetlib.dhp.schema.oaf.{Publication, Dataset => OafDataset}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.SparkGenerateDoiBoost.getClass
+import eu.dnetlib.doiboost.mag.ConversionUtil
+import eu.dnetlib.doiboost.orcid.ORCIDElement
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
 import org.junit.jupiter.api.Test
+
+import scala.io.Source
 
 class DoiBoostHostedByMapTest {
 
@@ -19,7 +24,7 @@ class DoiBoostHostedByMapTest {
 
 
   @Test
-  def testFilter():Unit = {
+  def testMerge():Unit = {
     val conf: SparkConf = new SparkConf()
     val spark: SparkSession =
       SparkSession
@@ -29,19 +34,23 @@ class DoiBoostHostedByMapTest {
         .master("local[*]").getOrCreate()
 
 
+
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
     implicit val mapEncoderDataset: Encoder[OafDataset] = Encoders.kryo[OafDataset]
     implicit val tupleForJoinEncoder: Encoder[(String, Publication)] = Encoders.tuple(Encoders.STRING, mapEncoderPub)
 
 
+    import spark.implicits._
+    val dataset:Dataset[ORCIDElement] = spark.read.json("/home/sandro/orcid").as[ORCIDElement]
 
-    val pub =spark.read.load("/data/doiboost/doiboostPublicationFiltered").as[Publication]
 
-    val mapper = new ObjectMapper()
+    dataset.show(false)
 
-    val map = DoiBoostMappingUtil.retrieveHostedByMap()
 
-   println(pub.map(p => DoiBoostMappingUtil.fixPublication(p, map)).count())
+
+
+
+
 
 
   }

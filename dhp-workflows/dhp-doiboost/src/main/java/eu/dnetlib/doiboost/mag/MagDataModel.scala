@@ -71,6 +71,8 @@ case object ConversionUtil {
     } else {
       if (a == null) b else a
     }
+
+
   }
 
   def choiceLatestMagArtitcle(p1: MagPapers, p2:MagPapers) :MagPapers = {

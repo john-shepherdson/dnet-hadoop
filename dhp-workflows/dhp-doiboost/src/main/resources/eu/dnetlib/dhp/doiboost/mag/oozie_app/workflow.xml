@@ -31,8 +31,8 @@
 
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${targetPath}/preprocess'/>
-            <mkdir path='${targetPath}/preprocess'/>
+            <delete path='${targetPath}'/>
+            <mkdir path='${targetPath}'/>
         </fs>
         <ok to="PreprocessMag"/>
         <error to="Kill"/>

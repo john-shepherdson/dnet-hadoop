@@ -2,6 +2,7 @@ package eu.dnetlib.doiboost.orcid
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.Publication
+import eu.dnetlib.doiboost.mag.ConversionUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
@@ -25,17 +26,19 @@ object SparkConvertORCIDToOAF {
         .appName(getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
 
-    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.bean(classOf[Publication])
-
+    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
+    implicit val tupleForJoinEncoder: Encoder[(String, Publication)] = Encoders.tuple(Encoders.STRING, mapEncoderPubs)
+    import spark.implicits._
     val sourcePath = parser.get("sourcePath")
     val targetPath = parser.get("targetPath")
-    val inputRDD:RDD[String] = spark.sparkContext.textFile(s"$sourcePath")
+    val dataset:Dataset[ORCIDElement] = spark.read.json(sourcePath).as[ORCIDElement]
 
-    println(s"SourcePath is $sourcePath, targetPath is $targetPath master is ${parser.get("master")} ")
 
     logger.info("Converting ORCID to OAF")
-    val d:Dataset[Publication] = spark.createDataset(inputRDD.map(ORCIDToOAF.convertTOOAF).filter(p=>p!=null)).as[Publication]
-    d.write.mode(SaveMode.Overwrite).save(targetPath)
+    val d:RDD[Publication] = dataset.map(o => ORCIDToOAF.convertTOOAF(o)).filter(p=>p!=null).map(p=>(p.getId,p)).rdd.reduceByKey(ConversionUtil.mergePublication)
+      .map(_._2)
+
+    spark.createDataset(d).as[Publication].write.mode(SaveMode.Overwrite).save(targetPath)
   }
 
 }

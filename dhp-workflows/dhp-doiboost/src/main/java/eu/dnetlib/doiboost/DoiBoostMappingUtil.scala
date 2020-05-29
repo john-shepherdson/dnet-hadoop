@@ -86,7 +86,7 @@ object DoiBoostMappingUtil {
   }
 
   def generateGridAffiliationId(gridId:String) :String = {
-    s"10|grid________::${DHPUtils.md5(gridId.toLowerCase().trim())}"
+    s"20|grid________::${DHPUtils.md5(gridId.toLowerCase().trim())}"
   }
 
 
