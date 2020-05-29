@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
-public class VocabularyGroup {
+public class VocabularyGroup implements Serializable {
 
 	public static VocabularyGroup loadVocsFromIS(final String isLookupUrl) throws IOException, ISLookUpException {
 		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);

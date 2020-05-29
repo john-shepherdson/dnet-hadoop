@@ -47,8 +47,6 @@ import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
@@ -71,10 +69,12 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
-	private static final Log log = LogFactory.getLog(MigrateDbEntitiesApplication.class);
+	private static final Logger log = LoggerFactory.getLogger(MigrateDbEntitiesApplication.class);
 
 	public static final String SOURCE_TYPE = "source_type";
 	public static final String TARGET_TYPE = "target_type";
@@ -95,13 +95,22 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		parser.parseArgument(args);
 
 		final String dbUrl = parser.get("postgresUrl");
+		log.info("postgresUrl: {}", dbUrl);
+
 		final String dbUser = parser.get("postgresUser");
+		log.info("postgresUser: {}", dbUser);
+
 		final String dbPassword = parser.get("postgresPassword");
-		final String isLookupUrl = parser.get("islookup");
+		log.info("postgresPassword: xxx");
+
+		final String isLookupUrl = parser.get("isLookupUrl");
+		log.info("isLookupUrl: {}", isLookupUrl);
 
 		final String hdfsPath = parser.get("hdfsPath");
+		log.info("hdfsPath: {}", hdfsPath);
 
 		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
+		log.info("processClaims: {}", processClaims);
 
 		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, dbUrl, dbUser,
 			dbPassword, isLookupUrl)) {

@@ -30,8 +30,8 @@
 		"paramRequired": false
 	},
 	{
-		"paramName": "islookup",
-		"paramLongName": "islookup",
+		"paramName": "isu",
+		"paramLongName": "isLookupUrl",
 		"paramDescription": "the url of the ISLookupService",
 		"paramRequired": true
 	}

@@ -63,9 +63,13 @@ public class GenerateEntitiesApplication {
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String sourcePaths = parser.get("sourcePaths");
-		final String targetPath = parser.get("targetPath");
+		log.info("sourcePaths: {}", sourcePaths);
 
-		final String isLookupUrl = parser.get("islookup");
+		final String targetPath = parser.get("targetPath");
+		log.info("targetPath: {}", targetPath);
+
+		final String isLookupUrl = parser.get("isLookupUrl");
+		log.info("isLookupUrl: {}", isLookupUrl);
 
 		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupUrl);
 

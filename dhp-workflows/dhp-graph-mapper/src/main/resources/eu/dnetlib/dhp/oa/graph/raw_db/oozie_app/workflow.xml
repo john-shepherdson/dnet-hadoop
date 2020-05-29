@@ -92,7 +92,7 @@
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
-            <arg>--islookup</arg><arg>${isLookupUrl}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </java>
         <ok to="ImportDB_claims"/>
         <error to="Kill"/>
@@ -108,7 +108,7 @@
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
-            <arg>--islookup</arg><arg>${isLookupUrl}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--action</arg><arg>claims</arg>
         </java>
         <ok to="End"/>

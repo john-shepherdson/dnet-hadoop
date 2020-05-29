@@ -1,7 +1,9 @@
 
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
-public class VocabularyTerm {
+import java.io.Serializable;
+
+public class VocabularyTerm implements Serializable {
 
 	private final String id;
 	private final String name;
