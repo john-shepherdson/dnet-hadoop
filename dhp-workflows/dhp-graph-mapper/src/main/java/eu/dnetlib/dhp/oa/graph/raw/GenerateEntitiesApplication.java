@@ -39,9 +39,6 @@ import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
 public class GenerateEntitiesApplication {
@@ -68,13 +65,9 @@ public class GenerateEntitiesApplication {
 		final String sourcePaths = parser.get("sourcePaths");
 		final String targetPath = parser.get("targetPath");
 
-		// final String dbUrl = parser.get("postgresUrl");
-		// final String dbUser = parser.get("postgresUser");
-		// final String dbPassword = parser.get("postgresPassword");
+		final String isLookupUrl = parser.get("islookup");
 
-		final String isLookupUrl = parser.get("isLookupUrl");
-
-		final VocabularyGroup vocs = loadVocsFromIS(isLookupUrl); // MAP: vocId -> voc
+		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupUrl);
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
@@ -163,35 +156,6 @@ public class GenerateEntitiesApplication {
 			default:
 				throw new RuntimeException("type not managed: " + type.toLowerCase());
 		}
-	}
-
-	private static VocabularyGroup loadVocsFromIS(final String isLookupUrl) throws IOException, ISLookUpException {
-		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
-
-		final String xquery = IOUtils
-			.toString(
-				GenerateEntitiesApplication.class
-					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/xquery/load_vocabularies.xquery"));
-
-		final VocabularyGroup vocs = new VocabularyGroup();
-
-		for (final String s : isLookUpService.quickSearchProfile(xquery)) {
-			final String[] arr = s.split("@=@");
-			if (arr.length == 4) {
-				final String vocId = arr[0].trim();
-				final String vocName = arr[1].trim();
-				final String termId = arr[2].trim();
-				final String termName = arr[3].trim();
-
-				if (!vocs.vocabularyExists(vocId)) {
-					vocs.addVocabulary(vocId, vocName);
-				}
-
-				vocs.addTerm(vocId, termId, termName);
-			}
-		}
-
-		return vocs;
 	}
 
 	private static Oaf convertFromJson(final String s, final Class<? extends Oaf> clazz) {

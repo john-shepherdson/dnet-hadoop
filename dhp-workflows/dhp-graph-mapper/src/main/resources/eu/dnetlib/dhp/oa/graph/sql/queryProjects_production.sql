@@ -28,18 +28,15 @@ SELECT
                 p.summary                                                                                                  AS summary,
                 p.currency                                                                                                 AS currency,
                 p.totalcost                                                                                                AS totalcost,
-        p.fundedamount                                                                                             AS fundedamount,
+        p.fundedamount                                                                                                     AS fundedamount,
                 dc.id                                                                                                      AS collectedfromid,
                 dc.officialname                                                                                            AS collectedfromname,
-                ctc.code || '@@@' || ctc.name || '@@@' || cts.code || '@@@' || cts.name                                    AS contracttype,
-                pac.code || '@@@' || pac.name || '@@@' || pas.code || '@@@' || pas.name                                    AS provenanceaction,
+                p.contracttypeclass || '@@@' || p.contracttypescheme                                                       AS contracttype,
+                p.provenanceactionclass || '@@@' || p.provenanceactionscheme                                               AS provenanceaction,
                 array_agg(DISTINCT i.pid || '###' || i.issuertype)                                                         AS pid,
-                array_agg(DISTINCT s.name || '###' || sc.code || '@@@' || sc.name || '@@@' || ss.code || '@@@' || ss.name) AS subjects,
+                array_agg(DISTINCT s.name || '###' || s.semanticclass || '@@@' || s.semanticscheme) AS subjects,
                 array_agg(DISTINCT fp.path)                                                                                AS fundingtree
         FROM projects p
-                LEFT OUTER JOIN class pac ON (pac.code = p.provenanceactionclass)
-                LEFT OUTER JOIN scheme pas ON (pas.code = p.provenanceactionscheme)
-
                 LEFT OUTER JOIN projectpids pp ON (pp.project = p.id)
                 LEFT OUTER JOIN dsm_identities i ON (i.pid = pp.pid)
 
@@ -50,12 +47,6 @@ SELECT
 
                 LEFT OUTER JOIN project_subject ps ON (ps.project = p.id)
                 LEFT OUTER JOIN subjects s ON (s.id = ps.subject)
-
-                LEFT OUTER JOIN class sc ON (sc.code = s.semanticclass)
-                LEFT OUTER JOIN scheme ss ON (ss.code = s.semanticscheme)
-
-                LEFT OUTER JOIN class ctc ON (ctc.code = p.contracttypeclass)
-                LEFT OUTER JOIN scheme cts ON (cts.code = p.contracttypescheme)
 
         GROUP BY
                 p.id,
@@ -85,6 +76,6 @@ SELECT
                 p.totalcost,
                 p.fundedamount,
                 dc.id,
-                dc.officialname,
-                pac.code, pac.name, pas.code, pas.name,
-                ctc.code, ctc.name, cts.code, cts.name;
+                dc.officialname
+                
+                

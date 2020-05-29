@@ -52,7 +52,7 @@
 	{
 		"field": "semantics",
 		"type": "not_used",
-		"value": "providedBy@@@provided by@@@dnet:datasources_organizations_typologies@@@dnet:datasources_organizations_typologies"
+		"value": "providedBy@@@dnet:datasources_organizations_typologies"
 	},
 	{
 		"field": "provenanceaction",

@@ -28,5 +28,11 @@
 		"paramLongName": "action",
 		"paramDescription": "process claims",
 		"paramRequired": false
+	},
+	{
+		"paramName": "islookup",
+		"paramLongName": "islookup",
+		"paramDescription": "the url of the ISLookupService",
+		"paramRequired": true
 	}
 ]

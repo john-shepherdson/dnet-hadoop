@@ -173,6 +173,7 @@
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--islookup</arg><arg>${isLookupUrl}</arg>
         </java>
         <ok to="ImportODF"/>
         <error to="Kill"/>
