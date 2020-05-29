@@ -134,7 +134,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 				Encoders.bean(EntityRelEntity.class))
 			.write()
 			.mode(SaveMode.Overwrite)
-			.parquet(outputPath + "/" + EntityType.fromClass(clazz));
+			.parquet(outputPath);
 	}
 
 	private static <E extends OafEntity> Dataset<E> readPathEntity(

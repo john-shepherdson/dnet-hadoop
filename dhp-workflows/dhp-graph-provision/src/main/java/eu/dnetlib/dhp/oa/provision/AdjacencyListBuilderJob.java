@@ -30,6 +30,8 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import scala.Function1;
 import scala.Function2;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects. The
@@ -83,18 +85,7 @@ public class AdjacencyListBuilderJob {
 
 		SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		List<Class<?>> modelClasses = Arrays.asList(ModelSupport.getOafModelClasses());
-		modelClasses
-			.addAll(
-				Lists
-					.newArrayList(
-						TypedRow.class,
-						EntityRelEntity.class,
-						JoinedEntity.class,
-						RelatedEntity.class,
-						Tuple2.class,
-						SortableRelation.class));
-		conf.registerKryoClasses(modelClasses.toArray(new Class[] {}));
+		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
 		runWithSparkSession(
 			conf,
@@ -108,11 +99,17 @@ public class AdjacencyListBuilderJob {
 	private static void createAdjacencyListsKryo(
 		SparkSession spark, String inputPath, String outputPath) {
 
-		TypedColumn<EntityRelEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
 		log.info("Reading joined entities from: {}", inputPath);
+
+		final List<String> paths = HdfsSupport
+			.listFiles(inputPath, spark.sparkContext().hadoopConfiguration());
+
+		log.info("Found paths: {}", String.join(",", paths));
+
+		TypedColumn<EntityRelEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
 		spark
 			.read()
-			.load(inputPath)
+			.load(toSeq(paths))
 			.as(Encoders.kryo(EntityRelEntity.class))
 			.groupByKey(
 				(MapFunction<EntityRelEntity, String>) value -> value.getEntity().getId(),
@@ -230,6 +227,10 @@ public class AdjacencyListBuilderJob {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
+	}
+
+	private static Seq<String> toSeq(List<String> list) {
+		return JavaConverters.asScalaIteratorConverter(list.iterator()).asScala().toSeq();
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {
