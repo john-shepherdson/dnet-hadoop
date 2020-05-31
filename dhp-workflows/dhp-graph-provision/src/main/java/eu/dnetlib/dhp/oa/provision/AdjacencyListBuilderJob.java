@@ -4,32 +4,23 @@ package eu.dnetlib.dhp.oa.provision;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.*;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import scala.Function1;
-import scala.Function2;
+import scala.Tuple2;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
@@ -106,127 +97,6 @@ public class AdjacencyListBuilderJob {
 
 		log.info("Found paths: {}", String.join(",", paths));
 
-		TypedColumn<EntityRelEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
-		spark
-			.read()
-			.load(toSeq(paths))
-			.as(Encoders.kryo(EntityRelEntity.class))
-			.groupByKey(
-				(MapFunction<EntityRelEntity, String>) value -> value.getEntity().getId(),
-				Encoders.STRING())
-			.agg(aggregator)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
-	}
-
-	public static class AdjacencyListAggregator extends Aggregator<EntityRelEntity, JoinedEntity, JoinedEntity> {
-
-		@Override
-		public JoinedEntity zero() {
-			return new JoinedEntity();
-		}
-
-		@Override
-		public JoinedEntity reduce(JoinedEntity j, EntityRelEntity e) {
-			j.setEntity(e.getEntity());
-			if (j.getLinks().size() <= MAX_LINKS) {
-				j.getLinks().add(new Tuple2(e.getRelation(), e.getTarget()));
-			}
-			return j;
-		}
-
-		@Override
-		public JoinedEntity merge(JoinedEntity j1, JoinedEntity j2) {
-			j1.getLinks().addAll(j2.getLinks());
-			return j1;
-		}
-
-		@Override
-		public JoinedEntity finish(JoinedEntity j) {
-			if (j.getLinks().size() > MAX_LINKS) {
-				ArrayList<Tuple2> links = j
-					.getLinks()
-					.stream()
-					.limit(MAX_LINKS)
-					.collect(Collectors.toCollection(ArrayList::new));
-				j.setLinks(links);
-			}
-			return j;
-		}
-
-		@Override
-		public Encoder<JoinedEntity> bufferEncoder() {
-			return Encoders.kryo(JoinedEntity.class);
-		}
-
-		@Override
-		public Encoder<JoinedEntity> outputEncoder() {
-			return Encoders.kryo(JoinedEntity.class);
-		}
-	}
-
-	private static void createAdjacencyLists(
-		SparkSession spark, String inputPath, String outputPath) {
-
-		log.info("Reading joined entities from: {}", inputPath);
-		spark
-			.read()
-			.load(inputPath)
-			.as(Encoders.bean(EntityRelEntity.class))
-			.groupByKey(
-				(MapFunction<EntityRelEntity, String>) value -> value.getEntity().getId(),
-				Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, EntityRelEntity, JoinedEntity>) (key, values) -> {
-					JoinedEntity j = new JoinedEntity();
-					List<Tuple2> links = new ArrayList<>();
-					while (values.hasNext() && links.size() < MAX_LINKS) {
-						EntityRelEntity curr = values.next();
-						if (j.getEntity() == null) {
-							j.setEntity(curr.getEntity());
-						}
-						links.add(new Tuple2(curr.getRelation(), curr.getTarget()));
-					}
-					j.setLinks(links);
-					return j;
-				},
-				Encoders.bean(JoinedEntity.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
-	}
-
-	private static void createAdjacencyListsRDD(
-		SparkSession spark, String inputPath, String outputPath) {
-
-		log.info("Reading joined entities from: {}", inputPath);
-		RDD<JoinedEntity> joinedEntities = spark
-			.read()
-			.load(inputPath)
-			.as(Encoders.bean(EntityRelEntity.class))
-			.javaRDD()
-			.mapToPair(re -> {
-				JoinedEntity je = new JoinedEntity();
-				je.setEntity(re.getEntity());
-				je.setLinks(Lists.newArrayList());
-				if (re.getRelation() != null && re.getTarget() != null) {
-					je.getLinks().add(new Tuple2(re.getRelation(), re.getTarget()));
-				}
-				return new scala.Tuple2<>(re.getEntity().getId(), je);
-			})
-			.reduceByKey((je1, je2) -> {
-				je1.getLinks().addAll(je2.getLinks());
-				return je1;
-			})
-			.map(t -> t._2())
-			.rdd();
-
-		spark
-			.createDataset(joinedEntities, Encoders.bean(JoinedEntity.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
 	}
 
 	private static Seq<String> toSeq(List<String> list) {

@@ -16,10 +16,9 @@ public class ProvisionModelSupport {
 				Lists
 					.newArrayList(
 						TypedRow.class,
-						EntityRelEntity.class,
+						RelatedEntityWrapper.class,
 						JoinedEntity.class,
 						RelatedEntity.class,
-						Tuple2.class,
 						SortableRelation.class));
 		return modelClasses.toArray(new Class[] {});
 	}

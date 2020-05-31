@@ -13,10 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +25,11 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
+import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.model.TypedRow;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -75,7 +76,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.toString(
 				PrepareRelationsJob.class
 					.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/provision/input_params_related_entities_pahase2.json"));
+						"/eu/dnetlib/dhp/oa/provision/input_params_related_entities_pahase2.json"));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
@@ -124,32 +125,84 @@ public class CreateRelatedEntitiesJob_phase2 {
 		int numPartitions,
 		Class<E> entityClazz) {
 
-		Dataset<Tuple2<String, E>> entity = readPathEntity(spark, entityPath, entityClazz);
-		Dataset<Tuple2<String, EntityRelEntity>> relatedEntities = readRelatedEntities(
+		Dataset<Tuple2<String, E>> entities = readPathEntity(spark, entityPath, entityClazz);
+		Dataset<Tuple2<String, RelatedEntityWrapper>> relatedEntities = readRelatedEntities(
 			spark, relatedEntitiesPath, entityClazz);
 
-		entity
-			.joinWith(relatedEntities, entity.col("_1").equalTo(relatedEntities.col("_1")), "left_outer")
-			.map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, EntityRelEntity>>, EntityRelEntity>) value -> {
-				EntityRelEntity re = new EntityRelEntity();
-				re.setEntity(getTypedRow(entityClazz.getCanonicalName().toLowerCase(), value._1()._2()));
-				Optional<EntityRelEntity> related = Optional.ofNullable(value._2()).map(Tuple2::_2);
-				if (related.isPresent()) {
-					re.setRelation(related.get().getRelation());
-					re.setTarget(related.get().getTarget());
-				}
-				return re;
-			}, Encoders.bean(EntityRelEntity.class))
-			.repartition(numPartitions)
-			.filter(
-				(FilterFunction<EntityRelEntity>) value -> value.getEntity() != null
-					&& StringUtils.isNotBlank(value.getEntity().getId()))
+		TypedColumn<JoinedEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
+
+		entities
+			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left_outer")
+			.map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, RelatedEntityWrapper>>, JoinedEntity>) value -> {
+				JoinedEntity je = new JoinedEntity(value._1()._2());
+				Optional
+					.ofNullable(value._2())
+					.map(Tuple2::_2)
+					.ifPresent(r -> je.getLinks().add(r));
+				return je;
+			}, Encoders.kryo(JoinedEntity.class))
+			.filter(filterEmptyEntityFn())
+			.groupByKey(
+				(MapFunction<JoinedEntity, String>) value -> value.getEntity().getId(),
+				Encoders.STRING())
+			.agg(aggregator)
+			.map(
+				(MapFunction<Tuple2<String, JoinedEntity>, JoinedEntity>) value -> value._2(),
+				Encoders.kryo(JoinedEntity.class))
+			.filter(filterEmptyEntityFn())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
 	}
 
-	private static <E extends OafEntity> Dataset<Tuple2<String, EntityRelEntity>> readRelatedEntities(
+	public static class AdjacencyListAggregator extends Aggregator<JoinedEntity, JoinedEntity, JoinedEntity> {
+
+		@Override
+		public JoinedEntity zero() {
+			return new JoinedEntity();
+		}
+
+		@Override
+		public JoinedEntity reduce(JoinedEntity b, JoinedEntity a) {
+			return mergeAndGet(b, a);
+		}
+
+		private JoinedEntity mergeAndGet(JoinedEntity b, JoinedEntity a) {
+			b
+				.setEntity(
+					Optional
+						.ofNullable(a.getEntity())
+						.orElse(
+							Optional
+								.ofNullable(b.getEntity())
+								.orElse(null)));
+			b.getLinks().addAll(a.getLinks());
+			return b;
+		}
+
+		@Override
+		public JoinedEntity merge(JoinedEntity b, JoinedEntity a) {
+			return mergeAndGet(b, a);
+		}
+
+		@Override
+		public JoinedEntity finish(JoinedEntity j) {
+			return j;
+		}
+
+		@Override
+		public Encoder<JoinedEntity> bufferEncoder() {
+			return Encoders.kryo(JoinedEntity.class);
+		}
+
+		@Override
+		public Encoder<JoinedEntity> outputEncoder() {
+			return Encoders.kryo(JoinedEntity.class);
+		}
+
+	}
+
+	private static <E extends OafEntity> Dataset<Tuple2<String, RelatedEntityWrapper>> readRelatedEntities(
 		SparkSession spark, String inputRelatedEntitiesPath, Class<E> entityClazz) {
 
 		log.info("Reading related entities from: {}", inputRelatedEntitiesPath);
@@ -164,12 +217,12 @@ public class CreateRelatedEntitiesJob_phase2 {
 		return spark
 			.read()
 			.load(toSeq(paths))
-			.as(Encoders.bean(EntityRelEntity.class))
-			.filter((FilterFunction<EntityRelEntity>) e -> e.getRelation().getSource().startsWith(idPrefix))
+			.as(Encoders.kryo(RelatedEntityWrapper.class))
+			.filter((FilterFunction<RelatedEntityWrapper>) e -> e.getRelation().getSource().startsWith(idPrefix))
 			.map(
-				(MapFunction<EntityRelEntity, Tuple2<String, EntityRelEntity>>) value -> new Tuple2<>(
+				(MapFunction<RelatedEntityWrapper, Tuple2<String, RelatedEntityWrapper>>) value -> new Tuple2<>(
 					value.getRelation().getSource(), value),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(EntityRelEntity.class)));
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntityWrapper.class)));
 	}
 
 	private static <E extends OafEntity> Dataset<Tuple2<String, E>> readPathEntity(
@@ -248,6 +301,14 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.map(Qualifier::getClassid)
 			.filter(StringUtils::isNotBlank)
 			.anyMatch(c -> "orcid".equals(c.toLowerCase()));
+	}
+
+	private static FilterFunction<JoinedEntity> filterEmptyEntityFn() {
+		return (FilterFunction<JoinedEntity>) v -> Objects.nonNull(v.getEntity());
+		/*
+		 * return (FilterFunction<JoinedEntity>) v -> Optional .ofNullable(v.getEntity()) .map(e ->
+		 * StringUtils.isNotBlank(e.getId())) .orElse(false);
+		 */
 	}
 
 	private static TypedRow getTypedRow(String type, OafEntity entity)

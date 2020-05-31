@@ -104,7 +104,6 @@
             <case to="prepare_relations">${wf:conf('resumeFrom') eq 'prepare_relations'}</case>
             <case to="fork_join_related_entities">${wf:conf('resumeFrom') eq 'fork_join_related_entities'}</case>
             <case to="fork_join_all_entities">${wf:conf('resumeFrom') eq 'fork_join_all_entities'}</case>
-            <case to="adjancency_lists">${wf:conf('resumeFrom') eq 'adjancency_lists'}</case>
             <case to="convert_to_xml">${wf:conf('resumeFrom') eq 'convert_to_xml'}</case>
             <case to="to_solr_index">${wf:conf('resumeFrom') eq 'to_solr_index'}</case>
             <default to="prepare_relations"/>
@@ -373,7 +372,7 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/publication</arg>
-            <arg>--numPartitions</arg><arg>35000</arg>
+            <arg>--numPartitions</arg><arg>30000</arg>
         </spark>
         <ok to="wait_join_phase2"/>
         <error to="Kill"/>
@@ -394,7 +393,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15360
+                --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
@@ -422,7 +421,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15360
+                --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
@@ -450,7 +449,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15360
+                --conf spark.sql.shuffle.partitions=3840
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
@@ -478,7 +477,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15360
+                --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
@@ -506,7 +505,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15360
+                --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
@@ -534,7 +533,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15360
+                --conf spark.sql.shuffle.partitions=3840
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
@@ -547,32 +546,7 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_join_phase2" to="adjancency_lists"/>
-
-    <action name="adjancency_lists">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>build_adjacency_lists</name>
-            <class>eu.dnetlib.dhp.oa.provision.AdjacencyListBuilderJob</class>
-            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15360
-                --conf spark.network.timeout=${sparkNetworkTimeout}
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/joined</arg>
-        </spark>
-        <ok to="convert_to_xml"/>
-        <error to="Kill"/>
-    </action>
+    <join name="wait_join_phase2" to="convert_to_xml"/>
 
     <action name="convert_to_xml">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -592,7 +566,7 @@
                 --conf spark.sql.shuffle.partitions=3840
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingDir}/joined</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--otherDsTypeId</arg><arg>${otherDsTypeId}</arg>
@@ -622,7 +596,7 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/xml</arg>
-            <arg>--isLookupUrl</arg> <arg>${isLookupUrl}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
         </spark>
