@@ -22,7 +22,7 @@
         </property>
     </parameters>
 
-    <start to="PreprocessMag"/>
+    <start to="ResetWorkingPath"/>
 
 
     <kill name="Kill">

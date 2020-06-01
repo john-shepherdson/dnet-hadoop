@@ -168,9 +168,10 @@ case object Crossref2Oaf {
       instance.setRefereed(asField("peerReviewed"))
 
 
-    instance.setAccessright(createQualifier("Restricted", "dnet:access_modes"))
+    instance.setAccessright(createQualifier("RESTRICTED", "dnet:access_modes"))
     result.setInstance(List(instance).asJava)
     instance.setInstancetype(createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
+    result.setResourcetype(createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
@@ -198,7 +199,6 @@ case object Crossref2Oaf {
   def convert(input: String): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
-
 
     var resultList: List[Oaf] = List()
 
@@ -344,7 +344,7 @@ case object Crossref2Oaf {
   }
 
   def convertDataset(dataset: Dataset): Unit = {
-    //TODO probably we need to add relation and other stuff here
+    // TODO check if there are other info to map into the Dataset
   }
 
 

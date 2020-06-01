@@ -46,7 +46,7 @@ object UnpayWallToOAF {
     val i :Instance= new Instance()
 
     i.setCollectedfrom(createUnpayWallCollectedFrom())
-    i.setAccessright(createQualifier("Open", "dnet:access_modes"))
+    i.setAccessright(createQualifier("OPEN", "dnet:access_modes"))
     i.setUrl(List(oaLocation.url.get).asJava)
 
     if (oaLocation.license.isDefined)

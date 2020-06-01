@@ -122,8 +122,8 @@ object DoiBoostMappingUtil {
         hb.setValue(item.officialName)
         hb.setKey(generateDSId(item.id))
         if (item.openAccess)
-          i.setAccessright(createQualifier("Open", "dnet:access_modes"))
-        publication.setBestaccessright(createQualifier("Open", "dnet:access_modes"))
+          i.setAccessright(createQualifier("OPEN", "dnet:access_modes"))
+        publication.setBestaccessright(createQualifier("OPEN", "dnet:access_modes"))
       }
       else {
         hb.setValue("Unknown Repository")
@@ -134,8 +134,8 @@ object DoiBoostMappingUtil {
 
     val ar = publication.getInstance().asScala.filter(i => i.getInstancetype != null && i.getAccessright!= null && i.getAccessright.getClassid!= null).map(f=> f.getAccessright.getClassid)
     if (ar.nonEmpty) {
-      if(ar.contains("Open")){
-        publication.setBestaccessright(createQualifier("Open", "dnet:access_modes"))
+      if(ar.contains("OPEN")){
+        publication.setBestaccessright(createQualifier("OPEN", "dnet:access_modes"))
       }
       else {
         publication.setBestaccessright(createQualifier(ar.head, "dnet:access_modes"))

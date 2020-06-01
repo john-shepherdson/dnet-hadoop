@@ -43,7 +43,7 @@
                 --conf spark.sql.shuffle.partitions=3840
                 ${sparkExtraOPT}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}/json.gz</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/uw_extracted</arg>
             <arg>--targetPath</arg><arg>${targetPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
