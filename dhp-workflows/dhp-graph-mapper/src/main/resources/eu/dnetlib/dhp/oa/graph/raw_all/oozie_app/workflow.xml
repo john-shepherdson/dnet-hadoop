@@ -123,6 +123,7 @@
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--action</arg><arg>claims</arg>
         </java>
         <ok to="ImportODF_claims"/>
@@ -173,6 +174,7 @@
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </java>
         <ok to="ImportODF"/>
         <error to="Kill"/>
@@ -237,7 +239,7 @@
             </spark-opts>
             <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
-            <arg>--islookup</arg><arg>${isLookupUrl}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="GenerateGraph_claims"/>
         <error to="Kill"/>
@@ -284,7 +286,7 @@
             </spark-opts>
             <arg>--sourcePaths</arg><arg>${contentPath}/db_records,${contentPath}/oaf_records,${contentPath}/odf_records</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
-            <arg>--islookup</arg><arg>${isLookupUrl}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>

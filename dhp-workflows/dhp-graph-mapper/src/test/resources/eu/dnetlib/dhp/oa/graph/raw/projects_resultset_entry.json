@@ -167,7 +167,7 @@
 	{
 		"field": "provenanceaction",
 		"type": "not_used",
-		"value": "sysimport:crosswalk:entityregistry@@@Harvested@@@dnet:provenanceActions@@@dnet:provenanceActions"
+		"value": "sysimport:crosswalk:entityregistry@@@dnet:provenanceActions"
 	},
 	{
 		"field": "pid",

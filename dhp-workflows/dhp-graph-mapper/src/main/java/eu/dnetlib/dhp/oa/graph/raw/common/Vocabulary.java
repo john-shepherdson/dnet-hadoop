@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Vocabulary {
+public class Vocabulary implements Serializable {
 
 	private final String id;
 	private final String name;

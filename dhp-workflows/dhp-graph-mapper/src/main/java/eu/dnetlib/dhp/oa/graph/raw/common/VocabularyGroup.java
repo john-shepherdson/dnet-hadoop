@@ -1,12 +1,50 @@
 
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
-public class VocabularyGroup {
+import eu.dnetlib.dhp.oa.graph.raw.GenerateEntitiesApplication;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+
+public class VocabularyGroup implements Serializable {
+
+	public static VocabularyGroup loadVocsFromIS(final String isLookupUrl) throws IOException, ISLookUpException {
+		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+
+		final String xquery = IOUtils
+			.toString(
+				GenerateEntitiesApplication.class
+					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/xquery/load_vocabularies.xquery"));
+
+		final VocabularyGroup vocs = new VocabularyGroup();
+
+		for (final String s : isLookUpService.quickSearchProfile(xquery)) {
+			final String[] arr = s.split("@=@");
+			if (arr.length == 4) {
+				final String vocId = arr[0].trim();
+				final String vocName = arr[1].trim();
+				final String termId = arr[2].trim();
+				final String termName = arr[3].trim();
+
+				if (!vocs.vocabularyExists(vocId)) {
+					vocs.addVocabulary(vocId, vocName);
+				}
+
+				vocs.addTerm(vocId, termId, termName);
+			}
+		}
+
+		return vocs;
+	}
 
 	private final Map<String, Vocabulary> vocs = new HashMap<>();
 
@@ -29,7 +67,9 @@ public class VocabularyGroup {
 	}
 
 	public Qualifier getTermAsQualifier(final String vocId, final String id) {
-		if (termExists(vocId, id)) {
+		if (StringUtils.isBlank(id)) {
+			return OafMapperUtils.qualifier("UNKNOWN", "UNKNOWN", vocId, vocId);
+		} else if (termExists(vocId, id)) {
 			final Vocabulary v = vocs.get(vocId.toLowerCase());
 			final VocabularyTerm t = v.getTerm(id);
 			return OafMapperUtils.qualifier(t.getId(), t.getName(), v.getId(), v.getName());

@@ -62,11 +62,11 @@
 	{
 		"field": "semantics",
 		"type": "not_used",
-		"value": "coordinator@@@coordinator@@@dnet:project_organization_relations@@@dnet:project_organization_relations"
+		"value": "coordinator@@@dnet:project_organization_relations"
 	},
 	{
 		"field": "provenanceaction",
 		"type": "not_used",
-		"value": "sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions"
+		"value": "sysimport:crosswalk:entityregistry@@@dnet:provenance_actions"
 	}
 ]
