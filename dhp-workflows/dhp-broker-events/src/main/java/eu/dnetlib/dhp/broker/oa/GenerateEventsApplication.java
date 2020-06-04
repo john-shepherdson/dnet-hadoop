@@ -57,7 +57,6 @@ import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreSubject;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -87,25 +86,32 @@ public class GenerateEventsApplication {
 	private static final UpdateMatcher<Pair<Result, List<Software>>, ?> enrichMoreSoftware = new EnrichMoreSoftware();
 
 	private static final UpdateMatcher<Pair<Result, List<Publication>>, ?> enrichMisissingPublicationIsRelatedTo = new EnrichMissingPublicationIsRelatedTo();
-	private static final UpdateMatcher<Pair<Result, List<Publication>>, ?> enrichMissingPublicationIsReferencedBy = new EnrichMissingPublicationIsReferencedBy();
+	private static final UpdateMatcher<Pair<Result, List<Publication>>, ?> enrichMissingPublicationIsReferencedBy =
+		new EnrichMissingPublicationIsReferencedBy();
 	private static final UpdateMatcher<Pair<Result, List<Publication>>, ?> enrichMissingPublicationReferences = new EnrichMissingPublicationReferences();
-	private static final UpdateMatcher<Pair<Result, List<Publication>>, ?> enrichMissingPublicationIsSupplementedTo = new EnrichMissingPublicationIsSupplementedTo();
-	private static final UpdateMatcher<Pair<Result, List<Publication>>, ?> enrichMissingPublicationIsSupplementedBy = new EnrichMissingPublicationIsSupplementedBy();
+	private static final UpdateMatcher<Pair<Result, List<Publication>>, ?> enrichMissingPublicationIsSupplementedTo =
+		new EnrichMissingPublicationIsSupplementedTo();
+	private static final UpdateMatcher<Pair<Result, List<Publication>>, ?> enrichMissingPublicationIsSupplementedBy =
+		new EnrichMissingPublicationIsSupplementedBy();
 
-	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMisissingDatasetIsRelatedTo = new EnrichMissingDatasetIsRelatedTo();
-	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetIsReferencedBy = new EnrichMissingDatasetIsReferencedBy();
-	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetReferences = new EnrichMissingDatasetReferences();
-	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetIsSupplementedTo = new EnrichMissingDatasetIsSupplementedTo();
-	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetIsSupplementedBy = new EnrichMissingDatasetIsSupplementedBy();
+	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMisissingDatasetIsRelatedTo =
+		new EnrichMissingDatasetIsRelatedTo();
+	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetIsReferencedBy =
+		new EnrichMissingDatasetIsReferencedBy();
+	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetReferences =
+		new EnrichMissingDatasetReferences();
+	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetIsSupplementedTo =
+		new EnrichMissingDatasetIsSupplementedTo();
+	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetIsSupplementedBy =
+		new EnrichMissingDatasetIsSupplementedBy();
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					GenerateEventsApplication.class
-						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json")));
+				.toString(GenerateEventsApplication.class
+					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -128,10 +134,13 @@ public class GenerateEventsApplication {
 
 			final JavaRDD<Event> eventsRdd = sc.emptyRDD();
 
-			eventsRdd.union(generateSimpleEvents(spark, graphPath, Publication.class));
-			eventsRdd.union(generateSimpleEvents(spark, graphPath, eu.dnetlib.dhp.schema.oaf.Dataset.class));
-			eventsRdd.union(generateSimpleEvents(spark, graphPath, Software.class));
-			eventsRdd.union(generateSimpleEvents(spark, graphPath, OtherResearchProduct.class));
+			for (final Class<? extends Result> r1 : BrokerConstants.RESULT_CLASSES) {
+				eventsRdd.union(generateSimpleEvents(spark, graphPath, r1));
+
+				for (final Class<? extends Result> r2 : BrokerConstants.RESULT_CLASSES) {
+					eventsRdd.union(generateRelationEvents(spark, graphPath, r1, r2));
+				}
+			}
 
 			eventsRdd.saveAsTextFile(eventsPath, GzipCodec.class);
 		});
@@ -146,9 +155,8 @@ public class GenerateEventsApplication {
 		final String graphPath,
 		final Class<R> resultClazz) {
 
-		final Dataset<R> results = readPath(
-			spark, graphPath + "/" + resultClazz.getSimpleName().toLowerCase(), resultClazz)
-				.filter(r -> r.getDataInfo().getDeletedbyinference());
+		final Dataset<R> results = readPath(spark, graphPath + "/" + resultClazz.getSimpleName().toLowerCase(), resultClazz)
+			.filter(r -> r.getDataInfo().getDeletedbyinference());
 
 		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
 			.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
@@ -167,6 +175,14 @@ public class GenerateEventsApplication {
 
 		return null;
 
+	}
+
+	private static <SRC extends Result, TRG extends Result> JavaRDD<Event> generateRelationEvents(final SparkSession spark,
+		final String graphPath,
+		final Class<SRC> sourceClass,
+		final Class<TRG> targetClass) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private List<Event> generateSimpleEvents(final Collection<Result> children) {
