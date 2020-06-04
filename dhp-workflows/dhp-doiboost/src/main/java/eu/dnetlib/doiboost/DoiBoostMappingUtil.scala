@@ -1,7 +1,7 @@
 package eu.dnetlib.doiboost
 
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{DataInfo, Dataset, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{DataInfo, Dataset, Field, Instance, KeyValue, Oaf, Organization, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.jackson.map.ObjectMapper
@@ -14,11 +14,21 @@ import scala.collection.JavaConverters._
 import scala.io.Source
 
 
-case class HostedByItemType(id: String, officialName: String, issn: String, eissn: String, lissn: String, openAccess: Boolean) {}
+case class HostedByItemType(id: String, officialname: String, issn: String, eissn: String, lissn: String, openAccess: Boolean) {}
 
-case class DoiBoostAffiliation(PaperId:Long, AffiliationId:Long, GridId:String){}
+case class DoiBoostAffiliation(PaperId:Long, AffiliationId:Long, GridId:Option[String], OfficialPage:Option[String], DisplayName:Option[String]){}
 
 object DoiBoostMappingUtil {
+  def getUnknownCountry(): Qualifier = {
+    createQualifier("UNKNOWN","UNKNOWN","dnet:countries","dnet:countries")
+  }
+
+
+
+  def generateMAGAffiliationId(affId: String): String = {
+    s"20|microsoft___$SEPARATOR${DHPUtils.md5(affId)}"
+  }
+
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
@@ -52,6 +62,11 @@ object DoiBoostMappingUtil {
         a.setClazz(classOf[Publication])
         a.setPayload(publication)
         (publication.getClass.getCanonicalName, mapper.writeValueAsString(a))
+      case organization: Organization =>
+        val a: AtomicAction[Organization] = new AtomicAction[Organization]
+        a.setClazz(classOf[Organization])
+        a.setPayload(organization)
+        (organization.getClass.getCanonicalName, mapper.writeValueAsString(a))
       case relation: Relation =>
         val a: AtomicAction[Relation] = new AtomicAction[Relation]
         a.setClazz(classOf[Relation])
@@ -64,26 +79,32 @@ object DoiBoostMappingUtil {
   }
 
 
-  def retrieveHostedByMap(): Map[String, HostedByItemType] = {
+  def toHostedByItem(input:String): (String, HostedByItemType) = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    val jsonMap = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/hbMap.json")).mkString
-    lazy val json: json4s.JValue = parse(jsonMap)
-    json.extract[Map[String, HostedByItemType]]
+
+    lazy val json: json4s.JValue = parse(input)
+    val c :Map[String,HostedByItemType] = json.extract[Map[String, HostedByItemType]]
+    (c.keys.head, c.values.head)
   }
 
-  def retrieveHostedByItem(issn: String, eissn: String, lissn: String, hostedByMap: Map[String, HostedByItemType]): HostedByItemType = {
-    if (issn != null && issn.nonEmpty && hostedByMap.contains(issn))
-      return hostedByMap(issn)
 
-    if (eissn != null && eissn.nonEmpty && hostedByMap.contains(eissn))
-      return hostedByMap(eissn)
+  def toISSNPair(publication: Publication) : (String, Publication) = {
+    val issn = if (publication.getJournal == null) null else publication.getJournal.getIssnPrinted
+    val eissn =if (publication.getJournal == null) null else  publication.getJournal.getIssnOnline
+    val lissn =if (publication.getJournal == null) null else  publication.getJournal.getIssnLinking
 
-    if (lissn != null && lissn.nonEmpty && hostedByMap.contains(lissn))
-      return hostedByMap(lissn)
-
-    null
-
+    if (issn!= null && issn.nonEmpty)
+      (issn, publication)
+    else if(eissn!= null && eissn.nonEmpty)
+      (eissn, publication)
+    else if(lissn!= null && lissn.nonEmpty)
+      (lissn, publication)
+    else
+      (publication.getId, publication)
   }
+
+
+
 
   def generateGridAffiliationId(gridId:String) :String = {
     s"20|grid________::${DHPUtils.md5(gridId.toLowerCase().trim())}"
@@ -96,18 +117,36 @@ object DoiBoostMappingUtil {
       result.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
     }
     result.getInstance().asScala.foreach(i => {
-      val hb = new KeyValue
-      hb.setValue("Unknown Repository")
-      hb.setKey(s"10|$OPENAIRE_PREFIX::55045bd2a65019fd8e6741a755395c8c")
-      i.setHostedby(hb)
+      i.setHostedby(getUbknownHostedBy())
     })
     result
   }
 
-  def fixPublication(publication: Publication, hostedByMap: Map[String, HostedByItemType]): Publication = {
-    val issn = if (publication.getJournal == null) null else publication.getJournal.getIssnPrinted
-    val eissn =if (publication.getJournal == null) null else  publication.getJournal.getIssnOnline
-    val lissn =if (publication.getJournal == null) null else  publication.getJournal.getIssnLinking
+  def getUbknownHostedBy():KeyValue = {
+    val hb = new KeyValue
+    hb.setValue("Unknown Repository")
+    hb.setKey(s"10|$OPENAIRE_PREFIX::55045bd2a65019fd8e6741a755395c8c")
+    hb
+
+  }
+
+
+  def getOpenAccessQualifier():Qualifier = {
+    createQualifier("OPEN","Open Access","dnet:access_modes", "dnet:access_modes")
+
+  }
+
+  def getRestrictedQualifier():Qualifier = {
+    createQualifier("RESTRICTED","Restricted","dnet:access_modes", "dnet:access_modes")
+
+  }
+
+  def fixPublication(input:((String,Publication), (String,HostedByItemType))): Publication = {
+
+    val publication = input._1._2
+
+    val item = if (input._2 != null) input._2._2 else null
+
 
     val instanceType = publication.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
 
@@ -115,15 +154,15 @@ object DoiBoostMappingUtil {
       publication.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
     }
 
-    val item = retrieveHostedByItem(issn, eissn, lissn, hostedByMap)
+
     publication.getInstance().asScala.foreach(i => {
       val hb = new KeyValue
       if (item != null) {
-        hb.setValue(item.officialName)
+        hb.setValue(item.officialname)
         hb.setKey(generateDSId(item.id))
         if (item.openAccess)
-          i.setAccessright(createQualifier("OPEN", "dnet:access_modes"))
-        publication.setBestaccessright(createQualifier("OPEN", "dnet:access_modes"))
+          i.setAccessright(getOpenAccessQualifier())
+        publication.setBestaccessright(getOpenAccessQualifier())
       }
       else {
         hb.setValue("Unknown Repository")
@@ -135,10 +174,10 @@ object DoiBoostMappingUtil {
     val ar = publication.getInstance().asScala.filter(i => i.getInstancetype != null && i.getAccessright!= null && i.getAccessright.getClassid!= null).map(f=> f.getAccessright.getClassid)
     if (ar.nonEmpty) {
       if(ar.contains("OPEN")){
-        publication.setBestaccessright(createQualifier("OPEN", "dnet:access_modes"))
+        publication.setBestaccessright(getOpenAccessQualifier())
       }
       else {
-        publication.setBestaccessright(createQualifier(ar.head, "dnet:access_modes"))
+        publication.setBestaccessright(getRestrictedQualifier())
       }
     }
     publication
@@ -296,6 +335,8 @@ object DoiBoostMappingUtil {
       id
     }"
   }
+
+
 
 
   def createMAGCollectedFrom(): KeyValue = {

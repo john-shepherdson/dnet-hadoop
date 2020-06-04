@@ -115,7 +115,7 @@ case object ConversionUtil {
       j.setName(ci.DisplayName.get)
       if (ci.StartDate.isDefined && ci.EndDate.isDefined)
       {
-        j.setConferencedate(s"${ci.StartDate.get.toString} - ${ci.EndDate.get.toString}")
+        j.setConferencedate(s"${ci.StartDate.get.toString.substring(0,10)} - ${ci.EndDate.get.toString.substring(0,10)}")
       }
 
       publication.setJournal(j)
@@ -214,7 +214,7 @@ case object ConversionUtil {
 
 
     if (paper.Date != null && paper.Date.isDefined) {
-      pub.setDateofacceptance(asField(paper.Date.get.toString))
+      pub.setDateofacceptance(asField(paper.Date.get.toString.substring(0,10)))
     }
     pub.setPublisher(asField(paper.Publisher))
 
@@ -280,7 +280,7 @@ case object ConversionUtil {
 
 
     if (paper.Date != null) {
-      pub.setDateofacceptance(asField(paper.Date.toString))
+      pub.setDateofacceptance(asField(paper.Date.toString.substring(0,10)))
     }
 
     pub.setAuthor(authorsOAF.asJava)

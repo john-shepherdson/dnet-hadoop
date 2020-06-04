@@ -27,7 +27,7 @@ object SparkMapUnpayWallToOAF {
         .appName(getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
 
-    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.bean(classOf[Publication])
+    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
 
 
     val sourcePath = parser.get("sourcePath")
@@ -35,7 +35,8 @@ object SparkMapUnpayWallToOAF {
     val inputRDD:RDD[String] = spark.sparkContext.textFile(s"$sourcePath")
 
     logger.info("Converting UnpayWall to OAF")
-    val d:Dataset[Publication] = spark.createDataset(inputRDD.repartition(1000).map(UnpayWallToOAF.convertToOAF).filter(p=>p!=null)).as[Publication]
+
+    val d:Dataset[Publication] = spark.createDataset(inputRDD.map(UnpayWallToOAF.convertToOAF).filter(p=>p!=null)).as[Publication]
     d.write.mode(SaveMode.Overwrite).save(targetPath)
   }
 

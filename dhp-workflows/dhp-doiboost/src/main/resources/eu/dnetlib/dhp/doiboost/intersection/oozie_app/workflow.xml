@@ -1,37 +1,17 @@
 <workflow-app name="Create DOIBoostActionSet" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>crossrefPublicationPath</name>
-            <description>the Crossref Publication Path</description>
+            <name>hostedByMapPath</name>
+            <description>the Hosted By Map Path</description>
         </property>
-        <property>
-            <name>crossrefDatasetPath</name>
-            <description>the Crossref Dataset Path</description>
-        </property>
-        <property>
-            <name>uwPublicationPath</name>
-            <description>the UnpayWall Publication Path</description>
-        </property>
-        <property>
-            <name>magPublicationPath</name>
-            <description>the MAG Publication Path</description>
-        </property>
-        <property>
-            <name>orcidPublicationPath</name>
-            <description>the ORCID Publication Path</description>
-        </property>
-
         <property>
             <name>affiliationPath</name>
             <description>the Affliation Path</description>
         </property>
-
         <property>
             <name>paperAffiliationPath</name>
             <description>the paperAffiliation Path</description>
         </property>
-
-
         <property>
             <name>workingDirPath</name>
             <description>the Working Path</description>
@@ -52,7 +32,7 @@
 
 
 
-    <start to="CreateDOIBoost"/>
+    <start to="GenerateActionSet"/>
 
 
     <kill name="Kill">
@@ -82,17 +62,13 @@
                 --conf spark.sql.shuffle.partitions=3840
                 ${sparkExtraOPT}
             </spark-opts>
-            <arg>--crossrefPublicationPath</arg><arg>${crossrefPublicationPath}</arg>
-            <arg>--crossrefDatasetPath</arg><arg>${crossrefDatasetPath}</arg>
-            <arg>--uwPublicationPath</arg><arg>${uwPublicationPath}</arg>
-            <arg>--magPublicationPath</arg><arg>${magPublicationPath}</arg>
-            <arg>--orcidPublicationPath</arg><arg>${orcidPublicationPath}</arg>
+            <arg>--hostedByMapPath</arg><arg>${hostedByMapPath}</arg>
             <arg>--affiliationPath</arg><arg>${affiliationPath}</arg>
             <arg>--paperAffiliationPath</arg><arg>${paperAffiliationPath}</arg>
             <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="GenerateActionSet"/>
         <error to="Kill"/>
     </action>
 
@@ -115,6 +91,7 @@
             <arg>--dbDatasetPath</arg><arg>${workingDirPath}/crossrefDataset</arg>
             <arg>--crossRefRelation</arg><arg>/data/doiboost/input/crossref/relations</arg>
             <arg>--dbaffiliationRelationPath</arg><arg>${workingDirPath}/doiBoostPublicationAffiliation</arg>
+            <arg>-do</arg><arg>${workingDirPath}/doiBoostOrganization</arg>
             <arg>--targetPath</arg><arg>${workingDirPath}/actionDataSet</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>

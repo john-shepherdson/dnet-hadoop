@@ -106,7 +106,9 @@ case object Crossref2Oaf {
 
     // Publisher ( Name of work's publisher mapped into  Result/Publisher)
     val publisher = (json \ "publisher").extractOrElse[String](null)
-    result.setPublisher(asField(publisher))
+    if (publisher!= null && publisher.nonEmpty)
+      result.setPublisher(asField(publisher))
+
 
     // TITLE
     val mainTitles = for {JString(title) <- json \ "title" if title.nonEmpty} yield createSP(title, "main title", "dnet:dataCite_title")
@@ -120,7 +122,7 @@ case object Crossref2Oaf {
     result.setDescription(descriptionList.asJava)
 
     // Source
-    val sourceList = for {JString(source) <- json \ "source" if source.nonEmpty} yield asField(source)
+    val sourceList = for {JString(source) <- json \ "source" if source!= null && source.nonEmpty} yield asField(source)
     result.setSource(sourceList.asJava)
 
     //RELEVANT DATE Mapping
@@ -168,7 +170,7 @@ case object Crossref2Oaf {
       instance.setRefereed(asField("peerReviewed"))
 
 
-    instance.setAccessright(createQualifier("RESTRICTED", "dnet:access_modes"))
+    instance.setAccessright(getRestrictedQualifier())
     result.setInstance(List(instance).asJava)
     instance.setInstancetype(createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
     result.setResourcetype(createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))

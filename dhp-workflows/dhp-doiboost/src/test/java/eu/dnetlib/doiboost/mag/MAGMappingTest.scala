@@ -1,5 +1,7 @@
 package eu.dnetlib.doiboost.mag
 
+import java.sql.Timestamp
+
 import eu.dnetlib.dhp.schema.oaf.Publication
 import org.apache.htrace.fasterxml.jackson.databind.SerializationFeature
 import org.apache.spark.SparkConf
@@ -34,6 +36,17 @@ class MAGMappingTest {
     if (s.contains(".")) {
       println(s.split("\\.")head)
     }
+
+  }
+
+
+
+  @Test
+  def testDate() :Unit = {
+
+    val p:Timestamp = Timestamp.valueOf("2011-10-02 00:00:00")
+
+    println(p.toString.substring(0,10))
 
   }
 

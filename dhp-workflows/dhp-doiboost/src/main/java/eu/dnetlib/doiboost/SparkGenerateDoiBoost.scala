@@ -1,7 +1,7 @@
 package eu.dnetlib.doiboost
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Dataset => OafDataset, Organization}
 import eu.dnetlib.doiboost.mag.ConversionUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
@@ -26,22 +26,13 @@ object SparkGenerateDoiBoost {
         .master(parser.get("master")).getOrCreate()
 
     import spark.implicits._
-    val crossrefPublicationPath = parser.get("crossrefPublicationPath")
-    val crossrefDatasetPath = parser.get("crossrefDatasetPath")
-    val uwPublicationPath = parser.get("uwPublicationPath")
-    val magPublicationPath = parser.get("magPublicationPath")
-    val orcidPublicationPath = parser.get("orcidPublicationPath")
+
+    val hostedByMapPath = parser.get("hostedByMapPath")
     val workingDirPath = parser.get("workingDirPath")
 
 
-//    logger.info("Phase 1) repartition and move all the dataset in a same working folder")
-//    spark.read.load(crossrefPublicationPath).as(Encoders.bean(classOf[Publication])).map(s => s)(Encoders.kryo[Publication]).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/crossrefPublication")
-//    spark.read.load(crossrefDatasetPath).as(Encoders.bean(classOf[OafDataset])).map(s => s)(Encoders.kryo[OafDataset]).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/crossrefDataset")
-//    spark.read.load(uwPublicationPath).as(Encoders.bean(classOf[Publication])).map(s => s)(Encoders.kryo[Publication]).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/uwPublication")
-//    spark.read.load(orcidPublicationPath).as(Encoders.bean(classOf[Publication])).map(s => s)(Encoders.kryo[Publication]).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/orcidPublication")
-//    spark.read.load(magPublicationPath).as(Encoders.bean(classOf[Publication])).map(s => s)(Encoders.kryo[Publication]).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/magPublication")
-
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
+    implicit val mapEncoderOrg: Encoder[Organization] = Encoders.kryo[Organization]
     implicit val mapEncoderDataset: Encoder[OafDataset] = Encoders.kryo[OafDataset]
     implicit val tupleForJoinEncoder: Encoder[(String, Publication)] = Encoders.tuple(Encoders.STRING, mapEncoderPub)
     implicit val mapEncoderRel: Encoder[Relation] = Encoders.kryo[Relation]
@@ -75,23 +66,26 @@ object SparkGenerateDoiBoost {
     sj.joinWith(magPublication, sj("_1").equalTo(magPublication("_1")), "left").map(applyMerge).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostPublication")
 
 
-    val doiBoostPublication: Dataset[Publication] = spark.read.load(s"$workingDirPath/doiBoostPublication").as[Publication]
+    val doiBoostPublication: Dataset[(String,Publication)] = spark.read.load(s"$workingDirPath/doiBoostPublication").as[Publication].filter(p=>DoiBoostMappingUtil.filterPublication(p)).map(DoiBoostMappingUtil.toISSNPair)(tupleForJoinEncoder)
 
-    val map = DoiBoostMappingUtil.retrieveHostedByMap()
+    val hostedByDataset : Dataset[(String, HostedByItemType)] = spark.createDataset(spark.sparkContext.textFile(hostedByMapPath).map(DoiBoostMappingUtil.toHostedByItem))
 
-    doiBoostPublication.filter(p=>DoiBoostMappingUtil.filterPublication(p)).map(p => DoiBoostMappingUtil.fixPublication(p, map)).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostPublicationFiltered")
 
+    doiBoostPublication.joinWith(hostedByDataset, doiBoostPublication("_1").equalTo(hostedByDataset("_1")), "left")
+      .map(DoiBoostMappingUtil.fixPublication)
+      .write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostPublicationFiltered")
 
     val affiliationPath = parser.get("affiliationPath")
     val paperAffiliationPath = parser.get("paperAffiliationPath")
 
-    val affiliation = spark.read.load(affiliationPath).where(col("GridId").isNotNull).select(col("AffiliationId"), col("GridId"))
+    val affiliation = spark.read.load(affiliationPath).select(col("AffiliationId"), col("GridId"), col("OfficialPage"), col("DisplayName"))
 
     val paperAffiliation = spark.read.load(paperAffiliationPath).select(col("AffiliationId").alias("affId"), col("PaperId"))
 
 
     val a:Dataset[DoiBoostAffiliation] = paperAffiliation
-      .joinWith(affiliation, paperAffiliation("affId").equalTo(affiliation("AffiliationId"))).select(col("_1.PaperId"), col("_2.AffiliationId"), col("_2.GridId")).as[DoiBoostAffiliation]
+      .joinWith(affiliation, paperAffiliation("affId").equalTo(affiliation("AffiliationId")))
+      .select(col("_1.PaperId"), col("_2.AffiliationId"), col("_2.GridId"), col("_2.OfficialPage"), col("_2.DisplayName")).as[DoiBoostAffiliation]
 
 
 
@@ -102,24 +96,45 @@ object SparkGenerateDoiBoost {
     magPubs.joinWith(a,magPubs("_1").equalTo(a("PaperId"))).flatMap(item => {
       val pub:Publication = item._1._2
       val affiliation = item._2
+      val affId:String = if (affiliation.GridId.isDefined) DoiBoostMappingUtil.generateGridAffiliationId(affiliation.GridId.get) else  DoiBoostMappingUtil.generateMAGAffiliationId(affiliation.AffiliationId.toString)
       val r:Relation = new Relation
       r.setSource(pub.getId)
-      r.setTarget(DoiBoostMappingUtil.generateGridAffiliationId(affiliation.GridId))
+      r.setTarget(affId)
       r.setRelType("resultOrganization")
       r.setRelClass("hasAuthorInstitution")
       r.setSubRelType("affiliation")
       r.setDataInfo(pub.getDataInfo)
-      r.setCollectedfrom(pub.getCollectedfrom)
+      r.setCollectedfrom(List(DoiBoostMappingUtil.createMAGCollectedFrom()).asJava)
       val r1:Relation = new Relation
       r1.setTarget(pub.getId)
-      r1.setSource(DoiBoostMappingUtil.generateGridAffiliationId(affiliation.GridId))
+      r1.setSource(affId)
       r1.setRelType("resultOrganization")
       r1.setRelClass("isAuthorInstitutionOf")
       r1.setSubRelType("affiliation")
       r1.setDataInfo(pub.getDataInfo)
-      r1.setCollectedfrom(pub.getCollectedfrom)
+      r1.setCollectedfrom(List(DoiBoostMappingUtil.createMAGCollectedFrom()).asJava)
       List(r, r1)
     })(mapEncoderRel).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostPublicationAffiliation")
-  }
+
+
+    magPubs.joinWith(a,magPubs("_1").equalTo(a("PaperId"))).map( item => {
+      val affiliation = item._2
+      if (affiliation.GridId.isEmpty) {
+        val o = new Organization
+        o.setCollectedfrom(List(DoiBoostMappingUtil.createMAGCollectedFrom()).asJava)
+        o.setDataInfo(DoiBoostMappingUtil.generateDataInfo())
+        o.setId(DoiBoostMappingUtil.generateMAGAffiliationId(affiliation.AffiliationId.toString))
+        o.setOriginalId(List(affiliation.AffiliationId.toString).asJava)
+        if (affiliation.DisplayName.nonEmpty)
+          o.setLegalname(DoiBoostMappingUtil.asField(affiliation.DisplayName.get))
+        if (affiliation.OfficialPage.isDefined)
+          o.setWebsiteurl(DoiBoostMappingUtil.asField(affiliation.OfficialPage.get))
+        o.setCountry(DoiBoostMappingUtil.getUnknownCountry())
+        o
+      }
+      else
+        null
+    }).filter(o=> o!=null).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostOrganization")
+    }
 
 }
