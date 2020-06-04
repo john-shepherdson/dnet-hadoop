@@ -39,9 +39,8 @@ public class EventFactory {
 
 		final String payload = createPayload(updateInfo);
 
-		final String eventId = calculateEventId(
-			updateInfo.getTopicPath(), updateInfo.getTarget().getOriginalId().get(0),
-			updateInfo.getHighlightValueAsString());
+		final String eventId =
+			calculateEventId(updateInfo.getTopicPath(), updateInfo.getTarget().getOriginalId().get(0), updateInfo.getHighlightValueAsString());
 
 		res.setEventId(eventId);
 		res.setProducerId(PRODUCER_ID);
@@ -56,7 +55,7 @@ public class EventFactory {
 
 	private static String createPayload(final UpdateInfo<?> updateInfo) {
 		final OpenAireEventPayload payload = new OpenAireEventPayload();
-		// TODO
+		// TODO : use ConversionUtils
 
 		updateInfo.compileHighlight(payload);
 
@@ -93,17 +92,13 @@ public class EventFactory {
 		final List<StructuredProperty> subjects = target.getSubject();
 		if (subjects.size() > 0) {
 			map
-				.put(
-					"target_publication_subject_list",
-					subjects.stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
+				.put("target_publication_subject_list", subjects.stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
 		}
 
 		final List<Author> authors = target.getAuthor();
 		if (authors.size() > 0) {
 			map
-				.put(
-					"target_publication_author_list",
-					authors.stream().map(Author::getFullname).collect(Collectors.toList()));
+				.put("target_publication_author_list", authors.stream().map(Author::getFullname).collect(Collectors.toList()));
 		}
 
 		// PROVENANCE INFO
@@ -130,9 +125,7 @@ public class EventFactory {
 	}
 
 	private static long parseDateTolong(final String date) {
-		if (StringUtils.isBlank(date)) {
-			return -1;
-		}
+		if (StringUtils.isBlank(date)) { return -1; }
 		try {
 			return DateUtils.parseDate(date, DATE_PATTERNS).getTime();
 		} catch (final ParseException e) {

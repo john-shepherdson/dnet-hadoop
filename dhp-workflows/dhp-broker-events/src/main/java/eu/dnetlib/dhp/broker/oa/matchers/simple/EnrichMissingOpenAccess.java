@@ -28,16 +28,14 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
 			.filter(right -> right.equals(BrokerConstants.OPEN_ACCESS))
 			.count();
 
-		if (count > 0) {
-			return Arrays.asList();
-		}
+		if (count > 0) { return Arrays.asList(); }
 
 		return source
 			.getInstance()
 			.stream()
 			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
 			.map(ConversionUtils::oafInstanceToBrokerInstances)
-			.flatMap(s -> s)
+			.flatMap(List::stream)
 			.map(i -> generateUpdateInfo(i, source, target))
 			.collect(Collectors.toList());
 	}
