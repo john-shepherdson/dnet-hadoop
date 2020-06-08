@@ -4,8 +4,6 @@ package eu.dnetlib.dhp.oa.provision.utils;
 import org.apache.spark.Partitioner;
 import org.apache.spark.util.Utils;
 
-import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
-
 /**
  * Used in combination with SortableRelationKey, allows to partition the records by source id, therefore allowing to
  * sort relations sharing the same source id by the ordering defined in SortableRelationKey.
@@ -25,6 +23,8 @@ public class RelationPartitioner extends Partitioner {
 
 	@Override
 	public int getPartition(Object key) {
-		return Utils.nonNegativeMod(((SortableRelation) key).getSource().hashCode(), numPartitions());
+		String partitionKey = (String) key;
+		return Utils.nonNegativeMod(partitionKey.hashCode(), numPartitions());
 	}
+
 }

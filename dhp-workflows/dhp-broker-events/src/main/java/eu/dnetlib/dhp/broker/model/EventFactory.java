@@ -12,7 +12,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
-import eu.dnetlib.broker.objects.OpenAireEventPayload;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
@@ -37,29 +36,19 @@ public class EventFactory {
 
 		final Map<String, Object> map = createMapFromResult(updateInfo);
 
-		final String payload = createPayload(updateInfo);
-
-		final String eventId =
-			calculateEventId(updateInfo.getTopicPath(), updateInfo.getTarget().getOriginalId().get(0), updateInfo.getHighlightValueAsString());
+		final String eventId = calculateEventId(
+			updateInfo.getTopicPath(), updateInfo.getTarget().getOriginalId().get(0),
+			updateInfo.getHighlightValueAsString());
 
 		res.setEventId(eventId);
 		res.setProducerId(PRODUCER_ID);
-		res.setPayload(payload);
+		res.setPayload(updateInfo.asBrokerPayload().toJSON());
 		res.setMap(map);
 		res.setTopic(updateInfo.getTopicPath());
 		res.setCreationDate(now);
 		res.setExpiryDate(calculateExpiryDate(now));
 		res.setInstantMessage(false);
 		return res;
-	}
-
-	private static String createPayload(final UpdateInfo<?> updateInfo) {
-		final OpenAireEventPayload payload = new OpenAireEventPayload();
-		// TODO : use ConversionUtils
-
-		updateInfo.compileHighlight(payload);
-
-		return payload.toJSON();
 	}
 
 	private static Map<String, Object> createMapFromResult(final UpdateInfo<?> updateInfo) {
@@ -92,13 +81,17 @@ public class EventFactory {
 		final List<StructuredProperty> subjects = target.getSubject();
 		if (subjects.size() > 0) {
 			map
-				.put("target_publication_subject_list", subjects.stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
+				.put(
+					"target_publication_subject_list",
+					subjects.stream().map(StructuredProperty::getValue).collect(Collectors.toList()));
 		}
 
 		final List<Author> authors = target.getAuthor();
 		if (authors.size() > 0) {
 			map
-				.put("target_publication_author_list", authors.stream().map(Author::getFullname).collect(Collectors.toList()));
+				.put(
+					"target_publication_author_list",
+					authors.stream().map(Author::getFullname).collect(Collectors.toList()));
 		}
 
 		// PROVENANCE INFO
@@ -125,7 +118,9 @@ public class EventFactory {
 	}
 
 	private static long parseDateTolong(final String date) {
-		if (StringUtils.isBlank(date)) { return -1; }
+		if (StringUtils.isBlank(date)) {
+			return -1;
+		}
 		try {
 			return DateUtils.parseDate(date, DATE_PATTERNS).getTime();
 		} catch (final ParseException e) {

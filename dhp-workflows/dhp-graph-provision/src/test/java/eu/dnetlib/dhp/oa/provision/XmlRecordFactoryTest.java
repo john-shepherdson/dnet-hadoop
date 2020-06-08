@@ -45,7 +45,6 @@ public class XmlRecordFactoryTest {
 
 		assertNotNull(doc);
 
-		System.out.println(doc.asXML());
-
+		// TODO add assertions based of values extracted from the XML record
 	}
 }

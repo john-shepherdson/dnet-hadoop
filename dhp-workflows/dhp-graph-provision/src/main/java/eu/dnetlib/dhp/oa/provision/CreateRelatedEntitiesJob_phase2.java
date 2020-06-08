@@ -4,27 +4,32 @@ package eu.dnetlib.dhp.oa.provision;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
+import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.model.TypedRow;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -59,6 +64,12 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+	private static final int MAX_EXTERNAL_ENTITIES = 50;
+	private static final int MAX_AUTHORS = 200;
+	private static final int MAX_AUTHOR_FULLNAME_LENGTH = 1000;
+	private static final int MAX_TITLE_LENGTH = 5000;
+	private static final int MAX_ABSTRACT_LENGTH = 100000;
+
 	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
@@ -78,8 +89,8 @@ public class CreateRelatedEntitiesJob_phase2 {
 		String inputRelatedEntitiesPath = parser.get("inputRelatedEntitiesPath");
 		log.info("inputRelatedEntitiesPath: {}", inputRelatedEntitiesPath);
 
-		String inputGraphRootPath = parser.get("inputGraphRootPath");
-		log.info("inputGraphRootPath: {}", inputGraphRootPath);
+		String inputEntityPath = parser.get("inputEntityPath");
+		log.info("inputEntityPath: {}", inputEntityPath);
 
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -87,80 +98,112 @@ public class CreateRelatedEntitiesJob_phase2 {
 		int numPartitions = Integer.parseInt(parser.get("numPartitions"));
 		log.info("numPartitions: {}", numPartitions);
 
+		String graphTableClassName = parser.get("graphTableClassName");
+		log.info("graphTableClassName: {}", graphTableClassName);
+
+		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
+
 		SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				joinAllEntities(
-					spark, inputRelatedEntitiesPath, inputGraphRootPath, outputPath, numPartitions);
+				joinEntityWithRelatedEntities(
+					spark, inputRelatedEntitiesPath, inputEntityPath, outputPath, numPartitions, entityClazz);
 			});
 	}
 
-	private static void joinAllEntities(
+	private static <E extends OafEntity> void joinEntityWithRelatedEntities(
 		SparkSession spark,
-		String inputRelatedEntitiesPath,
-		String inputGraphRootPath,
+		String relatedEntitiesPath,
+		String entityPath,
 		String outputPath,
-		int numPartitions) {
+		int numPartitions,
+		Class<E> entityClazz) {
 
-		Dataset<Tuple2<String, TypedRow>> entities = readAllEntities(spark, inputGraphRootPath, numPartitions);
-		Dataset<Tuple2<String, EntityRelEntity>> relsBySource = readRelatedEntities(spark, inputRelatedEntitiesPath);
+		Dataset<Tuple2<String, E>> entities = readPathEntity(spark, entityPath, entityClazz);
+		Dataset<Tuple2<String, RelatedEntityWrapper>> relatedEntities = readRelatedEntities(
+			spark, relatedEntitiesPath, entityClazz);
+
+		TypedColumn<JoinedEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
 
 		entities
-			.joinWith(relsBySource, entities.col("_1").equalTo(relsBySource.col("_1")), "left_outer")
+			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left_outer")
+			.map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, RelatedEntityWrapper>>, JoinedEntity>) value -> {
+				JoinedEntity je = new JoinedEntity(value._1()._2());
+				Optional
+					.ofNullable(value._2())
+					.map(Tuple2::_2)
+					.ifPresent(r -> je.getLinks().add(r));
+				return je;
+			}, Encoders.kryo(JoinedEntity.class))
+			.filter(filterEmptyEntityFn())
+			.groupByKey(
+				(MapFunction<JoinedEntity, String>) value -> value.getEntity().getId(),
+				Encoders.STRING())
+			.agg(aggregator)
 			.map(
-				(MapFunction<Tuple2<Tuple2<String, TypedRow>, Tuple2<String, EntityRelEntity>>, EntityRelEntity>) value -> {
-					EntityRelEntity re = new EntityRelEntity();
-					re.setEntity(value._1()._2());
-					Optional<EntityRelEntity> related = Optional.ofNullable(value._2()).map(Tuple2::_2);
-					if (related.isPresent()) {
-						re.setRelation(related.get().getRelation());
-						re.setTarget(related.get().getTarget());
-					}
-					return re;
-				},
-				Encoders.bean(EntityRelEntity.class))
-			.repartition(numPartitions)
-			.filter(
-				(FilterFunction<EntityRelEntity>) value -> value.getEntity() != null
-					&& StringUtils.isNotBlank(value.getEntity().getId()))
+				(MapFunction<Tuple2<String, JoinedEntity>, JoinedEntity>) value -> value._2(),
+				Encoders.kryo(JoinedEntity.class))
+			.filter(filterEmptyEntityFn())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
 	}
 
-	private static Dataset<Tuple2<String, TypedRow>> readAllEntities(
-		SparkSession spark, String inputGraphPath, int numPartitions) {
-		Dataset<TypedRow> publication = readPathEntity(spark, inputGraphPath + "/publication", Publication.class);
-		Dataset<TypedRow> dataset = readPathEntity(
-			spark, inputGraphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
-		Dataset<TypedRow> other = readPathEntity(
-			spark, inputGraphPath + "/otherresearchproduct", OtherResearchProduct.class);
-		Dataset<TypedRow> software = readPathEntity(spark, inputGraphPath + "/software", Software.class);
-		Dataset<TypedRow> datasource = readPathEntity(spark, inputGraphPath + "/datasource", Datasource.class);
-		Dataset<TypedRow> organization = readPathEntity(spark, inputGraphPath + "/organization", Organization.class);
-		Dataset<TypedRow> project = readPathEntity(spark, inputGraphPath + "/project", Project.class);
+	public static class AdjacencyListAggregator extends Aggregator<JoinedEntity, JoinedEntity, JoinedEntity> {
 
-		return publication
-			.union(dataset)
-			.union(other)
-			.union(software)
-			.union(datasource)
-			.union(organization)
-			.union(project)
-			.map(
-				(MapFunction<TypedRow, Tuple2<String, TypedRow>>) value -> new Tuple2<>(value.getId(), value),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(TypedRow.class)))
-			.repartition(numPartitions);
+		@Override
+		public JoinedEntity zero() {
+			return new JoinedEntity();
+		}
+
+		@Override
+		public JoinedEntity reduce(JoinedEntity b, JoinedEntity a) {
+			return mergeAndGet(b, a);
+		}
+
+		private JoinedEntity mergeAndGet(JoinedEntity b, JoinedEntity a) {
+			b
+				.setEntity(
+					Optional
+						.ofNullable(a.getEntity())
+						.orElse(
+							Optional
+								.ofNullable(b.getEntity())
+								.orElse(null)));
+			b.getLinks().addAll(a.getLinks());
+			return b;
+		}
+
+		@Override
+		public JoinedEntity merge(JoinedEntity b, JoinedEntity a) {
+			return mergeAndGet(b, a);
+		}
+
+		@Override
+		public JoinedEntity finish(JoinedEntity j) {
+			return j;
+		}
+
+		@Override
+		public Encoder<JoinedEntity> bufferEncoder() {
+			return Encoders.kryo(JoinedEntity.class);
+		}
+
+		@Override
+		public Encoder<JoinedEntity> outputEncoder() {
+			return Encoders.kryo(JoinedEntity.class);
+		}
+
 	}
 
-	private static Dataset<Tuple2<String, EntityRelEntity>> readRelatedEntities(
-		SparkSession spark, String inputRelatedEntitiesPath) {
+	private static <E extends OafEntity> Dataset<Tuple2<String, RelatedEntityWrapper>> readRelatedEntities(
+		SparkSession spark, String inputRelatedEntitiesPath, Class<E> entityClazz) {
 
 		log.info("Reading related entities from: {}", inputRelatedEntitiesPath);
 
@@ -169,17 +212,20 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 		log.info("Found paths: {}", String.join(",", paths));
 
+		final String idPrefix = ModelSupport.getIdPrefix(entityClazz);
+
 		return spark
 			.read()
 			.load(toSeq(paths))
-			.as(Encoders.bean(EntityRelEntity.class))
+			.as(Encoders.kryo(RelatedEntityWrapper.class))
+			.filter((FilterFunction<RelatedEntityWrapper>) e -> e.getRelation().getSource().startsWith(idPrefix))
 			.map(
-				(MapFunction<EntityRelEntity, Tuple2<String, EntityRelEntity>>) value -> new Tuple2<>(
+				(MapFunction<RelatedEntityWrapper, Tuple2<String, RelatedEntityWrapper>>) value -> new Tuple2<>(
 					value.getRelation().getSource(), value),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(EntityRelEntity.class)));
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntityWrapper.class)));
 	}
 
-	private static <E extends OafEntity> Dataset<TypedRow> readPathEntity(
+	private static <E extends OafEntity> Dataset<Tuple2<String, E>> readPathEntity(
 		SparkSession spark, String inputEntityPath, Class<E> entityClazz) {
 
 		log.info("Reading Graph table from: {}", inputEntityPath);
@@ -190,10 +236,79 @@ public class CreateRelatedEntitiesJob_phase2 {
 				(MapFunction<String, E>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
 				Encoders.bean(entityClazz))
 			.filter("dataInfo.invisible == false")
+			.map((MapFunction<E, E>) e -> pruneOutliers(entityClazz, e), Encoders.bean(entityClazz))
 			.map(
-				(MapFunction<E, TypedRow>) value -> getTypedRow(
-					StringUtils.substringAfterLast(inputEntityPath, "/"), value),
-				Encoders.bean(TypedRow.class));
+				(MapFunction<E, Tuple2<String, E>>) e -> new Tuple2<>(e.getId(), e),
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(entityClazz)));
+	}
+
+	private static <E extends OafEntity> E pruneOutliers(Class<E> entityClazz, E e) {
+		if (ModelSupport.isSubClass(entityClazz, Result.class)) {
+			Result r = (Result) e;
+			if (r.getExternalReference() != null) {
+				List<ExternalReference> refs = r
+					.getExternalReference()
+					.stream()
+					.limit(MAX_EXTERNAL_ENTITIES)
+					.collect(Collectors.toList());
+				r.setExternalReference(refs);
+			}
+			if (r.getAuthor() != null) {
+				List<Author> authors = Lists.newArrayList();
+				for (Author a : r.getAuthor()) {
+					a.setFullname(StringUtils.left(a.getFullname(), MAX_AUTHOR_FULLNAME_LENGTH));
+					if (authors.size() < MAX_AUTHORS || hasORCID(a)) {
+						authors.add(a);
+					}
+				}
+				r.setAuthor(authors);
+			}
+			if (r.getDescription() != null) {
+				List<Field<String>> desc = r
+					.getDescription()
+					.stream()
+					.filter(Objects::nonNull)
+					.map(d -> {
+						d.setValue(StringUtils.left(d.getValue(), MAX_ABSTRACT_LENGTH));
+						return d;
+					})
+					.collect(Collectors.toList());
+				r.setDescription(desc);
+			}
+			if (r.getTitle() != null) {
+				List<StructuredProperty> titles = r
+					.getTitle()
+					.stream()
+					.filter(Objects::nonNull)
+					.map(t -> {
+						t.setValue(StringUtils.left(t.getValue(), MAX_TITLE_LENGTH));
+						return t;
+					})
+					.collect(Collectors.toList());
+				r.setTitle(titles);
+			}
+		}
+		return e;
+	}
+
+	private static boolean hasORCID(Author a) {
+		return a.getPid() != null && a
+			.getPid()
+			.stream()
+			.filter(Objects::nonNull)
+			.map(StructuredProperty::getQualifier)
+			.filter(Objects::nonNull)
+			.map(Qualifier::getClassid)
+			.filter(StringUtils::isNotBlank)
+			.anyMatch(c -> "orcid".equals(c.toLowerCase()));
+	}
+
+	private static FilterFunction<JoinedEntity> filterEmptyEntityFn() {
+		return (FilterFunction<JoinedEntity>) v -> Objects.nonNull(v.getEntity());
+		/*
+		 * return (FilterFunction<JoinedEntity>) v -> Optional .ofNullable(v.getEntity()) .map(e ->
+		 * StringUtils.isNotBlank(e.getId())) .orElse(false);
+		 */
 	}
 
 	private static TypedRow getTypedRow(String type, OafEntity entity)

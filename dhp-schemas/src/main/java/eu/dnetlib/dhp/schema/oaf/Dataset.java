@@ -10,6 +10,7 @@ public class Dataset extends Result implements Serializable {
 
 	private Field<String> storagedate;
 
+	// candidate for removal
 	private Field<String> device;
 
 	private Field<String> size;

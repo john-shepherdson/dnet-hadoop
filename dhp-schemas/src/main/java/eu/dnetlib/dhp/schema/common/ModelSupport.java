@@ -58,6 +58,18 @@ public class ModelSupport {
 		oafTypes.put("relation", Relation.class);
 	}
 
+	public static final Map<Class, String> idPrefixMap = Maps.newHashMap();
+
+	static {
+		idPrefixMap.put(Datasource.class, "10");
+		idPrefixMap.put(Organization.class, "20");
+		idPrefixMap.put(Project.class, "40");
+		idPrefixMap.put(Dataset.class, "50");
+		idPrefixMap.put(OtherResearchProduct.class, "50");
+		idPrefixMap.put(Software.class, "50");
+		idPrefixMap.put(Publication.class, "50");
+	}
+
 	public static final Map<String, String> entityIdPrefix = Maps.newHashMap();
 
 	static {
@@ -287,6 +299,10 @@ public class ModelSupport {
 	private static final String schemeTemplate = "dnet:%s_%s_relations";
 
 	private ModelSupport() {
+	}
+
+	public static <E extends OafEntity> String getIdPrefix(Class<E> clazz) {
+		return idPrefixMap.get(clazz);
 	}
 
 	/**
