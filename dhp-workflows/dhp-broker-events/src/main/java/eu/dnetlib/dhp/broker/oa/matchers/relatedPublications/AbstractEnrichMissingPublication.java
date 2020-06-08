@@ -39,7 +39,7 @@ public abstract class AbstractEnrichMissingPublication
 			.getRight()
 			.stream()
 			.filter(d -> !existingPublications.contains(d.getId()))
-			.map(ConversionUtils::oafPublicationToBrokerPublication)
+			.map(ConversionUtils::oafResultToBrokerPublication)
 			.map(i -> generateUpdateInfo(i, source, target))
 			.collect(Collectors.toList());
 
