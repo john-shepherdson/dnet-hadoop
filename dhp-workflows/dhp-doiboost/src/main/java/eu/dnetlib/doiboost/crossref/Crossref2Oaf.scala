@@ -179,6 +179,9 @@ case object Crossref2Oaf {
     if (StringUtils.isNotBlank(issuedDate)) {
       instance.setDateofacceptance(asField(issuedDate))
     }
+    else {
+      instance.setDateofacceptance(asField(createdDate.getValue))
+    }
     val s: String = (json \ "URL").extract[String]
     val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
     if (links.nonEmpty)
