@@ -28,7 +28,8 @@ public class EnrichMissingProject
 		if (source.getRight().isEmpty()) {
 			return Arrays.asList();
 		} else {
-			return target.getRight()
+			return target
+				.getRight()
 				.stream()
 				.map(ConversionUtils::oafProjectToBrokerProject)
 				.map(p -> generateUpdateInfo(p, source, target))

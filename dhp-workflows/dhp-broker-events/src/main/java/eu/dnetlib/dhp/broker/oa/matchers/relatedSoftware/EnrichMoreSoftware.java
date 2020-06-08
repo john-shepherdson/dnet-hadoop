@@ -26,12 +26,14 @@ public class EnrichMoreSoftware
 		final Pair<Result, List<Software>> source,
 		final Pair<Result, List<Software>> target) {
 
-		final Set<String> existingSoftwares = source.getRight()
+		final Set<String> existingSoftwares = source
+			.getRight()
 			.stream()
 			.map(Software::getId)
 			.collect(Collectors.toSet());
 
-		return target.getRight()
+		return target
+			.getRight()
 			.stream()
 			.filter(p -> !existingSoftwares.contains(p.getId()))
 			.map(ConversionUtils::oafSoftwareToBrokerSoftware)
