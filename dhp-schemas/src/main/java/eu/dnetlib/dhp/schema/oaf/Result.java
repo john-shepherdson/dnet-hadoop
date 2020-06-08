@@ -2,8 +2,10 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Result extends OafEntity implements Serializable {
 
@@ -248,13 +250,24 @@ public class Result extends OafEntity implements Serializable {
 		StructuredProperty baseMainTitle = null;
 		if (title != null) {
 			baseMainTitle = getMainTitle(title);
-			title.remove(baseMainTitle);
+			if (baseMainTitle != null) {
+				final StructuredProperty p = baseMainTitle;
+				title = title.stream().filter(t -> t != p).collect(Collectors.toList());
+			}
+//
+//
+//			title.remove(baseMainTitle);
 		}
 
 		StructuredProperty newMainTitle = null;
 		if (r.getTitle() != null) {
 			newMainTitle = getMainTitle(r.getTitle());
-			r.getTitle().remove(newMainTitle);
+			if (newMainTitle != null) {
+				final StructuredProperty p = newMainTitle;
+				title = title.stream().filter(t -> t != p).collect(Collectors.toList());
+			}
+
+			// r.getTitle().remove(newMainTitle);
 		}
 
 		if (newMainTitle != null && compareTrust(this, r) < 0)

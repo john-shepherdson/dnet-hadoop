@@ -13,8 +13,14 @@
   },
   {
     "paramName": "iep",
-    "paramLongName": "inputGraphRootPath",
-    "paramDescription": "root graph path",
+    "paramLongName": "inputEntityPath",
+    "paramDescription": "input Entity Path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "clazz",
+    "paramLongName": "graphTableClassName",
+    "paramDescription": "class name associated to the input entity path",
     "paramRequired": true
   },
   {

@@ -103,8 +103,7 @@
         <switch>
             <case to="prepare_relations">${wf:conf('resumeFrom') eq 'prepare_relations'}</case>
             <case to="fork_join_related_entities">${wf:conf('resumeFrom') eq 'fork_join_related_entities'}</case>
-            <case to="join_all_entities">${wf:conf('resumeFrom') eq 'join_all_entities'}</case>
-            <case to="adjancency_lists">${wf:conf('resumeFrom') eq 'adjancency_lists'}</case>
+            <case to="fork_join_all_entities">${wf:conf('resumeFrom') eq 'fork_join_all_entities'}</case>
             <case to="convert_to_xml">${wf:conf('resumeFrom') eq 'convert_to_xml'}</case>
             <case to="to_solr_index">${wf:conf('resumeFrom') eq 'to_solr_index'}</case>
             <default to="prepare_relations"/>
@@ -134,7 +133,7 @@
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--relPartitions</arg><arg>3000</arg>
+            <arg>--relPartitions</arg><arg>5000</arg>
         </spark>
         <ok to="fork_join_related_entities"/>
         <error to="Kill"/>
@@ -171,7 +170,7 @@
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_partial/publication</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -198,7 +197,7 @@
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_partial/dataset</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -225,7 +224,7 @@
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_partial/otherresearchproduct</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -252,7 +251,7 @@
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_partial/software</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -279,7 +278,7 @@
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_partial/datasource</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -306,7 +305,7 @@
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_partial/organization</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
@@ -333,19 +332,57 @@
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_partial/project</arg>
         </spark>
         <ok to="wait_joins"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait_joins" to="join_all_entities"/>
+    <join name="wait_joins" to="fork_join_all_entities"/>
 
-    <action name="join_all_entities">
+    <fork name="fork_join_all_entities">
+        <path start="join_publication_relations"/>
+        <path start="join_dataset_relations"/>
+        <path start="join_otherresearchproduct_relations"/>
+        <path start="join_software_relations"/>
+        <path start="join_datasource_relations"/>
+        <path start="join_organization_relations"/>
+        <path start="join_project_relations"/>
+    </fork>
+
+    <action name="join_publication_relations">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Join[entities.id = relatedEntity.source]</name>
+            <name>Join[publication.id = relatedEntity.source]</name>
+            <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=15360
+                --conf spark.network.timeout=${sparkNetworkTimeout}
+            </spark-opts>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_entities/publication</arg>
+            <arg>--numPartitions</arg><arg>30000</arg>
+        </spark>
+        <ok to="wait_join_phase2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="join_dataset_relations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Join[dataset.id = relatedEntity.source]</name>
             <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
@@ -359,21 +396,22 @@
                 --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputGraphRootPath</arg><arg>${inputGraphRootPath}</arg>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/join_entities</arg>
-            <arg>--numPartitions</arg><arg>12000</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_entities/dataset</arg>
+            <arg>--numPartitions</arg><arg>20000</arg>
         </spark>
-        <ok to="adjancency_lists"/>
+        <ok to="wait_join_phase2"/>
         <error to="Kill"/>
     </action>
 
-    <action name="adjancency_lists">
+    <action name="join_otherresearchproduct_relations">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>build_adjacency_lists</name>
-            <class>eu.dnetlib.dhp.oa.provision.AdjacencyListBuilderJob</class>
+            <name>Join[otherresearchproduct.id = relatedEntity.source]</name>
+            <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -386,12 +424,129 @@
                 --conf spark.sql.shuffle.partitions=7680
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputPath</arg> <arg>${workingDir}/join_entities</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/joined</arg>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_entities/otherresearchproduct</arg>
+            <arg>--numPartitions</arg><arg>10000</arg>
         </spark>
-        <ok to="convert_to_xml"/>
+        <ok to="wait_join_phase2"/>
         <error to="Kill"/>
     </action>
+
+    <action name="join_software_relations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Join[software.id = relatedEntity.source]</name>
+            <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
+            </spark-opts>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_entities/software</arg>
+            <arg>--numPartitions</arg><arg>10000</arg>
+        </spark>
+        <ok to="wait_join_phase2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="join_datasource_relations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Join[datasource.id = relatedEntity.source]</name>
+            <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.network.timeout=${sparkNetworkTimeout}
+            </spark-opts>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
+            <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_entities/datasource</arg>
+            <arg>--numPartitions</arg><arg>1000</arg>
+        </spark>
+        <ok to="wait_join_phase2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="join_organization_relations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Join[organization.id = relatedEntity.source]</name>
+            <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.network.timeout=${sparkNetworkTimeout}
+            </spark-opts>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
+            <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_entities/organization</arg>
+            <arg>--numPartitions</arg><arg>20000</arg>
+        </spark>
+        <ok to="wait_join_phase2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="join_project_relations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Join[project.id = relatedEntity.source]</name>
+            <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.network.timeout=${sparkNetworkTimeout}
+            </spark-opts>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
+            <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_entities/project</arg>
+            <arg>--numPartitions</arg><arg>10000</arg>
+        </spark>
+        <ok to="wait_join_phase2"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_join_phase2" to="convert_to_xml"/>
 
     <action name="convert_to_xml">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -411,7 +566,7 @@
                 --conf spark.sql.shuffle.partitions=3840
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingDir}/joined</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--otherDsTypeId</arg><arg>${otherDsTypeId}</arg>
@@ -441,7 +596,7 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/xml</arg>
-            <arg>--isLookupUrl</arg> <arg>${isLookupUrl}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
         </spark>

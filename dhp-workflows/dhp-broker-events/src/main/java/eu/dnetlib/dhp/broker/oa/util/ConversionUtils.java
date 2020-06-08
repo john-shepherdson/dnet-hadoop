@@ -56,7 +56,13 @@ public class ConversionUtils {
 			.setOriginalId(d.getOriginalId().get(0))
 			.setTitles(structPropList(d.getTitle()))
 			.setPids(d.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
-			.setInstances(d.getInstance().stream().map(ConversionUtils::oafInstanceToBrokerInstances).flatMap(List::stream).collect(Collectors.toList()))
+			.setInstances(
+				d
+					.getInstance()
+					.stream()
+					.map(ConversionUtils::oafInstanceToBrokerInstances)
+					.flatMap(List::stream)
+					.collect(Collectors.toList()))
 			.setCollectedFrom(d.getCollectedfrom().stream().map(KeyValue::getValue).collect(Collectors.toList()))
 			: null;
 	}
@@ -74,11 +80,23 @@ public class ConversionUtils {
 			.setPublisher(fieldValue(result.getPublisher()))
 			.setEmbargoenddate(fieldValue(result.getEmbargoenddate()))
 			.setContributor(fieldList(result.getContributor()))
-			.setJournal(result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null)
+			.setJournal(
+				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null)
 			.setCollectedFrom(result.getCollectedfrom().stream().map(KeyValue::getValue).collect(Collectors.toList()))
 			.setPids(result.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
-			.setInstances(result.getInstance().stream().map(ConversionUtils::oafInstanceToBrokerInstances).flatMap(List::stream).collect(Collectors.toList()))
-			.setExternalReferences(result.getExternalReference().stream().map(ConversionUtils::oafExtRefToBrokerExtRef).collect(Collectors.toList()))
+			.setInstances(
+				result
+					.getInstance()
+					.stream()
+					.map(ConversionUtils::oafInstanceToBrokerInstances)
+					.flatMap(List::stream)
+					.collect(Collectors.toList()))
+			.setExternalReferences(
+				result
+					.getExternalReference()
+					.stream()
+					.map(ConversionUtils::oafExtRefToBrokerExtRef)
+					.collect(Collectors.toList()))
 			: null;
 	}
 
@@ -100,7 +118,9 @@ public class ConversionUtils {
 	}
 
 	public static final eu.dnetlib.broker.objects.Project oafProjectToBrokerProject(final Project p) {
-		if (p == null) { return null; }
+		if (p == null) {
+			return null;
+		}
 
 		final eu.dnetlib.broker.objects.Project res = new eu.dnetlib.broker.objects.Project()
 			.setTitle(fieldValue(p.getTitle()))
@@ -136,20 +156,29 @@ public class ConversionUtils {
 	}
 
 	private static String fieldValue(final List<Field<String>> fl) {
-		return fl != null ? fl.stream().map(Field::getValue).filter(StringUtils::isNotBlank).findFirst().orElse(null) : null;
+		return fl != null ? fl.stream().map(Field::getValue).filter(StringUtils::isNotBlank).findFirst().orElse(null)
+			: null;
 	}
 
 	private static String structPropValue(final List<StructuredProperty> props) {
-		return props != null ? props.stream().map(StructuredProperty::getValue).filter(StringUtils::isNotBlank).findFirst().orElse(null) : null;
+		return props != null
+			? props.stream().map(StructuredProperty::getValue).filter(StringUtils::isNotBlank).findFirst().orElse(null)
+			: null;
 	}
 
 	private static List<String> fieldList(final List<Field<String>> fl) {
-		return fl != null ? fl.stream().map(Field::getValue).filter(StringUtils::isNotBlank).collect(Collectors.toList())
+		return fl != null
+			? fl.stream().map(Field::getValue).filter(StringUtils::isNotBlank).collect(Collectors.toList())
 			: new ArrayList<>();
 	}
 
 	private static List<String> structPropList(final List<StructuredProperty> props) {
-		return props != null ? props.stream().map(StructuredProperty::getValue).filter(StringUtils::isNotBlank).collect(Collectors.toList())
+		return props != null
+			? props
+				.stream()
+				.map(StructuredProperty::getValue)
+				.filter(StringUtils::isNotBlank)
+				.collect(Collectors.toList())
 			: new ArrayList<>();
 	}
 }

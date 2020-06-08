@@ -5,31 +5,21 @@ import java.io.Serializable;
 
 import com.google.common.base.Objects;
 
-public class EntityRelEntity implements Serializable {
+public class RelatedEntityWrapper implements Serializable {
 
-	private TypedRow entity;
 	private SortableRelation relation;
 	private RelatedEntity target;
 
-	public EntityRelEntity() {
+	public RelatedEntityWrapper() {
 	}
 
-	public EntityRelEntity(SortableRelation relation, RelatedEntity target) {
+	public RelatedEntityWrapper(SortableRelation relation, RelatedEntity target) {
 		this(null, relation, target);
 	}
 
-	public EntityRelEntity(TypedRow entity, SortableRelation relation, RelatedEntity target) {
-		this.entity = entity;
+	public RelatedEntityWrapper(TypedRow entity, SortableRelation relation, RelatedEntity target) {
 		this.relation = relation;
 		this.target = target;
-	}
-
-	public TypedRow getEntity() {
-		return entity;
-	}
-
-	public void setEntity(TypedRow entity) {
-		this.entity = entity;
 	}
 
 	public SortableRelation getRelation() {
@@ -54,14 +44,13 @@ public class EntityRelEntity implements Serializable {
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		EntityRelEntity that = (EntityRelEntity) o;
-		return Objects.equal(entity, that.entity)
-			&& Objects.equal(relation, that.relation)
+		RelatedEntityWrapper that = (RelatedEntityWrapper) o;
+		return Objects.equal(relation, that.relation)
 			&& Objects.equal(target, that.target);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(entity, relation, target);
+		return Objects.hashCode(relation, target);
 	}
 }

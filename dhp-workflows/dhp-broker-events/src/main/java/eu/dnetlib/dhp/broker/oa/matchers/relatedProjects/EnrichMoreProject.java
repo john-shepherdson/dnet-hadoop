@@ -24,12 +24,14 @@ public class EnrichMoreProject extends UpdateMatcher<Pair<Result, List<Project>>
 	protected List<UpdateInfo<eu.dnetlib.broker.objects.Project>> findUpdates(final Pair<Result, List<Project>> source,
 		final Pair<Result, List<Project>> target) {
 
-		final Set<String> existingProjects = source.getRight()
+		final Set<String> existingProjects = source
+			.getRight()
 			.stream()
 			.map(Project::getId)
 			.collect(Collectors.toSet());
 
-		return target.getRight()
+		return target
+			.getRight()
 			.stream()
 			.filter(p -> !existingProjects.contains(p.getId()))
 			.map(ConversionUtils::oafProjectToBrokerProject)

@@ -15,7 +15,7 @@ public class BrokerConstants {
 	public static final String OPEN_ACCESS = "OPEN";
 	public static final String IS_MERGED_IN_CLASS = "isMergedIn";
 
-	public static final List<Class<? extends Result>> RESULT_CLASSES =
-		Arrays.asList(Publication.class, Dataset.class, Software.class, OtherResearchProduct.class);
+	public static final List<Class<? extends Result>> RESULT_CLASSES = Arrays
+		.asList(Publication.class, Dataset.class, Software.class, OtherResearchProduct.class);
 
 }
