@@ -83,8 +83,20 @@ public final class UpdateInfo<T> {
 		compileHighlight.accept(hl, getHighlightValue());
 
 		final String provId = getSource().getOriginalId().stream().findFirst().orElse(null);
-		final String provRepo = getSource().getCollectedfrom().stream().map(KeyValue::getValue).findFirst().orElse(null);
-		final String provUrl = getSource().getInstance().stream().map(Instance::getUrl).flatMap(List::stream).findFirst().orElse(null);;
+		final String provRepo = getSource()
+			.getCollectedfrom()
+			.stream()
+			.map(KeyValue::getValue)
+			.findFirst()
+			.orElse(null);
+		final String provUrl = getSource()
+			.getInstance()
+			.stream()
+			.map(Instance::getUrl)
+			.flatMap(List::stream)
+			.findFirst()
+			.orElse(null);
+		;
 
 		final Provenance provenance = new Provenance().setId(provId).setRepositoryName(provRepo).setUrl(provUrl);
 

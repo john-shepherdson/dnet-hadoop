@@ -29,7 +29,8 @@ public class EnrichMissingSoftware
 		if (source.getRight().isEmpty()) {
 			return Arrays.asList();
 		} else {
-			return target.getRight()
+			return target
+				.getRight()
 				.stream()
 				.map(ConversionUtils::oafSoftwareToBrokerSoftware)
 				.map(p -> generateUpdateInfo(p, source, target))

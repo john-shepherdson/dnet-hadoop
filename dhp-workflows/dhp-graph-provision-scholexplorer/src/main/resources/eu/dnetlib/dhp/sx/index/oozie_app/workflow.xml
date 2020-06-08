@@ -16,6 +16,11 @@
             <name>index</name>
             <description>index name</description>
         </property>
+
+        <property>
+            <name>indexHost</name>
+            <description>index host name</description>
+        </property>
     </parameters>
 
     <start to="indexSummary"/>
@@ -37,6 +42,7 @@
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${workingDirPath}/summary</arg>
             <arg>--index</arg><arg>${index}_object</arg>
+            <arg>--esHost</arg><arg>${indexHost}</arg>
             <arg>--idPath</arg><arg>id</arg>
             <arg>--type</arg><arg>summary</arg>
         </spark>
@@ -57,6 +63,7 @@
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${workingDirPath}/scholix_json</arg>
             <arg>--index</arg><arg>${index}_scholix</arg>
+            <arg>--esHost</arg><arg>${indexHost}</arg>
             <arg>--idPath</arg><arg>identifier</arg>
             <arg>--type</arg><arg>scholix</arg>
         </spark>
