@@ -10,8 +10,10 @@ public class Software extends Result implements Serializable {
 
 	private List<Field<String>> documentationUrl;
 
+	// candidate for removal
 	private List<StructuredProperty> license;
 
+	// candidate for removal
 	private Field<String> codeRepositoryUrl;
 
 	private Qualifier programmingLanguage;
