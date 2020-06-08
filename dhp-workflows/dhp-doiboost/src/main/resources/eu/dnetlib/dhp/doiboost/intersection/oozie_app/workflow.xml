@@ -1,0 +1,103 @@
+<workflow-app name="Create DOIBoostActionSet" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>hostedByMapPath</name>
+            <description>the Hosted By Map Path</description>
+        </property>
+        <property>
+            <name>affiliationPath</name>
+            <description>the Affliation Path</description>
+        </property>
+        <property>
+            <name>paperAffiliationPath</name>
+            <description>the paperAffiliation Path</description>
+        </property>
+        <property>
+            <name>workingDirPath</name>
+            <description>the Working Path</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
+    </parameters>
+
+
+
+    <start to="GenerateActionSet"/>
+
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="ResetWorkingPath">
+        <fs>
+            <delete path='${workingDirPath}'/>
+            <mkdir path='${workingDirPath}'/>
+        </fs>
+        <ok to="CreateDOIBoost"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateDOIBoost">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create DOIBoost Infospace</name>
+            <class>eu.dnetlib.doiboost.SparkGenerateDoiBoost</class>
+            <jar>dhp-doiboost-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=3840
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>--hostedByMapPath</arg><arg>${hostedByMapPath}</arg>
+            <arg>--affiliationPath</arg><arg>${affiliationPath}</arg>
+            <arg>--paperAffiliationPath</arg><arg>${paperAffiliationPath}</arg>
+            <arg>--workingDirPath</arg><arg>${workingDirPath}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="GenerateActionSet"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="GenerateActionSet">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Generate DOIBoost ActionSet</name>
+            <class>eu.dnetlib.doiboost.SparkGenerateDOIBoostActionSet</class>
+            <jar>dhp-doiboost-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=3840
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>--dbPublicationPath</arg><arg>${workingDirPath}/doiBoostPublicationFiltered</arg>
+            <arg>--dbDatasetPath</arg><arg>${workingDirPath}/crossrefDataset</arg>
+            <arg>--crossRefRelation</arg><arg>/data/doiboost/input/crossref/relations</arg>
+            <arg>--dbaffiliationRelationPath</arg><arg>${workingDirPath}/doiBoostPublicationAffiliation</arg>
+            <arg>-do</arg><arg>${workingDirPath}/doiBoostOrganization</arg>
+            <arg>--targetPath</arg><arg>${workingDirPath}/actionDataSet</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

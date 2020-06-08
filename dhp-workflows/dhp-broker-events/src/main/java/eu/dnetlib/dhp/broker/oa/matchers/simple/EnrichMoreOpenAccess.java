@@ -34,7 +34,7 @@ public class EnrichMoreOpenAccess extends UpdateMatcher<Result, Instance> {
 			.stream()
 			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
 			.map(ConversionUtils::oafInstanceToBrokerInstances)
-			.flatMap(s -> s)
+			.flatMap(List::stream)
 			.filter(i -> !urls.contains(i.getUrl()))
 			.map(i -> generateUpdateInfo(i, source, target))
 			.collect(Collectors.toList());

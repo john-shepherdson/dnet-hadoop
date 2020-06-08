@@ -43,21 +43,21 @@ import eu.dnetlib.dhp.broker.oa.matchers.relatedPublications.EnrichMissingPublic
 import eu.dnetlib.dhp.broker.oa.matchers.relatedPublications.EnrichMissingPublicationIsSupplementedBy;
 import eu.dnetlib.dhp.broker.oa.matchers.relatedPublications.EnrichMissingPublicationIsSupplementedTo;
 import eu.dnetlib.dhp.broker.oa.matchers.relatedPublications.EnrichMissingPublicationReferences;
+import eu.dnetlib.dhp.broker.oa.matchers.relatedSoftware.EnrichMissingSoftware;
+import eu.dnetlib.dhp.broker.oa.matchers.relatedSoftware.EnrichMoreSoftware;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingAbstract;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingAuthorOrcid;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingOpenAccess;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingPid;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingPublicationDate;
-import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingSoftware;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingSubject;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreOpenAccess;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMorePid;
-import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreSoftware;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreSubject;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -128,10 +128,13 @@ public class GenerateEventsApplication {
 
 			final JavaRDD<Event> eventsRdd = sc.emptyRDD();
 
-			eventsRdd.union(generateSimpleEvents(spark, graphPath, Publication.class));
-			eventsRdd.union(generateSimpleEvents(spark, graphPath, eu.dnetlib.dhp.schema.oaf.Dataset.class));
-			eventsRdd.union(generateSimpleEvents(spark, graphPath, Software.class));
-			eventsRdd.union(generateSimpleEvents(spark, graphPath, OtherResearchProduct.class));
+			for (final Class<? extends Result> r1 : BrokerConstants.RESULT_CLASSES) {
+				eventsRdd.union(generateSimpleEvents(spark, graphPath, r1));
+
+				for (final Class<? extends Result> r2 : BrokerConstants.RESULT_CLASSES) {
+					eventsRdd.union(generateRelationEvents(spark, graphPath, r1, r2));
+				}
+			}
 
 			eventsRdd.saveAsTextFile(eventsPath, GzipCodec.class);
 		});
@@ -185,6 +188,38 @@ public class GenerateEventsApplication {
 		}
 
 		return list.stream().map(EventFactory::newBrokerEvent).collect(Collectors.toList());
+	}
+
+	private static <SRC extends Result, TRG extends OafEntity> JavaRDD<Event> generateRelationEvents(
+		final SparkSession spark,
+		final String graphPath,
+		final Class<SRC> sourceClass,
+		final Class<TRG> targetClass) {
+
+		final Dataset<SRC> sources = readPath(
+			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), sourceClass)
+				.filter(r -> r.getDataInfo().getDeletedbyinference());
+
+		final Dataset<TRG> targets = readPath(
+			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), targetClass);
+
+		final Dataset<Relation> mergedRels = readPath(spark, graphPath + "/relation", Relation.class)
+			.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+
+		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
+			.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+
+		if (targetClass == Project.class) {
+			// TODO join using: generateProjectsEvents
+		} else if (targetClass == Software.class) {
+			// TODO join using: generateSoftwareEvents
+		} else if (targetClass == Publication.class) {
+			// TODO join using: generatePublicationRelatedEvents
+		} else if (targetClass == eu.dnetlib.dhp.schema.oaf.Dataset.class) {
+			// TODO join using: generateDatasetRelatedEvents
+		}
+
+		return null;
 	}
 
 	private List<Event> generateProjectsEvents(final Collection<Pair<Result, List<Project>>> childrenWithProjects) {
