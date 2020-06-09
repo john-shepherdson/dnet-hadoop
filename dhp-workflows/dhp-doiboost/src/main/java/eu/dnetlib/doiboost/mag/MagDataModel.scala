@@ -229,6 +229,8 @@ case object ConversionUtil {
         pub.setPublisher(asField(journal.Publisher.get))
       if (journal.Issn.isDefined)
         j.setIssnPrinted(journal.Issn.get)
+      j.setVol(paper.Volume)
+      j.setIss(paper.Issue)
       pub.setJournal(j)
     }
     pub.setCollectedfrom(List(createMAGCollectedFrom()).asJava)
