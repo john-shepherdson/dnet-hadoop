@@ -12,6 +12,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.pace.config.DedupConfig;
 
 public class EnrichMoreSubject extends UpdateMatcher<Result, Pair<String, String>> {
 
@@ -20,7 +21,7 @@ public class EnrichMoreSubject extends UpdateMatcher<Result, Pair<String, String
 	}
 
 	@Override
-	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target) {
+	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
 		final Set<String> existingSubjects = target
 			.getSubject()
 			.stream()
@@ -32,20 +33,20 @@ public class EnrichMoreSubject extends UpdateMatcher<Result, Pair<String, String
 			.stream()
 			.filter(pid -> !existingSubjects.contains(pid.getQualifier().getClassid() + "::" + pid.getValue()))
 			.map(ConversionUtils::oafSubjectToPair)
-			.map(i -> generateUpdateInfo(i, source, target))
+			.map(i -> generateUpdateInfo(i, source, target, dedupConfig))
 			.collect(Collectors.toList());
 	}
 
-	@Override
 	public UpdateInfo<Pair<String, String>> generateUpdateInfo(final Pair<String, String> highlightValue,
 		final Result source,
-		final Result target) {
+		final Result target,
+		final DedupConfig dedupConfig) {
 
 		return new UpdateInfo<>(
 			Topic.fromPath("ENRICH/MORE/SUBJECT/" + highlightValue.getLeft()),
 			highlightValue, source, target,
 			(p, pair) -> p.getSubjects().add(pair.getRight()),
-			pair -> pair.getLeft() + "::" + pair.getRight());
+			pair -> pair.getLeft() + "::" + pair.getRight(), dedupConfig);
 	}
 
 }

@@ -13,6 +13,7 @@ import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.pace.config.DedupConfig;
 
 public abstract class AbstractEnrichMissingPublication
 	extends UpdateMatcher<Pair<Result, List<Publication>>, eu.dnetlib.broker.objects.Publication> {
@@ -27,7 +28,8 @@ public abstract class AbstractEnrichMissingPublication
 	@Override
 	protected final List<UpdateInfo<eu.dnetlib.broker.objects.Publication>> findUpdates(
 		final Pair<Result, List<Publication>> source,
-		final Pair<Result, List<Publication>> target) {
+		final Pair<Result, List<Publication>> target,
+		final DedupConfig dedupConfig) {
 
 		final Set<String> existingPublications = target
 			.getRight()
@@ -40,21 +42,21 @@ public abstract class AbstractEnrichMissingPublication
 			.stream()
 			.filter(d -> !existingPublications.contains(d.getId()))
 			.map(ConversionUtils::oafResultToBrokerPublication)
-			.map(i -> generateUpdateInfo(i, source, target))
+			.map(i -> generateUpdateInfo(i, source, target, dedupConfig))
 			.collect(Collectors.toList());
 
 	}
 
-	@Override
 	protected final UpdateInfo<eu.dnetlib.broker.objects.Publication> generateUpdateInfo(
 		final eu.dnetlib.broker.objects.Publication highlightValue,
 		final Pair<Result, List<Publication>> source,
-		final Pair<Result, List<Publication>> target) {
+		final Pair<Result, List<Publication>> target,
+		final DedupConfig dedupConfig) {
 		return new UpdateInfo<>(
 			getTopic(),
 			highlightValue, source.getLeft(), target.getLeft(),
 			(p, rel) -> p.getPublications().add(rel),
-			rel -> rel.getInstances().get(0).getUrl());
+			rel -> rel.getInstances().get(0).getUrl(), dedupConfig);
 	}
 
 	public Topic getTopic() {
