@@ -24,7 +24,6 @@ public class Result extends OafEntity implements Serializable {
 
 	private String subtitle;
 
-
 	private List<String> description;
 
 	private String publicationdata; // dateofacceptance;
@@ -49,21 +48,32 @@ public class Result extends OafEntity implements Serializable {
 
 	private List<Instance> instance;
 
+	private Container container;//Journal
+
 	public List<Author> getAuthor() {
 		return author;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Container getContainer() {
+		return container;
+	}
+
+	public void setContainer(Container container) {
+		this.container = container;
 	}
 
 	public void setAuthor(List<Author> author) {
 		this.author = author;
 	}
 
-	public String getResulttype() {
-		return type;
-	}
-
-	public void setResulttype(String resulttype) {
-		this.type = resulttype;
-	}
 
 	public Qualifier getLanguage() {
 		return language;
@@ -200,4 +210,6 @@ public class Result extends OafEntity implements Serializable {
 	public void setInstance(List<Instance> instance) {
 		this.instance = instance;
 	}
+
+
 }

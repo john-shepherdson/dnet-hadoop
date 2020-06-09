@@ -16,7 +16,7 @@ public class OtherResearchProduct extends Result implements Serializable {
 	private List<String> tool;
 
 	public OtherResearchProduct() {
-		setResulttype(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
+		setType(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
 	}
 
 	public List<String> getContactperson() {

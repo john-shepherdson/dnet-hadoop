@@ -1,5 +1,7 @@
 package eu.dnetlib.dhp.schema.dump.oaf;
 
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+
 import java.io.Serializable;
 
 public class ControlledField implements Serializable {
@@ -20,5 +22,14 @@ public class ControlledField implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public static ControlledField newInstance(StructuredProperty pid){
+            ControlledField cf = new ControlledField();
+
+        cf.scheme = pid.getQualifier().getClassid();
+        cf.value = pid.getValue();
+
+        return cf;
     }
 }

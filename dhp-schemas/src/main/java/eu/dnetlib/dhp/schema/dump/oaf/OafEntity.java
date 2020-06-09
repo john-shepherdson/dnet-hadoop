@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 
+
 public abstract class OafEntity extends Oaf implements Serializable {
 
 	private String id;
@@ -16,9 +17,7 @@ public abstract class OafEntity extends Oaf implements Serializable {
 
 	private String dateofcollection;
 
-
-	private List<ExternalReference> externalReferences; //extraInfo
-
+	private List<Projects> projects;
 
 	public String getId() {
 		return id;
@@ -52,11 +51,13 @@ public abstract class OafEntity extends Oaf implements Serializable {
 		this.dateofcollection = dateofcollection;
 	}
 
-	public List<ExternalReference> getExternalReferences() {
-		return externalReferences;
+	public List<Projects> getProjects() {
+		return projects;
 	}
 
-	public void setExternalReferences(List<ExternalReference> externalReferences) {
-		this.externalReferences = externalReferences;
+	public void setProjects(List<Projects> projects) {
+		this.projects = projects;
 	}
+
+
 }

@@ -16,7 +16,7 @@ public class Software extends Result implements Serializable {
 	private String programmingLanguage;
 
 	public Software() {
-		setResulttype(ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE.getClassname());
+		setType(ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE.getClassname());
 	}
 
 	public List<String> getDocumentationUrl() {
@@ -42,4 +42,6 @@ public class Software extends Result implements Serializable {
 	public void setProgrammingLanguage(String programmingLanguage) {
 		this.programmingLanguage = programmingLanguage;
 	}
+
+
 }

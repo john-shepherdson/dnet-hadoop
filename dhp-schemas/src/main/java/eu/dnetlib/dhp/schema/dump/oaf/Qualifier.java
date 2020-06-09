@@ -27,40 +27,10 @@ public class Qualifier implements Serializable {
 		this.label = label;
 	}
 
-	public String toComparableString() {
-		return isBlank()
-			? ""
-			: String
-				.format(
-					"%s::%s::%s::%s",
-					code != null ? code : "",
-					label != null ? label : "");
-
-	}
-
-	@JsonIgnore
-	public boolean isBlank() {
-		return StringUtils.isBlank(code)
-			&& StringUtils.isBlank(label);
-
-	}
-
-	@Override
-	public int hashCode() {
-		return toComparableString().hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-
-		Qualifier other = (Qualifier) obj;
-
-		return toComparableString().equals(other.toComparableString());
+	public static Qualifier newInstance(String code, String value){
+		Qualifier qualifier = new Qualifier();
+		qualifier.setCode(code);
+		qualifier.setLabel(value);
+		return qualifier;
 	}
 }

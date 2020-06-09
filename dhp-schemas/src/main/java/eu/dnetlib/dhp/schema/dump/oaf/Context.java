@@ -2,14 +2,16 @@
 package eu.dnetlib.dhp.schema.dump.oaf;
 
 
-public class Context extends Qualifier {
-	private String provenance;
+import java.util.List;
 
-	public String getProvenance() {
+public class Context extends Qualifier {
+	private List<String> provenance;
+
+	public List<String> getProvenance() {
 		return provenance;
 	}
 
-	public void setProvenance(String provenance) {
+	public void setProvenance(List<String> provenance) {
 		this.provenance = provenance;
 	}
 }

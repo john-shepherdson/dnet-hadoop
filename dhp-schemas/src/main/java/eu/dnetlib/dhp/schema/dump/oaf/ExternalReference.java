@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
+import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
+
 import java.io.Serializable;
 import java.util.Objects;
 //ExtraInfo
@@ -56,22 +58,14 @@ public class ExternalReference implements Serializable {
 		this.value = value;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		ExternalReference extraInfo = (ExternalReference) o;
-		return Objects.equals(name, extraInfo.name)
-			&& Objects.equals(typology, extraInfo.typology)
-			&& Objects.equals(provenance, extraInfo.provenance)
-			&& Objects.equals(trust, extraInfo.trust)
-			&& Objects.equals(value, extraInfo.value);
-	}
+	public static ExternalReference newInstance(ExtraInfo ei){
+		ExternalReference er = new ExternalReference();
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(name, typology, provenance, trust, value);
+		er.name = ei.getName();
+		er.typology = ei.getTypology();
+		er.provenance = ei.getProvenance();
+		er.trust = ei.getTrust();
+		er.value = ei.getValue();
+		return er;
 	}
 }

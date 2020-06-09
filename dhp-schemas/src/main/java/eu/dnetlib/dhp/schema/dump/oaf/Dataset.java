@@ -17,7 +17,7 @@ public class Dataset extends Result implements Serializable {
 	private List<GeoLocation> geolocation;
 
 	public Dataset() {
-		setResulttype(ModelConstants.DATASET_DEFAULT_RESULTTYPE.getClassname());
+		setType(ModelConstants.DATASET_DEFAULT_RESULTTYPE.getClassname());
 	}
 
 

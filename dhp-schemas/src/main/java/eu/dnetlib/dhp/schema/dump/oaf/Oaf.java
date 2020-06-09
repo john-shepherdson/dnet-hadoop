@@ -5,6 +5,7 @@ package eu.dnetlib.dhp.schema.dump.oaf;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class Oaf implements Serializable {
 
@@ -31,5 +32,12 @@ public abstract class Oaf implements Serializable {
 	public void setLastupdatetimestamp(Long lastupdatetimestamp) {
 		this.lastupdatetimestamp = lastupdatetimestamp;
 	}
+
+//	public void setAllowedValues(eu.dnetlib.dhp.schema.oaf.Oaf o){
+//		collectedfrom = o.getCollectedfrom().stream().map(cf -> KeyValue.newInstance(cf)).collect(Collectors.toList());
+//
+//		lastupdatetimestamp = o.getLastupdatetimestamp();
+//
+//	}
 
 }

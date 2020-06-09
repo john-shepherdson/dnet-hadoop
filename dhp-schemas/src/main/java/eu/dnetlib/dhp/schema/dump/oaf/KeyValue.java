@@ -31,6 +31,12 @@ public class KeyValue implements Serializable {
 	}
 
 
+	public static KeyValue newInstance(String key, String value){
+		KeyValue inst = new KeyValue();
+		inst.key = key;
+		inst.value = value;
+		return inst;
+	}
 
 	@JsonIgnore
 	public boolean isBlank() {
