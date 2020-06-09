@@ -6,11 +6,9 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -18,22 +16,20 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 
 
-public class DumpCommunityProducts implements Serializable {
+public class SparkDumpCommunityProducts implements Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(DumpCommunityProducts.class);
+    private static final Logger log = LoggerFactory.getLogger(SparkDumpCommunityProducts.class);
 
 
     public static void main(String[] args) throws Exception {
         String jsonConfiguration = IOUtils
                 .toString(
-                        DumpCommunityProducts.class
+                        SparkDumpCommunityProducts.class
                                 .getResourceAsStream(
                                         "/eu/dnetlib/dhp/oa/graph/dump/input_parameters.json"));
 

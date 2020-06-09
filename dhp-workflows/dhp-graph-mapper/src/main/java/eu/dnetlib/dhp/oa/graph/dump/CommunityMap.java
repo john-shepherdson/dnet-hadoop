@@ -1,4 +1,7 @@
 package eu.dnetlib.dhp.oa.graph.dump;
 
-public class CommunityMap {
+
+import java.util.HashMap;
+
+public class CommunityMap extends HashMap<String, String> {
 }
