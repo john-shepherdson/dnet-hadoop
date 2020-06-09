@@ -3,9 +3,8 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -20,6 +19,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.clearspring.analytics.util.Lists;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -27,9 +27,11 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
 import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
+import scala.Function1;
 import scala.Tuple2;
 
 /**
@@ -111,35 +113,8 @@ public class PrepareRelationsJob {
 			spark -> {
 				removeOutputDir(spark, outputPath);
 				prepareRelationsRDD(
-					spark, inputRelationsPath, outputPath, relationFilter, relPartitions, maxRelations);
+					spark, inputRelationsPath, outputPath, relationFilter, maxRelations, relPartitions);
 			});
-	}
-
-	/**
-	 * Dataset based implementation that prepares the graph relations by limiting the number of outgoing links and
-	 * filtering the relation types according to the given criteria.
-	 *
-	 * @param spark the spark session
-	 * @param inputRelationsPath source path for the graph relations
-	 * @param outputPath output path for the processed relations
-	 * @param relationFilter set of relation filters applied to the `relClass` field
-	 * @param maxRelations maximum number of allowed outgoing edges
-	 */
-	private static void prepareRelations(
-		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter,
-		int maxRelations) {
-		readPathRelation(spark, inputRelationsPath)
-			.filter("dataInfo.deletedbyinference == false")
-			.filter((FilterFunction<SortableRelation>) rel -> !relationFilter.contains(rel.getRelClass()))
-			.groupByKey(
-				(MapFunction<SortableRelation, String>) value -> value.getSource(), Encoders.STRING())
-			.flatMapGroups(
-				(FlatMapGroupsFunction<String, SortableRelation, SortableRelation>) (key, values) -> Iterators
-					.limit(values, maxRelations),
-				Encoders.bean(SortableRelation.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
 	}
 
 	/**
@@ -152,50 +127,41 @@ public class PrepareRelationsJob {
 	 * @param outputPath output path for the processed relations
 	 * @param relationFilter set of relation filters applied to the `relClass` field
 	 * @param maxRelations maximum number of allowed outgoing edges
+	 * @param relPartitions number of partitions for the output RDD
 	 */
-	// TODO work in progress
 	private static void prepareRelationsRDD(
-		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter, int relPartitions,
-		int maxRelations) {
-		JavaRDD<SortableRelation> rels = readPathRelationRDD(spark, inputRelationsPath).repartition(relPartitions);
-		RelationPartitioner partitioner = new RelationPartitioner(rels.getNumPartitions());
+		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter, int maxRelations,
+		int relPartitions) {
 
-		// only consider those that are not virtually deleted
-		RDD<SortableRelation> d = rels
+		RDD<SortableRelation> cappedRels = readPathRelationRDD(spark, inputRelationsPath)
+			.repartition(relPartitions)
 			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
 			.filter(rel -> !relationFilter.contains(rel.getRelClass()))
-			.mapToPair(
-				(PairFunction<SortableRelation, SortableRelation, SortableRelation>) rel -> new Tuple2<>(rel, rel))
-			.groupByKey(partitioner)
-			.map(group -> Iterables.limit(group._2(), maxRelations))
-			.flatMap(group -> group.iterator())
+			// group by SOURCE and apply limit
+			.mapToPair(rel -> new Tuple2<>(rel.getSource(), rel))
+			.groupByKey(new RelationPartitioner(relPartitions))
+			.flatMap(group -> Iterables.limit(group._2(), maxRelations).iterator())
+			// group by TARGET and apply limit
+			.mapToPair(rel -> new Tuple2<>(rel.getTarget(), rel))
+			.groupByKey(new RelationPartitioner(relPartitions))
+			.flatMap(group -> Iterables.limit(group._2(), maxRelations).iterator())
 			.rdd();
 
 		spark
-			.createDataset(d, Encoders.bean(SortableRelation.class))
+			.createDataset(cappedRels, Encoders.bean(SortableRelation.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
 	}
 
 	/**
-	 * Reads a Dataset of eu.dnetlib.dhp.oa.provision.model.SortableRelation objects from a newline delimited json text
+	 * Reads a JavaRDD of eu.dnetlib.dhp.oa.provision.model.SortableRelation objects from a newline delimited json text
 	 * file,
 	 *
 	 * @param spark
 	 * @param inputPath
-	 * @return the Dataset<SortableRelation> containing all the relationships
+	 * @return the JavaRDD<SortableRelation> containing all the relationships
 	 */
-	private static Dataset<SortableRelation> readPathRelation(
-		SparkSession spark, final String inputPath) {
-		return spark
-			.read()
-			.textFile(inputPath)
-			.map(
-				(MapFunction<String, SortableRelation>) value -> OBJECT_MAPPER.readValue(value, SortableRelation.class),
-				Encoders.bean(SortableRelation.class));
-	}
-
 	private static JavaRDD<SortableRelation> readPathRelationRDD(
 		SparkSession spark, final String inputPath) {
 		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());

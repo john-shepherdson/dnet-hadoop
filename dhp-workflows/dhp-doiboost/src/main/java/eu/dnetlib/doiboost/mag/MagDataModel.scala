@@ -129,16 +129,16 @@ case object ConversionUtil {
     val fieldOfStudy = item._2
     if (fieldOfStudy != null && fieldOfStudy.subjects != null && fieldOfStudy.subjects.nonEmpty) {
       val p: List[StructuredProperty] = fieldOfStudy.subjects.flatMap(s => {
-        val s1 = createSP(s.DisplayName, "keywords", "dnet:subject_classification_typologies")
+        val s1 = createSP(s.DisplayName, "keyword", "dnet:subject_classification_typologies")
         val di = DoiBoostMappingUtil.generateDataInfo(s.Score.toString)
         var resList: List[StructuredProperty] = List(s1)
         if (s.MainType.isDefined) {
           val maintp = s.MainType.get
-          val s2 = createSP(s.MainType.get, "keywords", "dnet:subject_classification_typologies")
+          val s2 = createSP(s.MainType.get, "keyword", "dnet:subject_classification_typologies")
           s2.setDataInfo(di)
           resList = resList ::: List(s2)
           if (maintp.contains(".")) {
-            val s3 = createSP(maintp.split("\\.").head, "keywords", "dnet:subject_classification_typologies")
+            val s3 = createSP(maintp.split("\\.").head, "keyword", "dnet:subject_classification_typologies")
             s3.setDataInfo(di)
             resList = resList ::: List(s3)
           }
@@ -190,7 +190,7 @@ case object ConversionUtil {
     pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
-    //Set identifier as {50|60} | doiboost____::md5(DOI)
+    //Set identifier as 50|doiboost____::md5(DOI)
     pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
@@ -229,6 +229,8 @@ case object ConversionUtil {
         pub.setPublisher(asField(journal.Publisher.get))
       if (journal.Issn.isDefined)
         j.setIssnPrinted(journal.Issn.get)
+      j.setVol(paper.Volume)
+      j.setIss(paper.Issue)
       pub.setJournal(j)
     }
     pub.setCollectedfrom(List(createMAGCollectedFrom()).asJava)
@@ -247,7 +249,7 @@ case object ConversionUtil {
     pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
-    //Set identifier as {50|60} | doiboost____::md5(DOI)
+    //Set identifier as 50 | doiboost____::md5(DOI)
     pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
