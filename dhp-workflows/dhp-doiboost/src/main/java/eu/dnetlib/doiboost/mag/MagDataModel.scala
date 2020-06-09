@@ -190,7 +190,7 @@ case object ConversionUtil {
     pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
-    //Set identifier as {50|60} | doiboost____::md5(DOI)
+    //Set identifier as 50|doiboost____::md5(DOI)
     pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
@@ -247,7 +247,7 @@ case object ConversionUtil {
     pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
-    //Set identifier as {50|60} | doiboost____::md5(DOI)
+    //Set identifier as 50 | doiboost____::md5(DOI)
     pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
