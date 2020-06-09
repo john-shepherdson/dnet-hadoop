@@ -39,6 +39,8 @@ import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
 public class GenerateEntitiesApplication {
@@ -71,7 +73,8 @@ public class GenerateEntitiesApplication {
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
-		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupUrl);
+		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {

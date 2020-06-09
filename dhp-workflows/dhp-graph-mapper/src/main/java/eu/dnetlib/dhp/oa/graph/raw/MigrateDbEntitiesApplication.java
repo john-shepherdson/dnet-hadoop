@@ -71,6 +71,7 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
@@ -151,7 +152,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		super(hdfsPath);
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.lastUpdateTimestamp = new Date().getTime();
-		this.vocs = VocabularyGroup.loadVocsFromIS(isLookupUrl);
+		this.vocs = VocabularyGroup.loadVocsFromIS(ISLookupClientFactory.getLookUpService(isLookupUrl));
 	}
 
 	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer)

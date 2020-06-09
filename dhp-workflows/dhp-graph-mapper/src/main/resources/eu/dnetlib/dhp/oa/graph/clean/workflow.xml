@@ -1,4 +1,4 @@
-<workflow-app name="fix Graph" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="clean graph" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
         <property>
@@ -7,7 +7,7 @@
         </property>
         <property>
             <name>graphOutputPath</name>
-            <description>the target path to store fixed graph</description>
+            <description>the target path to store cleaned graph</description>
         </property>
         <property>
             <name>isLookupUrl</name>
@@ -50,29 +50,29 @@
         </property>
     </parameters>
 
-	<start to="fork_fix_graph"/>
+	<start to="fork_clean_graph"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <fork name="fork_fix_graph">
-        <path start="fix_publication"/>
-        <path start="fix_dataset"/>
-        <path start="fix_otherresearchproduct"/>
-        <path start="fix_software"/>
-        <path start="fix_datasource"/>
-        <path start="fix_organization"/>
-        <path start="fix_project"/>
-        <path start="fix_relation"/>
+    <fork name="fork_clean_graph">
+        <path start="clean_publication"/>
+        <path start="clean_dataset"/>
+        <path start="clean_otherresearchproduct"/>
+        <path start="clean_software"/>
+        <path start="clean_datasource"/>
+        <path start="clean_organization"/>
+        <path start="clean_project"/>
+        <path start="clean_relation"/>
     </fork>
 
-    <action name="fix_publication">
+    <action name="clean_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fix publications</name>
-            <class>eu.dnetlib.dhp.oa.graph.fix.FixGraphProperties</class>
+            <name>Clean publications</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -90,16 +90,16 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="wait_fix"/>
+        <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <action name="fix_dataset">
+    <action name="clean_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fix datasets</name>
-            <class>eu.dnetlib.dhp.oa.graph.fix.FixGraphProperties</class>
+            <name>Clean datasets</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -117,16 +117,16 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="wait_fix"/>
+        <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <action name="fix_otherresearchproduct">
+    <action name="clean_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fix otherresearchproducts</name>
-            <class>eu.dnetlib.dhp.oa.graph.fix.FixGraphProperties</class>
+            <name>Clean otherresearchproducts</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -144,16 +144,16 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="wait_fix"/>
+        <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <action name="fix_software">
+    <action name="clean_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fix softwares</name>
-            <class>eu.dnetlib.dhp.oa.graph.fix.FixGraphProperties</class>
+            <name>Clean softwares</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -171,16 +171,16 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="wait_fix"/>
+        <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <action name="fix_datasource">
+    <action name="clean_datasource">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fix datasources</name>
-            <class>eu.dnetlib.dhp.oa.graph.fix.FixGraphProperties</class>
+            <name>Clean datasources</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -198,16 +198,16 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="wait_fix"/>
+        <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <action name="fix_organization">
+    <action name="clean_organization">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fix organizations</name>
-            <class>eu.dnetlib.dhp.oa.graph.fix.FixGraphProperties</class>
+            <name>Clean organizations</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -225,16 +225,16 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="wait_fix"/>
+        <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <action name="fix_project">
+    <action name="clean_project">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fix projects</name>
-            <class>eu.dnetlib.dhp.oa.graph.fix.FixGraphProperties</class>
+            <name>Clean projects</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -252,16 +252,16 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="wait_fix"/>
+        <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <action name="fix_relation">
+    <action name="clean_relation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fix relations</name>
-            <class>eu.dnetlib.dhp.oa.graph.fix.FixGraphProperties</class>
+            <name>Clean relations</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCoresForJoining}
@@ -279,11 +279,11 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="wait_fix"/>
+        <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait_fix" to="End"/>
+    <join name="wait_clean" to="End"/>
 
     <end name="End"/>
 </workflow-app>
