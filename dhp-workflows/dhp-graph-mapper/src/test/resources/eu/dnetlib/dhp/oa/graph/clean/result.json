@@ -6,6 +6,28 @@
       "fullname": "Brien, Tom",
       "name": "Tom",
       "pid": [
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:datasetarchive",
+              "classname": "sysimport:crosswalk:datasetarchive",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "ORCID12",
+            "classname": "ORCID12",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-6639"
+        }
       ],
       "rank": 1,
       "surname": "Brien"
@@ -16,6 +38,28 @@
       "fullname": "Ade, Peter",
       "name": "Peter",
       "pid": [
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:datasetarchive",
+              "classname": "sysimport:crosswalk:datasetarchive",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "xyz",
+            "classname": "XYZ",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "qwerty"
+        }
       ],
       "rank": 2,
       "surname": "Ade"
@@ -207,7 +251,7 @@
     {
       "accessright": {
         "classid": "CLOSED",
-        "classname": "Closed Access",
+        "classname": "CLOSED",
         "schemeid": "dnet:access_modes",
         "schemename": "dnet:access_modes"
       },

@@ -166,8 +166,10 @@ case object Crossref2Oaf {
 
     val has_review = (json \ "relation" \"has-review" \ "id")
 
-    if(has_review != JNothing)
-      instance.setRefereed(asField("peerReviewed"))
+    if(has_review != JNothing) {
+      instance.setRefereed(
+        createQualifier("0001", "peerReviewed", "dnet:review_levels", "dnet:review_levels"))
+    }
 
 
     instance.setAccessright(getRestrictedQualifier())

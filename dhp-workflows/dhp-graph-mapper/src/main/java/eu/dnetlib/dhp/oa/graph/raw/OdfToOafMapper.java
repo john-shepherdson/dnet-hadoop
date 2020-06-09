@@ -4,19 +4,7 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_DATE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_RESOURCE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_LANGUAGES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PUBLICATION_RESOURCE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PART_OF;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_SUPPLEMENTED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_SUPPLEMENT_TO;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PART;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.SUPPLEMENT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -129,7 +117,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		instance
 			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
-		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
+		instance.setRefereed(prepareQualifier(doc, "//oaf:refereed", DNET_REVIEW_LEVELS));
 		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));

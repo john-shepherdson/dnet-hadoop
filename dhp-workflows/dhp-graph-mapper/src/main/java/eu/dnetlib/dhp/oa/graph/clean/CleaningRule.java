@@ -1,19 +1,16 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 import org.apache.spark.api.java.function.MapFunction;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class CleaningRule<T extends Oaf> implements MapFunction<T, T> {
@@ -61,7 +58,6 @@ public class CleaningRule<T extends Oaf> implements MapFunction<T, T> {
 						if (value instanceof Qualifier) {
 							Qualifier q = (Qualifier) value;
 							if (vocabularies.vocabularyExists(q.getSchemeid())) {
-
 								field.set(o, vocabularies.lookup(q.getSchemeid(), q.getClassid()));
 							}
 
@@ -85,5 +81,9 @@ public class CleaningRule<T extends Oaf> implements MapFunction<T, T> {
 		}
 
 		return fields;
+	}
+
+	public VocabularyGroup getVocabularies() {
+		return vocabularies;
 	}
 }

@@ -1165,10 +1165,10 @@ public class XmlRecordFactory implements Serializable {
 									.asXmlElement(
 										"distributionlocation", instance.getDistributionlocation()));
 					}
-					if (instance.getRefereed() != null && isNotBlank(instance.getRefereed().getValue())) {
+					if (instance.getRefereed() != null && !instance.getRefereed().isBlank()) {
 						fields
 							.add(
-								XmlSerializationUtils.asXmlElement("refereed", instance.getRefereed().getValue()));
+								XmlSerializationUtils.mapQualifier("refereed", instance.getRefereed()));
 					}
 					if (instance.getProcessingchargeamount() != null
 						&& isNotBlank(instance.getProcessingchargeamount().getValue())) {

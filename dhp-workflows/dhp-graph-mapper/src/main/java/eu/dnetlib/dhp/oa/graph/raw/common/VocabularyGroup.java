@@ -2,10 +2,9 @@
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -84,6 +83,19 @@ public class VocabularyGroup implements Serializable {
 		} else {
 			return new VocabularyTerm(id, id);
 		}
+	}
+
+	public Set<String> getTerms(String vocId) {
+		if (!vocabularyExists(vocId)) {
+			return new HashSet<>();
+		}
+		return vocs
+			.get(vocId.toLowerCase())
+			.getTerms()
+			.values()
+			.stream()
+			.map(t -> t.getId())
+			.collect(Collectors.toCollection(HashSet::new));
 	}
 
 	public Qualifier lookup(String vocId, String id) {
