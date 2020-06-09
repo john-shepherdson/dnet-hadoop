@@ -1,4 +1,11 @@
+
 [
+	{
+		"paramName":"is",
+		"paramLongName":"isLookUpUrl",
+		"paramDescription": "URL of the isLookUp Service",
+		"paramRequired": true
+	},
 	{
 		"paramName":"s",
 		"paramLongName":"sourcePath",
@@ -16,5 +23,26 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
+	},
+	{
+		"paramName":"tn",
+		"paramLongName":"resultTableName",
+		"paramDescription": "the name of the result table we are currently working on",
+		"paramRequired": true
+	},
+	{
+		"paramName":"dn",
+		"paramLongName":"dumpTableName",
+		"paramDescription": "the name of the corresondent dump element ",
+		"paramRequired": true
+	},
+	{
+		"paramName":"rt",
+		"paramLongName":"resultType",
+		"paramDescription": "the name of the corresondent dump element ",
+		"paramRequired": true
 	}
 ]
+
+
+

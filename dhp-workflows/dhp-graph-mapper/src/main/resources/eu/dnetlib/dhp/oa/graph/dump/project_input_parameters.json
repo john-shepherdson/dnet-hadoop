@@ -1,11 +1,6 @@
 
 [
-	{
-		"paramName":"is",
-		"paramLongName":"isLookUpUrl",
-		"paramDescription": "URL of the isLookUp Service",
-		"paramRequired": true
-	},
+
 	{
 		"paramName":"s",
 		"paramLongName":"sourcePath",
@@ -31,18 +26,11 @@
 		"paramRequired": true
 	},
 	{
-		"paramName":"dn",
-		"paramLongName":"dumpTableName",
-		"paramDescription": "the name of the corresondent dump element ",
-		"paramRequired": true
-	},
-	{
-		"paramName":"rt",
-		"paramLongName":"resultType",
-		"paramDescription": "the name of the corresondent dump element ",
+		"paramName": "pip",
+		"paramLongName": "preparedInfoPath",
+		"paramDescription": "the path of the association result projectlist",
 		"paramRequired": true
 	}
 ]
-
 
 
