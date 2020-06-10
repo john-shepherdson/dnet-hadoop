@@ -31,8 +31,8 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
-	public OafToOafMapper(final VocabularyGroup vocs) {
-		super(vocs);
+	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
+		super(vocs, invisible);
 	}
 
 	@Override
