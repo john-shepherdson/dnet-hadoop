@@ -12,6 +12,7 @@ import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.pace.config.DedupConfig;
 
 public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
 
@@ -20,7 +21,8 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
 	}
 
 	@Override
-	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target) {
+	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		final long count = target
 			.getInstance()
 			.stream()
@@ -38,19 +40,19 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
 			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
 			.map(ConversionUtils::oafInstanceToBrokerInstances)
 			.flatMap(List::stream)
-			.map(i -> generateUpdateInfo(i, source, target))
+			.map(i -> generateUpdateInfo(i, source, target, dedupConfig))
 			.collect(Collectors.toList());
 	}
 
-	@Override
 	public UpdateInfo<Instance> generateUpdateInfo(final Instance highlightValue,
 		final Result source,
-		final Result target) {
+		final Result target,
+		final DedupConfig dedupConfig) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MISSING_OA_VERSION,
 			highlightValue, source, target,
 			(p, i) -> p.getInstances().add(i),
-			Instance::getUrl);
+			Instance::getUrl, dedupConfig);
 	}
 
 }

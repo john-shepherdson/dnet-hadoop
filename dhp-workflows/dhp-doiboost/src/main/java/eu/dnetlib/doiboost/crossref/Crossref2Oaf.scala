@@ -181,6 +181,9 @@ case object Crossref2Oaf {
     if (StringUtils.isNotBlank(issuedDate)) {
       instance.setDateofacceptance(asField(issuedDate))
     }
+    else {
+      instance.setDateofacceptance(asField(createdDate.getValue))
+    }
     val s: String = (json \ "URL").extract[String]
     val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
     if (links.nonEmpty)
@@ -242,7 +245,7 @@ case object Crossref2Oaf {
     val queue = new mutable.Queue[Relation]
 
 
-    def snfRule(award:String): String = {
+    def snsfRule(award:String): String = {
       var tmp1 = StringUtils.substringAfter(award,"_")
       val tmp2 = StringUtils.substringBefore(tmp1,"/")
       logger.debug(s"From $award to $tmp2")
@@ -317,7 +320,7 @@ case object Crossref2Oaf {
           case "10.13039/501100006588" |
                 "10.13039/501100004488" =>  generateSimpleRelationFromAward(funder, "irb_hr______", a=>a.replaceAll("Project No.", "").replaceAll("HRZZ-","") )
           case "10.13039/501100006769"=>    generateSimpleRelationFromAward(funder, "rsf_________", a=>a)
-          case "10.13039/501100001711"=>    generateSimpleRelationFromAward(funder, "snsf________", snfRule)
+          case "10.13039/501100001711"=>    generateSimpleRelationFromAward(funder, "snsf________", snsfRule)
           case "10.13039/501100004410"=>    generateSimpleRelationFromAward(funder, "tubitakf____", a =>a)
           case "10.10.13039/100004440"=>    generateSimpleRelationFromAward(funder, "wt__________", a =>a)
           case "10.13039/100004440"=>       queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "wt__________" )

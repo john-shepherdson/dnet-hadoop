@@ -12,16 +12,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.TypedColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +52,9 @@ import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreOpenAccess;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMorePid;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreSubject;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
+import eu.dnetlib.dhp.broker.oa.util.EventGroup;
+import eu.dnetlib.dhp.broker.oa.util.ResultAggregator;
+import eu.dnetlib.dhp.broker.oa.util.ResultGroup;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
@@ -63,6 +63,10 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.config.DedupConfig;
+import scala.Tuple2;
 
 public class GenerateEventsApplication {
 
@@ -98,7 +102,11 @@ public class GenerateEventsApplication {
 	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetIsSupplementedTo = new EnrichMissingDatasetIsSupplementedTo();
 	private static final UpdateMatcher<Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>>, ?> enrichMissingDatasetIsSupplementedBy = new EnrichMissingDatasetIsSupplementedBy();
 
-	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	// Aggregators
+	private static final TypedColumn<Tuple2<Result, Relation>, ResultGroup> resultAggrTypedColumn = new ResultAggregator()
+		.toColumn();
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -120,23 +128,31 @@ public class GenerateEventsApplication {
 		final String eventsPath = parser.get("eventsPath");
 		log.info("eventsPath: {}", eventsPath);
 
+		final String isLookupUrl = parser.get("isLookupUrl");
+		log.info("isLookupUrl: {}", isLookupUrl);
+
+		final String dedupConfigProfileId = parser.get("dedupConfProfile");
+		log.info("dedupConfigProfileId: {}", dedupConfigProfileId);
+
 		final SparkConf conf = new SparkConf();
 
+		final DedupConfig dedupConfig = loadDedupConfig(isLookupUrl, dedupConfigProfileId);
+
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
-			final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
 			removeOutputDir(spark, eventsPath);
 
-			final JavaRDD<Event> eventsRdd = sc.emptyRDD();
+			final Dataset<Event> all = spark.emptyDataset(Encoders.kryo(Event.class));
 
 			for (final Class<? extends Result> r1 : BrokerConstants.RESULT_CLASSES) {
-				eventsRdd.union(generateSimpleEvents(spark, graphPath, r1));
+				all.union(generateSimpleEvents(spark, graphPath, r1, dedupConfig));
 
 				for (final Class<? extends Result> r2 : BrokerConstants.RESULT_CLASSES) {
-					eventsRdd.union(generateRelationEvents(spark, graphPath, r1, r2));
+					all.union(generateRelationEvents(spark, graphPath, r1, r2, dedupConfig));
 				}
 			}
 
-			eventsRdd.saveAsTextFile(eventsPath, GzipCodec.class);
+			all.write().mode(SaveMode.Overwrite).json(eventsPath);
 		});
 
 	}
@@ -145,59 +161,60 @@ public class GenerateEventsApplication {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 
-	private static <R extends Result> JavaRDD<Event> generateSimpleEvents(final SparkSession spark,
+	private static <R extends Result> Dataset<Event> generateSimpleEvents(final SparkSession spark,
 		final String graphPath,
-		final Class<R> resultClazz) {
+		final Class<R> resultClazz,
+		final DedupConfig dedupConfig) {
 
-		final Dataset<R> results = readPath(
-			spark, graphPath + "/" + resultClazz.getSimpleName().toLowerCase(), resultClazz)
+		final Dataset<Result> results = readPath(
+			spark, graphPath + "/" + resultClazz.getSimpleName().toLowerCase(), Result.class)
 				.filter(r -> r.getDataInfo().getDeletedbyinference());
 
-		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
+		final Dataset<Relation> mergedRels = readPath(spark, graphPath + "/relation", Relation.class)
 			.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
 
-		final Column c = null; // TODO
-
-		final Dataset<Row> aa = results
-			.joinWith(rels, results.col("id").equalTo(rels.col("source")), "inner")
-			.groupBy(rels.col("target"))
-			.agg(c)
-			.filter(x -> x.size() > 1)
-		// generateSimpleEvents(...)
-		// flatMap()
-		// toRdd()
-		;
-
-		return null;
-
+		return results
+			.joinWith(mergedRels, results.col("id").equalTo(mergedRels.col("source")), "inner")
+			.groupByKey((MapFunction<Tuple2<Result, Relation>, String>) t -> t._2.getTarget(), Encoders.STRING())
+			.agg(resultAggrTypedColumn)
+			.map((MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.kryo(ResultGroup.class))
+			.filter(ResultGroup::isValid)
+			.map(
+				(MapFunction<ResultGroup, EventGroup>) g -> GenerateEventsApplication
+					.generateSimpleEvents(g, dedupConfig),
+				Encoders.kryo(EventGroup.class))
+			.flatMap(group -> group.getData().iterator(), Encoders.kryo(Event.class));
 	}
 
-	private List<Event> generateSimpleEvents(final Collection<Result> children) {
+	private static EventGroup generateSimpleEvents(final ResultGroup results, final DedupConfig dedupConfig) {
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
-		for (final Result target : children) {
-			list.addAll(enrichMissingAbstract.searchUpdatesForRecord(target, children));
-			list.addAll(enrichMissingAuthorOrcid.searchUpdatesForRecord(target, children));
-			list.addAll(enrichMissingOpenAccess.searchUpdatesForRecord(target, children));
-			list.addAll(enrichMissingPid.searchUpdatesForRecord(target, children));
-			list.addAll(enrichMissingPublicationDate.searchUpdatesForRecord(target, children));
-			list.addAll(enrichMissingSubject.searchUpdatesForRecord(target, children));
-			list.addAll(enrichMoreOpenAccess.searchUpdatesForRecord(target, children));
-			list.addAll(enrichMorePid.searchUpdatesForRecord(target, children));
-			list.addAll(enrichMoreSubject.searchUpdatesForRecord(target, children));
+		for (final Result target : results.getData()) {
+			list.addAll(enrichMissingAbstract.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			list.addAll(enrichMissingAuthorOrcid.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			list.addAll(enrichMissingOpenAccess.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			list.addAll(enrichMissingPid.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			list.addAll(enrichMissingPublicationDate.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			list.addAll(enrichMissingSubject.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			list.addAll(enrichMoreOpenAccess.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			list.addAll(enrichMorePid.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			list.addAll(enrichMoreSubject.searchUpdatesForRecord(target, results.getData(), dedupConfig));
 		}
 
-		return list.stream().map(EventFactory::newBrokerEvent).collect(Collectors.toList());
+		final EventGroup events = new EventGroup();
+		list.stream().map(EventFactory::newBrokerEvent).forEach(events::addElement);
+		return events;
 	}
 
-	private static <SRC extends Result, TRG extends OafEntity> JavaRDD<Event> generateRelationEvents(
+	private static <SRC extends Result, TRG extends OafEntity> Dataset<Event> generateRelationEvents(
 		final SparkSession spark,
 		final String graphPath,
 		final Class<SRC> sourceClass,
-		final Class<TRG> targetClass) {
+		final Class<TRG> targetClass,
+		final DedupConfig dedupConfig) {
 
-		final Dataset<SRC> sources = readPath(
-			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), sourceClass)
+		final Dataset<Result> sources = readPath(
+			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), Result.class)
 				.filter(r -> r.getDataInfo().getDeletedbyinference());
 
 		final Dataset<TRG> targets = readPath(
@@ -208,6 +225,13 @@ public class GenerateEventsApplication {
 
 		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
 			.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+
+		final Dataset<ResultGroup> duplicates = sources
+			.joinWith(mergedRels, sources.col("id").equalTo(rels.col("source")), "inner")
+			.groupByKey((MapFunction<Tuple2<Result, Relation>, String>) t -> t._2.getTarget(), Encoders.STRING())
+			.agg(resultAggrTypedColumn)
+			.map((MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.kryo(ResultGroup.class))
+			.filter(ResultGroup::isValid);
 
 		if (targetClass == Project.class) {
 			// TODO join using: generateProjectsEvents
@@ -222,29 +246,32 @@ public class GenerateEventsApplication {
 		return null;
 	}
 
-	private List<Event> generateProjectsEvents(final Collection<Pair<Result, List<Project>>> childrenWithProjects) {
+	private List<Event> generateProjectsEvents(final Collection<Pair<Result, List<Project>>> childrenWithProjects,
+		final DedupConfig dedupConfig) {
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
 		for (final Pair<Result, List<Project>> target : childrenWithProjects) {
-			list.addAll(enrichMissingProject.searchUpdatesForRecord(target, childrenWithProjects));
-			list.addAll(enrichMoreProject.searchUpdatesForRecord(target, childrenWithProjects));
+			list.addAll(enrichMissingProject.searchUpdatesForRecord(target, childrenWithProjects, dedupConfig));
+			list.addAll(enrichMoreProject.searchUpdatesForRecord(target, childrenWithProjects, dedupConfig));
 		}
 
 		return list.stream().map(EventFactory::newBrokerEvent).collect(Collectors.toList());
 	}
 
-	private List<Event> generateSoftwareEvents(final Collection<Pair<Result, List<Software>>> childrenWithSoftwares) {
+	private List<Event> generateSoftwareEvents(final Collection<Pair<Result, List<Software>>> childrenWithSoftwares,
+		final DedupConfig dedupConfig) {
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
 		for (final Pair<Result, List<Software>> target : childrenWithSoftwares) {
-			list.addAll(enrichMissingSoftware.searchUpdatesForRecord(target, childrenWithSoftwares));
-			list.addAll(enrichMoreSoftware.searchUpdatesForRecord(target, childrenWithSoftwares));
+			list.addAll(enrichMissingSoftware.searchUpdatesForRecord(target, childrenWithSoftwares, dedupConfig));
+			list.addAll(enrichMoreSoftware.searchUpdatesForRecord(target, childrenWithSoftwares, dedupConfig));
 		}
 		return list.stream().map(EventFactory::newBrokerEvent).collect(Collectors.toList());
 	}
 
 	private List<Event> generatePublicationRelatedEvents(final String relType,
-		final Collection<Pair<Result, Map<String, List<Publication>>>> childrenWithRels) {
+		final Collection<Pair<Result, Map<String, List<Publication>>>> childrenWithRels,
+		final DedupConfig dedupConfig) {
 
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
@@ -257,15 +284,30 @@ public class GenerateEventsApplication {
 
 		for (final Pair<Result, List<Publication>> target : cleanedChildrens) {
 			if (relType.equals("isRelatedTo")) {
-				list.addAll(enrichMisissingPublicationIsRelatedTo.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMisissingPublicationIsRelatedTo
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			} else if (relType.equals("references")) {
-				list.addAll(enrichMissingPublicationReferences.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMissingPublicationReferences
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			} else if (relType.equals("isReferencedBy")) {
-				list.addAll(enrichMissingPublicationIsReferencedBy.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMissingPublicationIsReferencedBy
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			} else if (relType.equals("isSupplementedTo")) {
-				list.addAll(enrichMissingPublicationIsSupplementedTo.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMissingPublicationIsSupplementedTo
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			} else if (relType.equals("isSupplementedBy")) {
-				list.addAll(enrichMissingPublicationIsSupplementedBy.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMissingPublicationIsSupplementedBy
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			}
 		}
 
@@ -274,7 +316,8 @@ public class GenerateEventsApplication {
 	}
 
 	private List<Event> generateDatasetRelatedEvents(final String relType,
-		final Collection<Pair<Result, Map<String, List<eu.dnetlib.dhp.schema.oaf.Dataset>>>> childrenWithRels) {
+		final Collection<Pair<Result, Map<String, List<eu.dnetlib.dhp.schema.oaf.Dataset>>>> childrenWithRels,
+		final DedupConfig dedupConfig) {
 
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
@@ -287,15 +330,29 @@ public class GenerateEventsApplication {
 
 		for (final Pair<Result, List<eu.dnetlib.dhp.schema.oaf.Dataset>> target : cleanedChildrens) {
 			if (relType.equals("isRelatedTo")) {
-				list.addAll(enrichMisissingDatasetIsRelatedTo.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMisissingDatasetIsRelatedTo
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			} else if (relType.equals("references")) {
-				list.addAll(enrichMissingDatasetReferences.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMissingDatasetReferences.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			} else if (relType.equals("isReferencedBy")) {
-				list.addAll(enrichMissingDatasetIsReferencedBy.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMissingDatasetIsReferencedBy
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			} else if (relType.equals("isSupplementedTo")) {
-				list.addAll(enrichMissingDatasetIsSupplementedTo.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMissingDatasetIsSupplementedTo
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			} else if (relType.equals("isSupplementedBy")) {
-				list.addAll(enrichMissingDatasetIsSupplementedBy.searchUpdatesForRecord(target, cleanedChildrens));
+				list
+					.addAll(
+						enrichMissingDatasetIsSupplementedBy
+							.searchUpdatesForRecord(target, cleanedChildrens, dedupConfig));
 			}
 		}
 
@@ -312,4 +369,24 @@ public class GenerateEventsApplication {
 			.textFile(inputPath)
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
+
+	private static DedupConfig loadDedupConfig(final String isLookupUrl, final String profId) throws Exception {
+		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+
+		final String conf = isLookUpService
+			.getResourceProfileByQuery(
+				String
+					.format(
+						"for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
+						profId));
+
+		final DedupConfig dedupConfig = new ObjectMapper().readValue(conf, DedupConfig.class);
+		dedupConfig.getPace().initModel();
+		dedupConfig.getPace().initTranslationMap();
+		// dedupConfig.getWf().setConfigurationId("???");
+
+		return dedupConfig;
+
+	}
+
 }

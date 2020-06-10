@@ -319,15 +319,7 @@ object DoiBoostMappingUtil {
 
   def generateIdentifier (oaf: Result, doi: String): String = {
     val id = DHPUtils.md5 (doi.toLowerCase)
-    if (oaf.isInstanceOf[Dataset] )
-      return s"60|${
-        doiBoostNSPREFIX
-      }${
-        SEPARATOR
-      }${
-        id
-      }"
-    s"50|${
+    return s"50|${
       doiBoostNSPREFIX
     }${
       SEPARATOR

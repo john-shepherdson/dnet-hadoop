@@ -11,6 +11,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.pace.config.DedupConfig;
 
 public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
 
@@ -19,7 +20,8 @@ public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
 	}
 
 	@Override
-	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target) {
+	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		final long count = target.getPid().size();
 
 		if (count > 0) {
@@ -30,17 +32,17 @@ public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
 			.getPid()
 			.stream()
 			.map(ConversionUtils::oafPidToBrokerPid)
-			.map(i -> generateUpdateInfo(i, source, target))
+			.map(i -> generateUpdateInfo(i, source, target, dedupConfig))
 			.collect(Collectors.toList());
 	}
 
-	@Override
-	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target) {
+	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MISSING_PID,
 			highlightValue, source, target,
 			(p, pid) -> p.getPids().add(pid),
-			pid -> pid.getType() + "::" + pid.getValue());
+			pid -> pid.getType() + "::" + pid.getValue(), dedupConfig);
 	}
 
 }
