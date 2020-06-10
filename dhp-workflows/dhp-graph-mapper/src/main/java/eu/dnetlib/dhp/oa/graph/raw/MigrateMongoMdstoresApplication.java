@@ -26,8 +26,7 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 			IOUtils
 				.toString(
 					MigrateMongoMdstoresApplication.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/migrate_mongo_mstores_parameters.json")));
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_mongo_mstores_parameters.json")));
 		parser.parseArgument(args);
 
 		final String mongoBaseUrl = parser.get("mongoBaseUrl");
@@ -60,7 +59,7 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 			final String currentColl = entry.getValue();
 
 			for (final String xml : mdstoreClient.listRecords(currentColl)) {
-				emit(xml, "native_" + format);
+				emit(xml, String.format("%s-%s-%s", format, layout, interpretation));
 			}
 		}
 	}
