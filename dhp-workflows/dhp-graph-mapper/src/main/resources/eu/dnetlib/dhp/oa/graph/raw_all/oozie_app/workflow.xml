@@ -210,6 +210,23 @@
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
         </java>
+        <ok to="ImportOAF_invisible"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="ImportOAF_invisible">
+        <java>
+            <prepare>
+                <delete path="${contentPath}/oaf_records_invisible"/>
+            </prepare>
+            <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
+            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_records_invisible</arg>
+            <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
+            <arg>--mongoDb</arg><arg>${mongoDb}</arg>
+            <arg>--mdFormat</arg><arg>OAF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>intersection</arg>
+        </java>
         <ok to="wait_import"/>
         <error to="Kill"/>
     </action>
