@@ -68,8 +68,10 @@ public final class UpdateInfo<T> {
 	private float calculateTrust(final DedupConfig dedupConfig, final Result r1, final Result r2) {
 		try {
 			final ObjectMapper objectMapper = new ObjectMapper();
-			final MapDocument doc1 = MapDocumentUtil.asMapDocumentWithJPath(dedupConfig, objectMapper.writeValueAsString(r1));
-			final MapDocument doc2 = MapDocumentUtil.asMapDocumentWithJPath(dedupConfig, objectMapper.writeValueAsString(r2));
+			final MapDocument doc1 = MapDocumentUtil
+				.asMapDocumentWithJPath(dedupConfig, objectMapper.writeValueAsString(r1));
+			final MapDocument doc2 = MapDocumentUtil
+				.asMapDocumentWithJPath(dedupConfig, objectMapper.writeValueAsString(r2));
 
 			final double score = new TreeProcessor(dedupConfig).computeScore(doc1, doc2);
 			final double threshold = dedupConfig.getWf().getThreshold();
@@ -118,7 +120,8 @@ public final class UpdateInfo<T> {
 			.map(Instance::getUrl)
 			.flatMap(List::stream)
 			.findFirst()
-			.orElse(null);;
+			.orElse(null);
+		;
 
 		final Provenance provenance = new Provenance().setId(provId).setRepositoryName(provRepo).setUrl(provUrl);
 

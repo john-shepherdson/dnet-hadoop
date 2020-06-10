@@ -20,7 +20,8 @@ public class EnrichMorePid extends UpdateMatcher<Result, Pid> {
 	}
 
 	@Override
-	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		final Set<String> existingPids = target
 			.getPid()
 			.stream()
@@ -36,7 +37,8 @@ public class EnrichMorePid extends UpdateMatcher<Result, Pid> {
 			.collect(Collectors.toList());
 	}
 
-	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target, final DedupConfig dedupConfig) {
+	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MORE_PID,
 			highlightValue, source, target,

@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.broker.oa.util;
 
 import org.apache.spark.sql.Encoder;

@@ -19,7 +19,8 @@ public class EnrichMissingAuthorOrcid extends UpdateMatcher<Result, Pair<String,
 	}
 
 	@Override
-	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		// TODO
 		// return Arrays.asList(new EnrichMissingAbstract("xxxxxxx", 0.9f));
 		return Arrays.asList();
