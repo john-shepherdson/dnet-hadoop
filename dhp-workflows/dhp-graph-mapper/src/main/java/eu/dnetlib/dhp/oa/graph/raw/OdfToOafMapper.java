@@ -138,7 +138,14 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
 			url.add(((Node) o).getText().trim());
 		}
+		for (final Object o : doc
+			.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='landingPage']")) {
+			url.add(((Node) o).getText().trim());
+		}
 		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='URL']")) {
+			url.add(((Node) o).getText().trim());
+		}
+		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='landingPage']")) {
 			url.add(((Node) o).getText().trim());
 		}
 		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='DOI']")) {
@@ -379,11 +386,13 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
-					doc, "//datacite:identifier[@identifierType != 'URL']", "@identifierType", DNET_PID_TYPES, info));
+					doc, "//datacite:identifier[@identifierType != 'URL' and @identifierType != 'landingPage']",
+					"@identifierType", DNET_PID_TYPES, info));
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
-					doc, "//datacite:alternateIdentifier[@alternateIdentifierType != 'URL']",
+					doc,
+					"//datacite:alternateIdentifier[@alternateIdentifierType != 'URL' and @alternateIdentifierType != 'landingPage']",
 					"@alternateIdentifierType", DNET_PID_TYPES, info));
 		return res;
 	}
