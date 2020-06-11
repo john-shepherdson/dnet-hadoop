@@ -36,7 +36,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class DumpJobTest {
@@ -65,6 +64,15 @@ public class DumpJobTest {
 
 	}
 
+	@Mock
+	private SparkDumpCommunityProducts dumpCommunityProducts;
+
+	private QueryInformationSystem queryInformationSystem;
+
+	@Mock
+	private ISLookUpService isLookUpService;
+
+
 	List<String> communityMap = Arrays.asList("<community id=\"egi\" label=\"EGI Federation\"/>",
 			"<community id=\"fet-fp7\" label=\"FET FP7\"/>" ,
 			"<community id=\"fet-h2020\" label=\"FET H2020\"/>" ,
@@ -88,16 +96,6 @@ public class DumpJobTest {
 			"<community id=\"science-innovation-policy\" label=\"Science and Innovation Policy Studies\"/>",
 			"<community id=\"covid-19\" label=\"COVID-19\"/>",
 			"<community id=\"enermaps\" label=\"Energy Research\"/>");
-
-	@Mock
-	private SparkDumpCommunityProducts dumpCommunityProducts;
-
-	@Mock
-	private QueryInformationSystem queryInformationSystem;
-
-	@Mock
-	private ISLookUpService isLookUpService;
-
 
 	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') " +
 			"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
@@ -131,9 +129,8 @@ public class DumpJobTest {
 
 	@BeforeEach
 	public void setUp() throws ISLookUpException {
-		lenient().when(dumpCommunityProducts.getCommunityMap(MOCK_IS_LOOK_UP_URL)).thenReturn(map);
-		lenient().when(queryInformationSystem.getCommunityMap(MOCK_IS_LOOK_UP_URL)).thenReturn(communityMap);
 		lenient().when(isLookUpService.quickSearchProfile(XQUERY)).thenReturn(communityMap);
+		lenient().when(dumpCommunityProducts.getIsLookUpService(MOCK_IS_LOOK_UP_URL)).thenReturn(isLookUpService);
 
 	}
 
@@ -147,32 +144,27 @@ public class DumpJobTest {
 	public void test1() throws Exception {
 
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/dataset.json")
-			.getPath();
-		dumpCommunityProducts
-			.main(
-				new String[] {
-					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-sourcePath", sourcePath,
-						"-resultType","dataset",
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-						"-dumpTableName","eu.dnetlib.dhp.schema.dump.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL
-				});
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/dataset.json")
+				.getPath();
+
+		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Dataset> tmp = sc
-			.textFile(workingDir.toString() + "/dataset")
-			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Dataset.class));
+				.textFile(workingDir.toString() + "/dataset")
+				.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Dataset.class));
 
 		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Dataset> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Dataset.class));
+				.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Dataset.class));
 
 		verificationDataset.show(false);
 
 
+	}
+	@Test
+	public void test0() throws ISLookUpException {
+		System.out.println(new Gson().toJson(queryInformationSystem.getCommunityMap()));
 	}
 
 //	@Test
