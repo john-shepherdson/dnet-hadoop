@@ -1,25 +1,12 @@
-<workflow-app name="graph_stats" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="import_infospace_graph" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>stats_db_name</name>
-            <description>the target stats database name</description>
+            <name>hive_db_name</name>
+            <description>the target hive database name</description>
         </property>
         <property>
-            <name>openaire_db_name</name>
-            <description>the original graph database name</description>
-        </property>
-        <property>
-            <name>external_stats_db_name</name>
-            <value>stats_ext</value>
-            <description>the external stats that should be added since they are not included in the graph database</description>
-        </property>
-        <property>
-            <name>hiveMetastoreUris</name>
-            <description>hive server metastore URIs</description>
-        </property>
-        <property>
-            <name>hiveJdbcUrl</name>
-            <description>hive server jdbc url</description>
+            <name>hive_source_db_name</name>
+            <description>the source hive database name</description>
         </property>
         <property>
             <name>hive_timeout</name>
@@ -42,892 +29,271 @@
         </configuration>
     </global>
 
-    <start to="Step1"/>
+    <start to="Step1-CreateDB"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="Step1">
+    <action name="Step1-CreateDB">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
             <script>scripts/step1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step2_1"/>
+        <ok to="Step2"/>
         <error to="Kill"/>
     </action>
-    
-    <action name="Step2_1">
+    <action name="Step2">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step2_2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step2_2">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step2_3"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step2_3">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step2_4"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step2_4">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_4.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step2_5"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step2_5">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_5.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step2_6"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step2_6">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_6.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step2_7"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step2_7">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_7.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step2_8"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step2_8">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_8.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step2_9"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step2_9">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step2_9.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step2.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
         <ok to="Step3"/>
         <error to="Kill"/>
     </action>
-    
     <action name="Step3">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
             <script>scripts/step3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step4_1"/>
+        <ok to="Step4"/>
+        <!-- <ok to="End"/> -->
         <error to="Kill"/>
     </action>
-    
-    <action name="Step4_1">
+    <action name="Step4">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+                <property>
+                    <name>hive.variable.substitute</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step4.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step4_2"/>
+        <ok to="Step5"/>
         <error to="Kill"/>
     </action>
-
-    <action name="Step4_2">
+    <action name="Step5">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step5.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step4_3"/>
+        <ok to="Step6"/>
         <error to="Kill"/>
     </action>
-
-    <action name="Step4_3">
+    <action name="Step6">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step6.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step4_4"/>
+        <ok to="Step7"/>
         <error to="Kill"/>
     </action>
-
-    <action name="Step4_4">
+    <action name="Step7">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_4.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step7.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step4_5"/>
+        <ok to="Step8"/>
         <error to="Kill"/>
     </action>
-
-    <action name="Step4_5">
+    <action name="Step8">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_5.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step8.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step4_6"/>
+        <ok to="Step9"/>
         <error to="Kill"/>
     </action>
-
-    <action name="Step4_6">
+    <action name="Step9">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_6.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step9.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step4_7"/>
+        <ok to="Step10"/>
         <error to="Kill"/>
     </action>
-
-    <action name="Step4_7">
+    <action name="Step10">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_7.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step4_8"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step4_8">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_8.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step4_9"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step4_9">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_9.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step4_10"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step4_10">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step4_10.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_1"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="Step5_1">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_2"/>
-        <error to="Kill"/>
-    </action>
-
-	<action name="Step5_2">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_3"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step5_3">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_4"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step5_4">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_4.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_5"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step5_5">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_5.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_6"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step5_6">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_6.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_7"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step5_7">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_7.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_8"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step5_8">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_8.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_9"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step5_9">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_9.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step5_10"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step5_10">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step5_10.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_1"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="Step6_1">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_2">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_3"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_3">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_4"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_4">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_4.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_5"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_5">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_5.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_6"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_6">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_6.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_7"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_7">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_7.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_8"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_8">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_8.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_9"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_9">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_9.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step6_10"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step6_10">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step6_10.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step7_1"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="Step7_1">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step7_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step7_2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step7_2">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step7_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step7_3"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step7_3">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step7_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step7_4"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step7_4">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step7_4.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step7_5"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step7_5">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step7_5.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_1"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="Step8_1">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_2">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_3"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_3">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_4"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_4">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_4.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_5"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_5">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_5.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_6"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_6">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_6.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_7"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_7">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_7.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_8"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_8">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_8.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_9"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_9">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_9.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_10"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_10">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_10.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step8_11"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step8_11">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step8_11.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_1"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="Step9_1">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step9_2">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_3"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step9_3">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_4"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step9_4">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_4.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_5"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step9_5">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_5.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_6"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step9_6">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_6.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_7"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step9_7">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_7.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_8"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step9_8">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_8.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step9_9"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step9_9">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step9_9.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step10_1"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="Step10_1">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step10_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step10_2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step10_2">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step10_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step10_3"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step10_3">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step10_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step10.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
         <ok to="Step11"/>
         <error to="Kill"/>
     </action>
-    
     <action name="Step11">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
             <script>scripts/step11.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-			<param>external_stats_db_name=${external_stats_db_name}</param>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
-        <ok to="Step12_1"/>
+        <ok to="Step12"/>
         <error to="Kill"/>
     </action>
-    
-    <action name="Step12_1">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step12_1.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step12_2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step12_2">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step12_2.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step12_3"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step12_3">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step12_3.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step12_4"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step12_4">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step12_4.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step12_5"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step12_5">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step12_5.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step12_6"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step12_6">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step12_6.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step12_7"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step12_7">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step12_7.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step12_8"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step12_8">
-    	<hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step12_8.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+    <action name="Step12">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
+            <script>scripts/step12.sql</script>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
         <ok to="Step13"/>
         <error to="Kill"/>
     </action>
-    
     <action name="Step13">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${hive_jdbc_url}/${hive_db_name}</jdbc-url>
             <script>scripts/step13.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
+            <param>hive_db_name=${hive_db_name}</param>
+            <param>hive_source_db_name=${hive_source_db_name}</param>
         </hive2>
         <ok to="Step14"/>
         <error to="Kill"/>
     </action>
-    
     <action name="Step14">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hiveJdbcUrl}</jdbc-url>
-            <script>scripts/step14.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <!-- <configuration>
+                <property>
+                    <name>hive.metastore.uris</name>
+                    <value>${hive_metastore_uris}</value>
+                </property>
+            </configuration> -->
+            <exec>impala-shell.sh</exec>
+            <argument>${hive_db_name}</argument>
+            <argument>impala-stats.sql</argument>
+            <argument>/user/giorgos.alexiou/graph/oozie_app/impala-stats.sql</argument>
+            <file>impala-shell.sh</file>
+            <!-- <param>hive_db_name=${hive_db_name}</param> -->
+        </shell>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-    
+
     <end name="End"/>
 </workflow-app>
