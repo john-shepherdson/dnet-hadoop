@@ -14,6 +14,7 @@ import eu.dnetlib.broker.objects.OpenAireEventPayload;
 import eu.dnetlib.broker.objects.Provenance;
 import eu.dnetlib.broker.objects.Publication;
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -28,9 +29,9 @@ public final class UpdateInfo<T> {
 
 	private final T highlightValue;
 
-	private final Result source;
+	private final ResultWithRelations source;
 
-	private final Result target;
+	private final ResultWithRelations target;
 
 	private final BiConsumer<Publication, T> compileHighlight;
 
@@ -40,7 +41,8 @@ public final class UpdateInfo<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateInfo.class);
 
-	public UpdateInfo(final Topic topic, final T highlightValue, final Result source, final Result target,
+	public UpdateInfo(final Topic topic, final T highlightValue, final ResultWithRelations source,
+		final ResultWithRelations target,
 		final BiConsumer<Publication, T> compileHighlight,
 		final Function<T, String> highlightToString,
 		final DedupConfig dedupConfig) {
@@ -50,18 +52,18 @@ public final class UpdateInfo<T> {
 		this.target = target;
 		this.compileHighlight = compileHighlight;
 		this.highlightToString = highlightToString;
-		this.trust = calculateTrust(dedupConfig, source, target);
+		this.trust = calculateTrust(dedupConfig, source.getResult(), target.getResult());
 	}
 
 	public T getHighlightValue() {
 		return highlightValue;
 	}
 
-	public Result getSource() {
+	public ResultWithRelations getSource() {
 		return source;
 	}
 
-	public Result getTarget() {
+	public ResultWithRelations getTarget() {
 		return target;
 	}
 
@@ -101,20 +103,22 @@ public final class UpdateInfo<T> {
 
 	public OpenAireEventPayload asBrokerPayload() {
 
-		final Publication p = ConversionUtils.oafResultToBrokerPublication(getSource());
+		final Publication p = ConversionUtils.oafResultToBrokerPublication(getSource().getResult());
 		compileHighlight.accept(p, getHighlightValue());
 
 		final Publication hl = new Publication();
 		compileHighlight.accept(hl, getHighlightValue());
 
-		final String provId = getSource().getOriginalId().stream().findFirst().orElse(null);
+		final String provId = getSource().getResult().getOriginalId().stream().findFirst().orElse(null);
 		final String provRepo = getSource()
+			.getResult()
 			.getCollectedfrom()
 			.stream()
 			.map(KeyValue::getValue)
 			.findFirst()
 			.orElse(null);
 		final String provUrl = getSource()
+			.getResult()
 			.getInstance()
 			.stream()
 			.map(Instance::getUrl)

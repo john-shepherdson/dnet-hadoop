@@ -137,8 +137,10 @@ public class GenerateEntitiesApplication {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
+			case "oaf-store-claim":
 			case "oaf-store-cleaned":
 				return new OafToOafMapper(vocs, false).processMdRecord(s);
+			case "odf-store-claim":
 			case "odf-store-cleaned":
 				return new OdfToOafMapper(vocs, false).processMdRecord(s);
 			case "oaf-store-intersection":

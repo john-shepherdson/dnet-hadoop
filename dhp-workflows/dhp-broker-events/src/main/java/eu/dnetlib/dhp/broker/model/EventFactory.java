@@ -37,7 +37,7 @@ public class EventFactory {
 		final Map<String, Object> map = createMapFromResult(updateInfo);
 
 		final String eventId = calculateEventId(
-			updateInfo.getTopicPath(), updateInfo.getTarget().getOriginalId().get(0),
+			updateInfo.getTopicPath(), updateInfo.getTarget().getResult().getOriginalId().get(0),
 			updateInfo.getHighlightValueAsString());
 
 		res.setEventId(eventId);
@@ -54,8 +54,8 @@ public class EventFactory {
 	private static Map<String, Object> createMapFromResult(final UpdateInfo<?> updateInfo) {
 		final Map<String, Object> map = new HashMap<>();
 
-		final Result source = updateInfo.getSource();
-		final Result target = updateInfo.getTarget();
+		final Result source = updateInfo.getSource().getResult();
+		final Result target = updateInfo.getTarget().getResult();
 
 		final List<KeyValue> collectedFrom = target.getCollectedfrom();
 		if (collectedFrom.size() == 1) {
