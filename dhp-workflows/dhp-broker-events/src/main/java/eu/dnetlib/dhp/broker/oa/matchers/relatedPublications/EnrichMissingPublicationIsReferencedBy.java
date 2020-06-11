@@ -9,4 +9,8 @@ public class EnrichMissingPublicationIsReferencedBy extends AbstractEnrichMissin
 		super(Topic.ENRICH_MISSING_PUBLICATION_IS_REFERENCED_BY);
 	}
 
+	@Override
+	protected boolean filterByType(final String relType) {
+		return relType.equals("isReferencedBy");
+	}
 }

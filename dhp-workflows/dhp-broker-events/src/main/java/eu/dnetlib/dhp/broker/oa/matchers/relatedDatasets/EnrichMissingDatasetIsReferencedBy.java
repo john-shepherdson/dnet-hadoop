@@ -9,4 +9,9 @@ public class EnrichMissingDatasetIsReferencedBy extends AbstractEnrichMissingDat
 		super(Topic.ENRICH_MISSING_DATASET_IS_REFERENCED_BY);
 	}
 
+	@Override
+	protected boolean filterByType(final String relType) {
+		return relType.equals("isReferencedBy");
+	}
+
 }

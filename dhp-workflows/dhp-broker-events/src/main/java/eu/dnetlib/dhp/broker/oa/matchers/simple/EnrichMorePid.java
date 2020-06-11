@@ -10,25 +10,28 @@ import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.pace.config.DedupConfig;
 
-public class EnrichMorePid extends UpdateMatcher<Result, Pid> {
+public class EnrichMorePid extends UpdateMatcher<Pid> {
 
 	public EnrichMorePid() {
 		super(true);
 	}
 
 	@Override
-	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target,
+	protected List<UpdateInfo<Pid>> findUpdates(final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 		final Set<String> existingPids = target
+			.getResult()
 			.getPid()
 			.stream()
 			.map(pid -> pid.getQualifier().getClassid() + "::" + pid.getValue())
 			.collect(Collectors.toSet());
 
 		return source
+			.getResult()
 			.getPid()
 			.stream()
 			.filter(pid -> !existingPids.contains(pid.getQualifier().getClassid() + "::" + pid.getValue()))
@@ -37,7 +40,9 @@ public class EnrichMorePid extends UpdateMatcher<Result, Pid> {
 			.collect(Collectors.toList());
 	}
 
-	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target,
+	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue,
+		final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MORE_PID,

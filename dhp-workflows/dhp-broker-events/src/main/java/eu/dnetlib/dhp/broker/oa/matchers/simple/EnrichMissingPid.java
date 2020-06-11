@@ -10,25 +10,27 @@ import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.pace.config.DedupConfig;
 
-public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
+public class EnrichMissingPid extends UpdateMatcher<Pid> {
 
 	public EnrichMissingPid() {
 		super(true);
 	}
 
 	@Override
-	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target,
+	protected List<UpdateInfo<Pid>> findUpdates(final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
-		final long count = target.getPid().size();
+		final long count = target.getResult().getPid().size();
 
 		if (count > 0) {
 			return Arrays.asList();
 		}
 
 		return source
+			.getResult()
 			.getPid()
 			.stream()
 			.map(ConversionUtils::oafPidToBrokerPid)
@@ -36,7 +38,9 @@ public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
 			.collect(Collectors.toList());
 	}
 
-	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target,
+	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue,
+		final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MISSING_PID,

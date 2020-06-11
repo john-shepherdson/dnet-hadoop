@@ -11,25 +11,28 @@ import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.pace.config.DedupConfig;
 
-public class EnrichMoreSubject extends UpdateMatcher<Result, Pair<String, String>> {
+public class EnrichMoreSubject extends UpdateMatcher<Pair<String, String>> {
 
 	public EnrichMoreSubject() {
 		super(true);
 	}
 
 	@Override
-	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target,
+	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 		final Set<String> existingSubjects = target
+			.getResult()
 			.getSubject()
 			.stream()
 			.map(pid -> pid.getQualifier().getClassid() + "::" + pid.getValue())
 			.collect(Collectors.toSet());
 
 		return source
+			.getResult()
 			.getPid()
 			.stream()
 			.filter(pid -> !existingSubjects.contains(pid.getQualifier().getClassid() + "::" + pid.getValue()))
@@ -39,8 +42,8 @@ public class EnrichMoreSubject extends UpdateMatcher<Result, Pair<String, String
 	}
 
 	public UpdateInfo<Pair<String, String>> generateUpdateInfo(final Pair<String, String> highlightValue,
-		final Result source,
-		final Result target,
+		final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 
 		return new UpdateInfo<>(

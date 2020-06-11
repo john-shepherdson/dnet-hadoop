@@ -5,18 +5,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedSoftware;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.pace.config.DedupConfig;
 
 public class EnrichMoreSoftware
-	extends UpdateMatcher<Pair<Result, List<Software>>, eu.dnetlib.broker.objects.Software> {
+	extends UpdateMatcher<eu.dnetlib.broker.objects.Software> {
 
 	public EnrichMoreSoftware() {
 		super(true);
@@ -24,19 +23,21 @@ public class EnrichMoreSoftware
 
 	@Override
 	protected List<UpdateInfo<eu.dnetlib.broker.objects.Software>> findUpdates(
-		final Pair<Result, List<Software>> source,
-		final Pair<Result, List<Software>> target,
+		final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 
 		final Set<String> existingSoftwares = source
-			.getRight()
+			.getSoftwares()
 			.stream()
+			.map(RelatedSoftware::getRelSoftware)
 			.map(Software::getId)
 			.collect(Collectors.toSet());
 
 		return target
-			.getRight()
+			.getSoftwares()
 			.stream()
+			.map(RelatedSoftware::getRelSoftware)
 			.filter(p -> !existingSoftwares.contains(p.getId()))
 			.map(ConversionUtils::oafSoftwareToBrokerSoftware)
 			.map(p -> generateUpdateInfo(p, source, target, dedupConfig))
@@ -45,12 +46,12 @@ public class EnrichMoreSoftware
 
 	public UpdateInfo<eu.dnetlib.broker.objects.Software> generateUpdateInfo(
 		final eu.dnetlib.broker.objects.Software highlightValue,
-		final Pair<Result, List<Software>> source,
-		final Pair<Result, List<Software>> target,
+		final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MORE_SOFTWARE,
-			highlightValue, source.getLeft(), target.getLeft(),
+			highlightValue, source, target,
 			(p, s) -> p.getSoftwares().add(s),
 			s -> s.getName(), dedupConfig);
 	}

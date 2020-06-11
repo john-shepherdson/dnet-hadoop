@@ -11,21 +11,23 @@ import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.pace.config.DedupConfig;
 
-public class EnrichMissingSubject extends UpdateMatcher<Result, Pair<String, String>> {
+public class EnrichMissingSubject extends UpdateMatcher<Pair<String, String>> {
 
 	public EnrichMissingSubject() {
 		super(true);
 	}
 
 	@Override
-	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target,
+	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 		final Set<String> existingTypes = target
+			.getResult()
 			.getSubject()
 			.stream()
 			.map(StructuredProperty::getQualifier)
@@ -33,6 +35,7 @@ public class EnrichMissingSubject extends UpdateMatcher<Result, Pair<String, Str
 			.collect(Collectors.toSet());
 
 		return source
+			.getResult()
 			.getPid()
 			.stream()
 			.filter(pid -> !existingTypes.contains(pid.getQualifier().getClassid()))
@@ -42,8 +45,8 @@ public class EnrichMissingSubject extends UpdateMatcher<Result, Pair<String, Str
 	}
 
 	public UpdateInfo<Pair<String, String>> generateUpdateInfo(final Pair<String, String> highlightValue,
-		final Result source,
-		final Result target,
+		final ResultWithRelations source,
+		final ResultWithRelations target,
 		final DedupConfig dedupConfig) {
 
 		return new UpdateInfo<>(
