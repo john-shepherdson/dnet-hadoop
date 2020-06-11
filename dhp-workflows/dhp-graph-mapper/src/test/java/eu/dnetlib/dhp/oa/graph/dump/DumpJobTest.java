@@ -47,7 +47,7 @@ public class DumpJobTest {
 
 	private static Path workingDir;
 
-	private static String MOCK_IS_LOOK_UP_URL = "https://beta.services.openaire.eu/is/services/isLookUp";
+	private static String MOCK_IS_LOOK_UP_URL = "BASEURL:8280/is/services/isLookUp";
 
 	private static final Logger log = LoggerFactory.getLogger(DumpJobTest.class);
 
@@ -92,6 +92,12 @@ public class DumpJobTest {
 	@Mock
 	private SparkDumpCommunityProducts dumpCommunityProducts;
 
+	@Mock
+	private QueryInformationSystem queryInformationSystem;
+
+	@Mock
+	private ISLookUpService isLookUpService;
+
 
 	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') " +
 			"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
@@ -126,6 +132,8 @@ public class DumpJobTest {
 	@BeforeEach
 	public void setUp() throws ISLookUpException {
 		lenient().when(dumpCommunityProducts.getCommunityMap(MOCK_IS_LOOK_UP_URL)).thenReturn(map);
+		lenient().when(queryInformationSystem.getCommunityMap(MOCK_IS_LOOK_UP_URL)).thenReturn(communityMap);
+		lenient().when(isLookUpService.quickSearchProfile(XQUERY)).thenReturn(communityMap);
 
 	}
 
