@@ -3,22 +3,19 @@ package eu.dnetlib.dhp.oa.graph.dump;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.schema.oaf.Context;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +28,8 @@ import javax.management.Query;
 public class SparkDumpCommunityProducts implements Serializable {
 
     private static final Logger log = LoggerFactory.getLogger(SparkDumpCommunityProducts.class);
+    private QueryInformationSystem queryInformationSystem;
+
 
     public static void main(String[] args) throws Exception {
         String jsonConfiguration = IOUtils
@@ -67,25 +66,37 @@ public class SparkDumpCommunityProducts implements Serializable {
         final String resultType = parser.get("resultType");
         log.info("resultType: {}", resultType);
 
+
+        SparkDumpCommunityProducts sdcp = new SparkDumpCommunityProducts();
+
+        sdcp.exec(isLookUpUrl, isSparkSessionManaged, outputPath,
+                inputPath, resultClassName, dumpClassName);
+
+    }
+
+    public QueryInformationSystem getQueryInformationSystem() {
+        return queryInformationSystem;
+    }
+
+    public void setQueryInformationSystem(QueryInformationSystem queryInformationSystem) {
+        this.queryInformationSystem = queryInformationSystem;
+    }
+
+    public ISLookUpService getIsLookUpService(String isLookUpUrl){
+        return ISLookupClientFactory.getLookUpService(isLookUpUrl);
+    }
+
+    public void exec(String isLookUpUrl, Boolean isSparkSessionManaged, String outputPath, String inputPath,
+                     String resultClassName, String dumpClassName) throws ISLookUpException, ClassNotFoundException {
+        SparkConf conf = new SparkConf();
+
         Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
         Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result> dumpClazz =
                 (Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result>) Class.forName(dumpClassName);
 
-        SparkDumpCommunityProducts sdcp = new SparkDumpCommunityProducts(isLookUpUrl, isSparkSessionManaged, outputPath,
-                inputPath, inputClazz, dumpClazz);
-
-
-    }
-
-    public <I extends eu.dnetlib.dhp.schema.oaf.Result, O extends eu.dnetlib.dhp.schema.dump.oaf.Result>
-    SparkDumpCommunityProducts(String isLookUpUrl, Boolean isSparkSessionManaged, String outputPath, String inputPath,
-                                      Class<I> inputClazz, Class<O> dumpClazz) throws ISLookUpException {
-        SparkConf conf = new SparkConf();
-
+        queryInformationSystem.setIsLookUp(getIsLookUpService(isLookUpUrl));
         Map<String,String>
-                communityMap = getCommunityMap(isLookUpUrl);
-
-
+                communityMap = queryInformationSystem.getCommunityMap();
         runWithSparkSession(
                 conf,
                 isSparkSessionManaged,
@@ -93,26 +104,6 @@ public class SparkDumpCommunityProducts implements Serializable {
                     Utils.removeOutputDir(spark, outputPath);
                     execDump(spark, inputPath, outputPath , communityMap, inputClazz, dumpClazz);
                 });
-    }
-
-    public  Map<String, String> getCommunityMap(String isLookUpUrl) throws ISLookUpException {
-        final Map<String, String> map = new HashMap<>();
-        QueryInformationSystem qis = new QueryInformationSystem();
-        List<String> communityMap = qis.getCommunityMap(isLookUpUrl);
-        communityMap.stream().forEach(xml -> {
-            final Document doc;
-            try {
-                doc = new SAXReader().read(new StringReader(xml));
-                Element root = doc.getRootElement();
-                map.put(root.attribute("id").getValue(), root.attribute("label").getValue());
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-
-
-        });
-
-        return map;
     }
 
 
