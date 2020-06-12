@@ -133,7 +133,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		instance
 			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
-		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
+		instance.setRefereed(prepareQualifier(doc, "//oaf:refereed", DNET_REVIEW_LEVELS));
 		instance
 			.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance

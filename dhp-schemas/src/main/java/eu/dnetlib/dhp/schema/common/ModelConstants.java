@@ -14,6 +14,7 @@ public class ModelConstants {
 	public static final String DNET_DATA_CITE_RESOURCE = "dnet:dataCite_resource";
 	public static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
 	public static final String DNET_COUNTRY_TYPE = "dnet:countries";
+	public static final String DNET_REVIEW_LEVELS = "dnet:review_levels";
 
 	public static final String SYSIMPORT_CROSSWALK_REPOSITORY = "sysimport:crosswalk:repository";
 	public static final String SYSIMPORT_CROSSWALK_ENTITYREGISTRY = "sysimport:crosswalk:entityregistry";
