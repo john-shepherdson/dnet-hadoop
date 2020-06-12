@@ -8,29 +8,26 @@ import java.util.stream.Collectors;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDataset;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public abstract class AbstractEnrichMissingDataset
 	extends UpdateMatcher<eu.dnetlib.broker.objects.Dataset> {
 
-	private final Topic topic;
-
 	public AbstractEnrichMissingDataset(final Topic topic) {
-		super(true);
-		this.topic = topic;
+		super(true,
+			rel -> topic,
+			(p, rel) -> p.getDatasets().add(rel),
+			rel -> rel.getInstances().get(0).getUrl());
 	}
 
 	protected abstract boolean filterByType(String relType);
 
 	@Override
-	protected final List<UpdateInfo<eu.dnetlib.broker.objects.Dataset>> findUpdates(
+	protected final List<eu.dnetlib.broker.objects.Dataset> findDifferences(
 		final ResultWithRelations source,
-		final ResultWithRelations target,
-		final DedupConfig dedupConfig) {
+		final ResultWithRelations target) {
 
 		final Set<String> existingDatasets = target
 			.getDatasets()
@@ -47,26 +44,8 @@ public abstract class AbstractEnrichMissingDataset
 			.map(RelatedDataset::getRelDataset)
 			.filter(d -> !existingDatasets.contains(d.getId()))
 			.map(ConversionUtils::oafDatasetToBrokerDataset)
-			.map(i -> generateUpdateInfo(i, source, target, dedupConfig))
 			.collect(Collectors.toList());
 
-	}
-
-	protected final UpdateInfo<eu.dnetlib.broker.objects.Dataset> generateUpdateInfo(
-		final eu.dnetlib.broker.objects.Dataset highlightValue,
-		final ResultWithRelations source,
-		final ResultWithRelations target,
-		final DedupConfig dedupConfig) {
-		return new UpdateInfo<>(
-			getTopic(),
-			highlightValue, source, target,
-			(p, rel) -> p.getDatasets().add(rel),
-			rel -> rel.getInstances().get(0).getUrl(),
-			dedupConfig);
-	}
-
-	public Topic getTopic() {
-		return topic;
 	}
 
 }
