@@ -27,8 +27,7 @@ public class ModelConstants {
 
 	public static final String RESULT_RESULT = "resultResult";
 	/**
-	 * @deprecated
-	 * Use {@link ModelConstants#RELATIONSHIP} instead.
+	 * @deprecated Use {@link ModelConstants#RELATIONSHIP} instead.
 	 */
 	@Deprecated
 	public static final String PUBLICATION_DATASET = "publicationDataset";
@@ -46,7 +45,6 @@ public class ModelConstants {
 	public static final String REVIEW = "review";
 	public static final String REVIEWS = "reviews";
 	public static final String IS_REVIEWED_BY = "IsReviewedBy";
-
 
 	public static final String RESULT_PROJECT = "resultProject";
 	public static final String OUTCOME = "outcome";

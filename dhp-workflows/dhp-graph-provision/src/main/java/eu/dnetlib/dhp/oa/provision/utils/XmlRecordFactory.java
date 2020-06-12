@@ -897,7 +897,10 @@ public class XmlRecordFactory implements Serializable {
 					metadata.add(XmlSerializationUtils.mapQualifier("contracttype", p.getContracttype()));
 				}
 				if (p.getOamandatepublications() != null) {
-					metadata.add(XmlSerializationUtils.asXmlElement("oamandatepublications", p.getOamandatepublications().getValue()));
+					metadata
+						.add(
+							XmlSerializationUtils
+								.asXmlElement("oamandatepublications", p.getOamandatepublications().getValue()));
 				}
 				if (p.getEcsc39() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("ecsc39", p.getEcsc39().getValue()));

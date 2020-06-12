@@ -1,13 +1,14 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 
 public class OafNavigator2 {
 
@@ -22,7 +23,7 @@ public class OafNavigator2 {
 		} else {
 			try {
 				for (Field field : getAllFields(o.getClass())) {
-					System.out.println("VISITING " + field.getName() + " in " + o.getClass());
+					//System.out.println("VISITING " + field.getName() + " in " + o.getClass());
 					field.setAccessible(true);
 					Object value = field.get(o);
 
@@ -33,7 +34,8 @@ public class OafNavigator2 {
 							for (Object fi : fs) {
 								navigate(fi, mapping);
 							}
-						} if (Iterable.class.isAssignableFrom(fieldType)) {
+						}
+						if (Iterable.class.isAssignableFrom(fieldType)) {
 							Iterable fs = (Iterable) value;
 							for (Object fi : fs) {
 								navigate(fi, mapping);
@@ -43,9 +45,9 @@ public class OafNavigator2 {
 							if (Objects.nonNull(cleaningFn)) {
 								final Object newValue = cleaningFn.apply(value);
 								if (!Objects.equals(value, newValue)) {
-									System.out.println("PATCHING " + field.getName()+ " " + value.getClass());
-									System.out.println("OLD VALUE " + getObjectMapper().writeValueAsString(value));
-									System.out.println("NEW VALUE " + getObjectMapper().writeValueAsString(newValue));
+									//System.out.println("PATCHING " + field.getName() + " " + value.getClass());
+									//System.out.println("OLD VALUE " + getObjectMapper().writeValueAsString(value));
+									//System.out.println("NEW VALUE " + getObjectMapper().writeValueAsString(newValue));
 									field.set(o, newValue);
 								}
 							}
@@ -53,7 +55,7 @@ public class OafNavigator2 {
 					}
 				}
 
-			} catch (IllegalAccessException | IllegalArgumentException | JsonProcessingException e) {
+			} catch (IllegalAccessException | IllegalArgumentException /*| JsonProcessingException*/ e) {
 				throw new RuntimeException(e);
 			}
 		}

@@ -17,12 +17,11 @@ import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
 
 /**
-* PacePerson tries to derive information from the fullname string of an author.
-* Such informations are Names, Surnames an Fullname split into terms. It provides also an additional field for
-* the original data.
-* The calculation of the names and the surnames is not always possible. When it is impossible to assert which are the
-* names and the surnames, the lists are empty.
-* */
+ * PacePerson tries to derive information from the fullname string of an author. Such informations are Names, Surnames
+ * an Fullname split into terms. It provides also an additional field for the original data. The calculation of the
+ * names and the surnames is not always possible. When it is impossible to assert which are the names and the surnames,
+ * the lists are empty.
+ */
 public class PacePerson {
 
 	private static final String UTF8 = "UTF-8";
@@ -34,18 +33,18 @@ public class PacePerson {
 	private static Set<String> particles = null;
 
 	/**
-	* Capitalizes a string
+	 * Capitalizes a string
 	 *
 	 * @param s the string to capitalize
 	 * @return the input string with capital letter
-	* */
+	 */
 	public static final String capitalize(final String s) {
 		return WordUtils.capitalize(s.toLowerCase(), ' ', '-');
 	}
 
 	/**
-	* Adds a dot to a string with length equals to 1
-	* */
+	 * Adds a dot to a string with length equals to 1
+	 */
 	public static final String dotAbbreviations(final String s) {
 		return s.length() == 1 ? s + "." : s;
 	}
@@ -63,11 +62,11 @@ public class PacePerson {
 	}
 
 	/**
-	* The constructor of the class. It fills the fields of the class basing on the input fullname.
+	 * The constructor of the class. It fills the fields of the class basing on the input fullname.
 	 *
 	 * @param s the input string (fullname of the author)
 	 * @param aggressive set the string normalization type
-	* */
+	 */
 	public PacePerson(String s, final boolean aggressive) {
 		original = s;
 		s = Normalizer.normalize(s, Normalizer.Form.NFD);
@@ -86,7 +85,7 @@ public class PacePerson {
 			// s = s.replaceAll("[\\W&&[^,-]]", "");
 		}
 
-		//if the string contains a comma, it can derive surname and name by splitting on it
+		// if the string contains a comma, it can derive surname and name by splitting on it
 		if (s.contains(",")) {
 			final String[] arr = s.split(",");
 			if (arr.length == 1) {
@@ -97,23 +96,23 @@ public class PacePerson {
 				fullname.addAll(surname);
 				fullname.addAll(name);
 			}
-		} else {  //otherwise, it should rely on CAPS terms and short terms
+		} else { // otherwise, it should rely on CAPS terms and short terms
 			fullname = splitTerms(s);
 
 			int lastInitialPosition = fullname.size();
 			boolean hasSurnameInUpperCase = false;
 
-			//computes lastInitialPosition and hasSurnameInUpperCase
+			// computes lastInitialPosition and hasSurnameInUpperCase
 			for (int i = 0; i < fullname.size(); i++) {
 				final String term = fullname.get(i);
 				if (term.length() == 1) {
-					lastInitialPosition = i; //first word in the name longer than 1 (to avoid name with dots)
+					lastInitialPosition = i; // first word in the name longer than 1 (to avoid name with dots)
 				} else if (term.equals(term.toUpperCase())) {
-					hasSurnameInUpperCase = true; //if one of the words is CAPS
+					hasSurnameInUpperCase = true; // if one of the words is CAPS
 				}
 			}
 
-			//manages particular cases of fullnames
+			// manages particular cases of fullnames
 			if (lastInitialPosition < fullname.size() - 1) { // Case: Michele G. Artini
 				name = fullname.subList(0, lastInitialPosition + 1);
 				surname = fullname.subList(lastInitialPosition + 1, fullname.size());

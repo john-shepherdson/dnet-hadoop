@@ -1,26 +1,26 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
-import com.google.common.collect.Maps;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.api.java.function.MapFunction;
-
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.function.MapFunction;
+
+import com.google.common.collect.Maps;
+
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class CleaningRule<T extends Oaf> implements MapFunction<T, T> {
 
 	private VocabularyGroup vocabularies;
 
 	private Map<Class, Function<Object, Object>> mapping = Maps.newHashMap();
-
 
 	public CleaningRule(VocabularyGroup vocabularies) {
 		this.vocabularies = vocabularies;
@@ -33,7 +33,7 @@ public class CleaningRule<T extends Oaf> implements MapFunction<T, T> {
 	@Override
 	public T call(T value) throws Exception {
 
-		OafNavigator.apply(value, mapping);
+		OafNavigator2.apply(value, mapping);
 
 		return value;
 	}
