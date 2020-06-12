@@ -51,7 +51,7 @@ public class GenerateEventsApplication {
 			IOUtils
 				.toString(
 					GenerateEventsApplication.class
-						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json")));
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_broker_events.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -149,7 +149,8 @@ public class GenerateEventsApplication {
 		return r4;
 	}
 
-	private static <T, RT> Dataset<RT> relatedEntities(final Dataset<T> targets, final Dataset<Relation> rels,
+	private static <T, RT> Dataset<RT> relatedEntities(final Dataset<T> targets,
+		final Dataset<Relation> rels,
 		final Class<RT> clazz) {
 		return rels
 			.joinWith(targets, targets.col("id").equalTo(rels.col("target")), "inner")
