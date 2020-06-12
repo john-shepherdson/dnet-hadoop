@@ -25,6 +25,11 @@ public class ModelConstants {
 	public static final String ORP_RESULTTYPE_CLASSID = "other";
 
 	public static final String RESULT_RESULT = "resultResult";
+	/**
+	 * @deprecated
+	 * Use {@link ModelConstants#RELATIONSHIP} instead.
+	 */
+	@Deprecated
 	public static final String PUBLICATION_DATASET = "publicationDataset";
 	public static final String IS_RELATED_TO = "isRelatedTo";
 	public static final String SUPPLEMENT = "supplement";
