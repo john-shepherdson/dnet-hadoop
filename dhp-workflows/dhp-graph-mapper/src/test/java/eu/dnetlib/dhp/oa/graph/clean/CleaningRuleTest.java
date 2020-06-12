@@ -7,6 +7,7 @@ import static org.mockito.Mockito.lenient;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -82,6 +84,11 @@ public class CleaningRuleTest {
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_out));
 
+		assertTrue(
+			p_out
+				.getPid()
+				.stream()
+				.allMatch(sp -> StringUtils.isNotBlank(sp.getValue())));
 	}
 
 	private Stream<Qualifier> getAuthorPidTypes(Publication pub) {

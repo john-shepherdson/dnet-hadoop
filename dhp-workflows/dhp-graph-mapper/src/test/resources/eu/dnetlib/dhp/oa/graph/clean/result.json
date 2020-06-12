@@ -380,6 +380,28 @@
         "schemename": "dnet:pid_types"
       },
       "value": "10.1007/s109090161569x"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "doi",
+        "classname": "doi",
+        "schemeid": "dnet:pid_types",
+        "schemename": "dnet:pid_types"
+      },
+      "value": ""
     }
   ],
   "relevantdate": [

@@ -1,86 +1,70 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-
+import com.google.common.collect.Maps;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+
 public class CleaningRule<T extends Oaf> implements MapFunction<T, T> {
 
 	private VocabularyGroup vocabularies;
 
+	private Map<Class, Function<Object, Object>> mapping = Maps.newHashMap();
+
+
 	public CleaningRule(VocabularyGroup vocabularies) {
 		this.vocabularies = vocabularies;
+
+		mapping.put(Qualifier.class, o -> patchQualifier(o));
+		mapping.put(StructuredProperty.class, o -> patchSp(o));
+		mapping.put(Field.class, o -> patchStringField(o));
 	}
 
 	@Override
 	public T call(T value) throws Exception {
 
-		doClean(value);
+		OafNavigator.apply(value, mapping);
 
 		return value;
 	}
 
-	private void doClean(Object o) {
-		if (Objects.isNull(o)) {
-			return;
+	private Object patchQualifier(Object o) {
+		Qualifier q = (Qualifier) o;
+		if (vocabularies.vocabularyExists(q.getSchemeid())) {
+			return vocabularies.lookup(q.getSchemeid(), q.getClassid());
 		}
-
-		if (o instanceof Iterable) {
-			for (Object oi : (Iterable) o) {
-				doClean(oi);
-			}
-		} else {
-
-			Class clazz = o.getClass();
-
-			if (clazz.isPrimitive()
-				|| o instanceof Integer
-				|| o instanceof Double
-				|| o instanceof Float
-				|| o instanceof Long
-				|| o instanceof Boolean
-				|| o instanceof String) {
-				return;
-			} else {
-				try {
-					for (Field field : getAllFields(new LinkedList<>(), clazz)) {
-						field.setAccessible(true);
-						Object value = field.get(o);
-						if (value instanceof Qualifier) {
-							Qualifier q = (Qualifier) value;
-							if (vocabularies.vocabularyExists(q.getSchemeid())) {
-								field.set(o, vocabularies.lookup(q.getSchemeid(), q.getClassid()));
-							}
-
-						} else {
-							doClean(value);
-						}
-					}
-				} catch (IllegalAccessException | IllegalArgumentException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
+		return o;
 	}
 
-	private static List<Field> getAllFields(List<Field> fields, Class<?> clazz) {
-		fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+	private Object patchSp(Object o) {
+		StructuredProperty sp = (StructuredProperty) o;
+		if (StringUtils.isBlank(sp.getValue())) {
+			return null;
+		}
+		return o;
+	}
 
-		final Class<?> superclass = clazz.getSuperclass();
-		if (Objects.nonNull(superclass) && superclass.getPackage().equals(Oaf.class.getPackage())) {
-			getAllFields(fields, superclass);
+	private Object patchStringField(Object o) {
+		Field f = (Field) o;
+		try {
+			if (StringUtils.isBlank((String) f.getValue())) {
+				return null;
+			}
+		} catch (ClassCastException e) {
+			// ignored on purpose
 		}
 
-		return fields;
+		return o;
 	}
 
 	public VocabularyGroup getVocabularies() {

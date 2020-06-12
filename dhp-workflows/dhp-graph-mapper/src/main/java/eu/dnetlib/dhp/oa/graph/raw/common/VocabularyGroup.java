@@ -105,7 +105,10 @@ public class VocabularyGroup implements Serializable {
 	}
 
 	public Qualifier getTermAsQualifier(final String vocId, final String id) {
-		return vocs.get(vocId.toLowerCase()).getTermAsQualifier(id);
+		if (vocabularyExists(vocId)) {
+			return vocs.get(vocId.toLowerCase()).getTermAsQualifier(id);
+		}
+		return OafMapperUtils.qualifier(id, id, "", "");
 	}
 
 	public Qualifier getSynonymAsQualifier(final String vocId, final String syn) {
