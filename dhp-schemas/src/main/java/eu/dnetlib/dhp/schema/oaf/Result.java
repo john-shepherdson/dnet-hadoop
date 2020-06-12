@@ -254,28 +254,25 @@ public class Result extends OafEntity implements Serializable {
 				final StructuredProperty p = baseMainTitle;
 				title = title.stream().filter(t -> t != p).collect(Collectors.toList());
 			}
-//
-//
-//			title.remove(baseMainTitle);
 		}
 
 		StructuredProperty newMainTitle = null;
 		if (r.getTitle() != null) {
 			newMainTitle = getMainTitle(r.getTitle());
-			if (newMainTitle != null) {
+			if (newMainTitle != null && title != null) {
 				final StructuredProperty p = newMainTitle;
 				title = title.stream().filter(t -> t != p).collect(Collectors.toList());
 			}
-
-			// r.getTitle().remove(newMainTitle);
 		}
 
-		if (newMainTitle != null && compareTrust(this, r) < 0)
+		if (newMainTitle != null && compareTrust(this, r) < 0) {
 			baseMainTitle = newMainTitle;
+		}
 
 		title = mergeLists(title, r.getTitle());
-		if (title != null && baseMainTitle != null)
+		if (title != null && baseMainTitle != null) {
 			title.add(baseMainTitle);
+		}
 
 		relevantdate = mergeLists(relevantdate, r.getRelevantdate());
 
