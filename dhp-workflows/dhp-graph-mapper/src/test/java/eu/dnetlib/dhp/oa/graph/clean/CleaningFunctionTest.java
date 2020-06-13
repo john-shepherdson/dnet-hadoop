@@ -5,32 +5,27 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyTerm;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
-public class CleaningRuleTest {
+public class CleaningFunctionTest {
 
 	public static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -39,7 +34,7 @@ public class CleaningRuleTest {
 
 	private VocabularyGroup vocabularies;
 
-	private CleaningRule<Publication> cleaningRule;
+	private CleaningRuleMap mapping;
 
 	@BeforeEach
 	public void setUp() throws ISLookUpException, IOException {
@@ -49,18 +44,19 @@ public class CleaningRuleTest {
 			.thenReturn(synonyms());
 
 		vocabularies = VocabularyGroup.loadVocsFromIS(isLookUpService);
-		cleaningRule = new CleaningRule(vocabularies);
+		mapping = CleaningRuleMap.create(vocabularies);
 	}
 
 	@Test
 	public void testCleaning() throws Exception {
 
-		assertNotNull(cleaningRule.getVocabularies());
+		assertNotNull(vocabularies);
+		assertNotNull(mapping);
 
 		String json = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result.json"));
 		Publication p_in = MAPPER.readValue(json, Publication.class);
 
-		Publication p_out = cleaningRule.call(p_in);
+		Publication p_out = OafCleaner.apply(p_in, mapping);
 
 		assertNotNull(p_out);
 
@@ -100,11 +96,11 @@ public class CleaningRuleTest {
 
 	private List<String> vocs() throws IOException {
 		return IOUtils
-			.readLines(CleaningRuleTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
-			.readLines(CleaningRuleTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 }

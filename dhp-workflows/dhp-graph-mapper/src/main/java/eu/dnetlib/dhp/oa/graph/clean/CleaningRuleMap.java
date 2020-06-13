@@ -1,43 +1,23 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
-import java.util.Map;
-import java.util.function.Consumer;
+import java.io.Serializable;
+import java.util.HashMap;
 
-import org.apache.spark.api.java.function.MapFunction;
-
-import com.google.common.collect.Maps;
-
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableConsumer;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class CleaningRule<T extends Oaf> implements MapFunction<T, T> {
-
-	private VocabularyGroup vocabularies;
-
-	private Map<Class, Consumer<Object>> mapping = Maps.newHashMap();
-
-	public CleaningRule(VocabularyGroup vocabularies) {
-		this.vocabularies = vocabularies;
-		setMappings(vocabularies);
-	}
-
-	@Override
-	public T call(T value) throws Exception {
-
-		OafNavigator.apply(value, mapping);
-
-		return value;
-	}
+public class CleaningRuleMap extends HashMap<Class, SerializableConsumer<Object>> implements Serializable {
 
 	/**
-	 * Populates the mapping for the Oaf types subject to cleaning
-	 * 
+	 * Creates the mapping for the Oaf types subject to cleaning
+	 *
 	 * @param vocabularies
 	 */
-	private void setMappings(VocabularyGroup vocabularies) {
+	public static CleaningRuleMap create(VocabularyGroup vocabularies) {
+		CleaningRuleMap mapping = new CleaningRuleMap();
 		mapping.put(Qualifier.class, o -> {
 			Qualifier q = (Qualifier) o;
 			if (vocabularies.vocabularyExists(q.getSchemeid())) {
@@ -54,10 +34,7 @@ public class CleaningRule<T extends Oaf> implements MapFunction<T, T> {
 			 * }
 			 */
 		});
-	}
-
-	public VocabularyGroup getVocabularies() {
-		return vocabularies;
+		return mapping;
 	}
 
 }

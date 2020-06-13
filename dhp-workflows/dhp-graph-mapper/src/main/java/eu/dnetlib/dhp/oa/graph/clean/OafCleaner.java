@@ -1,15 +1,18 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 
-public class OafNavigator {
+public class OafCleaner implements Serializable {
 
-	public static <E extends Oaf> E apply(E oaf, Map<Class, Consumer<Object>> mapping) {
+	public static <E extends Oaf> E apply(E oaf, CleaningRuleMap mapping) {
 		try {
 			navigate(oaf, mapping);
 		} catch (IllegalAccessException e) {
@@ -18,7 +21,7 @@ public class OafNavigator {
 		return oaf;
 	}
 
-	private static void navigate(Object o, Map<Class, Consumer<Object>> mapping) throws IllegalAccessException {
+	private static void navigate(Object o, CleaningRuleMap mapping) throws IllegalAccessException {
 		if (isPrimitive(o)) {
 			return;
 		} else if (isIterable(o.getClass())) {
@@ -40,7 +43,7 @@ public class OafNavigator {
 		}
 	}
 
-	private static boolean hasMapping(Object o, Map<Class, Consumer<Object>> mapping) {
+	private static boolean hasMapping(Object o, CleaningRuleMap mapping) {
 		return mapping.containsKey(o.getClass());
 	}
 

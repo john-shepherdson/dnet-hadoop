@@ -72,18 +72,17 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Clean publications</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
-                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/publication</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
@@ -99,18 +98,17 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Clean datasets</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
-                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/dataset</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
@@ -126,18 +124,17 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Clean otherresearchproducts</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
-                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/otherresearchproduct</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
@@ -153,18 +150,17 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Clean softwares</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
-                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/software</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
@@ -180,18 +176,17 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Clean datasources</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
-                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/datasource</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
@@ -207,18 +202,17 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Clean organizations</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
-                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/organization</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
@@ -234,18 +228,17 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Clean projects</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
-                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/project</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
@@ -261,18 +254,17 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Clean relations</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphProperties</class>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
-                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/relation</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>

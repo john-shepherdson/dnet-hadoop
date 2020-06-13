@@ -3,19 +3,9 @@ package eu.dnetlib.dhp.oa.graph.clean;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -33,11 +23,10 @@ import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import scala.Predef;
 
-public class CleanGraphProperties {
+public class CleanGraphSparkJob {
 
-	private static final Logger log = LoggerFactory.getLogger(CleanGraphProperties.class);
+	private static final Logger log = LoggerFactory.getLogger(CleanGraphSparkJob.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -45,7 +34,7 @@ public class CleanGraphProperties {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				CleanGraphProperties.class
+				CleanGraphSparkJob.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/oa/graph/input_clean_graph_parameters.json"));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
@@ -91,13 +80,14 @@ public class CleanGraphProperties {
 		Class<T> clazz,
 		String outputPath) {
 
-		CleaningRule<T> rule = new CleaningRule<>(vocs);
+		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
 
 		readTableFromPath(spark, inputPath, clazz)
-			.map(rule, Encoders.bean(clazz))
+			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
+			.option("compression", "gzip")
+			.json(outputPath);
 	}
 
 	private static <T extends Oaf> Dataset<T> readTableFromPath(
