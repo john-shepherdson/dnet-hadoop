@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.oa.graph.dump;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -6,10 +7,8 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.oaf.Context;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import javax.management.Query;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
@@ -19,127 +18,129 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Result;
-
-import javax.management.Query;
-
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class SparkDumpCommunityProducts implements Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkDumpCommunityProducts.class);
-    private QueryInformationSystem queryInformationSystem;
+	private static final Logger log = LoggerFactory.getLogger(SparkDumpCommunityProducts.class);
+	private static QueryInformationSystem queryInformationSystem;
 
+	public static void main(String[] args) throws Exception {
+		String jsonConfiguration = IOUtils
+			.toString(
+				SparkDumpCommunityProducts.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/dump/input_parameters.json"));
 
-    public static void main(String[] args) throws Exception {
-        String jsonConfiguration = IOUtils
-                .toString(
-                        SparkDumpCommunityProducts.class
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/graph/dump/input_parameters.json"));
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		parser.parseArgument(args);
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(args);
+		Boolean isSparkSessionManaged = Optional
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		final String inputPath = parser.get("sourcePath");
+		log.info("inputPath: {}", inputPath);
 
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath: {}", outputPath);
 
-        final String inputPath = parser.get("sourcePath");
-        log.info("inputPath: {}", inputPath);
+		final String resultClassName = parser.get("resultTableName");
+		log.info("resultTableName: {}", resultClassName);
 
-        final String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+		final String dumpClassName = parser.get("dumpTableName");
+		log.info("dumpClassName: {}", dumpClassName);
 
-        final String resultClassName = parser.get("resultTableName");
-        log.info("resultTableName: {}", resultClassName);
+		final String isLookUpUrl = parser.get("isLookUpUrl");
+		log.info("isLookUpUrl: {}", isLookUpUrl);
 
-        final String dumpClassName = parser.get("dumpTableName");
-        log.info("dumpClassName: {}", dumpClassName);
+//        final String resultType = parser.get("resultType");
+//        log.info("resultType: {}", resultType);
 
-        final String isLookUpUrl = parser.get("isLookUpUrl");
-        log.info("isLookUpUrl: {}", isLookUpUrl);
+		final Optional<String> cm = Optional.ofNullable(parser.get("communityMap"));
 
-        final String resultType = parser.get("resultType");
-        log.info("resultType: {}", resultType);
+		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
+		Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result> dumpClazz = (Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result>) Class
+			.forName(dumpClassName);
 
+		SparkConf conf = new SparkConf();
 
-        SparkDumpCommunityProducts sdcp = new SparkDumpCommunityProducts();
+		CommunityMap communityMap;
 
-        sdcp.exec(isLookUpUrl, isSparkSessionManaged, outputPath,
-                inputPath, resultClassName, dumpClassName);
+		if (!isLookUpUrl.equals("BASEURL:8280/is/services/isLookUp")) {
+			queryInformationSystem = new QueryInformationSystem();
+			queryInformationSystem.setIsLookUp(getIsLookUpService(isLookUpUrl));
+			communityMap = queryInformationSystem.getCommunityMap();
+		} else {
+			communityMap = new Gson().fromJson(cm.get(), CommunityMap.class);
+		}
 
-    }
+		runWithSparkSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				Utils.removeOutputDir(spark, outputPath);
+				execDump(spark, inputPath, outputPath, communityMap, inputClazz, dumpClazz);
 
-    public QueryInformationSystem getQueryInformationSystem() {
-        return queryInformationSystem;
-    }
+			});
 
-    public void setQueryInformationSystem(QueryInformationSystem queryInformationSystem) {
-        this.queryInformationSystem = queryInformationSystem;
-    }
+	}
 
-    public ISLookUpService getIsLookUpService(String isLookUpUrl){
-        return ISLookupClientFactory.getLookUpService(isLookUpUrl);
-    }
+	public static ISLookUpService getIsLookUpService(String isLookUpUrl) {
+		return ISLookupClientFactory.getLookUpService(isLookUpUrl);
+	}
 
-    public void exec(String isLookUpUrl, Boolean isSparkSessionManaged, String outputPath, String inputPath,
-                     String resultClassName, String dumpClassName) throws ISLookUpException, ClassNotFoundException {
-        SparkConf conf = new SparkConf();
+	public static <I extends Result, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> void execDump(SparkSession spark,
+		String inputPath,
+		String outputPath,
+		CommunityMap communityMap,
+		Class<I> inputClazz,
+		Class<O> dumpClazz) {
 
-        Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
-        Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result> dumpClazz =
-                (Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result>) Class.forName(dumpClassName);
+		// Set<String> communities = communityMap.keySet();
+		Dataset<I> tmp = Utils.readPath(spark, inputPath, inputClazz);
 
-        queryInformationSystem.setIsLookUp(getIsLookUpService(isLookUpUrl));
-        Map<String,String>
-                communityMap = queryInformationSystem.getCommunityMap();
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    Utils.removeOutputDir(spark, outputPath);
-                    execDump(spark, inputPath, outputPath , communityMap, inputClazz, dumpClazz);
-                });
-    }
+		tmp
+			.map(value -> execMap(value, communityMap), Encoders.bean(dumpClazz))
+			.filter(Objects::nonNull)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
 
+	}
 
-    private  <I extends Result, O extends eu.dnetlib.dhp.schema.dump.oaf.Result > void execDump(
-            SparkSession spark,
-            String inputPath,
-            String outputPath,
-            Map<String,String> communityMap,
-            Class<I> inputClazz,
-            Class<O> dumpClazz) {
-
-        Set<String> communities = communityMap.keySet();
-        Dataset<I> tmp = Utils.readPath(spark, inputPath, inputClazz);
-        tmp.map(value -> {
-            Optional<List<Context>> inputContext = Optional.ofNullable(value.getContext());
-            if(!inputContext.isPresent()){
-                return null;
-            }
-            List<String> toDumpFor = inputContext.get().stream().map(c -> {
-                if (communities.contains(c.getId())) {
-                    return c.getId();
-                }
-                return null;
-            }).filter(Objects::nonNull).collect(Collectors.toList());
-            if(toDumpFor.size() == 0){
-                return null;
-            }
-            return Mapper.map(value, communityMap);
-        },Encoders.bean(dumpClazz))
-        .write()
-        .mode(SaveMode.Overwrite)
-        .option("compression","gzip")
-        .json(outputPath);
-
-    }
-
+	private static <O extends eu.dnetlib.dhp.schema.dump.oaf.Result, I extends Result> O execMap(I value,
+		CommunityMap communityMap) {
+		{
+			Set<String> communities = communityMap.keySet();
+			Optional<List<Context>> inputContext = Optional.ofNullable(value.getContext());
+			if (!inputContext.isPresent()) {
+				return null;
+			}
+			List<String> toDumpFor = inputContext.get().stream().map(c -> {
+				if (communities.contains(c.getId())) {
+					return c.getId();
+				}
+				if (c.getId().contains("::") && communities.contains(c.getId().substring(0, c.getId().indexOf("::")))) {
+					return c.getId().substring(0, 3);
+				}
+				return null;
+			}).filter(Objects::nonNull).collect(Collectors.toList());
+			if (toDumpFor.size() == 0) {
+				return null;
+			}
+			return Mapper.map(value, communityMap);
+		}
+	}
 
 }
-

@@ -1,98 +1,122 @@
+
 package eu.dnetlib.dhp.oa.graph.dump;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.google.gson.Gson;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class SparkSplitForCommunity implements Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkSplitForCommunity.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkSplitForCommunity.class);
 
+	public static void main(String[] args) throws Exception {
+		String jsonConfiguration = IOUtils
+			.toString(
+				SparkSplitForCommunity.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/dump/split_parameters.json"));
 
-    public static void main(String[] args) throws Exception {
-        String jsonConfiguration = IOUtils
-                .toString(
-                        SparkSplitForCommunity.class
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/graph/dump/split_parameters.json"));
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		parser.parseArgument(args);
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(args);
+		Boolean isSparkSessionManaged = Optional
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		final String inputPath = parser.get("sourcePath");
+		log.info("inputPath: {}", inputPath);
 
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath: {}", outputPath);
 
-        final String inputPath = parser.get("sourcePath");
-        log.info("inputPath: {}", inputPath);
+		final String resultClassName = parser.get("resultTableName");
+		log.info("resultTableName: {}", resultClassName);
 
-        final String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+		final String isLookUpUrl = parser.get("isLookUpUrl");
+		log.info("isLookUpUrl: {}", isLookUpUrl);
 
-        final String resultClassName = parser.get("resultTableName");
-        log.info("resultTableName: {}", resultClassName);
+		final Optional<String> cm = Optional.ofNullable(parser.get("communityMap"));
 
-        final String isLookUpUrl = parser.get("isLookUpUrl");
-        log.info("isLookUpUrl: {}", isLookUpUrl);
+		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
+		SparkConf conf = new SparkConf();
 
-        Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
+		CommunityMap communityMap;
 
-        SparkConf conf = new SparkConf();
+		if (!isLookUpUrl.equals("BASEURL:8280/is/services/isLookUp")) {
+			QueryInformationSystem queryInformationSystem = new QueryInformationSystem();
+			queryInformationSystem.setIsLookUp(getIsLookUpService(isLookUpUrl));
+			communityMap = queryInformationSystem.getCommunityMap();
+		} else {
+			communityMap = new Gson().fromJson(cm.get(), CommunityMap.class);
+		}
 
-        Map<String,String>
-                communityMap = QueryInformationSystem.getCommunityMap(isLookUpUrl);
+		runWithSparkSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				Utils.removeOutputDir(spark, outputPath);
+				execSplit(spark, inputPath, outputPath, communityMap.keySet(), inputClazz);
+			});
+	}
 
+	public static ISLookUpService getIsLookUpService(String isLookUpUrl) {
+		return ISLookupClientFactory.getLookUpService(isLookUpUrl);
+	}
 
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    Utils.removeOutputDir(spark, outputPath);
-                    execSplit(spark, inputPath, outputPath , communityMap.keySet(), inputClazz);
-                });
-    }
+	private static <R extends Result> void execSplit(SparkSession spark, String inputPath, String outputPath,
+		Set<String> communities, Class<R> inputClazz) {
 
-    private static <R extends Result> void execSplit(SparkSession spark, String inputPath, String outputPath, Set<String> communities
-            , Class<R> inputClazz) {
+		Dataset<R> result = Utils.readPath(spark, inputPath, inputClazz);
 
-        Dataset<R> result = Utils.readPath(spark, inputPath, inputClazz);
+		communities
+			.stream()
+			.forEach(c -> printResult(c, result, outputPath));
 
-        communities.stream()
-                .forEach(c -> printResult(c, result, outputPath));
+	}
 
-    }
+	private static <R extends Result> void printResult(String c, Dataset<R> result, String outputPath) {
+		result
+			.filter(r -> containsCommunity(r, c))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Append)
+			.json(outputPath + "/" + c);
+	}
 
-    private static <R extends Result> void printResult(String c, Dataset<R> result, String outputPath) {
-        result.filter(r -> containsCommunity(r, c))
-                .write()
-                .option("compression","gzip")
-                .mode(SaveMode.Append)
-                .json(outputPath + "/" + c);
-    }
-
-    private static <R extends Result> boolean containsCommunity(R r, String c) {
-        if(Optional.ofNullable(r.getContext()).isPresent()) {
-            return r.getContext().stream().filter(con -> con.getCode().equals(c)).collect(Collectors.toList()).size() > 0;
-        }
-        return false;
-    }
+	private static <R extends Result> boolean containsCommunity(R r, String c) {
+		if (Optional.ofNullable(r.getContext()).isPresent()) {
+			return r
+				.getContext()
+				.stream()
+				.filter(con -> con.getCode().equals(c))
+				.collect(Collectors.toList())
+				.size() > 0;
+		}
+		return false;
+	}
 }

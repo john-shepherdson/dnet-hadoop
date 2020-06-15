@@ -1,34 +1,32 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import java.io.StringReader;
+import java.util.List;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class QueryInformationSystem {
 
 	private ISLookUpService isLookUp;
 
-	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') " +
-			"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-			"  return " +
-			"<community> " +
-			"{$x//CONFIGURATION/context/@id}" +
-			"{$x//CONFIGURATION/context/@label}" +
-			"</community>";
+	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
+		+
+		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
+		"  return " +
+		"<community> " +
+		"{$x//CONFIGURATION/context/@id}" +
+		"{$x//CONFIGURATION/context/@label}" +
+		"</community>";
 
-
-
-	public Map<String,String> getCommunityMap()
+	public CommunityMap getCommunityMap()
 		throws ISLookUpException {
 		return getMap(isLookUp.quickSearchProfile(XQUERY));
 
@@ -42,12 +40,8 @@ public class QueryInformationSystem {
 		this.isLookUp = isLookUpService;
 	}
 
-public void set(String isLookUpUrl){
-		isLookUpUrl = get(isLookUpUrl);
-}
-	public ISLookUpService
-	private static Map<String, String> getMap(List<String> communityMap) {
-		final Map<String, String> map = new HashMap<>();
+	public static CommunityMap getMap(List<String> communityMap) {
+		final CommunityMap map = new CommunityMap();
 
 		communityMap.stream().forEach(xml -> {
 			final Document doc;
@@ -58,7 +52,6 @@ public void set(String isLookUpUrl){
 			} catch (DocumentException e) {
 				e.printStackTrace();
 			}
-
 
 		});
 
