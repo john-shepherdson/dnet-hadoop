@@ -1,6 +1,6 @@
 --------------------------------------------------------------
 --------------------------------------------------------------
--- 2. Publication table/view and Publication related tables/views
+-- Publication table/view and Publication related tables/views
 --------------------------------------------------------------
 --------------------------------------------------------------
 
@@ -30,3 +30,6 @@ CREATE TABLE ${stats_db_name}.publication_oids AS SELECT substr(p.id, 4) AS id, 
 CREATE TABLE ${stats_db_name}.publication_pids AS SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value as pid FROM ${openaire_db_name}.publication p LATERAL VIEW explode(p.pid) pids AS ppid;
 
 CREATE TABLE ${stats_db_name}.publication_topics as select substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS TYPE, subjects.subject.value AS topic FROM ${openaire_db_name}.publication p LATERAL VIEW explode(p.subject) subjects AS subject;
+
+-- Publication_citations
+CREATE TABLE ${stats_db_name}.publication_citations AS SELECT substr(p.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS result FROM ${openaire_db_name}.publication p lateral view explode(p.extrainfo) citations AS citation WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") !="";

@@ -1,37 +1,24 @@
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- 6. Otherresearchproduct table/view and Otherresearchproduct related tables/views
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+------------------------------------------------------
+------------------------------------------------------
+-- Project table/view and Project related tables/views
+------------------------------------------------------
+------------------------------------------------------
+-- Project_oids Table
+DROP TABLE IF EXISTS ${stats_db_name}.project_oids;
+CREATE TABLE ${stats_db_name}.project_oids AS SELECT substr(p.id, 4) AS id, oids.ids AS oid FROM ${openaire_db_name}.project p LATERAL VIEW explode(p.originalid) oids AS ids;
 
--- Otherresearchproduct temporary table supporting updates
-DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_tmp;
-CREATE TABLE ${stats_db_name}.otherresearchproduct_tmp (   id STRING,   title STRING,   publisher STRING,   journal STRING,   date STRING,   year STRING,   bestlicence STRING,   embargo_end_date STRING,   delayed BOOLEAN,   authors INT,   source STRING,   abstract BOOLEAN,   type STRING )  CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties('transactional'='true');
+-- Project_organizations Table
+DROP TABLE IF EXISTS ${stats_db_name}.project_organizations;
+CREATE TABLE ${stats_db_name}.project_organizations AS SELECT substr(r.source, 4) AS id, substr(r.target, 4) AS organization from ${openaire_db_name}.relation r WHERE r.reltype='projectOrganization';
 
-INSERT INTO ${stats_db_name}.otherresearchproduct_tmp SELECT substr(o.id, 4) AS id, o.title[0].value AS title, o.publisher.value AS publisher, CAST(NULL AS string) AS journal, 
-o.dateofacceptance.value AS DATE, date_format(o.dateofacceptance.value,'yyyy') AS year, o.bestaccessright.classname AS bestlicence,
-o.embargoenddate.value as embargo_end_date, FALSE AS delayed, SIZE(o.author) AS authors , concat_ws('\u003B',o.source.value) AS source,
-CASE WHEN SIZE(o.description) > 0 THEN TRUE ELSE FALSE END AS abstract,
-'other' AS type 
-FROM ${openaire_db_name}.otherresearchproduct o
-WHERE o.datainfo.deletedbyinference=FALSE;
+-- Project_results Table
+DROP TABLE IF EXISTS ${stats_db_name}.project_results;
+CREATE TABLE ${stats_db_name}.project_results AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result FROM ${openaire_db_name}.relation r WHERE r.reltype='resultProject';
 
--- Otherresearchproduct_citations
-CREATE TABLE ${stats_db_name}.otherresearchproduct_citations AS SELECT substr(o.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS RESULT FROM ${openaire_db_name}.otherresearchproduct o  LATERAL VIEW explode(o.extrainfo) citations AS citation WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") !="";
+-- Project table
+----------------
+-- Creating and populating temporary Project table
+DROP TABLE IF EXISTS ${stats_db_name}.project_tmp;
+CREATE TABLE ${stats_db_name}.project_tmp (id STRING, acronym STRING, title STRING, funder STRING, funding_lvl0 STRING, funding_lvl1 STRING, funding_lvl2 STRING, ec39 STRING, type STRING, startdate STRING, enddate STRING, start_year STRING, end_year STRING, duration INT, haspubs STRING, numpubs INT, daysforlastpub INT, delayedpubs INT, callidentifier STRING, code STRING) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties('transactional'='true');
 
-CREATE TABLE ${stats_db_name}.otherresearchproduct_classifications AS SELECT substr(p.id, 4) AS id, instancetype.classname AS type FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype;
-
-CREATE TABLE ${stats_db_name}.otherresearchproduct_concepts AS SELECT substr(p.id, 4) AS id, contexts.context.id AS concept FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.context) contexts AS context;
-
-
-CREATE TABLE ${stats_db_name}.otherresearchproduct_datasources AS SELECT p.id, CASE WHEN d.id IS NULL THEN 'other' ELSE p.datasource END AS datasource FROM (SELECT  substr(p.id, 4) AS id, substr(instances.instance.hostedby.key, 4) AS datasource 
-from ${openaire_db_name}.otherresearchproduct p lateral view explode(p.instance) instances as instance) p LEFT OUTER JOIN
-(SELECT substr(d.id, 4) id from ${openaire_db_name}.datasource d WHERE d.datainfo.deletedbyinference=false) d on p.datasource = d.id;
-
-CREATE TABLE ${stats_db_name}.otherresearchproduct_languages AS SELECT substr(p.id, 4) AS id, p.language.classname AS language FROM ${openaire_db_name}.otherresearchproduct p;
-
-CREATE TABLE ${stats_db_name}.otherresearchproduct_oids AS SELECT substr(p.id, 4) AS id, oids.ids AS oid FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.originalid) oids AS ids;
-
-CREATE TABLE ${stats_db_name}.otherresearchproduct_pids AS SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value AS pid FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.pid) pids AS ppid;
-
-CREATE TABLE ${stats_db_name}.otherresearchproduct_topics AS SELECT substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS type, subjects.subject.value AS topic FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.subject) subjects AS subject;
+INSERT INTO ${stats_db_name}.project_tmp SELECT substr(p.id, 4) AS id, p.acronym.value AS acronym, p.title.value AS title, xpath_string(p.fundingtree[0].value, '//funder/name') AS funder, xpath_string(p.fundingtree[0].value, '//funding_level_0/name') AS funding_lvl0, xpath_string(p.fundingtree[0].value, '//funding_level_1/name') AS funding_lvl1, xpath_string(p.fundingtree[0].value, '//funding_level_2/name') AS funding_lvl2, p.ecsc39.value AS ec39, p.contracttype.classname AS type, p.startdate.value AS startdate, p.enddate.value AS enddate,  date_format(p.startdate.value, 'yyyy') AS start_year, date_format(p.enddate.value, 'yyyy') AS end_year, 0 AS duration, 'no' AS haspubs, 0 AS numpubs, 0 AS daysforlastpub, 0 AS delayedpubs, p.callidentifier.value AS callidentifier, p.code.value AS code FROM ${openaire_db_name}.project p WHERE p.datainfo.deletedbyinference=false;

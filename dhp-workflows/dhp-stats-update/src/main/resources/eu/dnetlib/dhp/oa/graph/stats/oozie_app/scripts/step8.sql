@@ -1,31 +1,37 @@
-----------------------------------------------------
-----------------------------------------------------
--- 8. Result table/view and Result related tables/views
-----------------------------------------------------
-----------------------------------------------------
+------------------------------------------------------------
+------------------------------------------------------------
+-- Datasource table/view and Datasource related tables/views
+------------------------------------------------------------
+------------------------------------------------------------
 
--- Views on temporary tables that should be re-created in the end
-CREATE OR REPLACE VIEW ${stats_db_name}.result as SELECT *, bestlicence AS access_mode FROM ${stats_db_name}.publication_tmp UNION ALL SELECT *,bestlicence AS access_mode FROM ${stats_db_name}.software_tmp UNION ALL SELECT *,bestlicence AS access_mode FROM ${stats_db_name}.dataset_tmp UNION ALL SELECT *,bestlicence AS access_mode FROM ${stats_db_name}.otherresearchproduct_tmp;
+-- Datasource table creation & update
+-------------------------------------
+-- Creating and populating temporary datasource table
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_tmp;
+CREATE TABLE ${stats_db_name}.datasource_tmp(`id` string, `name` STRING, `type` STRING, `dateofvalidation` STRING, `yearofvalidation` string, `harvested` BOOLEAN, `piwik_id` INT, `latitude` STRING, `longitude`STRING, `websiteurl` STRING, `compatibility` STRING) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties('transactional'='true');
 
--- Views on final tables
-CREATE OR REPLACE VIEW ${stats_db_name}.result_datasources AS SELECT * FROM ${stats_db_name}.publication_datasources UNION ALL SELECT * FROM ${stats_db_name}.software_datasources UNION ALL SELECT * FROM ${stats_db_name}.dataset_datasources UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_datasources;
+INSERT INTO ${stats_db_name}.datasource_tmp SELECT substr(d.id, 4) AS id, officialname.value AS name, datasourcetype.classname AS type, dateofvalidation.value AS dateofvalidation, date_format(d.dateofvalidation.value,'yyyy') AS yearofvalidation, FALSE AS harvested, 0 AS piwik_id, d.latitude.value AS latitude, d.longitude.value AS longitude, d.websiteurl.value AS websiteurl, d.openairecompatibility.classid AS compatibility
+FROM ${openaire_db_name}.datasource d
+WHERE d.datainfo.deletedbyinference=FALSE;
 
-CREATE OR REPLACE VIEW ${stats_db_name}.result_citations AS SELECT * FROM ${stats_db_name}.publication_citations UNION ALL SELECT * FROM ${stats_db_name}.software_citations UNION ALL SELECT * FROM ${stats_db_name}.dataset_citations UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_citations;
+-- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
+-- Creating a temporary dual table that will be removed after the following insert
+CREATE TABLE ${stats_db_name}.dual(dummy CHAR(1));
+INSERT INTO ${stats_db_name}.dual VALUES('X');
+INSERT INTO ${stats_db_name}.datasource_tmp (`id`, `name`, `type`, `dateofvalidation`, `yearofvalidation`, `harvested`, `piwik_id`, `latitude`, `longitude`, `websiteurl`, `compatibility`) 
+SELECT 'other', 'Other', 'Repository', NULL, NULL, false, 0, NULL, NULL, NULL, 'unknown' FROM ${stats_db_name}.dual WHERE 'other' not in (SELECT id FROM ${stats_db_name}.datasource_tmp WHERE name='Unknown Repository');
+DROP TABLE ${stats_db_name}.dual;
 
-CREATE OR REPLACE VIEW ${stats_db_name}.result_classifications AS SELECT * FROM ${stats_db_name}.publication_classifications UNION ALL SELECT * FROM ${stats_db_name}.software_classifications UNION ALL SELECT * FROM ${stats_db_name}.dataset_classifications UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_classifications;
+UPDATE ${stats_db_name}.datasource_tmp SET name='Other' WHERE name='Unknown Repository';
+UPDATE ${stats_db_name}.datasource_tmp SET yearofvalidation=null WHERE yearofvalidation='-1';
 
-CREATE OR REPLACE VIEW ${stats_db_name}.result_concepts AS SELECT * FROM ${stats_db_name}.publication_concepts UNION ALL SELECT * FROM ${stats_db_name}.software_concepts UNION ALL SELECT * FROM ${stats_db_name}.dataset_concepts UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_concepts;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_languages;
+CREATE TABLE ${stats_db_name}.datasource_languages AS SELECT substr(d.id, 4) AS id, langs.languages AS language FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages;
 
-CREATE OR REPLACE VIEW ${stats_db_name}.result_languages AS SELECT * FROM ${stats_db_name}.publication_languages UNION ALL SELECT * FROM ${stats_db_name}.software_languages UNION ALL SELECT * FROM ${stats_db_name}.dataset_languages UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_languages;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids;
+CREATE TABLE ${stats_db_name}.datasource_oids AS SELECT substr(d.id, 4) AS id, oids.ids AS oid FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids;
 
-CREATE OR REPLACE VIEW ${stats_db_name}.result_oids AS SELECT * FROM ${stats_db_name}.publication_oids UNION ALL SELECT * FROM ${stats_db_name}.software_oids UNION ALL SELECT * FROM ${stats_db_name}.dataset_oids UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_oids;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations;
+CREATE TABLE ${stats_db_name}.datasource_organizations AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization FROM ${openaire_db_name}.relation r WHERE r.reltype='datasourceOrganization';
 
-CREATE OR REPLACE VIEW ${stats_db_name}.result_pids AS SELECT * FROM ${stats_db_name}.publication_pids UNION ALL SELECT * FROM ${stats_db_name}.software_pids UNION ALL SELECT * FROM ${stats_db_name}.dataset_pids UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_pids;
-
-CREATE OR REPLACE VIEW ${stats_db_name}.result_topics AS SELECT * FROM ${stats_db_name}.publication_topics UNION ALL SELECT * FROM ${stats_db_name}.software_topics UNION ALL SELECT * FROM ${stats_db_name}.dataset_topics UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_topics;
-
-DROP TABLE IF EXISTS ${stats_db_name}.result_organization;
-CREATE TABLE ${stats_db_name}.result_organization AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization FROM ${openaire_db_name}.relation r WHERE r.reltype='resultOrganization';
-
-DROP TABLE IF EXISTS ${stats_db_name}.result_projects;
-CREATE TABLE ${stats_db_name}.result_projects AS select pr.result AS id, pr.id AS project, datediff(p.enddate, p.startdate) AS daysfromend FROM ${stats_db_name}.result r JOIN ${stats_db_name}.project_results pr ON r.id=pr.result JOIN ${stats_db_name}.project_tmp p ON p.id=pr.id;
+CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS SELECT datasource AS id, id AS result FROM ${stats_db_name}.result_datasources;
