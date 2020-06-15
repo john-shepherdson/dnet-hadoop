@@ -2,10 +2,7 @@
 package eu.dnetlib.dhp.schema.dump.oaf;
 
 import java.io.Serializable;
-
 import java.util.List;
-
-
 
 public abstract class OafEntity extends Oaf implements Serializable {
 
@@ -58,6 +55,5 @@ public abstract class OafEntity extends Oaf implements Serializable {
 	public void setProjects(List<Projects> projects) {
 		this.projects = projects;
 	}
-
 
 }

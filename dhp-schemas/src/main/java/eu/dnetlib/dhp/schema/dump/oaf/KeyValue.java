@@ -1,18 +1,17 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class KeyValue implements Serializable {
 
 	private String key;
 
 	private String value;
-
 
 	public String getKey() {
 		return key;
@@ -30,8 +29,7 @@ public class KeyValue implements Serializable {
 		this.value = value;
 	}
 
-
-	public static KeyValue newInstance(String key, String value){
+	public static KeyValue newInstance(String key, String value) {
 		KeyValue inst = new KeyValue();
 		inst.key = key;
 		inst.value = value;
@@ -42,6 +40,5 @@ public class KeyValue implements Serializable {
 	public boolean isBlank() {
 		return StringUtils.isBlank(key) && StringUtils.isBlank(value);
 	}
-
 
 }

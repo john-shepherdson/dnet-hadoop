@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
-
 import java.io.Serializable;
 import java.util.Objects;
+
+import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
+
 //ExtraInfo
 public class ExternalReference implements Serializable {
 	private String name;
@@ -58,7 +59,7 @@ public class ExternalReference implements Serializable {
 		this.value = value;
 	}
 
-	public static ExternalReference newInstance(ExtraInfo ei){
+	public static ExternalReference newInstance(ExtraInfo ei) {
 		ExternalReference er = new ExternalReference();
 
 		er.name = ei.getName();

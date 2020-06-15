@@ -1,17 +1,15 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-
 import java.io.Serializable;
 import java.util.List;
-
 
 public class Result extends OafEntity implements Serializable {
 
 	private List<Author> author;
 
 	// resulttype allows subclassing results into publications | datasets | software
-	private String type; //resulttype
+	private String type; // resulttype
 
 	// common fields
 	private Qualifier language;
@@ -26,7 +24,7 @@ public class Result extends OafEntity implements Serializable {
 
 	private List<String> description;
 
-	private String publicationdata; // dateofacceptance;
+	private String publicationdate; // dateofacceptance;
 
 	private String publisher;
 
@@ -48,7 +46,7 @@ public class Result extends OafEntity implements Serializable {
 
 	private List<Instance> instance;
 
-	private Container container;//Journal
+	private Container container;// Journal
 
 	public List<Author> getAuthor() {
 		return author;
@@ -73,7 +71,6 @@ public class Result extends OafEntity implements Serializable {
 	public void setAuthor(List<Author> author) {
 		this.author = author;
 	}
-
 
 	public Qualifier getLanguage() {
 		return language;
@@ -123,12 +120,12 @@ public class Result extends OafEntity implements Serializable {
 		this.description = description;
 	}
 
-	public String getPublicationdata() {
-		return publicationdata;
+	public String getPublicationdate() {
+		return publicationdate;
 	}
 
-	public void setPublicationdata(String publicationdata) {
-		this.publicationdata = publicationdata;
+	public void setPublicationdate(String publicationdate) {
+		this.publicationdate = publicationdate;
 	}
 
 	public String getPublisher() {
@@ -210,6 +207,5 @@ public class Result extends OafEntity implements Serializable {
 	public void setInstance(List<Instance> instance) {
 		this.instance = instance;
 	}
-
 
 }

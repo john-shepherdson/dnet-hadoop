@@ -1,67 +1,68 @@
-package eu.dnetlib.dhp.schema.dump.oaf;
 
-import eu.dnetlib.dhp.schema.oaf.Project;
+package eu.dnetlib.dhp.schema.dump.oaf;
 
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.Project;
+
 public class Projects {
 
-    private String id ;//OpenAIRE id
-    private String code;
+	private String id;// OpenAIRE id
+	private String code;
 
-    private String acronym;
+	private String acronym;
 
-    private String title;
+	private String title;
 
-    private List<String> funding_tree;
+	private Funder funder;
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getCode() {
-        return code;
-    }
+	public String getCode() {
+		return code;
+	}
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+	public void setCode(String code) {
+		this.code = code;
+	}
 
-    public String getAcronym() {
-        return acronym;
-    }
+	public String getAcronym() {
+		return acronym;
+	}
 
-    public void setAcronym(String acronym) {
-        this.acronym = acronym;
-    }
+	public void setAcronym(String acronym) {
+		this.acronym = acronym;
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public List<String> getFunding_tree() {
-        return funding_tree;
-    }
+	public Funder getFunder() {
+		return funder;
+	}
 
-    public void setFunding_tree(List<String> funding_tree) {
-        this.funding_tree = funding_tree;
-    }
+	public void setFunder(Funder funders) {
+		this.funder = funders;
+	}
 
-    public static Projects newInstance(String id, String code, String acronym, String title, List<String> funding_tree){
-        Projects projects = new Projects();
-        projects.setAcronym(acronym);
-        projects.setCode(code);
-        projects.setFunding_tree(funding_tree);
-        projects.setId(id);
-        projects.setTitle(title);
-        return projects;
-    }
+	public static Projects newInstance(String id, String code, String acronym, String title, Funder funder) {
+		Projects projects = new Projects();
+		projects.setAcronym(acronym);
+		projects.setCode(code);
+		projects.setFunder(funder);
+		projects.setId(id);
+		projects.setTitle(title);
+		return projects;
+	}
 }

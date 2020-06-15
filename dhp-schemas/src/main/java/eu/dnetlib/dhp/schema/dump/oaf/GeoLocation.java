@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
+
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class GeoLocation implements Serializable {
 
@@ -42,6 +43,5 @@ public class GeoLocation implements Serializable {
 	public boolean isBlank() {
 		return StringUtils.isBlank(point) && StringUtils.isBlank(box) && StringUtils.isBlank(place);
 	}
-
 
 }

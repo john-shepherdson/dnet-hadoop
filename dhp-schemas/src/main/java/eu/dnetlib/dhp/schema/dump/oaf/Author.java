@@ -1,5 +1,6 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -65,6 +66,5 @@ public class Author implements Serializable {
 	public void setAffiliation(List<String> affiliation) {
 		this.affiliation = affiliation;
 	}
-
 
 }

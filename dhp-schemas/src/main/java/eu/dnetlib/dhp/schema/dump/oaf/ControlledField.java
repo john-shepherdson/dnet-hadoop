@@ -1,35 +1,36 @@
-package eu.dnetlib.dhp.schema.dump.oaf;
 
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+package eu.dnetlib.dhp.schema.dump.oaf;
 
 import java.io.Serializable;
 
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+
 public class ControlledField implements Serializable {
-    private String scheme;
-    private String value;
+	private String scheme;
+	private String value;
 
-    public String getScheme() {
-        return scheme;
-    }
+	public String getScheme() {
+		return scheme;
+	}
 
-    public void setScheme(String scheme) {
-        this.scheme = scheme;
-    }
+	public void setScheme(String scheme) {
+		this.scheme = scheme;
+	}
 
-    public String getValue() {
-        return value;
-    }
+	public String getValue() {
+		return value;
+	}
 
-    public void setValue(String value) {
-        this.value = value;
-    }
+	public void setValue(String value) {
+		this.value = value;
+	}
 
-    public static ControlledField newInstance(StructuredProperty pid){
-            ControlledField cf = new ControlledField();
+	public static ControlledField newInstance(String scheme, String value) {
+		ControlledField cf = new ControlledField();
 
-        cf.scheme = pid.getQualifier().getClassid();
-        cf.value = pid.getValue();
+		cf.setScheme(scheme);
+		cf.setValue(value);
 
-        return cf;
-    }
+		return cf;
+	}
 }

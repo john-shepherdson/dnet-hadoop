@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-
 import java.util.List;
 
 public class Context extends Qualifier {

@@ -1,18 +1,23 @@
+
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class AccessRight extends Qualifier {
 
-public class AccessRight extends Qualifier{
+	private String scheme;
 
-    private String schema;
+	public String getScheme() {
+		return scheme;
+	}
 
-    public String getSchema() {
-        return schema;
-    }
+	public void setScheme(String scheme) {
+		this.scheme = scheme;
+	}
 
-    public void setSchema(String schema) {
-        this.schema = schema;
-    }
-
-
+	public static AccessRight newInstance(String code, String label, String scheme) {
+		AccessRight ar = new AccessRight();
+		ar.setCode(code);
+		ar.setLabel(label);
+		ar.setScheme(scheme);
+		return ar;
+	}
 }

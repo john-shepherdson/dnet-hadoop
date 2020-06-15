@@ -1,14 +1,12 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-
-
 import java.io.Serializable;
 import java.util.List;
 
-public class Dataset extends Result implements Serializable {
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
+public class Dataset extends Result implements Serializable {
 
 	private String size;
 
@@ -19,7 +17,6 @@ public class Dataset extends Result implements Serializable {
 	public Dataset() {
 		setType(ModelConstants.DATASET_DEFAULT_RESULTTYPE.getClassname());
 	}
-
 
 	public String getSize() {
 		return size;
@@ -44,6 +41,5 @@ public class Dataset extends Result implements Serializable {
 	public void setGeolocation(List<GeoLocation> geolocation) {
 		this.geolocation = geolocation;
 	}
-
 
 }

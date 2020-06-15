@@ -1,11 +1,10 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-
-
 import java.io.Serializable;
 import java.util.List;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class OtherResearchProduct extends Result implements Serializable {
 

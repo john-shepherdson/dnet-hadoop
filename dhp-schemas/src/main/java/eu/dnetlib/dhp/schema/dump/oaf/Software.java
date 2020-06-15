@@ -1,11 +1,10 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-
-
 import java.io.Serializable;
 import java.util.List;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class Software extends Result implements Serializable {
 
@@ -42,6 +41,5 @@ public class Software extends Result implements Serializable {
 	public void setProgrammingLanguage(String programmingLanguage) {
 		this.programmingLanguage = programmingLanguage;
 	}
-
 
 }

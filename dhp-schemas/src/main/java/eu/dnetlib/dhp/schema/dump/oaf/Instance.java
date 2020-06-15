@@ -18,7 +18,7 @@ public class Instance implements Serializable {
 
 	private KeyValue collectedfrom;
 
-	private String publicationdata;//dateofacceptance;
+	private String publicationdate;// dateofacceptance;
 
 	// ( article | book ) processing charges. Defined here to cope with possible wrongly typed
 	// results
@@ -78,12 +78,12 @@ public class Instance implements Serializable {
 		this.collectedfrom = collectedfrom;
 	}
 
-	public String getPublicationdata() {
-		return publicationdata;
+	public String getPublicationdate() {
+		return publicationdate;
 	}
 
-	public void setPublicationdata(String publicationdata) {
-		this.publicationdata = publicationdata;
+	public void setPublicationdate(String publicationdate) {
+		this.publicationdate = publicationdate;
 	}
 
 	public String getRefereed() {
@@ -93,6 +93,5 @@ public class Instance implements Serializable {
 	public void setRefereed(String refereed) {
 		this.refereed = refereed;
 	}
-
 
 }
