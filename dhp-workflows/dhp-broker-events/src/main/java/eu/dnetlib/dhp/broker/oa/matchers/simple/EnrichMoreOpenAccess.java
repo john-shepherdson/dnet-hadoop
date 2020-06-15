@@ -10,18 +10,22 @@ import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
-public class EnrichMoreOpenAccess extends UpdateMatcher<Result, Instance> {
+public class EnrichMoreOpenAccess extends UpdateMatcher<Instance> {
 
 	public EnrichMoreOpenAccess() {
-		super(true);
+		super(true,
+			i -> Topic.ENRICH_MORE_OA_VERSION,
+			(p, i) -> p.getInstances().add(i),
+			Instance::getUrl);
 	}
 
 	@Override
-	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target) {
+	protected List<Instance> findDifferences(final ResultWithRelations source,
+		final ResultWithRelations target) {
 		final Set<String> urls = target
+			.getResult()
 			.getInstance()
 			.stream()
 			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
@@ -30,25 +34,14 @@ public class EnrichMoreOpenAccess extends UpdateMatcher<Result, Instance> {
 			.collect(Collectors.toSet());
 
 		return source
+			.getResult()
 			.getInstance()
 			.stream()
 			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
 			.map(ConversionUtils::oafInstanceToBrokerInstances)
 			.flatMap(List::stream)
 			.filter(i -> !urls.contains(i.getUrl()))
-			.map(i -> generateUpdateInfo(i, source, target))
 			.collect(Collectors.toList());
-	}
-
-	@Override
-	public UpdateInfo<Instance> generateUpdateInfo(final Instance highlightValue,
-		final Result source,
-		final Result target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MORE_OA_VERSION,
-			highlightValue, source, target,
-			(p, i) -> p.getInstances().add(i),
-			Instance::getUrl);
 	}
 
 }

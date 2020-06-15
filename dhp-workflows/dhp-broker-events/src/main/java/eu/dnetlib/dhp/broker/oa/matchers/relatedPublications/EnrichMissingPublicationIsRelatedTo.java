@@ -9,4 +9,9 @@ public class EnrichMissingPublicationIsRelatedTo extends AbstractEnrichMissingPu
 		super(Topic.ENRICH_MISSING_PUBLICATION_IS_RELATED_TO);
 	}
 
+	@Override
+	protected boolean filterByType(final String relType) {
+		return relType.equals("isRelatedTo");
+	}
+
 }

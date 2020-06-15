@@ -7,32 +7,25 @@ import java.util.List;
 
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
-public class EnrichMissingAbstract extends UpdateMatcher<Result, String> {
+public class EnrichMissingAbstract extends UpdateMatcher<String> {
 
 	public EnrichMissingAbstract() {
-		super(false);
-	}
-
-	@Override
-	protected List<UpdateInfo<String>> findUpdates(final Result source, final Result target) {
-		if (isMissing(target.getDescription()) && !isMissing(source.getDescription())) {
-			return Arrays.asList(generateUpdateInfo(source.getDescription().get(0).getValue(), source, target));
-		}
-		return new ArrayList<>();
-	}
-
-	@Override
-	public UpdateInfo<String> generateUpdateInfo(final String highlightValue,
-		final Result source,
-		final Result target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MISSING_ABSTRACT,
-			highlightValue, source, target,
+		super(false,
+			s -> Topic.ENRICH_MISSING_ABSTRACT,
 			(p, s) -> p.getAbstracts().add(s),
 			s -> s);
+	}
+
+	@Override
+	protected List<String> findDifferences(final ResultWithRelations source,
+		final ResultWithRelations target) {
+		if (isMissing(target.getResult().getDescription()) && !isMissing(source.getResult().getDescription())) {
+			return Arrays
+				.asList(source.getResult().getDescription().get(0).getValue());
+		}
+		return new ArrayList<>();
 	}
 
 }

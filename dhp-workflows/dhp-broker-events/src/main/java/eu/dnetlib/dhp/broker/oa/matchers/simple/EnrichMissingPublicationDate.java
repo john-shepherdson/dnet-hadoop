@@ -7,32 +7,25 @@ import java.util.List;
 
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
-public class EnrichMissingPublicationDate extends UpdateMatcher<Result, String> {
+public class EnrichMissingPublicationDate extends UpdateMatcher<String> {
 
 	public EnrichMissingPublicationDate() {
-		super(false);
-	}
-
-	@Override
-	protected List<UpdateInfo<String>> findUpdates(final Result source, final Result target) {
-		if (isMissing(target.getDateofacceptance()) && !isMissing(source.getDateofacceptance())) {
-			return Arrays.asList(generateUpdateInfo(source.getDateofacceptance().getValue(), source, target));
-		}
-		return new ArrayList<>();
-	}
-
-	@Override
-	public UpdateInfo<String> generateUpdateInfo(final String highlightValue,
-		final Result source,
-		final Result target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MISSING_PUBLICATION_DATE,
-			highlightValue, source, target,
+		super(false,
+			date -> Topic.ENRICH_MISSING_PUBLICATION_DATE,
 			(p, date) -> p.setPublicationdate(date),
 			s -> s);
+	}
+
+	@Override
+	protected List<String> findDifferences(final ResultWithRelations source,
+		final ResultWithRelations target) {
+		if (isMissing(target.getResult().getDateofacceptance())
+			&& !isMissing(source.getResult().getDateofacceptance())) {
+			return Arrays.asList(source.getResult().getDateofacceptance().getValue());
+		}
+		return new ArrayList<>();
 	}
 
 }

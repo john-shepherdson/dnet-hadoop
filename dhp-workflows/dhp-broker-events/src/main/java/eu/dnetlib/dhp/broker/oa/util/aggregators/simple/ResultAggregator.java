@@ -1,14 +1,15 @@
-package eu.dnetlib.dhp.broker.oa.util;
+
+package eu.dnetlib.dhp.broker.oa.util.aggregators.simple;
 
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
 
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
 
-public class ResultAggregator extends Aggregator<Tuple2<Result, Relation>, ResultGroup, ResultGroup> {
+public class ResultAggregator extends Aggregator<Tuple2<ResultWithRelations, Relation>, ResultGroup, ResultGroup> {
 
 	/**
 	 *
@@ -21,7 +22,7 @@ public class ResultAggregator extends Aggregator<Tuple2<Result, Relation>, Resul
 	}
 
 	@Override
-	public ResultGroup reduce(final ResultGroup group, final Tuple2<Result, Relation> t) {
+	public ResultGroup reduce(final ResultGroup group, final Tuple2<ResultWithRelations, Relation> t) {
 		return group.addElement(t._1);
 	}
 

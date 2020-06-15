@@ -1,16 +1,14 @@
 package eu.dnetlib.doiboost.orcid
 
-import eu.dnetlib.dhp.schema.oaf.Publication
-import eu.dnetlib.doiboost.crossref.Crossref2Oaf
-import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
+import org.codehaus.jackson.map.ObjectMapper
+import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
-import org.junit.jupiter.api.Assertions._
 
 import scala.io.Source
 
 class MappingORCIDToOAFTest {
-  val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
+  val logger: Logger = LoggerFactory.getLogger(ORCIDToOAF.getClass)
   val mapper = new ObjectMapper()
 
   @Test

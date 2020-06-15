@@ -1,36 +1,53 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class EnrichMissingAuthorOrcid extends UpdateMatcher<Result, Pair<String, String>> {
+public class EnrichMissingAuthorOrcid extends UpdateMatcher<String> {
 
 	public EnrichMissingAuthorOrcid() {
-		super(true);
+		super(true,
+			aut -> Topic.ENRICH_MISSING_AUTHOR_ORCID,
+			(p, aut) -> p.getCreators().add(aut),
+			aut -> aut);
 	}
 
 	@Override
-	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target) {
-		// return Arrays.asList(new EnrichMissingAbstract("xxxxxxx", 0.9f));
-		return Arrays.asList();
-	}
+	protected List<String> findDifferences(final ResultWithRelations source,
+		final ResultWithRelations target) {
 
-	@Override
-	public UpdateInfo<Pair<String, String>> generateUpdateInfo(final Pair<String, String> highlightValue,
-		final Result source,
-		final Result target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MISSING_AUTHOR_ORCID,
-			highlightValue, source, target,
-			(p, pair) -> p.getCreators().add(pair.getLeft() + " - ORCID: " + pair.getRight()),
-			pair -> pair.getLeft() + "::" + pair.getRight());
+		final Set<String> existingOrcids = target
+			.getResult()
+			.getAuthor()
+			.stream()
+			.map(Author::getPid)
+			.flatMap(List::stream)
+			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+			.map(pid -> pid.getValue())
+			.collect(Collectors.toSet());
+
+		final List<String> list = new ArrayList<>();
+
+		for (final Author author : source.getResult().getAuthor()) {
+			final String name = author.getFullname();
+
+			for (final StructuredProperty pid : author.getPid()) {
+				if (pid.getQualifier().getClassid().equalsIgnoreCase("orcid")
+					&& !existingOrcids.contains(pid.getValue())) {
+					list.add(name + " [ORCID: " + pid.getValue() + "]");
+				}
+			}
+		}
+
+		return list;
 	}
 }

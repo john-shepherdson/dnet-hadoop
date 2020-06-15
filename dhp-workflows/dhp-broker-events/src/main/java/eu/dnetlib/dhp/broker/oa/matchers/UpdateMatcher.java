@@ -6,28 +6,48 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import eu.dnetlib.broker.objects.Publication;
+import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.pace.config.DedupConfig;
 
-public abstract class UpdateMatcher<K, T> {
+public abstract class UpdateMatcher<T> {
 
 	private final boolean multipleUpdate;
+	private final Function<T, Topic> topicFunction;
+	private final BiConsumer<Publication, T> compileHighlightFunction;
+	private final Function<T, String> highlightToStringFunction;
 
-	public UpdateMatcher(final boolean multipleUpdate) {
+	public UpdateMatcher(final boolean multipleUpdate, final Function<T, Topic> topicFunction,
+		final BiConsumer<Publication, T> compileHighlightFunction,
+		final Function<T, String> highlightToStringFunction) {
 		this.multipleUpdate = multipleUpdate;
+		this.topicFunction = topicFunction;
+		this.compileHighlightFunction = compileHighlightFunction;
+		this.highlightToStringFunction = highlightToStringFunction;
 	}
 
-	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final K res, final Collection<K> others) {
+	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final ResultWithRelations res,
+		final Collection<ResultWithRelations> others,
+		final DedupConfig dedupConfig) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
 
-		for (final K source : others) {
+		for (final ResultWithRelations source : others) {
 			if (source != res) {
-				for (final UpdateInfo<T> info : findUpdates(source, res)) {
+				for (final T hl : findDifferences(source, res)) {
+					final Topic topic = getTopicFunction().apply(hl);
+					final UpdateInfo<T> info = new UpdateInfo<>(topic, hl, source, res, getCompileHighlightFunction(),
+						getHighlightToStringFunction(),
+						dedupConfig);
 					final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
 					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {
 					} else {
@@ -51,11 +71,7 @@ public abstract class UpdateMatcher<K, T> {
 		}
 	}
 
-	protected abstract List<UpdateInfo<T>> findUpdates(K source, K target);
-
-	protected abstract UpdateInfo<T> generateUpdateInfo(final T highlightValue,
-		final K source,
-		final K target);
+	protected abstract List<T> findDifferences(ResultWithRelations source, ResultWithRelations target);
 
 	protected static boolean isMissing(final List<Field<String>> list) {
 		return list == null || list.isEmpty() || StringUtils.isBlank(list.get(0).getValue());
@@ -63,6 +79,22 @@ public abstract class UpdateMatcher<K, T> {
 
 	protected boolean isMissing(final Field<String> field) {
 		return field == null || StringUtils.isBlank(field.getValue());
+	}
+
+	public boolean isMultipleUpdate() {
+		return multipleUpdate;
+	}
+
+	public Function<T, Topic> getTopicFunction() {
+		return topicFunction;
+	}
+
+	public BiConsumer<Publication, T> getCompileHighlightFunction() {
+		return compileHighlightFunction;
+	}
+
+	public Function<T, String> getHighlightToStringFunction() {
+		return highlightToStringFunction;
 	}
 
 }

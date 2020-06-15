@@ -9,4 +9,9 @@ public class EnrichMissingPublicationIsSupplementedTo extends AbstractEnrichMiss
 		super(Topic.ENRICH_MISSING_PUBLICATION_IS_SUPPLEMENTED_TO);
 	}
 
+	@Override
+	protected boolean filterByType(final String relType) {
+		return relType.equals("isSupplementedTo");
+	}
+
 }

@@ -58,3 +58,5 @@ reference,Array of Reference,No,List of references made by the work,,Future impr
 content-domain,Content Domain,No,Information on domains that support Crossmark for this work,N/A,
 relation,Relations,No,Relations to other works,Result/Instance/refereed,"if(relation.has-review) instance.refereed = ""peerReviewed"". "
 review,Review,No,Peer review metadata,N/A,
+funder,Array of Funder,No,,Relation between Result and Project,"The mapping between Crossref funder elements and OpenAIRE projects is implemented in eu.dnetlib.doiboost.crossref.Crossref2Oaf.mappingFunderToRelations.
+The matching is based on Funder DOIs, Funder names, and grant codes. Different mapping approaches are applied to cover the different cases in Crossref records."

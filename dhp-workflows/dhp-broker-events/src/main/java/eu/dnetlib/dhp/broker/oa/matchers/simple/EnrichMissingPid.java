@@ -9,38 +9,32 @@ import eu.dnetlib.broker.objects.Pid;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
-public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
+public class EnrichMissingPid extends UpdateMatcher<Pid> {
 
 	public EnrichMissingPid() {
-		super(true);
+		super(true,
+			pid -> Topic.ENRICH_MISSING_PID,
+			(p, pid) -> p.getPids().add(pid),
+			pid -> pid.getType() + "::" + pid.getValue());
 	}
 
 	@Override
-	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target) {
-		final long count = target.getPid().size();
+	protected List<Pid> findDifferences(final ResultWithRelations source,
+		final ResultWithRelations target) {
+		final long count = target.getResult().getPid().size();
 
 		if (count > 0) {
 			return Arrays.asList();
 		}
 
 		return source
+			.getResult()
 			.getPid()
 			.stream()
 			.map(ConversionUtils::oafPidToBrokerPid)
-			.map(i -> generateUpdateInfo(i, source, target))
 			.collect(Collectors.toList());
-	}
-
-	@Override
-	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MISSING_PID,
-			highlightValue, source, target,
-			(p, pid) -> p.getPids().add(pid),
-			pid -> pid.getType() + "::" + pid.getValue());
 	}
 
 }

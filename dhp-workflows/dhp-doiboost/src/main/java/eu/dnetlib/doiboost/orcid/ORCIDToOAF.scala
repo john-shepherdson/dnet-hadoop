@@ -1,16 +1,10 @@
 package eu.dnetlib.doiboost.orcid
 
-import java.io.IOException
-
 import eu.dnetlib.dhp.schema.oaf.{Author, Publication}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil.{ORCID, PID_TYPES, createSP, generateDataInfo, generateIdentifier}
-import eu.dnetlib.doiboost.crossref.Crossref2Oaf
 import org.apache.commons.lang.StringUtils
 import org.codehaus.jackson.map.ObjectMapper
-import org.json4s
-import org.json4s.DefaultFormats
-import org.json4s.jackson.JsonMethods.parse
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
@@ -22,7 +16,7 @@ case class ORCIDItem(oid:String,name:String,surname:String,creditName:String,err
 
 case class ORCIDElement(doi:String, authors:List[ORCIDItem]) {}
 object ORCIDToOAF {
-  val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
+  val logger: Logger = LoggerFactory.getLogger(ORCIDToOAF.getClass)
   val mapper = new ObjectMapper
 
   def isJsonValid(inputStr: String): Boolean = {
@@ -57,7 +51,7 @@ object ORCIDToOAF {
     pub.setId(generateIdentifier(pub, doi.toLowerCase))
     try{
       pub.setAuthor(input.authors.map(a=> {
-        generateAuhtor(a.name, a.surname, a.creditName, a.oid)
+        generateAuthor(a.name, a.surname, a.creditName, a.oid)
       }).asJava)
       pub.setCollectedfrom(List(DoiBoostMappingUtil.createORIDCollectedFrom()).asJava)
       pub.setDataInfo(DoiBoostMappingUtil.generateDataInfo())
@@ -69,7 +63,7 @@ object ORCIDToOAF {
     }
   }
 
-  def generateAuhtor(given: String, family: String, fullName:String, orcid: String): Author = {
+  def generateAuthor(given: String, family: String, fullName:String, orcid: String): Author = {
     val a = new Author
     a.setName(given)
     a.setSurname(family)

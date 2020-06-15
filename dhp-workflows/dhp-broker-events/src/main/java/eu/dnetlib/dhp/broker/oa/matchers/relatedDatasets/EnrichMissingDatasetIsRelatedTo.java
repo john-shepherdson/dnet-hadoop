@@ -9,4 +9,9 @@ public class EnrichMissingDatasetIsRelatedTo extends AbstractEnrichMissingDatase
 		super(Topic.ENRICH_MISSING_DATASET_IS_RELATED_TO);
 	}
 
+	@Override
+	protected boolean filterByType(final String relType) {
+		return relType.equals("isRelatedTo");
+	}
+
 }

@@ -39,6 +39,8 @@ import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
 public class GenerateEntitiesApplication {
@@ -71,7 +73,8 @@ public class GenerateEntitiesApplication {
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
-		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupUrl);
+		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
@@ -137,10 +140,16 @@ public class GenerateEntitiesApplication {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
-			case "native_oaf":
-				return new OafToOafMapper(vocs).processMdRecord(s);
-			case "native_odf":
-				return new OdfToOafMapper(vocs).processMdRecord(s);
+			case "oaf-store-cleaned":
+			case "oaf-store-claim":
+				return new OafToOafMapper(vocs, false).processMdRecord(s);
+			case "odf-store-cleaned":
+			case "odf-store-claim":
+				return new OdfToOafMapper(vocs, false).processMdRecord(s);
+			case "oaf-store-intersection":
+				return new OafToOafMapper(vocs, true).processMdRecord(s);
+			case "odf-store-intersection":
+				return new OdfToOafMapper(vocs, true).processMdRecord(s);
 			case "datasource":
 				return Arrays.asList(convertFromJson(s, Datasource.class));
 			case "organization":

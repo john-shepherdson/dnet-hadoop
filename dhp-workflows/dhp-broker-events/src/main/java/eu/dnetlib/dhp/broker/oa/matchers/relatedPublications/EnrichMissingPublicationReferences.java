@@ -9,4 +9,9 @@ public class EnrichMissingPublicationReferences extends AbstractEnrichMissingPub
 		super(Topic.ENRICH_MISSING_PUBLICATION_REFERENCES);
 	}
 
+	@Override
+	protected boolean filterByType(final String relType) {
+		return relType.equals("references");
+	}
+
 }

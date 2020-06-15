@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -55,7 +56,7 @@ public class MappersTest {
 
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
 
-		final List<Oaf> list = new OafToOafMapper(vocs).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Publication);
@@ -69,6 +70,7 @@ public class MappersTest {
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertFalse(p.getDataInfo().getInvisible());
 
 		assertTrue(p.getAuthor().size() > 0);
 		final Optional<Author> author = p
@@ -135,10 +137,26 @@ public class MappersTest {
 	}
 
 	@Test
+	void testPublicationInvisible() throws IOException {
+
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
+
+		final List<Oaf> list = new OafToOafMapper(vocs, true).processMdRecord(xml);
+
+		assertTrue(list.size() > 0);
+		assertTrue(list.get(0) instanceof Publication);
+
+		final Publication p = (Publication) list.get(0);
+
+		assertTrue(p.getDataInfo().getInvisible());
+
+	}
+
+	@Test
 	void testDataset() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Dataset);
@@ -220,7 +238,7 @@ public class MappersTest {
 	void testSoftware() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_software.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
 
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof Software);
