@@ -1,223 +1,9 @@
-dnet:countries @=@ AF @=@ AFG
-dnet:countries @=@ AF @=@ Afghanistan
-dnet:countries @=@ AD @=@ Andorra
-dnet:countries @=@ AO @=@ Angola
-dnet:countries @=@ AR @=@ ARG
-dnet:countries @=@ AR @=@ Argentina
-dnet:countries @=@ AU @=@ AUS
-dnet:countries @=@ AU @=@ Australia
-dnet:countries @=@ AT @=@ AUT
-dnet:countries @=@ AT @=@ Austria
-dnet:countries @=@ AZ @=@ AZE
-dnet:countries @=@ BD @=@ Bangladesh
-dnet:countries @=@ BY @=@ Belarus
-dnet:countries @=@ BE @=@ BEL
-dnet:countries @=@ BE @=@ Belgium
-dnet:countries @=@ BJ @=@ BEN
-dnet:countries @=@ BO @=@ Bolivia, Plurinational State of
-dnet:countries @=@ BA @=@ BIH
-dnet:countries @=@ BA @=@ Bosnia-Hercegovina
-dnet:countries @=@ BR @=@ BRA
-dnet:countries @=@ BR @=@ Brazil
-dnet:countries @=@ BG @=@ Bulgaria
-dnet:countries @=@ BF @=@ BFA
-dnet:countries @=@ KH @=@ Campuchea
-dnet:countries @=@ CM @=@ CMR
-dnet:countries @=@ CA @=@ CAN
-dnet:countries @=@ CA @=@ Canada
-dnet:countries @=@ CV @=@ Cape Verde
-dnet:countries @=@ CL @=@ CHL
-dnet:countries @=@ CL @=@ Chile
-dnet:countries @=@ CN @=@ CHN
-dnet:countries @=@ CN @=@ China
-dnet:countries @=@ CO @=@ COL
-dnet:countries @=@ CO @=@ Colombia
-dnet:countries @=@ CG @=@ Congo, Republic
-dnet:countries @=@ CD @=@ Congo, the Democratic Republic of the
-dnet:countries @=@ CD @=@ Congo Democratic Republic (formerly Zaire)
-dnet:countries @=@ CD @=@ Congo Democratic Republic
-dnet:countries @=@ CD @=@ Zaire
-dnet:countries @=@ CR @=@ CRI
-dnet:countries @=@ CI @=@ CIV
-dnet:countries @=@ CI @=@ Ivory Coast
-dnet:countries @=@ HR @=@ Croatia
-dnet:countries @=@ HR @=@ HRV
-dnet:countries @=@ CY @=@ CYP
-dnet:countries @=@ CY @=@ Cyprus
-dnet:countries @=@ CZ @=@ CZE
-dnet:countries @=@ CZ @=@ Czech Republic
-dnet:countries @=@ CZ @=@ Czechoslovakia
-dnet:countries @=@ DK @=@ DNK
-dnet:countries @=@ DK @=@ Denmark
-dnet:countries @=@ EC @=@ Ecuador
-dnet:countries @=@ EG @=@ EGY
-dnet:countries @=@ EG @=@ Egypt
-dnet:countries @=@ SV @=@ SLV
-dnet:countries @=@ EE @=@ EST
-dnet:countries @=@ EE @=@ Estonia
-dnet:countries @=@ ET @=@ ETH
-dnet:countries @=@ EU @=@ EEC
-dnet:countries @=@ FI @=@ FIN
-dnet:countries @=@ FI @=@ Finland
-dnet:countries @=@ MK @=@ Macedonia, the Former Yugoslav Republic Of
-dnet:countries @=@ MK @=@ Macedonia
-dnet:countries @=@ FR @=@ FRA
-dnet:countries @=@ FR @=@ France
-dnet:countries @=@ PF @=@ French Polynesia
-dnet:countries @=@ PF @=@ PYF
-dnet:countries @=@ TF @=@ French Southern Territories
-dnet:countries @=@ GE @=@ Georgia
-dnet:countries @=@ DE @=@ DEU
-dnet:countries @=@ DE @=@ Germany
-dnet:countries @=@ DE @=@ Germany, Berlin
-dnet:countries @=@ GH @=@ GHA
-dnet:countries @=@ GR @=@ EL
-dnet:countries @=@ GR @=@ GRC
-dnet:countries @=@ GL @=@ GRL
-dnet:countries @=@ GN @=@ Guinea
-dnet:countries @=@ GW @=@ Guinea-Bissau
-dnet:countries @=@ VA @=@ Vatican State
-dnet:countries @=@ HK @=@ HKG
-dnet:countries @=@ HK @=@ Hong Kong
-dnet:countries @=@ HK @=@ Hongkong
-dnet:countries @=@ HU @=@ HUN
-dnet:countries @=@ HU @=@ Hungary
-dnet:countries @=@ IS @=@ ISL
-dnet:countries @=@ IN @=@ IND
-dnet:countries @=@ IN @=@ India
-dnet:countries @=@ ID @=@ IDN
-dnet:countries @=@ ID @=@ Indonesia
-dnet:countries @=@ IR @=@ Iran
-dnet:countries @=@ IR @=@ Iran, Islamic Republic of
-dnet:countries @=@ IE @=@ IRL
-dnet:countries @=@ IE @=@ Ireland
-dnet:countries @=@ IL @=@ ISR
-dnet:countries @=@ IL @=@ Israel
-dnet:countries @=@ IT @=@ ITA
-dnet:countries @=@ IT @=@ Italy
-dnet:countries @=@ JM @=@ Jamaica
-dnet:countries @=@ JP @=@ JPN
-dnet:countries @=@ JP @=@ Japan
-dnet:countries @=@ KZ @=@ KAZ
-dnet:countries @=@ KZ @=@ Kazakistan
-dnet:countries @=@ KZ @=@ Kazakstan
-dnet:countries @=@ KE @=@ KEN
-dnet:countries @=@ KE @=@ Kenya
-dnet:countries @=@ KR @=@ KOR
-dnet:countries @=@ KR @=@ Korea, Republic of
-dnet:countries @=@ KR @=@ Korean Republic (South Korea)
-dnet:countries @=@ KP @=@ PRK
-dnet:countries @=@ LY @=@ Libya
-dnet:countries @=@ LT @=@ LTU
-dnet:countries @=@ LU @=@ LUX
-dnet:countries @=@ LU @=@ Luxembourg
-dnet:countries @=@ MO @=@ Macao
-dnet:countries @=@ MG @=@ Madagascar
-dnet:countries @=@ MY @=@ Malaysia
-dnet:countries @=@ ML @=@ Mali
-dnet:countries @=@ MT @=@ Malta
-dnet:countries @=@ MU @=@ Mauritius
-dnet:countries @=@ MX @=@ MEX
-dnet:countries @=@ MX @=@ Mexico
-dnet:countries @=@ FM @=@ Micronesia
-dnet:countries @=@ MD @=@ Moldova
-dnet:countries @=@ MD @=@ Moldova, Republic of
-dnet:countries @=@ MN @=@ Mongolia
-dnet:countries @=@ MA @=@ Morocco
-dnet:countries @=@ MZ @=@ Mozambique
-dnet:countries @=@ NA @=@ NAM
-dnet:countries @=@ NL @=@ NLD
-dnet:countries @=@ NL @=@ Netherlands
-dnet:countries @=@ AN @=@ Netherlands Antilles
-dnet:countries @=@ NZ @=@ NZL
-dnet:countries @=@ NZ @=@ New Zealand
-dnet:countries @=@ NO @=@ NOR
-dnet:countries @=@ NO @=@ Norway
-dnet:countries @=@ OC @=@ Australasia
-dnet:countries @=@ OM @=@ Oman
-dnet:countries @=@ PK @=@ PAK
-dnet:countries @=@ PK @=@ Pakistan
-dnet:countries @=@ PS @=@ Palestine, State of
-dnet:countries @=@ PS @=@ Palestinian Territory, Occupied
-dnet:countries @=@ PA @=@ PAN
-dnet:countries @=@ PA @=@ Panama
-dnet:countries @=@ PG @=@ PapuaNew Guinea
-dnet:countries @=@ PE @=@ PER
-dnet:countries @=@ PH @=@ PHL
-dnet:countries @=@ PH @=@ Philippines
-dnet:countries @=@ PL @=@ POL
-dnet:countries @=@ PL @=@ Poland
-dnet:countries @=@ PT @=@ PRT
-dnet:countries @=@ PT @=@ Portugal
-dnet:countries @=@ PR @=@ Puerto Rico
-dnet:countries @=@ RO @=@ ROU
-dnet:countries @=@ RO @=@ Romania
-dnet:countries @=@ RU @=@ RUS
-dnet:countries @=@ RU @=@ Russia
-dnet:countries @=@ RU @=@ Russian Federation
-dnet:countries @=@ RE @=@ Réunion
-dnet:countries @=@ KN @=@ Saint Kitts And Nevis
-dnet:countries @=@ SA @=@ Saudi Arabia
-dnet:countries @=@ SN @=@ SEN
-dnet:countries @=@ SG @=@ SGP
-dnet:countries @=@ SG @=@ Singapore
-dnet:countries @=@ SK @=@ SVK
-dnet:countries @=@ SI @=@ SVN
-dnet:countries @=@ SI @=@ Slovenia
-dnet:countries @=@ ZA @=@ South Africa
-dnet:countries @=@ ZA @=@ ZAF
-dnet:countries @=@ ES @=@ ESP
-dnet:countries @=@ ES @=@ Spain
-dnet:countries @=@ LK @=@ Sri Lanka
-dnet:countries @=@ LK @=@ LKA
-dnet:countries @=@ SR @=@ Suriname
-dnet:countries @=@ SE @=@ SWE
-dnet:countries @=@ SE @=@ Sweden
-dnet:countries @=@ CH @=@ CHE
-dnet:countries @=@ CH @=@ Switzerland
-dnet:countries @=@ SY @=@ Syria
-dnet:countries @=@ ST @=@ Sao Tome and Principe
-dnet:countries @=@ TW @=@ TWN
-dnet:countries @=@ TW @=@ Taiwan, Province of China
-dnet:countries @=@ TZ @=@ Tanzania
-dnet:countries @=@ TZ @=@ Tanzania, United Republic of
-dnet:countries @=@ TH @=@ THA
-dnet:countries @=@ TH @=@ Thailand
-dnet:countries @=@ TL @=@ East Timor
-dnet:countries @=@ TN @=@ TUN
-dnet:countries @=@ TN @=@ Tunisia
-dnet:countries @=@ TR @=@ TUR
-dnet:countries @=@ TR @=@ Turkey
-dnet:countries @=@ UNKNOWN @=@ AAA
-dnet:countries @=@ UNKNOWN @=@ [Unknown]
-dnet:countries @=@ UNKNOWN @=@ _?
-dnet:countries @=@ UA @=@ UKR
-dnet:countries @=@ UA @=@ Ukraine
-dnet:countries @=@ AE @=@ United Arab Emirates
-dnet:countries @=@ GB @=@ GBR
-dnet:countries @=@ GB @=@ UK
-dnet:countries @=@ GB @=@ United Kingdom
-dnet:countries @=@ GB @=@ Great Britain
-dnet:countries @=@ GB @=@ Great Britain and Northern Ireland
-dnet:countries @=@ US @=@ USA
-dnet:countries @=@ US @=@ United States
-dnet:countries @=@ US @=@ United States of America
-dnet:countries @=@ UY @=@ Uruguay
-dnet:countries @=@ UZ @=@ Uzbekistan
-dnet:countries @=@ VE @=@ Venezuela, Bolivarian Republic of
-dnet:countries @=@ VN @=@ Vietnam
-dnet:countries @=@ VG @=@ British Virgin Islands
-dnet:countries @=@ YU @=@ Jugoslavia
-dnet:countries @=@ YU @=@ Yugoslavia
-dnet:countries @=@ ZW @=@ ABW
-dnet:datasourceCompatibilityLevel @=@ openaire-pub_4.0 @=@ openaire4.0
 dnet:access_modes @=@ CLOSED @=@ http://purl.org/coar/access_right/c_14cb
 dnet:access_modes @=@ CLOSED @=@ info:eu-repo/semantics/closedAccess
 dnet:access_modes @=@ EMBARGO @=@ http://purl.org/coar/access_right/c_f1cf
 dnet:access_modes @=@ EMBARGO @=@ info:eu-repo/semantics/embargoedAccess
 dnet:access_modes @=@ OPEN @=@ Creative Commons License [CC BY-NC-ND] http://creativecommons.org/licenses/by-nc-nd/3.0/de/
 dnet:access_modes @=@ OPEN @=@ Creative commons
-dnet:access_modes @=@ OPEN @=@ Open Access
 dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by-nc-nd/3.0/
 dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by-nc/3.0/
 dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by-sa/3.0/
@@ -228,53 +14,489 @@ dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by/4.0/
 dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/publicdomain/zero/1.0/
 dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/publicdomain/zero/1.0/ & http://www.canadensys.net/norms
 dnet:access_modes @=@ OPEN @=@ http://purl.org/coar/access_right/c_abf2
+dnet:access_modes @=@ OPEN @=@ https://creativecommons.org/licenses/by-nc/4.0/
 dnet:access_modes @=@ OPEN @=@ info:eu-repo/semantics/openAccess
-dnet:access_modes @=@ OPEN @=@ openAccess
-dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by-nc-nd/2.0/uk/
+dnet:access_modes @=@ OPEN @=@ open_access
 dnet:access_modes @=@ RESTRICTED @=@ http://purl.org/coar/access_right/c_16ec
 dnet:access_modes @=@ RESTRICTED @=@ info:eu-repo/semantics/restrictedAccess
-dnet:result_typologies @=@ dataset @=@ 0021
-dnet:result_typologies @=@ dataset @=@ 0024
-dnet:result_typologies @=@ dataset @=@ 0025
-dnet:result_typologies @=@ dataset @=@ 0030
-dnet:result_typologies @=@ dataset @=@ 0033
-dnet:result_typologies @=@ dataset @=@ 0037
-dnet:result_typologies @=@ dataset @=@ 0039
-dnet:result_typologies @=@ other @=@ 0000
-dnet:result_typologies @=@ other @=@ 0010
-dnet:result_typologies @=@ other @=@ 0018
-dnet:result_typologies @=@ other @=@ 0020
-dnet:result_typologies @=@ other @=@ 0022
-dnet:result_typologies @=@ other @=@ 0023
-dnet:result_typologies @=@ other @=@ 0026
-dnet:result_typologies @=@ other @=@ 0027
-dnet:result_typologies @=@ other @=@ 0028
-dnet:result_typologies @=@ publication @=@ 0001
-dnet:result_typologies @=@ publication @=@ 0002
-dnet:result_typologies @=@ publication @=@ 0004
-dnet:result_typologies @=@ publication @=@ 0005
-dnet:result_typologies @=@ publication @=@ 0006
-dnet:result_typologies @=@ publication @=@ 0007
-dnet:result_typologies @=@ publication @=@ 0008
-dnet:result_typologies @=@ publication @=@ 0009
-dnet:result_typologies @=@ publication @=@ 0011
-dnet:result_typologies @=@ publication @=@ 0012
-dnet:result_typologies @=@ publication @=@ 0013
-dnet:result_typologies @=@ publication @=@ 0014
-dnet:result_typologies @=@ publication @=@ 0015
-dnet:result_typologies @=@ publication @=@ 0016
-dnet:result_typologies @=@ publication @=@ 0017
-dnet:result_typologies @=@ publication @=@ 0019
-dnet:result_typologies @=@ publication @=@ 0031
-dnet:result_typologies @=@ publication @=@ 0032
-dnet:result_typologies @=@ publication @=@ 0034
-dnet:result_typologies @=@ publication @=@ 0035
-dnet:result_typologies @=@ publication @=@ 0036
-dnet:result_typologies @=@ publication @=@ 0038
-dnet:result_typologies @=@ publication @=@ 0044
-dnet:result_typologies @=@ publication @=@ 0045
-dnet:result_typologies @=@ software @=@ 0029
-dnet:result_typologies @=@ software @=@ 0040
+dnet:compatibilityLevel @=@ openaire-pub_4.0 @=@ openaire4.0
+dnet:subject_classification_typologies @=@ jel @=@ jelElement
+dnet:publication_resource @=@ 0018 @=@ Comment/debate
+dnet:publication_resource @=@ 0018 @=@ http://purl.org/coar/resource_type/c_1162
+dnet:publication_resource @=@ 0018 @=@ info:eu-repo/semantics/annotation
+dnet:publication_resource @=@ 0001 @=@ A1 Alkuperäisartikkeli tieteellisessä aikakauslehdessä
+dnet:publication_resource @=@ 0001 @=@ Article
+dnet:publication_resource @=@ 0001 @=@ Article (author)
+dnet:publication_resource @=@ 0001 @=@ Article - letter to the editor
+dnet:publication_resource @=@ 0001 @=@ Article / Letter to editor
+dnet:publication_resource @=@ 0001 @=@ Article / Letter to the editor
+dnet:publication_resource @=@ 0001 @=@ Article / Newspaper
+dnet:publication_resource @=@ 0001 @=@ Article in journal
+dnet:publication_resource @=@ 0001 @=@ Article in monograph or in proceedings
+dnet:publication_resource @=@ 0001 @=@ Article in proceedings
+dnet:publication_resource @=@ 0001 @=@ Article-letter to the editor
+dnet:publication_resource @=@ 0001 @=@ Article/Letter to editor
+dnet:publication_resource @=@ 0001 @=@ Articolo
+dnet:publication_resource @=@ 0001 @=@ Artículo
+dnet:publication_resource @=@ 0001 @=@ Aufsatz
+dnet:publication_resource @=@ 0001 @=@ Clinical Study
+dnet:publication_resource @=@ 0001 @=@ Institutional Series
+dnet:publication_resource @=@ 0001 @=@ International Journal
+dnet:publication_resource @=@ 0001 @=@ International Journal Abstract
+dnet:publication_resource @=@ 0001 @=@ International Journal ISI/JCR
+dnet:publication_resource @=@ 0001 @=@ Journal (full / special issue)
+dnet:publication_resource @=@ 0001 @=@ Journal Article/Review
+dnet:publication_resource @=@ 0001 @=@ Journal article
+dnet:publication_resource @=@ 0001 @=@ Journal article (on-line or printed)
+dnet:publication_resource @=@ 0001 @=@ Journal articles
+dnet:publication_resource @=@ 0001 @=@ Journal paper
+dnet:publication_resource @=@ 0001 @=@ National Journal
+dnet:publication_resource @=@ 0001 @=@ Original article (non peer-reviewed)
+dnet:publication_resource @=@ 0001 @=@ Original article (peer-reviewed)
+dnet:publication_resource @=@ 0001 @=@ Peer-reviewed Article
+dnet:publication_resource @=@ 0001 @=@ Published Journal Article
+dnet:publication_resource @=@ 0001 @=@ Research Article
+dnet:publication_resource @=@ 0001 @=@ Review article (non peer-reviewed)
+dnet:publication_resource @=@ 0001 @=@ Review article (peer-reviewed)
+dnet:publication_resource @=@ 0001 @=@ Volumes Edited / Special Issues
+dnet:publication_resource @=@ 0001 @=@ article in non peer-reviewed journal
+dnet:publication_resource @=@ 0001 @=@ article in peer-reviewed journal
+dnet:publication_resource @=@ 0001 @=@ article-commentary
+dnet:publication_resource @=@ 0001 @=@ article_site_web
+dnet:publication_resource @=@ 0001 @=@ doc-type:Journal Article
+dnet:publication_resource @=@ 0001 @=@ doc-type:article
+dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_2df8fbb1
+dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_545b
+dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_6501
+dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_7877
+dnet:publication_resource @=@ 0001 @=@ in-brief
+dnet:publication_resource @=@ 0001 @=@ info:eu-repo/semantics/article
+dnet:publication_resource @=@ 0001 @=@ journal-article
+dnet:publication_resource @=@ 0001 @=@ journalArticle
+dnet:publication_resource @=@ 0001 @=@ journal_article
+dnet:publication_resource @=@ 0001 @=@ letter
+dnet:publication_resource @=@ 0001 @=@ non peer-reviewed article
+dnet:publication_resource @=@ 0001 @=@ partial-retraction
+dnet:publication_resource @=@ 0001 @=@ proceeding with peer review
+dnet:publication_resource @=@ 0001 @=@ publication-article
+dnet:publication_resource @=@ 0001 @=@ rapid-communication
+dnet:publication_resource @=@ 0001 @=@ reply
+dnet:publication_resource @=@ 0001 @=@ research-article
+dnet:publication_resource @=@ 0001 @=@ retraction
+dnet:publication_resource @=@ 0001 @=@ review-article
+dnet:publication_resource @=@ 0001 @=@ text (article)
+dnet:publication_resource @=@ 0001 @=@ Статья
+dnet:publication_resource @=@ 0001 @=@ ArticleArtikel
+dnet:publication_resource @=@ 0033 @=@ AUDIOVISUAL_DOCUMENT
+dnet:publication_resource @=@ 0033 @=@ Audiovisual/Audiovisual
+dnet:publication_resource @=@ 0033 @=@ http://purl.org/coar/resource_type/c_c513
+dnet:publication_resource @=@ 0008 @=@ Bachelor's
+dnet:publication_resource @=@ 0008 @=@ Bachelor's Degree
+dnet:publication_resource @=@ 0008 @=@ Bachelors Thesis
+dnet:publication_resource @=@ 0008 @=@ Proyecto fin de carrera
+dnet:publication_resource @=@ 0008 @=@ Undergraduate Thesis
+dnet:publication_resource @=@ 0008 @=@ http://purl.org/coar/resource_type/c_7a1f
+dnet:publication_resource @=@ 0008 @=@ info:eu-repo/semantics/bachelorThesis
+dnet:publication_resource @=@ 0008 @=@ выпускная бакалаврская работа
+dnet:publication_resource @=@ 0002 @=@ Book (monograph)
+dnet:publication_resource @=@ 0002 @=@ Book (non peer-reviewed)
+dnet:publication_resource @=@ 0002 @=@ Book (peer-reviewed)
+dnet:publication_resource @=@ 0002 @=@ Book - monograph - editorial book
+dnet:publication_resource @=@ 0002 @=@ Book Section
+dnet:publication_resource @=@ 0002 @=@ Book as author
+dnet:publication_resource @=@ 0002 @=@ Buch
+dnet:publication_resource @=@ 0002 @=@ International Book/Monograph
+dnet:publication_resource @=@ 0002 @=@ Libro
+dnet:publication_resource @=@ 0002 @=@ Monografia
+dnet:publication_resource @=@ 0002 @=@ Monograph
+dnet:publication_resource @=@ 0002 @=@ National Book/Monograph
+dnet:publication_resource @=@ 0002 @=@ atlas
+dnet:publication_resource @=@ 0002 @=@ book
+dnet:publication_resource @=@ 0002 @=@ book-series
+dnet:publication_resource @=@ 0002 @=@ book-set
+dnet:publication_resource @=@ 0002 @=@ book-track
+dnet:publication_resource @=@ 0002 @=@ book_series
+dnet:publication_resource @=@ 0002 @=@ book_title
+dnet:publication_resource @=@ 0002 @=@ doc-type:book
+dnet:publication_resource @=@ 0002 @=@ edited-book
+dnet:publication_resource @=@ 0002 @=@ http://purl.org/coar/resource_type/c_2f33
+dnet:publication_resource @=@ 0002 @=@ info:eu-repo/semantics/book
+dnet:publication_resource @=@ 0002 @=@ ouvrage
+dnet:publication_resource @=@ 0002 @=@ publication-book
+dnet:publication_resource @=@ 0002 @=@ reference-book
+dnet:publication_resource @=@ 0002 @=@ scientific book
+dnet:publication_resource @=@ 0002 @=@ Монография
+dnet:publication_resource @=@ 0002 @=@ Учебник
+dnet:publication_resource @=@ 0037 @=@ clinicalTrial
+dnet:publication_resource @=@ 0037 @=@ http://purl.org/coar/resource_type/c_cb28
+dnet:publication_resource @=@ 0022 @=@ collection
+dnet:publication_resource @=@ 0004 @=@ A4 Artikkeli konferenssijulkaisussa
+dnet:publication_resource @=@ 0004 @=@ Comunicación de congreso
+dnet:publication_resource @=@ 0004 @=@ Conference Paper
+dnet:publication_resource @=@ 0004 @=@ Conference Paper/Proceeding/Abstract
+dnet:publication_resource @=@ 0004 @=@ Conference Proceedings
+dnet:publication_resource @=@ 0004 @=@ Conference article
+dnet:publication_resource @=@ 0004 @=@ Conference contribution
+dnet:publication_resource @=@ 0004 @=@ Conference lecture
+dnet:publication_resource @=@ 0004 @=@ Conference or Workshop Item
+dnet:publication_resource @=@ 0004 @=@ Conference paper, poster, etc.
+dnet:publication_resource @=@ 0004 @=@ Conference papers
+dnet:publication_resource @=@ 0004 @=@ Conference report
+dnet:publication_resource @=@ 0004 @=@ International Conference
+dnet:publication_resource @=@ 0004 @=@ International Conference Abstract/Poster
+dnet:publication_resource @=@ 0004 @=@ International Conference ISI/JCR
+dnet:publication_resource @=@ 0004 @=@ International Conference communication/abstract/poster
+dnet:publication_resource @=@ 0004 @=@ National Conference
+dnet:publication_resource @=@ 0004 @=@ National Conference Abstract/Poster
+dnet:publication_resource @=@ 0004 @=@ National Conference communication/abstract/poster
+dnet:publication_resource @=@ 0004 @=@ PREFACE_PROCEEDINGS
+dnet:publication_resource @=@ 0004 @=@ PROCEEDING_PAPER
+dnet:publication_resource @=@ 0004 @=@ Papers in Conference Proceedings
+dnet:publication_resource @=@ 0004 @=@ Presentación
+dnet:publication_resource @=@ 0004 @=@ Proceedings (peer-reviewed)
+dnet:publication_resource @=@ 0004 @=@ Proceedings of a Conference
+dnet:publication_resource @=@ 0004 @=@ Proceedings paper
+dnet:publication_resource @=@ 0004 @=@ Póster
+dnet:publication_resource @=@ 0004 @=@ actes_congres
+dnet:publication_resource @=@ 0004 @=@ communication_avec_actes
+dnet:publication_resource @=@ 0004 @=@ communication_invitee
+dnet:publication_resource @=@ 0004 @=@ communication_par_affiche
+dnet:publication_resource @=@ 0004 @=@ communication_sans_actes
+dnet:publication_resource @=@ 0004 @=@ conference
+dnet:publication_resource @=@ 0004 @=@ conference item
+dnet:publication_resource @=@ 0004 @=@ conference proceeding
+dnet:publication_resource @=@ 0004 @=@ conferenceObject
+dnet:publication_resource @=@ 0004 @=@ conference_paper
+dnet:publication_resource @=@ 0004 @=@ doc-type:conferenceObject
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_18co
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_18cp
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_5794
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_6670
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_c94f
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_f744
+dnet:publication_resource @=@ 0004 @=@ info:eu-repo/semantics/conferenceItem
+dnet:publication_resource @=@ 0004 @=@ info:eu-repo/semantics/conferenceObject
+dnet:publication_resource @=@ 0004 @=@ invited conference talk
+dnet:publication_resource @=@ 0004 @=@ poster
+dnet:publication_resource @=@ 0004 @=@ presentation
+dnet:publication_resource @=@ 0004 @=@ proceeding, seminar, workshop without peer review
+dnet:publication_resource @=@ 0004 @=@ proceedings
+dnet:publication_resource @=@ 0004 @=@ proceedings-article
+dnet:publication_resource @=@ 0004 @=@ publication-conferencepaper
+dnet:publication_resource @=@ 0004 @=@ научный доклад
+dnet:publication_resource @=@ 0005 @=@ Newspaper or magazine article
+dnet:publication_resource @=@ 0005 @=@ http://purl.org/coar/resource_type/c_998f
+dnet:publication_resource @=@ 0005 @=@ info:eu-repo/semantics/contributionToPeriodical
+dnet:publication_resource @=@ 0045 @=@ Data Management Plan
+dnet:publication_resource @=@ 0045 @=@ Data Management Plan (NSF Generic)
+dnet:publication_resource @=@ 0045 @=@ http://purl.org/coar/resource_type/c_ab20
+dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataManagementPolicy
+dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataManagementPolicyDocument
+dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataMangementPlan
+dnet:publication_resource @=@ 0045 @=@ plan de gestión de datos
+dnet:publication_resource @=@ 0045 @=@ publication-datamanagementplan
+dnet:publication_resource @=@ 0031 @=@ Data Descriptor
+dnet:publication_resource @=@ 0031 @=@ DataPaper
+dnet:publication_resource @=@ 0031 @=@ data-article
+dnet:publication_resource @=@ 0031 @=@ http://purl.org/coar/resource_type/c_beb9
+dnet:publication_resource @=@ 0021 @=@ Dataset/Dataset
+dnet:publication_resource @=@ 0021 @=@ Research Data
+dnet:publication_resource @=@ 0021 @=@ dataset
+dnet:publication_resource @=@ 0021 @=@ http://purl.org/coar/resource_type/c_ddb1
+dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/DDIInstance
+dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/datafile
+dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/dataset
+dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/enhancedObjectFile
+dnet:publication_resource @=@ 0006 @=@ Diss
+dnet:publication_resource @=@ 0006 @=@ Dissertation
+dnet:publication_resource @=@ 0006 @=@ Doctoral
+dnet:publication_resource @=@ 0006 @=@ DoctoralThesis
+dnet:publication_resource @=@ 0006 @=@ PhD thesis
+dnet:publication_resource @=@ 0006 @=@ Tesis
+dnet:publication_resource @=@ 0006 @=@ Text.Thesis.Doctoral
+dnet:publication_resource @=@ 0006 @=@ Theses
+dnet:publication_resource @=@ 0006 @=@ Thesis
+dnet:publication_resource @=@ 0006 @=@ Thesis or Dissertation
+dnet:publication_resource @=@ 0006 @=@ Thesis.Doctoral
+dnet:publication_resource @=@ 0006 @=@ doc-type:doctoralThesis
+dnet:publication_resource @=@ 0006 @=@ http://purl.org/coar/resource_type/c_db06
+dnet:publication_resource @=@ 0006 @=@ info:eu-repo/semantics/doctoralThesis
+dnet:publication_resource @=@ 0006 @=@ publication-thesis
+dnet:publication_resource @=@ 0006 @=@ these
+dnet:publication_resource @=@ 0006 @=@ these exercice
+dnet:publication_resource @=@ 0023 @=@ Event/Event
+dnet:publication_resource @=@ 0023 @=@ event
+dnet:publication_resource @=@ 0009 @=@ Departmental Technical Report
+dnet:publication_resource @=@ 0009 @=@ Informe Técnico
+dnet:publication_resource @=@ 0009 @=@ RESEARCH_REPORT
+dnet:publication_resource @=@ 0009 @=@ Tech-Report
+dnet:publication_resource @=@ 0009 @=@ Technical Report
+dnet:publication_resource @=@ 0009 @=@ http://purl.org/coar/resource_type/c_18gh
+dnet:publication_resource @=@ 0009 @=@ publication-technicalnote
+dnet:publication_resource @=@ 0009 @=@ research report
+dnet:publication_resource @=@ 0024 @=@ Video
+dnet:publication_resource @=@ 0024 @=@ film
+dnet:publication_resource @=@ 0024 @=@ http://purl.org/coar/resource_type/c_12ce
+dnet:publication_resource @=@ 0024 @=@ http://purl.org/coar/resource_type/c_8a7e
+dnet:publication_resource @=@ 0025 @=@ Diagram
+dnet:publication_resource @=@ 0025 @=@ Drawing
+dnet:publication_resource @=@ 0025 @=@ Figure
+dnet:publication_resource @=@ 0025 @=@ Image/Image
+dnet:publication_resource @=@ 0025 @=@ Imagen
+dnet:publication_resource @=@ 0025 @=@ Photo
+dnet:publication_resource @=@ 0025 @=@ Plot
+dnet:publication_resource @=@ 0025 @=@ fotó
+dnet:publication_resource @=@ 0025 @=@ grafika
+dnet:publication_resource @=@ 0025 @=@ http://purl.org/coar/resource_type/c_ecc8
+dnet:publication_resource @=@ 0025 @=@ image
+dnet:publication_resource @=@ 0025 @=@ image-diagram
+dnet:publication_resource @=@ 0025 @=@ image-drawing
+dnet:publication_resource @=@ 0025 @=@ image-figure
+dnet:publication_resource @=@ 0025 @=@ image-other
+dnet:publication_resource @=@ 0025 @=@ image-photo
+dnet:publication_resource @=@ 0025 @=@ image-plot
+dnet:publication_resource @=@ 0026 @=@ http://purl.org/coar/resource_type/c_e9a0
+dnet:publication_resource @=@ 0026 @=@ interactiveResource
+dnet:publication_resource @=@ 0011 @=@ Internal note
+dnet:publication_resource @=@ 0011 @=@ http://purl.org/coar/resource_type/c_18ww
+dnet:publication_resource @=@ 0043 @=@ http://purl.org/coar/resource_type/c_0640
+dnet:publication_resource @=@ 0010 @=@ Inaugural lecture
+dnet:publication_resource @=@ 0010 @=@ Material didáctico
+dnet:publication_resource @=@ 0010 @=@ Public-Lecture
+dnet:publication_resource @=@ 0010 @=@ http://purl.org/coar/resource_type/c_8544
+dnet:publication_resource @=@ 0010 @=@ info:eu-repo/semantics/lecture
+dnet:publication_resource @=@ 0010 @=@ lesson
+dnet:publication_resource @=@ 0010 @=@ Учебный материал
+dnet:publication_resource @=@ 0007 @=@ Diploma Project
+dnet:publication_resource @=@ 0007 @=@ MSc Thesis
+dnet:publication_resource @=@ 0007 @=@ Master Degree
+dnet:publication_resource @=@ 0007 @=@ Master's
+dnet:publication_resource @=@ 0007 @=@ Masterarbeit u.a.
+dnet:publication_resource @=@ 0007 @=@ Masters (Taught)
+dnet:publication_resource @=@ 0007 @=@ Masters thesis
+dnet:publication_resource @=@ 0007 @=@ Masters-Thesis.Magister
+dnet:publication_resource @=@ 0007 @=@ Tesina
+dnet:publication_resource @=@ 0007 @=@ Thesis.Master
+dnet:publication_resource @=@ 0007 @=@ Trabajo fin de Máster
+dnet:publication_resource @=@ 0007 @=@ doc-type:masterThesis
+dnet:publication_resource @=@ 0007 @=@ hdr
+dnet:publication_resource @=@ 0007 @=@ http://purl.org/coar/resource_type/c_bdcc
+dnet:publication_resource @=@ 0007 @=@ info:eu-repo/semantics/masterThesis
+dnet:publication_resource @=@ 0007 @=@ masterThesis
+dnet:publication_resource @=@ 0007 @=@ memoire
+dnet:publication_resource @=@ 0027 @=@ Model/Model
+dnet:publication_resource @=@ 0027 @=@ model
+dnet:publication_resource @=@ 0020 @=@ Exhibition
+dnet:publication_resource @=@ 0020 @=@ Learning Object
+dnet:publication_resource @=@ 0020 @=@ Mapa
+dnet:publication_resource @=@ 0020 @=@ Modelo de utilidad
+dnet:publication_resource @=@ 0020 @=@ PEDAGOGICAL_DOCUMENT
+dnet:publication_resource @=@ 0020 @=@ Partitura
+dnet:publication_resource @=@ 0020 @=@ Sitio web
+dnet:publication_resource @=@ 0020 @=@ Trabajo de divulgación
+dnet:publication_resource @=@ 0020 @=@ Web publication/site
+dnet:publication_resource @=@ 0020 @=@ application
+dnet:publication_resource @=@ 0020 @=@ artefact
+dnet:publication_resource @=@ 0020 @=@ carte
+dnet:publication_resource @=@ 0020 @=@ composition
+dnet:publication_resource @=@ 0020 @=@ document_audiovisuel
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_12cc
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_12cd
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_1843
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_18cd
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_18cw
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_26e4
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_7ad9
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_e059
+dnet:publication_resource @=@ 0020 @=@ info:eu-repo/semantics/other
+dnet:publication_resource @=@ 0020 @=@ learningObject
+dnet:publication_resource @=@ 0020 @=@ map
+dnet:publication_resource @=@ 0020 @=@ misc
+dnet:publication_resource @=@ 0020 @=@ other
+dnet:publication_resource @=@ 0020 @=@ revue
+dnet:publication_resource @=@ 0038 @=@ Abstract
+dnet:publication_resource @=@ 0038 @=@ Blog
+dnet:publication_resource @=@ 0038 @=@ Book Prospectus
+dnet:publication_resource @=@ 0038 @=@ Dictionary Entry
+dnet:publication_resource @=@ 0038 @=@ Disclosure
+dnet:publication_resource @=@ 0038 @=@ Editorial
+dnet:publication_resource @=@ 0038 @=@ Editorial ISI/JCR
+dnet:publication_resource @=@ 0038 @=@ Editors
+dnet:publication_resource @=@ 0038 @=@ Editors (non peer-reviewed)
+dnet:publication_resource @=@ 0038 @=@ Editors (peer-reviewed)
+dnet:publication_resource @=@ 0038 @=@ Encyclopedia Entry
+dnet:publication_resource @=@ 0038 @=@ Entrada de blog
+dnet:publication_resource @=@ 0038 @=@ Funding Submission
+dnet:publication_resource @=@ 0038 @=@ HabilitationThesis
+dnet:publication_resource @=@ 0038 @=@ License
+dnet:publication_resource @=@ 0038 @=@ Manual
+dnet:publication_resource @=@ 0038 @=@ Manuscript
+dnet:publication_resource @=@ 0038 @=@ Manuscrito
+dnet:publication_resource @=@ 0038 @=@ Other publication (non peer-review)
+dnet:publication_resource @=@ 0038 @=@ Other publication (peer-review)
+dnet:publication_resource @=@ 0038 @=@ Revista
+dnet:publication_resource @=@ 0038 @=@ Supervised Student Publication
+dnet:publication_resource @=@ 0038 @=@ Tesis/trabajos de grado – Thesis
+dnet:publication_resource @=@ 0038 @=@ Text
+dnet:publication_resource @=@ 0038 @=@ Text/Text
+dnet:publication_resource @=@ 0038 @=@ Trademark
+dnet:publication_resource @=@ 0038 @=@ Translation
+dnet:publication_resource @=@ 0038 @=@ afterword
+dnet:publication_resource @=@ 0038 @=@ avantpropos
+dnet:publication_resource @=@ 0038 @=@ bibliography
+dnet:publication_resource @=@ 0038 @=@ chronique
+dnet:publication_resource @=@ 0038 @=@ compte rendu
+dnet:publication_resource @=@ 0038 @=@ correction
+dnet:publication_resource @=@ 0038 @=@ foreword
+dnet:publication_resource @=@ 0038 @=@ habilitation à diriger des recherches
+dnet:publication_resource @=@ 0038 @=@ historicalDocument
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_0040
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_0857
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_18cf
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_18wz
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_3e5a
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_46ec
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_6947
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_7acd
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_86bc
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_b239
+dnet:publication_resource @=@ 0038 @=@ note de lecture
+dnet:publication_resource @=@ 0038 @=@ notedelecture
+dnet:publication_resource @=@ 0038 @=@ other publication
+dnet:publication_resource @=@ 0038 @=@ postface
+dnet:publication_resource @=@ 0038 @=@ publication-other
+dnet:publication_resource @=@ 0038 @=@ revuedepresse
+dnet:publication_resource @=@ 0038 @=@ sa_component
+dnet:publication_resource @=@ 0038 @=@ standard
+dnet:publication_resource @=@ 0038 @=@ standard-series
+dnet:publication_resource @=@ 0013 @=@ A3 Kirjan tai muun kokoomateoksen osa
+dnet:publication_resource @=@ 0013 @=@ Book Part (author)
+dnet:publication_resource @=@ 0013 @=@ Book Section / Chapter
+dnet:publication_resource @=@ 0013 @=@ Book chapter or Essay in book
+dnet:publication_resource @=@ 0013 @=@ Book editorial
+dnet:publication_resource @=@ 0013 @=@ Book section
+dnet:publication_resource @=@ 0013 @=@ Book_Chapter
+dnet:publication_resource @=@ 0013 @=@ Buchbeitrag
+dnet:publication_resource @=@ 0013 @=@ Capítulo de libro
+dnet:publication_resource @=@ 0013 @=@ Contribution to International Book/Monograph
+dnet:publication_resource @=@ 0013 @=@ Contribution to International Book/Monograph ISI/JCR
+dnet:publication_resource @=@ 0013 @=@ Contribution to National Book/Monograph
+dnet:publication_resource @=@ 0013 @=@ Contribution to book (non peer-reviewed)
+dnet:publication_resource @=@ 0013 @=@ Contribution to book (peer-reviewed)
+dnet:publication_resource @=@ 0013 @=@ Part of book - chapter
+dnet:publication_resource @=@ 0013 @=@ book chapter
+dnet:publication_resource @=@ 0013 @=@ book-part
+dnet:publication_resource @=@ 0013 @=@ bookPart
+dnet:publication_resource @=@ 0013 @=@ book_content
+dnet:publication_resource @=@ 0013 @=@ chapitre_ouvrage
+dnet:publication_resource @=@ 0013 @=@ chapter
+dnet:publication_resource @=@ 0013 @=@ doc-type:bookPart
+dnet:publication_resource @=@ 0013 @=@ http://purl.org/coar/resource_type/c_3248
+dnet:publication_resource @=@ 0013 @=@ info:eu-repo/semantics/bookPart
+dnet:publication_resource @=@ 0013 @=@ publication-section
+dnet:publication_resource @=@ 0013 @=@ reference-entry
+dnet:publication_resource @=@ 0013 @=@ reference_entry
+dnet:publication_resource @=@ 0013 @=@ scientific book chapter
+dnet:publication_resource @=@ 0013 @=@ Глава монографии
+dnet:publication_resource @=@ 0019 @=@ H1 Myönnetty patentti
+dnet:publication_resource @=@ 0019 @=@ Patent
+dnet:publication_resource @=@ 0019 @=@ Patente
+dnet:publication_resource @=@ 0019 @=@ Solicitud de patente
+dnet:publication_resource @=@ 0019 @=@ Traducción de patente
+dnet:publication_resource @=@ 0019 @=@ brevet
+dnet:publication_resource @=@ 0019 @=@ http://purl.org/coar/resource_type/c_15cd
+dnet:publication_resource @=@ 0019 @=@ info:eu-repo/semantics/patent
+dnet:publication_resource @=@ 0019 @=@ publication-patent
+dnet:publication_resource @=@ 0028 @=@ Service
+dnet:publication_resource @=@ 0028 @=@ physicalObject
+dnet:publication_resource @=@ 0016 @=@ Pre Print
+dnet:publication_resource @=@ 0016 @=@ Pre-print
+dnet:publication_resource @=@ 0016 @=@ http://purl.org/coar/resource_type/c_816b
+dnet:publication_resource @=@ 0016 @=@ info:eu-repo/semantics/preprint
+dnet:publication_resource @=@ 0016 @=@ publication-preprint
+dnet:publication_resource @=@ 0016 @=@ Препринт
+dnet:publication_resource @=@ 0034 @=@ Project deliverable
+dnet:publication_resource @=@ 0034 @=@ http://purl.org/coar/resource_type/c_18op
+dnet:publication_resource @=@ 0034 @=@ publication-deliverable
+dnet:publication_resource @=@ 0035 @=@ Project milestone
+dnet:publication_resource @=@ 0035 @=@ publication-milestone
+dnet:publication_resource @=@ 0036 @=@ Proposal
+dnet:publication_resource @=@ 0036 @=@ http://purl.org/coar/resource_type/c_baaf
+dnet:publication_resource @=@ 0036 @=@ research-proposal
+dnet:publication_resource @=@ 0017 @=@ ACTIVITY_REPORT
+dnet:publication_resource @=@ 0017 @=@ Commissioned report
+dnet:publication_resource @=@ 0017 @=@ D4 Julkaistu kehittämis- tai tutkimusraportti tai -selvitys
+dnet:publication_resource @=@ 0017 @=@ Deliverable
+dnet:publication_resource @=@ 0017 @=@ Documento tecnico
+dnet:publication_resource @=@ 0017 @=@ Project Report
+dnet:publication_resource @=@ 0017 @=@ Software documentation
+dnet:publication_resource @=@ 0017 @=@ brief-report
+dnet:publication_resource @=@ 0017 @=@ case-report
+dnet:publication_resource @=@ 0017 @=@ chapitre_rapport
+dnet:publication_resource @=@ 0017 @=@ doc-type:report
+dnet:publication_resource @=@ 0017 @=@ document_institutionnel
+dnet:publication_resource @=@ 0017 @=@ document_technique
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_186u
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18hj
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18wq
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18ws
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_71bd
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_93fc
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_ba1f
+dnet:publication_resource @=@ 0017 @=@ info:eu-repo/semantics/report
+dnet:publication_resource @=@ 0017 @=@ publication-report
+dnet:publication_resource @=@ 0017 @=@ publication-softwaredocumentation
+dnet:publication_resource @=@ 0017 @=@ rapport_expertise
+dnet:publication_resource @=@ 0017 @=@ rapport_mission
+dnet:publication_resource @=@ 0017 @=@ report
+dnet:publication_resource @=@ 0017 @=@ report-paper
+dnet:publication_resource @=@ 0017 @=@ report-paper_title
+dnet:publication_resource @=@ 0017 @=@ report-series
+dnet:publication_resource @=@ 0017 @=@ support_cours
+dnet:publication_resource @=@ 0014 @=@ Arbeitspapier
+dnet:publication_resource @=@ 0014 @=@ Departmental Bulletin Paper
+dnet:publication_resource @=@ 0014 @=@ Documento de trabajo
+dnet:publication_resource @=@ 0014 @=@ Paper
+dnet:publication_resource @=@ 0014 @=@ Project description
+dnet:publication_resource @=@ 0014 @=@ Research-Paper
+dnet:publication_resource @=@ 0014 @=@ ResearchPaper
+dnet:publication_resource @=@ 0014 @=@ Working / discussion paper
+dnet:publication_resource @=@ 0014 @=@ Working Paper
+dnet:publication_resource @=@ 0014 @=@ Working Paper / Technical Report
+dnet:publication_resource @=@ 0014 @=@ doc-type:workingPaper
+dnet:publication_resource @=@ 0014 @=@ http://purl.org/coar/resource_type/c_8042
+dnet:publication_resource @=@ 0014 @=@ info:eu-repo/semantics/paper
+dnet:publication_resource @=@ 0014 @=@ info:eu-repo/semantics/workingPaper
+dnet:publication_resource @=@ 0014 @=@ publication-workingpaper
+dnet:publication_resource @=@ 0014 @=@ workingPaper
+dnet:publication_resource @=@ 0015 @=@ A2 Katsausartikkeli tieteellisessä aikakauslehdessä
+dnet:publication_resource @=@ 0015 @=@ Book Review
+dnet:publication_resource @=@ 0015 @=@ Book/Film/Article review
+dnet:publication_resource @=@ 0015 @=@ Literature review
+dnet:publication_resource @=@ 0015 @=@ Peer review
+dnet:publication_resource @=@ 0015 @=@ Reseña bibliográfica
+dnet:publication_resource @=@ 0015 @=@ Review Article
+dnet:publication_resource @=@ 0015 @=@ RezensionReview
+dnet:publication_resource @=@ 0015 @=@ book-review
+dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_ba08
+dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_dcae04bc
+dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_efa0
+dnet:publication_resource @=@ 0015 @=@ info:eu-repo/semantics/review
+dnet:publication_resource @=@ 0015 @=@ peer-review
+dnet:publication_resource @=@ 0029 @=@ Software
+dnet:publication_resource @=@ 0029 @=@ Software/Software
+dnet:publication_resource @=@ 0029 @=@ Workflow
+dnet:publication_resource @=@ 0029 @=@ Workflow/Workflow
+dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_393c
+dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_5ce6
+dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_c950
+dnet:publication_resource @=@ 0032 @=@ http://purl.org/coar/resource_type/c_7bab
+dnet:publication_resource @=@ 0030 @=@ http://purl.org/coar/resource_type/c_18cc
+dnet:publication_resource @=@ 0030 @=@ sound
+dnet:publication_resource @=@ 0044 @=@ Graduate diploma
+dnet:publication_resource @=@ 0044 @=@ Undergraduate diploma
+dnet:publication_resource @=@ 0000 @=@ UNKNOWN
+dnet:publication_resource @=@ 0042 @=@ EGI Virtual Appliance
 dnet:languages @=@ abk @=@ ab
 dnet:languages @=@ aar @=@ aa
 dnet:languages @=@ afr @=@ af
@@ -317,24 +539,37 @@ dnet:languages @=@ eng @=@ en_gb
 dnet:languages @=@ eng @=@ en_nz
 dnet:languages @=@ eng @=@ en_us
 dnet:languages @=@ eng @=@ english
+dnet:languages @=@ eng @=@ en-us
+dnet:languages @=@ eng @=@ en-US
+dnet:languages @=@ eng @=@ English
+dnet:languages @=@ eng @=@ EN
+dnet:languages @=@ eng @=@ en angielski
+dnet:languages @=@ eng @=@ en-GB
+dnet:languages @=@ eng @=@ Englisch
 dnet:languages @=@ epo @=@ eo
 dnet:languages @=@ est @=@ et
 dnet:languages @=@ fao @=@ fo
 dnet:languages @=@ fij @=@ fj
 dnet:languages @=@ fin @=@ fi
+dnet:languages @=@ fin @=@ Finnish
 dnet:languages @=@ fra/fre @=@ fr
+dnet:languages @=@ fra/fre @=@ FR
 dnet:languages @=@ fra/fre @=@ fr_be
 dnet:languages @=@ fra/fre @=@ fr_fr
 dnet:languages @=@ fra/fre @=@ fre/fra
+dnet:languages @=@ fra/fre @=@ fra
 dnet:languages @=@ fry @=@ fy
 dnet:languages @=@ glg @=@ gl
 dnet:languages @=@ geo/kat @=@ ka
 dnet:languages @=@ deu/ger @=@ de
 dnet:languages @=@ deu/ger @=@ ger/deu
 dnet:languages @=@ deu/ger @=@ german
-dnet:languages @=@ deu/ger @=@ de_DE
+dnet:languages @=@ deu/ger @=@ ger
+dnet:languages @=@ deu/ger @=@ deu
+dnet:languages @=@ deu/ger @=@ DE-de
 dnet:languages @=@ ell/gre @=@ el
 dnet:languages @=@ ell/gre @=@ gr
+dnet:languages @=@ ell/gre @=@ el-GR
 dnet:languages @=@ kal @=@ kl
 dnet:languages @=@ grn @=@ gn
 dnet:languages @=@ guj @=@ gu
@@ -418,6 +653,7 @@ dnet:languages @=@ tam @=@ ta
 dnet:languages @=@ tat @=@ tt
 dnet:languages @=@ tel @=@ te
 dnet:languages @=@ tha @=@ th
+dnet:languages @=@ tha @=@ thai
 dnet:languages @=@ bod/tib @=@ bo
 dnet:languages @=@ tir @=@ ti
 dnet:languages @=@ tog @=@ to
@@ -428,6 +664,8 @@ dnet:languages @=@ tuk @=@ tk
 dnet:languages @=@ twi @=@ tw
 dnet:languages @=@ uig @=@ ug
 dnet:languages @=@ ukr @=@ uk
+dnet:languages @=@ und @=@ UNKNOWN
+dnet:languages @=@ und @=@ none
 dnet:languages @=@ urd @=@ ur
 dnet:languages @=@ uzb @=@ uz
 dnet:languages @=@ vie @=@ vi
@@ -440,566 +678,280 @@ dnet:languages @=@ yid @=@ yi
 dnet:languages @=@ yor @=@ yo
 dnet:languages @=@ zha @=@ za
 dnet:languages @=@ zul @=@ zu
-dnet:pid_types @=@ orcid @=@ ORCID12
-dnet:subject_classification_typologies @=@ jel @=@ jelElement
+dnet:result_typologies @=@ dataset @=@ 0021
+dnet:result_typologies @=@ dataset @=@ 0024
+dnet:result_typologies @=@ dataset @=@ 0025
+dnet:result_typologies @=@ dataset @=@ 0030
+dnet:result_typologies @=@ dataset @=@ 0033
+dnet:result_typologies @=@ dataset @=@ 0037
+dnet:result_typologies @=@ dataset @=@ 0039
+dnet:result_typologies @=@ dataset @=@ 0046
+dnet:result_typologies @=@ other @=@ 0000
+dnet:result_typologies @=@ other @=@ 0010
+dnet:result_typologies @=@ other @=@ 0018
+dnet:result_typologies @=@ other @=@ 0020
+dnet:result_typologies @=@ other @=@ 0022
+dnet:result_typologies @=@ other @=@ 0023
+dnet:result_typologies @=@ other @=@ 0026
+dnet:result_typologies @=@ other @=@ 0027
+dnet:result_typologies @=@ other @=@ 0028
+dnet:result_typologies @=@ other @=@ 0042
+dnet:result_typologies @=@ publication @=@ 0001
+dnet:result_typologies @=@ publication @=@ 0002
+dnet:result_typologies @=@ publication @=@ 0004
+dnet:result_typologies @=@ publication @=@ 0005
+dnet:result_typologies @=@ publication @=@ 0006
+dnet:result_typologies @=@ publication @=@ 0007
+dnet:result_typologies @=@ publication @=@ 0008
+dnet:result_typologies @=@ publication @=@ 0009
+dnet:result_typologies @=@ publication @=@ 0011
+dnet:result_typologies @=@ publication @=@ 0012
+dnet:result_typologies @=@ publication @=@ 0013
+dnet:result_typologies @=@ publication @=@ 0014
+dnet:result_typologies @=@ publication @=@ 0015
+dnet:result_typologies @=@ publication @=@ 0016
+dnet:result_typologies @=@ publication @=@ 0017
+dnet:result_typologies @=@ publication @=@ 0019
+dnet:result_typologies @=@ publication @=@ 0031
+dnet:result_typologies @=@ publication @=@ 0032
+dnet:result_typologies @=@ publication @=@ 0034
+dnet:result_typologies @=@ publication @=@ 0035
+dnet:result_typologies @=@ publication @=@ 0036
+dnet:result_typologies @=@ publication @=@ 0038
+dnet:result_typologies @=@ publication @=@ 0044
+dnet:result_typologies @=@ publication @=@ 0045
+dnet:result_typologies @=@ software @=@ 0029
+dnet:result_typologies @=@ software @=@ 0040
+dnet:countries @=@ AF @=@ AFG
+dnet:countries @=@ AF @=@ Afghanistan
+dnet:countries @=@ AD @=@ Andorra
+dnet:countries @=@ AO @=@ Angola
+dnet:countries @=@ AR @=@ ARG
+dnet:countries @=@ AR @=@ Argentina
+dnet:countries @=@ AU @=@ AUS
+dnet:countries @=@ AU @=@ Australia
+dnet:countries @=@ AT @=@ AUT
+dnet:countries @=@ AT @=@ Austria
+dnet:countries @=@ AZ @=@ AZE
+dnet:countries @=@ BD @=@ Bangladesh
+dnet:countries @=@ BY @=@ Belarus
+dnet:countries @=@ BE @=@ BEL
+dnet:countries @=@ BE @=@ Belgium
+dnet:countries @=@ BJ @=@ BEN
+dnet:countries @=@ BO @=@ Bolivia, Plurinational State of
+dnet:countries @=@ BA @=@ BIH
+dnet:countries @=@ BA @=@ Bosnia-Hercegovina
+dnet:countries @=@ BR @=@ BRA
+dnet:countries @=@ BR @=@ Brazil
+dnet:countries @=@ BG @=@ Bulgaria
+dnet:countries @=@ BF @=@ BFA
+dnet:countries @=@ KH @=@ Cambodia
+dnet:countries @=@ KH @=@ Cambogia
+dnet:countries @=@ KH @=@ Campuchea
+dnet:countries @=@ CM @=@ CMR
+dnet:countries @=@ CA @=@ CAN
+dnet:countries @=@ CA @=@ Canada
+dnet:countries @=@ CV @=@ Cape Verde
+dnet:countries @=@ CL @=@ CHL
+dnet:countries @=@ CL @=@ Chile
+dnet:countries @=@ CN @=@ CHN
+dnet:countries @=@ CN @=@ China
+dnet:countries @=@ CO @=@ COL
+dnet:countries @=@ CO @=@ Colombia
+dnet:countries @=@ CD @=@ Congo
+dnet:countries @=@ CD @=@ Congo Democratic Republic (formerly Zaire)
+dnet:countries @=@ CD @=@ Congo, Republic
+dnet:countries @=@ CD @=@ Congo, the Democratic Republic of the
+dnet:countries @=@ CD @=@ Zaire
+dnet:countries @=@ CR @=@ CRI
+dnet:countries @=@ CI @=@ CIV
+dnet:countries @=@ CI @=@ Ivory Coast
+dnet:countries @=@ HR @=@ Croatia
+dnet:countries @=@ HR @=@ HRV
+dnet:countries @=@ CY @=@ CYP
+dnet:countries @=@ CY @=@ Cyprus
+dnet:countries @=@ CZ @=@ CZE
+dnet:countries @=@ CZ @=@ Czech Republic
+dnet:countries @=@ CZ @=@ Czechia
+dnet:countries @=@ CZ @=@ Czechoslovakia
+dnet:countries @=@ DK @=@ DNK
+dnet:countries @=@ DK @=@ Denmark
+dnet:countries @=@ EC @=@ Ecuador
+dnet:countries @=@ EG @=@ EGY
+dnet:countries @=@ EG @=@ Egypt
+dnet:countries @=@ SV @=@ SLV
+dnet:countries @=@ EE @=@ EST
+dnet:countries @=@ EE @=@ Estonia
+dnet:countries @=@ ET @=@ ETH
+dnet:countries @=@ EU @=@ EEC
+dnet:countries @=@ FJ @=@ FJI
+dnet:countries @=@ FI @=@ FIN
+dnet:countries @=@ FI @=@ Finland
+dnet:countries @=@ MK @=@ Macedonia
+dnet:countries @=@ MK @=@ Macedonia, the Former Yugoslav Republic Of
+dnet:countries @=@ MK @=@ North Macedonia
+dnet:countries @=@ FR @=@ FRA
+dnet:countries @=@ FR @=@ France
+dnet:countries @=@ PF @=@ French Polynesia
+dnet:countries @=@ PF @=@ PYF
+dnet:countries @=@ TF @=@ French Southern Territories
+dnet:countries @=@ GE @=@ Georgia
+dnet:countries @=@ DE @=@ DEU
+dnet:countries @=@ DE @=@ Germany
+dnet:countries @=@ DE @=@ Germany, Berlin
+dnet:countries @=@ GH @=@ GHA
+dnet:countries @=@ GR @=@ EL
+dnet:countries @=@ GR @=@ GRC
+dnet:countries @=@ GL @=@ GRL
+dnet:countries @=@ GN @=@ Guinea
+dnet:countries @=@ GW @=@ Guinea-Bissau
+dnet:countries @=@ VA @=@ Vatican State
+dnet:countries @=@ HK @=@ HKG
+dnet:countries @=@ HK @=@ Hong Kong
+dnet:countries @=@ HK @=@ Hongkong
+dnet:countries @=@ HU @=@ HUN
+dnet:countries @=@ HU @=@ Hungary
+dnet:countries @=@ IS @=@ ISL
+dnet:countries @=@ IN @=@ IND
+dnet:countries @=@ IN @=@ India
+dnet:countries @=@ ID @=@ IDN
+dnet:countries @=@ ID @=@ Indonesia
+dnet:countries @=@ IR @=@ Iran
+dnet:countries @=@ IR @=@ Iran, Islamic Republic of
+dnet:countries @=@ IE @=@ IRL
+dnet:countries @=@ IE @=@ Ireland
+dnet:countries @=@ IL @=@ ISR
+dnet:countries @=@ IL @=@ Israel
+dnet:countries @=@ IT @=@ ITA
+dnet:countries @=@ IT @=@ Italy
+dnet:countries @=@ JM @=@ Jamaica
+dnet:countries @=@ JP @=@ JPN
+dnet:countries @=@ JP @=@ Japan
+dnet:countries @=@ KZ @=@ KAZ
+dnet:countries @=@ KZ @=@ Kazakistan
+dnet:countries @=@ KZ @=@ Kazakstan
+dnet:countries @=@ KE @=@ KEN
+dnet:countries @=@ KE @=@ Kenya
+dnet:countries @=@ KR @=@ KOR
+dnet:countries @=@ KR @=@ Korea, Republic of
+dnet:countries @=@ KR @=@ Korean Republic (South Korea)
+dnet:countries @=@ KP @=@ PRK
+dnet:countries @=@ LV @=@ LVA
+dnet:countries @=@ LY @=@ Libya
+dnet:countries @=@ LT @=@ LTU
+dnet:countries @=@ LU @=@ LUX
+dnet:countries @=@ LU @=@ Luxembourg
+dnet:countries @=@ MO @=@ Macao
+dnet:countries @=@ MG @=@ Madagascar
+dnet:countries @=@ MY @=@ Malaysia
+dnet:countries @=@ ML @=@ Mali
+dnet:countries @=@ MT @=@ Malta
+dnet:countries @=@ MU @=@ Mauritius
+dnet:countries @=@ MX @=@ MEX
+dnet:countries @=@ MX @=@ Mexico
+dnet:countries @=@ FM @=@ Micronesia
+dnet:countries @=@ MD @=@ Moldova
+dnet:countries @=@ MD @=@ Moldova, Republic of
+dnet:countries @=@ MN @=@ Mongolia
+dnet:countries @=@ MA @=@ Morocco
+dnet:countries @=@ MZ @=@ Mozambique
+dnet:countries @=@ NA @=@ NAM
+dnet:countries @=@ NL @=@ NLD
+dnet:countries @=@ NL @=@ Netherlands
+dnet:countries @=@ AN @=@ Netherlands Antilles
+dnet:countries @=@ NC @=@ NCL
+dnet:countries @=@ NZ @=@ NZL
+dnet:countries @=@ NZ @=@ New Zealand
+dnet:countries @=@ NO @=@ NOR
+dnet:countries @=@ NO @=@ Norway
+dnet:countries @=@ OC @=@ Australasia
+dnet:countries @=@ OM @=@ Oman
+dnet:countries @=@ PK @=@ PAK
+dnet:countries @=@ PK @=@ Pakistan
+dnet:countries @=@ PS @=@ Palestin, State of
+dnet:countries @=@ PS @=@ Palestine, State of
+dnet:countries @=@ PS @=@ Palestinian Territory, Occupied
+dnet:countries @=@ PA @=@ PAN
+dnet:countries @=@ PA @=@ Panama
+dnet:countries @=@ PG @=@ PapuaNew Guinea
+dnet:countries @=@ PE @=@ PER
+dnet:countries @=@ PH @=@ PHL
+dnet:countries @=@ PH @=@ Philippines
+dnet:countries @=@ PL @=@ POL
+dnet:countries @=@ PL @=@ Poland
+dnet:countries @=@ PT @=@ PRT
+dnet:countries @=@ PT @=@ Portugal
+dnet:countries @=@ PR @=@ Puerto Rico
+dnet:countries @=@ RO @=@ ROU
+dnet:countries @=@ RO @=@ Romania
+dnet:countries @=@ RU @=@ RUS
+dnet:countries @=@ RU @=@ Russia
+dnet:countries @=@ RU @=@ Russian Federation
+dnet:countries @=@ RE @=@ Réunion
+dnet:countries @=@ KN @=@ Saint Kitts And Nevis
+dnet:countries @=@ SA @=@ Saudi Arabia
+dnet:countries @=@ SN @=@ SEN
+dnet:countries @=@ RS @=@ SRB
+dnet:countries @=@ CS @=@ Serbia and Montenegro
+dnet:countries @=@ SG @=@ SGP
+dnet:countries @=@ SG @=@ Singapore
+dnet:countries @=@ SK @=@ SVK
+dnet:countries @=@ SI @=@ SVN
+dnet:countries @=@ SI @=@ Slovenia
+dnet:countries @=@ ZA @=@ South Africa
+dnet:countries @=@ ZA @=@ ZAF
+dnet:countries @=@ ES @=@ ESP
+dnet:countries @=@ ES @=@ Spain
+dnet:countries @=@ LK @=@ LKA
+dnet:countries @=@ LK @=@ Sri Lanka
+dnet:countries @=@ SD @=@ SDN
+dnet:countries @=@ SR @=@ Suriname
+dnet:countries @=@ SE @=@ SWE
+dnet:countries @=@ SE @=@ Sweden
+dnet:countries @=@ CH @=@ CHE
+dnet:countries @=@ CH @=@ Switzerland
+dnet:countries @=@ SY @=@ Syria
+dnet:countries @=@ ST @=@ Sao Tome and Principe
+dnet:countries @=@ TW @=@ TWN
+dnet:countries @=@ TW @=@ Taiwan
+dnet:countries @=@ TW @=@ Taiwan, Province of China
+dnet:countries @=@ TZ @=@ Tanzania
+dnet:countries @=@ TZ @=@ Tanzania, United Republic of
+dnet:countries @=@ TH @=@ THA
+dnet:countries @=@ TH @=@ Thailand
+dnet:countries @=@ TL @=@ East Timor
+dnet:countries @=@ TN @=@ TUN
+dnet:countries @=@ TN @=@ Tunisia
+dnet:countries @=@ TR @=@ TUR
+dnet:countries @=@ TR @=@ Turkey
+dnet:countries @=@ UNKNOWN @=@ AAA
+dnet:countries @=@ UNKNOWN @=@ [Unknown]
+dnet:countries @=@ UNKNOWN @=@ _?
+dnet:countries @=@ UA @=@ UKR
+dnet:countries @=@ UA @=@ Ukraine
+dnet:countries @=@ AE @=@ United Arab Emirates
+dnet:countries @=@ GB @=@ England
+dnet:countries @=@ GB @=@ GBR
+dnet:countries @=@ GB @=@ Great Britain
+dnet:countries @=@ GB @=@ Great Britain and Northern Ireland
+dnet:countries @=@ GB @=@ Scotland
+dnet:countries @=@ GB @=@ UK
+dnet:countries @=@ GB @=@ United Kingdom
+dnet:countries @=@ US @=@ USA
+dnet:countries @=@ US @=@ United States
+dnet:countries @=@ US @=@ United States of America
+dnet:countries @=@ UY @=@ Uruguay
+dnet:countries @=@ UZ @=@ Uzbekistan
+dnet:countries @=@ VE @=@ Venezuela, Bolivarian Republic of
+dnet:countries @=@ VN @=@ Vietnam
+dnet:countries @=@ VG @=@ British Virgin Islands
+dnet:countries @=@ YU @=@ Jugoslavia
+dnet:countries @=@ YU @=@ Yugoslavia
+dnet:countries @=@ ZW @=@ ABW
 dnet:protocols @=@ oai @=@ OAI-PMH
 dnet:protocols @=@ oai @=@ OAI_PMH
-dnet:publication_resource @=@ 0018 @=@ Comentario
-dnet:publication_resource @=@ 0018 @=@ Comment/debate
-dnet:publication_resource @=@ 0018 @=@ http://purl.org/coar/resource_type/c_1162
-dnet:publication_resource @=@ 0018 @=@ info:eu-repo/semantics/annotation
-dnet:publication_resource @=@ 0001 @=@ A1 Alkuperäisartikkeli tieteellisessä aikakauslehdessä
-dnet:publication_resource @=@ 0001 @=@ Article
-dnet:publication_resource @=@ 0001 @=@ Article (author)
-dnet:publication_resource @=@ 0001 @=@ Article - letter to the editor
-dnet:publication_resource @=@ 0001 @=@ Article / Letter to editor
-dnet:publication_resource @=@ 0001 @=@ Article / Letter to the editor
-dnet:publication_resource @=@ 0001 @=@ Article / Newspaper
-dnet:publication_resource @=@ 0001 @=@ Article in journal
-dnet:publication_resource @=@ 0001 @=@ Article in monograph or in proceedings
-dnet:publication_resource @=@ 0001 @=@ Article in proceedings
-dnet:publication_resource @=@ 0001 @=@ Article-letter to the editor
-dnet:publication_resource @=@ 0001 @=@ Article/Letter to editor
-dnet:publication_resource @=@ 0001 @=@ Articles in Journals
-dnet:publication_resource @=@ 0001 @=@ Articolo
-dnet:publication_resource @=@ 0001 @=@ Articulo
-dnet:publication_resource @=@ 0001 @=@ Artículo
-dnet:publication_resource @=@ 0001 @=@ Artículo - Article
-dnet:publication_resource @=@ 0001 @=@ Aufsatz
-dnet:publication_resource @=@ 0001 @=@ Clinical Study
-dnet:publication_resource @=@ 0001 @=@ Institutional Series
-dnet:publication_resource @=@ 0001 @=@ International Journal
-dnet:publication_resource @=@ 0001 @=@ International Journal Abstract
-dnet:publication_resource @=@ 0001 @=@ International Journal ISI/JCR
-dnet:publication_resource @=@ 0001 @=@ Journal (full / special issue)
-dnet:publication_resource @=@ 0001 @=@ Journal Article/Review
-dnet:publication_resource @=@ 0001 @=@ Journal article
-dnet:publication_resource @=@ 0001 @=@ Journal article (on-line or printed)
-dnet:publication_resource @=@ 0001 @=@ Journal articles
-dnet:publication_resource @=@ 0001 @=@ Journal paper
-dnet:publication_resource @=@ 0001 @=@ Makale
-dnet:publication_resource @=@ 0001 @=@ National Journal
-dnet:publication_resource @=@ 0001 @=@ Original article (non peer-reviewed)
-dnet:publication_resource @=@ 0001 @=@ Original article (peer-reviewed)
-dnet:publication_resource @=@ 0001 @=@ Peer-reviewed Article
-dnet:publication_resource @=@ 0001 @=@ Publication - Article
-dnet:publication_resource @=@ 0001 @=@ Published Journal Article
-dnet:publication_resource @=@ 0001 @=@ Research Article
-dnet:publication_resource @=@ 0001 @=@ Review article (non peer-reviewed)
-dnet:publication_resource @=@ 0001 @=@ Review article (peer-reviewed)
-dnet:publication_resource @=@ 0001 @=@ Straipsnis / Article
-dnet:publication_resource @=@ 0001 @=@ Volumes Edited / Special Issues
-dnet:publication_resource @=@ 0001 @=@ art
-dnet:publication_resource @=@ 0001 @=@ article in non peer-reviewed journal
-dnet:publication_resource @=@ 0001 @=@ article in peer-reviewed journal
-dnet:publication_resource @=@ 0001 @=@ article-commentary
-dnet:publication_resource @=@ 0001 @=@ article_site_web
-dnet:publication_resource @=@ 0001 @=@ artykuł
-dnet:publication_resource @=@ 0001 @=@ artículo de revisión
-dnet:publication_resource @=@ 0001 @=@ doc-type:Journal Article
-dnet:publication_resource @=@ 0001 @=@ doc-type:article
-dnet:publication_resource @=@ 0001 @=@ foly
-dnet:publication_resource @=@ 0001 @=@ foly&oacute;iratcikk
-dnet:publication_resource @=@ 0001 @=@ folyoiratcikk
-dnet:publication_resource @=@ 0001 @=@ folyóiratcikk
-dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_2df8fbb1
-dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_545b
-dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_6501
-dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_7877
-dnet:publication_resource @=@ 0001 @=@ http://purl.org/escidoc/metadata/ves/publication-types/article
-dnet:publication_resource @=@ 0001 @=@ in-brief
-dnet:publication_resource @=@ 0001 @=@ info:eu-repo/semantics/Journal Article
-dnet:publication_resource @=@ 0001 @=@ info:eu-repo/semantics/article
-dnet:publication_resource @=@ 0001 @=@ journal-article
-dnet:publication_resource @=@ 0001 @=@ journalArticle
-dnet:publication_resource @=@ 0001 @=@ journal_article
-dnet:publication_resource @=@ 0001 @=@ letter
-dnet:publication_resource @=@ 0001 @=@ non peer-reviewed article
-dnet:publication_resource @=@ 0001 @=@ partial-retraction
-dnet:publication_resource @=@ 0001 @=@ proceeding with peer review
-dnet:publication_resource @=@ 0001 @=@ rapid-communication
-dnet:publication_resource @=@ 0001 @=@ reply
-dnet:publication_resource @=@ 0001 @=@ research-article
-dnet:publication_resource @=@ 0001 @=@ retraction
-dnet:publication_resource @=@ 0001 @=@ review-article
-dnet:publication_resource @=@ 0001 @=@ text (article)
-dnet:publication_resource @=@ 0001 @=@ Рецензована стаття
-dnet:publication_resource @=@ 0001 @=@ Статья
-dnet:publication_resource @=@ 0033 @=@ AUDIOVISUAL_DOCUMENT
-dnet:publication_resource @=@ 0033 @=@ Audiovisual/Audiovisual
-dnet:publication_resource @=@ 0033 @=@ http://purl.org/coar/resource_type/c_c513
-dnet:publication_resource @=@ 0008 @=@ Bachelor's
-dnet:publication_resource @=@ 0008 @=@ Bachelor's Degree
-dnet:publication_resource @=@ 0008 @=@ Bachelors Thesis
-dnet:publication_resource @=@ 0008 @=@ Proyecto fin de carrera
-dnet:publication_resource @=@ 0008 @=@ Undergraduate Thesis
-dnet:publication_resource @=@ 0008 @=@ http://purl.org/coar/resource_type/c_7a1f
-dnet:publication_resource @=@ 0008 @=@ info:eu-repo/semantics/bachelorThesis
-dnet:publication_resource @=@ 0008 @=@ выпускная бакалаврская работа
-dnet:publication_resource @=@ 0002 @=@ Book (monograph)
-dnet:publication_resource @=@ 0002 @=@ Book (non peer-reviewed)
-dnet:publication_resource @=@ 0002 @=@ Book (peer-reviewed)
-dnet:publication_resource @=@ 0002 @=@ Book - monograph - editorial book
-dnet:publication_resource @=@ 0002 @=@ Book Section
-dnet:publication_resource @=@ 0002 @=@ Book as author
-dnet:publication_resource @=@ 0002 @=@ Books
-dnet:publication_resource @=@ 0002 @=@ Buch
-dnet:publication_resource @=@ 0002 @=@ Capítulo de Libro - Book Section
-dnet:publication_resource @=@ 0002 @=@ Edited Book
-dnet:publication_resource @=@ 0002 @=@ International Book/Monograph
-dnet:publication_resource @=@ 0002 @=@ Knyga / Book
-dnet:publication_resource @=@ 0002 @=@ Książka
-dnet:publication_resource @=@ 0002 @=@ Libro
-dnet:publication_resource @=@ 0002 @=@ Libro - Book
-dnet:publication_resource @=@ 0002 @=@ Monografia
-dnet:publication_resource @=@ 0002 @=@ Monograph
-dnet:publication_resource @=@ 0002 @=@ National Book/Monograph
-dnet:publication_resource @=@ 0002 @=@ atlas
-dnet:publication_resource @=@ 0002 @=@ book
-dnet:publication_resource @=@ 0002 @=@ book-series
-dnet:publication_resource @=@ 0002 @=@ book-set
-dnet:publication_resource @=@ 0002 @=@ book-track
-dnet:publication_resource @=@ 0002 @=@ book_series
-dnet:publication_resource @=@ 0002 @=@ book_title
-dnet:publication_resource @=@ 0002 @=@ doc-type:book
-dnet:publication_resource @=@ 0002 @=@ eBook
-dnet:publication_resource @=@ 0002 @=@ edited-book
-dnet:publication_resource @=@ 0002 @=@ http://purl.org/coar/resource_type/c_2f33
-dnet:publication_resource @=@ 0002 @=@ http://purl.org/eprint/type/Book
-dnet:publication_resource @=@ 0002 @=@ info:eu-repo/semantics/book
-dnet:publication_resource @=@ 0002 @=@ könyv
-dnet:publication_resource @=@ 0002 @=@ reference-book
-dnet:publication_resource @=@ 0002 @=@ scientific book
-dnet:publication_resource @=@ 0002 @=@ Книга
-dnet:publication_resource @=@ 0002 @=@ Монография
-dnet:publication_resource @=@ 0002 @=@ Учебник
-dnet:publication_resource @=@ 0037 @=@ clinicalTrial
-dnet:publication_resource @=@ 0037 @=@ http://purl.org/coar/resource_type/c_cb28
-dnet:publication_resource @=@ 0022 @=@ collection
-dnet:publication_resource @=@ 0004 @=@ A4 Artikkeli konferenssijulkaisussa
-dnet:publication_resource @=@ 0004 @=@ Article from Conference in a Journal
-dnet:publication_resource @=@ 0004 @=@ Comunicación Congreso
-dnet:publication_resource @=@ 0004 @=@ Comunicación de congreso
-dnet:publication_resource @=@ 0004 @=@ Conference Abstract
-dnet:publication_resource @=@ 0004 @=@ Conference Paper
-dnet:publication_resource @=@ 0004 @=@ Conference Poster
-dnet:publication_resource @=@ 0004 @=@ Conference Proceedings
-dnet:publication_resource @=@ 0004 @=@ Conference Program
-dnet:publication_resource @=@ 0004 @=@ Conference article
-dnet:publication_resource @=@ 0004 @=@ Conference contribution
-dnet:publication_resource @=@ 0004 @=@ Conference lecture
-dnet:publication_resource @=@ 0004 @=@ Conference or Workshop Item
-dnet:publication_resource @=@ 0004 @=@ Conference paper, poster, etc.
-dnet:publication_resource @=@ 0004 @=@ Conference paper/abstract
-dnet:publication_resource @=@ 0004 @=@ Conference papers
-dnet:publication_resource @=@ 0004 @=@ Conference preprint
-dnet:publication_resource @=@ 0004 @=@ Conference report
-dnet:publication_resource @=@ 0004 @=@ Contributions to Conferences
-dnet:publication_resource @=@ 0004 @=@ International Conference
-dnet:publication_resource @=@ 0004 @=@ International Conference Abstract/Poster
-dnet:publication_resource @=@ 0004 @=@ International Conference ISI/JCR
-dnet:publication_resource @=@ 0004 @=@ International Conference communication/abstract/poster
-dnet:publication_resource @=@ 0004 @=@ National Conference
-dnet:publication_resource @=@ 0004 @=@ National Conference Abstract/Poster
-dnet:publication_resource @=@ 0004 @=@ National Conference communication/abstract/poster
-dnet:publication_resource @=@ 0004 @=@ PREFACE_PROCEEDINGS
-dnet:publication_resource @=@ 0004 @=@ PROCEEDING_PAPER
-dnet:publication_resource @=@ 0004 @=@ Papers in Conference Proceedings
-dnet:publication_resource @=@ 0004 @=@ Ponencia - Conference or Workshop Item
-dnet:publication_resource @=@ 0004 @=@ Presentación
-dnet:publication_resource @=@ 0004 @=@ Presentation
-dnet:publication_resource @=@ 0004 @=@ Proceedings (peer-reviewed)
-dnet:publication_resource @=@ 0004 @=@ Proceedings of a Conference
-dnet:publication_resource @=@ 0004 @=@ Proceedings paper
-dnet:publication_resource @=@ 0004 @=@ Póster
-dnet:publication_resource @=@ 0004 @=@ Póster de congreso
-dnet:publication_resource @=@ 0004 @=@ Resumen comunicación Congreso
-dnet:publication_resource @=@ 0004 @=@ Resúmen comunicación Congreso
-dnet:publication_resource @=@ 0004 @=@ actas de congreso
-dnet:publication_resource @=@ 0004 @=@ actes_congres
-dnet:publication_resource @=@ 0004 @=@ communication_avec_actes
-dnet:publication_resource @=@ 0004 @=@ communication_invitee
-dnet:publication_resource @=@ 0004 @=@ communication_par_affiche
-dnet:publication_resource @=@ 0004 @=@ communication_sans_actes
-dnet:publication_resource @=@ 0004 @=@ conference
-dnet:publication_resource @=@ 0004 @=@ conference item
-dnet:publication_resource @=@ 0004 @=@ conference proceeding
-dnet:publication_resource @=@ 0004 @=@ conferenceObject
-dnet:publication_resource @=@ 0004 @=@ conference_paper
-dnet:publication_resource @=@ 0004 @=@ doc-type:conferenceObject
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_18co
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_18cp
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_5794
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_6670
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_c94f
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_f744
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/eprint/type/ConferencePaper
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/eprint/type/ConferencePoster
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/escidoc/metadata/ves/publication-types/conference-report
-dnet:publication_resource @=@ 0004 @=@ http://purl.org/escidoc/metadata/ves/publication-types/proceedings
-dnet:publication_resource @=@ 0004 @=@ info:eu-repo/semantics/Conference Paper
-dnet:publication_resource @=@ 0004 @=@ info:eu-repo/semantics/conferenceItem
-dnet:publication_resource @=@ 0004 @=@ info:eu-repo/semantics/conferenceObject
-dnet:publication_resource @=@ 0004 @=@ info:eu-repo/semantics/conferencePaper
-dnet:publication_resource @=@ 0004 @=@ invited conference talk
-dnet:publication_resource @=@ 0004 @=@ plakat
-dnet:publication_resource @=@ 0004 @=@ ponencia
-dnet:publication_resource @=@ 0004 @=@ poster
-dnet:publication_resource @=@ 0004 @=@ prezentacja
-dnet:publication_resource @=@ 0004 @=@ proceeding, seminar, workshop without peer review
-dnet:publication_resource @=@ 0004 @=@ proceedings
-dnet:publication_resource @=@ 0004 @=@ proceedings-article
-dnet:publication_resource @=@ 0004 @=@ научный доклад
-dnet:publication_resource @=@ 0005 @=@ Magazine Article
-dnet:publication_resource @=@ 0005 @=@ Newspaper Article
-dnet:publication_resource @=@ 0005 @=@ Newspaper or magazine article
-dnet:publication_resource @=@ 0005 @=@ contributionToPeriodical
-dnet:publication_resource @=@ 0005 @=@ http://purl.org/coar/resource_type/c_998f
-dnet:publication_resource @=@ 0005 @=@ info:eu-repo/semantics/contributionToPeriodical
-dnet:publication_resource @=@ 0005 @=@ revista divulgativa
-dnet:publication_resource @=@ 0045 @=@ Data Management Plan
-dnet:publication_resource @=@ 0045 @=@ Data Management Plan (NSF Generic)
-dnet:publication_resource @=@ 0045 @=@ http://purl.org/coar/resource_type/c_ab20
-dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataManagementPolicy
-dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataManagementPolicyDocument
-dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataMangementPlan
-dnet:publication_resource @=@ 0045 @=@ plan de gestión de datos
-dnet:publication_resource @=@ 0045 @=@ publication-datamanagementplan
-dnet:publication_resource @=@ 0031 @=@ Data Descriptor
-dnet:publication_resource @=@ 0031 @=@ DataPaper
-dnet:publication_resource @=@ 0031 @=@ data-article
-dnet:publication_resource @=@ 0031 @=@ http://purl.org/coar/resource_type/c_beb9
-dnet:publication_resource @=@ 0021 @=@ Chemical Structures
-dnet:publication_resource @=@ 0021 @=@ Dataset/Dataset
-dnet:publication_resource @=@ 0021 @=@ Research Data
-dnet:publication_resource @=@ 0021 @=@ dataset
-dnet:publication_resource @=@ 0021 @=@ http://purl.org/coar/resource_type/c_ddb1
-dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/DDIInstance
-dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/datafile
-dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/dataset
-dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/enhancedObjectFile
-dnet:publication_resource @=@ 0006 @=@ Daktaro disertacija / Doctoral dissertation
-dnet:publication_resource @=@ 0006 @=@ Diss
-dnet:publication_resource @=@ 0006 @=@ Dissertation
-dnet:publication_resource @=@ 0006 @=@ Doctoral
-dnet:publication_resource @=@ 0006 @=@ DoctoralThesis
-dnet:publication_resource @=@ 0006 @=@ PhD Theses
-dnet:publication_resource @=@ 0006 @=@ PhD thesis
-dnet:publication_resource @=@ 0006 @=@ Tenure-Promotion
-dnet:publication_resource @=@ 0006 @=@ Tesi di dottorato
-dnet:publication_resource @=@ 0006 @=@ Tesis
-dnet:publication_resource @=@ 0006 @=@ Text.Thesis.Doctoral
-dnet:publication_resource @=@ 0006 @=@ Theses
-dnet:publication_resource @=@ 0006 @=@ Thesis
-dnet:publication_resource @=@ 0006 @=@ Thesis or Dissertation
-dnet:publication_resource @=@ 0006 @=@ Thesis.Doctoral
-dnet:publication_resource @=@ 0006 @=@ doc-type:doctoralThesis
-dnet:publication_resource @=@ 0006 @=@ dok
-dnet:publication_resource @=@ 0006 @=@ doktori dolgozat
-dnet:publication_resource @=@ 0006 @=@ http://purl.org/coar/resource_type/c_db06
-dnet:publication_resource @=@ 0006 @=@ http://purl.org/eprint/type/Thesis
-dnet:publication_resource @=@ 0006 @=@ info:eu-repo/semantics/doctoralThesis
-dnet:publication_resource @=@ 0006 @=@ tesis doctoral
-dnet:publication_resource @=@ 0006 @=@ these
-dnet:publication_resource @=@ 0006 @=@ these exercice
-dnet:publication_resource @=@ 0023 @=@ Event/Event
-dnet:publication_resource @=@ 0023 @=@ event
-dnet:publication_resource @=@ 0009 @=@ Departmental Technical Report
-dnet:publication_resource @=@ 0009 @=@ Informe Técnico
-dnet:publication_resource @=@ 0009 @=@ RESEARCH_REPORT
-dnet:publication_resource @=@ 0009 @=@ Tech-Report
-dnet:publication_resource @=@ 0009 @=@ Technical Report
-dnet:publication_resource @=@ 0009 @=@ http://purl.org/coar/resource_type/c_18gh
-dnet:publication_resource @=@ 0009 @=@ informe a organismo financiador
-dnet:publication_resource @=@ 0009 @=@ research report
-dnet:publication_resource @=@ 0024 @=@ Video
-dnet:publication_resource @=@ 0024 @=@ film
-dnet:publication_resource @=@ 0024 @=@ http://purl.org/coar/resource_type/c_12ce
-dnet:publication_resource @=@ 0024 @=@ http://purl.org/coar/resource_type/c_8a7e
-dnet:publication_resource @=@ 0024 @=@ vídeo
-dnet:publication_resource @=@ 0025 @=@ Image/Image
-dnet:publication_resource @=@ 0025 @=@ Imagen
-dnet:publication_resource @=@ 0025 @=@ Imagen - Image
-dnet:publication_resource @=@ 0025 @=@ Imagen 3-D
-dnet:publication_resource @=@ 0025 @=@ fotó
-dnet:publication_resource @=@ 0025 @=@ grafika
-dnet:publication_resource @=@ 0025 @=@ http://purl.org/coar/resource_type/c_ecc8
-dnet:publication_resource @=@ 0025 @=@ image
-dnet:publication_resource @=@ 0025 @=@ image-diagram
-dnet:publication_resource @=@ 0025 @=@ image-drawing
-dnet:publication_resource @=@ 0025 @=@ image-figure
-dnet:publication_resource @=@ 0025 @=@ image-other
-dnet:publication_resource @=@ 0025 @=@ image-photo
-dnet:publication_resource @=@ 0025 @=@ image-plot
-dnet:publication_resource @=@ 0025 @=@ Drawing
-dnet:publication_resource @=@ 0025 @=@ Photo
-dnet:publication_resource @=@ 0025 @=@ Figure
-dnet:publication_resource @=@ 0025 @=@ Diagram
-dnet:publication_resource @=@ 0025 @=@ Plot
-dnet:publication_resource @=@ 0026 @=@ http://purl.org/coar/resource_type/c_e9a0
-dnet:publication_resource @=@ 0026 @=@ interactiveResource
-dnet:publication_resource @=@ 0011 @=@ Internal note
-dnet:publication_resource @=@ 0011 @=@ http://purl.org/coar/resource_type/c_18ww
-dnet:publication_resource @=@ 0043 @=@ http://purl.org/coar/resource_type/c_0640
-dnet:publication_resource @=@ 0010 @=@ Inaugural lecture
-dnet:publication_resource @=@ 0010 @=@ Material didáctico
-dnet:publication_resource @=@ 0010 @=@ Public-Lecture
-dnet:publication_resource @=@ 0010 @=@ Teaching Resource
-dnet:publication_resource @=@ 0010 @=@ http://purl.org/coar/resource_type/c_8544
-dnet:publication_resource @=@ 0010 @=@ info:eu-repo/semantics/lecture
-dnet:publication_resource @=@ 0010 @=@ lesson
-dnet:publication_resource @=@ 0010 @=@ Учебный материал
-dnet:publication_resource @=@ 0007 @=@ Diploma Project
-dnet:publication_resource @=@ 0007 @=@ MSc Thesis
-dnet:publication_resource @=@ 0007 @=@ Magistro darbas / Master thesis
-dnet:publication_resource @=@ 0007 @=@ Master Degree
-dnet:publication_resource @=@ 0007 @=@ Master's
-dnet:publication_resource @=@ 0007 @=@ Master's Degree
-dnet:publication_resource @=@ 0007 @=@ Masterarbeit u.a.
-dnet:publication_resource @=@ 0007 @=@ Masters (Taught)
-dnet:publication_resource @=@ 0007 @=@ Masters thesis
-dnet:publication_resource @=@ 0007 @=@ Masters-Thesis.Magister
-dnet:publication_resource @=@ 0007 @=@ Tesina
-dnet:publication_resource @=@ 0007 @=@ Thesis.Master
-dnet:publication_resource @=@ 0007 @=@ Trabajo fin de Máster
-dnet:publication_resource @=@ 0007 @=@ doc-type:masterThesis
-dnet:publication_resource @=@ 0007 @=@ hdr
-dnet:publication_resource @=@ 0007 @=@ http://purl.org/coar/resource_type/c_bdcc
-dnet:publication_resource @=@ 0007 @=@ info:eu-repo/semantics/masterThesis
-dnet:publication_resource @=@ 0007 @=@ masterThesis
-dnet:publication_resource @=@ 0007 @=@ memoire
-dnet:publication_resource @=@ 0007 @=@ tesis de maestría
-dnet:publication_resource @=@ 0027 @=@ Model/Model
-dnet:publication_resource @=@ 0027 @=@ model
-dnet:publication_resource @=@ 0012 @=@ Newsletter Article
-dnet:publication_resource @=@ 0020 @=@ Estudio y edición crítica de música
-dnet:publication_resource @=@ 0020 @=@ Exhibition
-dnet:publication_resource @=@ 0020 @=@ Kita / Other
-dnet:publication_resource @=@ 0020 @=@ Learning Object
-dnet:publication_resource @=@ 0020 @=@ Mapa
-dnet:publication_resource @=@ 0020 @=@ Modelo de utilidad
-dnet:publication_resource @=@ 0020 @=@ Online Resource
-dnet:publication_resource @=@ 0020 @=@ Otro - Other
-dnet:publication_resource @=@ 0020 @=@ PEDAGOGICAL_DOCUMENT
-dnet:publication_resource @=@ 0020 @=@ Partitura
-dnet:publication_resource @=@ 0020 @=@ Planimetría
-dnet:publication_resource @=@ 0020 @=@ Registered Copyright
-dnet:publication_resource @=@ 0020 @=@ Research Tool
-dnet:publication_resource @=@ 0020 @=@ Sitio web
-dnet:publication_resource @=@ 0020 @=@ Trabajo de divulgación
-dnet:publication_resource @=@ 0020 @=@ University Academic Unit
-dnet:publication_resource @=@ 0020 @=@ Web publication/site
-dnet:publication_resource @=@ 0020 @=@ application
-dnet:publication_resource @=@ 0020 @=@ artefact
-dnet:publication_resource @=@ 0020 @=@ carte
-dnet:publication_resource @=@ 0020 @=@ composition
-dnet:publication_resource @=@ 0020 @=@ document_audiovisuel
-dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_12cc
-dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_12cd
-dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_1843
-dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_18cd
-dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_18cw
-dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_26e4
-dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_7ad9
-dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_e059
-dnet:publication_resource @=@ 0020 @=@ info:eu-repo/semantics/other
-dnet:publication_resource @=@ 0020 @=@ learningObject
-dnet:publication_resource @=@ 0020 @=@ map
-dnet:publication_resource @=@ 0020 @=@ misc
-dnet:publication_resource @=@ 0020 @=@ other
-dnet:publication_resource @=@ 0020 @=@ otro
-dnet:publication_resource @=@ 0020 @=@ revue
-dnet:publication_resource @=@ 0038 @=@ Abstract
-dnet:publication_resource @=@ 0038 @=@ Blog
-dnet:publication_resource @=@ 0038 @=@ Book Prospectus
-dnet:publication_resource @=@ 0038 @=@ Dictionary Entry
-dnet:publication_resource @=@ 0038 @=@ Disclosure
-dnet:publication_resource @=@ 0038 @=@ Editorial
-dnet:publication_resource @=@ 0038 @=@ Editorial ISI/JCR
-dnet:publication_resource @=@ 0038 @=@ Editors
-dnet:publication_resource @=@ 0038 @=@ Editors (non peer-reviewed)
-dnet:publication_resource @=@ 0038 @=@ Encyclopedia Entry
-dnet:publication_resource @=@ 0038 @=@ Entrada de blog
-dnet:publication_resource @=@ 0038 @=@ Funding Submission
-dnet:publication_resource @=@ 0038 @=@ HabilitationThesis
-dnet:publication_resource @=@ 0038 @=@ License
-dnet:publication_resource @=@ 0038 @=@ Manual
-dnet:publication_resource @=@ 0038 @=@ Manuscript
-dnet:publication_resource @=@ 0038 @=@ Manuscrito
-dnet:publication_resource @=@ 0038 @=@ Other publication (non peer-review)
-dnet:publication_resource @=@ 0038 @=@ Other publication (peer-review)
-dnet:publication_resource @=@ 0038 @=@ Revista
-dnet:publication_resource @=@ 0038 @=@ Supervised Student Publication
-dnet:publication_resource @=@ 0038 @=@ Tesis/trabajos de grado – Thesis
-dnet:publication_resource @=@ 0038 @=@ Text
-dnet:publication_resource @=@ 0038 @=@ Text/Text
-dnet:publication_resource @=@ 0038 @=@ Trademark
-dnet:publication_resource @=@ 0038 @=@ afterword
-dnet:publication_resource @=@ 0038 @=@ avantpropos
-dnet:publication_resource @=@ 0038 @=@ bibliography
-dnet:publication_resource @=@ 0038 @=@ chronique
-dnet:publication_resource @=@ 0038 @=@ compte rendu
-dnet:publication_resource @=@ 0038 @=@ correction
-dnet:publication_resource @=@ 0038 @=@ corrigenda
-dnet:publication_resource @=@ 0038 @=@ foreword
-dnet:publication_resource @=@ 0038 @=@ habilitation à diriger des recherches
-dnet:publication_resource @=@ 0038 @=@ historicalDocument
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_0040
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_0857
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_18cf
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_18wz
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_3e5a
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_46ec
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_6947
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_7acd
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_86bc
-dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_b239
-dnet:publication_resource @=@ 0038 @=@ note de lecture
-dnet:publication_resource @=@ 0038 @=@ notedelecture
-dnet:publication_resource @=@ 0038 @=@ other publication
-dnet:publication_resource @=@ 0038 @=@ postface
-dnet:publication_resource @=@ 0038 @=@ publication-other
-dnet:publication_resource @=@ 0038 @=@ revuedepresse
-dnet:publication_resource @=@ 0038 @=@ sa_component
-dnet:publication_resource @=@ 0038 @=@ standard
-dnet:publication_resource @=@ 0038 @=@ standard-series
-dnet:publication_resource @=@ 0038 @=@ Índice
-dnet:publication_resource @=@ 0013 @=@ A3 Kirjan tai muun kokoomateoksen osa
-dnet:publication_resource @=@ 0013 @=@ Book Part (author)
-dnet:publication_resource @=@ 0013 @=@ Book Section / Chapter
-dnet:publication_resource @=@ 0013 @=@ Book chapter or Essay in book
-dnet:publication_resource @=@ 0013 @=@ Book editorial
-dnet:publication_resource @=@ 0013 @=@ Book section
-dnet:publication_resource @=@ 0013 @=@ Book_Chapter
-dnet:publication_resource @=@ 0013 @=@ Buchbeitrag
-dnet:publication_resource @=@ 0013 @=@ Capítulo de libro
-dnet:publication_resource @=@ 0013 @=@ Contribution to International Book/Monograph
-dnet:publication_resource @=@ 0013 @=@ Contribution to International Book/Monograph ISI/JCR
-dnet:publication_resource @=@ 0013 @=@ Contribution to National Book/Monograph
-dnet:publication_resource @=@ 0013 @=@ Contribution to book (non peer-reviewed)
-dnet:publication_resource @=@ 0013 @=@ Contribution to book (peer-reviewed)
-dnet:publication_resource @=@ 0013 @=@ Knygos dalis / Book chapter
-dnet:publication_resource @=@ 0013 @=@ Part of book - chapter
-dnet:publication_resource @=@ 0013 @=@ Rozdział z książki
-dnet:publication_resource @=@ 0013 @=@ book chapter
-dnet:publication_resource @=@ 0013 @=@ book-chapter
-dnet:publication_resource @=@ 0013 @=@ book-part
-dnet:publication_resource @=@ 0013 @=@ book-section
-dnet:publication_resource @=@ 0013 @=@ bookPart
-dnet:publication_resource @=@ 0013 @=@ book_content
-dnet:publication_resource @=@ 0013 @=@ chapitre_ouvrage
-dnet:publication_resource @=@ 0013 @=@ chapter
-dnet:publication_resource @=@ 0013 @=@ doc-type:bookPart
-dnet:publication_resource @=@ 0013 @=@ http://purl.org/coar/resource_type/c_3248
-dnet:publication_resource @=@ 0013 @=@ http://purl.org/eprint/type/BookItem
-dnet:publication_resource @=@ 0013 @=@ info:eu-repo/semantics/Chapter
-dnet:publication_resource @=@ 0013 @=@ info:eu-repo/semantics/bookPart
-dnet:publication_resource @=@ 0013 @=@ könyvfejezet
-dnet:publication_resource @=@ 0013 @=@ publication-section
-dnet:publication_resource @=@ 0013 @=@ reference-entry
-dnet:publication_resource @=@ 0013 @=@ reference_entry
-dnet:publication_resource @=@ 0013 @=@ scientific book chapter
-dnet:publication_resource @=@ 0013 @=@ Глава монографии
-dnet:publication_resource @=@ 0019 @=@ H1 Myönnetty patentti
-dnet:publication_resource @=@ 0019 @=@ Patente
-dnet:publication_resource @=@ 0019 @=@ Solicitud de patente
-dnet:publication_resource @=@ 0019 @=@ Traducción de patente
-dnet:publication_resource @=@ 0019 @=@ brevet
-dnet:publication_resource @=@ 0019 @=@ http://purl.org/coar/resource_type/c_15cd
-dnet:publication_resource @=@ 0019 @=@ info:eu-repo/semantics/patent
-dnet:publication_resource @=@ 0028 @=@ Service
-dnet:publication_resource @=@ 0028 @=@ physicalObject
-dnet:publication_resource @=@ 0016 @=@ Pre Print
-dnet:publication_resource @=@ 0016 @=@ Pre-print
-dnet:publication_resource @=@ 0016 @=@ http://purl.org/coar/resource_type/c_816b
-dnet:publication_resource @=@ 0016 @=@ info:eu-repo/semantics/preprint
-dnet:publication_resource @=@ 0016 @=@ Препринт
-dnet:publication_resource @=@ 0034 @=@ http://purl.org/coar/resource_type/c_18op
-dnet:publication_resource @=@ 0034 @=@ publication-deliverable
-dnet:publication_resource @=@ 0034 @=@ Project deliverable
-dnet:publication_resource @=@ 0035 @=@ publication-milestone
-dnet:publication_resource @=@ 0035 @=@ Project milestone
-dnet:publication_resource @=@ 0036 @=@ http://purl.org/coar/resource_type/c_baaf
-dnet:publication_resource @=@ 0036 @=@ research-proposal
-dnet:publication_resource @=@ 0036 @=@ Proposal
-dnet:publication_resource @=@ 0017 @=@ ACTIVITY_REPORT
-dnet:publication_resource @=@ 0017 @=@ Case Report
-dnet:publication_resource @=@ 0017 @=@ Commissioned report
-dnet:publication_resource @=@ 0017 @=@ D4 Julkaistu kehittämis- tai tutkimusraportti tai -selvitys
-dnet:publication_resource @=@ 0017 @=@ Deliverable
-dnet:publication_resource @=@ 0017 @=@ Documento tecnico
-dnet:publication_resource @=@ 0017 @=@ EUR - Scientific and Technical Research Reports
-dnet:publication_resource @=@ 0017 @=@ JRC Reference Reports
-dnet:publication_resource @=@ 0017 @=@ Project Report
-dnet:publication_resource @=@ 0017 @=@ brief-report
-dnet:publication_resource @=@ 0017 @=@ case-report
-dnet:publication_resource @=@ 0017 @=@ chapitre_rapport
-dnet:publication_resource @=@ 0017 @=@ doc-type:report
-dnet:publication_resource @=@ 0017 @=@ document_institutionnel
-dnet:publication_resource @=@ 0017 @=@ document_technique
-dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_186u
-dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18hj
-dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18wq
-dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18ws
-dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_71bd
-dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_93fc
-dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_ba1f
-dnet:publication_resource @=@ 0017 @=@ http://purl.org/eprint/type/Report
-dnet:publication_resource @=@ 0017 @=@ info:eu-repo/semantics/report
-dnet:publication_resource @=@ 0017 @=@ publication-softwaredocumentation
-dnet:publication_resource @=@ 0017 @=@ rapport_expertise
-dnet:publication_resource @=@ 0017 @=@ rapport_mission
-dnet:publication_resource @=@ 0017 @=@ report
-dnet:publication_resource @=@ 0017 @=@ report-paper
-dnet:publication_resource @=@ 0017 @=@ report-paper_title
-dnet:publication_resource @=@ 0017 @=@ report-series
-dnet:publication_resource @=@ 0017 @=@ support_cours
-dnet:publication_resource @=@ 0017 @=@ Software documentation
-dnet:publication_resource @=@ 0014 @=@ Arbeitspapier
-dnet:publication_resource @=@ 0014 @=@ Departmental Bulletin Paper
-dnet:publication_resource @=@ 0014 @=@ Documento de trabajo
-dnet:publication_resource @=@ 0014 @=@ Paper
-dnet:publication_resource @=@ 0014 @=@ Project description
-dnet:publication_resource @=@ 0014 @=@ Research-Paper
-dnet:publication_resource @=@ 0014 @=@ ResearchPaper
-dnet:publication_resource @=@ 0014 @=@ Working / discussion paper
-dnet:publication_resource @=@ 0014 @=@ Working Paper
-dnet:publication_resource @=@ 0014 @=@ Working Paper / Technical Report
-dnet:publication_resource @=@ 0014 @=@ doc-type:workingPaper
-dnet:publication_resource @=@ 0014 @=@ http://purl.org/coar/resource_type/c_8042
-dnet:publication_resource @=@ 0014 @=@ http://purl.org/escidoc/metadata/ves/publication-types/paper
-dnet:publication_resource @=@ 0014 @=@ info:eu-repo/semantics/paper
-dnet:publication_resource @=@ 0014 @=@ info:eu-repo/semantics/workingPaper
-dnet:publication_resource @=@ 0014 @=@ workingPaper
-dnet:publication_resource @=@ 0015 @=@ A2 Katsausartikkeli tieteellisessä aikakauslehdessä
-dnet:publication_resource @=@ 0015 @=@ Book Review
-dnet:publication_resource @=@ 0015 @=@ Book/Film/Article review
-dnet:publication_resource @=@ 0015 @=@ Literature review
-dnet:publication_resource @=@ 0015 @=@ Peer review
-dnet:publication_resource @=@ 0015 @=@ Reseña bibliográfica
-dnet:publication_resource @=@ 0015 @=@ Review Article
-dnet:publication_resource @=@ 0015 @=@ Revisión
-dnet:publication_resource @=@ 0015 @=@ RezensionReview
-dnet:publication_resource @=@ 0015 @=@ book-review
-dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_ba08
-dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_dcae04bc
-dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_efa0
-dnet:publication_resource @=@ 0015 @=@ info:eu-repo/semantics/review
-dnet:publication_resource @=@ 0015 @=@ peer-review
-dnet:publication_resource @=@ 0015 @=@ reseña de libro
-dnet:publication_resource @=@ 0029 @=@ Software
-dnet:publication_resource @=@ 0029 @=@ Software/Software
-dnet:publication_resource @=@ 0029 @=@ Workflow
-dnet:publication_resource @=@ 0029 @=@ Workflow/Workflow
-dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_393c
-dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_5ce6
-dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_c950
-dnet:publication_resource @=@ 0032 @=@ http://purl.org/coar/resource_type/c_7bab
-dnet:publication_resource @=@ 0030 @=@ Audio
-dnet:publication_resource @=@ 0030 @=@ http://purl.org/coar/resource_type/c_18cc
-dnet:publication_resource @=@ 0030 @=@ sound
-dnet:publication_resource @=@ 0044 @=@ Graduate diploma
-dnet:publication_resource @=@ 0044 @=@ Undergraduate diploma
+dnet:pid_types @=@ orcid @=@ ORCID12
+dnet:review_levels @=@ 0000 @=@ UNKNOWN
 dnet:review_levels @=@ 0002 @=@ 80 大阪経大学会「Working Paper」
 dnet:review_levels @=@ 0002 @=@ AO
 dnet:review_levels @=@ 0002 @=@ ARTICLE SANS COMITE DE LECTURE (ASCL)
@@ -1025,6 +977,7 @@ dnet:review_levels @=@ 0002 @=@ Discussion Paper
 dnet:review_levels @=@ 0002 @=@ Document de travail (Working Paper)
 dnet:review_levels @=@ 0002 @=@ Documento de trabajo
 dnet:review_levels @=@ 0002 @=@ Documento de trabajo de investigaci??n
+dnet:review_levels @=@ 0002 @=@ Draft
 dnet:review_levels @=@ 0002 @=@ E-pub ahead of print
 dnet:review_levels @=@ 0002 @=@ Editorial de revista, no evaluado por pares
 dnet:review_levels @=@ 0002 @=@ Editorial de revista, não avaliado por pares
@@ -1095,7 +1048,6 @@ dnet:review_levels @=@ 0002 @=@ communication_invitee
 dnet:review_levels @=@ 0002 @=@ doc-type:preprint
 dnet:review_levels @=@ 0002 @=@ doc-type:workingPaper
 dnet:review_levels @=@ 0002 @=@ draf
-dnet:review_levels @=@ 0002 @=@ draft
 dnet:review_levels @=@ 0002 @=@ eu-repo/semantics/submittedVersion
 dnet:review_levels @=@ 0002 @=@ http://purl.org/coar/resource_type/c_8042
 dnet:review_levels @=@ 0002 @=@ http://purl.org/coar/resource_type/c_816b
@@ -1178,6 +1130,7 @@ dnet:review_levels @=@ 0001 @=@ Artículo de investigación, Investigaciones ori
 dnet:review_levels @=@ 0001 @=@ Artículo evaluado por pares
 dnet:review_levels @=@ 0001 @=@ Artículo evaluado por pares, Ensayos de investigación
 dnet:review_levels @=@ 0001 @=@ Artículo evaluado por pares, Investigaciones empíricas, Artículos de investigación
+dnet:review_levels @=@ 0001 @=@ Artículo revisado
 dnet:review_levels @=@ 0001 @=@ Artículo revisado por pares
 dnet:review_levels @=@ 0001 @=@ Artículos de estudiantes, Artículo evaluado por pares, Artículos de investigación
 dnet:review_levels @=@ 0001 @=@ Artículos de investigación evaluados por doble ciego
@@ -1185,7 +1138,7 @@ dnet:review_levels @=@ 0001 @=@ Artículos evaluadores por doble ciego
 dnet:review_levels @=@ 0001 @=@ Artículos evaluados por pares
 dnet:review_levels @=@ 0001 @=@ Artículos evaluados por pares académicos
 dnet:review_levels @=@ 0001 @=@ Artículos revisados por pares
-dnet:review_levels @=@ 0001 @=@ avaliadas pelos pares
+dnet:review_levels @=@ 0001 @=@ Avaliadas pelos pares
 dnet:review_levels @=@ 0001 @=@ Avaliado anonimamente por pares
 dnet:review_levels @=@ 0001 @=@ Avaliado em duplo cego por pares
 dnet:review_levels @=@ 0001 @=@ Avaliado pela Editoria
@@ -1236,6 +1189,7 @@ dnet:review_levels @=@ 0001 @=@ Peer-reviewed Review
 dnet:review_levels @=@ 0001 @=@ Peer-reviewed Review Article
 dnet:review_levels @=@ 0001 @=@ Peer-reviewed Text
 dnet:review_levels @=@ 0001 @=@ Peer-reviewed communication
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed conference proceedings
 dnet:review_levels @=@ 0001 @=@ Peer-reviewed research article
 dnet:review_levels @=@ 0001 @=@ Peer-reviewed short communication
 dnet:review_levels @=@ 0001 @=@ PeerReviewed
