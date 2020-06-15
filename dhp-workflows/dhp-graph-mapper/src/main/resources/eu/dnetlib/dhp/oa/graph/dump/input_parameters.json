@@ -1,10 +1,17 @@
 
+
 [
+	{
+		"paramName":"map",
+		"paramLongName":"communityMap",
+		"paramDescription": "communityMap when testing",
+		"paramRequired": false
+	},
 	{
 		"paramName":"is",
 		"paramLongName":"isLookUpUrl",
 		"paramDescription": "URL of the isLookUp Service",
-		"paramRequired": true
+		"paramRequired": false
 	},
 	{
 		"paramName":"s",
@@ -40,7 +47,7 @@
 		"paramName":"rt",
 		"paramLongName":"resultType",
 		"paramDescription": "the name of the corresondent dump element ",
-		"paramRequired": true
+		"paramRequired": false
 	}
 ]
 

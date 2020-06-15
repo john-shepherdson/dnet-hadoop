@@ -1,4 +1,4 @@
-<workflow-app name="import_graph_as_hive_DB" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="dump_community_products" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
             <property>
@@ -120,12 +120,12 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${inputPath}/publication</arg>
-            <arg>--inputType</arg><arg>publication</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
+            <arg>--resultType</arg><arg>publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--dumpTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLoohUpUrl}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -148,12 +148,12 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${inputPath}/dataset</arg>
-            <arg>--inputType</arg><arg>dataset</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
+            <arg>--resultType</arg><arg>dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--dumpTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLoohUpUrl}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -176,12 +176,12 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${inputPath}/otherresearchproduct</arg>
-            <arg>--inputType</arg><arg>otherresearchproduct</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
+            <arg>--resultType</arg><arg>otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--dumpTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLoohUpUrl}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -204,12 +204,12 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${inputPath}/software</arg>
-            <arg>--inputType</arg><arg>software</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
+            <arg>--resultType</arg><arg>software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--dumpTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/software</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLoohUpUrl}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -234,7 +234,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${inputPath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="fork_extendWithProject"/>
@@ -317,7 +317,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/ext/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/orp</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
@@ -380,8 +380,8 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/ext/publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Software</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLoohUpUrl}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Publication</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_split"/>
         <error to="Kill"/>
@@ -406,8 +406,8 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/ext/dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
-            <arg>--className</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Dataset</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLoohUpUrl}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Dataset</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_split"/>
         <error to="Kill"/>
@@ -431,8 +431,8 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/ext/orp</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
-            <arg>--className</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLoohUpUrl}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_split"/>
         <error to="Kill"/>
@@ -456,8 +456,8 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/ext/software</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
-            <arg>--className</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Software</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLoohUpUrl}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Software</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_split"/>
         <error to="Kill"/>

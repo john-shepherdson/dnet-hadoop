@@ -29,6 +29,12 @@
 		"paramLongName":"resultTableName",
 		"paramDescription": "the name of the result table we are currently working on",
 		"paramRequired": true
+	},
+	{
+		"paramName":"map",
+		"paramLongName":"communityMap",
+		"paramDescription": "communityMap when testing",
+		"paramRequired": false
 	}
 ]
 
