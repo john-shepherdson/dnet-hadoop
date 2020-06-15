@@ -50,6 +50,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
@@ -171,7 +173,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final Datasource ds = new Datasource();
 
 			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
-			ds.setOriginalId(Arrays.asList(rs.getString("datasourceid")));
+			ds.setOriginalId(Arrays.asList((String[]) rs.getArray("identities").getArray()));
 			ds
 				.setCollectedfrom(
 					listKeyValues(
