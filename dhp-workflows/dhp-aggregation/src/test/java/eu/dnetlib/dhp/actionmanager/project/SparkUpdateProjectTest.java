@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import eu.dnetlib.dhp.schema.action.AtomicAction;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Project;
 
 public class SparkUpdateProjectTest {
@@ -84,15 +84,12 @@ public class SparkUpdateProjectTest {
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Project> tmp = sc
-				.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
-				.map(aa -> ((Project)aa.getPayload()))
-			;
+			.map(aa -> ((Project) aa.getPayload()));
 
 		Assertions.assertEquals(14, tmp.count());
 
-//        Dataset<CSVProgramme> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(CSVProgramme.class));
-//
-//        Assertions.assertEquals(0, verificationDataset.filter("shortTitle =''").count());
+
 	}
 }

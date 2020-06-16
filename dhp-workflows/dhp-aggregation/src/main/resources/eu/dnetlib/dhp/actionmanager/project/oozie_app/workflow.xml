@@ -96,7 +96,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareProgramme</name>
+            <name>PrepareProjects</name>
             <class>eu.dnetlib.dhp.actionmanager.project.PrepareProjects</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
@@ -111,6 +111,7 @@
             </spark-opts>
             <arg>--projectPath</arg><arg>${workingDir}/projects</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedProjects</arg>
+            <arg>--dbProjectPath</arg><arg>${workingDir}/dbProjects</arg>
         </spark>
         <ok to="create_updates"/>
         <error to="Kill"/>
