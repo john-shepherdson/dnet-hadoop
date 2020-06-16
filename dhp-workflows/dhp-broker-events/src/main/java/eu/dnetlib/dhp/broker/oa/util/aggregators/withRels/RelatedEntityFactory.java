@@ -16,13 +16,17 @@ public class RelatedEntityFactory {
 		final Class<RT> clazz) {
 
 		if (clazz == RelatedProject.class) {
-			return (RT) new RelatedProject(sourceId, relType, ConversionUtils.oafProjectToBrokerProject((Project) target));
+			return (RT) new RelatedProject(sourceId, relType,
+				ConversionUtils.oafProjectToBrokerProject((Project) target));
 		} else if (clazz == RelatedSoftware.class) {
-			return (RT) new RelatedSoftware(sourceId, relType, ConversionUtils.oafSoftwareToBrokerSoftware((Software) target));
+			return (RT) new RelatedSoftware(sourceId, relType,
+				ConversionUtils.oafSoftwareToBrokerSoftware((Software) target));
 		} else if (clazz == RelatedDataset.class) {
-			return (RT) new RelatedDataset(sourceId, relType, ConversionUtils.oafDatasetToBrokerDataset((Dataset) target));
+			return (RT) new RelatedDataset(sourceId, relType,
+				ConversionUtils.oafDatasetToBrokerDataset((Dataset) target));
 		} else if (clazz == RelatedPublication.class) {
-			return (RT) new RelatedPublication(sourceId, relType, ConversionUtils.oafPublicationToBrokerPublication((Publication) target));
+			return (RT) new RelatedPublication(sourceId, relType,
+				ConversionUtils.oafPublicationToBrokerPublication((Publication) target));
 		} else {
 			return null;
 		}

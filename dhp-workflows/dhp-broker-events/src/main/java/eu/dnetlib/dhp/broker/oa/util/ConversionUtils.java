@@ -57,12 +57,13 @@ public class ConversionUtils {
 			.setOriginalId(d.getOriginalId().get(0))
 			.setTitle(structPropValue(d.getTitle()))
 			.setPids(d.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
-			.setInstances(d
-				.getInstance()
-				.stream()
-				.map(ConversionUtils::oafInstanceToBrokerInstances)
-				.flatMap(List::stream)
-				.collect(Collectors.toList()))
+			.setInstances(
+				d
+					.getInstance()
+					.stream()
+					.map(ConversionUtils::oafInstanceToBrokerInstances)
+					.flatMap(List::stream)
+					.collect(Collectors.toList()))
 			.setCollectedFrom(d.getCollectedfrom().stream().map(KeyValue::getValue).findFirst().orElse(null))
 			: null;
 	}
@@ -72,12 +73,13 @@ public class ConversionUtils {
 			.setOriginalId(p.getOriginalId().get(0))
 			.setTitle(structPropValue(p.getTitle()))
 			.setPids(p.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
-			.setInstances(p
-				.getInstance()
-				.stream()
-				.map(ConversionUtils::oafInstanceToBrokerInstances)
-				.flatMap(List::stream)
-				.collect(Collectors.toList()))
+			.setInstances(
+				p
+					.getInstance()
+					.stream()
+					.map(ConversionUtils::oafInstanceToBrokerInstances)
+					.flatMap(List::stream)
+					.collect(Collectors.toList()))
 			.setCollectedFrom(p.getCollectedfrom().stream().map(KeyValue::getValue).findFirst().orElse(null))
 			: null;
 	}
@@ -92,48 +94,54 @@ public class ConversionUtils {
 			.setAbstracts(fieldList(result.getDescription()))
 			.setLanguage(result.getLanguage().getClassid())
 			.setSubjects(structPropTypedList(result.getSubject()))
-			.setCreators(result.getAuthor().stream().map(ConversionUtils::oafAuthorToBrokerAuthor).collect(Collectors.toList()))
+			.setCreators(
+				result.getAuthor().stream().map(ConversionUtils::oafAuthorToBrokerAuthor).collect(Collectors.toList()))
 			.setPublicationdate(result.getDateofacceptance().getValue())
 			.setPublisher(fieldValue(result.getPublisher()))
 			.setEmbargoenddate(fieldValue(result.getEmbargoenddate()))
 			.setContributor(fieldList(result.getContributor()))
-			.setJournal(result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null)
+			.setJournal(
+				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null)
 			.setCollectedFromId(result.getCollectedfrom().stream().map(KeyValue::getKey).findFirst().orElse(null))
 			.setCollectedFromName(result.getCollectedfrom().stream().map(KeyValue::getValue).findFirst().orElse(null))
 			.setPids(result.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
-			.setInstances(result
-				.getInstance()
-				.stream()
-				.map(ConversionUtils::oafInstanceToBrokerInstances)
-				.flatMap(List::stream)
-				.collect(Collectors.toList()))
-			.setExternalReferences(result
-				.getExternalReference()
-				.stream()
-				.map(ConversionUtils::oafExtRefToBrokerExtRef)
-				.collect(Collectors.toList()))
+			.setInstances(
+				result
+					.getInstance()
+					.stream()
+					.map(ConversionUtils::oafInstanceToBrokerInstances)
+					.flatMap(List::stream)
+					.collect(Collectors.toList()))
+			.setExternalReferences(
+				result
+					.getExternalReference()
+					.stream()
+					.map(ConversionUtils::oafExtRefToBrokerExtRef)
+					.collect(Collectors.toList()))
 			: null;
 	}
 
 	private static List<TypedValue> structPropTypedList(final List<StructuredProperty> list) {
 		return list
 			.stream()
-			.map(p -> new TypedValue()
-				.setValue(p.getValue())
-				.setType(p.getQualifier().getClassid()))
+			.map(
+				p -> new TypedValue()
+					.setValue(p.getValue())
+					.setType(p.getQualifier().getClassid()))
 			.collect(Collectors.toList());
 	}
 
 	private static eu.dnetlib.broker.objects.Author oafAuthorToBrokerAuthor(final Author author) {
 		return author != null ? new eu.dnetlib.broker.objects.Author()
 			.setFullname(author.getFullname())
-			.setOrcid(author
-				.getPid()
-				.stream()
-				.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
-				.map(pid -> pid.getValue())
-				.findFirst()
-				.orElse(null))
+			.setOrcid(
+				author
+					.getPid()
+					.stream()
+					.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+					.map(pid -> pid.getValue())
+					.findFirst()
+					.orElse(null))
 			: null;
 	}
 
@@ -155,7 +163,9 @@ public class ConversionUtils {
 	}
 
 	public static final eu.dnetlib.broker.objects.Project oafProjectToBrokerProject(final Project p) {
-		if (p == null) { return null; }
+		if (p == null) {
+			return null;
+		}
 
 		final eu.dnetlib.broker.objects.Project res = new eu.dnetlib.broker.objects.Project()
 			.setTitle(fieldValue(p.getTitle()))
