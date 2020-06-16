@@ -1,10 +1,16 @@
 
 package eu.dnetlib.dhp.broker.oa.util.aggregators.withRels;
 
-import eu.dnetlib.dhp.schema.oaf.Dataset;
+import java.io.Serializable;
 
-public class RelatedDataset {
+import eu.dnetlib.broker.objects.Dataset;
 
+public class RelatedDataset implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 774487705184038324L;
 	private final String source;
 	private final String relType;
 	private final Dataset relDataset;

@@ -5,15 +5,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.Software;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedSoftware;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
-import eu.dnetlib.dhp.schema.oaf.Software;
 
-public class EnrichMoreSoftware
-	extends UpdateMatcher<eu.dnetlib.broker.objects.Software> {
+public class EnrichMoreSoftware extends UpdateMatcher<Software> {
 
 	public EnrichMoreSoftware() {
 		super(true,
@@ -24,22 +21,19 @@ public class EnrichMoreSoftware
 
 	@Override
 	protected List<eu.dnetlib.broker.objects.Software> findDifferences(
-		final ResultWithRelations source,
-		final ResultWithRelations target) {
+		final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 
 		final Set<String> existingSoftwares = source
 			.getSoftwares()
 			.stream()
-			.map(RelatedSoftware::getRelSoftware)
-			.map(Software::getId)
+			.map(Software::getName)
 			.collect(Collectors.toSet());
 
 		return target
 			.getSoftwares()
 			.stream()
-			.map(RelatedSoftware::getRelSoftware)
-			.filter(p -> !existingSoftwares.contains(p.getId()))
-			.map(ConversionUtils::oafSoftwareToBrokerSoftware)
+			.filter(p -> !existingSoftwares.contains(p.getName()))
 			.collect(Collectors.toList());
 	}
 

@@ -1,53 +1,43 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.broker.objects.Author;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class EnrichMissingAuthorOrcid extends UpdateMatcher<String> {
+public class EnrichMissingAuthorOrcid extends UpdateMatcher<Author> {
 
 	public EnrichMissingAuthorOrcid() {
 		super(true,
 			aut -> Topic.ENRICH_MISSING_AUTHOR_ORCID,
 			(p, aut) -> p.getCreators().add(aut),
-			aut -> aut);
+			aut -> aut.getOrcid());
 	}
 
 	@Override
-	protected List<String> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
+	protected List<Author> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 
 		final Set<String> existingOrcids = target
-			.getResult()
-			.getAuthor()
+			.getCreators()
 			.stream()
-			.map(Author::getPid)
-			.flatMap(List::stream)
-			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
-			.map(pid -> pid.getValue())
+			.map(Author::getOrcid)
+			.filter(StringUtils::isNotBlank)
 			.collect(Collectors.toSet());
 
-		final List<String> list = new ArrayList<>();
+		return source
+			.getCreators()
+			.stream()
+			.filter(a -> StringUtils.isNotBlank(a.getOrcid()))
+			.filter(a -> !existingOrcids.contains(a.getOrcid()))
+			.collect(Collectors.toList());
 
-		for (final Author author : source.getResult().getAuthor()) {
-			final String name = author.getFullname();
-
-			for (final StructuredProperty pid : author.getPid()) {
-				if (pid.getQualifier().getClassid().equalsIgnoreCase("orcid")
-					&& !existingOrcids.contains(pid.getValue())) {
-					list.add(name + " [ORCID: " + pid.getValue() + "]");
-				}
-			}
-		}
-
-		return list;
 	}
 }

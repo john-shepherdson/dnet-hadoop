@@ -5,11 +5,11 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
 
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
-public class ResultAggregator extends Aggregator<Tuple2<ResultWithRelations, Relation>, ResultGroup, ResultGroup> {
+public class ResultAggregator extends Aggregator<Tuple2<OpenaireBrokerResult, Relation>, ResultGroup, ResultGroup> {
 
 	/**
 	 *
@@ -22,7 +22,7 @@ public class ResultAggregator extends Aggregator<Tuple2<ResultWithRelations, Rel
 	}
 
 	@Override
-	public ResultGroup reduce(final ResultGroup group, final Tuple2<ResultWithRelations, Relation> t) {
+	public ResultGroup reduce(final ResultGroup group, final Tuple2<OpenaireBrokerResult, Relation> t) {
 		return group.addElement(t._1);
 	}
 

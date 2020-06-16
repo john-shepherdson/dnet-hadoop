@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.broker.oa.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.EventFactory;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.matchers.relatedDatasets.EnrichMissingDatasetIsReferencedBy;
@@ -30,7 +31,6 @@ import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreOpenAccess;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMorePid;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreSubject;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 import eu.dnetlib.pace.config.DedupConfig;
 
 public class EventFinder {
@@ -68,7 +68,7 @@ public class EventFinder {
 	public static EventGroup generateEvents(final ResultGroup results, final DedupConfig dedupConfig) {
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
-		for (final ResultWithRelations target : results.getData()) {
+		for (final OpenaireBrokerResult target : results.getData()) {
 			for (final UpdateMatcher<?> matcher : matchers) {
 				list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), dedupConfig));
 			}

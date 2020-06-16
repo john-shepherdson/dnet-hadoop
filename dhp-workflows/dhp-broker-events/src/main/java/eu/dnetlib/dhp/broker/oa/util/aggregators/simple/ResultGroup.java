@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 
 public class ResultGroup implements Serializable {
 
@@ -14,13 +14,13 @@ public class ResultGroup implements Serializable {
 	 */
 	private static final long serialVersionUID = -3360828477088669296L;
 
-	private final List<ResultWithRelations> data = new ArrayList<>();
+	private final List<OpenaireBrokerResult> data = new ArrayList<>();
 
-	public List<ResultWithRelations> getData() {
+	public List<OpenaireBrokerResult> getData() {
 		return data;
 	}
 
-	public ResultGroup addElement(final ResultWithRelations elem) {
+	public ResultGroup addElement(final OpenaireBrokerResult elem) {
 		data.add(elem);
 		return this;
 	}
