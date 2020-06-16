@@ -12,22 +12,20 @@ import java.util.function.Function;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.broker.objects.Publication;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
-import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.pace.config.DedupConfig;
 
 public abstract class UpdateMatcher<T> {
 
 	private final boolean multipleUpdate;
 	private final Function<T, Topic> topicFunction;
-	private final BiConsumer<Publication, T> compileHighlightFunction;
+	private final BiConsumer<OpenaireBrokerResult, T> compileHighlightFunction;
 	private final Function<T, String> highlightToStringFunction;
 
 	public UpdateMatcher(final boolean multipleUpdate, final Function<T, Topic> topicFunction,
-		final BiConsumer<Publication, T> compileHighlightFunction,
+		final BiConsumer<OpenaireBrokerResult, T> compileHighlightFunction,
 		final Function<T, String> highlightToStringFunction) {
 		this.multipleUpdate = multipleUpdate;
 		this.topicFunction = topicFunction;
@@ -35,19 +33,18 @@ public abstract class UpdateMatcher<T> {
 		this.highlightToStringFunction = highlightToStringFunction;
 	}
 
-	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final ResultWithRelations res,
-		final Collection<ResultWithRelations> others,
+	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OpenaireBrokerResult res,
+		final Collection<OpenaireBrokerResult> others,
 		final DedupConfig dedupConfig) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
 
-		for (final ResultWithRelations source : others) {
+		for (final OpenaireBrokerResult source : others) {
 			if (source != res) {
 				for (final T hl : findDifferences(source, res)) {
 					final Topic topic = getTopicFunction().apply(hl);
 					final UpdateInfo<T> info = new UpdateInfo<>(topic, hl, source, res, getCompileHighlightFunction(),
-						getHighlightToStringFunction(),
-						dedupConfig);
+						getHighlightToStringFunction(), dedupConfig);
 					final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
 					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {
 					} else {
@@ -71,14 +68,14 @@ public abstract class UpdateMatcher<T> {
 		}
 	}
 
-	protected abstract List<T> findDifferences(ResultWithRelations source, ResultWithRelations target);
+	protected abstract List<T> findDifferences(OpenaireBrokerResult source, OpenaireBrokerResult target);
 
-	protected static boolean isMissing(final List<Field<String>> list) {
-		return list == null || list.isEmpty() || StringUtils.isBlank(list.get(0).getValue());
+	protected static boolean isMissing(final List<String> list) {
+		return list == null || list.isEmpty() || StringUtils.isBlank(list.get(0));
 	}
 
-	protected boolean isMissing(final Field<String> field) {
-		return field == null || StringUtils.isBlank(field.getValue());
+	protected boolean isMissing(final String field) {
+		return StringUtils.isBlank(field);
 	}
 
 	public boolean isMultipleUpdate() {
@@ -89,7 +86,7 @@ public abstract class UpdateMatcher<T> {
 		return topicFunction;
 	}
 
-	public BiConsumer<Publication, T> getCompileHighlightFunction() {
+	public BiConsumer<OpenaireBrokerResult, T> getCompileHighlightFunction() {
 		return compileHighlightFunction;
 	}
 

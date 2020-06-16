@@ -5,42 +5,38 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.TypedValue;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class EnrichMissingSubject extends UpdateMatcher<Pair<String, String>> {
+public class EnrichMissingSubject extends UpdateMatcher<TypedValue> {
 
 	public EnrichMissingSubject() {
 		super(true,
-			pair -> Topic.fromPath("ENRICH/MISSING/SUBJECT/" + pair.getLeft()),
-			(p, pair) -> p.getSubjects().add(pair.getRight()),
-			pair -> pair.getLeft() + "::" + pair.getRight());
+			s -> Topic.fromPath("ENRICH/MISSING/SUBJECT/" + s.getType()),
+			(p, s) -> p.getSubjects().add(s),
+			s -> subjectAsString(s));
 	}
 
 	@Override
-	protected List<Pair<String, String>> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
-		final Set<String> existingTypes = target
-			.getResult()
-			.getSubject()
+	protected List<TypedValue> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
+		final Set<String> existingSubject = target
+			.getSubjects()
 			.stream()
-			.map(StructuredProperty::getQualifier)
-			.map(Qualifier::getClassid)
+			.map(s -> subjectAsString(s))
 			.collect(Collectors.toSet());
 
 		return source
-			.getResult()
-			.getPid()
+			.getSubjects()
 			.stream()
-			.filter(pid -> !existingTypes.contains(pid.getQualifier().getClassid()))
-			.map(ConversionUtils::oafSubjectToPair)
+			.filter(s -> !existingSubject.contains(subjectAsString(s)))
 			.collect(Collectors.toList());
+	}
+
+	private static String subjectAsString(final TypedValue s) {
+		return s.getType() + "::" + s.getValue();
 	}
 
 }

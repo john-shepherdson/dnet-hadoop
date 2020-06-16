@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
 public class EnrichMissingPublicationDate extends UpdateMatcher<String> {
 
@@ -19,13 +19,14 @@ public class EnrichMissingPublicationDate extends UpdateMatcher<String> {
 	}
 
 	@Override
-	protected List<String> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
-		if (isMissing(target.getResult().getDateofacceptance())
-			&& !isMissing(source.getResult().getDateofacceptance())) {
-			return Arrays.asList(source.getResult().getDateofacceptance().getValue());
+	protected List<String> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
+
+		if (isMissing(target.getPublicationdate()) && !isMissing(source.getPublicationdate())) {
+			return Arrays.asList(source.getPublicationdate());
+		} else {
+			return new ArrayList<>();
 		}
-		return new ArrayList<>();
 	}
 
 }

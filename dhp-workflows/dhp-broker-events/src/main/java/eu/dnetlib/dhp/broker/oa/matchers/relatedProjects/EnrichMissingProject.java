@@ -1,19 +1,15 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.relatedProjects;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.broker.objects.Project;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
-public class EnrichMissingProject
-	extends UpdateMatcher<eu.dnetlib.broker.objects.Project> {
+public class EnrichMissingProject extends UpdateMatcher<Project> {
 
 	public EnrichMissingProject() {
 		super(true,
@@ -23,16 +19,11 @@ public class EnrichMissingProject
 	}
 
 	@Override
-	protected List<Project> findDifferences(final ResultWithRelations source, final ResultWithRelations target) {
-		if (source.getProjects().isEmpty()) {
-			return Arrays.asList();
+	protected List<Project> findDifferences(final OpenaireBrokerResult source, final OpenaireBrokerResult target) {
+		if (target.getProjects().isEmpty()) {
+			return source.getProjects();
 		} else {
-			return target
-				.getProjects()
-				.stream()
-				.map(RelatedProject::getRelProject)
-				.map(ConversionUtils::oafProjectToBrokerProject)
-				.collect(Collectors.toList());
+			return new ArrayList<>();
 		}
 	}
 }

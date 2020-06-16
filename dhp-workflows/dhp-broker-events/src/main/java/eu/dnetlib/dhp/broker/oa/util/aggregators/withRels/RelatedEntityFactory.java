@@ -1,15 +1,17 @@
 
 package eu.dnetlib.dhp.broker.oa.util.aggregators.withRels;
 
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.broker.objects.Dataset;
+import eu.dnetlib.broker.objects.Project;
+import eu.dnetlib.broker.objects.Publication;
+import eu.dnetlib.broker.objects.Software;
 
 public class RelatedEntityFactory {
 
 	@SuppressWarnings("unchecked")
-	public static <RT, T> RT newRelatedEntity(final String sourceId, final String relType, final T target,
+	public static <RT, T> RT newRelatedEntity(final String sourceId,
+		final String relType,
+		final T target,
 		final Class<RT> clazz) {
 		if (clazz == RelatedProject.class) {
 			return (RT) new RelatedProject(sourceId, relType, (Project) target);

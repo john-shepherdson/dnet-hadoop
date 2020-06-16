@@ -6,11 +6,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.broker.objects.Instance;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
 public class EnrichMoreOpenAccess extends UpdateMatcher<Instance> {
 
@@ -22,24 +21,19 @@ public class EnrichMoreOpenAccess extends UpdateMatcher<Instance> {
 	}
 
 	@Override
-	protected List<Instance> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
+	protected List<Instance> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 		final Set<String> urls = target
-			.getResult()
-			.getInstance()
+			.getInstances()
 			.stream()
-			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
+			.filter(i -> i.getLicense().equals(BrokerConstants.OPEN_ACCESS))
 			.map(i -> i.getUrl())
-			.flatMap(List::stream)
 			.collect(Collectors.toSet());
 
 		return source
-			.getResult()
-			.getInstance()
+			.getInstances()
 			.stream()
-			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
-			.map(ConversionUtils::oafInstanceToBrokerInstances)
-			.flatMap(List::stream)
+			.filter(i -> i.getLicense().equals(BrokerConstants.OPEN_ACCESS))
 			.filter(i -> !urls.contains(i.getUrl()))
 			.collect(Collectors.toList());
 	}

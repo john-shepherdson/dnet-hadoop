@@ -5,21 +5,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.Publication;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedPublication;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
-import eu.dnetlib.dhp.schema.oaf.Publication;
 
-public abstract class AbstractEnrichMissingPublication
-	extends UpdateMatcher<eu.dnetlib.broker.objects.Publication> {
+public abstract class AbstractEnrichMissingPublication extends UpdateMatcher<Publication> {
 
 	public AbstractEnrichMissingPublication(final Topic topic) {
 		super(true,
 			rel -> topic,
 			(p, rel) -> p.getPublications().add(rel),
-			rel -> rel.getInstances().get(0).getUrl());
+			rel -> rel.getOriginalId());
 
 	}
 
@@ -27,24 +24,21 @@ public abstract class AbstractEnrichMissingPublication
 
 	@Override
 	protected final List<eu.dnetlib.broker.objects.Publication> findDifferences(
-		final ResultWithRelations source,
-		final ResultWithRelations target) {
+		final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 
 		final Set<String> existingPublications = target
 			.getPublications()
 			.stream()
 			.filter(rel -> filterByType(rel.getRelType()))
-			.map(RelatedPublication::getRelPublication)
-			.map(Publication::getId)
+			.map(Publication::getOriginalId)
 			.collect(Collectors.toSet());
 
 		return source
 			.getPublications()
 			.stream()
 			.filter(rel -> filterByType(rel.getRelType()))
-			.map(RelatedPublication::getRelPublication)
-			.filter(d -> !existingPublications.contains(d.getId()))
-			.map(ConversionUtils::oafResultToBrokerPublication)
+			.filter(p -> !existingPublications.contains(p.getOriginalId()))
 			.collect(Collectors.toList());
 	}
 

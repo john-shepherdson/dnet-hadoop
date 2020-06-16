@@ -5,38 +5,37 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.broker.objects.Pid;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.TypedValue;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
-public class EnrichMorePid extends UpdateMatcher<Pid> {
+public class EnrichMorePid extends UpdateMatcher<TypedValue> {
 
 	public EnrichMorePid() {
 		super(true,
 			pid -> Topic.ENRICH_MORE_PID,
 			(p, pid) -> p.getPids().add(pid),
-			pid -> pid.getType() + "::" + pid.getValue());
+			pid -> pidAsString(pid));
 	}
 
 	@Override
-	protected List<Pid> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
+	protected List<TypedValue> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 		final Set<String> existingPids = target
-			.getResult()
-			.getPid()
+			.getPids()
 			.stream()
-			.map(pid -> pid.getQualifier().getClassid() + "::" + pid.getValue())
+			.map(pid -> pidAsString(pid))
 			.collect(Collectors.toSet());
 
 		return source
-			.getResult()
-			.getPid()
+			.getPids()
 			.stream()
-			.filter(pid -> !existingPids.contains(pid.getQualifier().getClassid() + "::" + pid.getValue()))
-			.map(ConversionUtils::oafPidToBrokerPid)
+			.filter(pid -> !existingPids.contains(pidAsString(pid)))
 			.collect(Collectors.toList());
 	}
 
+	private static String pidAsString(final TypedValue pid) {
+		return pid.getType() + "::" + pid.getValue();
+	}
 }

@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
 public class EnrichMissingAbstract extends UpdateMatcher<String> {
 
@@ -19,13 +19,12 @@ public class EnrichMissingAbstract extends UpdateMatcher<String> {
 	}
 
 	@Override
-	protected List<String> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
-		if (isMissing(target.getResult().getDescription()) && !isMissing(source.getResult().getDescription())) {
-			return Arrays
-				.asList(source.getResult().getDescription().get(0).getValue());
+	protected List<String> findDifferences(final OpenaireBrokerResult source, final OpenaireBrokerResult target) {
+		if (isMissing(target.getAbstracts()) && !isMissing(source.getAbstracts())) {
+			return Arrays.asList(source.getAbstracts().get(0));
+		} else {
+			return new ArrayList<>();
 		}
-		return new ArrayList<>();
 	}
 
 }

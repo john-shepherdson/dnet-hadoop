@@ -1,15 +1,12 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.relatedSoftware;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedSoftware;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
 public class EnrichMissingSoftware
 	extends UpdateMatcher<eu.dnetlib.broker.objects.Software> {
@@ -23,18 +20,13 @@ public class EnrichMissingSoftware
 
 	@Override
 	protected List<eu.dnetlib.broker.objects.Software> findDifferences(
-		final ResultWithRelations source,
-		final ResultWithRelations target) {
+		final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 
-		if (source.getSoftwares().isEmpty()) {
-			return Arrays.asList();
+		if (target.getSoftwares().isEmpty()) {
+			return source.getSoftwares();
 		} else {
-			return target
-				.getSoftwares()
-				.stream()
-				.map(RelatedSoftware::getRelSoftware)
-				.map(ConversionUtils::oafSoftwareToBrokerSoftware)
-				.collect(Collectors.toList());
+			return new ArrayList<>();
 		}
 	}
 

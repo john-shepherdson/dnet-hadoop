@@ -18,18 +18,20 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
+import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.EventFinder;
 import eu.dnetlib.dhp.broker.oa.util.EventGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultAggregator;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.OpenaireBrokerResultAggregator;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedEntityFactory;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelationsAggregator;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -73,6 +75,8 @@ public class GenerateEventsApplication {
 		log.info("dedupConfigProfileId: {}", dedupConfigProfileId);
 
 		final SparkConf conf = new SparkConf();
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		conf.registerKryoClasses(BrokerConstants.getModelClasses());
 
 		final DedupConfig dedupConfig = loadDedupConfig(isLookupUrl, dedupConfigProfileId);
 
@@ -80,13 +84,16 @@ public class GenerateEventsApplication {
 
 			removeOutputDir(spark, eventsPath);
 
-			final Dataset<Event> all = spark.emptyDataset(Encoders.kryo(Event.class));
-
-			for (final Class<? extends Result> r1 : BrokerConstants.RESULT_CLASSES) {
-				all.union(generateEvents(spark, graphPath, r1, dedupConfig));
-			}
-
-			all.write().mode(SaveMode.Overwrite).option("compression", "gzip").json(eventsPath);
+			spark
+				.emptyDataset(Encoders.kryo(Event.class))
+				.union(generateEvents(spark, graphPath, Publication.class, dedupConfig))
+				.union(generateEvents(spark, graphPath, eu.dnetlib.dhp.schema.oaf.Dataset.class, dedupConfig))
+				.union(generateEvents(spark, graphPath, Software.class, dedupConfig))
+				.union(generateEvents(spark, graphPath, OtherResearchProduct.class, dedupConfig))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.json(eventsPath);
 		});
 
 	}
@@ -101,18 +108,18 @@ public class GenerateEventsApplication {
 		final Class<SRC> sourceClass,
 		final DedupConfig dedupConfig) {
 
-		final Dataset<ResultWithRelations> results = expandResultsWithRelations(spark, graphPath, sourceClass);
+		final Dataset<OpenaireBrokerResult> results = expandResultsWithRelations(spark, graphPath, sourceClass);
 
 		final Dataset<Relation> mergedRels = readPath(spark, graphPath + "/relation", Relation.class)
 			.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
 
-		final TypedColumn<Tuple2<ResultWithRelations, Relation>, ResultGroup> aggr = new ResultAggregator()
+		final TypedColumn<Tuple2<OpenaireBrokerResult, Relation>, ResultGroup> aggr = new ResultAggregator()
 			.toColumn();
 
 		return results
 			.joinWith(mergedRels, results.col("result.id").equalTo(mergedRels.col("source")), "inner")
 			.groupByKey(
-				(MapFunction<Tuple2<ResultWithRelations, Relation>, String>) t -> t._2.getTarget(), Encoders.STRING())
+				(MapFunction<Tuple2<OpenaireBrokerResult, Relation>, String>) t -> t._2.getTarget(), Encoders.STRING())
 			.agg(aggr)
 			.map((MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.kryo(ResultGroup.class))
 			.filter(ResultGroup::isValid)
@@ -122,7 +129,7 @@ public class GenerateEventsApplication {
 			.flatMap(group -> group.getData().iterator(), Encoders.kryo(Event.class));
 	}
 
-	private static <SRC extends Result> Dataset<ResultWithRelations> expandResultsWithRelations(
+	private static <SRC extends Result> Dataset<OpenaireBrokerResult> expandResultsWithRelations(
 		final SparkSession spark,
 		final String graphPath,
 		final Class<SRC> sourceClass) {
@@ -135,14 +142,15 @@ public class GenerateEventsApplication {
 		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
 			.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
 
-		final Dataset<ResultWithRelations> r0 = readPath(
+		final Dataset<OpenaireBrokerResult> r0 = readPath(
 			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), Result.class)
 				.filter(r -> r.getDataInfo().getDeletedbyinference())
-				.map(r -> new ResultWithRelations(r), Encoders.kryo(ResultWithRelations.class));
-		final Dataset<ResultWithRelations> r1 = join(r0, rels, relatedEntities(projects, rels, RelatedProject.class));
-		final Dataset<ResultWithRelations> r2 = join(r1, rels, relatedEntities(softwares, rels, RelatedProject.class));
-		final Dataset<ResultWithRelations> r3 = join(r2, rels, relatedEntities(datasets, rels, RelatedProject.class));
-		final Dataset<ResultWithRelations> r4 = join(
+				.map(ConversionUtils::oafResultToBrokerResult, Encoders.kryo(OpenaireBrokerResult.class));
+
+		final Dataset<OpenaireBrokerResult> r1 = join(r0, rels, relatedEntities(projects, rels, RelatedProject.class));
+		final Dataset<OpenaireBrokerResult> r2 = join(r1, rels, relatedEntities(softwares, rels, RelatedProject.class));
+		final Dataset<OpenaireBrokerResult> r3 = join(r2, rels, relatedEntities(datasets, rels, RelatedProject.class));
+		final Dataset<OpenaireBrokerResult> r4 = join(
 			r3, rels, relatedEntities(publications, rels, RelatedProject.class));
 		;
 
@@ -159,20 +167,20 @@ public class GenerateEventsApplication {
 				Encoders.kryo(clazz));
 	}
 
-	private static <T> Dataset<ResultWithRelations> join(final Dataset<ResultWithRelations> sources,
+	private static <T> Dataset<OpenaireBrokerResult> join(final Dataset<OpenaireBrokerResult> sources,
 		final Dataset<Relation> rels,
 		final Dataset<T> typedRels) {
 
-		final TypedColumn<Tuple2<ResultWithRelations, T>, ResultWithRelations> aggr = new ResultWithRelationsAggregator<T>()
+		final TypedColumn<Tuple2<OpenaireBrokerResult, T>, OpenaireBrokerResult> aggr = new OpenaireBrokerResultAggregator<T>()
 			.toColumn();
 		;
 
 		return sources
 			.joinWith(typedRels, sources.col("result.id").equalTo(rels.col("source")), "left_outer")
 			.groupByKey(
-				(MapFunction<Tuple2<ResultWithRelations, T>, String>) t -> t._1.getResult().getId(), Encoders.STRING())
+				(MapFunction<Tuple2<OpenaireBrokerResult, T>, String>) t -> t._1.getOpenaireId(), Encoders.STRING())
 			.agg(aggr)
-			.map(t -> t._2, Encoders.kryo(ResultWithRelations.class));
+			.map(t -> t._2, Encoders.kryo(OpenaireBrokerResult.class));
 	}
 
 	public static <R> Dataset<R> readPath(

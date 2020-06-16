@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.broker.oa.util;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -10,14 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.broker.objects.Instance;
 import eu.dnetlib.broker.objects.OpenAireEventPayload;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.broker.objects.Provenance;
-import eu.dnetlib.broker.objects.Publication;
 import eu.dnetlib.dhp.broker.model.Topic;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.tree.support.TreeProcessor;
@@ -29,11 +25,11 @@ public final class UpdateInfo<T> {
 
 	private final T highlightValue;
 
-	private final ResultWithRelations source;
+	private final OpenaireBrokerResult source;
 
-	private final ResultWithRelations target;
+	private final OpenaireBrokerResult target;
 
-	private final BiConsumer<Publication, T> compileHighlight;
+	private final BiConsumer<OpenaireBrokerResult, T> compileHighlight;
 
 	private final Function<T, String> highlightToString;
 
@@ -41,9 +37,9 @@ public final class UpdateInfo<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateInfo.class);
 
-	public UpdateInfo(final Topic topic, final T highlightValue, final ResultWithRelations source,
-		final ResultWithRelations target,
-		final BiConsumer<Publication, T> compileHighlight,
+	public UpdateInfo(final Topic topic, final T highlightValue, final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target,
+		final BiConsumer<OpenaireBrokerResult, T> compileHighlight,
 		final Function<T, String> highlightToString,
 		final DedupConfig dedupConfig) {
 		this.topic = topic;
@@ -52,22 +48,23 @@ public final class UpdateInfo<T> {
 		this.target = target;
 		this.compileHighlight = compileHighlight;
 		this.highlightToString = highlightToString;
-		this.trust = calculateTrust(dedupConfig, source.getResult(), target.getResult());
+		this.trust = calculateTrust(dedupConfig, source, target);
 	}
 
 	public T getHighlightValue() {
 		return highlightValue;
 	}
 
-	public ResultWithRelations getSource() {
+	public OpenaireBrokerResult getSource() {
 		return source;
 	}
 
-	public ResultWithRelations getTarget() {
+	public OpenaireBrokerResult getTarget() {
 		return target;
 	}
 
-	private float calculateTrust(final DedupConfig dedupConfig, final Result r1, final Result r2) {
+	private float calculateTrust(final DedupConfig dedupConfig, final OpenaireBrokerResult r1,
+		final OpenaireBrokerResult r2) {
 		try {
 			final ObjectMapper objectMapper = new ObjectMapper();
 			final MapDocument doc1 = MapDocumentUtil
@@ -103,26 +100,18 @@ public final class UpdateInfo<T> {
 
 	public OpenAireEventPayload asBrokerPayload() {
 
-		final Publication p = ConversionUtils.oafResultToBrokerPublication(getSource().getResult());
-		compileHighlight.accept(p, getHighlightValue());
+		compileHighlight.accept(target, getHighlightValue());
 
-		final Publication hl = new Publication();
+		final OpenaireBrokerResult hl = new OpenaireBrokerResult();
 		compileHighlight.accept(hl, getHighlightValue());
 
-		final String provId = getSource().getResult().getOriginalId().stream().findFirst().orElse(null);
-		final String provRepo = getSource()
-			.getResult()
-			.getCollectedfrom()
-			.stream()
-			.map(KeyValue::getValue)
-			.findFirst()
-			.orElse(null);
+		final String provId = getSource().getOriginalId();
+		final String provRepo = getSource().getCollectedFromName();
+
 		final String provUrl = getSource()
-			.getResult()
-			.getInstance()
+			.getInstances()
 			.stream()
 			.map(Instance::getUrl)
-			.flatMap(List::stream)
 			.findFirst()
 			.orElse(null);
 		;
@@ -130,7 +119,7 @@ public final class UpdateInfo<T> {
 		final Provenance provenance = new Provenance().setId(provId).setRepositoryName(provRepo).setUrl(provUrl);
 
 		return new OpenAireEventPayload()
-			.setPublication(p)
+			.setPublication(target)
 			.setHighlight(hl)
 			.setTrust(trust)
 			.setProvenance(provenance);

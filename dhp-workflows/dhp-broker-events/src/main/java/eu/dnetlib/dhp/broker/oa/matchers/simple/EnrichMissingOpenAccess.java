@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.broker.objects.Instance;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
 public class EnrichMissingOpenAccess extends UpdateMatcher<Instance> {
 
@@ -22,13 +21,12 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<Instance> {
 	}
 
 	@Override
-	protected List<Instance> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
+	protected List<Instance> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 		final long count = target
-			.getResult()
-			.getInstance()
+			.getInstances()
 			.stream()
-			.map(i -> i.getAccessright().getClassid())
+			.map(Instance::getLicense)
 			.filter(right -> right.equals(BrokerConstants.OPEN_ACCESS))
 			.count();
 
@@ -37,12 +35,9 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<Instance> {
 		}
 
 		return source
-			.getResult()
-			.getInstance()
+			.getInstances()
 			.stream()
-			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
-			.map(ConversionUtils::oafInstanceToBrokerInstances)
-			.flatMap(List::stream)
+			.filter(i -> i.getLicense().equals(BrokerConstants.OPEN_ACCESS))
 			.collect(Collectors.toList());
 	}
 

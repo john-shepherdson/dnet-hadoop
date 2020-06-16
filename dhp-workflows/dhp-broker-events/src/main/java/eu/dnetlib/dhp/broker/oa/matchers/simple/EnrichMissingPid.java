@@ -5,13 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.broker.objects.Pid;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.TypedValue;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
 
-public class EnrichMissingPid extends UpdateMatcher<Pid> {
+public class EnrichMissingPid extends UpdateMatcher<TypedValue> {
 
 	public EnrichMissingPid() {
 		super(true,
@@ -21,19 +20,17 @@ public class EnrichMissingPid extends UpdateMatcher<Pid> {
 	}
 
 	@Override
-	protected List<Pid> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
-		final long count = target.getResult().getPid().size();
+	protected List<TypedValue> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
+		final long count = target.getPids().size();
 
 		if (count > 0) {
 			return Arrays.asList();
 		}
 
 		return source
-			.getResult()
-			.getPid()
+			.getPids()
 			.stream()
-			.map(ConversionUtils::oafPidToBrokerPid)
 			.collect(Collectors.toList());
 	}
 
