@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 public class Result extends OafEntity implements Serializable {
 
+	private List<Measure> measures;
+
 	private List<Author> author;
 
 	// resulttype allows subclassing results into publications | datasets | software
@@ -52,6 +54,14 @@ public class Result extends OafEntity implements Serializable {
 	private List<ExternalReference> externalReference;
 
 	private List<Instance> instance;
+
+	public List<Measure> getMeasures() {
+		return measures;
+	}
+
+	public void setMeasures(List<Measure> measures) {
+		this.measures = measures;
+	}
 
 	public List<Author> getAuthor() {
 		return author;
@@ -230,6 +240,8 @@ public class Result extends OafEntity implements Serializable {
 		}
 
 		Result r = (Result) e;
+
+		// TODO consider merging also Measures
 
 		instance = mergeLists(instance, r.getInstance());
 
