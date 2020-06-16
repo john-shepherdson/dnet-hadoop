@@ -68,6 +68,22 @@ public class ConversionUtils {
 			: null;
 	}
 
+	public static eu.dnetlib.broker.objects.Publication oafPublicationToBrokerPublication(final Publication p) {
+		return p != null ? new eu.dnetlib.broker.objects.Publication()
+			.setOriginalId(p.getOriginalId().get(0))
+			.setTitle(structPropValue(p.getTitle()))
+			.setPids(p.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
+			.setInstances(
+				p
+					.getInstance()
+					.stream()
+					.map(ConversionUtils::oafInstanceToBrokerInstances)
+					.flatMap(List::stream)
+					.collect(Collectors.toList()))
+			.setCollectedFrom(p.getCollectedfrom().stream().map(KeyValue::getValue).findFirst().orElse(null))
+			: null;
+	}
+
 	public static final OpenaireBrokerResult oafResultToBrokerResult(final Result result) {
 
 		return result != null ? new OpenaireBrokerResult()

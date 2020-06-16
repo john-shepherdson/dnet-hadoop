@@ -140,7 +140,8 @@ public class GenerateEventsApplication {
 		final Dataset<Publication> publications = readPath(spark, graphPath + "/publication", Publication.class);
 
 		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
-			.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+			.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+			.cache();
 
 		final Dataset<OpenaireBrokerResult> r0 = readPath(
 			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), Result.class)
