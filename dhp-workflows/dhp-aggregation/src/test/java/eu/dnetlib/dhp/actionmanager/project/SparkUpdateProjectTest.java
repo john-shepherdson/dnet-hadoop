@@ -90,6 +90,5 @@ public class SparkUpdateProjectTest {
 
 		Assertions.assertEquals(14, tmp.count());
 
-
 	}
 }

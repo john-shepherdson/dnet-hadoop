@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Relation models any edge between two nodes in the OpenAIRE graph. It has a source id and a target id
- * pointing to graph node identifiers and it is further characterised by the semantic of the link through the fields
- * relType, subRelType and relClass. Provenance information is modeled according to the dataInfo element and collectedFrom,
- * while individual relationship types can provide extra information via the properties field.
+ * Relation models any edge between two nodes in the OpenAIRE graph. It has a source id and a target id pointing to
+ * graph node identifiers and it is further characterised by the semantic of the link through the fields relType,
+ * subRelType and relClass. Provenance information is modeled according to the dataInfo element and collectedFrom, while
+ * individual relationship types can provide extra information via the properties field.
  */
 public class Relation extends Oaf {
 
@@ -26,7 +26,8 @@ public class Relation extends Oaf {
 	private String subRelType;
 
 	/**
-	 * Indicates the direction of the relationship, values include 'isSupplementTo', 'isSupplementedBy', 'merges, 'isMergedIn'.
+	 * Indicates the direction of the relationship, values include 'isSupplementTo', 'isSupplementedBy', 'merges,
+	 * 'isMergedIn'.
 	 */
 	private String relClass;
 
@@ -51,7 +52,8 @@ public class Relation extends Oaf {
 	private String validationDate;
 
 	/**
-	 * List of relation specific properties. Values include 'similarityLevel', indicating the similarity score between a pair of publications.
+	 * List of relation specific properties. Values include 'similarityLevel', indicating the similarity score between a
+	 * pair of publications.
 	 */
 	private List<KeyValue> properties = new ArrayList<>();
 

@@ -241,7 +241,7 @@ public class Result extends OafEntity implements Serializable {
 
 		Result r = (Result) e;
 
-		//TODO consider merging also Measures
+		// TODO consider merging also Measures
 
 		instance = mergeLists(instance, r.getInstance());
 
