@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.provision;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +33,8 @@ import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects. The
@@ -89,6 +92,8 @@ public class XmlConverterJob {
 		log.info("otherDsTypeId: {}", otherDsTypeId);
 
 		SparkConf conf = new SparkConf();
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
 		runWithSparkSession(
 			conf,
@@ -114,26 +119,18 @@ public class XmlConverterJob {
 			schemaLocation,
 			otherDsTypeId);
 
+		final List<String> paths = HdfsSupport
+			.listFiles(inputPath, spark.sparkContext().hadoopConfiguration());
+
+		log.info("Found paths: {}", String.join(",", paths));
+
 		spark
 			.read()
-			.load(inputPath)
-			.as(Encoders.bean(JoinedEntity.class))
+			.load(toSeq(paths))
+			.as(Encoders.kryo(JoinedEntity.class))
 			.map(
-				(MapFunction<JoinedEntity, JoinedEntity>) j -> {
-					if (j.getLinks() != null) {
-						j
-							.setLinks(
-								j
-									.getLinks()
-									.stream()
-									.filter(t -> t.getRelation() != null & t.getRelatedEntity() != null)
-									.collect(Collectors.toCollection(ArrayList::new)));
-					}
-					return j;
-				},
-				Encoders.bean(JoinedEntity.class))
-			.map(
-				(MapFunction<JoinedEntity, Tuple2<String, String>>) je -> new Tuple2<>(je.getEntity().getId(),
+				(MapFunction<JoinedEntity, Tuple2<String, String>>) je -> new Tuple2<>(
+					je.getEntity().getId(),
 					recordFactory.build(je)),
 				Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
 			.javaRDD()
@@ -146,6 +143,10 @@ public class XmlConverterJob {
 
 	private static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+	}
+
+	private static Seq<String> toSeq(List<String> list) {
+		return JavaConverters.asScalaIteratorConverter(list.iterator()).asScala().toSeq();
 	}
 
 	private static Map<String, LongAccumulator> prepareAccumulators(SparkContext sc) {

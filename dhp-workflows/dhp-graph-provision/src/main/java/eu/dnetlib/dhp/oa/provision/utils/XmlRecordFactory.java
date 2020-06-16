@@ -85,17 +85,19 @@ public class XmlRecordFactory implements Serializable {
 
 		final Set<String> contexts = Sets.newHashSet();
 
-		final OafEntity entity = toOafEntity(je.getEntity());
+		// final OafEntity entity = toOafEntity(je.getEntity());
+		OafEntity entity = je.getEntity();
 		TemplateFactory templateFactory = new TemplateFactory();
 		try {
-			final EntityType type = EntityType.valueOf(je.getEntity().getType());
+
+			final EntityType type = EntityType.fromClass(entity.getClass());
 			final List<String> metadata = metadata(type, entity, contexts);
 
 			// rels has to be processed before the contexts because they enrich the contextMap with
 			// the
 			// funding info.
-			final List<String> relations = je
-				.getLinks()
+			final List<RelatedEntityWrapper> links = je.getLinks();
+			final List<String> relations = links
 				.stream()
 				.filter(link -> !isDuplicate(link))
 				.map(link -> mapRelation(contexts, templateFactory, type, link))
@@ -894,6 +896,12 @@ public class XmlRecordFactory implements Serializable {
 				if (p.getContracttype() != null) {
 					metadata.add(XmlSerializationUtils.mapQualifier("contracttype", p.getContracttype()));
 				}
+				if (p.getOamandatepublications() != null) {
+					metadata
+						.add(
+							XmlSerializationUtils
+								.asXmlElement("oamandatepublications", p.getOamandatepublications().getValue()));
+				}
 				if (p.getEcsc39() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("ecsc39", p.getEcsc39().getValue()));
 				}
@@ -975,10 +983,10 @@ public class XmlRecordFactory implements Serializable {
 		metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", dsType));
 	}
 
-	private List<String> mapFields(Tuple2 link, Set<String> contexts) {
+	private List<String> mapFields(RelatedEntityWrapper link, Set<String> contexts) {
 		final Relation rel = link.getRelation();
-		final RelatedEntity re = link.getRelatedEntity();
-		final String targetType = link.getRelatedEntity().getType();
+		final RelatedEntity re = link.getTarget();
+		final String targetType = link.getTarget().getType();
 
 		final List<String> metadata = Lists.newArrayList();
 		switch (EntityType.valueOf(targetType)) {
@@ -1089,9 +1097,10 @@ public class XmlRecordFactory implements Serializable {
 		return metadata;
 	}
 
-	private String mapRelation(Set<String> contexts, TemplateFactory templateFactory, EntityType type, Tuple2 link) {
+	private String mapRelation(Set<String> contexts, TemplateFactory templateFactory, EntityType type,
+		RelatedEntityWrapper link) {
 		final Relation rel = link.getRelation();
-		final String targetType = link.getRelatedEntity().getType();
+		final String targetType = link.getTarget().getType();
 		final String scheme = ModelSupport.getScheme(type.toString(), targetType);
 
 		if (StringUtils.isBlank(scheme)) {
@@ -1107,18 +1116,18 @@ public class XmlRecordFactory implements Serializable {
 	private List<String> listChildren(
 		final OafEntity entity, JoinedEntity je, TemplateFactory templateFactory) {
 
-		EntityType entityType = EntityType.valueOf(je.getEntity().getType());
+		final EntityType entityType = EntityType.fromClass(je.getEntity().getClass());
 
-		List<String> children = je
-			.getLinks()
+		final List<RelatedEntityWrapper> links = je.getLinks();
+		List<String> children = links
 			.stream()
 			.filter(link -> isDuplicate(link))
 			.map(link -> {
-				final String targetType = link.getRelatedEntity().getType();
+				final String targetType = link.getTarget().getType();
 				final String name = ModelSupport.getMainType(EntityType.valueOf(targetType));
 				final HashSet<String> fields = Sets.newHashSet(mapFields(link, null));
 				return templateFactory
-					.getChild(name, link.getRelatedEntity().getId(), Lists.newArrayList(fields));
+					.getChild(name, link.getTarget().getId(), Lists.newArrayList(fields));
 			})
 			.collect(Collectors.toCollection(ArrayList::new));
 
@@ -1162,10 +1171,10 @@ public class XmlRecordFactory implements Serializable {
 									.asXmlElement(
 										"distributionlocation", instance.getDistributionlocation()));
 					}
-					if (instance.getRefereed() != null && isNotBlank(instance.getRefereed().getValue())) {
+					if (instance.getRefereed() != null && !instance.getRefereed().isBlank()) {
 						fields
 							.add(
-								XmlSerializationUtils.asXmlElement("refereed", instance.getRefereed().getValue()));
+								XmlSerializationUtils.mapQualifier("refereed", instance.getRefereed()));
 					}
 					if (instance.getProcessingchargeamount() != null
 						&& isNotBlank(instance.getProcessingchargeamount().getValue())) {
@@ -1227,7 +1236,7 @@ public class XmlRecordFactory implements Serializable {
 		return children;
 	}
 
-	private boolean isDuplicate(Tuple2 link) {
+	private boolean isDuplicate(RelatedEntityWrapper link) {
 		return REL_SUBTYPE_DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
 	}
 

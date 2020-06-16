@@ -2,30 +2,40 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-public class JoinedEntity implements Serializable {
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
-	private TypedRow entity;
+public class JoinedEntity<E extends OafEntity> implements Serializable {
 
-	private List<Tuple2> links;
+	private E entity;
+
+	private List<RelatedEntityWrapper> links;
 
 	public JoinedEntity() {
+		links = new LinkedList<>();
 	}
 
-	public TypedRow getEntity() {
-		return entity;
-	}
-
-	public void setEntity(TypedRow entity) {
+	public JoinedEntity(E entity) {
+		this();
 		this.entity = entity;
 	}
 
-	public List<Tuple2> getLinks() {
+	public E getEntity() {
+		return entity;
+	}
+
+	public void setEntity(E entity) {
+		this.entity = entity;
+	}
+
+	public List<RelatedEntityWrapper> getLinks() {
 		return links;
 	}
 
-	public void setLinks(List<Tuple2> links) {
+	public void setLinks(List<RelatedEntityWrapper> links) {
 		this.links = links;
 	}
 }

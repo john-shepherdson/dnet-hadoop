@@ -60,6 +60,10 @@ public class OafMapperUtils {
 			.collect(Collectors.toList());
 	}
 
+	public static Qualifier unknown(final String schemeid, final String schemename) {
+		return qualifier("UNKNOWN", "Unknown", schemeid, schemename);
+	}
+
 	public static Qualifier qualifier(
 		final String classid,
 		final String classname,

@@ -63,6 +63,8 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected final VocabularyGroup vocs;
 
+	private final boolean invisible;
+
 	protected static final String DATACITE_SCHEMA_KERNEL_4 = "http://datacite.org/schema/kernel-4";
 	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
 	protected static final Qualifier ORCID_PID_TYPE = qualifier(
@@ -85,8 +87,9 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
 		"main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
 
-	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs) {
+	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
 		this.vocs = vocs;
+		this.invisible = invisible;
 	}
 
 	public List<Oaf> processMdRecord(final String xml) {
@@ -112,7 +115,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				return null;
 			}
 
-			final DataInfo info = prepareDataInfo(doc);
+			final DataInfo info = prepareDataInfo(doc, invisible);
 			final long lastUpdateTimestamp = new Date().getTime();
 
 			return createOafs(doc, type, collectedFrom, hostedBy, info, lastUpdateTimestamp);
@@ -510,11 +513,11 @@ public abstract class AbstractMdRecordToOafMapper {
 		return oaiIProvenance(identifier, baseURL, metadataNamespace, altered, datestamp, harvestDate);
 	}
 
-	protected DataInfo prepareDataInfo(final Document doc) {
+	protected DataInfo prepareDataInfo(final Document doc, final boolean invisible) {
 		final Node n = doc.selectSingleNode("//oaf:datainfo");
 
 		if (n == null) {
-			return dataInfo(false, null, false, false, REPOSITORY_PROVENANCE_ACTIONS, "0.9");
+			return dataInfo(false, null, false, invisible, REPOSITORY_PROVENANCE_ACTIONS, "0.9");
 		}
 
 		final String paClassId = n.valueOf("./oaf:provenanceaction/@classid");
@@ -528,7 +531,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		final String trust = n.valueOf("./oaf:trust");
 
 		return dataInfo(
-			deletedbyinference, inferenceprovenance, inferred, false,
+			deletedbyinference, inferenceprovenance, inferred, invisible,
 			qualifier(paClassId, paClassName, paSchemeId, paSchemeName), trust);
 	}
 

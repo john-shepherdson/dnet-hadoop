@@ -96,10 +96,19 @@ public class ProtoConverter implements Serializable {
 					.stream()
 					.distinct()
 					.collect(Collectors.toCollection(ArrayList::new)) : null);
-		i.setRefereed(mapStringField(ri.getRefereed()));
+		i.setRefereed(mapRefereed(ri.getRefereed()));
 		i.setProcessingchargeamount(mapStringField(ri.getProcessingchargeamount()));
 		i.setProcessingchargecurrency(mapStringField(ri.getProcessingchargecurrency()));
 		return i;
+	}
+
+	private static Qualifier mapRefereed(FieldTypeProtos.StringField refereed) {
+		Qualifier q = new Qualifier();
+		q.setClassid(refereed.getValue());
+		q.setSchemename(refereed.getValue());
+		q.setSchemeid("dnet:review_levels");
+		q.setSchemename("dnet:review_levels");
+		return q;
 	}
 
 	private static List<ExternalReference> convertExternalRefs(OafProtos.Oaf oaf) {

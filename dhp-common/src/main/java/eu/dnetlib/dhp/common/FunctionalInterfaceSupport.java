@@ -2,12 +2,23 @@
 package eu.dnetlib.dhp.common;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /** Provides serializable and throwing extensions to standard functional interfaces. */
 public class FunctionalInterfaceSupport {
 
 	private FunctionalInterfaceSupport() {
+	}
+
+	/**
+	 * Serializable consumer of any kind of objects. To be used withing spark processing pipelines when supplying
+	 * functions externally.
+	 *
+	 * @param <T>
+	 */
+	@FunctionalInterface
+	public interface SerializableConsumer<T> extends Consumer<T>, Serializable {
 	}
 
 	/**

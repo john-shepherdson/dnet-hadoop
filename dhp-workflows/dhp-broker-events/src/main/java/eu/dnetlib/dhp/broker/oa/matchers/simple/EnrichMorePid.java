@@ -5,43 +5,37 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.broker.objects.Pid;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.TypedValue;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMorePid extends UpdateMatcher<Result, Pid> {
+public class EnrichMorePid extends UpdateMatcher<TypedValue> {
 
 	public EnrichMorePid() {
-		super(true);
+		super(true,
+			pid -> Topic.ENRICH_MORE_PID,
+			(p, pid) -> p.getPids().add(pid),
+			pid -> pidAsString(pid));
 	}
 
 	@Override
-	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target) {
+	protected List<TypedValue> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 		final Set<String> existingPids = target
-			.getPid()
+			.getPids()
 			.stream()
-			.map(pid -> pid.getQualifier().getClassid() + "::" + pid.getValue())
+			.map(pid -> pidAsString(pid))
 			.collect(Collectors.toSet());
 
 		return source
-			.getPid()
+			.getPids()
 			.stream()
-			.filter(pid -> !existingPids.contains(pid.getQualifier().getClassid() + "::" + pid.getValue()))
-			.map(ConversionUtils::oafPidToBrokerPid)
-			.map(i -> generateUpdateInfo(i, source, target))
+			.filter(pid -> !existingPids.contains(pidAsString(pid)))
 			.collect(Collectors.toList());
 	}
 
-	@Override
-	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MORE_PID,
-			highlightValue, source, target,
-			(p, pid) -> p.getPids().add(pid),
-			pid -> pid.getType() + "::" + pid.getValue());
+	private static String pidAsString(final TypedValue pid) {
+		return pid.getType() + "::" + pid.getValue();
 	}
-
 }

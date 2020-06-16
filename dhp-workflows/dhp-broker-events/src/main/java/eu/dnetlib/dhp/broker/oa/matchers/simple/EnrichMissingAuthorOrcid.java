@@ -1,36 +1,43 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 
+import eu.dnetlib.broker.objects.Author;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
 
-public class EnrichMissingAuthorOrcid extends UpdateMatcher<Result, Pair<String, String>> {
+public class EnrichMissingAuthorOrcid extends UpdateMatcher<Author> {
 
 	public EnrichMissingAuthorOrcid() {
-		super(true);
+		super(true,
+			aut -> Topic.ENRICH_MISSING_AUTHOR_ORCID,
+			(p, aut) -> p.getCreators().add(aut),
+			aut -> aut.getOrcid());
 	}
 
 	@Override
-	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target) {
-		// return Arrays.asList(new EnrichMissingAbstract("xxxxxxx", 0.9f));
-		return Arrays.asList();
-	}
+	protected List<Author> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 
-	@Override
-	public UpdateInfo<Pair<String, String>> generateUpdateInfo(final Pair<String, String> highlightValue,
-		final Result source,
-		final Result target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MISSING_AUTHOR_ORCID,
-			highlightValue, source, target,
-			(p, pair) -> p.getCreators().add(pair.getLeft() + " - ORCID: " + pair.getRight()),
-			pair -> pair.getLeft() + "::" + pair.getRight());
+		final Set<String> existingOrcids = target
+			.getCreators()
+			.stream()
+			.map(Author::getOrcid)
+			.filter(StringUtils::isNotBlank)
+			.collect(Collectors.toSet());
+
+		return source
+			.getCreators()
+			.stream()
+			.filter(a -> StringUtils.isNotBlank(a.getOrcid()))
+			.filter(a -> !existingOrcids.contains(a.getOrcid()))
+			.collect(Collectors.toList());
+
 	}
 }

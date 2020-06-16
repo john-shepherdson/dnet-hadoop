@@ -40,7 +40,6 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
@@ -66,15 +65,16 @@ public class GenerateEntitiesApplication {
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String sourcePaths = parser.get("sourcePaths");
-		final String targetPath = parser.get("targetPath");
+		log.info("sourcePaths: {}", sourcePaths);
 
-		// final String dbUrl = parser.get("postgresUrl");
-		// final String dbUser = parser.get("postgresUser");
-		// final String dbPassword = parser.get("postgresPassword");
+		final String targetPath = parser.get("targetPath");
+		log.info("targetPath: {}", targetPath);
 
 		final String isLookupUrl = parser.get("isLookupUrl");
+		log.info("isLookupUrl: {}", isLookupUrl);
 
-		final VocabularyGroup vocs = loadVocsFromIS(isLookupUrl); // MAP: vocId -> voc
+		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
@@ -140,10 +140,16 @@ public class GenerateEntitiesApplication {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
-			case "native_oaf":
-				return new OafToOafMapper(vocs).processMdRecord(s);
-			case "native_odf":
-				return new OdfToOafMapper(vocs).processMdRecord(s);
+			case "oaf-store-cleaned":
+			case "oaf-store-claim":
+				return new OafToOafMapper(vocs, false).processMdRecord(s);
+			case "odf-store-cleaned":
+			case "odf-store-claim":
+				return new OdfToOafMapper(vocs, false).processMdRecord(s);
+			case "oaf-store-intersection":
+				return new OafToOafMapper(vocs, true).processMdRecord(s);
+			case "odf-store-intersection":
+				return new OdfToOafMapper(vocs, true).processMdRecord(s);
 			case "datasource":
 				return Arrays.asList(convertFromJson(s, Datasource.class));
 			case "organization":
@@ -163,35 +169,6 @@ public class GenerateEntitiesApplication {
 			default:
 				throw new RuntimeException("type not managed: " + type.toLowerCase());
 		}
-	}
-
-	private static VocabularyGroup loadVocsFromIS(final String isLookupUrl) throws IOException, ISLookUpException {
-		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
-
-		final String xquery = IOUtils
-			.toString(
-				GenerateEntitiesApplication.class
-					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/xquery/load_vocabularies.xquery"));
-
-		final VocabularyGroup vocs = new VocabularyGroup();
-
-		for (final String s : isLookUpService.quickSearchProfile(xquery)) {
-			final String[] arr = s.split("@=@");
-			if (arr.length == 4) {
-				final String vocId = arr[0].trim();
-				final String vocName = arr[1].trim();
-				final String termId = arr[2].trim();
-				final String termName = arr[3].trim();
-
-				if (!vocs.vocabularyExists(vocId)) {
-					vocs.addVocabulary(vocId, vocName);
-				}
-
-				vocs.addTerm(vocId, termId, termName);
-			}
-		}
-
-		return vocs;
 	}
 
 	private static Oaf convertFromJson(final String s, final Class<? extends Oaf> clazz) {
