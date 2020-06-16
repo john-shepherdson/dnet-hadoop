@@ -281,8 +281,8 @@
         "value": "VIRTA"
       },
       "instancetype": {
-        "classid": "Comentario",
-        "classname": "Comentario",
+        "classid": "Comment/debate",
+        "classname": "Comment/debate",
         "schemeid": "dnet:publication_resource",
         "schemename": "dnet:publication_resource"
       },
@@ -317,8 +317,8 @@
     "vol": ""
   },
   "language": {
-    "classid": "en",
-    "classname": "en",
+    "classid": "UNKNOWN",
+    "classname": "UNKNOWN",
     "schemeid": "dnet:languages",
     "schemename": "dnet:languages"
   },

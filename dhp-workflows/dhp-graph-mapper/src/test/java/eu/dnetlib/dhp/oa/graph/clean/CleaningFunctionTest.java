@@ -60,8 +60,8 @@ public class CleaningFunctionTest {
 
 		assertNotNull(p_out);
 
-		assertEquals("eng", p_out.getLanguage().getClassid());
-		assertEquals("English", p_out.getLanguage().getClassname());
+		assertEquals("und", p_out.getLanguage().getClassid());
+		assertEquals("Undetermined", p_out.getLanguage().getClassname());
 
 		assertEquals("0018", p_out.getInstance().get(0).getInstancetype().getClassid());
 		assertEquals("Annotation", p_out.getInstance().get(0).getInstancetype().getClassname());
