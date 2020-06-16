@@ -259,9 +259,9 @@ public class Result extends OafEntity implements Serializable {
 		StructuredProperty newMainTitle = null;
 		if (r.getTitle() != null) {
 			newMainTitle = getMainTitle(r.getTitle());
-			if (newMainTitle != null && title != null) {
+			if (newMainTitle != null) {
 				final StructuredProperty p = newMainTitle;
-				title = title.stream().filter(t -> t != p).collect(Collectors.toList());
+				r.setTitle(r.getTitle().stream().filter(t -> t != p).collect(Collectors.toList()));
 			}
 		}
 
