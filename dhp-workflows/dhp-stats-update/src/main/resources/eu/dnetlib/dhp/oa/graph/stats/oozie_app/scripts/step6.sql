@@ -13,7 +13,7 @@ CREATE TABLE ${stats_db_name}.project_organizations AS SELECT substr(r.source, 4
 
 -- Project_results Table
 DROP TABLE IF EXISTS ${stats_db_name}.project_results;
-CREATE TABLE ${stats_db_name}.project_results AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result FROM ${openaire_db_name}.relation r WHERE r.reltype='resultProject';
+CREATE TABLE ${stats_db_name}.project_results AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result FROM ${openaire_db_name}.relation r WHERE r.reltype='resultProject' and r.datainfo.deletedbyinference=false;
 
 -- Project table
 ----------------
