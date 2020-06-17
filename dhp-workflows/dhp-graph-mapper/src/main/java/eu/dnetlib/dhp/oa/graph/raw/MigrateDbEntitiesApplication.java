@@ -50,6 +50,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
@@ -71,6 +73,7 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
@@ -151,7 +154,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		super(hdfsPath);
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.lastUpdateTimestamp = new Date().getTime();
-		this.vocs = VocabularyGroup.loadVocsFromIS(isLookupUrl);
+		this.vocs = VocabularyGroup.loadVocsFromIS(ISLookupClientFactory.getLookUpService(isLookupUrl));
 	}
 
 	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer)
@@ -170,7 +173,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final Datasource ds = new Datasource();
 
 			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
-			ds.setOriginalId(Arrays.asList(rs.getString("datasourceid")));
+			ds.setOriginalId(Arrays.asList((String[]) rs.getArray("identities").getArray()));
 			ds
 				.setCollectedfrom(
 					listKeyValues(

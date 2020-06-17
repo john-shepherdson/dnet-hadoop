@@ -1,55 +1,33 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.relatedSoftware;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public class EnrichMissingSoftware
-	extends UpdateMatcher<Pair<Result, List<Software>>, eu.dnetlib.broker.objects.Software> {
+	extends UpdateMatcher<eu.dnetlib.broker.objects.Software> {
 
 	public EnrichMissingSoftware() {
-		super(true);
+		super(true,
+			s -> Topic.ENRICH_MISSING_SOFTWARE,
+			(p, s) -> p.getSoftwares().add(s),
+			s -> s.getName());
 	}
 
 	@Override
-	protected List<UpdateInfo<eu.dnetlib.broker.objects.Software>> findUpdates(
-		final Pair<Result, List<Software>> source,
-		final Pair<Result, List<Software>> target,
-		final DedupConfig dedupConfig) {
+	protected List<eu.dnetlib.broker.objects.Software> findDifferences(
+		final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 
-		if (source.getRight().isEmpty()) {
-			return Arrays.asList();
+		if (target.getSoftwares().isEmpty()) {
+			return source.getSoftwares();
 		} else {
-			return target
-				.getRight()
-				.stream()
-				.map(ConversionUtils::oafSoftwareToBrokerSoftware)
-				.map(p -> generateUpdateInfo(p, source, target, dedupConfig))
-				.collect(Collectors.toList());
+			return new ArrayList<>();
 		}
-	}
-
-	public UpdateInfo<eu.dnetlib.broker.objects.Software> generateUpdateInfo(
-		final eu.dnetlib.broker.objects.Software highlightValue,
-		final Pair<Result, List<Software>> source,
-		final Pair<Result, List<Software>> target,
-		final DedupConfig dedupConfig) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MISSING_SOFTWARE,
-			highlightValue, source.getLeft(), target.getLeft(),
-			(p, s) -> p.getSoftwares().add(s),
-			s -> s.getName(), dedupConfig);
 	}
 
 }

@@ -13,7 +13,8 @@ import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.broker.objects.Pid;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.TypedValue;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.ExternalReference;
@@ -41,8 +42,8 @@ public class ConversionUtils {
 		}).collect(Collectors.toList());
 	}
 
-	public static Pid oafPidToBrokerPid(final StructuredProperty sp) {
-		return sp != null ? new Pid()
+	public static TypedValue oafPidToBrokerPid(final StructuredProperty sp) {
+		return sp != null ? new TypedValue()
 			.setValue(sp.getValue())
 			.setType(sp.getQualifier().getClassid()) : null;
 	}
@@ -54,7 +55,7 @@ public class ConversionUtils {
 	public static final eu.dnetlib.broker.objects.Dataset oafDatasetToBrokerDataset(final Dataset d) {
 		return d != null ? new eu.dnetlib.broker.objects.Dataset()
 			.setOriginalId(d.getOriginalId().get(0))
-			.setTitles(structPropList(d.getTitle()))
+			.setTitle(structPropValue(d.getTitle()))
 			.setPids(d.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
 			.setInstances(
 				d
@@ -63,26 +64,46 @@ public class ConversionUtils {
 					.map(ConversionUtils::oafInstanceToBrokerInstances)
 					.flatMap(List::stream)
 					.collect(Collectors.toList()))
-			.setCollectedFrom(d.getCollectedfrom().stream().map(KeyValue::getValue).collect(Collectors.toList()))
+			.setCollectedFrom(d.getCollectedfrom().stream().map(KeyValue::getValue).findFirst().orElse(null))
 			: null;
 	}
 
-	public static final eu.dnetlib.broker.objects.Publication oafResultToBrokerPublication(final Result result) {
+	public static eu.dnetlib.broker.objects.Publication oafPublicationToBrokerPublication(final Publication p) {
+		return p != null ? new eu.dnetlib.broker.objects.Publication()
+			.setOriginalId(p.getOriginalId().get(0))
+			.setTitle(structPropValue(p.getTitle()))
+			.setPids(p.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
+			.setInstances(
+				p
+					.getInstance()
+					.stream()
+					.map(ConversionUtils::oafInstanceToBrokerInstances)
+					.flatMap(List::stream)
+					.collect(Collectors.toList()))
+			.setCollectedFrom(p.getCollectedfrom().stream().map(KeyValue::getValue).findFirst().orElse(null))
+			: null;
+	}
 
-		return result != null ? new eu.dnetlib.broker.objects.Publication()
+	public static final OpenaireBrokerResult oafResultToBrokerResult(final Result result) {
+
+		return result != null ? new OpenaireBrokerResult()
+			.setOpenaireId(result.getId())
 			.setOriginalId(result.getOriginalId().get(0))
+			.setTypology(result.getResulttype().getClassid())
 			.setTitles(structPropList(result.getTitle()))
 			.setAbstracts(fieldList(result.getDescription()))
 			.setLanguage(result.getLanguage().getClassid())
-			.setSubjects(structPropList(result.getSubject()))
-			.setCreators(result.getAuthor().stream().map(Author::getFullname).collect(Collectors.toList()))
-			.setPublicationdate(result.getDateofcollection())
+			.setSubjects(structPropTypedList(result.getSubject()))
+			.setCreators(
+				result.getAuthor().stream().map(ConversionUtils::oafAuthorToBrokerAuthor).collect(Collectors.toList()))
+			.setPublicationdate(result.getDateofacceptance().getValue())
 			.setPublisher(fieldValue(result.getPublisher()))
 			.setEmbargoenddate(fieldValue(result.getEmbargoenddate()))
 			.setContributor(fieldList(result.getContributor()))
 			.setJournal(
 				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null)
-			.setCollectedFrom(result.getCollectedfrom().stream().map(KeyValue::getValue).collect(Collectors.toList()))
+			.setCollectedFromId(result.getCollectedfrom().stream().map(KeyValue::getKey).findFirst().orElse(null))
+			.setCollectedFromName(result.getCollectedfrom().stream().map(KeyValue::getValue).findFirst().orElse(null))
 			.setPids(result.getPid().stream().map(ConversionUtils::oafPidToBrokerPid).collect(Collectors.toList()))
 			.setInstances(
 				result
@@ -97,6 +118,30 @@ public class ConversionUtils {
 					.stream()
 					.map(ConversionUtils::oafExtRefToBrokerExtRef)
 					.collect(Collectors.toList()))
+			: null;
+	}
+
+	private static List<TypedValue> structPropTypedList(final List<StructuredProperty> list) {
+		return list
+			.stream()
+			.map(
+				p -> new TypedValue()
+					.setValue(p.getValue())
+					.setType(p.getQualifier().getClassid()))
+			.collect(Collectors.toList());
+	}
+
+	private static eu.dnetlib.broker.objects.Author oafAuthorToBrokerAuthor(final Author author) {
+		return author != null ? new eu.dnetlib.broker.objects.Author()
+			.setFullname(author.getFullname())
+			.setOrcid(
+				author
+					.getPid()
+					.stream()
+					.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+					.map(pid -> pid.getValue())
+					.findFirst()
+					.orElse(null))
 			: null;
 	}
 

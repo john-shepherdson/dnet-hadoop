@@ -1,33 +1,38 @@
 
 package eu.dnetlib.dhp.oa.graph.raw.common;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.oa.graph.raw.GenerateEntitiesApplication;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class VocabularyGroup implements Serializable {
 
-	public static VocabularyGroup loadVocsFromIS(final String isLookupUrl) throws IOException, ISLookUpException {
-		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+	public static final String VOCABULARIES_XQUERY = "for $x in collection('/db/DRIVER/VocabularyDSResources/VocabularyDSResourceType') \n"
+		+
+		"let $vocid := $x//VOCABULARY_NAME/@code\n" +
+		"let $vocname := $x//VOCABULARY_NAME/text()\n" +
+		"for $term in ($x//TERM)\n" +
+		"return concat($vocid,' @=@ ',$vocname,' @=@ ',$term/@code,' @=@ ',$term/@english_name)";
 
-		final String xquery = IOUtils
-			.toString(
-				GenerateEntitiesApplication.class
-					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/xquery/load_vocabularies.xquery"));
+	public static final String VOCABULARY_SYNONYMS_XQUERY = "for $x in collection('/db/DRIVER/VocabularyDSResources/VocabularyDSResourceType')\n"
+		+
+		"let $vocid := $x//VOCABULARY_NAME/@code\n" +
+		"let $vocname := $x//VOCABULARY_NAME/text()\n" +
+		"for $term in ($x//TERM)\n" +
+		"for $syn in ($term//SYNONYM/@term)\n" +
+		"return concat($vocid,' @=@ ',$term/@code,' @=@ ', $syn)\n";
+
+	public static VocabularyGroup loadVocsFromIS(ISLookUpService isLookUpService) throws ISLookUpException {
 
 		final VocabularyGroup vocs = new VocabularyGroup();
 
-		for (final String s : isLookUpService.quickSearchProfile(xquery)) {
+		for (final String s : isLookUpService.quickSearchProfile(VOCABULARIES_XQUERY)) {
 			final String[] arr = s.split("@=@");
 			if (arr.length == 4) {
 				final String vocId = arr[0].trim();
@@ -40,6 +45,19 @@ public class VocabularyGroup implements Serializable {
 				}
 
 				vocs.addTerm(vocId, termId, termName);
+				// vocs.addSynonyms(vocId, termId, termId);
+			}
+		}
+
+		for (final String s : isLookUpService.quickSearchProfile(VOCABULARY_SYNONYMS_XQUERY)) {
+			final String[] arr = s.split("@=@");
+			if (arr.length == 3) {
+				final String vocId = arr[0].trim();
+				final String termId = arr[1].trim();
+				final String syn = arr[2].trim();
+
+				vocs.addSynonyms(vocId, termId, syn);
+				// vocs.addSynonyms(vocId, termId, termId);
 			}
 		}
 
@@ -66,16 +84,37 @@ public class VocabularyGroup implements Serializable {
 		}
 	}
 
-	public Qualifier getTermAsQualifier(final String vocId, final String id) {
-		if (StringUtils.isBlank(id)) {
-			return OafMapperUtils.qualifier("UNKNOWN", "UNKNOWN", vocId, vocId);
-		} else if (termExists(vocId, id)) {
-			final Vocabulary v = vocs.get(vocId.toLowerCase());
-			final VocabularyTerm t = v.getTerm(id);
-			return OafMapperUtils.qualifier(t.getId(), t.getName(), v.getId(), v.getName());
-		} else {
-			return OafMapperUtils.qualifier(id, id, vocId, vocId);
+	public Set<String> getTerms(String vocId) {
+		if (!vocabularyExists(vocId)) {
+			return new HashSet<>();
 		}
+		return vocs
+			.get(vocId.toLowerCase())
+			.getTerms()
+			.values()
+			.stream()
+			.map(t -> t.getId())
+			.collect(Collectors.toCollection(HashSet::new));
+	}
+
+	public Qualifier lookup(String vocId, String id) {
+		return Optional
+			.ofNullable(getSynonymAsQualifier(vocId, id))
+			.orElse(getTermAsQualifier(vocId, id));
+	}
+
+	public Qualifier getTermAsQualifier(final String vocId, final String id) {
+		if (vocabularyExists(vocId)) {
+			return vocs.get(vocId.toLowerCase()).getTermAsQualifier(id);
+		}
+		return OafMapperUtils.qualifier(id, id, "", "");
+	}
+
+	public Qualifier getSynonymAsQualifier(final String vocId, final String syn) {
+		if (StringUtils.isBlank(vocId)) {
+			return OafMapperUtils.unknown("", "");
+		}
+		return vocs.get(vocId.toLowerCase()).getSynonymAsQualifier(syn);
 	}
 
 	public boolean termExists(final String vocId, final String id) {
@@ -84,6 +123,18 @@ public class VocabularyGroup implements Serializable {
 
 	public boolean vocabularyExists(final String vocId) {
 		return vocs.containsKey(vocId.toLowerCase());
+	}
+
+	private void addSynonyms(final String vocId, final String termId, final String syn) {
+		String id = Optional
+			.ofNullable(vocId)
+			.map(s -> s.toLowerCase())
+			.orElseThrow(
+				() -> new IllegalArgumentException(String.format("empty vocabulary id for [term:%s, synonym:%s]")));
+		Optional
+			.ofNullable(vocs.get(id))
+			.orElseThrow(() -> new IllegalArgumentException("missing vocabulary id: " + vocId))
+			.addSynonym(syn.toLowerCase(), termId);
 	}
 
 }

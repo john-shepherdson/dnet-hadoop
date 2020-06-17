@@ -4,13 +4,7 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_LANGUAGES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PUBLICATION_RESOURCE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_RELATED_TO;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DATASET;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +31,8 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
-	public OafToOafMapper(final VocabularyGroup vocs) {
-		super(vocs);
+	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
+		super(vocs, invisible);
 	}
 
 	@Override
@@ -139,7 +133,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		instance
 			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
-		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
+		instance.setRefereed(prepareQualifier(doc, "//oaf:refereed", DNET_REVIEW_LEVELS));
 		instance
 			.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance
@@ -281,12 +275,12 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						getRelation(
-							docId, otherId, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO, collectedFrom, info,
+							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, collectedFrom, info,
 							lastUpdateTimestamp));
 				res
 					.add(
 						getRelation(
-							otherId, docId, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO, collectedFrom, info,
+							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, collectedFrom, info,
 							lastUpdateTimestamp));
 			}
 		}

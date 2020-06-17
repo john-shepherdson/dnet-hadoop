@@ -1,9 +1,15 @@
 
 package eu.dnetlib.dhp.broker.model;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Event {
+public class Event implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -5936790326505781395L;
 
 	private String eventId;
 

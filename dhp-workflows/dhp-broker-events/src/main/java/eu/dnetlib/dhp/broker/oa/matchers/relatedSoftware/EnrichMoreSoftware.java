@@ -5,54 +5,36 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.Software;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.pace.config.DedupConfig;
 
-public class EnrichMoreSoftware
-	extends UpdateMatcher<Pair<Result, List<Software>>, eu.dnetlib.broker.objects.Software> {
+public class EnrichMoreSoftware extends UpdateMatcher<Software> {
 
 	public EnrichMoreSoftware() {
-		super(true);
+		super(true,
+			s -> Topic.ENRICH_MORE_SOFTWARE,
+			(p, s) -> p.getSoftwares().add(s),
+			s -> s.getName());
 	}
 
 	@Override
-	protected List<UpdateInfo<eu.dnetlib.broker.objects.Software>> findUpdates(
-		final Pair<Result, List<Software>> source,
-		final Pair<Result, List<Software>> target,
-		final DedupConfig dedupConfig) {
+	protected List<eu.dnetlib.broker.objects.Software> findDifferences(
+		final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 
 		final Set<String> existingSoftwares = source
-			.getRight()
+			.getSoftwares()
 			.stream()
-			.map(Software::getId)
+			.map(Software::getName)
 			.collect(Collectors.toSet());
 
 		return target
-			.getRight()
+			.getSoftwares()
 			.stream()
-			.filter(p -> !existingSoftwares.contains(p.getId()))
-			.map(ConversionUtils::oafSoftwareToBrokerSoftware)
-			.map(p -> generateUpdateInfo(p, source, target, dedupConfig))
+			.filter(p -> !existingSoftwares.contains(p.getName()))
 			.collect(Collectors.toList());
-	}
-
-	public UpdateInfo<eu.dnetlib.broker.objects.Software> generateUpdateInfo(
-		final eu.dnetlib.broker.objects.Software highlightValue,
-		final Pair<Result, List<Software>> source,
-		final Pair<Result, List<Software>> target,
-		final DedupConfig dedupConfig) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MORE_SOFTWARE,
-			highlightValue, source.getLeft(), target.getLeft(),
-			(p, s) -> p.getSoftwares().add(s),
-			s -> s.getName(), dedupConfig);
 	}
 
 }

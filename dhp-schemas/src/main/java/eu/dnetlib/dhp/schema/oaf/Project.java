@@ -58,6 +58,8 @@ public class Project extends OafEntity implements Serializable {
 
 	private Float fundedamount;
 
+	private List<Programme> programme;
+
 	public Field<String> getWebsiteurl() {
 		return websiteurl;
 	}
@@ -266,6 +268,14 @@ public class Project extends OafEntity implements Serializable {
 		this.fundedamount = fundedamount;
 	}
 
+	public List<Programme> getProgramme() {
+		return programme;
+	}
+
+	public void setProgramme(List<Programme> programme) {
+		this.programme = programme;
+	}
+
 	@Override
 	public void mergeFrom(OafEntity e) {
 		super.mergeFrom(e);
@@ -320,6 +330,9 @@ public class Project extends OafEntity implements Serializable {
 		fundedamount = p.getFundedamount() != null && compareTrust(this, e) < 0
 			? p.getFundedamount()
 			: fundedamount;
+
+		programme = mergeLists(programme, p.getProgramme());
+
 		mergeOAFDataInfo(e);
 	}
 }

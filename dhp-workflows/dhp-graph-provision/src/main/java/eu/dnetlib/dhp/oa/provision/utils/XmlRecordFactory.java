@@ -896,6 +896,12 @@ public class XmlRecordFactory implements Serializable {
 				if (p.getContracttype() != null) {
 					metadata.add(XmlSerializationUtils.mapQualifier("contracttype", p.getContracttype()));
 				}
+				if (p.getOamandatepublications() != null) {
+					metadata
+						.add(
+							XmlSerializationUtils
+								.asXmlElement("oamandatepublications", p.getOamandatepublications().getValue()));
+				}
 				if (p.getEcsc39() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("ecsc39", p.getEcsc39().getValue()));
 				}
@@ -1165,10 +1171,10 @@ public class XmlRecordFactory implements Serializable {
 									.asXmlElement(
 										"distributionlocation", instance.getDistributionlocation()));
 					}
-					if (instance.getRefereed() != null && isNotBlank(instance.getRefereed().getValue())) {
+					if (instance.getRefereed() != null && !instance.getRefereed().isBlank()) {
 						fields
 							.add(
-								XmlSerializationUtils.asXmlElement("refereed", instance.getRefereed().getValue()));
+								XmlSerializationUtils.mapQualifier("refereed", instance.getRefereed()));
 					}
 					if (instance.getProcessingchargeamount() != null
 						&& isNotBlank(instance.getProcessingchargeamount().getValue())) {

@@ -14,6 +14,7 @@ public class ModelConstants {
 	public static final String DNET_DATA_CITE_RESOURCE = "dnet:dataCite_resource";
 	public static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
 	public static final String DNET_COUNTRY_TYPE = "dnet:countries";
+	public static final String DNET_REVIEW_LEVELS = "dnet:review_levels";
 
 	public static final String SYSIMPORT_CROSSWALK_REPOSITORY = "sysimport:crosswalk:repository";
 	public static final String SYSIMPORT_CROSSWALK_ENTITYREGISTRY = "sysimport:crosswalk:entityregistry";
@@ -25,6 +26,10 @@ public class ModelConstants {
 	public static final String ORP_RESULTTYPE_CLASSID = "other";
 
 	public static final String RESULT_RESULT = "resultResult";
+	/**
+	 * @deprecated Use {@link ModelConstants#RELATIONSHIP} instead.
+	 */
+	@Deprecated
 	public static final String PUBLICATION_DATASET = "publicationDataset";
 	public static final String IS_RELATED_TO = "isRelatedTo";
 	public static final String SUPPLEMENT = "supplement";
@@ -34,6 +39,12 @@ public class ModelConstants {
 	public static final String IS_PART_OF = "IsPartOf";
 	public static final String HAS_PARTS = "HasParts";
 	public static final String RELATIONSHIP = "relationship";
+	public static final String CITATION = "citation";
+	public static final String CITES = "cites";
+	public static final String IS_CITED_BY = "IsCitedBy";
+	public static final String REVIEW = "review";
+	public static final String REVIEWS = "reviews";
+	public static final String IS_REVIEWED_BY = "IsReviewedBy";
 
 	public static final String RESULT_PROJECT = "resultProject";
 	public static final String OUTCOME = "outcome";

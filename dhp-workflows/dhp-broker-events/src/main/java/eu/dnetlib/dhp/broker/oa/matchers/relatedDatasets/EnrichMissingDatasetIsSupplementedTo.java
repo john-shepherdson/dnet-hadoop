@@ -9,4 +9,9 @@ public class EnrichMissingDatasetIsSupplementedTo extends AbstractEnrichMissingD
 		super(Topic.ENRICH_MISSING_DATASET_IS_SUPPLEMENTED_TO);
 	}
 
+	@Override
+	protected boolean filterByType(final String relType) {
+		return relType.equals("isSupplementedTo");
+	}
+
 }

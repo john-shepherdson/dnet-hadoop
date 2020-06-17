@@ -6,27 +6,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.broker.objects.Instance;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.pace.config.DedupConfig;
 
-public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
+public class EnrichMissingOpenAccess extends UpdateMatcher<Instance> {
 
 	public EnrichMissingOpenAccess() {
-		super(true);
+		super(true,
+			i -> Topic.ENRICH_MISSING_OA_VERSION,
+			(p, i) -> p.getInstances().add(i),
+			Instance::getUrl);
 	}
 
 	@Override
-	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target,
-		final DedupConfig dedupConfig) {
+	protected List<Instance> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 		final long count = target
-			.getInstance()
+			.getInstances()
 			.stream()
-			.map(i -> i.getAccessright().getClassid())
+			.map(Instance::getLicense)
 			.filter(right -> right.equals(BrokerConstants.OPEN_ACCESS))
 			.count();
 
@@ -35,24 +35,10 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
 		}
 
 		return source
-			.getInstance()
+			.getInstances()
 			.stream()
-			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
-			.map(ConversionUtils::oafInstanceToBrokerInstances)
-			.flatMap(List::stream)
-			.map(i -> generateUpdateInfo(i, source, target, dedupConfig))
+			.filter(i -> i.getLicense().equals(BrokerConstants.OPEN_ACCESS))
 			.collect(Collectors.toList());
-	}
-
-	public UpdateInfo<Instance> generateUpdateInfo(final Instance highlightValue,
-		final Result source,
-		final Result target,
-		final DedupConfig dedupConfig) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MISSING_OA_VERSION,
-			highlightValue, source, target,
-			(p, i) -> p.getInstances().add(i),
-			Instance::getUrl, dedupConfig);
 	}
 
 }

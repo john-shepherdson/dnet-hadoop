@@ -6,51 +6,36 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.broker.objects.Instance;
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.pace.config.DedupConfig;
 
-public class EnrichMoreOpenAccess extends UpdateMatcher<Result, Instance> {
+public class EnrichMoreOpenAccess extends UpdateMatcher<Instance> {
 
 	public EnrichMoreOpenAccess() {
-		super(true);
+		super(true,
+			i -> Topic.ENRICH_MORE_OA_VERSION,
+			(p, i) -> p.getInstances().add(i),
+			Instance::getUrl);
 	}
 
 	@Override
-	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target,
-		final DedupConfig dedupConfig) {
+	protected List<Instance> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 		final Set<String> urls = target
-			.getInstance()
+			.getInstances()
 			.stream()
-			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
+			.filter(i -> i.getLicense().equals(BrokerConstants.OPEN_ACCESS))
 			.map(i -> i.getUrl())
-			.flatMap(List::stream)
 			.collect(Collectors.toSet());
 
 		return source
-			.getInstance()
+			.getInstances()
 			.stream()
-			.filter(i -> i.getAccessright().getClassid().equals(BrokerConstants.OPEN_ACCESS))
-			.map(ConversionUtils::oafInstanceToBrokerInstances)
-			.flatMap(List::stream)
+			.filter(i -> i.getLicense().equals(BrokerConstants.OPEN_ACCESS))
 			.filter(i -> !urls.contains(i.getUrl()))
-			.map(i -> generateUpdateInfo(i, source, target, dedupConfig))
 			.collect(Collectors.toList());
-	}
-
-	public UpdateInfo<Instance> generateUpdateInfo(final Instance highlightValue,
-		final Result source,
-		final Result target,
-		final DedupConfig dedupConfig) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MORE_OA_VERSION,
-			highlightValue, source, target,
-			(p, i) -> p.getInstances().add(i),
-			Instance::getUrl, dedupConfig);
 	}
 
 }
