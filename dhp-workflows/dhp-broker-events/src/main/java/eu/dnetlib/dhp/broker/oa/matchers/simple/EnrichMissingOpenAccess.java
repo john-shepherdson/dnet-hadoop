@@ -21,7 +21,8 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
 	}
 
 	@Override
-	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		final long count = target
 			.getInstance()
 			.stream()
@@ -29,7 +30,9 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<Result, Instance> {
 			.filter(right -> right.equals(BrokerConstants.OPEN_ACCESS))
 			.count();
 
-		if (count > 0) { return Arrays.asList(); }
+		if (count > 0) {
+			return Arrays.asList();
+		}
 
 		return source
 			.getInstance()

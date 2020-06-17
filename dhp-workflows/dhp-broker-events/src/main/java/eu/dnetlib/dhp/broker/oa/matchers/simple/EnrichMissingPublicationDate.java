@@ -18,9 +18,11 @@ public class EnrichMissingPublicationDate extends UpdateMatcher<Result, String> 
 	}
 
 	@Override
-	protected List<UpdateInfo<String>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<String>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		if (isMissing(target.getDateofacceptance()) && !isMissing(source.getDateofacceptance())) {
-			return Arrays.asList(generateUpdateInfo(source.getDateofacceptance().getValue(), source, target, dedupConfig));
+			return Arrays
+				.asList(generateUpdateInfo(source.getDateofacceptance().getValue(), source, target, dedupConfig));
 		}
 		return new ArrayList<>();
 	}

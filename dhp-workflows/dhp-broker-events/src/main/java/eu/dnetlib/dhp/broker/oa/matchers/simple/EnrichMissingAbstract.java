@@ -18,9 +18,11 @@ public class EnrichMissingAbstract extends UpdateMatcher<Result, String> {
 	}
 
 	@Override
-	protected List<UpdateInfo<String>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<String>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		if (isMissing(target.getDescription()) && !isMissing(source.getDescription())) {
-			return Arrays.asList(generateUpdateInfo(source.getDescription().get(0).getValue(), source, target, dedupConfig));
+			return Arrays
+				.asList(generateUpdateInfo(source.getDescription().get(0).getValue(), source, target, dedupConfig));
 		}
 		return new ArrayList<>();
 	}

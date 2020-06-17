@@ -213,10 +213,10 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
 				.setValue(
 					VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='description']"));
 
-			if (StringUtils.isNotBlank(description.getValue())
-				&& description.getValue().length() > 10000) {
-				description.setValue(description.getValue().substring(0, 10000));
-			}
+//			if (StringUtils.isNotBlank(description.getValue())
+//				&& description.getValue().length() > 10000) {
+//				description.setValue(description.getValue().substring(0, 10000));
+//			}
 
 			parsedObject.setDescription(Collections.singletonList(description));
 

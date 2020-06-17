@@ -21,7 +21,8 @@ public class EnrichMoreSubject extends UpdateMatcher<Result, Pair<String, String
 	}
 
 	@Override
-	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		final Set<String> existingSubjects = target
 			.getSubject()
 			.stream()

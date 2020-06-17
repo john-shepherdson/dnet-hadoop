@@ -20,10 +20,13 @@ public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
 	}
 
 	@Override
-	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		final long count = target.getPid().size();
 
-		if (count > 0) { return Arrays.asList(); }
+		if (count > 0) {
+			return Arrays.asList();
+		}
 
 		return source
 			.getPid()
@@ -33,7 +36,8 @@ public class EnrichMissingPid extends UpdateMatcher<Result, Pid> {
 			.collect(Collectors.toList());
 	}
 
-	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target, final DedupConfig dedupConfig) {
+	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		return new UpdateInfo<>(
 			Topic.ENRICH_MISSING_PID,
 			highlightValue, source, target,

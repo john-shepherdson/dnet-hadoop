@@ -22,7 +22,8 @@ public abstract class UpdateMatcher<K, T> {
 		this.multipleUpdate = multipleUpdate;
 	}
 
-	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final K res, final Collection<K> others, final DedupConfig dedupConfig) {
+	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final K res, final Collection<K> others,
+		final DedupConfig dedupConfig) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
 
@@ -30,7 +31,8 @@ public abstract class UpdateMatcher<K, T> {
 			if (source != res) {
 				for (final UpdateInfo<T> info : findUpdates(source, res, dedupConfig)) {
 					final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
-					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {} else {
+					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {
+					} else {
 						infoMap.put(s, info);
 					}
 				}

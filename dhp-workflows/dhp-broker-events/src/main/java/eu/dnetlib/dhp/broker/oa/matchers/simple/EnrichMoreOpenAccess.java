@@ -21,7 +21,8 @@ public class EnrichMoreOpenAccess extends UpdateMatcher<Result, Instance> {
 	}
 
 	@Override
-	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<Instance>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		final Set<String> urls = target
 			.getInstance()
 			.stream()

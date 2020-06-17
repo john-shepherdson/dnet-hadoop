@@ -23,7 +23,8 @@ public class EnrichMissingSubject extends UpdateMatcher<Result, Pair<String, Str
 	}
 
 	@Override
-	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target, final DedupConfig dedupConfig) {
+	protected List<UpdateInfo<Pair<String, String>>> findUpdates(final Result source, final Result target,
+		final DedupConfig dedupConfig) {
 		final Set<String> existingTypes = target
 			.getSubject()
 			.stream()
