@@ -10,9 +10,22 @@
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_tmp;
 CREATE TABLE ${stats_db_name}.datasource_tmp(`id` string, `name` STRING, `type` STRING, `dateofvalidation` STRING, `yearofvalidation` string, `harvested` BOOLEAN, `piwik_id` INT, `latitude` STRING, `longitude`STRING, `websiteurl` STRING, `compatibility` STRING) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties('transactional'='true');
 
-INSERT INTO ${stats_db_name}.datasource_tmp SELECT substr(d.id, 4) AS id, officialname.value AS name, datasourcetype.classname AS type, dateofvalidation.value AS dateofvalidation, date_format(d.dateofvalidation.value,'yyyy') AS yearofvalidation, FALSE AS harvested, 0 AS piwik_id, d.latitude.value AS latitude, d.longitude.value AS longitude, d.websiteurl.value AS websiteurl, d.openairecompatibility.classid AS compatibility
-FROM ${openaire_db_name}.datasource d
-WHERE d.datainfo.deletedbyinference=FALSE;
+-- Insert statement that takes into account the piwik_id of the openAIRE graph
+INSERT INTO ${stats_db_name}.datasource_tmp 
+SELECT substr(d1.id, 4) AS id, officialname.value AS name, 
+datasourcetype.classname AS type, dateofvalidation.value AS dateofvalidation, date_format(d1.dateofvalidation.value,'yyyy') AS yearofvalidation, 
+FALSE AS harvested, 
+CASE WHEN d2.piwik_id IS NULL THEN 0 ELSE d2.piwik_id END AS piwik_id, 
+d1.latitude.value AS latitude, d1.longitude.value AS longitude, 
+d1.websiteurl.value AS websiteurl, d1.openairecompatibility.classid AS compatibility
+FROM ${openaire_db_name}.datasource d1
+LEFT OUTER JOIN
+(SELECT id, split(originalidd, '\\:')[1] as piwik_id
+FROM ${openaire_db_name}.datasource
+LATERAL VIEW EXPLODE(originalid) temp AS originalidd
+WHERE originalidd like "piwik:%") AS d2
+ON d1.id = d2.id
+WHERE d1.datainfo.deletedbyinference=FALSE;
 
 -- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
 -- Creating a temporary dual table that will be removed after the following insert
