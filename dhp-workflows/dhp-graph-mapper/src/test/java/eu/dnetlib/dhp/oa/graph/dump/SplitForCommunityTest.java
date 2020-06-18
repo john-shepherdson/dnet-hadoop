@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
-import eu.dnetlib.dhp.schema.dump.oaf.Software;
 
 public class SplitForCommunityTest {
 

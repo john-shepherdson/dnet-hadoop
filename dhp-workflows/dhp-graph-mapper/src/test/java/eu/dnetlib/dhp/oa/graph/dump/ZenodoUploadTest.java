@@ -12,14 +12,14 @@ public class ZenodoUploadTest {
 	@Test
 	public void testConnection() throws IOException {
 		APIClient s = new APIClient(
-		//	"https://sandbox.zenodo.org/api/deposit/depositions?access_token=5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe");
-				"https://sandbox.zenodo.org/api/deposit/depositions");
+			// "https://sandbox.zenodo.org/api/deposit/depositions?access_token=5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe");
+			"https://sandbox.zenodo.org/api/deposit/depositions");
 
 		Assertions.assertEquals(201, s.connect());
 
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/zenodo/ni")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/zenodo/ni")
+			.getPath();
 
 		s.upload(sourcePath, "Neuroinformatics");
 
@@ -35,13 +35,13 @@ public class ZenodoUploadTest {
 	@Test
 	public void testUpload() throws IOException {
 
-		APIClient s = new APIClient("https://sandbox.zenodo.org/api/deposit/depositions?access_token=5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe");
+		APIClient s = new APIClient(
+			"https://sandbox.zenodo.org/api/deposit/depositions?access_token=5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe");
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/zenodo/ni")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/zenodo/ni")
+			.getPath();
 
 		s.upload(sourcePath, "Neuroinformatics");
-
 
 	}
 }

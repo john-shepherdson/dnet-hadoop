@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
-import eu.dnetlib.dhp.schema.dump.oaf.Software;
 
 public class UpdateProjectInfoTest {
 
