@@ -63,8 +63,14 @@ public final class UpdateInfo<T> {
 		return target;
 	}
 
-	private float calculateTrust(final DedupConfig dedupConfig, final OpenaireBrokerResult r1,
+	private float calculateTrust(final DedupConfig dedupConfig,
+		final OpenaireBrokerResult r1,
 		final OpenaireBrokerResult r2) {
+
+		if (dedupConfig == null) {
+			return BrokerConstants.MIN_TRUST;
+		}
+
 		try {
 			final ObjectMapper objectMapper = new ObjectMapper();
 			final MapDocument doc1 = MapDocumentUtil
