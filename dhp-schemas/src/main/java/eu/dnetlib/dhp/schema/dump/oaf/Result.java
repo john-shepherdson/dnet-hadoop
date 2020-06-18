@@ -48,6 +48,24 @@ public class Result extends OafEntity implements Serializable {
 
 	private Container container;// Journal
 
+	private List<String> documentationUrl; // software
+
+	private String codeRepositoryUrl; // software
+
+	private String programmingLanguage; // software
+
+	private List<String> contactperson; // orp
+
+	private List<String> contactgroup; // orp
+
+	private List<String> tool; // orp
+
+	private String size; // dataset
+
+	private String version; // dataset
+
+	private List<GeoLocation> geolocation; // dataset
+
 	public List<Author> getAuthor() {
 		return author;
 	}
@@ -208,4 +226,75 @@ public class Result extends OafEntity implements Serializable {
 		this.instance = instance;
 	}
 
+	public List<String> getDocumentationUrl() {
+		return documentationUrl;
+	}
+
+	public void setDocumentationUrl(List<String> documentationUrl) {
+		this.documentationUrl = documentationUrl;
+	}
+
+	public String getCodeRepositoryUrl() {
+		return codeRepositoryUrl;
+	}
+
+	public void setCodeRepositoryUrl(String codeRepositoryUrl) {
+		this.codeRepositoryUrl = codeRepositoryUrl;
+	}
+
+	public String getProgrammingLanguage() {
+		return programmingLanguage;
+	}
+
+	public void setProgrammingLanguage(String programmingLanguage) {
+		this.programmingLanguage = programmingLanguage;
+	}
+
+	public List<String> getContactperson() {
+		return contactperson;
+	}
+
+	public void setContactperson(List<String> contactperson) {
+		this.contactperson = contactperson;
+	}
+
+	public List<String> getContactgroup() {
+		return contactgroup;
+	}
+
+	public void setContactgroup(List<String> contactgroup) {
+		this.contactgroup = contactgroup;
+	}
+
+	public List<String> getTool() {
+		return tool;
+	}
+
+	public void setTool(List<String> tool) {
+		this.tool = tool;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public List<GeoLocation> getGeolocation() {
+		return geolocation;
+	}
+
+	public void setGeolocation(List<GeoLocation> geolocation) {
+		this.geolocation = geolocation;
+	}
 }

@@ -13,7 +13,7 @@ public class Country extends Qualifier {
 		this.provenance = provenance;
 	}
 
-	public static Country newInstance(String code, String label, String provenance){
+	public static Country newInstance(String code, String label, String provenance) {
 		Country c = new Country();
 		c.setProvenance(provenance);
 		c.setCode(code);
