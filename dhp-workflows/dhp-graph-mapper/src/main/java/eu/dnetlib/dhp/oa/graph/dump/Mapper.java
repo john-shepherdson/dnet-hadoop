@@ -294,8 +294,8 @@ public class Mapper implements Serializable {
 								.ifPresent(value -> instance.setPublicationdate(value.getValue()));
 							Optional
 								.ofNullable(i.getRefereed())
-								// .ifPresent(value -> instance.setRefereed(value.getClassname()));
-								.ifPresent(value -> instance.setRefereed(value.getValue()));
+								.ifPresent(value -> instance.setRefereed(value.getClassname()));
+							// .ifPresent(value -> instance.setRefereed(value.getValue()));
 							Optional
 								.ofNullable(i.getInstancetype())
 								.ifPresent(value -> instance.setType(value.getClassname()));

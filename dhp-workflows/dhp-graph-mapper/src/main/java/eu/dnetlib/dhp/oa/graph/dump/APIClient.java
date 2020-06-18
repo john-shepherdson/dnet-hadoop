@@ -4,15 +4,6 @@ package eu.dnetlib.dhp.oa.graph.dump;
 import java.io.*;
 import java.io.IOException;
 
-//import com.cloudera.org.apache.http.HttpResponse;
-//import com.cloudera.org.apache.http.client.HttpClient;
-//import com.cloudera.org.apache.http.client.methods.HttpPost;
-//import com.cloudera.org.apache.http.entity.StringEntity;
-//import com.cloudera.org.apache.http.impl.client.DefaultHttpClient;
-//import com.cloudera.org.apache.http.util.EntityUtils;
-import com.google.gson.Gson;
-
-import eu.dnetlib.dhp.oa.graph.dump.zenodo.ZenodoModel;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -26,6 +17,15 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+// import com.cloudera.org.apache.http.HttpResponse;
+// import com.cloudera.org.apache.http.client.HttpClient;
+// import com.cloudera.org.apache.http.client.methods.HttpPost;
+// import com.cloudera.org.apache.http.entity.StringEntity;
+// import com.cloudera.org.apache.http.impl.client.DefaultHttpClient;
+// import com.cloudera.org.apache.http.util.EntityUtils;
+import com.google.gson.Gson;
+
+import eu.dnetlib.dhp.oa.graph.dump.zenodo.ZenodoModel;
 
 public class APIClient implements Serializable {
 
@@ -54,14 +54,12 @@ public class APIClient implements Serializable {
 	public APIClient(String urlString) throws IOException {
 
 		this.urlString = urlString;
-		//connect();
+		// connect();
 	}
-
 
 	public int connect() throws IOException {
 
 		String json = "{}";
-
 
 		client = new DefaultHttpClient();
 
@@ -92,7 +90,8 @@ public class APIClient implements Serializable {
 		HttpEntity data = MultipartEntityBuilder.create().addBinaryBody(file_name, file).build();
 		post.setEntity(data);
 
-		//HttpUriRequest request = RequestBuilder.post(bucket + "/" + file_name +"?access_token=5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe").setEntity(data).build();
+		// HttpUriRequest request = RequestBuilder.post(bucket + "/" + file_name
+		// +"?access_token=5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe").setEntity(data).build();
 
 		HttpResponse response = client.execute(post);
 		System.out.println(response.getStatusLine().getStatusCode());
