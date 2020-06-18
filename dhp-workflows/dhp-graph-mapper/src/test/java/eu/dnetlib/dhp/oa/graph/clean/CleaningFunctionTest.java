@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -56,12 +57,18 @@ public class CleaningFunctionTest {
 		String json = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result.json"));
 		Publication p_in = MAPPER.readValue(json, Publication.class);
 
+		assertTrue(p_in instanceof Result);
+		assertTrue(p_in instanceof Publication);
+
 		Publication p_out = OafCleaner.apply(p_in, mapping);
 
 		assertNotNull(p_out);
 
 		assertEquals("und", p_out.getLanguage().getClassid());
 		assertEquals("Undetermined", p_out.getLanguage().getClassname());
+
+		assertEquals("DE", p_out.getCountry().get(0).getClassid());
+		assertEquals("Germany", p_out.getCountry().get(0).getClassname());
 
 		assertEquals("0018", p_out.getInstance().get(0).getInstancetype().getClassid());
 		assertEquals("Annotation", p_out.getInstance().get(0).getInstancetype().getClassname());
