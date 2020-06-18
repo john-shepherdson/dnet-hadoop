@@ -153,7 +153,7 @@ public class SplitForCommunityTest {
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/splitForCommunity")
 			.getPath();
 
-		SparkSplitForCommunity2.main(new String[] {
+		SparkSplitForCommunity.main(new String[] {
 			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
 			"-outputPath", workingDir.toString() + "/split",
