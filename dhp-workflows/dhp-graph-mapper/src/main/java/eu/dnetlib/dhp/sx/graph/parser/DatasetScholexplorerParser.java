@@ -159,7 +159,7 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
 					.setDescription(
 						descs
 							.stream()
-							.map(it -> it.length() < 10000 ? it : it.substring(0, 10000))
+//							.map(it -> it.length() < 10000 ? it : it.substring(0, 10000))
 							.map(
 								it -> {
 									final Field<String> d = new Field<>();
