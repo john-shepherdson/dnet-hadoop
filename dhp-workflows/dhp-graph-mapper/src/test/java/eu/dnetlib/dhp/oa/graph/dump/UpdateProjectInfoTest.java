@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.schema.dump.oaf.Result;
 import eu.dnetlib.dhp.schema.dump.oaf.Software;
 
 public class UpdateProjectInfoTest {
@@ -75,20 +76,19 @@ public class UpdateProjectInfoTest {
 
 		SparkUpdateProjectInfo.main(new String[] {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-resultTableName", "eu.dnetlib.dhp.schema.dump.oaf.Software",
 			"-preparedInfoPath", sourcePath + "/preparedInfo",
-			"-outputPath", workingDir.toString() + "/ext/software",
-			"-sourcePath", sourcePath + "/software"
+			"-outputPath", workingDir.toString() + "/result",
+			"-sourcePath", sourcePath + "/software.json"
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<Software> tmp = sc
-			.textFile(workingDir.toString() + "/ext/software")
-			.map(item -> OBJECT_MAPPER.readValue(item, Software.class));
+		JavaRDD<Result> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
 
-		org.apache.spark.sql.Dataset<Software> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(Software.class));
+		org.apache.spark.sql.Dataset<Result> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Result.class));
 
 		verificationDataset.show(false);
 

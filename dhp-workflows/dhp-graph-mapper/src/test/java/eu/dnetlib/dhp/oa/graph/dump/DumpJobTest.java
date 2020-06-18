@@ -151,10 +151,9 @@ public class DumpJobTest {
 		SparkDumpCommunityProducts.main(new String[] {
 			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/dataset",
+			"-outputPath", workingDir.toString() + "/result",
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-			"-dumpTableName", "eu.dnetlib.dhp.schema.dump.oaf.Dataset",
 			"-communityMap", new Gson().toJson(map)
 		});
 
@@ -162,12 +161,12 @@ public class DumpJobTest {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Dataset> tmp = sc
-			.textFile(workingDir.toString() + "/dataset")
-			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Dataset.class));
+		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
-		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Dataset> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Dataset.class));
+		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Result> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
 		Assertions.assertEquals(90, verificationDataset.count());
 		// verificationDataset.show(false);
@@ -198,7 +197,9 @@ public class DumpJobTest {
 
 		Assertions.assertTrue(verificationDataset.filter("size(context) > 0").count() == 90);
 
-		verificationDataset.select("instance.type").show(false);
+		Assertions.assertTrue(verificationDataset.filter("type = 'dataset'").count() == 90);
+
+		// verificationDataset.select("instance.type").show(false);
 
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
 
@@ -214,10 +215,9 @@ public class DumpJobTest {
 		SparkDumpCommunityProducts.main(new String[] {
 			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/publication",
+			"-outputPath", workingDir.toString() + "/result",
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-			"-dumpTableName", "eu.dnetlib.dhp.schema.dump.oaf.Publication",
 			"-communityMap", new Gson().toJson(map)
 		});
 
@@ -225,15 +225,17 @@ public class DumpJobTest {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Publication> tmp = sc
-			.textFile(workingDir.toString() + "/publication")
-			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Publication.class));
+		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
-		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Publication> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Publication.class));
+		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Result> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
 		Assertions.assertEquals(76, verificationDataset.count());
 		verificationDataset.show(false);
+
+		Assertions.assertEquals(76, verificationDataset.filter("type = 'publication'").count());
 
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
 
@@ -249,10 +251,9 @@ public class DumpJobTest {
 		SparkDumpCommunityProducts.main(new String[] {
 			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/software",
+			"-outputPath", workingDir.toString() + "/result",
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
-			"-dumpTableName", "eu.dnetlib.dhp.schema.dump.oaf.Software",
 			"-communityMap", new Gson().toJson(map)
 		});
 
@@ -260,14 +261,16 @@ public class DumpJobTest {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Software> tmp = sc
-			.textFile(workingDir.toString() + "/software")
-			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Software.class));
+		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
-		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Software> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Software.class));
+		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Result> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
 		Assertions.assertEquals(6, verificationDataset.count());
+
+		Assertions.assertEquals(6, verificationDataset.filter("type = 'software'").count());
 		verificationDataset.show(false);
 
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
@@ -284,10 +287,9 @@ public class DumpJobTest {
 		SparkDumpCommunityProducts.main(new String[] {
 			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/orp",
+			"-outputPath", workingDir.toString() + "/result",
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
-			"-dumpTableName", "eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct",
 			"-communityMap", new Gson().toJson(map)
 		});
 
@@ -295,14 +297,16 @@ public class DumpJobTest {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct> tmp = sc
-			.textFile(workingDir.toString() + "/orp")
-			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct.class));
+		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
-		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct.class));
+		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Result> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
 		Assertions.assertEquals(3, verificationDataset.count());
+
+		Assertions.assertEquals(3, verificationDataset.filter("type = 'other'").count());
 		verificationDataset.show(false);
 
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
