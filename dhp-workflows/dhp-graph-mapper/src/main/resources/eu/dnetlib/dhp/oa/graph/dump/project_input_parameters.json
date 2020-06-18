@@ -20,12 +20,6 @@
 		"paramRequired": false
 	},
 	{
-		"paramName":"tn",
-		"paramLongName":"resultTableName",
-		"paramDescription": "the name of the result table we are currently working on",
-		"paramRequired": true
-	},
-	{
 		"paramName": "pip",
 		"paramLongName": "preparedInfoPath",
 		"paramDescription": "the path of the association result projectlist",
