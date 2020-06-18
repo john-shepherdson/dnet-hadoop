@@ -52,13 +52,8 @@ public class SparkUpdateProjectInfo implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String resultClassName = parser.get("resultTableName");
-		log.info("resultTableName: {}", resultClassName);
-
 		final String preparedInfoPath = parser.get("preparedInfoPath");
 		log.info("preparedInfoPath: {}", preparedInfoPath);
-
-		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
 
@@ -67,33 +62,33 @@ public class SparkUpdateProjectInfo implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				extend(spark, inputPath, outputPath, preparedInfoPath, inputClazz);
+				extend(spark, inputPath, outputPath, preparedInfoPath);// , inputClazz);
 			});
 	}
 
-	private static <R extends Result> void extend(
+	private static void extend(
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
-		String preparedInfoPath,
-		Class<R> inputClazz) {
+		String preparedInfoPath) {// ,
+		// Class<R> inputClazz) {
 
-		Dataset<R> result = Utils.readPath(spark, inputPath, inputClazz);
+		Dataset<Result> result = Utils.readPath(spark, inputPath, Result.class);
 		Dataset<ResultProject> resultProject = Utils.readPath(spark, preparedInfoPath, ResultProject.class);
 		result
 			.joinWith(
 				resultProject, result.col("id").equalTo(resultProject.col("resultId")),
 				"left")
 			.map(value -> {
-				R r = value._1();
+				Result r = value._1();
 				Optional.ofNullable(value._2()).ifPresent(rp -> {
 					r.setProjects(rp.getProjectsList());
 				});
 				return r;
-			}, Encoders.bean(inputClazz))
+			}, Encoders.bean(Result.class))
 			.write()
 			.option("compression", "gzip")
-			.mode(SaveMode.Overwrite)
+			.mode(SaveMode.Append)
 			.json(outputPath);
 
 	}

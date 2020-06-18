@@ -4,8 +4,8 @@ package eu.dnetlib.dhp.oa.graph.dump;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.io.StringReader;
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -13,10 +13,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,15 +49,13 @@ public class SparkSplitForCommunity implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String resultClassName = parser.get("resultTableName");
-		log.info("resultTableName: {}", resultClassName);
+//        final String resultClassName = parser.get("resultTableName");
+//        log.info("resultTableName: {}", resultClassName);
 
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
 
 		final Optional<String> cm = Optional.ofNullable(parser.get("communityMap"));
-
-		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
 
@@ -80,7 +74,7 @@ public class SparkSplitForCommunity implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				execSplit(spark, inputPath, outputPath, communityMap.keySet(), inputClazz);
+				execSplit(spark, inputPath, outputPath, communityMap.keySet());// , inputClazz);
 			});
 	}
 
@@ -88,10 +82,14 @@ public class SparkSplitForCommunity implements Serializable {
 		return ISLookupClientFactory.getLookUpService(isLookUpUrl);
 	}
 
-	private static <R extends Result> void execSplit(SparkSession spark, String inputPath, String outputPath,
-		Set<String> communities, Class<R> inputClazz) {
+	private static void execSplit(SparkSession spark, String inputPath, String outputPath,
+		Set<String> communities) {// }, Class<R> inputClazz) {
 
-		Dataset<R> result = Utils.readPath(spark, inputPath, inputClazz);
+		Dataset<Result> result = Utils
+			.readPath(spark, inputPath + "/publication", Result.class)
+			.union(Utils.readPath(spark, inputPath + "/dataset", Result.class))
+			.union(Utils.readPath(spark, inputPath + "/orp", Result.class))
+			.union(Utils.readPath(spark, inputPath + "/software", Result.class));
 
 		communities
 			.stream()
@@ -99,16 +97,17 @@ public class SparkSplitForCommunity implements Serializable {
 
 	}
 
-	private static <R extends Result> void printResult(String c, Dataset<R> result, String outputPath) {
+	private static void printResult(String c, Dataset<Result> result, String outputPath) {
 		result
 			.filter(r -> containsCommunity(r, c))
+			.repartition(1)
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Append)
 			.json(outputPath + "/" + c);
 	}
 
-	private static <R extends Result> boolean containsCommunity(R r, String c) {
+	private static boolean containsCommunity(Result r, String c) {
 		if (Optional.ofNullable(r.getContext()).isPresent()) {
 			return r
 				.getContext()

@@ -57,8 +57,8 @@ public class SparkDumpCommunityProducts implements Serializable {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final String dumpClassName = parser.get("dumpTableName");
-		log.info("dumpClassName: {}", dumpClassName);
+//		final String dumpClassName = parser.get("dumpTableName");
+//		log.info("dumpClassName: {}", dumpClassName);
 
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
@@ -69,8 +69,8 @@ public class SparkDumpCommunityProducts implements Serializable {
 		final Optional<String> cm = Optional.ofNullable(parser.get("communityMap"));
 
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
-		Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result> dumpClazz = (Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result>) Class
-			.forName(dumpClassName);
+//		Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result> dumpClazz = (Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result>) Class
+//			.forName(dumpClassName);
 
 		SparkConf conf = new SparkConf();
 
@@ -89,7 +89,7 @@ public class SparkDumpCommunityProducts implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				execDump(spark, inputPath, outputPath, communityMap, inputClazz, dumpClazz);
+				execDump(spark, inputPath, outputPath, communityMap, inputClazz);// , dumpClazz);
 
 			});
 
@@ -103,14 +103,13 @@ public class SparkDumpCommunityProducts implements Serializable {
 		String inputPath,
 		String outputPath,
 		CommunityMap communityMap,
-		Class<I> inputClazz,
-		Class<O> dumpClazz) {
+		Class<I> inputClazz) {// Class<O> dumpClazz) {
 
 		// Set<String> communities = communityMap.keySet();
 		Dataset<I> tmp = Utils.readPath(spark, inputPath, inputClazz);
 
 		tmp
-			.map(value -> execMap(value, communityMap), Encoders.bean(dumpClazz))
+			.map(value -> execMap(value, communityMap), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class))
 			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -119,7 +118,7 @@ public class SparkDumpCommunityProducts implements Serializable {
 
 	}
 
-	private static <O extends eu.dnetlib.dhp.schema.dump.oaf.Result, I extends Result> O execMap(I value,
+	private static <I extends Result> eu.dnetlib.dhp.schema.dump.oaf.Result execMap(I value,
 		CommunityMap communityMap) {
 		{
 			Set<String> communities = communityMap.keySet();

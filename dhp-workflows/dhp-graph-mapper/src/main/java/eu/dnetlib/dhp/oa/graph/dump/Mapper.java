@@ -9,6 +9,7 @@ import javax.swing.text.html.Option;
 
 import org.apache.avro.generic.GenericData;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -17,15 +18,14 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class Mapper implements Serializable {
 
-	public static <I extends eu.dnetlib.dhp.schema.oaf.Result, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> O map(
+	public static <I extends eu.dnetlib.dhp.schema.oaf.Result> Result map(
 		I input, Map<String, String> communityMap) {
 
-		O out = null;
+		final Result out = new Result();
 		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> ort = Optional.ofNullable(input.getResulttype());
 		if (ort.isPresent()) {
 			switch (ort.get().getClassid()) {
 				case "publication":
-					out = (O) new Publication();
 					Optional<Journal> journal = Optional
 						.ofNullable(((eu.dnetlib.dhp.schema.oaf.Publication) input).getJournal());
 					if (journal.isPresent()) {
@@ -43,15 +43,15 @@ public class Mapper implements Serializable {
 						c.setSp(j.getSp());
 						c.setVol(j.getVol());
 						out.setContainer(c);
+						out.setType(ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE.getClassname());
 					}
 					break;
 				case "dataset":
-					Dataset d = new Dataset();
 					eu.dnetlib.dhp.schema.oaf.Dataset id = (eu.dnetlib.dhp.schema.oaf.Dataset) input;
-					Optional.ofNullable(id.getSize()).ifPresent(v -> d.setSize(v.getValue()));
-					Optional.ofNullable(id.getVersion()).ifPresent(v -> d.setVersion(v.getValue()));
+					Optional.ofNullable(id.getSize()).ifPresent(v -> out.setSize(v.getValue()));
+					Optional.ofNullable(id.getVersion()).ifPresent(v -> out.setVersion(v.getValue()));
 
-					d
+					out
 						.setGeolocation(
 							Optional
 								.ofNullable(id.getGeolocation())
@@ -69,19 +69,18 @@ public class Mapper implements Serializable {
 										.collect(Collectors.toList()))
 								.orElse(null));
 
-					out = (O) d;
-
+					out.setType(ModelConstants.DATASET_DEFAULT_RESULTTYPE.getClassname());
 					break;
 				case "software":
-					Software s = new Software();
+
 					eu.dnetlib.dhp.schema.oaf.Software is = (eu.dnetlib.dhp.schema.oaf.Software) input;
 					Optional
 						.ofNullable(is.getCodeRepositoryUrl())
-						.ifPresent(value -> s.setCodeRepositoryUrl(value.getValue()));
+						.ifPresent(value -> out.setCodeRepositoryUrl(value.getValue()));
 					Optional
 						.ofNullable(is.getDocumentationUrl())
 						.ifPresent(
-							value -> s
+							value -> out
 								.setDocumentationUrl(
 									value
 										.stream()
@@ -90,33 +89,35 @@ public class Mapper implements Serializable {
 
 					Optional
 						.ofNullable(is.getProgrammingLanguage())
-						.ifPresent(value -> s.setProgrammingLanguage(value.getClassid()));
+						.ifPresent(value -> out.setProgrammingLanguage(value.getClassid()));
 
-					out = (O) s;
+					out.setType(ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE.getClassname());
 					break;
 				case "other":
-					OtherResearchProduct or = new OtherResearchProduct();
+
 					eu.dnetlib.dhp.schema.oaf.OtherResearchProduct ir = (eu.dnetlib.dhp.schema.oaf.OtherResearchProduct) input;
-					or
+					out
 						.setContactgroup(
 							Optional
 								.ofNullable(ir.getContactgroup())
 								.map(value -> value.stream().map(cg -> cg.getValue()).collect(Collectors.toList()))
 								.orElse(null));
 
-					or
+					out
 						.setContactperson(
 							Optional
 								.ofNullable(ir.getContactperson())
 								.map(value -> value.stream().map(cp -> cp.getValue()).collect(Collectors.toList()))
 								.orElse(null));
-					or
+					out
 						.setTool(
 							Optional
 								.ofNullable(ir.getTool())
 								.map(value -> value.stream().map(t -> t.getValue()).collect(Collectors.toList()))
 								.orElse(null));
-					out = (O) or;
+
+					out.setType(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
+
 					break;
 			}
 			Optional<List<eu.dnetlib.dhp.schema.oaf.Author>> oAuthor = Optional.ofNullable(input.getAuthor());
@@ -293,6 +294,7 @@ public class Mapper implements Serializable {
 								.ifPresent(value -> instance.setPublicationdate(value.getValue()));
 							Optional
 								.ofNullable(i.getRefereed())
+								// .ifPresent(value -> instance.setRefereed(value.getClassname()));
 								.ifPresent(value -> instance.setRefereed(value.getValue()));
 							Optional
 								.ofNullable(i.getInstancetype())
