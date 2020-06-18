@@ -58,12 +58,12 @@ public class OpenaireBrokerResultAggregator<T>
 
 	@Override
 	public Encoder<OpenaireBrokerResult> bufferEncoder() {
-		return Encoders.kryo(OpenaireBrokerResult.class);
+		return Encoders.bean(OpenaireBrokerResult.class);
 	}
 
 	@Override
 	public Encoder<OpenaireBrokerResult> outputEncoder() {
-		return Encoders.kryo(OpenaireBrokerResult.class);
+		return Encoders.bean(OpenaireBrokerResult.class);
 	}
 
 }

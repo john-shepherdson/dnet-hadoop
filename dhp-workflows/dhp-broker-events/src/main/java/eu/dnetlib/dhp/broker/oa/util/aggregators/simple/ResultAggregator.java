@@ -38,13 +38,13 @@ public class ResultAggregator extends Aggregator<Tuple2<OpenaireBrokerResult, Re
 
 	@Override
 	public Encoder<ResultGroup> bufferEncoder() {
-		return Encoders.kryo(ResultGroup.class);
+		return Encoders.bean(ResultGroup.class);
 
 	}
 
 	@Override
 	public Encoder<ResultGroup> outputEncoder() {
-		return Encoders.kryo(ResultGroup.class);
+		return Encoders.bean(ResultGroup.class);
 
 	}
 
