@@ -1,0 +1,23 @@
+{
+  "subRelType": null,
+  "relClass": "datacite",
+  "dataInfo": {
+    "deletedbyinference": false,
+    "provenanceaction": null,
+    "inferred": null,
+    "inferenceprovenance": null,
+    "invisible": false,
+    "trust": "0.9"
+  },
+  "target": "50|00062410e2a15322480277d063c181bb",
+  "lastupdatetimestamp": null,
+  "relType": "IsReferencedBy",
+  "source": "60|4ee78ab329b49416b45c3774c132f244",
+  "collectedFrom": [
+    {
+      "dataInfo": null,
+      "value": "Europe PMC",
+      "key": "dli_________::europe_pmc__"
+    }
+  ]
+}

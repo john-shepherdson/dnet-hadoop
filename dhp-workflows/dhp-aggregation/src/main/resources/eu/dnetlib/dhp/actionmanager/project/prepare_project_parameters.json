@@ -1,0 +1,26 @@
+[
+  {
+  "paramName": "issm",
+  "paramLongName": "isSparkSessionManaged",
+  "paramDescription": "when true will stop SparkSession after job execution",
+  "paramRequired": false
+},
+{
+"paramName": "pjp",
+"paramLongName": "projectPath",
+"paramDescription": "the URL from where to get the programme file",
+"paramRequired": true
+},
+{
+"paramName": "o",
+"paramLongName": "outputPath",
+"paramDescription": "the path of the new ActionSet",
+"paramRequired": true
+},
+  {
+    "paramName": "dbp",
+    "paramLongName": "dbProjectPath",
+    "paramDescription": "the path of the project code read from db",
+    "paramRequired": true
+  }
+]

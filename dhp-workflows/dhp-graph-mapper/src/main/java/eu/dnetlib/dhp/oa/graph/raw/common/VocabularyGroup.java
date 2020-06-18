@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.oa.graph.raw.common;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +13,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class VocabularyGroup implements Serializable {
 
-	public static final String VOCABULARIES_XQUERY = "for $x in collection(' /db/DRIVER/VocabularyDSResources/VocabularyDSResourceType') \n"
+	public static final String VOCABULARIES_XQUERY = "for $x in collection('/db/DRIVER/VocabularyDSResources/VocabularyDSResourceType') \n"
 		+
 		"let $vocid := $x//VOCABULARY_NAME/@code\n" +
 		"let $vocname := $x//VOCABULARY_NAME/text()\n" +
@@ -46,7 +45,7 @@ public class VocabularyGroup implements Serializable {
 				}
 
 				vocs.addTerm(vocId, termId, termName);
-				vocs.addSynonyms(vocId, termId, termId);
+				// vocs.addSynonyms(vocId, termId, termId);
 			}
 		}
 
@@ -58,7 +57,7 @@ public class VocabularyGroup implements Serializable {
 				final String syn = arr[2].trim();
 
 				vocs.addSynonyms(vocId, termId, syn);
-				vocs.addSynonyms(vocId, termId, termId);
+				// vocs.addSynonyms(vocId, termId, termId);
 			}
 		}
 
@@ -135,7 +134,7 @@ public class VocabularyGroup implements Serializable {
 		Optional
 			.ofNullable(vocs.get(id))
 			.orElseThrow(() -> new IllegalArgumentException("missing vocabulary id: " + vocId))
-			.addSynonym(syn, termId);
+			.addSynonym(syn.toLowerCase(), termId);
 	}
 
 }

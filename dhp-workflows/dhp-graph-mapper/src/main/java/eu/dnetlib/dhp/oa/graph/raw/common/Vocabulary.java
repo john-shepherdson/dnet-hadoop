@@ -61,7 +61,7 @@ public class Vocabulary implements Serializable {
 	}
 
 	public VocabularyTerm getTermBySynonym(final String syn) {
-		return getTerm(synonyms.get(syn));
+		return getTerm(synonyms.get(syn.toLowerCase()));
 	}
 
 	public Qualifier getTermAsQualifier(final String termId) {

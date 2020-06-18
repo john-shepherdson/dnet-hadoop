@@ -42,6 +42,16 @@ public class Relation extends Oaf {
 	private String target;
 
 	/**
+	 * Was this relationship authoritatively validated?
+	 */
+	private Boolean validated;
+
+	/**
+	 * When was this relationship authoritatively validated.
+	 */
+	private String validationDate;
+
+	/**
 	 * List of relation specific properties. Values include 'similarityLevel', indicating the similarity score between a
 	 * pair of publications.
 	 */
@@ -95,6 +105,22 @@ public class Relation extends Oaf {
 		this.properties = properties;
 	}
 
+	public Boolean getValidated() {
+		return validated;
+	}
+
+	public void setValidated(Boolean validated) {
+		this.validated = validated;
+	}
+
+	public String getValidationDate() {
+		return validationDate;
+	}
+
+	public void setValidationDate(String validationDate) {
+		this.validationDate = validationDate;
+	}
+
 	public void mergeFrom(final Relation r) {
 
 		checkArgument(Objects.equals(getSource(), r.getSource()), "source ids must be equal");
@@ -137,4 +163,5 @@ public class Relation extends Oaf {
 	public int hashCode() {
 		return Objects.hash(relType, subRelType, relClass, source, target, collectedfrom);
 	}
+
 }

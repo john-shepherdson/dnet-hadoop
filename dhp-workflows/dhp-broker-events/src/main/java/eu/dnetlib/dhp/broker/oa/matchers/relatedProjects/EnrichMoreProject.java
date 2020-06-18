@@ -5,39 +5,38 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.Project;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.ResultWithRelations;
-import eu.dnetlib.dhp.schema.oaf.Project;
 
-public class EnrichMoreProject extends UpdateMatcher<eu.dnetlib.broker.objects.Project> {
+public class EnrichMoreProject extends UpdateMatcher<Project> {
 
 	public EnrichMoreProject() {
 		super(true,
 			prj -> Topic.ENRICH_MORE_PROJECT,
 			(p, prj) -> p.getProjects().add(prj),
-			prj -> prj.getFunder() + "::" + prj.getFundingProgram() + prj.getCode());
+			prj -> projectAsString(prj));
+	}
+
+	private static String projectAsString(final Project prj) {
+		return prj.getFunder() + "::" + prj.getFundingProgram() + "::" + prj.getCode();
 	}
 
 	@Override
-	protected List<eu.dnetlib.broker.objects.Project> findDifferences(final ResultWithRelations source,
-		final ResultWithRelations target) {
+	protected List<eu.dnetlib.broker.objects.Project> findDifferences(final OpenaireBrokerResult source,
+		final OpenaireBrokerResult target) {
 
-		final Set<String> existingProjects = source
+		final Set<String> existingProjects = target
 			.getProjects()
 			.stream()
-			.map(RelatedProject::getRelProject)
-			.map(Project::getId)
+			.map(EnrichMoreProject::projectAsString)
 			.collect(Collectors.toSet());
 
-		return target
+		return source
 			.getProjects()
 			.stream()
-			.map(RelatedProject::getRelProject)
-			.filter(p -> !existingProjects.contains(p.getId()))
-			.map(ConversionUtils::oafProjectToBrokerProject)
+			.filter(p -> !existingProjects.contains(projectAsString(p)))
 			.collect(Collectors.toList());
 	}
 

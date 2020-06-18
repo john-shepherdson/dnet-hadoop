@@ -6,9 +6,10 @@
 	},
 	{
 		"field": "identities",
-		"type": "not_used",
+		"type": "array",
 		"value": [
 			"274269ac6f3b::2579-5449",
+			"piwik:13",
 			null
 		]
 	},

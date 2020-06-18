@@ -1,0 +1,128 @@
+{
+  "dataInfo": {
+    "invisible": false,
+    "inferred": null,
+    "deletedbyinference": false,
+    "trust": "0.9",
+    "inferenceprovenance": null,
+    "provenanceaction": null
+  },
+  "lastupdatetimestamp": null,
+  "id": "50|9e117414be07bf03cbce8889d22d661a",
+  "originalId": [
+    "9e117414be07bf03cbce8889d22d661a"
+  ],
+  "collectedfrom": [
+    {
+      "key": "dli_________::crossref",
+      "value": "Crossref",
+      "dataInfo": null
+    }
+  ],
+  "pid": [
+    {
+      "value": "10.1007/978-94-017-3490-5_15",
+      "qualifier": {
+        "classid": "doi",
+        "classname": "doi",
+        "schemeid": "dnet:pid_types",
+        "schemename": "dnet:pid_types"
+      },
+      "dataInfo": null
+    }
+  ],
+  "dateofcollection": "2020-06-08T07:28:55.731Z",
+  "dateoftransformation": null,
+  "extraInfo": null,
+  "oaiprovenance": null,
+  "author": [
+    {
+      "fullname": "Calcaterra Domenico",
+      "name": null,
+      "surname": null,
+      "rank": null,
+      "pid": null,
+      "affiliation": null
+    },
+    {
+      "fullname": "Parise Mario",
+      "name": null,
+      "surname": null,
+      "rank": null,
+      "pid": null,
+      "affiliation": null
+    }
+  ],
+  "resulttype": {
+    "classid": "publication",
+    "classname": "publication",
+    "schemeid": "publication",
+    "schemename": "publication"
+  },
+  "language": null,
+  "country": null,
+  "subject":[
+    {
+      "value":"Strain-linked information about bacterial and archaeal biodiversity",
+      "qualifier":{
+        "classid":"dnet:subject",
+        "classname":"dnet:subject",
+        "schemeid":"",
+        "schemename":""
+      },
+      "dataInfo":null
+    }
+  ],
+  "title": [
+    {
+      "value": "The Contribution of Historical Information in the Assessment of Landslide Hazard",
+      "qualifier": null,
+      "dataInfo": null
+    }
+  ],
+  "relevantdate": [
+    {
+      "value": "2013-01-29T16:50:44Z",
+      "qualifier": {
+        "classid": "date",
+        "classname": "date",
+        "schemeid": "dnet::date",
+        "schemename": "dnet::date"
+      },
+      "dataInfo": null
+    }
+  ],
+  "description": [
+    {
+      "value": null,
+      "dataInfo": null
+    }
+  ],
+  "dateofacceptance": null,
+  "publisher": {
+    "value": "Springer Netherlands",
+    "dataInfo": null
+  },
+  "embargoenddate": null,
+  "source": null,
+  "fulltext": null,
+  "format": null,
+  "contributor": null,
+  "resourcetype": null,
+  "coverage": null,
+  "bestaccessright": null,
+  "context": null,
+  "externalReference": null,
+  "instance": [],
+  "journal": null,
+  "originalObjIdentifier": "dli_resolver::9e117414be07bf03cbce8889d22d661a",
+  "dlicollectedfrom": [
+    {
+      "id": "dli_________::crossref",
+      "name": "Crossref",
+      "completionStatus": "complete",
+      "collectionMode": "resolved"
+    }
+  ],
+  "completionStatus": "complete"
+}

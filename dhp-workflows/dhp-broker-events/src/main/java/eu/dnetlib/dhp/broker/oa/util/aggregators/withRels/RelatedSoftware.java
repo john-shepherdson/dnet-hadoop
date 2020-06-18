@@ -1,10 +1,16 @@
 
 package eu.dnetlib.dhp.broker.oa.util.aggregators.withRels;
 
-import eu.dnetlib.dhp.schema.oaf.Software;
+import java.io.Serializable;
 
-public class RelatedSoftware {
+import eu.dnetlib.broker.objects.Software;
 
+public class RelatedSoftware implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 7573383356943300157L;
 	private final String source;
 	private final String relType;
 	private final Software relSoftware;
