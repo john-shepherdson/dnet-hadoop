@@ -1,14 +1,11 @@
+
 package eu.dnetlib.dhp.oa.graph.dump;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.DbClient;
-import eu.dnetlib.dhp.oa.graph.dump.zenodo.Creator;
-import eu.dnetlib.dhp.oa.graph.dump.zenodo.Metadata;
-import eu.dnetlib.dhp.oa.graph.dump.zenodo.ZenodoModel;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import java.io.File;
+import java.io.Serializable;
+
+import javax.management.Query;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,72 +15,73 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.Serializable;
-import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 
 public class SendToZenodo implements Serializable {
 
-    private static final Log log = LogFactory.getLog(SendToZenodo.class);
+	private static final Log log = LogFactory.getLog(SendToZenodo.class);
 
+	public static void main(final String[] args) throws Exception {
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SendToZenodo.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/graph/dump/upload_zenodo.json")));
 
-    public static void main(final String[] args) throws Exception {
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils
-                        .toString(
-                                SendToZenodo.class
-                                        .getResourceAsStream(
-                                                "/eu/dnetlib/dhp/oa/graph/dump/upload_zenodo.json")));
+		parser.parseArgument(args);
 
-        parser.parseArgument(args);
+		final String hdfsPath = parser.get("hdfsPath");
+		final String hdfsNameNode = parser.get("hdfsNameNode");
+		final String access_token = parser.get("accessToken");
+		final String connection_url = parser.get("connectionUrl");
+		final String metadata = parser.get("metadata");
+		final String isLookUpUrl = parser.get("isLookUpUrl");
 
+		QueryInformationSystem qis = new QueryInformationSystem();
+		qis.setIsLookUp(ISLookupClientFactory.getLookUpService(isLookUpUrl));
+		CommunityMap communityMap = qis.getCommunityMap();
 
-        final String hdfsPath = parser.get("hdfsPath");
-        final String hdfsNameNode = parser.get("hdfsNameNode");
-        final String access_token = parser.get("accessToken");
-        final String connection_url = parser.get("url");
-        final String metadata = parser.get("metadata");
-        Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", hdfsNameNode);
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
 
-        FileSystem fileSystem = FileSystem.get(conf);
+		FileSystem fileSystem = FileSystem.get(conf);
 
+		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
+			.listFiles(
+				new Path(hdfsPath), true);
+		APIClient apiClient = new APIClient(connection_url, access_token);
+		apiClient.connect();
+		while (fileStatusListIterator.hasNext()) {
+			LocatedFileStatus fileStatus = fileStatusListIterator.next();
 
-        RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem.listFiles(
-               new Path(hdfsPath), true);
-        APIClient apiClient = new APIClient(connection_url, access_token);
-        apiClient.connect();
-        while(fileStatusListIterator.hasNext()){
-            LocatedFileStatus fileStatus = fileStatusListIterator.next();
+			Path p = fileStatus.getPath();
+			String p_string = p.toString();
+			String tmp = p_string.substring(0, p_string.lastIndexOf("/"));
+			String community = tmp.substring(tmp.lastIndexOf("/") + 1);
+			log.info("Sending information for community: " + community);
+			String community_name = communityMap.get(community).replace(" ", "_");
+			log.info("Copying information for community: " + community);
+			fileSystem.copyToLocalFile(p, new Path("/tmp/" + community_name));
+			File f = new File("/tmp/" + community_name);
+			try {
+				apiClient.upload(f, community_name);
+				apiClient.sendMretadata(metadata);
+				apiClient.publish();
+			} catch (Exception e) {
+				if (f.exists()) {
+					log.info("Deleting information for community: " + community);
+					f.delete();
+				}
+			} finally {
+				if (f.exists()) {
+					log.info("Deleting information for community: " + community);
+					f.delete();
+				}
+			}
+		}
 
-            Path p = fileStatus.getPath();
-            String p_string = p.toString();
-            String tmp = p_string.substring(0, p_string.lastIndexOf("/") );
-            String community = tmp.substring(tmp.lastIndexOf("/") + 1);
-            log.info("Sending information for community: " + community);
-            fileSystem.copyToLocalFile(p, new Path("/tmp/" + community));
-
-
-            File f = new File("/tmp/" + community);
-            apiClient.upload(f, community);
-            apiClient.sendMretadata(metadata);
-            apiClient.publish();
-
-            if (f.exists()){
-                f.delete();
-            }
-        }
-
-
-
-
-
-    }
-
+	}
 
 }

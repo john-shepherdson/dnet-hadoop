@@ -5,21 +5,12 @@ import java.io.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
-
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -27,6 +18,8 @@ import org.apache.http.util.EntityUtils;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.oa.graph.dump.zenodo.ZenodoModel;
+
+//import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 public class APIClient implements Serializable {
 
@@ -81,9 +74,26 @@ public class APIClient implements Serializable {
 
 		return response.getStatusLine().getStatusCode();
 
-
 	}
 
+//	public int upload(InputStream is, String file_name) throws IOException {
+//		HttpClient client = new DefaultHttpClient();
+//
+//		HttpPut put = new HttpPut(bucket + "/" + file_name);
+//		put.setHeader("Authorization", "Bearer " + access_token);
+//		put.addHeader("Content-Type", "application/zip");
+//
+//		HttpEntity data = MultipartEntityBuilder
+//			.create()
+//			// .addPart("file", new ByteArrayInputStream(is));
+//			.addBinaryBody(file_name, is, ContentType.APPLICATION_OCTET_STREAM, file_name)
+//			.build();
+//		put.setEntity(data);
+//
+//		HttpResponse response = client.execute(put);
+//
+//		return response.getStatusLine().getStatusCode();
+//	}
 
 	public int upload(File file, String file_name) throws IOException {
 		HttpClient client = new DefaultHttpClient();
@@ -112,12 +122,11 @@ public class APIClient implements Serializable {
 		HttpResponse response = client.execute(post);
 		return response.getStatusLine().getStatusCode();
 
-
 	}
 
 	public int publish() throws IOException {
 		HttpClient client = new DefaultHttpClient();
-		HttpPost post = new HttpPost(urlString +"/"+ deposition_id +"/actions/publish") ;
+		HttpPost post = new HttpPost(urlString + "/" + deposition_id + "/actions/publish");
 		post.setHeader("Authorization", "Bearer " + access_token);
 
 		HttpResponse response = client.execute(post);

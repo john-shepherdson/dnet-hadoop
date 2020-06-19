@@ -40,7 +40,7 @@ public class QueryInformationSystem {
 		this.isLookUp = isLookUpService;
 	}
 
-	public static CommunityMap getMap(List<String> communityMap) {
+	private CommunityMap getMap(List<String> communityMap) {
 		final CommunityMap map = new CommunityMap();
 
 		communityMap.stream().forEach(xml -> {
