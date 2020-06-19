@@ -11,9 +11,12 @@ public class RelatedSoftware implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 7573383356943300157L;
-	private final String source;
-	private final String relType;
-	private final Software relSoftware;
+	private String source;
+	private String relType;
+	private Software relSoftware;
+
+	public RelatedSoftware() {
+	}
 
 	public RelatedSoftware(final String source, final String relType, final Software relSoftware) {
 		this.source = source;
@@ -25,12 +28,24 @@ public class RelatedSoftware implements Serializable {
 		return source;
 	}
 
+	public void setSource(final String source) {
+		this.source = source;
+	}
+
 	public String getRelType() {
 		return relType;
 	}
 
+	public void setRelType(final String relType) {
+		this.relType = relType;
+	}
+
 	public Software getRelSoftware() {
 		return relSoftware;
+	}
+
+	public void setRelSoftware(final Software relSoftware) {
+		this.relSoftware = relSoftware;
 	}
 
 }

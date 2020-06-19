@@ -31,12 +31,9 @@ import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.OpenaireBrokerResultAg
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedEntityFactory;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
@@ -75,25 +72,38 @@ public class GenerateEventsApplication {
 		log.info("dedupConfigProfileId: {}", dedupConfigProfileId);
 
 		final SparkConf conf = new SparkConf();
-		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf.registerKryoClasses(BrokerConstants.getModelClasses());
+		// conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		// conf.registerKryoClasses(BrokerConstants.getModelClasses());
 
-		final DedupConfig dedupConfig = loadDedupConfig(isLookupUrl, dedupConfigProfileId);
+		// TODO UNCOMMENT
+		// final DedupConfig dedupConfig = loadDedupConfig(isLookupUrl, dedupConfigProfileId);
+		final DedupConfig dedupConfig = null;
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
 			removeOutputDir(spark, eventsPath);
 
-			spark
-				.emptyDataset(Encoders.kryo(Event.class))
-				.union(generateEvents(spark, graphPath, Publication.class, dedupConfig))
-				.union(generateEvents(spark, graphPath, eu.dnetlib.dhp.schema.oaf.Dataset.class, dedupConfig))
-				.union(generateEvents(spark, graphPath, Software.class, dedupConfig))
-				.union(generateEvents(spark, graphPath, OtherResearchProduct.class, dedupConfig))
+			// TODO REMOVE THIS
+			final Dataset<Project> projects = readPath(spark, graphPath + "/project", Project.class);
+			final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
+				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+				.cache();
+			relatedEntities(projects, rels, RelatedProject.class)
 				.write()
 				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
 				.json(eventsPath);
+
+			// TODO UNCOMMENT THIS
+			// spark
+			// .emptyDataset(Encoders.bean(Event.class))
+			// .union(generateEvents(spark, graphPath, Publication.class, dedupConfig))
+			// .union(generateEvents(spark, graphPath, eu.dnetlib.dhp.schema.oaf.Dataset.class, dedupConfig))
+			// .union(generateEvents(spark, graphPath, Software.class, dedupConfig))
+			// .union(generateEvents(spark, graphPath, OtherResearchProduct.class, dedupConfig))
+			// .write()
+			// .mode(SaveMode.Overwrite)
+			// .option("compression", "gzip")
+			// .json(eventsPath);
 		});
 
 	}
@@ -117,45 +127,48 @@ public class GenerateEventsApplication {
 			.toColumn();
 
 		return results
-			.joinWith(mergedRels, results.col("result.id").equalTo(mergedRels.col("source")), "inner")
+			.joinWith(mergedRels, results.col("openaireId").equalTo(mergedRels.col("source")), "inner")
 			.groupByKey(
 				(MapFunction<Tuple2<OpenaireBrokerResult, Relation>, String>) t -> t._2.getTarget(), Encoders.STRING())
 			.agg(aggr)
-			.map((MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.kryo(ResultGroup.class))
-			.filter(ResultGroup::isValid)
+			.map((MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.bean(ResultGroup.class))
+			.filter(rg -> rg.getData().size() > 1)
 			.map(
 				(MapFunction<ResultGroup, EventGroup>) g -> EventFinder.generateEvents(g, dedupConfig),
-				Encoders.kryo(EventGroup.class))
-			.flatMap(group -> group.getData().iterator(), Encoders.kryo(Event.class));
+				Encoders.bean(EventGroup.class))
+			.flatMap(group -> group.getData().iterator(), Encoders.bean(Event.class));
 	}
 
 	private static <SRC extends Result> Dataset<OpenaireBrokerResult> expandResultsWithRelations(
 		final SparkSession spark,
 		final String graphPath,
 		final Class<SRC> sourceClass) {
+
 		final Dataset<Project> projects = readPath(spark, graphPath + "/project", Project.class);
-		final Dataset<eu.dnetlib.dhp.schema.oaf.Dataset> datasets = readPath(
-			spark, graphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
-		final Dataset<Software> softwares = readPath(spark, graphPath + "/software", Software.class);
-		final Dataset<Publication> publications = readPath(spark, graphPath + "/publication", Publication.class);
+		// final Dataset<eu.dnetlib.dhp.schema.oaf.Dataset> datasets = readPath(
+		// spark, graphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
+		// final Dataset<Software> softwares = readPath(spark, graphPath + "/software", Software.class);
+		// final Dataset<Publication> publications = readPath(spark, graphPath + "/publication", Publication.class);
 
 		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
 			.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
 			.cache();
 
 		final Dataset<OpenaireBrokerResult> r0 = readPath(
-			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), Result.class)
+			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), sourceClass)
 				.filter(r -> r.getDataInfo().getDeletedbyinference())
-				.map(ConversionUtils::oafResultToBrokerResult, Encoders.kryo(OpenaireBrokerResult.class));
+				.map(ConversionUtils::oafResultToBrokerResult, Encoders.bean(OpenaireBrokerResult.class));
 
+		// TODO UNCOMMENT THIS
 		final Dataset<OpenaireBrokerResult> r1 = join(r0, rels, relatedEntities(projects, rels, RelatedProject.class));
-		final Dataset<OpenaireBrokerResult> r2 = join(r1, rels, relatedEntities(softwares, rels, RelatedProject.class));
-		final Dataset<OpenaireBrokerResult> r3 = join(r2, rels, relatedEntities(datasets, rels, RelatedProject.class));
-		final Dataset<OpenaireBrokerResult> r4 = join(
-			r3, rels, relatedEntities(publications, rels, RelatedProject.class));
-		;
+		// final Dataset<OpenaireBrokerResult> r2 = join(r1, rels, relatedEntities(softwares, rels,
+		// RelatedSoftware.class));
+		// final Dataset<OpenaireBrokerResult> r3 = join(r2, rels, relatedEntities(datasets, rels,
+		// RelatedDataset.class));
+		// final Dataset<OpenaireBrokerResult> r4 = join(r3, rels, relatedEntities(publications, rels,
+		// RelatedPublication.class));;
 
-		return r4;
+		return r0; // TODO it should be r4
 	}
 
 	private static <T, RT> Dataset<RT> relatedEntities(final Dataset<T> targets,
@@ -165,7 +178,7 @@ public class GenerateEventsApplication {
 			.joinWith(targets, targets.col("id").equalTo(rels.col("target")), "inner")
 			.map(
 				t -> RelatedEntityFactory.newRelatedEntity(t._1.getSource(), t._1.getRelType(), t._2, clazz),
-				Encoders.kryo(clazz));
+				Encoders.bean(clazz));
 	}
 
 	private static <T> Dataset<OpenaireBrokerResult> join(final Dataset<OpenaireBrokerResult> sources,
@@ -174,14 +187,14 @@ public class GenerateEventsApplication {
 
 		final TypedColumn<Tuple2<OpenaireBrokerResult, T>, OpenaireBrokerResult> aggr = new OpenaireBrokerResultAggregator<T>()
 			.toColumn();
-		;
 
 		return sources
-			.joinWith(typedRels, sources.col("result.id").equalTo(rels.col("source")), "left_outer")
+			.joinWith(typedRels, sources.col("openaireId").equalTo(rels.col("source")), "left_outer")
 			.groupByKey(
 				(MapFunction<Tuple2<OpenaireBrokerResult, T>, String>) t -> t._1.getOpenaireId(), Encoders.STRING())
 			.agg(aggr)
-			.map(t -> t._2, Encoders.kryo(OpenaireBrokerResult.class));
+			.map(t -> t._2, Encoders.bean(OpenaireBrokerResult.class));
+
 	}
 
 	public static <R> Dataset<R> readPath(
@@ -195,6 +208,7 @@ public class GenerateEventsApplication {
 	}
 
 	private static DedupConfig loadDedupConfig(final String isLookupUrl, final String profId) throws Exception {
+
 		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
 
 		final String conf = isLookUpService

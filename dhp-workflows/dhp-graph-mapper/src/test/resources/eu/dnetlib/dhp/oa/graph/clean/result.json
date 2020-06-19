@@ -202,6 +202,12 @@
   "contributor": [
   ],
   "country": [
+    {
+      "classid": "DE",
+      "classname": "DE",
+      "schemeid": "dnet:countries",
+      "schemename": "dnet:countries"
+    }
   ],
   "coverage": [
   ],

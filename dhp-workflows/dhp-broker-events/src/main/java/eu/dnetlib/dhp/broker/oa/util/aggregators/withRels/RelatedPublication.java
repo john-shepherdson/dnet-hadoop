@@ -12,9 +12,12 @@ public class RelatedPublication implements Serializable {
 	 */
 	private static final long serialVersionUID = 9021609640411395128L;
 
-	private final String source;
-	private final String relType;
-	private final Publication relPublication;
+	private String source;
+	private String relType;
+	private Publication relPublication;
+
+	public RelatedPublication() {
+	}
 
 	public RelatedPublication(final String source, final String relType, final Publication relPublication) {
 		this.source = source;
@@ -26,12 +29,24 @@ public class RelatedPublication implements Serializable {
 		return source;
 	}
 
+	public void setSource(final String source) {
+		this.source = source;
+	}
+
 	public String getRelType() {
 		return relType;
 	}
 
+	public void setRelType(final String relType) {
+		this.relType = relType;
+	}
+
 	public Publication getRelPublication() {
 		return relPublication;
+	}
+
+	public void setRelPublication(final Publication relPublication) {
+		this.relPublication = relPublication;
 	}
 
 }
