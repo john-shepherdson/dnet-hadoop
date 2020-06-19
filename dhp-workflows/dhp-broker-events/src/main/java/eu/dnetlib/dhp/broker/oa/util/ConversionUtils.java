@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -57,10 +56,6 @@ public class ConversionUtils {
 
 	public static TypedValue oafStructPropToBrokerTypedValue(final StructuredProperty sp) {
 		return sp != null ? new TypedValue(classId(sp.getQualifier()), sp.getValue()) : null;
-	}
-
-	public static final Pair<String, String> oafSubjectToPair(final StructuredProperty sp) {
-		return sp != null ? Pair.of(classId(sp.getQualifier()), sp.getValue()) : null;
 	}
 
 	public static final eu.dnetlib.broker.objects.Dataset oafDatasetToBrokerDataset(final Dataset d) {
@@ -121,55 +116,6 @@ public class ConversionUtils {
 		res.setExternalReferences(mappedList(result.getExternalReference(), ConversionUtils::oafExtRefToBrokerExtRef));
 
 		return res;
-	}
-
-	private static List<TypedValue> structPropTypedList(final List<StructuredProperty> list) {
-		if (list == null) {
-			return new ArrayList<>();
-		}
-
-		return list
-			.stream()
-			.map(ConversionUtils::oafStructPropToBrokerTypedValue)
-			.collect(Collectors.toList());
-	}
-
-	private static <F, T> List<T> mappedList(final List<F> list, final Function<F, T> func) {
-		if (list == null) {
-			return new ArrayList<>();
-		}
-
-		return list
-			.stream()
-			.map(func::apply)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
-	}
-
-	private static <F, T> List<T> flatMappedList(final List<F> list, final Function<F, List<T>> func) {
-		if (list == null) {
-			return new ArrayList<>();
-		}
-
-		return list
-			.stream()
-			.map(func::apply)
-			.flatMap(List::stream)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
-	}
-
-	private static <F, T> T mappedFirst(final List<F> list, final Function<F, T> func) {
-		if (list == null) {
-			return null;
-		}
-
-		return list
-			.stream()
-			.map(func::apply)
-			.filter(Objects::nonNull)
-			.findFirst()
-			.orElse(null);
 	}
 
 	private static eu.dnetlib.broker.objects.Author oafAuthorToBrokerAuthor(final Author author) {
@@ -300,4 +246,55 @@ public class ConversionUtils {
 				.collect(Collectors.toList())
 			: new ArrayList<>();
 	}
+
+	private static List<TypedValue> structPropTypedList(final List<StructuredProperty> list) {
+		if (list == null) {
+			return new ArrayList<>();
+		}
+
+		return list
+			.stream()
+			.map(ConversionUtils::oafStructPropToBrokerTypedValue)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
+
+	private static <F, T> List<T> mappedList(final List<F> list, final Function<F, T> func) {
+		if (list == null) {
+			return new ArrayList<>();
+		}
+
+		return list
+			.stream()
+			.map(func::apply)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
+
+	private static <F, T> List<T> flatMappedList(final List<F> list, final Function<F, List<T>> func) {
+		if (list == null) {
+			return new ArrayList<>();
+		}
+
+		return list
+			.stream()
+			.map(func::apply)
+			.flatMap(List::stream)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
+
+	private static <F, T> T mappedFirst(final List<F> list, final Function<F, T> func) {
+		if (list == null) {
+			return null;
+		}
+
+		return list
+			.stream()
+			.map(func::apply)
+			.filter(Objects::nonNull)
+			.findFirst()
+			.orElse(null);
+	}
+
 }

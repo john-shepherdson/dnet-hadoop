@@ -12,9 +12,12 @@ public class RelatedProject implements Serializable {
 	 */
 	private static final long serialVersionUID = 4941437626549329870L;
 
-	private final String source;
-	private final String relType;
-	private final Project relProject;
+	private String source;
+	private String relType;
+	private Project relProject;
+
+	public RelatedProject() {
+	}
 
 	public RelatedProject(final String source, final String relType, final Project relProject) {
 		this.source = source;
@@ -26,12 +29,24 @@ public class RelatedProject implements Serializable {
 		return source;
 	}
 
+	public void setSource(final String source) {
+		this.source = source;
+	}
+
 	public String getRelType() {
 		return relType;
 	}
 
+	public void setRelType(final String relType) {
+		this.relType = relType;
+	}
+
 	public Project getRelProject() {
 		return relProject;
+	}
+
+	public void setRelProject(final Project relProject) {
+		this.relProject = relProject;
 	}
 
 }

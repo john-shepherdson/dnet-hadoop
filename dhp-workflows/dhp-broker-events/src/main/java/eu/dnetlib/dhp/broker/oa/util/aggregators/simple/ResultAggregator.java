@@ -23,12 +23,14 @@ public class ResultAggregator extends Aggregator<Tuple2<OpenaireBrokerResult, Re
 
 	@Override
 	public ResultGroup reduce(final ResultGroup group, final Tuple2<OpenaireBrokerResult, Relation> t) {
-		return group.addElement(t._1);
+		group.getData().add(t._1);
+		return group;
 	}
 
 	@Override
 	public ResultGroup merge(final ResultGroup g1, final ResultGroup g2) {
-		return g1.addGroup(g2);
+		g1.getData().addAll(g2.getData());
+		return g1;
 	}
 
 	@Override

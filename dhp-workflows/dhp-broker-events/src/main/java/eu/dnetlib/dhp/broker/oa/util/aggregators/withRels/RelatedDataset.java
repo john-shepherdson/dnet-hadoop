@@ -11,9 +11,12 @@ public class RelatedDataset implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 774487705184038324L;
-	private final String source;
-	private final String relType;
-	private final Dataset relDataset;
+	private String source;
+	private String relType;
+	private Dataset relDataset;
+
+	public RelatedDataset() {
+	}
 
 	public RelatedDataset(final String source, final String relType, final Dataset relDataset) {
 		this.source = source;
@@ -25,12 +28,24 @@ public class RelatedDataset implements Serializable {
 		return source;
 	}
 
+	public void setSource(final String source) {
+		this.source = source;
+	}
+
 	public String getRelType() {
 		return relType;
 	}
 
+	public void setRelType(final String relType) {
+		this.relType = relType;
+	}
+
 	public Dataset getRelDataset() {
 		return relDataset;
+	}
+
+	public void setRelDataset(final Dataset relDataset) {
+		this.relDataset = relDataset;
 	}
 
 }

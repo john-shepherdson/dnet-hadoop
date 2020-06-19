@@ -29,8 +29,9 @@ import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultAggregator;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.OpenaireBrokerResultAggregator;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedEntityFactory;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -83,9 +84,11 @@ public class GenerateEventsApplication {
 			removeOutputDir(spark, eventsPath);
 
 			// TODO REMOVE THIS
-			readPath(spark, graphPath + "/publication", Publication.class)
-				.filter(r -> r.getDataInfo().getDeletedbyinference())
-				.map(ConversionUtils::oafResultToBrokerResult, Encoders.bean(OpenaireBrokerResult.class))
+			final Dataset<Project> projects = readPath(spark, graphPath + "/project", Project.class);
+			final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
+				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+				.cache();
+			relatedEntities(projects, rels, RelatedProject.class)
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(eventsPath);
@@ -129,7 +132,7 @@ public class GenerateEventsApplication {
 				(MapFunction<Tuple2<OpenaireBrokerResult, Relation>, String>) t -> t._2.getTarget(), Encoders.STRING())
 			.agg(aggr)
 			.map((MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.bean(ResultGroup.class))
-			.filter(ResultGroup::isValid)
+			.filter(rg -> rg.getData().size() > 1)
 			.map(
 				(MapFunction<ResultGroup, EventGroup>) g -> EventFinder.generateEvents(g, dedupConfig),
 				Encoders.bean(EventGroup.class))
@@ -141,15 +144,15 @@ public class GenerateEventsApplication {
 		final String graphPath,
 		final Class<SRC> sourceClass) {
 
-		// final Dataset<Project> projects = readPath(spark, graphPath + "/project", Project.class);
+		final Dataset<Project> projects = readPath(spark, graphPath + "/project", Project.class);
 		// final Dataset<eu.dnetlib.dhp.schema.oaf.Dataset> datasets = readPath(
 		// spark, graphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
 		// final Dataset<Software> softwares = readPath(spark, graphPath + "/software", Software.class);
 		// final Dataset<Publication> publications = readPath(spark, graphPath + "/publication", Publication.class);
 
-		// final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
-		// .filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
-		// .cache();
+		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
+			.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+			.cache();
 
 		final Dataset<OpenaireBrokerResult> r0 = readPath(
 			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), sourceClass)
@@ -157,8 +160,7 @@ public class GenerateEventsApplication {
 				.map(ConversionUtils::oafResultToBrokerResult, Encoders.bean(OpenaireBrokerResult.class));
 
 		// TODO UNCOMMENT THIS
-		// final Dataset<OpenaireBrokerResult> r1 = join(r0, rels, relatedEntities(projects, rels,
-		// RelatedProject.class));
+		final Dataset<OpenaireBrokerResult> r1 = join(r0, rels, relatedEntities(projects, rels, RelatedProject.class));
 		// final Dataset<OpenaireBrokerResult> r2 = join(r1, rels, relatedEntities(softwares, rels,
 		// RelatedSoftware.class));
 		// final Dataset<OpenaireBrokerResult> r3 = join(r2, rels, relatedEntities(datasets, rels,
