@@ -30,11 +30,9 @@ import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.OpenaireBrokerResultAggregator;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedEntityFactory;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
@@ -85,7 +83,9 @@ public class GenerateEventsApplication {
 			removeOutputDir(spark, eventsPath);
 
 			// TODO REMOVE THIS
-			expandResultsWithRelations(spark, graphPath, Publication.class)
+			readPath(spark, graphPath + "/publication", Publication.class)
+				.filter(r -> r.getDataInfo().getDeletedbyinference())
+				.map(ConversionUtils::oafResultToBrokerResult, Encoders.bean(OpenaireBrokerResult.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(eventsPath);
@@ -141,15 +141,15 @@ public class GenerateEventsApplication {
 		final String graphPath,
 		final Class<SRC> sourceClass) {
 
-		final Dataset<Project> projects = readPath(spark, graphPath + "/project", Project.class);
-		final Dataset<eu.dnetlib.dhp.schema.oaf.Dataset> datasets = readPath(
-			spark, graphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
-		final Dataset<Software> softwares = readPath(spark, graphPath + "/software", Software.class);
-		final Dataset<Publication> publications = readPath(spark, graphPath + "/publication", Publication.class);
+		// final Dataset<Project> projects = readPath(spark, graphPath + "/project", Project.class);
+		// final Dataset<eu.dnetlib.dhp.schema.oaf.Dataset> datasets = readPath(
+		// spark, graphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
+		// final Dataset<Software> softwares = readPath(spark, graphPath + "/software", Software.class);
+		// final Dataset<Publication> publications = readPath(spark, graphPath + "/publication", Publication.class);
 
-		final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
-			.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
-			.cache();
+		// final Dataset<Relation> rels = readPath(spark, graphPath + "/relation", Relation.class)
+		// .filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+		// .cache();
 
 		final Dataset<OpenaireBrokerResult> r0 = readPath(
 			spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), sourceClass)
@@ -185,7 +185,6 @@ public class GenerateEventsApplication {
 
 		final TypedColumn<Tuple2<OpenaireBrokerResult, T>, OpenaireBrokerResult> aggr = new OpenaireBrokerResultAggregator<T>()
 			.toColumn();
-		;
 
 		return sources
 			.joinWith(typedRels, sources.col("openaireId").equalTo(rels.col("source")), "left_outer")

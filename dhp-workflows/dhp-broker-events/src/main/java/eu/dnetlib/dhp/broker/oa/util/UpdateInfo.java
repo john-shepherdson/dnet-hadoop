@@ -122,13 +122,15 @@ public final class UpdateInfo<T> {
 			.orElse(null);
 		;
 
-		final Provenance provenance = new Provenance().setId(provId).setRepositoryName(provRepo).setUrl(provUrl);
+		final Provenance provenance = new Provenance(provId, provRepo, provUrl);
 
-		return new OpenAireEventPayload()
-			.setPublication(target)
-			.setHighlight(hl)
-			.setTrust(trust)
-			.setProvenance(provenance);
+		final OpenAireEventPayload res = new OpenAireEventPayload();
+		res.setResult(target);
+		res.setHighlight(hl);
+		res.setTrust(trust);
+		res.setProvenance(provenance);
+
+		return res;
 	}
 
 }
