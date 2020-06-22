@@ -102,7 +102,7 @@ public class ZenodoUploadTest {
 //			System.out.println(client.upload(bis, community));
 
 			File f = new File("/tmp/" + community_name);
-			client.upload(f, community_name);
+			System.out.println(client.upload(f, community_name));
 
 			if (f.exists()) {
 				f.delete();
