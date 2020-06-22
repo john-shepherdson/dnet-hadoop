@@ -144,6 +144,9 @@ public class CleanGraphSparkJob {
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
 						i.setAccessright(qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
 					}
+					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
+						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
+					}
 				}
 			}
 

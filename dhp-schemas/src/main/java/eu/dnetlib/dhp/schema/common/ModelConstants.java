@@ -1,6 +1,10 @@
 
 package eu.dnetlib.dhp.schema.common;
 
+import java.security.Key;
+
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class ModelConstants {
@@ -95,6 +99,9 @@ public class ModelConstants {
 		SYSIMPORT_CROSSWALK_ENTITYREGISTRY, SYSIMPORT_CROSSWALK_ENTITYREGISTRY,
 		DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS);
 
+	public static final KeyValue UNKNOWN_REPOSITORY = keyValue(
+		"10|openaire____::55045bd2a65019fd8e6741a755395c8c", "Unknown Repository");
+
 	private static Qualifier qualifier(
 		final String classid,
 		final String classname,
@@ -106,5 +113,13 @@ public class ModelConstants {
 		q.setSchemeid(schemeid);
 		q.setSchemename(schemename);
 		return q;
+	}
+
+	private static KeyValue keyValue(String key, String value) {
+		KeyValue kv = new KeyValue();
+		kv.setKey(key);
+		kv.setValue(value);
+		kv.setDataInfo(new DataInfo());
+		return kv;
 	}
 }
