@@ -5,24 +5,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.broker.objects.Instance;
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.OaBrokerInstance;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 
-public class EnrichMoreOpenAccess extends UpdateMatcher<Instance> {
+public class EnrichMoreOpenAccess extends UpdateMatcher<OaBrokerInstance> {
 
 	public EnrichMoreOpenAccess() {
 		super(true,
 			i -> Topic.ENRICH_MORE_OA_VERSION,
 			(p, i) -> p.getInstances().add(i),
-			Instance::getUrl);
+			OaBrokerInstance::getUrl);
 	}
 
 	@Override
-	protected List<Instance> findDifferences(final OpenaireBrokerResult source,
-		final OpenaireBrokerResult target) {
+	protected List<OaBrokerInstance> findDifferences(final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
 		final Set<String> urls = target
 			.getInstances()
 			.stream()

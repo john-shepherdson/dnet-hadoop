@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
-import eu.dnetlib.broker.objects.Project;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerProject;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 
-public class EnrichMoreProject extends UpdateMatcher<Project> {
+public class EnrichMoreProject extends UpdateMatcher<OaBrokerProject> {
 
 	public EnrichMoreProject() {
 		super(true,
@@ -19,13 +19,13 @@ public class EnrichMoreProject extends UpdateMatcher<Project> {
 			prj -> projectAsString(prj));
 	}
 
-	private static String projectAsString(final Project prj) {
+	private static String projectAsString(final OaBrokerProject prj) {
 		return prj.getFunder() + "::" + prj.getFundingProgram() + "::" + prj.getCode();
 	}
 
 	@Override
-	protected List<eu.dnetlib.broker.objects.Project> findDifferences(final OpenaireBrokerResult source,
-		final OpenaireBrokerResult target) {
+	protected List<OaBrokerProject> findDifferences(final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
 
 		final Set<String> existingProjects = target
 			.getProjects()

@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
-import eu.dnetlib.broker.objects.Software;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 
-public class EnrichMoreSoftware extends UpdateMatcher<Software> {
+public class EnrichMoreSoftware extends UpdateMatcher<OaBrokerRelatedSoftware> {
 
 	public EnrichMoreSoftware() {
 		super(true,
@@ -20,14 +20,14 @@ public class EnrichMoreSoftware extends UpdateMatcher<Software> {
 	}
 
 	@Override
-	protected List<eu.dnetlib.broker.objects.Software> findDifferences(
-		final OpenaireBrokerResult source,
-		final OpenaireBrokerResult target) {
+	protected List<OaBrokerRelatedSoftware> findDifferences(
+		final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
 
 		final Set<String> existingSoftwares = source
 			.getSoftwares()
 			.stream()
-			.map(Software::getName)
+			.map(OaBrokerRelatedSoftware::getName)
 			.collect(Collectors.toSet());
 
 		return target

@@ -11,7 +11,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 
 public class EventFactory {
@@ -49,8 +49,8 @@ public class EventFactory {
 	private static Map<String, Object> createMapFromResult(final UpdateInfo<?> updateInfo) {
 		final Map<String, Object> map = new HashMap<>();
 
-		final OpenaireBrokerResult source = updateInfo.getSource();
-		final OpenaireBrokerResult target = updateInfo.getTarget();
+		final OaBrokerMainEntity source = updateInfo.getSource();
+		final OaBrokerMainEntity target = updateInfo.getTarget();
 
 		map.put("target_datasource_id", target.getCollectedFromId());
 		map.put("target_datasource_name", target.getCollectedFromName());
