@@ -80,7 +80,7 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="send_zenodo"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -366,146 +366,19 @@
             <error to="Kill"/>
         </action>
 
-<!--    <join name="join_extend" to="fork_splitForCommunities"/>-->
-
-
-<!--    <fork name="fork_splitForCommunities">-->
-<!--        <path start="split_publication"/>-->
-<!--        <path start="split_dataset"/>-->
-<!--        <path start="split_orp"/>-->
-<!--        <path start="split_software"/>-->
-<!--    </fork>-->
-
-<!--    <action name="split_publication">-->
-<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
-<!--            <master>yarn</master>-->
-<!--            <mode>cluster</mode>-->
-<!--            <name>Split dumped result for community</name>-->
-<!--            <class>eu.dnetlib.dhp.oa.graph.dump.SparkSplitForCommunity</class>-->
-<!--            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>-->
-<!--            <spark-opts>-->
-<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
-<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
-<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
-<!--                &#45;&#45;conf spark.extraListeners=${spark2ExtraListeners}-->
-<!--                &#45;&#45;conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}-->
-<!--                &#45;&#45;conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}-->
-<!--                &#45;&#45;conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}-->
-<!--                &#45;&#45;conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}-->
-<!--            </spark-opts>-->
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${workingDir}/ext/publication</arg>-->
-<!--            <arg>&#45;&#45;outputPath</arg><arg>${outputPath}</arg>-->
-<!--            <arg>&#45;&#45;resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Publication</arg>-->
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
-<!--        </spark>-->
-<!--        <ok to="join_split"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
-
-<!--    <action name="split_dataset">-->
-<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
-<!--            <master>yarn</master>-->
-<!--            <mode>cluster</mode>-->
-<!--            <name>Split dumped result for community</name>-->
-<!--            <class>eu.dnetlib.dhp.oa.graph.dump.SparkSplitForCommunity</class>-->
-<!--            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>-->
-<!--            <spark-opts>-->
-<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
-<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
-<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
-<!--                &#45;&#45;conf spark.extraListeners=${spark2ExtraListeners}-->
-<!--                &#45;&#45;conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}-->
-<!--                &#45;&#45;conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}-->
-<!--                &#45;&#45;conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}-->
-<!--                &#45;&#45;conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}-->
-<!--            </spark-opts>-->
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${workingDir}/ext/dataset</arg>-->
-<!--            <arg>&#45;&#45;outputPath</arg><arg>${outputPath}</arg>-->
-<!--            <arg>&#45;&#45;resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Dataset</arg>-->
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
-<!--        </spark>-->
-<!--        <ok to="join_split"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
-<!--    <action name="split_orp">-->
-<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
-<!--            <master>yarn</master>-->
-<!--            <mode>cluster</mode>-->
-<!--            <name>Split dumped result for community</name>-->
-<!--            <class>eu.dnetlib.dhp.oa.graph.dump.SparkSplitForCommunity</class>-->
-<!--            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>-->
-<!--            <spark-opts>-->
-<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
-<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
-<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
-<!--                &#45;&#45;conf spark.extraListeners=${spark2ExtraListeners}-->
-<!--                &#45;&#45;conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}-->
-<!--                &#45;&#45;conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}-->
-<!--                &#45;&#45;conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}-->
-<!--                &#45;&#45;conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}-->
-<!--            </spark-opts>-->
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${workingDir}/ext/orp</arg>-->
-<!--            <arg>&#45;&#45;outputPath</arg><arg>${outputPath}</arg>-->
-<!--            <arg>&#45;&#45;resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.OtherResearchProduct</arg>-->
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
-<!--        </spark>-->
-<!--        <ok to="join_split"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
-<!--    <action name="split_software">-->
-<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
-<!--            <master>yarn</master>-->
-<!--            <mode>cluster</mode>-->
-<!--            <name>Split dumped result for community</name>-->
-<!--            <class>eu.dnetlib.dhp.oa.graph.dump.SparkSplitForCommunity</class>-->
-<!--            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>-->
-<!--            <spark-opts>-->
-<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
-<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
-<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
-<!--                &#45;&#45;conf spark.extraListeners=${spark2ExtraListeners}-->
-<!--                &#45;&#45;conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}-->
-<!--                &#45;&#45;conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}-->
-<!--                &#45;&#45;conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}-->
-<!--                &#45;&#45;conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}-->
-<!--            </spark-opts>-->
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${workingDir}/ext/software</arg>-->
-<!--            <arg>&#45;&#45;outputPath</arg><arg>${outputPath}</arg>-->
-<!--            <arg>&#45;&#45;resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Software</arg>-->
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
-<!--        </spark>-->
-<!--        <ok to="join_split"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
-
-<!--    <join name="join_split" to="loadInZenodo"/>-->
-<!--    <join name="join_split" to="End"/>-->
-
-<!--    <action name="loadInZenodo">-->
-<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
-<!--            <master>yarn</master>-->
-<!--            <mode>cluster</mode>-->
-<!--            <name>Import table software</name>-->
-<!--            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableImporterJob</class>-->
-<!--            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>-->
-<!--            <spark-opts>-->
-<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
-<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
-<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
-<!--                &#45;&#45;conf spark.extraListeners=${spark2ExtraListeners}-->
-<!--                &#45;&#45;conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}-->
-<!--                &#45;&#45;conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}-->
-<!--                &#45;&#45;conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}-->
-<!--                &#45;&#45;conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}-->
-<!--            </spark-opts>-->
-<!--            <arg>&#45;&#45;inputPath</arg><arg>${workingDir}/ext/publication</arg>-->
-<!--            <arg>&#45;&#45;hiveDbName</arg><arg>${hiveDbName}</arg>-->
-<!--            <arg>&#45;&#45;resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Publication</arg>-->
-<!--            -->
-<!--        </spark>-->
-<!--        <ok to="End"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
+    <action name="send_zenodo">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.SendToZenodo</main-class>
+            <arg>--hdfsPath</arg><arg>${outputPath}</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--accessToken</arg><arg>${accessToken}</arg>
+            <arg>--connectionUrl</arg><arg>${connectionUrl}</arg>
+            <arg>--metadata</arg><arg>${metadata}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
     <end name="End"/>
 
