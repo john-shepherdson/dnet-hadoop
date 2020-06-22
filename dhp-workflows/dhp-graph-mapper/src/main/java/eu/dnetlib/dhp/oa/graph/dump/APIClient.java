@@ -5,13 +5,16 @@ import java.io.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
+//import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -57,7 +60,7 @@ public class APIClient implements Serializable {
 
 		String json = "{}";
 
-		CloseableHttpClient client = HttpClients.createDefault();
+		HttpClient client = new DefaultHttpClient();
 
 		HttpPost post = new HttpPost(urlString);
 
@@ -73,7 +76,7 @@ public class APIClient implements Serializable {
 		ZenodoModel newSubmission = new Gson().fromJson(json, ZenodoModel.class);
 		this.bucket = newSubmission.getLinks().getBucket();
 		this.deposition_id = newSubmission.getId();
-		client.close();
+
 		return response.getStatusLine().getStatusCode();
 
 	}
@@ -98,23 +101,31 @@ public class APIClient implements Serializable {
 //	}
 
 	public int upload(File file, String file_name) throws IOException {
-		CloseableHttpClient client = HttpClients.createDefault();
+		HttpClient client = new DefaultHttpClient();
 
 		HttpPut put = new HttpPut(bucket + "/" + file_name);
 		put.setHeader("Authorization", "Bearer " + access_token);
 		put.addHeader("Content-Type", "application/zip");
-		HttpEntity data = MultipartEntityBuilder.create().addBinaryBody(file_name, file).build();
+		InputStreamEntity data = new InputStreamEntity(new FileInputStream(file), -1);
+		data.setContentType("binary/octet-stream");
+		data.setChunked(true); // Send in multiple parts if needed
+//		ByteArrayInputStream bais = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
+//		EntityUtils.toByteArray(new ByteArrayInputStream(FileUtils.readFileToByteArray(file)));
+//		InputStream targetStream = new FileInputStream(file);
+//		DataInputStream tmp = new DataInputStream(targetStream);
+//		HttpEntity data = new ByteArrayEntity(tmp.);
+//		HttpEntity data = MultipartEntityBuilder.create().addBinaryBody(file_name, file).build();
 		put.setEntity(data);
 
 		HttpResponse response = client.execute(put);
-		client.close();
+
 		return response.getStatusLine().getStatusCode();
 
 	}
 
 	public int sendMretadata(String metadata) throws IOException {
 
-		CloseableHttpClient client = HttpClients.createDefault();
+		HttpClient client = new DefaultHttpClient();
 		HttpPut post = new HttpPut(urlString + "/" + deposition_id);
 		post.setHeader("Authorization", "Bearer " + access_token);
 		post.addHeader("Content-Type", "application/json");
@@ -122,18 +133,18 @@ public class APIClient implements Serializable {
 		post.setEntity(entity);
 
 		HttpResponse response = client.execute(post);
-		client.close();
+
 		return response.getStatusLine().getStatusCode();
 
 	}
 
 	public int publish() throws IOException {
-		CloseableHttpClient client = HttpClients.createDefault();
+		HttpClient client = new DefaultHttpClient();
 		HttpPost post = new HttpPost(urlString + "/" + deposition_id + "/actions/publish");
 		post.setHeader("Authorization", "Bearer " + access_token);
 
 		HttpResponse response = client.execute(post);
-		client.close();
+
 		return response.getStatusLine().getStatusCode();
 	}
 
