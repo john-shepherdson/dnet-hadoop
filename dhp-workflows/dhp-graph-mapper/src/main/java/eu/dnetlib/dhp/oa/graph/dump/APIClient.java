@@ -12,7 +12,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
@@ -55,7 +57,7 @@ public class APIClient implements Serializable {
 
 		String json = "{}";
 
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 
 		HttpPost post = new HttpPost(urlString);
 
@@ -71,7 +73,7 @@ public class APIClient implements Serializable {
 		ZenodoModel newSubmission = new Gson().fromJson(json, ZenodoModel.class);
 		this.bucket = newSubmission.getLinks().getBucket();
 		this.deposition_id = newSubmission.getId();
-
+		client.close();
 		return response.getStatusLine().getStatusCode();
 
 	}
@@ -96,7 +98,7 @@ public class APIClient implements Serializable {
 //	}
 
 	public int upload(File file, String file_name) throws IOException {
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 
 		HttpPut put = new HttpPut(bucket + "/" + file_name);
 		put.setHeader("Authorization", "Bearer " + access_token);
@@ -105,14 +107,14 @@ public class APIClient implements Serializable {
 		put.setEntity(data);
 
 		HttpResponse response = client.execute(put);
-
+		client.close();
 		return response.getStatusLine().getStatusCode();
 
 	}
 
 	public int sendMretadata(String metadata) throws IOException {
 
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPut post = new HttpPut(urlString + "/" + deposition_id);
 		post.setHeader("Authorization", "Bearer " + access_token);
 		post.addHeader("Content-Type", "application/json");
@@ -120,17 +122,18 @@ public class APIClient implements Serializable {
 		post.setEntity(entity);
 
 		HttpResponse response = client.execute(post);
+		client.close();
 		return response.getStatusLine().getStatusCode();
 
 	}
 
 	public int publish() throws IOException {
-		HttpClient client = new DefaultHttpClient();
+		CloseableHttpClient client = HttpClients.createDefault();
 		HttpPost post = new HttpPost(urlString + "/" + deposition_id + "/actions/publish");
 		post.setHeader("Authorization", "Bearer " + access_token);
 
 		HttpResponse response = client.execute(post);
-
+		client.close();
 		return response.getStatusLine().getStatusCode();
 	}
 
