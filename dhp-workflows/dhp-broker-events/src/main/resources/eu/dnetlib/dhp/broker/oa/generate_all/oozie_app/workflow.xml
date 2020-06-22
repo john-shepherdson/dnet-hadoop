@@ -79,7 +79,6 @@
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     
-    
     <action name="ensure_working_path">
         <fs>
             <mkdir path='${workingPath}'/>
@@ -120,7 +119,6 @@
         <error to="Kill"/>
     </action>
 
-
     <action name="prepare_related_datasets">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -144,7 +142,6 @@
         <ok to="wait_entities_and_rels"/>
         <error to="Kill"/>
     </action>
-
 
     <action name="prepare_related_projects">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -170,7 +167,6 @@
         <error to="Kill"/>
     </action>
 
-
     <action name="prepare_related_publications">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -194,7 +190,6 @@
         <ok to="wait_entities_and_rels"/>
         <error to="Kill"/>
     </action>
-
 
     <action name="prepare_related_softwares">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -246,7 +241,6 @@
         <error to="Kill"/>
     </action>
 
-
     <action name="prepare_groups">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -270,7 +264,6 @@
         <ok to="generate_events"/>
         <error to="Kill"/>
     </action>
-
 
     <action name="generate_events">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -297,10 +290,6 @@
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-    
-    
-    
-    
 
     <end name="End"/>
 
