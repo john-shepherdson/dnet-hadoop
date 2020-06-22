@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.broker.objects.Author;
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.OaBrokerAuthor;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 
-public class EnrichMissingAuthorOrcid extends UpdateMatcher<Author> {
+public class EnrichMissingAuthorOrcid extends UpdateMatcher<OaBrokerAuthor> {
 
 	public EnrichMissingAuthorOrcid() {
 		super(true,
@@ -22,13 +22,13 @@ public class EnrichMissingAuthorOrcid extends UpdateMatcher<Author> {
 	}
 
 	@Override
-	protected List<Author> findDifferences(final OpenaireBrokerResult source,
-		final OpenaireBrokerResult target) {
+	protected List<OaBrokerAuthor> findDifferences(final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
 
 		final Set<String> existingOrcids = target
 			.getCreators()
 			.stream()
-			.map(Author::getOrcid)
+			.map(OaBrokerAuthor::getOrcid)
 			.filter(StringUtils::isNotBlank)
 			.collect(Collectors.toSet());
 

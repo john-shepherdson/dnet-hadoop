@@ -15,8 +15,16 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
-import eu.dnetlib.broker.objects.TypedValue;
+import eu.dnetlib.broker.objects.OaBrokerAuthor;
+import eu.dnetlib.broker.objects.OaBrokerExternalReference;
+import eu.dnetlib.broker.objects.OaBrokerInstance;
+import eu.dnetlib.broker.objects.OaBrokerJournal;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerProject;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDataset;
+import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
+import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
+import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.ExternalReference;
@@ -35,13 +43,13 @@ public class ConversionUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ConversionUtils.class);
 
-	public static List<eu.dnetlib.broker.objects.Instance> oafInstanceToBrokerInstances(final Instance i) {
+	public static List<OaBrokerInstance> oafInstanceToBrokerInstances(final Instance i) {
 		if (i == null) {
 			return new ArrayList<>();
 		}
 
 		return mappedList(i.getUrl(), url -> {
-			final eu.dnetlib.broker.objects.Instance res = new eu.dnetlib.broker.objects.Instance();
+			final OaBrokerInstance res = new OaBrokerInstance();
 			res.setUrl(url);
 			res.setInstancetype(classId(i.getInstancetype()));
 			res.setLicense(BrokerConstants.OPEN_ACCESS);
@@ -50,20 +58,21 @@ public class ConversionUtils {
 		});
 	}
 
-	public static TypedValue oafPidToBrokerPid(final StructuredProperty sp) {
+	public static OaBrokerTypedValue oafPidToBrokerPid(final StructuredProperty sp) {
 		return oafStructPropToBrokerTypedValue(sp);
 	}
 
-	public static TypedValue oafStructPropToBrokerTypedValue(final StructuredProperty sp) {
-		return sp != null ? new TypedValue(classId(sp.getQualifier()), sp.getValue()) : null;
+	public static OaBrokerTypedValue oafStructPropToBrokerTypedValue(final StructuredProperty sp) {
+		return sp != null ? new OaBrokerTypedValue(classId(sp.getQualifier()), sp.getValue()) : null;
 	}
 
-	public static final eu.dnetlib.broker.objects.Dataset oafDatasetToBrokerDataset(final Dataset d) {
+	public static final OaBrokerRelatedDataset oafDatasetToBrokerDataset(final Dataset d) {
 		if (d == null) {
 			return null;
 		}
 
-		final eu.dnetlib.broker.objects.Dataset res = new eu.dnetlib.broker.objects.Dataset();
+		final OaBrokerRelatedDataset res = new OaBrokerRelatedDataset();
+		res.setOpenaireId(d.getId());
 		res.setOriginalId(first(d.getOriginalId()));
 		res.setTitle(structPropValue(d.getTitle()));
 		res.setPids(mappedList(d.getPid(), ConversionUtils::oafPidToBrokerPid));
@@ -72,12 +81,13 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static eu.dnetlib.broker.objects.Publication oafPublicationToBrokerPublication(final Publication p) {
+	public static OaBrokerRelatedPublication oafPublicationToBrokerPublication(final Publication p) {
 		if (p == null) {
 			return null;
 		}
 
-		final eu.dnetlib.broker.objects.Publication res = new eu.dnetlib.broker.objects.Publication();
+		final OaBrokerRelatedPublication res = new OaBrokerRelatedPublication();
+		res.setOpenaireId(p.getId());
 		res.setOriginalId(first(p.getOriginalId()));
 		res.setTitle(structPropValue(p.getTitle()));
 		res.setPids(mappedList(p.getPid(), ConversionUtils::oafPidToBrokerPid));
@@ -87,12 +97,12 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final OpenaireBrokerResult oafResultToBrokerResult(final Result result) {
+	public static final OaBrokerMainEntity oafResultToBrokerResult(final Result result) {
 		if (result == null) {
 			return null;
 		}
 
-		final OpenaireBrokerResult res = new OpenaireBrokerResult();
+		final OaBrokerMainEntity res = new OaBrokerMainEntity();
 
 		res.setOpenaireId(result.getId());
 		res.setOriginalId(first(result.getOriginalId()));
@@ -118,7 +128,7 @@ public class ConversionUtils {
 		return res;
 	}
 
-	private static eu.dnetlib.broker.objects.Author oafAuthorToBrokerAuthor(final Author author) {
+	private static OaBrokerAuthor oafAuthorToBrokerAuthor(final Author author) {
 		if (author == null) {
 			return null;
 		}
@@ -135,15 +145,15 @@ public class ConversionUtils {
 			.findFirst()
 			.orElse(null) : null;
 
-		return new eu.dnetlib.broker.objects.Author(author.getFullname(), pids);
+		return new OaBrokerAuthor(author.getFullname(), pids);
 	}
 
-	private static eu.dnetlib.broker.objects.Journal oafJournalToBrokerJournal(final Journal journal) {
+	private static OaBrokerJournal oafJournalToBrokerJournal(final Journal journal) {
 		if (journal == null) {
 			return null;
 		}
 
-		final eu.dnetlib.broker.objects.Journal res = new eu.dnetlib.broker.objects.Journal();
+		final OaBrokerJournal res = new OaBrokerJournal();
 		res.setName(journal.getName());
 		res.setIssn(journal.getIssnPrinted());
 		res.setEissn(journal.getIssnOnline());
@@ -152,12 +162,12 @@ public class ConversionUtils {
 		return res;
 	}
 
-	private static eu.dnetlib.broker.objects.ExternalReference oafExtRefToBrokerExtRef(final ExternalReference ref) {
+	private static OaBrokerExternalReference oafExtRefToBrokerExtRef(final ExternalReference ref) {
 		if (ref == null) {
 			return null;
 		}
 
-		final eu.dnetlib.broker.objects.ExternalReference res = new eu.dnetlib.broker.objects.ExternalReference();
+		final OaBrokerExternalReference res = new OaBrokerExternalReference();
 		res.setRefidentifier(ref.getRefidentifier());
 		res.setSitename(ref.getSitename());
 		res.setType(classId(ref.getQualifier()));
@@ -165,12 +175,13 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final eu.dnetlib.broker.objects.Project oafProjectToBrokerProject(final Project p) {
+	public static final OaBrokerProject oafProjectToBrokerProject(final Project p) {
 		if (p == null) {
 			return null;
 		}
 
-		final eu.dnetlib.broker.objects.Project res = new eu.dnetlib.broker.objects.Project();
+		final OaBrokerProject res = new OaBrokerProject();
+		res.setOpenaireId(p.getId());
 		res.setTitle(fieldValue(p.getTitle()));
 		res.setAcronym(fieldValue(p.getAcronym()));
 		res.setCode(fieldValue(p.getCode()));
@@ -190,12 +201,13 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final eu.dnetlib.broker.objects.Software oafSoftwareToBrokerSoftware(final Software sw) {
+	public static final OaBrokerRelatedSoftware oafSoftwareToBrokerSoftware(final Software sw) {
 		if (sw == null) {
 			return null;
 		}
 
-		final eu.dnetlib.broker.objects.Software res = new eu.dnetlib.broker.objects.Software();
+		final OaBrokerRelatedSoftware res = new OaBrokerRelatedSoftware();
+		res.setOpenaireId(sw.getId());
 		res.setName(structPropValue(sw.getTitle()));
 		res.setDescription(fieldValue(sw.getDescription()));
 		res.setRepository(fieldValue(sw.getCodeRepositoryUrl()));
@@ -247,7 +259,7 @@ public class ConversionUtils {
 			: new ArrayList<>();
 	}
 
-	private static List<TypedValue> structPropTypedList(final List<StructuredProperty> list) {
+	private static List<OaBrokerTypedValue> structPropTypedList(final List<StructuredProperty> list) {
 		if (list == null) {
 			return new ArrayList<>();
 		}

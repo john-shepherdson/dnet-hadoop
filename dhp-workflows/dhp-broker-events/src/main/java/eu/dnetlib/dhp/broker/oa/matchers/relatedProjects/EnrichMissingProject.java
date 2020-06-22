@@ -4,12 +4,12 @@ package eu.dnetlib.dhp.broker.oa.matchers.relatedProjects;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
-import eu.dnetlib.broker.objects.Project;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerProject;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 
-public class EnrichMissingProject extends UpdateMatcher<Project> {
+public class EnrichMissingProject extends UpdateMatcher<OaBrokerProject> {
 
 	public EnrichMissingProject() {
 		super(true,
@@ -19,7 +19,7 @@ public class EnrichMissingProject extends UpdateMatcher<Project> {
 	}
 
 	@Override
-	protected List<Project> findDifferences(final OpenaireBrokerResult source, final OpenaireBrokerResult target) {
+	protected List<OaBrokerProject> findDifferences(final OaBrokerMainEntity source, final OaBrokerMainEntity target) {
 		if (target.getProjects().isEmpty()) {
 			return source.getProjects();
 		} else {
