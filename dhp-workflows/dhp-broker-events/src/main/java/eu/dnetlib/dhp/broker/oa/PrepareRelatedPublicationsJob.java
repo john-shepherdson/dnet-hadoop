@@ -13,22 +13,27 @@ import org.apache.spark.sql.SaveMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDataset;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedPublication;
+import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
-public class GenerateRelatedDatasets {
+public class PrepareRelatedPublicationsJob {
 
-	private static final Logger log = LoggerFactory.getLogger(GenerateRelatedDatasets.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareRelatedPublicationsJob.class);
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					GenerateRelatedDatasets.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_relations.json")));
+					PrepareRelatedPublicationsJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -40,7 +45,10 @@ public class GenerateRelatedDatasets {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String relsPath = parser.get("relsPath");
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath: {}", workingPath);
+
+		final String relsPath = workingPath + "/relatedPublications";
 		log.info("relsPath: {}", relsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -49,19 +57,19 @@ public class GenerateRelatedDatasets {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
-			final Dataset<eu.dnetlib.dhp.schema.oaf.Dataset> datasets = ClusterUtils
-				.readPath(spark, graphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
+			final Dataset<Publication> pubs = ClusterUtils
+				.readPath(spark, graphPath + "/publication", Publication.class);
 
 			final Dataset<Relation> rels = ClusterUtils.readPath(spark, graphPath + "/relation", Relation.class);
 
 			rels
-				.joinWith(datasets, datasets.col("id").equalTo(rels.col("target")), "inner")
+				.joinWith(pubs, pubs.col("id").equalTo(rels.col("target")), "inner")
 				.map(
-					t -> new RelatedDataset(
+					t -> new RelatedPublication(
 						t._1.getSource(),
 						t._1.getRelType(),
-						ConversionUtils.oafDatasetToBrokerDataset(t._2)),
-					Encoders.bean(RelatedDataset.class))
+						ConversionUtils.oafPublicationToBrokerPublication(t._2)),
+					Encoders.bean(RelatedPublication.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(relsPath);

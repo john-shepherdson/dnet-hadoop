@@ -7,7 +7,7 @@
 	},
 	{
 		"paramName": "o",
-		"paramLongName": "eventsPath",
+		"paramLongName": "workingPath",
 		"paramDescription": "the path where the generated events will be stored",
 		"paramRequired": true
 	},

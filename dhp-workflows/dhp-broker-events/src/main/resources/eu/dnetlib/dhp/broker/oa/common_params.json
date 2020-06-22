@@ -7,8 +7,8 @@
 	},
 	{
 		"paramName": "o",
-		"paramLongName": "relsPath",
-		"paramDescription": "the path where the generated relations will be stored",
+		"paramLongName": "workingPath",
+		"paramDescription": "the path where the temporary data will be stored",
 		"paramRequired": true
 	}
 ]

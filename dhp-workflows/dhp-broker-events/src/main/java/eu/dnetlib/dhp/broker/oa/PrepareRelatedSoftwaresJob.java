@@ -18,14 +18,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedSoftware;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Software;
 
-public class GenerateRelatedProjects {
+public class PrepareRelatedSoftwaresJob {
 
-	private static final Logger log = LoggerFactory.getLogger(GenerateRelatedProjects.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareRelatedSoftwaresJob.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -33,8 +32,8 @@ public class GenerateRelatedProjects {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					GenerateRelatedProjects.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_relations.json")));
+					PrepareRelatedSoftwaresJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -46,7 +45,10 @@ public class GenerateRelatedProjects {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String relsPath = parser.get("relsPath");
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath: {}", workingPath);
+
+		final String relsPath = workingPath + "/relatedSoftwares";
 		log.info("relsPath: {}", relsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -55,23 +57,22 @@ public class GenerateRelatedProjects {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
-			final Dataset<Project> projects = ClusterUtils.readPath(spark, graphPath + "/project", Project.class);
+			final Dataset<Software> softwares = ClusterUtils.readPath(spark, graphPath + "/software", Software.class);
 
-			final Dataset<Relation> rels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
-				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_PROJECT));
+			final Dataset<Relation> rels = ClusterUtils.readPath(spark, graphPath + "/relation", Relation.class);
 
 			rels
-				.joinWith(projects, projects.col("id").equalTo(rels.col("target")), "inner")
+				.joinWith(softwares, softwares.col("id").equalTo(rels.col("target")), "inner")
 				.map(
-					t -> new RelatedProject(
+					t -> new RelatedSoftware(
 						t._1.getSource(),
 						t._1.getRelType(),
-						ConversionUtils.oafProjectToBrokerProject(t._2)),
-					Encoders.bean(RelatedProject.class))
+						ConversionUtils.oafSoftwareToBrokerSoftware(t._2)),
+					Encoders.bean(RelatedSoftware.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(relsPath);
+
 		});
 
 	}
