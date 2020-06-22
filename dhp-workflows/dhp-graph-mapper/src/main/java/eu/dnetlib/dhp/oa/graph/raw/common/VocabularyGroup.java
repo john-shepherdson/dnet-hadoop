@@ -122,7 +122,11 @@ public class VocabularyGroup implements Serializable {
 	}
 
 	public boolean vocabularyExists(final String vocId) {
-		return vocs.containsKey(vocId.toLowerCase());
+		return Optional
+			.ofNullable(vocId)
+			.map(String::toLowerCase)
+			.map(id -> vocs.containsKey(id))
+			.orElse(false);
 	}
 
 	private void addSynonyms(final String vocId, final String termId, final String syn) {

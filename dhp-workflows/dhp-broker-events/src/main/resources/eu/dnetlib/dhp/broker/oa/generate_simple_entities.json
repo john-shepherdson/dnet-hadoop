@@ -1,0 +1,14 @@
+[
+	{
+		"paramName": "g",
+		"paramLongName": "graphPath",
+		"paramDescription": "the path where there the graph is stored",
+		"paramRequired": true
+	},
+	{
+		"paramName": "o",
+		"paramLongName": "simpleEntitiesPath",
+		"paramDescription": "the path where the generated simple entities (without relations) will be stored",
+		"paramRequired": true
+	}
+]

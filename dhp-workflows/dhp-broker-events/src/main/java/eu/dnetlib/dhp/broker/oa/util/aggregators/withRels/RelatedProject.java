@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.broker.oa.util.aggregators.withRels;
 
 import java.io.Serializable;
 
-import eu.dnetlib.broker.objects.Project;
+import eu.dnetlib.broker.objects.OaBrokerProject;
 
 public class RelatedProject implements Serializable {
 
@@ -12,11 +12,14 @@ public class RelatedProject implements Serializable {
 	 */
 	private static final long serialVersionUID = 4941437626549329870L;
 
-	private final String source;
-	private final String relType;
-	private final Project relProject;
+	private String source;
+	private String relType;
+	private OaBrokerProject relProject;
 
-	public RelatedProject(final String source, final String relType, final Project relProject) {
+	public RelatedProject() {
+	}
+
+	public RelatedProject(final String source, final String relType, final OaBrokerProject relProject) {
 		this.source = source;
 		this.relType = relType;
 		this.relProject = relProject;
@@ -26,12 +29,24 @@ public class RelatedProject implements Serializable {
 		return source;
 	}
 
+	public void setSource(final String source) {
+		this.source = source;
+	}
+
 	public String getRelType() {
 		return relType;
 	}
 
-	public Project getRelProject() {
+	public void setRelType(final String relType) {
+		this.relType = relType;
+	}
+
+	public OaBrokerProject getRelProject() {
 		return relProject;
+	}
+
+	public void setRelProject(final OaBrokerProject relProject) {
+		this.relProject = relProject;
 	}
 
 }

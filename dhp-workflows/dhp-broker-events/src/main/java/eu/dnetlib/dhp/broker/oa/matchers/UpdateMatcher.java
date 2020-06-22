@@ -12,7 +12,7 @@ import java.util.function.Function;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 import eu.dnetlib.pace.config.DedupConfig;
@@ -21,11 +21,11 @@ public abstract class UpdateMatcher<T> {
 
 	private final boolean multipleUpdate;
 	private final Function<T, Topic> topicFunction;
-	private final BiConsumer<OpenaireBrokerResult, T> compileHighlightFunction;
+	private final BiConsumer<OaBrokerMainEntity, T> compileHighlightFunction;
 	private final Function<T, String> highlightToStringFunction;
 
 	public UpdateMatcher(final boolean multipleUpdate, final Function<T, Topic> topicFunction,
-		final BiConsumer<OpenaireBrokerResult, T> compileHighlightFunction,
+		final BiConsumer<OaBrokerMainEntity, T> compileHighlightFunction,
 		final Function<T, String> highlightToStringFunction) {
 		this.multipleUpdate = multipleUpdate;
 		this.topicFunction = topicFunction;
@@ -33,13 +33,13 @@ public abstract class UpdateMatcher<T> {
 		this.highlightToStringFunction = highlightToStringFunction;
 	}
 
-	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OpenaireBrokerResult res,
-		final Collection<OpenaireBrokerResult> others,
+	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OaBrokerMainEntity res,
+		final Collection<OaBrokerMainEntity> others,
 		final DedupConfig dedupConfig) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
 
-		for (final OpenaireBrokerResult source : others) {
+		for (final OaBrokerMainEntity source : others) {
 			if (source != res) {
 				for (final T hl : findDifferences(source, res)) {
 					final Topic topic = getTopicFunction().apply(hl);
@@ -68,7 +68,7 @@ public abstract class UpdateMatcher<T> {
 		}
 	}
 
-	protected abstract List<T> findDifferences(OpenaireBrokerResult source, OpenaireBrokerResult target);
+	protected abstract List<T> findDifferences(OaBrokerMainEntity source, OaBrokerMainEntity target);
 
 	protected static boolean isMissing(final List<String> list) {
 		return list == null || list.isEmpty() || StringUtils.isBlank(list.get(0));
@@ -86,7 +86,7 @@ public abstract class UpdateMatcher<T> {
 		return topicFunction;
 	}
 
-	public BiConsumer<OpenaireBrokerResult, T> getCompileHighlightFunction() {
+	public BiConsumer<OaBrokerMainEntity, T> getCompileHighlightFunction() {
 		return compileHighlightFunction;
 	}
 

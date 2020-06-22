@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 
 public class ResultGroup implements Serializable {
 
@@ -14,23 +14,14 @@ public class ResultGroup implements Serializable {
 	 */
 	private static final long serialVersionUID = -3360828477088669296L;
 
-	private final List<OpenaireBrokerResult> data = new ArrayList<>();
+	private List<OaBrokerMainEntity> data = new ArrayList<>();
 
-	public List<OpenaireBrokerResult> getData() {
+	public List<OaBrokerMainEntity> getData() {
 		return data;
 	}
 
-	public ResultGroup addElement(final OpenaireBrokerResult elem) {
-		data.add(elem);
-		return this;
+	public void setData(final List<OaBrokerMainEntity> data) {
+		this.data = data;
 	}
 
-	public ResultGroup addGroup(final ResultGroup group) {
-		data.addAll(group.getData());
-		return this;
-	}
-
-	public boolean isValid() {
-		return data.size() > 1;
-	}
 }

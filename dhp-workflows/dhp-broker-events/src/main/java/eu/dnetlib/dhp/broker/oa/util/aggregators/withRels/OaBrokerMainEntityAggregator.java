@@ -5,11 +5,11 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import scala.Tuple2;
 
-public class OpenaireBrokerResultAggregator<T>
-	extends Aggregator<Tuple2<OpenaireBrokerResult, T>, OpenaireBrokerResult, OpenaireBrokerResult> {
+public class OaBrokerMainEntityAggregator<T>
+	extends Aggregator<Tuple2<OaBrokerMainEntity, T>, OaBrokerMainEntity, OaBrokerMainEntity> {
 
 	/**
 	 *
@@ -17,17 +17,17 @@ public class OpenaireBrokerResultAggregator<T>
 	private static final long serialVersionUID = -3687878788861013488L;
 
 	@Override
-	public OpenaireBrokerResult zero() {
-		return new OpenaireBrokerResult();
+	public OaBrokerMainEntity zero() {
+		return new OaBrokerMainEntity();
 	}
 
 	@Override
-	public OpenaireBrokerResult finish(final OpenaireBrokerResult g) {
+	public OaBrokerMainEntity finish(final OaBrokerMainEntity g) {
 		return g;
 	}
 
 	@Override
-	public OpenaireBrokerResult reduce(final OpenaireBrokerResult g, final Tuple2<OpenaireBrokerResult, T> t) {
+	public OaBrokerMainEntity reduce(final OaBrokerMainEntity g, final Tuple2<OaBrokerMainEntity, T> t) {
 		if (g.getOriginalId() == null) {
 			return t._1;
 		} else if (t._2 instanceof RelatedSoftware) {
@@ -38,13 +38,15 @@ public class OpenaireBrokerResultAggregator<T>
 			g.getPublications().add(((RelatedPublication) t._2).getRelPublication());
 		} else if (t._2 instanceof RelatedProject) {
 			g.getProjects().add(((RelatedProject) t._2).getRelProject());
+		} else {
+			throw new RuntimeException("Invalid Object: " + t._2.getClass());
 		}
 		return g;
 
 	}
 
 	@Override
-	public OpenaireBrokerResult merge(final OpenaireBrokerResult g1, final OpenaireBrokerResult g2) {
+	public OaBrokerMainEntity merge(final OaBrokerMainEntity g1, final OaBrokerMainEntity g2) {
 		if (g1.getOriginalId() != null) {
 			g1.getSoftwares().addAll(g2.getSoftwares());
 			g1.getDatasets().addAll(g2.getDatasets());
@@ -57,13 +59,13 @@ public class OpenaireBrokerResultAggregator<T>
 	}
 
 	@Override
-	public Encoder<OpenaireBrokerResult> bufferEncoder() {
-		return Encoders.kryo(OpenaireBrokerResult.class);
+	public Encoder<OaBrokerMainEntity> bufferEncoder() {
+		return Encoders.bean(OaBrokerMainEntity.class);
 	}
 
 	@Override
-	public Encoder<OpenaireBrokerResult> outputEncoder() {
-		return Encoders.kryo(OpenaireBrokerResult.class);
+	public Encoder<OaBrokerMainEntity> outputEncoder() {
+		return Encoders.bean(OaBrokerMainEntity.class);
 	}
 
 }
