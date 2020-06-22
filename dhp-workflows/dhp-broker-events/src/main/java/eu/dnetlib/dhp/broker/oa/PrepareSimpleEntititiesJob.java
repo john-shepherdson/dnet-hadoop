@@ -18,19 +18,21 @@ import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.Software;
 
-public class GenerateSimpleEntitities {
+public class PrepareSimpleEntititiesJob {
 
-	private static final Logger log = LoggerFactory.getLogger(GenerateSimpleEntitities.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareSimpleEntititiesJob.class);
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					GenerateSimpleEntitities.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_simple_entities.json")));
+					PrepareSimpleEntititiesJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -42,7 +44,10 @@ public class GenerateSimpleEntitities {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String simpleEntitiesPath = parser.get("simpleEntitiesPath");
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath: {}", workingPath);
+
+		final String simpleEntitiesPath = workingPath + "/simpleEntities";
 		log.info("simpleEntitiesPath: {}", simpleEntitiesPath);
 
 		final SparkConf conf = new SparkConf();
@@ -51,27 +56,18 @@ public class GenerateSimpleEntitities {
 
 			ClusterUtils.removeDir(spark, simpleEntitiesPath);
 
-			expandResultsWithRelations(spark, graphPath, Publication.class)
+			prepareSimpleEntities(spark, graphPath, Publication.class)
+				.union(prepareSimpleEntities(spark, graphPath, eu.dnetlib.dhp.schema.oaf.Dataset.class))
+				.union(prepareSimpleEntities(spark, graphPath, Software.class))
+				.union(prepareSimpleEntities(spark, graphPath, OtherResearchProduct.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(simpleEntitiesPath);
-
-			// TODO UNCOMMENT THIS
-			// spark
-			// .emptyDataset(Encoders.bean(Event.class))
-			// .union(generateEvents(spark, graphPath, Publication.class, dedupConfig))
-			// .union(generateEvents(spark, graphPath, eu.dnetlib.dhp.schema.oaf.Dataset.class, dedupConfig))
-			// .union(generateEvents(spark, graphPath, Software.class, dedupConfig))
-			// .union(generateEvents(spark, graphPath, OtherResearchProduct.class, dedupConfig))
-			// .write()
-			// .mode(SaveMode.Overwrite)
-			// .option("compression", "gzip")
-			// .json(eventsPath);
 		});
 
 	}
 
-	private static <SRC extends Result> Dataset<OaBrokerMainEntity> expandResultsWithRelations(
+	private static <SRC extends Result> Dataset<OaBrokerMainEntity> prepareSimpleEntities(
 		final SparkSession spark,
 		final String graphPath,
 		final Class<SRC> sourceClass) {
