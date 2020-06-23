@@ -58,7 +58,7 @@ public class PrepareGroupsJob {
 			ClusterUtils.removeDir(spark, groupsPath);
 
 			final Dataset<OaBrokerMainEntity> results = ClusterUtils
-				.readPath(spark, graphPath + "/joinedEntities", OaBrokerMainEntity.class);
+				.readPath(spark, workingPath + "/joinedEntities", OaBrokerMainEntity.class);
 
 			final Dataset<Relation> mergedRels = ClusterUtils
 				.readPath(spark, graphPath + "/relation", Relation.class)

@@ -44,9 +44,6 @@ public class GenerateEventsJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String graphPath = parser.get("graphPath");
-		log.info("graphPath: {}", graphPath);
-
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
@@ -70,7 +67,7 @@ public class GenerateEventsJob {
 			ClusterUtils.removeDir(spark, eventsPath);
 
 			final Dataset<ResultGroup> groups = ClusterUtils
-				.readPath(spark, graphPath + "/relation", ResultGroup.class);
+				.readPath(spark, workingPath + "/relation", ResultGroup.class);
 
 			final Dataset<Event> events = groups
 				.map(

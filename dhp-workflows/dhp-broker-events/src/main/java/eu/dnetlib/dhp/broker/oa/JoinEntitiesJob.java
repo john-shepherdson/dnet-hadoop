@@ -43,9 +43,6 @@ public class JoinEntitiesJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String graphPath = parser.get("graphPath");
-		log.info("graphPath: {}", graphPath);
-
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
@@ -59,16 +56,16 @@ public class JoinEntitiesJob {
 			ClusterUtils.removeDir(spark, joinedEntitiesPath);
 
 			final Dataset<OaBrokerMainEntity> r0 = ClusterUtils
-				.readPath(spark, graphPath + "/simpleEntities", OaBrokerMainEntity.class);
+				.readPath(spark, workingPath + "/simpleEntities", OaBrokerMainEntity.class);
 
 			final Dataset<OaBrokerMainEntity> r1 = join(
-				r0, ClusterUtils.readPath(spark, graphPath + "/relatedProjects", RelatedProject.class));
+				r0, ClusterUtils.readPath(spark, workingPath + "/relatedProjects", RelatedProject.class));
 			final Dataset<OaBrokerMainEntity> r2 = join(
-				r1, ClusterUtils.readPath(spark, graphPath + "/relatedDatasets", RelatedDataset.class));
+				r1, ClusterUtils.readPath(spark, workingPath + "/relatedDatasets", RelatedDataset.class));
 			final Dataset<OaBrokerMainEntity> r3 = join(
-				r2, ClusterUtils.readPath(spark, graphPath + "/relatedPublications", RelatedPublication.class));
+				r2, ClusterUtils.readPath(spark, workingPath + "/relatedPublications", RelatedPublication.class));
 			final Dataset<OaBrokerMainEntity> r4 = join(
-				r3, ClusterUtils.readPath(spark, graphPath + "/relatedSoftwares", RelatedSoftware.class));
+				r3, ClusterUtils.readPath(spark, workingPath + "/relatedSoftwares", RelatedSoftware.class));
 
 			r4.write().mode(SaveMode.Overwrite).json(joinedEntitiesPath);
 
