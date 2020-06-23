@@ -74,6 +74,7 @@ public class PrepareSimpleEntititiesJob {
 
 		return ClusterUtils
 			.readPath(spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), sourceClass)
+			.filter(r -> !ClusterUtils.isDedupRoot(r.getId()))
 			.filter(r -> r.getDataInfo().getDeletedbyinference())
 			.map(ConversionUtils::oafResultToBrokerResult, Encoders.bean(OaBrokerMainEntity.class));
 	}

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
@@ -31,9 +32,8 @@ public class PrepareRelatedSoftwaresJob {
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					PrepareRelatedSoftwaresJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+				.toString(PrepareRelatedSoftwaresJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -57,18 +57,22 @@ public class PrepareRelatedSoftwaresJob {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
-			final Dataset<Software> softwares = ClusterUtils.readPath(spark, graphPath + "/software", Software.class);
+			final Dataset<OaBrokerRelatedSoftware> softwares = ClusterUtils
+				.readPath(spark, graphPath + "/software", Software.class)
+				.filter(sw -> !ClusterUtils.isDedupRoot(sw.getId()))
+				.map(ConversionUtils::oafSoftwareToBrokerSoftware, Encoders.bean(OaBrokerRelatedSoftware.class));
 
-			final Dataset<Relation> rels = ClusterUtils.readPath(spark, graphPath + "/relation", Relation.class);
+			final Dataset<Relation> rels = ClusterUtils
+				.readPath(spark, graphPath + "/relation", Relation.class)
+				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
+				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
 			rels
-				.joinWith(softwares, softwares.col("id").equalTo(rels.col("target")), "inner")
-				.map(
-					t -> new RelatedSoftware(
-						t._1.getSource(),
-						t._1.getRelType(),
-						ConversionUtils.oafSoftwareToBrokerSoftware(t._2)),
-					Encoders.bean(RelatedSoftware.class))
+				.joinWith(softwares, softwares.col("openaireId").equalTo(rels.col("target")), "inner")
+				.map(t -> new RelatedSoftware(
+					t._1.getSource(),
+					t._1.getRelType(),
+					t._2), Encoders.bean(RelatedSoftware.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(relsPath);

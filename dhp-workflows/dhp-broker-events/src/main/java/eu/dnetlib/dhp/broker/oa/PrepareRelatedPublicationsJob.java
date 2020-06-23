@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
@@ -31,9 +32,8 @@ public class PrepareRelatedPublicationsJob {
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					PrepareRelatedPublicationsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+				.toString(PrepareRelatedPublicationsJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -57,19 +57,22 @@ public class PrepareRelatedPublicationsJob {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
-			final Dataset<Publication> pubs = ClusterUtils
-				.readPath(spark, graphPath + "/publication", Publication.class);
+			final Dataset<OaBrokerRelatedPublication> pubs = ClusterUtils
+				.readPath(spark, graphPath + "/publication", Publication.class)
+				.filter(p -> !ClusterUtils.isDedupRoot(p.getId()))
+				.map(ConversionUtils::oafPublicationToBrokerPublication, Encoders.bean(OaBrokerRelatedPublication.class));
 
-			final Dataset<Relation> rels = ClusterUtils.readPath(spark, graphPath + "/relation", Relation.class);
+			final Dataset<Relation> rels = ClusterUtils
+				.readPath(spark, graphPath + "/relation", Relation.class)
+				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
+				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
 			rels
-				.joinWith(pubs, pubs.col("id").equalTo(rels.col("target")), "inner")
-				.map(
-					t -> new RelatedPublication(
-						t._1.getSource(),
-						t._1.getRelType(),
-						ConversionUtils.oafPublicationToBrokerPublication(t._2)),
-					Encoders.bean(RelatedPublication.class))
+				.joinWith(pubs, pubs.col("openaireId").equalTo(rels.col("target")), "inner")
+				.map(t -> new RelatedPublication(
+					t._1.getSource(),
+					t._1.getRelType(),
+					t._2), Encoders.bean(RelatedPublication.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(relsPath);

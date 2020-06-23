@@ -62,7 +62,9 @@ public class PrepareRelatedProjectsJob {
 
 			final Dataset<Relation> rels = ClusterUtils
 				.readPath(spark, graphPath + "/relation", Relation.class)
-				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_PROJECT));
+				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_PROJECT))
+				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
+				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
 			rels
 				.joinWith(projects, projects.col("id").equalTo(rels.col("target")), "inner")

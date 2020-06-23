@@ -32,4 +32,8 @@ public class ClusterUtils {
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
+	public static boolean isDedupRoot(final String id) {
+		return id.contains("dedup_wf_");
+	}
+
 }
