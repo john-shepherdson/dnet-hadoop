@@ -25,8 +25,9 @@ public class ZenodoUploadTest {
 
 	private static String workingDir;
 
-//	private static FileSystem fileSystem;
-//
+	private final String URL_STRING = "https://sandbox.zenodo.org/api/deposit/depositions";
+	private final String ACCESS_TOKEN = "5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe";
+
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files
@@ -78,8 +79,8 @@ public class ZenodoUploadTest {
 //		s.connect();
 //		s.upload(workingDir +"/ni", "Neuroinformatics", fs);
 
-		APIClient client = new APIClient("https://sandbox.zenodo.org/api/deposit/depositions",
-			"5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe");
+		APIClient client = new APIClient(URL_STRING,
+			ACCESS_TOKEN);
 		client.connect();
 
 		// the second boolean parameter here sets the recursion to true
