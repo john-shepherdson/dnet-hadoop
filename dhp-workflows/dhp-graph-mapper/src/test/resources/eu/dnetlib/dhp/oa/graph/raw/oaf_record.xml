@@ -57,6 +57,7 @@
     <oaf:identifier identifierType="doi">10.3897/oneeco.2.e13718</oaf:identifier>
     <oaf:fulltext>https://oneecosystem.pensoft.net/article/13718/</oaf:fulltext>
     <oaf:journal eissn="2367-8194" issn="">One Ecosystem</oaf:journal>
+    <oaf:refereed>0001</oaf:refereed>
   </metadata>
   <about xmlns:oai="http://www.openarchives.org/OAI/2.0/">
     <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">

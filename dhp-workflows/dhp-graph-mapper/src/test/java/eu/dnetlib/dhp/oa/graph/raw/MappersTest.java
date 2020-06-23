@@ -111,6 +111,7 @@ public class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
+		assertEquals("0001", p.getInstance().get(0).getRefereed().getClassid());
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
@@ -217,6 +218,7 @@ public class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
+		assertEquals("0001", d.getInstance().get(0).getRefereed().getClassid());
 
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());
