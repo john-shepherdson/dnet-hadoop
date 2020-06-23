@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerRelatedDataset;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDataset;
@@ -63,7 +62,7 @@ public class PrepareRelatedDatasetsJob {
 			final Dataset<Relation> rels = ClusterUtils
 				.readPath(spark, graphPath + "/relation", Relation.class)
 				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
-				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+				.filter(r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 

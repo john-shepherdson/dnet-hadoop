@@ -36,4 +36,12 @@ public class ClusterUtils {
 		return id.contains("dedup_wf_");
 	}
 
+	public static final boolean isValidResultResultClass(final String s) {
+		return s.equals("isReferencedBy")
+			|| s.equals("isRelatedTo")
+			|| s.equals("references")
+			|| s.equals("isSupplementedBy")
+			|| s.equals("isSupplementedTo");
+	}
+
 }
