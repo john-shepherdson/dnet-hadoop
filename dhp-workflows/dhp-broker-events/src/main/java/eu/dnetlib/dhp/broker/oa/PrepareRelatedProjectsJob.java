@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.broker.objects.OaBrokerProject;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
@@ -58,22 +60,21 @@ public class PrepareRelatedProjectsJob {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
-			final Dataset<Project> projects = ClusterUtils.readPath(spark, graphPath + "/project", Project.class);
+			final Dataset<OaBrokerProject> projects = ClusterUtils
+				.readPath(spark, graphPath + "/project", Project.class)
+				.filter(p -> !ClusterUtils.isDedupRoot(p.getId()))
+				.map(ConversionUtils::oafProjectToBrokerProject, Encoders.bean(OaBrokerProject.class));
 
 			final Dataset<Relation> rels = ClusterUtils
 				.readPath(spark, graphPath + "/relation", Relation.class)
 				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_PROJECT))
+				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
 			rels
-				.joinWith(projects, projects.col("id").equalTo(rels.col("target")), "inner")
-				.map(
-					t -> new RelatedProject(
-						t._1.getSource(),
-						t._1.getRelType(),
-						ConversionUtils.oafProjectToBrokerProject(t._2)),
-					Encoders.bean(RelatedProject.class))
+				.joinWith(projects, projects.col("openaireId").equalTo(rels.col("target")), "inner")
+				.map(t -> new RelatedProject(t._1.getSource(), t._2), Encoders.bean(RelatedProject.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(relsPath);

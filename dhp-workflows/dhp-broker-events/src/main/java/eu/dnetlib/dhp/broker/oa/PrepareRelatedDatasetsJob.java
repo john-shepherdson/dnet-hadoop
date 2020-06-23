@@ -15,9 +15,11 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerRelatedDataset;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDataset;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class PrepareRelatedDatasetsJob {
@@ -60,17 +62,18 @@ public class PrepareRelatedDatasetsJob {
 
 			final Dataset<Relation> rels = ClusterUtils
 				.readPath(spark, graphPath + "/relation", Relation.class)
+				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
+				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
 			rels
 				.joinWith(datasets, datasets.col("openaireId").equalTo(rels.col("target")), "inner")
-				.map(
-					t -> new RelatedDataset(
-						t._1.getSource(),
-						t._1.getRelType(),
-						t._2),
-					Encoders.bean(RelatedDataset.class))
+				.map(t -> {
+					final RelatedDataset rel = new RelatedDataset(t._1.getSource(), t._2);
+					rel.getRelDataset().setRelType(t._1.getRelClass());
+					return rel;
+				}, Encoders.bean(RelatedDataset.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.json(relsPath);
