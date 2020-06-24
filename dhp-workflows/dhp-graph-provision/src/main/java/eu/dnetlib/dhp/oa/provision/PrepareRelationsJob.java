@@ -3,7 +3,9 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.Serializable;
 import java.util.*;
+import java.util.function.Supplier;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -18,7 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -58,6 +62,21 @@ public class PrepareRelationsJob {
 	public static final int MAX_RELS = 100;
 
 	public static final int DEFAULT_NUM_PARTITIONS = 3000;
+
+	private static final Map<String, Integer> weights = Maps.newHashMap();
+
+	static {
+		weights.put("outcome", 0);
+		weights.put("supplement", 1);
+		weights.put("affiliation", 2);
+		weights.put("relationship", 3);
+		weights.put("publicationDataset", 4);
+		weights.put("similarity", 5);
+
+		weights.put("provision", 6);
+		weights.put("participation", 7);
+		weights.put("dedup", 8);
+	}
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -132,11 +151,15 @@ public class PrepareRelationsJob {
 			.filter(rel -> !relationFilter.contains(rel.getRelClass()))
 			// group by SOURCE and apply limit
 			.groupBy(r -> SortableRelationKey.create(r, r.getSource()))
-			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
+			.repartitionAndSortWithinPartitions(
+				new RelationPartitioner(relPartitions),
+				(SerializableComparator<SortableRelationKey>) (o1, o2) -> compare(o1, o2))
 			.flatMap(t -> Iterables.limit(t._2(), maxRelations).iterator())
 			// group by TARGET and apply limit
 			.groupBy(r -> SortableRelationKey.create(r, r.getTarget()))
-			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
+			.repartitionAndSortWithinPartitions(
+				new RelationPartitioner(relPartitions),
+				(SerializableComparator<SortableRelationKey>) (o1, o2) -> compare(o1, o2))
 			.flatMap(t -> Iterables.limit(t._2(), maxRelations).iterator())
 			.rdd();
 
@@ -145,6 +168,24 @@ public class PrepareRelationsJob {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
+	}
+
+	private static int compare(SortableRelationKey o1, SortableRelationKey o2) {
+		final Integer w1 = Optional.ofNullable(weights.get(o1.getSubRelType())).orElse(Integer.MAX_VALUE);
+		final Integer w2 = Optional.ofNullable(weights.get(o2.getSubRelType())).orElse(Integer.MAX_VALUE);
+		return ComparisonChain
+			.start()
+			.compare(w1, w2)
+			.compare(o1.getSource(), o2.getSource())
+			.compare(o1.getTarget(), o2.getTarget())
+			.result();
+	}
+
+	@FunctionalInterface
+	public interface SerializableComparator<T> extends Comparator<T>, Serializable {
+
+		@Override
+		int compare(T o1, T o2);
 	}
 
 	/**

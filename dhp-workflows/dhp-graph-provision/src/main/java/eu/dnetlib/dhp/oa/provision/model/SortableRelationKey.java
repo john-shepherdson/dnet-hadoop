@@ -5,27 +5,13 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
-public class SortableRelationKey implements Comparable<SortableRelationKey>, Serializable {
-
-	private static final Map<String, Integer> weights = Maps.newHashMap();
-
-	static {
-		weights.put("outcome", 0);
-		weights.put("supplement", 1);
-		weights.put("affiliation", 2);
-		weights.put("relationship", 3);
-		weights.put("publicationDataset", 4);
-		weights.put("similarity", 5);
-
-		weights.put("provision", 6);
-		weights.put("participation", 7);
-		weights.put("dedup", 8);
-	}
+public class SortableRelationKey implements Serializable {
 
 	private String groupingKey;
 
@@ -49,15 +35,18 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 	}
 
 	@Override
-	public int compareTo(SortableRelationKey o) {
-		final Integer wt = Optional.ofNullable(weights.get(getSubRelType())).orElse(Integer.MAX_VALUE);
-		final Integer wo = Optional.ofNullable(weights.get(o.getSubRelType())).orElse(Integer.MAX_VALUE);
-		return ComparisonChain
-			.start()
-			.compare(wt, wo)
-			.compare(getSource(), o.getSource())
-			.compare(getTarget(), o.getTarget())
-			.result();
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		SortableRelationKey that = (SortableRelationKey) o;
+		return Objects.equal(getGroupingKey(), that.getGroupingKey());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getGroupingKey());
 	}
 
 	public void setSource(String source) {
