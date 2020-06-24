@@ -276,7 +276,7 @@ public class XmlRecordFactory implements Serializable {
 																			pidType,
 																			pidValue
 																				.toLowerCase()
-																				.replaceAll("orcid", "")));
+																				.replaceAll("^.*orcid\\.org\\/", "")));
 														}
 													}
 												});
