@@ -7,7 +7,7 @@
         <DATE_OF_CREATION value="2020-06-15T16:35:09+00:00"/>
     </HEADER>
     <BODY>
-        <WORKFLOW_NAME>Data Provision [OCEAN]</WORKFLOW_NAME>
+        <WORKFLOW_NAME>Graph Construction [OCEAN]</WORKFLOW_NAME>
         <WORKFLOW_TYPE>Data Provision</WORKFLOW_TYPE>
         <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
         <CONFIGURATION start="manual">
