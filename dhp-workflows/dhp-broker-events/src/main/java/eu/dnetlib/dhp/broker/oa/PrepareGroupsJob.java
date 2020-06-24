@@ -48,7 +48,7 @@ public class PrepareGroupsJob {
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
-		final String groupsPath = workingPath + "/groups";
+		final String groupsPath = workingPath + "/duplicates";
 		log.info("groupsPath: {}", groupsPath);
 
 		final SparkConf conf = new SparkConf();

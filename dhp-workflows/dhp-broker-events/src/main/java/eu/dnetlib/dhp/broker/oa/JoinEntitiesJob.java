@@ -11,18 +11,15 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.TypedColumn;
+import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.OaBrokerMainEntityAggregator;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDataset;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedPublication;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedSoftware;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProjectAggregator;
 import scala.Tuple2;
 
 public class JoinEntitiesJob {
@@ -59,31 +56,33 @@ public class JoinEntitiesJob {
 				.readPath(spark, workingPath + "/simpleEntities", OaBrokerMainEntity.class);
 
 			final Dataset<OaBrokerMainEntity> r1 = join(
-				r0, ClusterUtils.readPath(spark, workingPath + "/relatedProjects", RelatedProject.class));
-			final Dataset<OaBrokerMainEntity> r2 = join(
-				r1, ClusterUtils.readPath(spark, workingPath + "/relatedDatasets", RelatedDataset.class));
-			final Dataset<OaBrokerMainEntity> r3 = join(
-				r2, ClusterUtils.readPath(spark, workingPath + "/relatedPublications", RelatedPublication.class));
-			final Dataset<OaBrokerMainEntity> r4 = join(
-				r3, ClusterUtils.readPath(spark, workingPath + "/relatedSoftwares", RelatedSoftware.class));
+				r0, ClusterUtils.readPath(spark, workingPath + "/relatedProjects", RelatedProject.class),
+				new RelatedProjectAggregator());
+			// final Dataset<OaBrokerMainEntity> r2 = join(
+			// r1, ClusterUtils.readPath(spark, workingPath + "/relatedDatasets", RelatedDataset.class), new
+			// RelatedDatasetAggregator());
+			// final Dataset<OaBrokerMainEntity> r3 = join(
+			// r2, ClusterUtils.readPath(spark, workingPath + "/relatedPublications", RelatedPublication.class), new
+			// RelatedPublicationAggregator());
+			// final Dataset<OaBrokerMainEntity> r4 = join(
+			// r3, ClusterUtils.readPath(spark, workingPath + "/relatedSoftwares", RelatedSoftware.class), new
+			// RelatedSoftwareAggregator());
 
-			r4.write().mode(SaveMode.Overwrite).json(joinedEntitiesPath);
+			r1.write().mode(SaveMode.Overwrite).json(joinedEntitiesPath);
 
 		});
 
 	}
 
 	private static <T> Dataset<OaBrokerMainEntity> join(final Dataset<OaBrokerMainEntity> sources,
-		final Dataset<T> typedRels) {
-
-		final TypedColumn<Tuple2<OaBrokerMainEntity, T>, OaBrokerMainEntity> aggr = new OaBrokerMainEntityAggregator<T>()
-			.toColumn();
+		final Dataset<T> typedRels,
+		final Aggregator<Tuple2<OaBrokerMainEntity, T>, OaBrokerMainEntity, OaBrokerMainEntity> aggr) {
 
 		return sources
 			.joinWith(typedRels, sources.col("openaireId").equalTo(typedRels.col("source")), "left_outer")
 			.groupByKey(
 				(MapFunction<Tuple2<OaBrokerMainEntity, T>, String>) t -> t._1.getOpenaireId(), Encoders.STRING())
-			.agg(aggr)
+			.agg(aggr.toColumn())
 			.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class));
 
 	}

@@ -67,7 +67,7 @@ public class GenerateEventsJob {
 			ClusterUtils.removeDir(spark, eventsPath);
 
 			final Dataset<ResultGroup> groups = ClusterUtils
-				.readPath(spark, workingPath + "/relation", ResultGroup.class);
+				.readPath(spark, workingPath + "/duplicates", ResultGroup.class);
 
 			final Dataset<Event> events = groups
 				.map(
