@@ -53,7 +53,7 @@ public class GenerateEventsJob {
 		final String dedupConfigProfileId = parser.get("dedupConfProfile");
 		log.info("dedupConfigProfileId: {}", dedupConfigProfileId);
 
-		final String eventsPath = workingPath + "/eventsPath";
+		final String eventsPath = workingPath + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
 		final SparkConf conf = new SparkConf();

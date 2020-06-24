@@ -29,15 +29,17 @@ public class RelatedProjectAggregator
 
 	@Override
 	public OaBrokerMainEntity reduce(final OaBrokerMainEntity g, final Tuple2<OaBrokerMainEntity, RelatedProject> t) {
-		final OaBrokerMainEntity res = StringUtils.isNotBlank(g.getOriginalId()) ? g : t._1;
-		res.getProjects().add(t._2.getRelProject());
+		final OaBrokerMainEntity res = StringUtils.isNotBlank(g.getOpenaireId()) ? g : t._1;
+		if (t._2 != null) {
+			res.getProjects().add(t._2.getRelProject());
+		}
 		return res;
 
 	}
 
 	@Override
 	public OaBrokerMainEntity merge(final OaBrokerMainEntity g1, final OaBrokerMainEntity g2) {
-		if (StringUtils.isNotBlank(g1.getOriginalId())) {
+		if (StringUtils.isNotBlank(g1.getOpenaireId())) {
 			g1.getProjects().addAll(g2.getProjects());
 			return g1;
 		} else {

@@ -29,15 +29,17 @@ public class RelatedDatasetAggregator
 
 	@Override
 	public OaBrokerMainEntity reduce(final OaBrokerMainEntity g, final Tuple2<OaBrokerMainEntity, RelatedDataset> t) {
-		final OaBrokerMainEntity res = StringUtils.isNotBlank(g.getOriginalId()) ? g : t._1;
-		res.getDatasets().add(t._2.getRelDataset());
+		final OaBrokerMainEntity res = StringUtils.isNotBlank(g.getOpenaireId()) ? g : t._1;
+		if (t._2 != null) {
+			res.getDatasets().add(t._2.getRelDataset());
+		}
 		return res;
 
 	}
 
 	@Override
 	public OaBrokerMainEntity merge(final OaBrokerMainEntity g1, final OaBrokerMainEntity g2) {
-		if (StringUtils.isNotBlank(g1.getOriginalId())) {
+		if (StringUtils.isNotBlank(g1.getOpenaireId())) {
 			g1.getDatasets().addAll(g2.getDatasets());
 			return g1;
 		} else {
