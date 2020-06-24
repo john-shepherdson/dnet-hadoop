@@ -9,6 +9,7 @@ public class AuthorData implements Serializable {
 	private String name;
 	private String surname;
 	private String creditName;
+	private String otherName;
 	private String errorCode;
 
 	public String getErrorCode() {
@@ -49,5 +50,13 @@ public class AuthorData implements Serializable {
 
 	public void setOid(String oid) {
 		this.oid = oid;
+	}
+
+	public String getOtherName() {
+		return otherName;
+	}
+
+	public void setOtherName(String otherName) {
+		this.otherName = otherName;
 	}
 }

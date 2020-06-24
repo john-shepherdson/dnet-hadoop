@@ -44,7 +44,7 @@ public class XMLRecordParserTest {
 
 		String xml = IOUtils
 			.toString(
-				this.getClass().getResourceAsStream("activity_work_0000-0002-5982-8983.xml"));
+				this.getClass().getResourceAsStream("activity_work_0000-0003-2760-1191.xml"));
 
 		XMLRecordParser p = new XMLRecordParser();
 
