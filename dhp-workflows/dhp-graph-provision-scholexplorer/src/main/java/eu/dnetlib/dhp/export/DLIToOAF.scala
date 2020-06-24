@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter
 
 import eu.dnetlib.dhp.common.PacePerson
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
@@ -97,6 +97,20 @@ object DLIToOAF {
     "DOI" -> "doi",
     "doi" -> "doi"
   )
+
+
+  def fixInstance(r:Publication) :Publication = {
+    val collectedFrom = r.getCollectedfrom.asScala.head
+    r.getInstance().asScala.foreach(i => i.setCollectedfrom(collectedFrom))
+    r
+  }
+
+
+  def fixInstanceDataset(r:Dataset) :Dataset = {
+    val collectedFrom = r.getCollectedfrom.asScala.head
+    r.getInstance().asScala.foreach(i => i.setCollectedfrom(collectedFrom))
+    r
+  }
 
 
   def toActionSet(item: Oaf): (String, String) = {
