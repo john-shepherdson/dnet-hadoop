@@ -216,14 +216,86 @@
         <error to="Kill"/>
     </action>
  
-	<join name="wait_entities_and_rels" to="join_entities"/>
+	<join name="wait_entities_and_rels" to="join_entities_step1"/>
     
-    <action name="join_entities">
+    <action name="join_entities_step1">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>JoinEntitiesJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.JoinEntitiesJob</class>
+            <name>JoinStep1</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep1Job</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+        </spark>
+        <ok to="join_entities_step2"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="join_entities_step2">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>JoinStep2</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep2Job</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+        </spark>
+        <ok to="join_entities_step3"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="join_entities_step3">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>JoinStep3</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep3Job</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+        </spark>
+        <ok to="join_entities_step4"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="join_entities_step4">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>JoinStep4</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep4Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}

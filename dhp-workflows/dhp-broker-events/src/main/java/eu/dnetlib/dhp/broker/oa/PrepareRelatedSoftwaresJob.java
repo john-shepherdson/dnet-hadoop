@@ -13,8 +13,6 @@ import org.apache.spark.sql.SaveMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
@@ -28,8 +26,6 @@ import eu.dnetlib.dhp.schema.oaf.Software;
 public class PrepareRelatedSoftwaresJob {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareRelatedSoftwaresJob.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -67,6 +63,7 @@ public class PrepareRelatedSoftwaresJob {
 
 			final Dataset<Relation> rels = ClusterUtils
 				.readPath(spark, graphPath + "/relation", Relation.class)
+				.filter(r -> r.getDataInfo().getDeletedbyinference())
 				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
 				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))

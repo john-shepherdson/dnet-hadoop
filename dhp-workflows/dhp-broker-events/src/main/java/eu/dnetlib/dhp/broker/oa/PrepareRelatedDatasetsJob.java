@@ -61,6 +61,7 @@ public class PrepareRelatedDatasetsJob {
 
 			final Dataset<Relation> rels = ClusterUtils
 				.readPath(spark, graphPath + "/relation", Relation.class)
+				.filter(r -> r.getDataInfo().getDeletedbyinference())
 				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
 				.filter(r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))

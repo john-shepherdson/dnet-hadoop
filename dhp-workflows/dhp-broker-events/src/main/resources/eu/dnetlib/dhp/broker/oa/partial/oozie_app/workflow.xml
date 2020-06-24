@@ -73,19 +73,19 @@
         </configuration>
     </global>
 
-    <start to="join_entities"/>
+    <start to="join_entities_step1"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     
     
-    <action name="join_entities">
+        <action name="join_entities_step1">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>JoinEntitiesJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.JoinEntitiesJob</class>
+            <name>JoinStep1</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep1Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -100,16 +100,16 @@
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
         </spark>
-        <ok to="prepare_groups"/>
+        <ok to="join_entities_step2"/>
         <error to="Kill"/>
     </action>
-
-    <action name="prepare_groups">
+    
+    <action name="join_entities_step2">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareGroupsJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.PrepareGroupsJob</class>
+            <name>JoinStep2</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep2Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -124,16 +124,16 @@
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
         </spark>
-        <ok to="generate_events"/>
+        <ok to="join_entities_step3"/>
         <error to="Kill"/>
     </action>
-
-    <action name="generate_events">
+    
+    <action name="join_entities_step3">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>GenerateEventsJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.GenerateEventsJob</class>
+            <name>JoinStep3</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep3Job</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -145,9 +145,32 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
+            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--dedupConfProfile</arg><arg>${dedupConfProfId}</arg>
+        </spark>
+        <ok to="join_entities_step4"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="join_entities_step4">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>JoinStep4</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep4Job</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
