@@ -28,8 +28,8 @@
         </property>
 		<property>
             <name>dbSchema</name>
-            <description>the database schema according to the D-Net infrastructure (beta or production)</description>
             <value>beta</value>
+            <description>the database schema according to the D-Net infrastructure (beta or production)</description>
         </property>
         <property>
             <name>mongoURL</name>
