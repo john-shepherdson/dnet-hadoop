@@ -41,6 +41,7 @@ public class QueryInformationSystem {
 		+ "  </selcriteria>  "
 		+ "  </datasource> } "
 		+ "  </datasources>  " +
+			"  <zenodocommunities>  "+
 		"{for $zc in $zenodo " +
 		"return " +
 		"<zenodocommunity> " +
@@ -48,7 +49,6 @@ public class QueryInformationSystem {
 		"{$zc} " +
 		"</zenodoid> " +
 		"</zenodocommunity>}"
-		+ "  <zenodocommunities>  "
 		+ "  {for $zc in $communities  "
 		+ "  return  "
 		+ "  <zenodocommunity>  "
