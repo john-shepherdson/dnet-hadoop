@@ -32,7 +32,7 @@
 
 
 
-    <start to="GenerateActionSet"/>
+    <start to="CreateDOIBoost"/>
 
 
     <kill name="Kill">
