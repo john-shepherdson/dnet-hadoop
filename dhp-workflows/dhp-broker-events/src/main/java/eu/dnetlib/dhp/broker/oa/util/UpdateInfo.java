@@ -111,7 +111,7 @@ public final class UpdateInfo<T> {
 		final OaBrokerMainEntity hl = new OaBrokerMainEntity();
 		compileHighlight.accept(hl, getHighlightValue());
 
-		final String provId = getSource().getOriginalId();
+		final String provId = getSource().getOpenaireId();
 		final String provRepo = getSource().getCollectedFromName();
 
 		final String provUrl = getSource()
