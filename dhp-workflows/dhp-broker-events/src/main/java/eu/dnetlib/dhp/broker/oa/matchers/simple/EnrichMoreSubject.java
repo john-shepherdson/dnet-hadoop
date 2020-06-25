@@ -22,6 +22,7 @@ public class EnrichMoreSubject extends UpdateMatcher<OaBrokerTypedValue> {
 	@Override
 	protected List<OaBrokerTypedValue> findDifferences(final OaBrokerMainEntity source,
 		final OaBrokerMainEntity target) {
+
 		final Set<String> existingSubjects = target
 			.getSubjects()
 			.stream()

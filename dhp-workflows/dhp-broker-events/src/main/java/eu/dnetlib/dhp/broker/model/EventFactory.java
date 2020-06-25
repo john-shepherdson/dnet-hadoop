@@ -33,7 +33,7 @@ public class EventFactory {
 		final Map<String, Object> map = createMapFromResult(updateInfo);
 
 		final String eventId = calculateEventId(
-			updateInfo.getTopicPath(), updateInfo.getTarget().getOriginalId(), updateInfo.getHighlightValueAsString());
+			updateInfo.getTopicPath(), updateInfo.getTarget().getOpenaireId(), updateInfo.getHighlightValueAsString());
 
 		res.setEventId(eventId);
 		res.setProducerId(PRODUCER_ID);
@@ -55,7 +55,7 @@ public class EventFactory {
 		map.put("target_datasource_id", target.getCollectedFromId());
 		map.put("target_datasource_name", target.getCollectedFromName());
 
-		map.put("target_publication_id", target.getOriginalId());
+		map.put("target_publication_id", target.getOpenaireId());
 
 		final List<String> titles = target.getTitles();
 		if (titles.size() > 0) {
@@ -74,7 +74,7 @@ public class EventFactory {
 		map.put("trust", updateInfo.getTrust());
 		map.put("provenance_datasource_id", source.getCollectedFromId());
 		map.put("provenance_datasource_name", source.getCollectedFromName());
-		map.put("provenance_publication_id_list", source.getOriginalId());
+		map.put("provenance_publication_id_list", source.getOpenaireId());
 
 		return map;
 	}
