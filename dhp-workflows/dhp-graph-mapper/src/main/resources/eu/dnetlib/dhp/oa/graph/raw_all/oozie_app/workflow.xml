@@ -26,6 +26,11 @@
             <name>postgresPassword</name>
             <description>the password postgres</description>
         </property>
+		<property>
+            <name>dbSchema</name>
+            <description>the database schema according to the D-Net infrastructure (beta or production)</description>
+            <value>beta</value>
+        </property>
         <property>
             <name>mongoURL</name>
             <description>mongoDB url, example: mongodb://[username:password@]host[:port]</description>
@@ -125,6 +130,7 @@
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--action</arg><arg>claims</arg>
+            <arg>--dbschema</arg><arg>${dbSchema}</arg>
         </java>
         <ok to="ImportODF_claims"/>
         <error to="Kill"/>
@@ -175,6 +181,7 @@
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--dbschema</arg><arg>${dbSchema}</arg>
         </java>
         <ok to="ImportODF"/>
         <error to="Kill"/>

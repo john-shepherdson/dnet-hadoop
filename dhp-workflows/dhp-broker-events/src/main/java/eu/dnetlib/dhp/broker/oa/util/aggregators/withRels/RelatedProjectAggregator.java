@@ -7,6 +7,7 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import scala.Tuple2;
 
 public class RelatedProjectAggregator
@@ -30,7 +31,7 @@ public class RelatedProjectAggregator
 	@Override
 	public OaBrokerMainEntity reduce(final OaBrokerMainEntity g, final Tuple2<OaBrokerMainEntity, RelatedProject> t) {
 		final OaBrokerMainEntity res = StringUtils.isNotBlank(g.getOpenaireId()) ? g : t._1;
-		if (t._2 != null) {
+		if (t._2 != null && res.getProjects().size() < BrokerConstants.MAX_NUMBER_OF_RELS) {
 			res.getProjects().add(t._2.getRelProject());
 		}
 		return res;
@@ -40,7 +41,14 @@ public class RelatedProjectAggregator
 	@Override
 	public OaBrokerMainEntity merge(final OaBrokerMainEntity g1, final OaBrokerMainEntity g2) {
 		if (StringUtils.isNotBlank(g1.getOpenaireId())) {
-			g1.getProjects().addAll(g2.getProjects());
+			final int availables = BrokerConstants.MAX_NUMBER_OF_RELS - g1.getProjects().size();
+			if (availables > 0) {
+				if (g2.getProjects().size() <= availables) {
+					g1.getProjects().addAll(g2.getProjects());
+				} else {
+					g1.getProjects().addAll(g2.getProjects().subList(0, availables));
+				}
+			}
 			return g1;
 		} else {
 			return g2;

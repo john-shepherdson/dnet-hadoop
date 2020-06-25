@@ -16,7 +16,7 @@ public class EnrichMissingSoftware
 		super(true,
 			s -> Topic.ENRICH_MISSING_SOFTWARE,
 			(p, s) -> p.getSoftwares().add(s),
-			s -> s.getName());
+			s -> s.getOpenaireId());
 	}
 
 	@Override

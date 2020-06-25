@@ -45,6 +45,7 @@ public abstract class UpdateMatcher<T> {
 					final Topic topic = getTopicFunction().apply(hl);
 					final UpdateInfo<T> info = new UpdateInfo<>(topic, hl, source, res, getCompileHighlightFunction(),
 						getHighlightToStringFunction(), dedupConfig);
+
 					final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
 					if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {
 					} else {

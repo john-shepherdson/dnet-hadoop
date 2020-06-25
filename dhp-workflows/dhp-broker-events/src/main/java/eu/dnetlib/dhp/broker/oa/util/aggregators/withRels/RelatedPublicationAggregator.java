@@ -7,6 +7,7 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import scala.Tuple2;
 
 public class RelatedPublicationAggregator
@@ -31,7 +32,7 @@ public class RelatedPublicationAggregator
 	public OaBrokerMainEntity reduce(final OaBrokerMainEntity g,
 		final Tuple2<OaBrokerMainEntity, RelatedPublication> t) {
 		final OaBrokerMainEntity res = StringUtils.isNotBlank(g.getOpenaireId()) ? g : t._1;
-		if (t._2 != null) {
+		if (t._2 != null && res.getPublications().size() < BrokerConstants.MAX_NUMBER_OF_RELS) {
 			res.getPublications().add(t._2.getRelPublication());
 		}
 		return res;
@@ -41,8 +42,16 @@ public class RelatedPublicationAggregator
 	@Override
 	public OaBrokerMainEntity merge(final OaBrokerMainEntity g1, final OaBrokerMainEntity g2) {
 		if (StringUtils.isNotBlank(g1.getOpenaireId())) {
-			g1.getPublications().addAll(g2.getPublications());
+			final int availables = BrokerConstants.MAX_NUMBER_OF_RELS - g1.getPublications().size();
+			if (availables > 0) {
+				if (g2.getPublications().size() <= availables) {
+					g1.getPublications().addAll(g2.getPublications());
+				} else {
+					g1.getPublications().addAll(g2.getPublications().subList(0, availables));
+				}
+			}
 			return g1;
+
 		} else {
 			return g2;
 		}

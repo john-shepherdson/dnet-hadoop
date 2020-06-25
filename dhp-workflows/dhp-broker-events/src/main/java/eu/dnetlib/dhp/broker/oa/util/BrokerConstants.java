@@ -17,6 +17,8 @@ public class BrokerConstants {
 	public static final float MIN_TRUST = 0.25f;
 	public static final float MAX_TRUST = 1.00f;
 
+	public static final int MAX_NUMBER_OF_RELS = 20;
+
 	public static Class<?>[] getModelClasses() {
 		final Set<Class<?>> list = new HashSet<>();
 		list.addAll(Arrays.asList(ModelSupport.getOafModelClasses()));
