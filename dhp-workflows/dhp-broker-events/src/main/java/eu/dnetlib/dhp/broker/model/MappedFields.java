@@ -4,8 +4,6 @@ package eu.dnetlib.dhp.broker.model;
 import java.io.Serializable;
 import java.util.List;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 public class MappedFields implements Serializable {
 
 	/**
@@ -13,37 +11,16 @@ public class MappedFields implements Serializable {
 	 */
 	private static final long serialVersionUID = -7999704113195802008L;
 
-	@JsonProperty("target_datasource_id")
 	private String targetDatasourceId;
-
-	@JsonProperty("target_datasource_name")
 	private String targetDatasourceName;
-
-	@JsonProperty("target_result_id")
 	private String targetResultId;
-
-	@JsonProperty("target_result_title")
 	private String targetResultTitle;
-
-	@JsonProperty("target_dateofacceptance")
 	private long targetDateofacceptance;
-
-	@JsonProperty("target_result_subject_list")
 	private List<String> targetSubjects;
-
-	@JsonProperty("target_result_author_list")
 	private List<String> targetAuthors;
-
-	@JsonProperty("trust")
 	private float trust;
-
-	@JsonProperty("provenance_datasource_id")
 	private String provenanceDatasourceId;
-
-	@JsonProperty("provenance_datasource_name")
 	private String provenanceDatasourceName;
-
-	@JsonProperty("setProvenanceResultId")
 	private String provenanceResultId;
 
 	public String getTargetDatasourceId() {
