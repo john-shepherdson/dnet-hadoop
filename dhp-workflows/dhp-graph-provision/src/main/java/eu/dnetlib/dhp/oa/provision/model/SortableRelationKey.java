@@ -50,7 +50,7 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 		if (o == null || getClass() != o.getClass())
 			return false;
 		SortableRelationKey that = (SortableRelationKey) o;
-		return Objects.equal(getGroupingKey(), that.getGroupingKey());
+		return getGroupingKey().equals(that.getGroupingKey());
 	}
 
 	@Override
