@@ -152,7 +152,18 @@ public class CleanGraphSparkJob {
 					}
 				}
 			}
-
+			if (Objects.nonNull(r.getAuthor())) {
+				boolean nullRank = r
+					.getAuthor()
+					.stream()
+					.anyMatch(a -> Objects.isNull(a.getRank()));
+				if (nullRank) {
+					int i = 1;
+					for (Author author : r.getAuthor()) {
+						author.setRank(i++);
+					}
+				}
+			}
 			if (value instanceof Publication) {
 
 			} else if (value instanceof eu.dnetlib.dhp.schema.oaf.Dataset) {
