@@ -1,38 +1,32 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-
-import java.util.*;
-import java.util.function.Function;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.provision.model.SortableRelationKey;
+import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.*;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.clearspring.analytics.util.Lists;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.FunctionalInterfaceSupport;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
-import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
-import scala.Function1;
 import scala.Tuple2;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects. The
@@ -133,22 +127,35 @@ public class PrepareRelationsJob {
 		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter, int maxRelations,
 		int relPartitions) {
 
-		RDD<SortableRelation> cappedRels = readPathRelationRDD(spark, inputRelationsPath)
-			.repartition(relPartitions)
-			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
-			.filter(rel -> !relationFilter.contains(rel.getRelClass()))
-			// group by SOURCE and apply limit
-			.mapToPair(rel -> new Tuple2<>(rel.getSource(), rel))
-			.groupByKey(new RelationPartitioner(relPartitions))
-			.flatMap(group -> Iterables.limit(group._2(), maxRelations).iterator())
-			// group by TARGET and apply limit
-			.mapToPair(rel -> new Tuple2<>(rel.getTarget(), rel))
-			.groupByKey(new RelationPartitioner(relPartitions))
-			.flatMap(group -> Iterables.limit(group._2(), maxRelations).iterator())
+		// group by SOURCE and apply limit
+		RDD<Relation> bySource = readPathRelationRDD(spark, inputRelationsPath)
+			.filter(rel -> rel.getDataInfo().getDeletedbyinference() == false)
+			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false)
+			.mapToPair(r -> new Tuple2<>(SortableRelationKey.create(r, r.getSource()), r))
+			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
+			.groupBy(Tuple2::_1)
+			.map(Tuple2::_2)
+			.map(t -> Iterables.limit(t, maxRelations))
+			.flatMap(Iterable::iterator)
+			.map(Tuple2::_2)
+			.rdd();
+
+		// group by TARGET and apply limit
+		RDD<Relation> byTarget = readPathRelationRDD(spark, inputRelationsPath)
+			.filter(rel -> rel.getDataInfo().getDeletedbyinference() == false)
+			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false)
+			.mapToPair(r -> new Tuple2<>(SortableRelationKey.create(r, r.getTarget()), r))
+			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
+			.groupBy(Tuple2::_1)
+			.map(Tuple2::_2)
+			.map(t -> Iterables.limit(t, maxRelations))
+			.flatMap(Iterable::iterator)
+			.map(Tuple2::_2)
 			.rdd();
 
 		spark
-			.createDataset(cappedRels, Encoders.bean(SortableRelation.class))
+			.createDataset(bySource.union(byTarget), Encoders.bean(Relation.class))
+			.repartition(relPartitions)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
@@ -162,10 +169,10 @@ public class PrepareRelationsJob {
 	 * @param inputPath
 	 * @return the JavaRDD<SortableRelation> containing all the relationships
 	 */
-	private static JavaRDD<SortableRelation> readPathRelationRDD(
+	private static JavaRDD<Relation> readPathRelationRDD(
 		SparkSession spark, final String inputPath) {
 		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-		return sc.textFile(inputPath).map(s -> OBJECT_MAPPER.readValue(s, SortableRelation.class));
+		return sc.textFile(inputPath).map(s -> OBJECT_MAPPER.readValue(s, Relation.class));
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

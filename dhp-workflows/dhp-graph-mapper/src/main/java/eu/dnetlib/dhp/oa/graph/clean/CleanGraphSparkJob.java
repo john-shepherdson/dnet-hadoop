@@ -147,6 +147,9 @@ public class CleanGraphSparkJob {
 					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
 						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
 					}
+					if (Objects.isNull(i.getRefereed())) {
+						i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
+					}
 				}
 			}
 

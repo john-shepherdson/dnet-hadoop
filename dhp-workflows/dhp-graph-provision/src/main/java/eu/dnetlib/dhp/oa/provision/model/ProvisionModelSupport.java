@@ -19,7 +19,7 @@ public class ProvisionModelSupport {
 						RelatedEntityWrapper.class,
 						JoinedEntity.class,
 						RelatedEntity.class,
-						SortableRelation.class));
+						SortableRelationKey.class));
 		return modelClasses.toArray(new Class[] {});
 	}
 }
