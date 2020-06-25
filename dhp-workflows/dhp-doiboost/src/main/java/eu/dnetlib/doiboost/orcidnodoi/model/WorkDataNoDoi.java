@@ -97,5 +97,4 @@ public class WorkDataNoDoi implements Serializable {
 	public void setContributors(List<Contributor> contributors) {
 		this.contributors = contributors;
 	}
-
 }

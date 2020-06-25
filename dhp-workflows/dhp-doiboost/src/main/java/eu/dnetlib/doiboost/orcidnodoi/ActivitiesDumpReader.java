@@ -1,12 +1,10 @@
 
-package eu.dnetlib.doiboost.orcid;
+package eu.dnetlib.doiboost.orcidnodoi;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-
+import eu.dnetlib.doiboost.orcid.json.JsonHelper;
+import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
+import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.hadoop.conf.Configuration;
@@ -19,15 +17,18 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.mortbay.log.Log;
 
-import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
-import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
 
-public class SummariesDecompressor {
+public class ActivitiesDumpReader {
 
-	private static final int MAX_XML_RECORDS_PARSED = -1;
+	private static final int MAX_XML_WORKS_PARSED = -1;
+	private static final int XML_WORKS_PARSED_COUNTER_LOG_INTERVAL = 100000;
 
-	public static void parseGzSummaries(Configuration conf, String inputUri, Path outputPath)
+	public static void parseGzActivities(Configuration conf, String inputUri, Path outputPath)
 		throws Exception {
 		String uri = inputUri;
 		FileSystem fs = FileSystem.get(URI.create(uri), conf);
@@ -42,7 +43,7 @@ public class SummariesDecompressor {
 		InputStream gzipInputStream = null;
 		try {
 			gzipInputStream = codec.createInputStream(fs.open(inputPath));
-			parseTarSummaries(fs, conf, gzipInputStream, outputPath);
+			parseTarActivities(fs, conf, gzipInputStream, outputPath);
 
 		} finally {
 			Log.debug("Closing gzip stream");
@@ -50,12 +51,10 @@ public class SummariesDecompressor {
 		}
 	}
 
-	private static void parseTarSummaries(
+	private static void parseTarActivities(
 		FileSystem fs, Configuration conf, InputStream gzipInputStream, Path outputPath) {
 		int counter = 0;
-		int nameFound = 0;
-		int surnameFound = 0;
-		int creditNameFound = 0;
+		int noDoiFound = 0;
 		int errorFromOrcidFound = 0;
 		int xmlParserErrorFound = 0;
 		try (TarArchiveInputStream tais = new TarArchiveInputStream(gzipInputStream)) {
@@ -69,11 +68,12 @@ public class SummariesDecompressor {
 					SequenceFile.Writer.valueClass(Text.class))) {
 				while ((entry = tais.getNextTarEntry()) != null) {
 					String filename = entry.getName();
+
 					try {
-						if (entry.isDirectory()) {
-							Log.debug("Directory entry name: " + entry.getName());
+						if (entry.isDirectory() || !filename.contains("works")) {
+
 						} else {
-							Log.debug("XML record entry name: " + entry.getName());
+							Log.debug("XML work entry name: " + entry.getName());
 							counter++;
 							BufferedReader br = new BufferedReader(new InputStreamReader(tais)); // Read directly from
 																									// tarInput
@@ -82,40 +82,36 @@ public class SummariesDecompressor {
 							while ((line = br.readLine()) != null) {
 								buffer.append(line);
 							}
-							AuthorData authorData = XMLRecordParser.VTDParseAuthorData(buffer.toString().getBytes());
-							if (authorData != null) {
-								if (authorData.getErrorCode() != null) {
+							WorkDataNoDoi workDataNoDoi = XMLRecordParserNoDoi.VTDParseWorkData(buffer.toString().getBytes());
+							if (workDataNoDoi != null) {
+								if (workDataNoDoi.getErrorCode() != null) {
 									errorFromOrcidFound += 1;
 									Log
 										.debug(
 											"error from Orcid with code "
-												+ authorData.getErrorCode()
-												+ " for oid "
+												+ workDataNoDoi.getErrorCode()
+												+ " for entry "
 												+ entry.getName());
 									continue;
 								}
-								String jsonData = JsonWriter.create(authorData);
-								Log.debug("oid: " + authorData.getOid() + " data: " + jsonData);
+								boolean isDoiFound = workDataNoDoi.getExtIds().stream()
+										.filter(e -> e.getType()!=null)
+										.anyMatch(e -> e.getType().equals("doi"));
+								if (!isDoiFound) {
+									String jsonData = JsonHelper.createOidWork(workDataNoDoi);
+									Log.debug("oid: " + workDataNoDoi.getOid() + " data: " + jsonData);
 
-								final Text key = new Text(authorData.getOid());
-								final Text value = new Text(jsonData);
+									final Text key = new Text(workDataNoDoi.getOid());
+									final Text value = new Text(jsonData);
 
-								try {
-									writer.append(key, value);
-								} catch (IOException e) {
-									Log.debug("Writing to sequence file: " + e.getMessage());
-									Log.debug(e);
-									throw new RuntimeException(e);
-								}
-
-								if (authorData.getName() != null) {
-									nameFound += 1;
-								}
-								if (authorData.getSurname() != null) {
-									surnameFound += 1;
-								}
-								if (authorData.getCreditName() != null) {
-									creditNameFound += 1;
+									try {
+										writer.append(key, value);
+									} catch (IOException e) {
+										Log.debug("Writing to sequence file: " + e.getMessage());
+										Log.debug(e);
+										throw new RuntimeException(e);
+									}
+									noDoiFound += 1;
 								}
 
 							} else {
@@ -126,33 +122,28 @@ public class SummariesDecompressor {
 					} catch (Exception e) {
 						Log
 							.warn(
-								"Parsing record from tar archive and xml record: "
-									+ filename
-									+ "  "
-									+ e.getMessage());
+								"Parsing work from tar archive and xml work: " + filename + "  " + e.getMessage());
 						Log.warn(e);
 					}
 
-					if ((counter % 100000) == 0) {
-						Log.info("Current xml records parsed: " + counter);
+					if ((counter % XML_WORKS_PARSED_COUNTER_LOG_INTERVAL) == 0) {
+						Log.info("Current xml works parsed: " + counter);
 					}
 
-					if ((MAX_XML_RECORDS_PARSED > -1) && (counter > MAX_XML_RECORDS_PARSED)) {
+					if ((MAX_XML_WORKS_PARSED > -1) && (counter > MAX_XML_WORKS_PARSED)) {
 						break;
 					}
 				}
 			}
 		} catch (IOException e) {
-			Log.warn("Parsing record from gzip archive: " + e.getMessage());
+			Log.warn("Parsing work from gzip archive: " + e.getMessage());
 			Log.warn(e);
 			throw new RuntimeException(e);
 		}
-		Log.info("Summaries parse completed");
-		Log.info("Total XML records parsed: " + counter);
-		Log.info("Name found: " + nameFound);
-		Log.info("Surname found: " + surnameFound);
-		Log.info("Credit name found: " + creditNameFound);
+		Log.info("Activities parse completed");
+		Log.info("Total XML works parsed: " + counter);
+		Log.info("Total no doi work found: " + noDoiFound);
 		Log.info("Error from Orcid found: " + errorFromOrcidFound);
-		Log.info("Error parsing xml record found: " + xmlParserErrorFound);
+		Log.info("Error parsing xml work found: " + xmlParserErrorFound);
 	}
 }

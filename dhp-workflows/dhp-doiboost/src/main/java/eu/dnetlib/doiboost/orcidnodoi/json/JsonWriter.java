@@ -1,5 +1,5 @@
 
-package eu.dnetlib.doiboost.orcid.json;
+package eu.dnetlib.doiboost.orcidnodoi.json;
 
 import com.google.gson.JsonObject;
 

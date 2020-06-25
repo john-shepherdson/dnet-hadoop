@@ -8,9 +8,9 @@ import eu.dnetlib.doiboost.orcid.model.AuthorData;
 public class Contributor extends AuthorData implements Serializable {
 	private String sequence;
 	private String role;
-	private boolean simpleMatch = false;
-	private Double score = 0.0;
-	private boolean bestMatch = false;
+	private transient boolean simpleMatch = false;
+	private transient Double score = 0.0;
+	private transient boolean bestMatch = false;
 
 	public String getSequence() {
 		return sequence;
