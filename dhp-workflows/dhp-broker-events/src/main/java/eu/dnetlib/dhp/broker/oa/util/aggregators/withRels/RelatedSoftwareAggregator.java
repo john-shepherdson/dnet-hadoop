@@ -7,6 +7,7 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import scala.Tuple2;
 
 public class RelatedSoftwareAggregator
@@ -30,7 +31,7 @@ public class RelatedSoftwareAggregator
 	@Override
 	public OaBrokerMainEntity reduce(final OaBrokerMainEntity g, final Tuple2<OaBrokerMainEntity, RelatedSoftware> t) {
 		final OaBrokerMainEntity res = StringUtils.isNotBlank(g.getOpenaireId()) ? g : t._1;
-		if (t._2 != null) {
+		if (t._2 != null && res.getSoftwares().size() < BrokerConstants.MAX_NUMBER_OF_RELS) {
 			res.getSoftwares().add(t._2.getRelSoftware());
 		}
 		return res;
@@ -40,7 +41,14 @@ public class RelatedSoftwareAggregator
 	@Override
 	public OaBrokerMainEntity merge(final OaBrokerMainEntity g1, final OaBrokerMainEntity g2) {
 		if (StringUtils.isNotBlank(g1.getOpenaireId())) {
-			g1.getSoftwares().addAll(g2.getSoftwares());
+			final int availables = BrokerConstants.MAX_NUMBER_OF_RELS - g1.getSoftwares().size();
+			if (availables > 0) {
+				if (g2.getSoftwares().size() <= availables) {
+					g1.getSoftwares().addAll(g2.getSoftwares());
+				} else {
+					g1.getSoftwares().addAll(g2.getSoftwares().subList(0, availables));
+				}
+			}
 			return g1;
 		} else {
 			return g2;

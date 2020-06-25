@@ -16,7 +16,7 @@ public abstract class AbstractEnrichMissingPublication extends UpdateMatcher<OaB
 		super(true,
 			rel -> topic,
 			(p, rel) -> p.getPublications().add(rel),
-			rel -> rel.getOriginalId());
+			rel -> rel.getOpenaireId());
 
 	}
 
@@ -31,14 +31,14 @@ public abstract class AbstractEnrichMissingPublication extends UpdateMatcher<OaB
 			.getPublications()
 			.stream()
 			.filter(rel -> filterByType(rel.getRelType()))
-			.map(OaBrokerRelatedPublication::getOriginalId)
+			.map(OaBrokerRelatedPublication::getOpenaireId)
 			.collect(Collectors.toSet());
 
 		return source
 			.getPublications()
 			.stream()
 			.filter(rel -> filterByType(rel.getRelType()))
-			.filter(p -> !existingPublications.contains(p.getOriginalId()))
+			.filter(p -> !existingPublications.contains(p.getOpenaireId()))
 			.collect(Collectors.toList());
 	}
 

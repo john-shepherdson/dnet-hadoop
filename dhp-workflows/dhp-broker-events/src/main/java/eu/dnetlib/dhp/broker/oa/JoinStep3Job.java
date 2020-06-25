@@ -17,22 +17,20 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultAggregator;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDataset;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDatasetAggregator;
 import scala.Tuple2;
 
-public class PrepareGroupsJob {
+public class JoinStep3Job {
 
-	private static final Logger log = LoggerFactory.getLogger(PrepareGroupsJob.class);
+	private static final Logger log = LoggerFactory.getLogger(JoinStep3Job.class);
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					PrepareGroupsJob.class
+					JoinStep3Job.class
 						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
@@ -42,47 +40,40 @@ public class PrepareGroupsJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String graphPath = parser.get("graphPath");
-		log.info("graphPath: {}", graphPath);
-
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
-		final String groupsPath = workingPath + "/duplicates";
-		log.info("groupsPath: {}", groupsPath);
+		final String joinedEntitiesPath = workingPath + "/joinedEntities_step3";
+		log.info("joinedEntitiesPath: {}", joinedEntitiesPath);
 
 		final SparkConf conf = new SparkConf();
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
-			ClusterUtils.removeDir(spark, groupsPath);
+			ClusterUtils.removeDir(spark, joinedEntitiesPath);
 
-			final Dataset<OaBrokerMainEntity> results = ClusterUtils
-				.readPath(spark, workingPath + "/joinedEntities_step4", OaBrokerMainEntity.class);
+			final Dataset<OaBrokerMainEntity> sources = ClusterUtils
+				.readPath(spark, workingPath + "/joinedEntities_step2", OaBrokerMainEntity.class);
 
-			final Dataset<Relation> mergedRels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
-				.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+			final Dataset<RelatedDataset> typedRels = ClusterUtils
+				.readPath(spark, workingPath + "/relatedDatasets", RelatedDataset.class);
 
-			final TypedColumn<Tuple2<OaBrokerMainEntity, Relation>, ResultGroup> aggr = new ResultAggregator()
+			final TypedColumn<Tuple2<OaBrokerMainEntity, RelatedDataset>, OaBrokerMainEntity> aggr = new RelatedDatasetAggregator()
 				.toColumn();
 
-			final Dataset<ResultGroup> groups = results
-				.joinWith(mergedRels, results.col("openaireId").equalTo(mergedRels.col("source")), "inner")
+			sources
+				.joinWith(typedRels, sources.col("openaireId").equalTo(typedRels.col("source")), "left_outer")
 				.groupByKey(
-					(MapFunction<Tuple2<OaBrokerMainEntity, Relation>, String>) t -> t._2.getTarget(),
+					(MapFunction<Tuple2<OaBrokerMainEntity, RelatedDataset>, String>) t -> t._1.getOpenaireId(),
 					Encoders.STRING())
 				.agg(aggr)
-				.map(
-					(MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.bean(ResultGroup.class))
-				.filter(rg -> rg.getData().size() > 1);
-
-			groups
+				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class))
 				.write()
 				.mode(SaveMode.Overwrite)
-				.json(groupsPath);
+				.json(joinedEntitiesPath);
 
 		});
+
 	}
 
 }

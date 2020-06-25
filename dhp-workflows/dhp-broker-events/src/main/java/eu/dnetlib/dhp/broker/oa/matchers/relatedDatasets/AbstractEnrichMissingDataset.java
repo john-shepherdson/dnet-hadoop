@@ -16,7 +16,7 @@ public abstract class AbstractEnrichMissingDataset extends UpdateMatcher<OaBroke
 		super(true,
 			rel -> topic,
 			(p, rel) -> p.getDatasets().add(rel),
-			rel -> rel.getOriginalId());
+			rel -> rel.getOpenaireId());
 	}
 
 	protected abstract boolean filterByType(String relType);
@@ -29,14 +29,14 @@ public abstract class AbstractEnrichMissingDataset extends UpdateMatcher<OaBroke
 			.getDatasets()
 			.stream()
 			.filter(rel -> filterByType(rel.getRelType()))
-			.map(OaBrokerRelatedDataset::getOriginalId)
+			.map(OaBrokerRelatedDataset::getOpenaireId)
 			.collect(Collectors.toSet());
 
 		return source
 			.getDatasets()
 			.stream()
 			.filter(rel -> filterByType(rel.getRelType()))
-			.filter(d -> !existingDatasets.contains(d.getOriginalId()))
+			.filter(d -> !existingDatasets.contains(d.getOpenaireId()))
 			.collect(Collectors.toList());
 
 	}

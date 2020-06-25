@@ -1,0 +1,90 @@
+[
+  {
+    "collectedfrom": [],
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "Harvested",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      },
+      "trust": "0.9"
+    },
+    "lastupdatetimestamp": 1592688952862,
+    "properties": [],
+    "relClass": "hasAuthorInstitution",
+    "relType": "resultOrganization",
+    "source": "1",
+    "subRelType": "affiliation",
+    "target": "2"
+  },
+  {
+    "collectedfrom": [],
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "Harvested",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      },
+      "trust": "0.9"
+    },
+    "lastupdatetimestamp": 1592688952862,
+    "properties": [],
+    "relClass": "isAuthorInstitutionOf",
+    "relType": "resultOrganization",
+    "source": "2",
+    "subRelType": "affiliation",
+    "target": "1"
+  },
+  {
+    "collectedfrom": [],
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "Harvested",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      },
+      "trust": "0.9"
+    },
+    "lastupdatetimestamp": 1592688952862,
+    "properties": [],
+    "relClass": "isProducedBy",
+    "relType": "resultProject",
+    "source": "1",
+    "subRelType": "outcome",
+    "target": "2"
+  },
+  {
+    "collectedfrom": [],
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "Harvested",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      },
+      "trust": "0.9"
+    },
+    "lastupdatetimestamp": 1592688952862,
+    "properties": [],
+    "relClass": "produces",
+    "relType": "resultProject",
+    "source": "2",
+    "subRelType": "outcome",
+    "target": "1"
+  }
+]
