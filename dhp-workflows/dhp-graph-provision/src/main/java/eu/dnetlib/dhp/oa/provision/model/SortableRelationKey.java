@@ -11,25 +11,34 @@ import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
-public class SortableRelationKey implements Serializable {
+public class SortableRelationKey implements Comparable<SortableRelationKey>, Serializable {
+
+	private static final Map<String, Integer> weights = Maps.newHashMap();
+
+	static {
+		weights.put("outcome", 0);
+		weights.put("supplement", 1);
+		weights.put("review", 2);
+		weights.put("citation", 3);
+		weights.put("affiliation", 4);
+		weights.put("relationship", 5);
+		weights.put("publicationDataset", 6);
+		weights.put("similarity", 7);
+
+		weights.put("provision", 8);
+		weights.put("participation", 9);
+		weights.put("dedup", 10);
+	}
+
+	private static final long serialVersionUID = 3232323;
 
 	private String groupingKey;
 
-	private String source;
-
-	private String target;
-
 	private String subRelType;
-
-	public String getSource() {
-		return source;
-	}
 
 	public static SortableRelationKey create(Relation r, String groupingKey) {
 		SortableRelationKey sr = new SortableRelationKey();
 		sr.setGroupingKey(groupingKey);
-		sr.setSource(r.getSource());
-		sr.setTarget(r.getTarget());
 		sr.setSubRelType(r.getSubRelType());
 		return sr;
 	}
@@ -49,16 +58,16 @@ public class SortableRelationKey implements Serializable {
 		return Objects.hashCode(getGroupingKey());
 	}
 
-	public void setSource(String source) {
-		this.source = source;
+	@Override
+	public int compareTo(SortableRelationKey o) {
+		return ComparisonChain
+			.start()
+			.compare(getWeight(this), getWeight(o))
+			.result() * -1;
 	}
 
-	public String getTarget() {
-		return target;
-	}
-
-	public void setTarget(String target) {
-		this.target = target;
+	private Integer getWeight(SortableRelationKey o) {
+		return Optional.ofNullable(weights.get(o.getSubRelType())).orElse(Integer.MAX_VALUE);
 	}
 
 	public String getSubRelType() {
@@ -76,4 +85,5 @@ public class SortableRelationKey implements Serializable {
 	public void setGroupingKey(String groupingKey) {
 		this.groupingKey = groupingKey;
 	}
+
 }

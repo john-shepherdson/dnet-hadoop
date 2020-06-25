@@ -12,6 +12,8 @@ import eu.dnetlib.dhp.oa.provision.model.SortableRelationKey;
  */
 public class RelationPartitioner extends Partitioner {
 
+	private static final long serialVersionUID = 343434456L;
+
 	private final int numPartitions;
 
 	public RelationPartitioner(int numPartitions) {
@@ -27,6 +29,16 @@ public class RelationPartitioner extends Partitioner {
 	public int getPartition(Object key) {
 		SortableRelationKey partitionKey = (SortableRelationKey) key;
 		return Utils.nonNegativeMod(partitionKey.getGroupingKey().hashCode(), numPartitions());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof RelationPartitioner) {
+			RelationPartitioner p = (RelationPartitioner) obj;
+			if (p.numPartitions() == numPartitions())
+				return true;
+		}
+		return false;
 	}
 
 }

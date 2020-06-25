@@ -11,6 +11,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -30,6 +32,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelationKey;
 import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import scala.Tuple2;
 
 /**
  * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects. The
@@ -62,21 +65,6 @@ public class PrepareRelationsJob {
 	public static final int MAX_RELS = 100;
 
 	public static final int DEFAULT_NUM_PARTITIONS = 3000;
-
-	private static final Map<String, Integer> weights = Maps.newHashMap();
-
-	static {
-		weights.put("outcome", 0);
-		weights.put("supplement", 1);
-		weights.put("affiliation", 2);
-		weights.put("relationship", 3);
-		weights.put("publicationDataset", 4);
-		weights.put("similarity", 5);
-
-		weights.put("provision", 6);
-		weights.put("participation", 7);
-		weights.put("dedup", 8);
-	}
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -146,21 +134,26 @@ public class PrepareRelationsJob {
 		int relPartitions) {
 
 		RDD<Relation> cappedRels = readPathRelationRDD(spark, inputRelationsPath)
-			.repartition(relPartitions)
-			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
-			.filter(rel -> !relationFilter.contains(rel.getRelClass()))
+			.filter(rel -> rel.getDataInfo().getDeletedbyinference() == false)
+			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false)
+
 			// group by SOURCE and apply limit
-			.groupBy(r -> SortableRelationKey.create(r, r.getSource()))
-			.repartitionAndSortWithinPartitions(
-				new RelationPartitioner(relPartitions),
-				(SerializableComparator<SortableRelationKey>) (o1, o2) -> compare(o1, o2))
-			.flatMap(t -> Iterables.limit(t._2(), maxRelations).iterator())
+			.mapToPair(r -> new Tuple2<>(SortableRelationKey.create(r, r.getSource()), r))
+			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
+			.groupBy(Tuple2::_1)
+			.map(Tuple2::_2)
+			.map(t -> Iterables.limit(t, maxRelations))
+			.flatMap(Iterable::iterator)
+			.map(Tuple2::_2)
+
 			// group by TARGET and apply limit
-			.groupBy(r -> SortableRelationKey.create(r, r.getTarget()))
-			.repartitionAndSortWithinPartitions(
-				new RelationPartitioner(relPartitions),
-				(SerializableComparator<SortableRelationKey>) (o1, o2) -> compare(o1, o2))
-			.flatMap(t -> Iterables.limit(t._2(), maxRelations).iterator())
+			.mapToPair(r -> new Tuple2<>(SortableRelationKey.create(r, r.getTarget()), r))
+			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
+			.groupBy(Tuple2::_1)
+			.map(Tuple2::_2)
+			.map(t -> Iterables.limit(t, maxRelations))
+			.flatMap(Iterable::iterator)
+			.map(Tuple2::_2)
 			.rdd();
 
 		spark
@@ -168,24 +161,6 @@ public class PrepareRelationsJob {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
-	}
-
-	private static int compare(SortableRelationKey o1, SortableRelationKey o2) {
-		final Integer w1 = Optional.ofNullable(weights.get(o1.getSubRelType())).orElse(Integer.MAX_VALUE);
-		final Integer w2 = Optional.ofNullable(weights.get(o2.getSubRelType())).orElse(Integer.MAX_VALUE);
-		return ComparisonChain
-			.start()
-			.compare(w1, w2)
-			.compare(o1.getSource(), o2.getSource())
-			.compare(o1.getTarget(), o2.getTarget())
-			.result();
-	}
-
-	@FunctionalInterface
-	public interface SerializableComparator<T> extends Comparator<T>, Serializable {
-
-		@Override
-		int compare(T o1, T o2);
 	}
 
 	/**
