@@ -62,8 +62,9 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 	public int compareTo(SortableRelationKey o) {
 		return ComparisonChain
 			.start()
+			.compare(getGroupingKey(), o.getGroupingKey())
 			.compare(getWeight(this), getWeight(o))
-			.result() * -1;
+			.result();
 	}
 
 	private Integer getWeight(SortableRelationKey o) {

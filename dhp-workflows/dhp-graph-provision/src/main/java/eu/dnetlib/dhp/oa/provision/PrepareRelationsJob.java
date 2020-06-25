@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -21,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Iterables;
@@ -142,7 +145,7 @@ public class PrepareRelationsJob {
 			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
 			.groupBy(Tuple2::_1)
 			.map(Tuple2::_2)
-			.map(t -> Iterables.limit(t, maxRelations))
+			.map(t -> Iterables.filter(t, input -> input._1().getSubRelType().equals("outcome")))
 			.flatMap(Iterable::iterator)
 			.map(Tuple2::_2)
 
@@ -151,7 +154,8 @@ public class PrepareRelationsJob {
 			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
 			.groupBy(Tuple2::_1)
 			.map(Tuple2::_2)
-			.map(t -> Iterables.limit(t, maxRelations))
+			.map(t -> Iterables.filter(t, input -> input._1().getSubRelType().equals("outcome")))
+			// .map(t -> Iterables.limit(t, maxRelations))
 			.flatMap(Iterable::iterator)
 			.map(Tuple2::_2)
 			.rdd();
