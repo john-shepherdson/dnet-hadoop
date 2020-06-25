@@ -3,9 +3,8 @@ package eu.dnetlib.dhp.broker.model;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +29,7 @@ public class EventFactory {
 
 		final Event res = new Event();
 
-		final Map<String, Object> map = createMapFromResult(updateInfo);
+		final MappedFields map = createMapFromResult(updateInfo);
 
 		final String eventId = calculateEventId(
 			updateInfo.getTopicPath(), updateInfo.getTarget().getOpenaireId(), updateInfo.getHighlightValueAsString());
@@ -46,35 +45,35 @@ public class EventFactory {
 		return res;
 	}
 
-	private static Map<String, Object> createMapFromResult(final UpdateInfo<?> updateInfo) {
-		final Map<String, Object> map = new HashMap<>();
+	private static MappedFields createMapFromResult(final UpdateInfo<?> updateInfo) {
+		final MappedFields map = new MappedFields();
 
 		final OaBrokerMainEntity source = updateInfo.getSource();
 		final OaBrokerMainEntity target = updateInfo.getTarget();
 
-		map.put("target_datasource_id", target.getCollectedFromId());
-		map.put("target_datasource_name", target.getCollectedFromName());
+		map.setTargetDatasourceId(target.getCollectedFromId());
+		map.setTargetDatasourceName(target.getCollectedFromName());
 
-		map.put("target_publication_id", target.getOpenaireId());
+		map.setTargetResultId(target.getOpenaireId());
 
 		final List<String> titles = target.getTitles();
 		if (titles.size() > 0) {
-			map.put("target_publication_title", titles.get(0));
+			map.setTargetResultTitle(titles.get(0));
 		}
 
 		final long date = parseDateTolong(target.getPublicationdate());
 		if (date > 0) {
-			map.put("target_dateofacceptance", date);
+			map.setTargetDateofacceptance(date);
 		}
 
-		map.put("target_publication_subject_list", target.getSubjects());
-		map.put("target_publication_author_list", target.getCreators());
+		map.setTargetSubjects(target.getSubjects().stream().map(s -> s.getValue()).collect(Collectors.toList()));
+		map.setTargetAuthors(target.getCreators().stream().map(a -> a.getFullname()).collect(Collectors.toList()));
 
 		// PROVENANCE INFO
-		map.put("trust", updateInfo.getTrust());
-		map.put("provenance_datasource_id", source.getCollectedFromId());
-		map.put("provenance_datasource_name", source.getCollectedFromName());
-		map.put("provenance_publication_id_list", source.getOpenaireId());
+		map.setTrust(updateInfo.getTrust());
+		map.setProvenanceDatasourceId(source.getCollectedFromId());
+		map.setProvenanceDatasourceName(source.getCollectedFromName());
+		map.setProvenanceResultId(source.getOpenaireId());
 
 		return map;
 	}
