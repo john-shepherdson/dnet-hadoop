@@ -121,10 +121,6 @@ public class XmlRecordFactory implements Serializable {
 		}
 	}
 
-	private static OafEntity toOafEntity(TypedRow typedRow) {
-		return parseOaf(typedRow.getOaf(), typedRow.getType());
-	}
-
 	private static OafEntity parseOaf(final String json, final String type) {
 		try {
 			switch (EntityType.valueOf(type)) {

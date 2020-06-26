@@ -3,28 +3,33 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.SortableRelationKey;
 import eu.dnetlib.dhp.oa.provision.utils.RelationPartitioner;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -102,13 +107,15 @@ public class PrepareRelationsJob {
 		log.info("maxRelations: {}", maxRelations);
 
 		SparkConf conf = new SparkConf();
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareRelationsRDD(
+				prepareRelationsDataset(
 					spark, inputRelationsPath, outputPath, relationFilter, maxRelations, relPartitions);
 			});
 	}
@@ -125,9 +132,8 @@ public class PrepareRelationsJob {
 	 * @param maxRelations maximum number of allowed outgoing edges
 	 * @param relPartitions number of partitions for the output RDD
 	 */
-	private static void prepareRelationsRDD(
-		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter, int maxRelations,
-		int relPartitions) {
+	private static void prepareRelationsRDD(SparkSession spark, String inputRelationsPath, String outputPath,
+		Set<String> relationFilter, int maxRelations, int relPartitions) {
 
 		// group by SOURCE and apply limit
 		RDD<Relation> bySource = readPathRelationRDD(spark, inputRelationsPath)
@@ -161,6 +167,108 @@ public class PrepareRelationsJob {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
+	}
+
+	private static void prepareRelationsDataset(
+		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter, int maxRelations,
+		int relPartitions) {
+
+		Dataset<Relation> bySource = pruneRelations(
+			spark, inputRelationsPath, relationFilter, maxRelations, relPartitions,
+			(Function<Relation, String>) r -> r.getSource());
+		Dataset<Relation> byTarget = pruneRelations(
+			spark, inputRelationsPath, relationFilter, maxRelations, relPartitions,
+			(Function<Relation, String>) r -> r.getTarget());
+
+		bySource
+			.union(byTarget)
+			.repartition(relPartitions)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.parquet(outputPath);
+	}
+
+	private static Dataset<Relation> pruneRelations(SparkSession spark, String inputRelationsPath,
+		Set<String> relationFilter, int maxRelations, int relPartitions,
+		Function<Relation, String> idFn) {
+		return readRelations(spark, inputRelationsPath, relationFilter, relPartitions)
+			.groupByKey(
+				(MapFunction<Relation, String>) r -> idFn.call(r),
+				Encoders.STRING())
+			.agg(new RelationAggregator(maxRelations).toColumn())
+			.flatMap(
+				(FlatMapFunction<Tuple2<String, RelationList>, Relation>) t -> t
+					._2()
+					.getRelations()
+					.iterator(),
+				Encoders.bean(Relation.class));
+	}
+
+	private static Dataset<Relation> readRelations(SparkSession spark, String inputRelationsPath,
+		Set<String> relationFilter, int relPartitions) {
+		return spark
+			.read()
+			.textFile(inputRelationsPath)
+			.repartition(relPartitions)
+			.map(
+				(MapFunction<String, Relation>) s -> OBJECT_MAPPER.readValue(s, Relation.class),
+				Encoders.kryo(Relation.class))
+			.filter((FilterFunction<Relation>) rel -> rel.getDataInfo().getDeletedbyinference() == false)
+			.filter((FilterFunction<Relation>) rel -> relationFilter.contains(rel.getRelClass()) == false);
+	}
+
+	public static class RelationAggregator
+		extends Aggregator<Relation, RelationList, RelationList> {
+
+		private int maxRelations;
+
+		public RelationAggregator(int maxRelations) {
+			this.maxRelations = maxRelations;
+		}
+
+		@Override
+		public RelationList zero() {
+			return new RelationList();
+		}
+
+		@Override
+		public RelationList reduce(RelationList b, Relation a) {
+			b.getRelations().add(a);
+			return getSortableRelationList(b);
+		}
+
+		@Override
+		public RelationList merge(RelationList b1, RelationList b2) {
+			b1.getRelations().addAll(b2.getRelations());
+			return getSortableRelationList(b1);
+		}
+
+		@Override
+		public RelationList finish(RelationList r) {
+			return getSortableRelationList(r);
+		}
+
+		private RelationList getSortableRelationList(RelationList b1) {
+			RelationList sr = new RelationList();
+			sr
+				.setRelations(
+					b1
+						.getRelations()
+						.stream()
+						.limit(maxRelations)
+						.collect(Collectors.toCollection(() -> new PriorityQueue<>(new RelationComparator()))));
+			return sr;
+		}
+
+		@Override
+		public Encoder<RelationList> bufferEncoder() {
+			return Encoders.kryo(RelationList.class);
+		}
+
+		@Override
+		public Encoder<RelationList> outputEncoder() {
+			return Encoders.kryo(RelationList.class);
+		}
 	}
 
 	/**
