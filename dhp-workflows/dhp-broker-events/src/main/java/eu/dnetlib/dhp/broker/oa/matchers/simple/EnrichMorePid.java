@@ -5,23 +5,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
-import eu.dnetlib.broker.objects.TypedValue;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 
-public class EnrichMorePid extends UpdateMatcher<TypedValue> {
+public class EnrichMorePid extends UpdateMatcher<OaBrokerTypedValue> {
 
 	public EnrichMorePid() {
-		super(true,
+		super(20,
 			pid -> Topic.ENRICH_MORE_PID,
 			(p, pid) -> p.getPids().add(pid),
 			pid -> pidAsString(pid));
 	}
 
 	@Override
-	protected List<TypedValue> findDifferences(final OpenaireBrokerResult source,
-		final OpenaireBrokerResult target) {
+	protected List<OaBrokerTypedValue> findDifferences(final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
 		final Set<String> existingPids = target
 			.getPids()
 			.stream()
@@ -35,7 +35,7 @@ public class EnrichMorePid extends UpdateMatcher<TypedValue> {
 			.collect(Collectors.toList());
 	}
 
-	private static String pidAsString(final TypedValue pid) {
+	private static String pidAsString(final OaBrokerTypedValue pid) {
 		return pid.getType() + "::" + pid.getValue();
 	}
 }

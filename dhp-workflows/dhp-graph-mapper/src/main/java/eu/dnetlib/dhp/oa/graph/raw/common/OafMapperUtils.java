@@ -9,7 +9,15 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.Journal;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
+import eu.dnetlib.dhp.schema.oaf.OriginDescription;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class OafMapperUtils {
@@ -89,7 +97,9 @@ public class OafMapperUtils {
 	}
 
 	public static StructuredProperty structuredProperty(
-		final String value, final Qualifier qualifier, final DataInfo dataInfo) {
+		final String value,
+		final Qualifier qualifier,
+		final DataInfo dataInfo) {
 		if (value == null) {
 			return null;
 		}
@@ -192,8 +202,12 @@ public class OafMapperUtils {
 	}
 
 	public static String createOpenaireId(
-		final int prefix, final String originalId, final boolean to_md5) {
-		if (to_md5) {
+		final int prefix,
+		final String originalId,
+		final boolean to_md5) {
+		if (StringUtils.isBlank(originalId)) {
+			return null;
+		} else if (to_md5) {
 			final String nsPrefix = StringUtils.substringBefore(originalId, "::");
 			final String rest = StringUtils.substringAfter(originalId, "::");
 			return String.format("%s|%s::%s", prefix, nsPrefix, DHPUtils.md5(rest));
@@ -203,7 +217,9 @@ public class OafMapperUtils {
 	}
 
 	public static String createOpenaireId(
-		final String type, final String originalId, final boolean to_md5) {
+		final String type,
+		final String originalId,
+		final boolean to_md5) {
 		switch (type) {
 			case "datasource":
 				return createOpenaireId(10, originalId, to_md5);

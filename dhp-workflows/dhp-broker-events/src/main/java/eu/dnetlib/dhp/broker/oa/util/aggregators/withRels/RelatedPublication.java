@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.broker.oa.util.aggregators.withRels;
 
 import java.io.Serializable;
 
-import eu.dnetlib.broker.objects.Publication;
+import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 
 public class RelatedPublication implements Serializable {
 
@@ -12,13 +12,14 @@ public class RelatedPublication implements Serializable {
 	 */
 	private static final long serialVersionUID = 9021609640411395128L;
 
-	private final String source;
-	private final String relType;
-	private final Publication relPublication;
+	private String source;
+	private OaBrokerRelatedPublication relPublication;
 
-	public RelatedPublication(final String source, final String relType, final Publication relPublication) {
+	public RelatedPublication() {
+	}
+
+	public RelatedPublication(final String source, final OaBrokerRelatedPublication relPublication) {
 		this.source = source;
-		this.relType = relType;
 		this.relPublication = relPublication;
 	}
 
@@ -26,12 +27,16 @@ public class RelatedPublication implements Serializable {
 		return source;
 	}
 
-	public String getRelType() {
-		return relType;
+	public void setSource(final String source) {
+		this.source = source;
 	}
 
-	public Publication getRelPublication() {
+	public OaBrokerRelatedPublication getRelPublication() {
 		return relPublication;
+	}
+
+	public void setRelPublication(final OaBrokerRelatedPublication relPublication) {
+		this.relPublication = relPublication;
 	}
 
 }

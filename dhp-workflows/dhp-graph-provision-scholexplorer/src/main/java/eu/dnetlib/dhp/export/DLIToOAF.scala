@@ -4,9 +4,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import eu.dnetlib.dhp.common.PacePerson
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Dataset, Field, Instance, KeyValue, Publication, Qualifier, Relation, StructuredProperty}
+import eu.dnetlib.dhp.schema.action.AtomicAction
+import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, StructuredProperty}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
+import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
+import org.codehaus.jackson.map.ObjectMapper
 
 import scala.collection.JavaConverters._
 
@@ -77,6 +80,76 @@ object DLIToOAF {
   )
 
 
+  val rel_inverse: Map[String, String] = Map(
+    "isRelatedTo" -> "isRelatedTo",
+    "IsSupplementedBy" -> "isSupplementTo",
+    "cites" -> "IsCitedBy",
+    "IsCitedBy" -> "cites",
+    "reviews" -> "IsReviewedBy"
+  )
+
+
+  val PidTypeMap: Map[String, String] = Map(
+    "pbmid" -> "pmid",
+    "pmcid" -> "pmc",
+    "pmid" -> "pmid",
+    "pubmedid" -> "pmid",
+    "DOI" -> "doi",
+    "doi" -> "doi"
+  )
+
+
+  def toActionSet(item: Oaf): (String, String) = {
+    val mapper = new ObjectMapper()
+
+    item match {
+      case dataset: Dataset =>
+        val a: AtomicAction[Dataset] = new AtomicAction[Dataset]
+        a.setClazz(classOf[Dataset])
+        a.setPayload(dataset)
+        (dataset.getClass.getCanonicalName, mapper.writeValueAsString(a))
+      case publication: Publication =>
+        val a: AtomicAction[Publication] = new AtomicAction[Publication]
+        a.setClazz(classOf[Publication])
+        a.setPayload(publication)
+        (publication.getClass.getCanonicalName, mapper.writeValueAsString(a))
+      case relation: Relation =>
+        val a: AtomicAction[Relation] = new AtomicAction[Relation]
+        a.setClazz(classOf[Relation])
+        a.setPayload(relation)
+        (relation.getClass.getCanonicalName, mapper.writeValueAsString(a))
+      case _ =>
+        null
+    }
+  }
+
+  def convertClinicalTrial(dataset: DLIDataset): (String, String) = {
+    val currentId = generateId(dataset.getId)
+    val pids = dataset.getPid.asScala.filter(p => "clinicaltrials.gov".equalsIgnoreCase(p.getQualifier.getClassname)).map(p => s"50|r3111dacbab5::${DHPUtils.md5(p.getValue.toLowerCase())}")
+    if (pids.isEmpty)
+      null
+    else
+      (currentId, pids.head)
+  }
+
+
+  def insertExternalRefs(publication: Publication, externalReferences: List[DLIExternalReference]): Publication = {
+
+    val eRefs = externalReferences.map(e => {
+      val result = new ExternalReference()
+      result.setSitename(e.sitename)
+      result.setLabel(e.label)
+      result.setUrl(e.url)
+      result.setRefidentifier(e.pid)
+      result.setDataInfo(generateDataInfo())
+      result.setQualifier(createQualifier(e.classId, "dnet:externalReference_typologies"))
+      result
+    })
+    publication.setExternalReference(eRefs.asJava)
+    publication
+
+  }
+
   def filterPid(p: StructuredProperty): Boolean = {
     if (expectecdPidType.contains(p.getQualifier.getClassname) && p.getQualifier.getClassname.equalsIgnoreCase("url"))
       if (filteredURL.exists(u => p.getValue.contains(u)))
@@ -97,7 +170,6 @@ object DLIToOAF {
   }
 
   def convertDLIDatasetToExternalReference(dataset: DLIDataset): DLIExternalReference = {
-    val currentId = generateId(dataset.getId)
     val pids = dataset.getPid.asScala.filter(filterPid)
 
     if (pids == null || pids.isEmpty)
@@ -109,7 +181,7 @@ object DLIToOAF {
     pid.getQualifier.getClassname match {
       case "uniprot" => DLIExternalReference(generateId(dataset.getId), s"https://www.uniprot.org/uniprot/${pid.getValue}", "UniProt", extractTitle(dataset.getTitle), pid.getValue, "accessionNumber")
       case "ena" =>
-        if(pid.getValue!= null && pid.getValue.nonEmpty && pid.getValue.length>7)
+        if (pid.getValue != null && pid.getValue.nonEmpty && pid.getValue.length > 7)
           DLIExternalReference(generateId(dataset.getId), s"https://www.ebi.ac.uk/ena/data/view/${pid.getValue.substring(0, 8)}", "European Nucleotide Archive", extractTitle(dataset.getTitle), pid.getValue, "accessionNumber")
         else
           null
@@ -126,43 +198,50 @@ object DLIToOAF {
   }
 
 
-  def convertDLIPublicationToOAF(p: DLIPublication): Publication = {
-
+  def convertDLIPublicationToOAF(inputPublication: DLIPublication): Publication = {
     val result = new Publication
-    result.setId(generateId(p.getId))
+    val cleanedPids = inputPublication.getPid.asScala.filter(p => PidTypeMap.contains(p.getQualifier.getClassid))
+      .map(p => {
+            p.setQualifier(createQualifier(PidTypeMap(p.getQualifier.getClassid), p.getQualifier.getSchemeid))
+            p
+    })
+    if (cleanedPids.isEmpty)
+      return null
+    result.setId(generateId(inputPublication.getId))
     result.setDataInfo(generateDataInfo(invisibile = true))
-    if (p.getCollectedfrom == null || p.getCollectedfrom.size() == 0 || (p.getCollectedfrom.size() == 1 && p.getCollectedfrom.get(0) == null))
+    if (inputPublication.getCollectedfrom == null || inputPublication.getCollectedfrom.size() == 0 || (inputPublication.getCollectedfrom.size() == 1 && inputPublication.getCollectedfrom.get(0) == null))
       return null
-
-    result.setCollectedfrom(p.getCollectedfrom.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).asJava)
-    result.setPid(p.getPid)
-    result.setDateofcollection(p.getDateofcollection)
-    result.setOriginalId(p.getPid.asScala.map(p => p.getValue).asJava)
+    result.setCollectedfrom(inputPublication.getCollectedfrom.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).filter(p => p != null).asJava)
+    if(result.getCollectedfrom.isEmpty)
+      return null
+    result.setPid(cleanedPids.asJava)
+    result.setDateofcollection(inputPublication.getDateofcollection)
+    result.setOriginalId(inputPublication.getPid.asScala.map(p => p.getValue).asJava)
     result.setDateoftransformation(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")))
-    if (p.getAuthor == null || p.getAuthor.isEmpty)
+    if (inputPublication.getAuthor == null || inputPublication.getAuthor.isEmpty)
       return null
-    result.setAuthor(p.getAuthor.asScala.map(convertAuthor).asJava)
-    result.setResulttype(createQualifier(p.getResulttype.getClassid, p.getResulttype.getClassname, "dnet:result_typologies", "dnet:result_typologies"))
+    result.setAuthor(inputPublication.getAuthor.asScala.map(convertAuthor).asJava)
+    result.setResulttype(createQualifier(inputPublication.getResulttype.getClassid, inputPublication.getResulttype.getClassname, "dnet:result_typologies", "dnet:result_typologies"))
 
-    if (p.getSubject != null)
-      result.setSubject(p.getSubject.asScala.map(convertSubject).asJava)
+    if (inputPublication.getSubject != null)
+      result.setSubject(inputPublication.getSubject.asScala.map(convertSubject).asJava)
 
-    if (p.getTitle == null || p.getTitle.isEmpty)
-      return null
-
-    result.setTitle(List(patchTitle(p.getTitle.get(0))).asJava)
-
-    if (p.getRelevantdate == null || p.getRelevantdate.size() == 0)
+    if (inputPublication.getTitle == null || inputPublication.getTitle.isEmpty)
       return null
 
-    result.setRelevantdate(p.getRelevantdate.asScala.map(patchRelevantDate).asJava)
+    result.setTitle(List(patchTitle(inputPublication.getTitle.get(0))).asJava)
+
+    if (inputPublication.getRelevantdate == null || inputPublication.getRelevantdate.size() == 0)
+      return null
+
+    result.setRelevantdate(inputPublication.getRelevantdate.asScala.map(patchRelevantDate).asJava)
 
 
-    result.setDescription(p.getDescription)
+    result.setDescription(inputPublication.getDescription)
 
-    result.setDateofacceptance(asField(p.getRelevantdate.get(0).getValue))
-    result.setPublisher(p.getPublisher)
-    result.setSource(p.getSource)
+    result.setDateofacceptance(asField(inputPublication.getRelevantdate.get(0).getValue))
+    result.setPublisher(inputPublication.getPublisher)
+    result.setSource(inputPublication.getSource)
     result.setBestaccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
 
     val dois = result.getPid.asScala.filter(p => "doi".equalsIgnoreCase(p.getQualifier.getClassname)).map(p => p.getValue)
@@ -170,7 +249,7 @@ object DLIToOAF {
       return null
 
 
-    val i: Instance = createInstance(s"https://dx.doi.org/${dois.head}", firstInstanceOrNull(p.getInstance()), result.getDateofacceptance)
+    val i: Instance = createInstance(s"https://dx.doi.org/${dois.head}", firstInstanceOrNull(inputPublication.getInstance()), result.getDateofacceptance)
 
     if (i != null)
       result.setInstance(List(i).asJava)
@@ -211,7 +290,9 @@ object DLIToOAF {
     val result: Dataset = new Dataset
     result.setId(generateId(d.getId))
     result.setDataInfo(generateDataInfo())
-    result.setCollectedfrom(d.getCollectedfrom.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).asJava)
+    result.setCollectedfrom(d.getCollectedfrom.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).filter(p => p != null).asJava)
+    if(result.getCollectedfrom.isEmpty)
+      return null
 
 
     result.setPid(d.getPid)
@@ -280,7 +361,7 @@ object DLIToOAF {
     if (dataset)
       i.setInstancetype(createQualifier("0021", "Dataset", "dnet:publication_resource", "dnet:publication_resource"))
     else
-      i.setInstancetype(createQualifier("0000", "UNKNOWN", "dnet:publication_resource", "dnet:publication_resource"))
+      i.setInstancetype(createQualifier("0000", "Unknown", "dnet:publication_resource", "dnet:publication_resource"))
     if (originalInstance != null && originalInstance.getHostedby != null)
       i.setHostedby(originalInstance.getHostedby)
 

@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.broker.objects.Instance;
-import eu.dnetlib.broker.objects.OpenAireEventPayload;
-import eu.dnetlib.broker.objects.OpenaireBrokerResult;
-import eu.dnetlib.broker.objects.Provenance;
+import eu.dnetlib.broker.objects.OaBrokerEventPayload;
+import eu.dnetlib.broker.objects.OaBrokerInstance;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerProvenance;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
@@ -25,11 +25,11 @@ public final class UpdateInfo<T> {
 
 	private final T highlightValue;
 
-	private final OpenaireBrokerResult source;
+	private final OaBrokerMainEntity source;
 
-	private final OpenaireBrokerResult target;
+	private final OaBrokerMainEntity target;
 
-	private final BiConsumer<OpenaireBrokerResult, T> compileHighlight;
+	private final BiConsumer<OaBrokerMainEntity, T> compileHighlight;
 
 	private final Function<T, String> highlightToString;
 
@@ -37,9 +37,9 @@ public final class UpdateInfo<T> {
 
 	private static final Logger log = LoggerFactory.getLogger(UpdateInfo.class);
 
-	public UpdateInfo(final Topic topic, final T highlightValue, final OpenaireBrokerResult source,
-		final OpenaireBrokerResult target,
-		final BiConsumer<OpenaireBrokerResult, T> compileHighlight,
+	public UpdateInfo(final Topic topic, final T highlightValue, final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target,
+		final BiConsumer<OaBrokerMainEntity, T> compileHighlight,
 		final Function<T, String> highlightToString,
 		final DedupConfig dedupConfig) {
 		this.topic = topic;
@@ -55,17 +55,17 @@ public final class UpdateInfo<T> {
 		return highlightValue;
 	}
 
-	public OpenaireBrokerResult getSource() {
+	public OaBrokerMainEntity getSource() {
 		return source;
 	}
 
-	public OpenaireBrokerResult getTarget() {
+	public OaBrokerMainEntity getTarget() {
 		return target;
 	}
 
 	private float calculateTrust(final DedupConfig dedupConfig,
-		final OpenaireBrokerResult r1,
-		final OpenaireBrokerResult r2) {
+		final OaBrokerMainEntity r1,
+		final OaBrokerMainEntity r2) {
 
 		if (dedupConfig == null) {
 			return BrokerConstants.MIN_TRUST;
@@ -104,31 +104,33 @@ public final class UpdateInfo<T> {
 		return highlightToString.apply(getHighlightValue());
 	}
 
-	public OpenAireEventPayload asBrokerPayload() {
+	public OaBrokerEventPayload asBrokerPayload() {
 
 		compileHighlight.accept(target, getHighlightValue());
 
-		final OpenaireBrokerResult hl = new OpenaireBrokerResult();
+		final OaBrokerMainEntity hl = new OaBrokerMainEntity();
 		compileHighlight.accept(hl, getHighlightValue());
 
-		final String provId = getSource().getOriginalId();
+		final String provId = getSource().getOpenaireId();
 		final String provRepo = getSource().getCollectedFromName();
 
 		final String provUrl = getSource()
 			.getInstances()
 			.stream()
-			.map(Instance::getUrl)
+			.map(OaBrokerInstance::getUrl)
 			.findFirst()
 			.orElse(null);
 		;
 
-		final Provenance provenance = new Provenance().setId(provId).setRepositoryName(provRepo).setUrl(provUrl);
+		final OaBrokerProvenance provenance = new OaBrokerProvenance(provId, provRepo, provUrl);
 
-		return new OpenAireEventPayload()
-			.setPublication(target)
-			.setHighlight(hl)
-			.setTrust(trust)
-			.setProvenance(provenance);
+		final OaBrokerEventPayload res = new OaBrokerEventPayload();
+		res.setResult(target);
+		res.setHighlight(hl);
+		res.setTrust(trust);
+		res.setProvenance(provenance);
+
+		return res;
 	}
 
 }
