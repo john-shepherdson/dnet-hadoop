@@ -19,9 +19,9 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.mortbay.log.Log;
 
-import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 import eu.dnetlib.doiboost.orcid.model.AuthorData;
 import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
+import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 
 public class SummariesDecompressor {
 

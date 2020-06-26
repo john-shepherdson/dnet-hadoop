@@ -1,15 +1,16 @@
 
 package eu.dnetlib.doiboost.orcidnodoi;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.doiboost.orcid.OrcidDSManager;
+import java.io.IOException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.mortbay.log.Log;
 
-import java.io.IOException;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.doiboost.orcid.OrcidDSManager;
 
 public class GenOrcidAuthorWork extends OrcidDSManager {
 

@@ -509,7 +509,7 @@
             <mode>cluster</mode>
             <name>Gen_Enriched_Orcid_Works</name>
             <class>eu.dnetlib.doiboost.orcidnodoi.SparkGenEnrichedOrcidWorks</class>
-            <jar>dhp-doiboost-1.2.3-SNAPSHOT.jar</jar>
+            <jar>dhp-doiboost-1.2.2-SNAPSHOT.jar</jar>
             <spark-opts>--num-executors 10 --conf spark.yarn.jars=&quot;hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2&quot; --executor-memory=${sparkExecutorMemory} --executor-cores=${sparkExecutorCores} --driver-memory=${sparkDriverMemory}
             </spark-opts>
             <arg>-w</arg><arg>${workingPath}/</arg>

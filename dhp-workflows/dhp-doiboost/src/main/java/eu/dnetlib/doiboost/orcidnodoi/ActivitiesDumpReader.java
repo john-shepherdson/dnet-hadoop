@@ -1,10 +1,12 @@
 
 package eu.dnetlib.doiboost.orcidnodoi;
 
-import eu.dnetlib.doiboost.orcid.json.JsonHelper;
-import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
-import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.hadoop.conf.Configuration;
@@ -17,11 +19,10 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.mortbay.log.Log;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
+import eu.dnetlib.doiboost.orcid.json.JsonHelper;
+import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
+import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
 
 public class ActivitiesDumpReader {
 
@@ -82,7 +83,8 @@ public class ActivitiesDumpReader {
 							while ((line = br.readLine()) != null) {
 								buffer.append(line);
 							}
-							WorkDataNoDoi workDataNoDoi = XMLRecordParserNoDoi.VTDParseWorkData(buffer.toString().getBytes());
+							WorkDataNoDoi workDataNoDoi = XMLRecordParserNoDoi
+								.VTDParseWorkData(buffer.toString().getBytes());
 							if (workDataNoDoi != null) {
 								if (workDataNoDoi.getErrorCode() != null) {
 									errorFromOrcidFound += 1;
@@ -94,9 +96,11 @@ public class ActivitiesDumpReader {
 												+ entry.getName());
 									continue;
 								}
-								boolean isDoiFound = workDataNoDoi.getExtIds().stream()
-										.filter(e -> e.getType()!=null)
-										.anyMatch(e -> e.getType().equals("doi"));
+								boolean isDoiFound = workDataNoDoi
+									.getExtIds()
+									.stream()
+									.filter(e -> e.getType() != null)
+									.anyMatch(e -> e.getType().equals("doi"));
 								if (!isDoiFound) {
 									String jsonData = JsonHelper.createOidWork(workDataNoDoi);
 									Log.debug("oid: " + workDataNoDoi.getOid() + " data: " + jsonData);

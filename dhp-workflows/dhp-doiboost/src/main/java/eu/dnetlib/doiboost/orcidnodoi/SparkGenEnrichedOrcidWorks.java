@@ -1,13 +1,12 @@
 
 package eu.dnetlib.doiboost.orcidnodoi;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
-import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -19,13 +18,16 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 import scala.Tuple2;
-
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class SparkGenEnrichedOrcidWorks {
 
@@ -67,27 +69,28 @@ public class SparkGenEnrichedOrcidWorks {
 						Encoders.bean(AuthorData.class));
 
 				JavaPairRDD<Text, Text> activitiesRDD = sc
-					.sequenceFile(workingPath + outputWorksPath + "works_X.seq" , Text.class, Text.class);
+					.sequenceFile(workingPath + outputWorksPath + "works_X.seq", Text.class, Text.class);
 				Dataset<WorkDataNoDoi> activitiesDataset = spark
 					.createDataset(
 						activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(),
 						Encoders.bean(WorkDataNoDoi.class));
 
 				activitiesDataset
-						.joinWith(
-								summariesDataset,
-								activitiesDataset.col("oid").equalTo(summariesDataset.col("oid")), "inner")
-						.map(
-								(MapFunction<Tuple2<WorkDataNoDoi, AuthorData>, Tuple2<String, WorkDataNoDoi>>) value -> {
-									WorkDataNoDoi w = value._1;
-									AuthorData a = value._2;
-									AuthorMatcher.match(a, w.getContributors());
-									return new Tuple2<>(a.getOid(), w);
-								},
-								Encoders.tuple(Encoders.STRING(), Encoders.bean(WorkDataNoDoi.class)))
-						.filter(Objects::nonNull)
-						.toJavaRDD()
-						.saveAsTextFile(workingPath + outputEnrichedWorksPath);;
+					.joinWith(
+						summariesDataset,
+						activitiesDataset.col("oid").equalTo(summariesDataset.col("oid")), "inner")
+					.map(
+						(MapFunction<Tuple2<WorkDataNoDoi, AuthorData>, Tuple2<String, WorkDataNoDoi>>) value -> {
+							WorkDataNoDoi w = value._1;
+							AuthorData a = value._2;
+							AuthorMatcher.match(a, w.getContributors());
+							return new Tuple2<>(a.getOid(), w);
+						},
+						Encoders.tuple(Encoders.STRING(), Encoders.bean(WorkDataNoDoi.class)))
+					.filter(Objects::nonNull)
+					.toJavaRDD()
+					.saveAsTextFile(workingPath + outputEnrichedWorksPath);
+				;
 			});
 	}
 
