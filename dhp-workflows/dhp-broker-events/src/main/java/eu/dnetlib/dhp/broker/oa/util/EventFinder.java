@@ -7,7 +7,16 @@ import java.util.List;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.model.EventFactory;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
+import eu.dnetlib.dhp.broker.oa.matchers.relatedProjects.EnrichMissingProject;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingAbstract;
+import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingAuthorOrcid;
+import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingOpenAccess;
+import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingPid;
+import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingPublicationDate;
+import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingSubject;
+import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreOpenAccess;
+import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMorePid;
+import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreSubject;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
 import eu.dnetlib.pace.config.DedupConfig;
 
@@ -16,17 +25,17 @@ public class EventFinder {
 	private static List<UpdateMatcher<?>> matchers = new ArrayList<>();
 	static {
 		matchers.add(new EnrichMissingAbstract());
-		// matchers.add(new EnrichMissingAuthorOrcid());
-		// matchers.add(new EnrichMissingOpenAccess());
-		// matchers.add(new EnrichMissingPid());
-		// matchers.add(new EnrichMissingPublicationDate());
-		// matchers.add(new EnrichMissingSubject());
-		// matchers.add(new EnrichMoreOpenAccess());
-		// matchers.add(new EnrichMorePid());
-		// matchers.add(new EnrichMoreSubject());
+		matchers.add(new EnrichMissingAuthorOrcid());
+		matchers.add(new EnrichMissingOpenAccess());
+		matchers.add(new EnrichMissingPid());
+		matchers.add(new EnrichMissingPublicationDate());
+		matchers.add(new EnrichMissingSubject());
+		matchers.add(new EnrichMoreOpenAccess());
+		matchers.add(new EnrichMorePid());
+		matchers.add(new EnrichMoreSubject());
 
 		// // Advanced matchers
-		// matchers.add(new EnrichMissingProject());
+		matchers.add(new EnrichMissingProject());
 		// matchers.add(new EnrichMoreProject());
 		// matchers.add(new EnrichMissingSoftware());
 		// matchers.add(new EnrichMoreSoftware());

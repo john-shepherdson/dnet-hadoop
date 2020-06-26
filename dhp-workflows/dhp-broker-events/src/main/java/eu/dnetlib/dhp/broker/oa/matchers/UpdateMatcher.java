@@ -1,13 +1,14 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,15 +20,15 @@ import eu.dnetlib.pace.config.DedupConfig;
 
 public abstract class UpdateMatcher<T> {
 
-	private final boolean multipleUpdate;
+	private final int maxNumber;
 	private final Function<T, Topic> topicFunction;
 	private final BiConsumer<OaBrokerMainEntity, T> compileHighlightFunction;
 	private final Function<T, String> highlightToStringFunction;
 
-	public UpdateMatcher(final boolean multipleUpdate, final Function<T, Topic> topicFunction,
+	public UpdateMatcher(final int maxNumber, final Function<T, Topic> topicFunction,
 		final BiConsumer<OaBrokerMainEntity, T> compileHighlightFunction,
 		final Function<T, String> highlightToStringFunction) {
-		this.multipleUpdate = multipleUpdate;
+		this.maxNumber = maxNumber;
 		this.topicFunction = topicFunction;
 		this.compileHighlightFunction = compileHighlightFunction;
 		this.highlightToStringFunction = highlightToStringFunction;
@@ -57,17 +58,19 @@ public abstract class UpdateMatcher<T> {
 			}
 		}
 
-		final Collection<UpdateInfo<T>> values = infoMap.values();
+		final List<UpdateInfo<T>> values = infoMap
+			.values()
+			.stream()
+			.sorted((o1, o2) -> Float.compare(o2.getTrust(), o1.getTrust())) // DESCENDING
+			.collect(Collectors.toList());
 
-		if (values.isEmpty() || multipleUpdate) {
-			return values;
+		if (values.isEmpty()) {
+			return new ArrayList<>();
+		} else if (values.size() > maxNumber) {
+			System.err.println("Too many events (" + values.size() + ") matched by " + getClass().getSimpleName());
+			return values.subList(0, maxNumber);
 		} else {
-			final UpdateInfo<T> v = values
-				.stream()
-				.sorted((o1, o2) -> Float.compare(o1.getTrust(), o2.getTrust()))
-				.findFirst()
-				.get();
-			return Arrays.asList(v);
+			return values;
 		}
 	}
 
@@ -81,8 +84,8 @@ public abstract class UpdateMatcher<T> {
 		return StringUtils.isBlank(field);
 	}
 
-	public boolean isMultipleUpdate() {
-		return multipleUpdate;
+	public int getMaxNumber() {
+		return maxNumber;
 	}
 
 	public Function<T, Topic> getTopicFunction() {

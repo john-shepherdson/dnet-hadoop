@@ -12,7 +12,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMissingPublicationDate extends UpdateMatcher<String> {
 
 	public EnrichMissingPublicationDate() {
-		super(false,
+		super(1,
 			date -> Topic.ENRICH_MISSING_PUBLICATION_DATE,
 			(p, date) -> p.setPublicationdate(date),
 			s -> s);

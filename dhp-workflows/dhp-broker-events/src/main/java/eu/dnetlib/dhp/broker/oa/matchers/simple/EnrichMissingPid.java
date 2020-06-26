@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMissingPid extends UpdateMatcher<OaBrokerTypedValue> {
 
 	public EnrichMissingPid() {
-		super(true,
+		super(10,
 			pid -> Topic.ENRICH_MISSING_PID,
 			(p, pid) -> p.getPids().add(pid),
 			pid -> pid.getType() + "::" + pid.getValue());

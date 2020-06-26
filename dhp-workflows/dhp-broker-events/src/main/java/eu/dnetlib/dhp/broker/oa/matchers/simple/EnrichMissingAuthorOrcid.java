@@ -15,7 +15,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMissingAuthorOrcid extends UpdateMatcher<OaBrokerAuthor> {
 
 	public EnrichMissingAuthorOrcid() {
-		super(true,
+		super(40,
 			aut -> Topic.ENRICH_MISSING_AUTHOR_ORCID,
 			(p, aut) -> p.getCreators().add(aut),
 			aut -> aut.getOrcid());
