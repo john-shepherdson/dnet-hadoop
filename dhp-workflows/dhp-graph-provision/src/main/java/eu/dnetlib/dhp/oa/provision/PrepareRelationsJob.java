@@ -115,7 +115,7 @@ public class PrepareRelationsJob {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareRelationsDataset(
+				prepareRelationsRDD(
 					spark, inputRelationsPath, outputPath, relationFilter, maxRelations, relPartitions);
 			});
 	}
@@ -148,21 +148,8 @@ public class PrepareRelationsJob {
 			.map(Tuple2::_2)
 			.rdd();
 
-		// group by TARGET and apply limit
-		RDD<Relation> byTarget = readPathRelationRDD(spark, inputRelationsPath)
-			.filter(rel -> rel.getDataInfo().getDeletedbyinference() == false)
-			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false)
-			.mapToPair(r -> new Tuple2<>(SortableRelationKey.create(r, r.getTarget()), r))
-			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
-			.groupBy(Tuple2::_1)
-			.map(Tuple2::_2)
-			.map(t -> Iterables.limit(t, maxRelations))
-			.flatMap(Iterable::iterator)
-			.map(Tuple2::_2)
-			.rdd();
-
 		spark
-			.createDataset(bySource.union(byTarget), Encoders.bean(Relation.class))
+			.createDataset(bySource, Encoders.bean(Relation.class))
 			.repartition(relPartitions)
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -172,41 +159,7 @@ public class PrepareRelationsJob {
 	private static void prepareRelationsDataset(
 		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter, int maxRelations,
 		int relPartitions) {
-
-		Dataset<Relation> bySource = pruneRelations(
-			spark, inputRelationsPath, relationFilter, maxRelations, relPartitions,
-			(Function<Relation, String>) r -> r.getSource());
-		Dataset<Relation> byTarget = pruneRelations(
-			spark, inputRelationsPath, relationFilter, maxRelations, relPartitions,
-			(Function<Relation, String>) r -> r.getTarget());
-
-		bySource
-			.union(byTarget)
-			.repartition(relPartitions)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
-	}
-
-	private static Dataset<Relation> pruneRelations(SparkSession spark, String inputRelationsPath,
-		Set<String> relationFilter, int maxRelations, int relPartitions,
-		Function<Relation, String> idFn) {
-		return readRelations(spark, inputRelationsPath, relationFilter, relPartitions)
-			.groupByKey(
-				(MapFunction<Relation, String>) r -> idFn.call(r),
-				Encoders.STRING())
-			.agg(new RelationAggregator(maxRelations).toColumn())
-			.flatMap(
-				(FlatMapFunction<Tuple2<String, RelationList>, Relation>) t -> t
-					._2()
-					.getRelations()
-					.iterator(),
-				Encoders.bean(Relation.class));
-	}
-
-	private static Dataset<Relation> readRelations(SparkSession spark, String inputRelationsPath,
-		Set<String> relationFilter, int relPartitions) {
-		return spark
+		spark
 			.read()
 			.textFile(inputRelationsPath)
 			.repartition(relPartitions)
@@ -214,7 +167,20 @@ public class PrepareRelationsJob {
 				(MapFunction<String, Relation>) s -> OBJECT_MAPPER.readValue(s, Relation.class),
 				Encoders.kryo(Relation.class))
 			.filter((FilterFunction<Relation>) rel -> rel.getDataInfo().getDeletedbyinference() == false)
-			.filter((FilterFunction<Relation>) rel -> relationFilter.contains(rel.getRelClass()) == false);
+			.filter((FilterFunction<Relation>) rel -> relationFilter.contains(rel.getRelClass()) == false)
+			.groupByKey(
+				(MapFunction<Relation, String>) Relation::getSource,
+				Encoders.STRING())
+			.agg(new RelationAggregator(maxRelations).toColumn())
+			.flatMap(
+				(FlatMapFunction<Tuple2<String, RelationList>, Relation>) t -> Iterables
+					.limit(t._2().getRelations(), maxRelations)
+					.iterator(),
+				Encoders.bean(Relation.class))
+			.repartition(relPartitions)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.parquet(outputPath);
 	}
 
 	public static class RelationAggregator
