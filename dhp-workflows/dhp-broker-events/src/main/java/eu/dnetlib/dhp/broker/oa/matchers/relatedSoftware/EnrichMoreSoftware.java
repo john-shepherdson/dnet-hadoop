@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMoreSoftware extends UpdateMatcher<OaBrokerRelatedSoftware> {
 
 	public EnrichMoreSoftware() {
-		super(true,
+		super(10,
 			s -> Topic.ENRICH_MORE_SOFTWARE,
 			(p, s) -> p.getSoftwares().add(s),
 			s -> s.getOpenaireId());

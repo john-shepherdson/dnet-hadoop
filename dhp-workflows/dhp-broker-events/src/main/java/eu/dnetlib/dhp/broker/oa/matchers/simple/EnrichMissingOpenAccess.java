@@ -14,7 +14,7 @@ import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 public class EnrichMissingOpenAccess extends UpdateMatcher<OaBrokerInstance> {
 
 	public EnrichMissingOpenAccess() {
-		super(true,
+		super(20,
 			i -> Topic.ENRICH_MISSING_OA_VERSION,
 			(p, i) -> p.getInstances().add(i),
 			OaBrokerInstance::getUrl);

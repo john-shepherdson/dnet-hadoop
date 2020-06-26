@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMoreSubject extends UpdateMatcher<OaBrokerTypedValue> {
 
 	public EnrichMoreSubject() {
-		super(true,
+		super(20,
 			s -> Topic.fromPath("ENRICH/MORE/SUBJECT/" + s.getType()),
 			(p, s) -> p.getSubjects().add(s),
 			s -> subjectAsString(s));

@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMissingSubject extends UpdateMatcher<OaBrokerTypedValue> {
 
 	public EnrichMissingSubject() {
-		super(true,
+		super(20,
 			s -> Topic.fromPath("ENRICH/MISSING/SUBJECT/" + s.getType()),
 			(p, s) -> p.getSubjects().add(s),
 			s -> subjectAsString(s));
