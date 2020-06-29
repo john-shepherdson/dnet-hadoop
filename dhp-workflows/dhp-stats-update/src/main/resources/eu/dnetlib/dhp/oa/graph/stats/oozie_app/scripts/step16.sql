@@ -1,163 +1,133 @@
-------------------------------------------------------
-------------------------------------------------------
--- Shadow schema table exchange
-------------------------------------------------------
-------------------------------------------------------
-
--- Dropping old views
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.country;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.countrygdp;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_citations;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_classifications;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_concepts;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_datasources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_languages;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_licenses;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_oids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_pids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_sources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.dataset_topics;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.datasource;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.datasource_languages;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.datasource_oids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.datasource_organizations;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.datasource_results;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.fundref;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.numbers_country;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.organization;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.organization_datasources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.organization_projects;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_citations;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_classifications;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_concepts;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_datasources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_languages;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_licenses;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_oids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_pids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_sources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.otherresearchproduct_topics;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.project;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.project_oids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.project_organizations;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.project_results;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_citations;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_classifications;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_concepts;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_datasources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_languages;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_licenses;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_oids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_pids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_sources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.publication_topics;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_citations;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_classifications;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_concepts;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_datasources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_languages;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_licenses;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_oids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_organization;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_pids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_projects;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_sources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.result_topics;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.rndexpediture;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.roarmap;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_citations;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_classifications;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_concepts;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_datasources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_languages;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_licenses;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_oids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_pids;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_sources;
-DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_topics;
+----------------------------------------------------
+-- Shortcuts for various definitions in stats db ---
+----------------------------------------------------
 
 
--- Creating the shadow database, in case it doesn't exist
-CREATE database ${stats_db_shadow_name};
+-- Peer reviewed:
+-- Results that have been collected from Crossref
+create table ${stats_db_name}.result_peerreviewed as
+with peer_reviewed as (
+    select distinct r.id as id
+    from ${stats_db_name}.result r
+    join ${stats_db_name}.result_sources rs on rs.id=r.id
+    join ${stats_db_name}.datasource d on d.id=rs.datasource
+    where d.name='Crossref')
+select distinct peer_reviewed.id as id, true as peer_reviewed
+from peer_reviewed
+union all
+select distinct r.id as id, false as peer_reviewed
+from ${stats_db_name}.result r
+where r.id not in (select id from peer_reviewed);
 
--- Creating new views
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.country AS SELECT * FROM ${stats_db_name}.country;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.countrygdp AS SELECT * FROM ${stats_db_name}.countrygdp;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset AS SELECT * FROM ${stats_db_name}.dataset;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_citations AS SELECT * FROM ${stats_db_name}.dataset_citations;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_classifications AS SELECT * FROM ${stats_db_name}.dataset_classifications;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_concepts AS SELECT * FROM ${stats_db_name}.dataset_concepts;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_datasources AS SELECT * FROM ${stats_db_name}.dataset_datasources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_languages AS SELECT * FROM ${stats_db_name}.dataset_languages;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_licenses AS SELECT * FROM ${stats_db_name}.dataset_licenses;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_oids AS SELECT * FROM ${stats_db_name}.dataset_oids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_pids AS SELECT * FROM ${stats_db_name}.dataset_pids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_sources AS SELECT * FROM ${stats_db_name}.dataset_sources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.dataset_topics AS SELECT * FROM ${stats_db_name}.dataset_topics;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.datasource AS SELECT * FROM ${stats_db_name}.datasource;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.datasource_languages AS SELECT * FROM ${stats_db_name}.datasource_languages;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.datasource_oids AS SELECT * FROM ${stats_db_name}.datasource_oids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.datasource_organizations AS SELECT * FROM ${stats_db_name}.datasource_organizations;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.datasource_results AS SELECT * FROM ${stats_db_name}.datasource_results;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.fundref AS SELECT * FROM ${stats_db_name}.fundref;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.numbers_country AS SELECT * FROM ${stats_db_name}.numbers_country;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.organization AS SELECT * FROM ${stats_db_name}.organization;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.organization_datasources AS SELECT * FROM ${stats_db_name}.organization_datasources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.organization_projects AS SELECT * FROM ${stats_db_name}.organization_projects;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct AS SELECT * FROM ${stats_db_name}.otherresearchproduct;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_citations AS SELECT * FROM ${stats_db_name}.otherresearchproduct_citations;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_classifications AS SELECT * FROM ${stats_db_name}.otherresearchproduct_classifications;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_concepts AS SELECT * FROM ${stats_db_name}.otherresearchproduct_concepts;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_datasources AS SELECT * FROM ${stats_db_name}.otherresearchproduct_datasources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_languages AS SELECT * FROM ${stats_db_name}.otherresearchproduct_languages;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_licenses AS SELECT * FROM ${stats_db_name}.otherresearchproduct_licenses;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_oids AS SELECT * FROM ${stats_db_name}.otherresearchproduct_oids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_pids AS SELECT * FROM ${stats_db_name}.otherresearchproduct_pids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_sources AS SELECT * FROM ${stats_db_name}.otherresearchproduct_sources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.otherresearchproduct_topics AS SELECT * FROM ${stats_db_name}.otherresearchproduct_topics;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.project AS SELECT * FROM ${stats_db_name}.project;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.project_oids AS SELECT * FROM ${stats_db_name}.project_oids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.project_organizations AS SELECT * FROM ${stats_db_name}.project_organizations;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.project_results AS SELECT * FROM ${stats_db_name}.project_results;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication AS SELECT * FROM ${stats_db_name}.publication;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_citations AS SELECT * FROM ${stats_db_name}.publication_citations;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_classifications AS SELECT * FROM ${stats_db_name}.publication_classifications;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_concepts AS SELECT * FROM ${stats_db_name}.publication_concepts;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_datasources AS SELECT * FROM ${stats_db_name}.publication_datasources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_languages AS SELECT * FROM ${stats_db_name}.publication_languages;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_licenses AS SELECT * FROM ${stats_db_name}.publication_licenses;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_oids AS SELECT * FROM ${stats_db_name}.publication_oids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_pids AS SELECT * FROM ${stats_db_name}.publication_pids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_sources AS SELECT * FROM ${stats_db_name}.publication_sources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.publication_topics AS SELECT * FROM ${stats_db_name}.publication_topics;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result AS SELECT * FROM ${stats_db_name}.result;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_citations AS SELECT * FROM ${stats_db_name}.result_citations;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_classifications AS SELECT * FROM ${stats_db_name}.result_classifications;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_concepts AS SELECT * FROM ${stats_db_name}.result_concepts;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_datasources AS SELECT * FROM ${stats_db_name}.result_datasources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_languages AS SELECT * FROM ${stats_db_name}.result_languages;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_licenses AS SELECT * FROM ${stats_db_name}.result_licenses;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_oids AS SELECT * FROM ${stats_db_name}.result_oids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_organization AS SELECT * FROM ${stats_db_name}.result_organization;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_pids AS SELECT * FROM ${stats_db_name}.result_pids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_projects AS SELECT * FROM ${stats_db_name}.result_projects;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_sources AS SELECT * FROM ${stats_db_name}.result_sources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.result_topics AS SELECT * FROM ${stats_db_name}.result_topics;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.rndexpediture AS SELECT * FROM ${stats_db_name}.rndexpediture;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.roarmap AS SELECT * FROM ${stats_db_name}.roarmap;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software AS SELECT * FROM ${stats_db_name}.software;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_citations AS SELECT * FROM ${stats_db_name}.software_citations;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_classifications AS SELECT * FROM ${stats_db_name}.software_classifications;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_concepts AS SELECT * FROM ${stats_db_name}.software_concepts;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_datasources AS SELECT * FROM ${stats_db_name}.software_datasources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_languages AS SELECT * FROM ${stats_db_name}.software_languages;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_licenses AS SELECT * FROM ${stats_db_name}.software_licenses;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_oids AS SELECT * FROM ${stats_db_name}.software_oids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_pids AS SELECT * FROM ${stats_db_name}.software_pids;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_sources AS SELECT * FROM ${stats_db_name}.software_sources;
-CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.software_topics AS SELECT * FROM ${stats_db_name}.software_topics;
+-- Green OA:
+-- OA results that are hosted by an Institutional repository and have NOT been harvested from a DOAJ journal.
+create table ${stats_db_name}.result_greenoa as
+with result_green as (
+    select distinct r.id as id
+    from ${stats_db_name}.result r
+    join ${stats_db_name}.result_datasources rd on rd.id=r.id
+    join ${stats_db_name}.datasource d on d.id=rd.datasource
+    where r.bestlicence in ('Open Access', 'Open Source') and d.type='Institutional Repository' and not exists (
+        select 1 from ${stats_db_name}.result_datasources rd
+        join ${stats_db_name}.datasource d on rd.datasource=d.id
+        join ${stats_db_name}.datasource_sources sds on sds.id=d.id
+        join ${stats_db_name}.datasource sd on sd.id=sds.datasource
+        where sd.name='DOAJ-ARTICLES' and rd.id=r.id))
+select distinct result_green.id, true as green
+from result_green
+union all
+select distinct r.id as id, false as green
+from ${stats_db_name}.result r
+where r.id not in (select id from result_green);
+
+-- GOLD OA:
+-- OA results that have been harvested from a DOAJ journal.
+create table ${stats_db_name}.result_gold as
+with result_gold as (
+    select distinct r.id as id
+    from ${stats_db_name}.result r
+    join ${stats_db_name}.result_datasources rd on rd.id=r.id
+    join ${stats_db_name}.datasource d on d.id=rd.datasource
+    join ${stats_db_name}.datasource_sources sds on sds.id=d.id
+    join ${stats_db_name}.datasource sd on sd.id=sds.datasource
+    where r.type='publication' and r.bestlicence='Open Access' and sd.name='DOAJ-Articles')
+select distinct result_gold.id, true as gold
+from result_gold
+union all
+select distinct r.id, false as gold
+from ${stats_db_name}.result r
+where r.id not in (select id from result_gold);
+
+-- shortcut result-country through the organization affiliation
+create table ${stats_db_name}.result_affiliated_country as
+select r.id as id, o.country as country
+from ${stats_db_name}.result r
+join ${stats_db_name}.result_organization ro on ro.id=r.id
+join ${stats_db_name}.organization o on o.id=ro.organization
+where o.country is not null and o.country!='';
+
+-- shortcut result-country through datasource of deposition
+create table ${stats_db_name}.result_deposited_country as
+select r.id as id, o.country as country
+from ${stats_db_name}.result r
+join ${stats_db_name}.result_datasources rd on rd.id=r.id
+join ${stats_db_name}.datasource d on d.id=rd.datasource
+join ${stats_db_name}.datasource_organizations dor on dor.id=d.id
+join ${stats_db_name}.organization o on o.id=dor.organization
+where o.country is not null and o.country!='';
+
+-- replace the creation of the result view to include the boolean fields from the previous tables (green, gold,
+-- peer reviewed)
+drop table if exists ${stats_db_name}.result_tmp;
+CREATE TABLE result_tmp (
+    id STRING,
+    title STRING,
+    publisher STRING,
+    journal STRING,
+    `date` STRING,
+    `year` INT,
+    bestlicence STRING,
+    access_mode STRING,
+    embargo_end_date STRING,
+    delayed BOOLEAN,
+    authors INT,
+    source STRING,
+    abstract BOOLEAN,
+    type STRING ,
+    peer_reviewed BOOLEAN,
+    green BOOLEAN,
+    gold BOOLEAN)
+clustered by (id) into 100 buckets stored as orc tblproperties('transactional'='true');
+
+insert into ${stats_db_name}.result_tmp
+select r.id, r.title, r.publisher, r.journal, r.`date`, date_format(r.`date`, 'yyyy'), r.bestlicence, r.bestlicence, r.embargo_end_date, r.delayed, r.authors, r.source, r.abstract, r.type, pr.peer_reviewed, green.green, gold.gold
+FROM ${stats_db_name}.publication r
+LEFT OUTER JOIN ${stats_db_name}.result_peerreviewed pr on pr.id=r.id
+LEFT OUTER JOIN ${stats_db_name}.result_greenoa green on green.id=r.id
+LEFT OUTER JOIN ${stats_db_name}.result_gold gold on gold.id=r.id;
+
+insert into ${stats_db_name}.result_tmp
+select r.id, r.title, r.publisher, r.journal, r.`date`, date_format(r.`date`, 'yyyy'), r.bestlicence, r.bestlicence, r.embargo_end_date, r.delayed, r.authors, r.source, r.abstract, r.type, pr.peer_reviewed, green.green, gold.gold
+FROM ${stats_db_name}.dataset r
+LEFT OUTER JOIN ${stats_db_name}.result_peerreviewed pr on pr.id=r.id
+LEFT OUTER JOIN ${stats_db_name}.result_greenoa green on green.id=r.id
+LEFT OUTER JOIN ${stats_db_name}.result_gold gold on gold.id=r.id;
+
+insert into ${stats_db_name}.result_tmp
+select r.id, r.title, r.publisher, r.journal, r.`date`, date_format(r.`date`, 'yyyy'), r.bestlicence, r.bestlicence, r.embargo_end_date, r.delayed, r.authors, r.source, r.abstract, r.type, pr.peer_reviewed, green.green, gold.gold
+FROM ${stats_db_name}.software r
+LEFT OUTER JOIN ${stats_db_name}.result_peerreviewed pr on pr.id=r.id
+LEFT OUTER JOIN ${stats_db_name}.result_greenoa green on green.id=r.id
+LEFT OUTER JOIN ${stats_db_name}.result_gold gold on gold.id=r.id;
+
+insert into ${stats_db_name}.result_tmp
+select r.id, r.title, r.publisher, r.journal, r.`date`, date_format(r.`date`, 'yyyy'), r.bestlicence, r.bestlicence, r.embargo_end_date, r.delayed, r.authors, r.source, r.abstract, r.type, pr.peer_reviewed, green.green, gold.gold
+FROM ${stats_db_name}.otherresearchproduct r
+LEFT OUTER JOIN ${stats_db_name}.result_peerreviewed pr on pr.id=r.id
+LEFT OUTER JOIN ${stats_db_name}.result_greenoa green on green.id=r.id
+LEFT OUTER JOIN ${stats_db_name}.result_gold gold on gold.id=r.id;
+
+drop table if exists ${stats_db_name}.result;
+drop view if exists ${stats_db_name}.result;
+create table ${stats_db_name}.result stored as parquet as select * from ${stats_db_name}.result_tmp;
+drop table ${stats_db_name}.result_tmp;
