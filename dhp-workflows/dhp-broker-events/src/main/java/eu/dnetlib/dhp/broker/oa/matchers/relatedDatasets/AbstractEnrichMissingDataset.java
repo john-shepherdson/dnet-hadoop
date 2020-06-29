@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public abstract class AbstractEnrichMissingDataset extends UpdateMatcher<OaBrokerRelatedDataset> {
 
 	public AbstractEnrichMissingDataset(final Topic topic) {
-		super(true,
+		super(10,
 			rel -> topic,
 			(p, rel) -> p.getDatasets().add(rel),
 			rel -> rel.getOpenaireId());

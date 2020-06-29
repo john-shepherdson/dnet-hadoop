@@ -12,7 +12,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMissingProject extends UpdateMatcher<OaBrokerProject> {
 
 	public EnrichMissingProject() {
-		super(true,
+		super(20,
 			prj -> Topic.ENRICH_MISSING_PROJECT,
 			(p, prj) -> p.getProjects().add(prj),
 			prj -> prj.getFunder() + "::" + prj.getFundingProgram() + prj.getCode());

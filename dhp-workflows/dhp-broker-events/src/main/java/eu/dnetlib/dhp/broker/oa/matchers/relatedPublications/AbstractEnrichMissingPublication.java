@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public abstract class AbstractEnrichMissingPublication extends UpdateMatcher<OaBrokerRelatedPublication> {
 
 	public AbstractEnrichMissingPublication(final Topic topic) {
-		super(true,
+		super(10,
 			rel -> topic,
 			(p, rel) -> p.getPublications().add(rel),
 			rel -> rel.getOpenaireId());

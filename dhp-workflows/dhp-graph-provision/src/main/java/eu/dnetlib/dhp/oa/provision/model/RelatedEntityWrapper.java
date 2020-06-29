@@ -16,10 +16,6 @@ public class RelatedEntityWrapper implements Serializable {
 	}
 
 	public RelatedEntityWrapper(Relation relation, RelatedEntity target) {
-		this(null, relation, target);
-	}
-
-	public RelatedEntityWrapper(TypedRow entity, Relation relation, RelatedEntity target) {
 		this.relation = relation;
 		this.target = target;
 	}

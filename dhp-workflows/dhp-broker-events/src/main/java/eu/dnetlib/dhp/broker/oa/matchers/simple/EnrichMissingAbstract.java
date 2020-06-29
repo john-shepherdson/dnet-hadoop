@@ -12,7 +12,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMissingAbstract extends UpdateMatcher<String> {
 
 	public EnrichMissingAbstract() {
-		super(false,
+		super(1,
 			s -> Topic.ENRICH_MISSING_ABSTRACT,
 			(p, s) -> p.getAbstracts().add(s),
 			s -> s);

@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 public class EnrichMoreProject extends UpdateMatcher<OaBrokerProject> {
 
 	public EnrichMoreProject() {
-		super(true,
+		super(20,
 			prj -> Topic.ENRICH_MORE_PROJECT,
 			(p, prj) -> p.getProjects().add(prj),
 			prj -> projectAsString(prj));
