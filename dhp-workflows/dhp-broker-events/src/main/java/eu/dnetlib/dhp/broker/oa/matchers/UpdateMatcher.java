@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.util.LongAccumulator;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.model.Topic;
@@ -36,7 +37,8 @@ public abstract class UpdateMatcher<T> {
 
 	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OaBrokerMainEntity res,
 		final Collection<OaBrokerMainEntity> others,
-		final DedupConfig dedupConfig) {
+		final DedupConfig dedupConfig,
+		final Map<String, LongAccumulator> accumulators) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
 
@@ -67,9 +69,10 @@ public abstract class UpdateMatcher<T> {
 		if (values.isEmpty()) {
 			return new ArrayList<>();
 		} else if (values.size() > maxNumber) {
-			System.err.println("Too many events (" + values.size() + ") matched by " + getClass().getSimpleName());
+			incrementAccumulator(accumulators, maxNumber);
 			return values.subList(0, maxNumber);
 		} else {
+			incrementAccumulator(accumulators, values.size());
 			return values;
 		}
 	}
@@ -98,6 +101,16 @@ public abstract class UpdateMatcher<T> {
 
 	public Function<T, String> getHighlightToStringFunction() {
 		return highlightToStringFunction;
+	}
+
+	public String accumulatorName() {
+		return "event_matcher_" + getClass().getSimpleName().toLowerCase();
+	}
+
+	public void incrementAccumulator(final Map<String, LongAccumulator> accumulators, final long n) {
+		if (accumulators.containsKey(accumulatorName())) {
+			accumulators.get(accumulatorName()).add(n);
+		}
 	}
 
 }

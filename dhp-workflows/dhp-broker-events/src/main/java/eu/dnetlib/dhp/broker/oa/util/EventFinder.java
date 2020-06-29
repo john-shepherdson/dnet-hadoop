@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.broker.oa.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.spark.util.LongAccumulator;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.model.EventFactory;
@@ -35,7 +38,7 @@ import eu.dnetlib.pace.config.DedupConfig;
 
 public class EventFinder {
 
-	private static List<UpdateMatcher<?>> matchers = new ArrayList<>();
+	private static final List<UpdateMatcher<?>> matchers = new ArrayList<>();
 	static {
 		matchers.add(new EnrichMissingAbstract());
 		matchers.add(new EnrichMissingAuthorOrcid());
@@ -47,7 +50,7 @@ public class EventFinder {
 		matchers.add(new EnrichMorePid());
 		matchers.add(new EnrichMoreSubject());
 
-		// // Advanced matchers
+		// Advanced matchers
 		matchers.add(new EnrichMissingProject());
 		matchers.add(new EnrichMoreProject());
 		matchers.add(new EnrichMissingSoftware());
@@ -65,12 +68,14 @@ public class EventFinder {
 		matchers.add(new EnrichMissingAbstract());
 	}
 
-	public static EventGroup generateEvents(final ResultGroup results, final DedupConfig dedupConfig) {
+	public static EventGroup generateEvents(final ResultGroup results,
+		final DedupConfig dedupConfig,
+		final Map<String, LongAccumulator> accumulators) {
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
 		for (final OaBrokerMainEntity target : results.getData()) {
 			for (final UpdateMatcher<?> matcher : matchers) {
-				list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+				list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), dedupConfig, accumulators));
 			}
 		}
 
@@ -81,6 +86,10 @@ public class EventFinder {
 		final EventGroup events = new EventGroup();
 		list.stream().map(EventFactory::newBrokerEvent).forEach(events::addElement);
 		return events;
+	}
+
+	public static List<UpdateMatcher<?>> getMatchers() {
+		return matchers;
 	}
 
 }
