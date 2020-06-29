@@ -8,15 +8,24 @@
         <value>true</value>
     </property>
     <property>
-      <name>oozie.launcher.mapreduce.map.java.opts</name>
-      <value>-Xmx4g</value>
+        <name>oozie.launcher.mapreduce.map.java.opts</name>
+        <value>-Xmx4g</value>
     </property>
     <property>
         <name>jobTracker</name>
-        <value>hadoop-rm3.garr-pa1.d4science.org:8032</value>
+        <value>yarnRM</value>
     </property>
     <property>
         <name>nameNode</name>
-        <value>hdfs://hadoop-rm1.garr-pa1.d4science.org:8020</value>
+        <value>hdfs://nameservice1</value>
+    </property>
+
+    <property>
+        <name>oozie.use.system.libpath</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>oozie.action.sharelib.for.spark</name>
+        <value>spark2</value>
     </property>
 </configuration>

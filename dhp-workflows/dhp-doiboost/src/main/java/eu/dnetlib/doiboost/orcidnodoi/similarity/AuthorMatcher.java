@@ -33,15 +33,13 @@ public class AuthorMatcher {
 		List<Integer> matchCounters = Arrays.asList(matchCounter);
 		Contributor contributor = null;
 		contributors.forEach(c -> {
-			if (normalize(c.getCreditName()).contains(normalize(author.getName())) ||
-				normalize(c.getCreditName()).contains(normalize(author.getSurname())) ||
-				((author.getOtherName() != null)
-					&& normalize(c.getCreditName()).contains(normalize(author.getOtherName())))) {
+			if (simpleMatch(c.getCreditName(), author.getName()) ||
+				simpleMatch(c.getCreditName(), author.getSurname()) ||
+				simpleMatch(c.getCreditName(), author.getOtherName())) {
 				matchCounters.set(0, matchCounters.get(0) + 1);
 				c.setSimpleMatch(true);
 			}
 		});
-		logger.info("match counter: " + Integer.toString(matchCounters.get(0)));
 		if (matchCounters.get(0) == 1) {
 			updateAuthorsSimpleMatch(contributors, author);
 		} else if (matchCounters.get(0) > 1) {
@@ -50,7 +48,6 @@ public class AuthorMatcher {
 				.filter(c -> c.isSimpleMatch())
 				.map(c -> {
 					c.setScore(bestMatch(author.getName(), author.getSurname(), c.getCreditName()));
-					logger.debug("nella map: " + c.getCreditName() + " score: " + c.getScore());
 					return c;
 				})
 				.filter(c -> c.getScore() >= threshold)
@@ -59,24 +56,21 @@ public class AuthorMatcher {
 			if (optCon.isPresent()) {
 				bestMatchContributor = optCon.get();
 				bestMatchContributor.setBestMatch(true);
-				logger.info("best match: " + bestMatchContributor.getCreditName());
 				updateAuthorsSimilarityMatch(contributors, author);
 			}
 
 		}
 
-		logger.info("UPDATED contributors: ");
-		contributors.forEach(c -> {
-			logger
-				.info(
-					c.getOid() + " - " + c.getCreditName() + " - " +
-						c.getName() + " - " + c.getSurname() + " - " +
-						c.getRole() + " - " + c.getSequence());
-		});
+	}
+
+	private static boolean simpleMatch(String name, String searchValue) {
+		if (searchValue == null) {
+			return false;
+		}
+		return normalize(name).contains(normalize(searchValue));
 	}
 
 	private static Double bestMatch(String authorSurname, String authorName, String contributor) {
-		logger.debug(authorSurname + " " + authorName + " vs " + contributor);
 		String[] contributorSplitted = contributor.split(" ");
 		if (contributorSplitted.length == 0) {
 			return 0.0;
@@ -90,10 +84,6 @@ public class AuthorMatcher {
 			}
 			contributorSurname = joiner.toString();
 		}
-		logger
-			.debug(
-				"contributorName: " + contributorName +
-					" contributorSurname: " + contributorSurname);
 		String authorNameNrm = normalize(authorName);
 		String authorSurnameNrm = normalize(authorSurname);
 		String contributorNameNrm = normalize(contributorName);
@@ -108,8 +98,6 @@ public class AuthorMatcher {
 
 	private static Double similarity(String nameA, String surnameA, String nameB, String surnameB) {
 		Double score = similarityJaroWinkler(nameA, surnameA, nameB, surnameB);
-		logger
-			.debug(nameA + ", " + surnameA + " <> " + nameB + ", " + surnameB + "   score: " + Double.toString(score));
 		return score;
 	}
 
@@ -118,6 +106,9 @@ public class AuthorMatcher {
 	}
 
 	private static String normalize(final String s) {
+		if (s == null) {
+			return new String("");
+		}
 		return nfd(s)
 			.toLowerCase()
 			// do not compact the regexes in a single expression, would cause StackOverflowError
@@ -142,7 +133,6 @@ public class AuthorMatcher {
 	private static void updateAuthorsSimpleMatch(List<Contributor> contributors, AuthorData author) {
 		contributors.forEach(c -> {
 			if (c.isSimpleMatch()) {
-				logger.info("simple match on : " + c.getCreditName());
 				c.setName(author.getName());
 				c.setSurname(author.getSurname());
 				c.setOid(author.getOid());
@@ -152,21 +142,10 @@ public class AuthorMatcher {
 	}
 
 	private static void updateAuthorsSimilarityMatch(List<Contributor> contributors, AuthorData author) {
-		logger.info("inside updateAuthorsSimilarityMatch ...");
-		contributors.forEach(c -> {
-			logger
-				.info(
-					c.getOid() + " - " + c.getCreditName() + " - " +
-						c.getName() + " - " + c.getSurname() + " - " +
-						c.getRole() + " - " + c.getSequence() + " - best: " + c.isBestMatch() + " - simpe: "
-						+ c.isSimpleMatch());
-		});
-
 		contributors
 			.stream()
 			.filter(c -> c.isBestMatch())
 			.forEach(c -> {
-				logger.info("similarity match on : " + c.getCreditName());
 				c.setName(author.getName());
 				c.setSurname(author.getSurname());
 				c.setOid(author.getOid());
@@ -184,7 +163,6 @@ public class AuthorMatcher {
 						c.getSequence().equals("additional")))
 			.count() > 0) {
 			seqFound = true;
-			logger.info("sequence data found");
 		}
 		if (!seqFound) {
 			List<Integer> seqIds = Arrays.asList(0);

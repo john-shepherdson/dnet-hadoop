@@ -71,10 +71,9 @@
             <description>the shell command that downloads and puts to hdfs orcid activity file X</description>
         </property>  
     </parameters>
-    
+
     <start to="ResetWorkingPath"/>
-    
-    
+
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -133,6 +132,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_0.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_0.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -169,6 +169,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_1.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_1.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -205,6 +206,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_2.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_2.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -241,6 +243,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_3.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_3.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -277,6 +280,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_4.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_4.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -313,6 +317,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_5.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_5.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -349,6 +354,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_6.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_6.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -386,6 +392,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_7.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_7.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -422,6 +429,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_8.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_8.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -458,6 +466,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_9.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_9.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
@@ -494,11 +503,12 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>ORCID_2019_activites_X.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_X.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
         <ok to="join_node"/>
         <error to="Kill"/>
     </action>
-    
+
     <join name = "join_node" to = "Gen_Enriched_Orcid_Works"/>
 
     <action name="Gen_Enriched_Orcid_Works">
@@ -509,12 +519,14 @@
             <mode>cluster</mode>
             <name>Gen_Enriched_Orcid_Works</name>
             <class>eu.dnetlib.doiboost.orcidnodoi.SparkGenEnrichedOrcidWorks</class>
-            <jar>dhp-doiboost-1.2.2-SNAPSHOT.jar</jar>
+            <jar>dhp-doiboost-1.2.4-SNAPSHOT.jar</jar>
             <spark-opts>--num-executors 10 --conf spark.yarn.jars=&quot;hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2&quot; --executor-memory=${sparkExecutorMemory} --executor-cores=${sparkExecutorCores} --driver-memory=${sparkDriverMemory}
             </spark-opts>
             <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>-</arg>
             <arg>-ow</arg><arg>no_doi_works/</arg>
-            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/output</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

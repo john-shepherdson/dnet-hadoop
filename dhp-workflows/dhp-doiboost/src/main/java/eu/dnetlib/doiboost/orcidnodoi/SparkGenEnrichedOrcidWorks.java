@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.doiboost.orcid.json.JsonHelper;
 import eu.dnetlib.doiboost.orcid.model.AuthorData;
 import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
@@ -31,9 +32,9 @@ import scala.Tuple2;
 
 public class SparkGenEnrichedOrcidWorks {
 
+	static Logger logger = LoggerFactory.getLogger(SparkGenEnrichedOrcidWorks.class);
+
 	public static void main(String[] args) throws IOException, Exception {
-		Logger logger = LoggerFactory.getLogger(SparkGenEnrichedOrcidWorks.class);
-		logger.info("[ SparkGenerateDoiAuthorList STARTED]");
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -46,13 +47,9 @@ public class SparkGenEnrichedOrcidWorks {
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
-		logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 		final String workingPath = parser.get("workingPath");
-		logger.info("workingPath: ", workingPath);
 		final String outputEnrichedWorksPath = parser.get("outputEnrichedWorksPath");
-		logger.info("outputEnrichedWorksPath: ", outputEnrichedWorksPath);
 		final String outputWorksPath = parser.get("outputWorksPath");
-		logger.info("outputWorksPath: ", outputWorksPath);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -67,30 +64,33 @@ public class SparkGenEnrichedOrcidWorks {
 					.createDataset(
 						summariesRDD.map(seq -> loadAuthorFromJson(seq._1(), seq._2())).rdd(),
 						Encoders.bean(AuthorData.class));
+				logger.info("Authors data loaded: " + summariesDataset.count());
 
 				JavaPairRDD<Text, Text> activitiesRDD = sc
-					.sequenceFile(workingPath + outputWorksPath + "works_X.seq", Text.class, Text.class);
+					.sequenceFile(workingPath + outputWorksPath + "*.seq", Text.class, Text.class);
 				Dataset<WorkDataNoDoi> activitiesDataset = spark
 					.createDataset(
 						activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(),
 						Encoders.bean(WorkDataNoDoi.class));
+				logger.info("Works data loaded: " + activitiesDataset.count());
 
-				activitiesDataset
+				JavaRDD<Tuple2<String, String>> enrichedWorksRDD = activitiesDataset
 					.joinWith(
 						summariesDataset,
 						activitiesDataset.col("oid").equalTo(summariesDataset.col("oid")), "inner")
 					.map(
-						(MapFunction<Tuple2<WorkDataNoDoi, AuthorData>, Tuple2<String, WorkDataNoDoi>>) value -> {
+						(MapFunction<Tuple2<WorkDataNoDoi, AuthorData>, Tuple2<String, String>>) value -> {
 							WorkDataNoDoi w = value._1;
 							AuthorData a = value._2;
 							AuthorMatcher.match(a, w.getContributors());
-							return new Tuple2<>(a.getOid(), w);
+							return new Tuple2<>(a.getOid(), JsonHelper.createOidWork(w));
 						},
-						Encoders.tuple(Encoders.STRING(), Encoders.bean(WorkDataNoDoi.class)))
+						Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
 					.filter(Objects::nonNull)
-					.toJavaRDD()
-					.saveAsTextFile(workingPath + outputEnrichedWorksPath);
-				;
+					.toJavaRDD();
+				logger.info("Works enriched data created: " + enrichedWorksRDD.count());
+				enrichedWorksRDD.repartition(10).saveAsTextFile(workingPath + outputEnrichedWorksPath);
+				logger.info("Works enriched data saved");
 			});
 	}
 
@@ -105,6 +105,7 @@ public class SparkGenEnrichedOrcidWorks {
 	}
 
 	private static WorkDataNoDoi loadWorkFromJson(Text orcidId, Text json) {
+
 		WorkDataNoDoi workData = new Gson().fromJson(json.toString(), WorkDataNoDoi.class);
 		return workData;
 	}

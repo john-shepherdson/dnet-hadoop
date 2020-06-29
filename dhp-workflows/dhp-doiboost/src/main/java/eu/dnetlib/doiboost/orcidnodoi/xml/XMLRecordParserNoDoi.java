@@ -41,7 +41,6 @@ public class XMLRecordParserNoDoi {
 	public static WorkDataNoDoi VTDParseWorkData(byte[] bytes)
 		throws VtdException, EncodingException, EOFException, EntityException, ParseException, XPathParseException,
 		NavException, XPathEvalException {
-		logger.info("parsing xml ...");
 		final VTDGen vg = new VTDGen();
 		vg.setDoc(bytes);
 		vg.parse(true);
@@ -190,6 +189,9 @@ public class XMLRecordParserNoDoi {
 				contributors.add(nameIndex, contributor);
 				nameIndex++;
 			}
+		}
+		if (contributors.size() == 0) {
+			return contributors;
 		}
 
 		int sequenceIndex = 0;
