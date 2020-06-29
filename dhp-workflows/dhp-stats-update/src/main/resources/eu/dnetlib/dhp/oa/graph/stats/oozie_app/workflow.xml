@@ -236,8 +236,8 @@
             <name-node>${nameNode}</name-node>
             <exec>impala-shell.sh</exec>
             <argument>${stats_db_name}</argument>
-            <argument>step14.sql</argument>
-            <argument>/user/${wf:user()}/oa/graph/stats/oozie_app/scripts/step14.sql</argument>
+            <argument>step17.sql</argument>
+            <argument>/user/${wf:user()}/oa/graph/stats/oozie_app/scripts/step17.sql</argument>
             <file>impala-shell.sh</file>
         </shell>
         <ok to="End"/>
