@@ -83,8 +83,8 @@ public abstract class UpdateMatcher<T> {
 		return list == null || list.isEmpty() || StringUtils.isBlank(list.get(0));
 	}
 
-	protected boolean isMissing(final String field) {
-		return StringUtils.isBlank(field);
+	protected boolean isMissing(final String s) {
+		return StringUtils.isBlank(s);
 	}
 
 	public int getMaxNumber() {
@@ -108,7 +108,7 @@ public abstract class UpdateMatcher<T> {
 	}
 
 	public void incrementAccumulator(final Map<String, LongAccumulator> accumulators, final long n) {
-		if (accumulators.containsKey(accumulatorName())) {
+		if (accumulators != null && accumulators.containsKey(accumulatorName())) {
 			accumulators.get(accumulatorName()).add(n);
 		}
 	}

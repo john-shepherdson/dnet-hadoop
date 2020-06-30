@@ -78,9 +78,8 @@
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-    
-    
-    <action name="generate_events">
+   
+     <action name="generate_events">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -100,31 +99,6 @@
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--dedupConfProfile</arg><arg>${dedupConfProfId}</arg>
-        </spark>
-        <ok to="index_es"/>
-        <error to="Kill"/>
-    </action>
-    
-     <action name="index_es">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>IndexOnESJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.IndexOnESJob</class>
-            <jar>dhp-broker-events-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
-            </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--index</arg><arg>${esIndexName}</arg>
-            <arg>--esHost</arg><arg>${esIndexHost}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

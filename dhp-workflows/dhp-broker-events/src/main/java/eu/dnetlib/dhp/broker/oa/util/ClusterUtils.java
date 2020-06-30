@@ -4,7 +4,9 @@ package eu.dnetlib.dhp.broker.oa.util;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.util.LongAccumulator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,6 +44,22 @@ public class ClusterUtils {
 			|| s.equals("references")
 			|| s.equals("isSupplementedBy")
 			|| s.equals("isSupplementedTo");
+	}
+
+	public static <T> T incrementAccumulator(final T o, final LongAccumulator acc) {
+		if (acc != null) {
+			acc.add(1);
+		}
+		return o;
+	}
+
+	public static <T> void save(final Dataset<T> dataset, final String path, final Class<T> clazz,
+		final LongAccumulator acc) {
+		dataset
+			.map(o -> ClusterUtils.incrementAccumulator(o, acc), Encoders.bean(clazz))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.json(path);
 	}
 
 }

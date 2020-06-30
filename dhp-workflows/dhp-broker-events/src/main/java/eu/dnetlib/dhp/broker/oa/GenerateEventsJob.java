@@ -10,10 +10,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,17 +71,17 @@ public class GenerateEventsJob {
 
 			final Map<String, LongAccumulator> accumulators = prepareAccumulators(spark.sparkContext());
 
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_events");
+
 			final Dataset<ResultGroup> groups = ClusterUtils
 				.readPath(spark, workingPath + "/duplicates", ResultGroup.class);
 
-			final Dataset<Event> events = groups
-				.map(
-					(MapFunction<ResultGroup, EventGroup>) g -> EventFinder
-						.generateEvents(g, dedupConfig, accumulators),
-					Encoders.bean(EventGroup.class))
-				.flatMap(group -> group.getData().iterator(), Encoders.bean(Event.class));
+			final Dataset<Event> dataset = groups
+				.map(g -> EventFinder.generateEvents(g, dedupConfig, accumulators), Encoders.bean(EventGroup.class))
+				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class))
+				.map(e -> ClusterUtils.incrementAccumulator(e, total), Encoders.bean(Event.class));
 
-			events.write().mode(SaveMode.Overwrite).json(eventsPath);
+			ClusterUtils.save(dataset, eventsPath, Event.class, total);
 
 		});
 

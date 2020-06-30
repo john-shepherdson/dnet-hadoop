@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
+import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 
 public class IndexOnESJob {
 
@@ -45,10 +46,8 @@ public class IndexOnESJob {
 
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
-		final JavaRDD<String> inputRdd = spark
-			.read()
-			.load(eventsPath)
-			.as(Encoders.bean(Event.class))
+		final JavaRDD<String> inputRdd = ClusterUtils
+			.readPath(spark, eventsPath, Event.class)
 			.map(IndexOnESJob::eventAsJsonString, Encoders.STRING())
 			.javaRDD();
 
