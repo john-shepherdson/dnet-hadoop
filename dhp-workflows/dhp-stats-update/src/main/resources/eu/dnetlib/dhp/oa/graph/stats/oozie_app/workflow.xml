@@ -237,7 +237,7 @@
 			<param>stats_db_name=${stats_db_name}</param>
 			<param>stats_db_shadow_name=${stats_db_shadow_name}</param>
         </hive2>
-        <ok to="Step17"/>
+        <ok to="Step18"/>
         <error to="Kill"/>
     </action>
     
