@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.relatedDatasets;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.broker.objects.OaBrokerRelatedDataset;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 
 public abstract class AbstractEnrichMissingDataset extends UpdateMatcher<OaBrokerRelatedDataset> {
 
@@ -24,6 +26,10 @@ public abstract class AbstractEnrichMissingDataset extends UpdateMatcher<OaBroke
 	@Override
 	protected final List<OaBrokerRelatedDataset> findDifferences(final OaBrokerMainEntity source,
 		final OaBrokerMainEntity target) {
+
+		if (target.getDatasets().size() >= BrokerConstants.MAX_LIST_SIZE) {
+			return new ArrayList<>();
+		}
 
 		final Set<String> existingDatasets = target
 			.getDatasets()

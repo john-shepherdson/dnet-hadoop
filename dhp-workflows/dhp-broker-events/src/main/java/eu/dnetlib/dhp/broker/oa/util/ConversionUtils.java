@@ -55,7 +55,7 @@ public class ConversionUtils {
 			res.setLicense(BrokerConstants.OPEN_ACCESS);
 			res.setHostedby(kvValue(i.getHostedby()));
 			return res;
-		}, 20);
+		});
 	}
 
 	public static OaBrokerTypedValue oafPidToBrokerPid(final StructuredProperty sp) {
@@ -75,8 +75,8 @@ public class ConversionUtils {
 		res.setOpenaireId(d.getId());
 		res.setOriginalId(first(d.getOriginalId()));
 		res.setTitle(structPropValue(d.getTitle()));
-		res.setPids(mappedList(d.getPid(), ConversionUtils::oafPidToBrokerPid, 20));
-		res.setInstances(flatMappedList(d.getInstance(), ConversionUtils::oafInstanceToBrokerInstances, 20));
+		res.setPids(mappedList(d.getPid(), ConversionUtils::oafPidToBrokerPid));
+		res.setInstances(flatMappedList(d.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
 		res.setCollectedFrom(mappedFirst(d.getCollectedfrom(), KeyValue::getValue));
 		return res;
 	}
@@ -90,8 +90,8 @@ public class ConversionUtils {
 		res.setOpenaireId(p.getId());
 		res.setOriginalId(first(p.getOriginalId()));
 		res.setTitle(structPropValue(p.getTitle()));
-		res.setPids(mappedList(p.getPid(), ConversionUtils::oafPidToBrokerPid, 20));
-		res.setInstances(flatMappedList(p.getInstance(), ConversionUtils::oafInstanceToBrokerInstances, 20));
+		res.setPids(mappedList(p.getPid(), ConversionUtils::oafPidToBrokerPid));
+		res.setInstances(flatMappedList(p.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
 		res.setCollectedFrom(mappedFirst(p.getCollectedfrom(), KeyValue::getValue));
 
 		return res;
@@ -107,25 +107,24 @@ public class ConversionUtils {
 		res.setOpenaireId(result.getId());
 		res.setOriginalId(first(result.getOriginalId()));
 		res.setTypology(classId(result.getResulttype()));
-		res.setTitles(structPropList(result.getTitle(), 10));
-		res.setAbstracts(fieldList(result.getDescription(), 10));
+		res.setTitles(structPropList(result.getTitle()));
+		res.setAbstracts(fieldList(result.getDescription()));
 		res.setLanguage(classId(result.getLanguage()));
 		res.setSubjects(structPropTypedList(result.getSubject()));
-		res.setCreators(mappedList(result.getAuthor(), ConversionUtils::oafAuthorToBrokerAuthor, 30));
+		res.setCreators(mappedList(result.getAuthor(), ConversionUtils::oafAuthorToBrokerAuthor));
 		res.setPublicationdate(fieldValue(result.getDateofacceptance()));
 		res.setPublisher(fieldValue(result.getPublisher()));
 		res.setEmbargoenddate(fieldValue(result.getEmbargoenddate()));
-		res.setContributor(fieldList(result.getContributor(), 20));
+		res.setContributor(fieldList(result.getContributor()));
 		res
 			.setJournal(
 				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null);
 		res.setCollectedFromId(mappedFirst(result.getCollectedfrom(), KeyValue::getKey));
 		res.setCollectedFromName(mappedFirst(result.getCollectedfrom(), KeyValue::getValue));
-		res.setPids(mappedList(result.getPid(), ConversionUtils::oafPidToBrokerPid, 20));
-		res.setInstances(flatMappedList(result.getInstance(), ConversionUtils::oafInstanceToBrokerInstances, 20));
+		res.setPids(mappedList(result.getPid(), ConversionUtils::oafPidToBrokerPid));
+		res.setInstances(flatMappedList(result.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
 		res
-			.setExternalReferences(
-				mappedList(result.getExternalReference(), ConversionUtils::oafExtRefToBrokerExtRef, 20));
+			.setExternalReferences(mappedList(result.getExternalReference(), ConversionUtils::oafExtRefToBrokerExtRef));
 
 		return res;
 	}
@@ -245,25 +244,25 @@ public class ConversionUtils {
 			: null;
 	}
 
-	private static List<String> fieldList(final List<Field<String>> fl, final long maxSize) {
+	private static List<String> fieldList(final List<Field<String>> fl) {
 		return fl != null
 			? fl
 				.stream()
 				.map(Field::getValue)
-				.map(s -> StringUtils.abbreviate(s, 3000)) // MAX 3000 CHARS
+				.map(s -> StringUtils.abbreviate(s, BrokerConstants.MAX_STRING_SIZE))
 				.filter(StringUtils::isNotBlank)
-				.limit(maxSize)
+				.limit(BrokerConstants.MAX_LIST_SIZE)
 				.collect(Collectors.toList())
 			: new ArrayList<>();
 	}
 
-	private static List<String> structPropList(final List<StructuredProperty> props, final long maxSize) {
+	private static List<String> structPropList(final List<StructuredProperty> props) {
 		return props != null
 			? props
 				.stream()
 				.map(StructuredProperty::getValue)
 				.filter(StringUtils::isNotBlank)
-				.limit(maxSize)
+				.limit(BrokerConstants.MAX_LIST_SIZE)
 				.collect(Collectors.toList())
 			: new ArrayList<>();
 	}
@@ -280,7 +279,7 @@ public class ConversionUtils {
 			.collect(Collectors.toList());
 	}
 
-	private static <F, T> List<T> mappedList(final List<F> list, final Function<F, T> func, final long maxSize) {
+	private static <F, T> List<T> mappedList(final List<F> list, final Function<F, T> func) {
 		if (list == null) {
 			return new ArrayList<>();
 		}
@@ -289,12 +288,11 @@ public class ConversionUtils {
 			.stream()
 			.map(func::apply)
 			.filter(Objects::nonNull)
-			.limit(maxSize)
+			.limit(BrokerConstants.MAX_LIST_SIZE)
 			.collect(Collectors.toList());
 	}
 
-	private static <F, T> List<T> flatMappedList(final List<F> list, final Function<F, List<T>> func,
-		final long maxSize) {
+	private static <F, T> List<T> flatMappedList(final List<F> list, final Function<F, List<T>> func) {
 		if (list == null) {
 			return new ArrayList<>();
 		}
@@ -304,7 +302,7 @@ public class ConversionUtils {
 			.map(func::apply)
 			.flatMap(List::stream)
 			.filter(Objects::nonNull)
-			.limit(maxSize)
+			.limit(BrokerConstants.MAX_LIST_SIZE)
 			.collect(Collectors.toList());
 	}
 
