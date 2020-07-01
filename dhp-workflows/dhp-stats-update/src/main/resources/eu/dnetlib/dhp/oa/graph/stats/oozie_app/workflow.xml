@@ -215,14 +215,39 @@
 			<param>stats_db_name=${stats_db_name}</param>
 			<param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
+        <ok to="Step15_5"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step15_5">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+            <script>scripts/step15_5.sql</script>
+            <param>stats_db_name=${stats_db_name}</param>
+            <param>openaire_db_name=${openaire_db_name}</param>
+        </hive2>
         <ok to="Step16"/>
         <error to="Kill"/>
     </action>
 
     <action name="Step16">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>impala-shell.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>step16.sql</argument>
+            <argument>/user/${wf:user()}/oa/graph/stats/oozie_app/scripts/step16.sql</argument>
+            <file>impala-shell.sh</file>
+        </shell>
+        <ok to="Step16_5"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step16_5">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
-            <script>scripts/step16.sql</script>
+            <script>scripts/step16_5.sql</script>
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
