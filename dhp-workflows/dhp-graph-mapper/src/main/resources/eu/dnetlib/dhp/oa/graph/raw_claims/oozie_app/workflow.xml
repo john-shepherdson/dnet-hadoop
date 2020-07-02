@@ -1,10 +1,6 @@
 <workflow-app name="import Claims as Graph" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>graphOutputPath</name>
-            <description>the target path to store raw graph</description>
-        </property>
-        <property>
             <name>reuseContent</name>
             <value>false</value>
             <description>should import content from the aggregator or reuse a previous version</description>
@@ -152,7 +148,7 @@
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>claim</arg>
         </java>
-        <ok to="wait_import"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
