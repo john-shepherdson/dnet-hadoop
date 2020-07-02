@@ -54,7 +54,7 @@ public class OrcidClientTest {
 	}
 
 //	@Test
-	public void testLambdaFileParser() throws Exception {
+	private void testLambdaFileParser() throws Exception {
 		try (BufferedReader br = new BufferedReader(
 			new InputStreamReader(this.getClass().getResourceAsStream("last_modified.csv")))) {
 			String line;
