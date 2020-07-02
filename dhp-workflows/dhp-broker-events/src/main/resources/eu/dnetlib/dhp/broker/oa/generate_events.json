@@ -16,5 +16,23 @@
 		"paramLongName": "dedupConfProfile",
 		"paramDescription": "the id of a valid Dedup Configuration Profile",
 		"paramRequired": true
+	},
+	{
+		"paramName": "datasourceIdWhitelist",
+		"paramLongName": "datasourceIdWhitelist",
+		"paramDescription": "a white list (comma separeted, - for empty list) of datasource ids",
+		"paramRequired": true
+	},
+	{
+		"paramName": "datasourceTypeWhitelist",
+		"paramLongName": "datasourceTypeWhitelist",
+		"paramDescription": "a white list (comma separeted, - for empty list) of datasource types",
+		"paramRequired": true
+	},
+	{
+		"paramName": "datasourceIdBlacklist",
+		"paramLongName": "datasourceIdBlacklist",
+		"paramDescription": "a black list (comma separeted, - for empty list) of datasource ids",
+		"paramRequired": true
 	}
 ]
