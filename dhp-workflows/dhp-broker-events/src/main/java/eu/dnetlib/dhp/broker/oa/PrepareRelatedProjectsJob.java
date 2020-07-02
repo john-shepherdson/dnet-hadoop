@@ -9,7 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +56,8 @@ public class PrepareRelatedProjectsJob {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_rels");
+
 			final Dataset<OaBrokerProject> projects = ClusterUtils
 				.readPath(spark, graphPath + "/project", Project.class)
 				.filter(p -> !ClusterUtils.isDedupRoot(p.getId()))
@@ -69,12 +71,12 @@ public class PrepareRelatedProjectsJob {
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
-			rels
+			final Dataset<RelatedProject> dataset = rels
 				.joinWith(projects, projects.col("openaireId").equalTo(rels.col("target")), "inner")
-				.map(t -> new RelatedProject(t._1.getSource(), t._2), Encoders.bean(RelatedProject.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.json(relsPath);
+				.map(t -> new RelatedProject(t._1.getSource(), t._2), Encoders.bean(RelatedProject.class));
+
+			ClusterUtils.save(dataset, relsPath, RelatedProject.class, total);
+
 		});
 
 	}

@@ -1,4 +1,4 @@
-<workflow-app name="create broker events" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="create broker events - partial" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
         <property>
@@ -78,9 +78,8 @@
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-    
-    
-        <action name="generate_events">
+   
+     <action name="generate_events">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>

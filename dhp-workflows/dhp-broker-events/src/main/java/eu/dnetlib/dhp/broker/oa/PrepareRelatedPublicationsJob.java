@@ -9,7 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +55,8 @@ public class PrepareRelatedPublicationsJob {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_rels");
+
 			final Dataset<OaBrokerRelatedPublication> pubs = ClusterUtils
 				.readPath(spark, graphPath + "/publication", Publication.class)
 				.filter(p -> !ClusterUtils.isDedupRoot(p.getId()))
@@ -70,16 +72,15 @@ public class PrepareRelatedPublicationsJob {
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
-			rels
+			final Dataset<RelatedPublication> dataset = rels
 				.joinWith(pubs, pubs.col("openaireId").equalTo(rels.col("target")), "inner")
 				.map(t -> {
 					final RelatedPublication rel = new RelatedPublication(t._1.getSource(), t._2);
 					rel.getRelPublication().setRelType(t._1.getRelClass());
 					return rel;
-				}, Encoders.bean(RelatedPublication.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.json(relsPath);
+				}, Encoders.bean(RelatedPublication.class));
+
+			ClusterUtils.save(dataset, relsPath, RelatedPublication.class, total);
 
 		});
 

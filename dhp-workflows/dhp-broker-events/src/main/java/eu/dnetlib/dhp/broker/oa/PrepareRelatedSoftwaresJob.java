@@ -9,7 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +56,8 @@ public class PrepareRelatedSoftwaresJob {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_rels");
+
 			final Dataset<OaBrokerRelatedSoftware> softwares = ClusterUtils
 				.readPath(spark, graphPath + "/software", Software.class)
 				.filter(sw -> !ClusterUtils.isDedupRoot(sw.getId()))
@@ -69,12 +71,11 @@ public class PrepareRelatedSoftwaresJob {
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
-			rels
+			final Dataset<RelatedSoftware> dataset = rels
 				.joinWith(softwares, softwares.col("openaireId").equalTo(rels.col("target")), "inner")
-				.map(t -> new RelatedSoftware(t._1.getSource(), t._2), Encoders.bean(RelatedSoftware.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.json(relsPath);
+				.map(t -> new RelatedSoftware(t._1.getSource(), t._2), Encoders.bean(RelatedSoftware.class));
+
+			ClusterUtils.save(dataset, relsPath, RelatedSoftware.class, total);
 
 		});
 

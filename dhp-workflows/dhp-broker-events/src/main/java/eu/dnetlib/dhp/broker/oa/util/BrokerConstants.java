@@ -19,6 +19,10 @@ public class BrokerConstants {
 
 	public static final int MAX_NUMBER_OF_RELS = 20;
 
+	public static final int MAX_STRING_SIZE = 3000;
+
+	public static final int MAX_LIST_SIZE = 50;
+
 	public static Class<?>[] getModelClasses() {
 		final Set<Class<?>> list = new HashSet<>();
 		list.addAll(Arrays.asList(ModelSupport.getOafModelClasses()));

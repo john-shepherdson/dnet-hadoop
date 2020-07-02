@@ -1,0 +1,20 @@
+[
+	{
+		"paramName": "o",
+		"paramLongName": "workingPath",
+		"paramDescription": "the workinh path",
+		"paramRequired": true
+	},
+	{
+		"paramName": "idx",
+		"paramLongName": "index",
+		"paramDescription": "the ES index",
+		"paramRequired": true
+	},
+	{
+		"paramName": "es",
+		"paramLongName": "esHost",
+		"paramDescription": "the ES host",
+		"paramRequired": true
+	}
+]
