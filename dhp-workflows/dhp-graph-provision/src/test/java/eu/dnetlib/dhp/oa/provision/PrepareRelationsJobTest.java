@@ -1,9 +1,10 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -19,9 +20,10 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class PrepareRelationsJobTest {
 
@@ -74,14 +76,19 @@ public class PrepareRelationsJobTest {
 					"-maxRelations", String.valueOf(maxRelations)
 				});
 
-		Dataset<Relation> out = spark.read()
-				.parquet(testPath.toString())
-				.as(Encoders.bean(Relation.class))
-				.cache();
+		Dataset<Relation> out = spark
+			.read()
+			.parquet(testPath.toString())
+			.as(Encoders.bean(Relation.class))
+			.cache();
 
 		Assertions.assertEquals(10, out.count());
 
-		Dataset<Row> freq = out.toDF().cube(SUBRELTYPE).count().filter((FilterFunction<Row>) value -> !value.isNullAt(0));
+		Dataset<Row> freq = out
+			.toDF()
+			.cube(SUBRELTYPE)
+			.count()
+			.filter((FilterFunction<Row>) value -> !value.isNullAt(0));
 		long outcome = freq.filter(freq.col(SUBRELTYPE).equalTo(OUTCOME)).collectAsList().get(0).getAs("count");
 		long supplement = freq.filter(freq.col(SUBRELTYPE).equalTo(SUPPLEMENT)).collectAsList().get(0).getAs("count");
 
