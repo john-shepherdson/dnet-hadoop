@@ -116,7 +116,7 @@ public class ZenodoUploadTest {
 
 		data.setTitle("Dump of OpenAIRE Communities related graph");
 		data.setUpload_type("dataset");
-		data.setDescription("this is a fake uploade done for testing purposes");
+		data.setDescription("this is a fake upload done for testing purposes");
 		Creator c = new Creator();
 		c.setName("Miriam Baglioni");
 		c.setAffiliation("CNR _ISTI");
@@ -176,22 +176,33 @@ public class ZenodoUploadTest {
 //				.getResource("/eu/dnetlib/dhp/oa/graph/dump/zenodo/science-innovation-policy")
 //				.getPath(), "ScienceandInnovationPolicyStudies");
 
-		ZenodoModel zenodo = new ZenodoModel();
-		Metadata data = new Metadata();
+//		ZenodoModel zenodo = new ZenodoModel();
+//		Metadata data = new Metadata();
+//
+//		data.setTitle("Dump of OpenAIRE Communities related graph");
+//		data.setUpload_type("dataset");
+//		data.setDescription("this is a fake uploade done for testing purposes");
+//		Creator c = new Creator();
+//		c.setName("Miriam Baglioni");
+//		c.setAffiliation("CNR _ISTI");
+//		data.setCreators(Arrays.asList(c));
+//		zenodo.setMetadata(data);
+//
+//		s.sendMretadata(new Gson().toJson(zenodo));
+//
+//		s.publish();
 
-		data.setTitle("Dump of OpenAIRE Communities related graph");
-		data.setUpload_type("dataset");
-		data.setDescription("this is a fake uploade done for testing purposes");
-		Creator c = new Creator();
-		c.setName("Miriam Baglioni");
-		c.setAffiliation("CNR _ISTI");
-		data.setCreators(Arrays.asList(c));
-		zenodo.setMetadata(data);
+	}
 
-		s.sendMretadata(new Gson().toJson(zenodo));
+	@Test
+	public void testConnectionOnly() throws IOException {
+		APIClient s = new APIClient(
+				"https://sandbox.zenodo.org/api/deposit/depositions",
+				"5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe");
 
-		s.publish();
+		int tmp = s.connect();
 
+		System.out.println(tmp);
 	}
 
 }
