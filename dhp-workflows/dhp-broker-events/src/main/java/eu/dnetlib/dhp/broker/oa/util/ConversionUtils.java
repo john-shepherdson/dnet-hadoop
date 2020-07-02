@@ -123,7 +123,8 @@ public class ConversionUtils {
 		res.setCollectedFromName(mappedFirst(result.getCollectedfrom(), KeyValue::getValue));
 		res.setPids(mappedList(result.getPid(), ConversionUtils::oafPidToBrokerPid));
 		res.setInstances(flatMappedList(result.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
-		res.setExternalReferences(mappedList(result.getExternalReference(), ConversionUtils::oafExtRefToBrokerExtRef));
+		res
+			.setExternalReferences(mappedList(result.getExternalReference(), ConversionUtils::oafExtRefToBrokerExtRef));
 
 		return res;
 	}
@@ -245,7 +246,13 @@ public class ConversionUtils {
 
 	private static List<String> fieldList(final List<Field<String>> fl) {
 		return fl != null
-			? fl.stream().map(Field::getValue).filter(StringUtils::isNotBlank).collect(Collectors.toList())
+			? fl
+				.stream()
+				.map(Field::getValue)
+				.map(s -> StringUtils.abbreviate(s, BrokerConstants.MAX_STRING_SIZE))
+				.filter(StringUtils::isNotBlank)
+				.limit(BrokerConstants.MAX_LIST_SIZE)
+				.collect(Collectors.toList())
 			: new ArrayList<>();
 	}
 
@@ -255,6 +262,7 @@ public class ConversionUtils {
 				.stream()
 				.map(StructuredProperty::getValue)
 				.filter(StringUtils::isNotBlank)
+				.limit(BrokerConstants.MAX_LIST_SIZE)
 				.collect(Collectors.toList())
 			: new ArrayList<>();
 	}
@@ -280,6 +288,7 @@ public class ConversionUtils {
 			.stream()
 			.map(func::apply)
 			.filter(Objects::nonNull)
+			.limit(BrokerConstants.MAX_LIST_SIZE)
 			.collect(Collectors.toList());
 	}
 
@@ -293,6 +302,7 @@ public class ConversionUtils {
 			.map(func::apply)
 			.flatMap(List::stream)
 			.filter(Objects::nonNull)
+			.limit(BrokerConstants.MAX_LIST_SIZE)
 			.collect(Collectors.toList());
 	}
 

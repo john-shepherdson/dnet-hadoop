@@ -9,8 +9,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +56,14 @@ public class PrepareSimpleEntititiesJob {
 
 			ClusterUtils.removeDir(spark, simpleEntitiesPath);
 
-			prepareSimpleEntities(spark, graphPath, Publication.class)
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_entities");
+
+			final Dataset<OaBrokerMainEntity> dataset = prepareSimpleEntities(spark, graphPath, Publication.class)
 				.union(prepareSimpleEntities(spark, graphPath, eu.dnetlib.dhp.schema.oaf.Dataset.class))
 				.union(prepareSimpleEntities(spark, graphPath, Software.class))
-				.union(prepareSimpleEntities(spark, graphPath, OtherResearchProduct.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.json(simpleEntitiesPath);
+				.union(prepareSimpleEntities(spark, graphPath, OtherResearchProduct.class));
+
+			ClusterUtils.save(dataset, simpleEntitiesPath, OaBrokerMainEntity.class, total);
 		});
 
 	}
@@ -74,6 +75,7 @@ public class PrepareSimpleEntititiesJob {
 
 		return ClusterUtils
 			.readPath(spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), sourceClass)
+			.filter(r -> !ClusterUtils.isDedupRoot(r.getId()))
 			.filter(r -> r.getDataInfo().getDeletedbyinference())
 			.map(ConversionUtils::oafResultToBrokerResult, Encoders.bean(OaBrokerMainEntity.class));
 	}

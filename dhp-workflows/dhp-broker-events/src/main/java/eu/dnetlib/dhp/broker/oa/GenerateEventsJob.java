@@ -3,14 +3,20 @@ package eu.dnetlib.dhp.broker.oa;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.SparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
+import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.EventFinder;
 import eu.dnetlib.dhp.broker.oa.util.EventGroup;
@@ -44,9 +51,6 @@ public class GenerateEventsJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String graphPath = parser.get("graphPath");
-		log.info("graphPath: {}", graphPath);
-
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
@@ -56,8 +60,17 @@ public class GenerateEventsJob {
 		final String dedupConfigProfileId = parser.get("dedupConfProfile");
 		log.info("dedupConfigProfileId: {}", dedupConfigProfileId);
 
-		final String eventsPath = workingPath + "/eventsPath";
+		final String eventsPath = workingPath + "/events";
 		log.info("eventsPath: {}", eventsPath);
+
+		final Set<String> dsIdWhitelist = parseParamAsList(parser, "datasourceIdWhitelist");
+		log.info("datasourceIdWhitelist: {}", StringUtils.join(dsIdWhitelist, ","));
+
+		final Set<String> dsTypeWhitelist = parseParamAsList(parser, "datasourceTypeWhitelist");
+		log.info("datasourceTypeWhitelist: {}", StringUtils.join(dsTypeWhitelist, ","));
+
+		final Set<String> dsIdBlacklist = parseParamAsList(parser, "datasourceIdBlacklist");
+		log.info("datasourceIdBlacklist: {}", StringUtils.join(dsIdBlacklist, ","));
 
 		final SparkConf conf = new SparkConf();
 
@@ -69,18 +82,51 @@ public class GenerateEventsJob {
 
 			ClusterUtils.removeDir(spark, eventsPath);
 
+			final Map<String, LongAccumulator> accumulators = prepareAccumulators(spark.sparkContext());
+
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_events");
+
 			final Dataset<ResultGroup> groups = ClusterUtils
-				.readPath(spark, graphPath + "/relation", ResultGroup.class);
+				.readPath(spark, workingPath + "/duplicates", ResultGroup.class);
 
-			final Dataset<Event> events = groups
+			final Dataset<Event> dataset = groups
 				.map(
-					(MapFunction<ResultGroup, EventGroup>) g -> EventFinder.generateEvents(g, dedupConfig),
-					Encoders.bean(EventGroup.class))
-				.flatMap(group -> group.getData().iterator(), Encoders.bean(Event.class));
+					g -> EventFinder
+						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, dedupConfig, accumulators),
+					Encoders
+						.bean(EventGroup.class))
+				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
 
-			events.write().mode(SaveMode.Overwrite).json(eventsPath);
+			ClusterUtils.save(dataset, eventsPath, Event.class, total);
 
 		});
+
+	}
+
+	private static Set<String> parseParamAsList(final ArgumentApplicationParser parser, final String key) {
+		final String s = parser.get(key).trim();
+
+		final Set<String> res = new HashSet<>();
+
+		if (s.length() > 1) { // A value of a single char (for example: '-') indicates an empty list
+			Arrays
+				.stream(s.split(","))
+				.map(String::trim)
+				.filter(StringUtils::isNotBlank)
+				.forEach(res::add);
+		}
+
+		return res;
+	}
+
+	public static Map<String, LongAccumulator> prepareAccumulators(final SparkContext sc) {
+
+		return EventFinder
+			.getMatchers()
+			.stream()
+			.map(UpdateMatcher::accumulatorName)
+			.distinct()
+			.collect(Collectors.toMap(s -> s, s -> sc.longAccumulator(s)));
 
 	}
 

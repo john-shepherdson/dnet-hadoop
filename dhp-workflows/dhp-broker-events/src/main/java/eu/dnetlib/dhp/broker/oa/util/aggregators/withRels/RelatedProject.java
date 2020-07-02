@@ -13,15 +13,13 @@ public class RelatedProject implements Serializable {
 	private static final long serialVersionUID = 4941437626549329870L;
 
 	private String source;
-	private String relType;
 	private OaBrokerProject relProject;
 
 	public RelatedProject() {
 	}
 
-	public RelatedProject(final String source, final String relType, final OaBrokerProject relProject) {
+	public RelatedProject(final String source, final OaBrokerProject relProject) {
 		this.source = source;
-		this.relType = relType;
 		this.relProject = relProject;
 	}
 
@@ -31,14 +29,6 @@ public class RelatedProject implements Serializable {
 
 	public void setSource(final String source) {
 		this.source = source;
-	}
-
-	public String getRelType() {
-		return relType;
-	}
-
-	public void setRelType(final String relType) {
-		this.relType = relType;
 	}
 
 	public OaBrokerProject getRelProject() {

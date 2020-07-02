@@ -271,6 +271,26 @@ object DoiBoostMappingUtil {
   }
 
 
+
+  def createSP(value: String, classId: String,className:String, schemeId: String, schemeName:String): StructuredProperty = {
+    val sp = new StructuredProperty
+    sp.setQualifier(createQualifier(classId,className, schemeId, schemeName))
+    sp.setValue(value)
+    sp
+
+  }
+
+
+
+  def createSP(value: String, classId: String,className:String, schemeId: String, schemeName:String, dataInfo: DataInfo): StructuredProperty = {
+    val sp = new StructuredProperty
+    sp.setQualifier(createQualifier(classId,className, schemeId, schemeName))
+    sp.setValue(value)
+    sp.setDataInfo(dataInfo)
+    sp
+
+  }
+
   def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
     val sp = new StructuredProperty
     sp.setQualifier(createQualifier(classId, schemeId))
@@ -278,6 +298,8 @@ object DoiBoostMappingUtil {
     sp
 
   }
+
+
 
   def createSP(value: String, classId: String, schemeId: String, dataInfo: DataInfo): StructuredProperty = {
     val sp = new StructuredProperty

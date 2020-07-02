@@ -3,6 +3,12 @@ package eu.dnetlib.dhp.broker.oa.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.spark.util.LongAccumulator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.model.EventFactory;
@@ -35,7 +41,9 @@ import eu.dnetlib.pace.config.DedupConfig;
 
 public class EventFinder {
 
-	private static List<UpdateMatcher<?>> matchers = new ArrayList<>();
+	private static final Logger log = LoggerFactory.getLogger(EventFinder.class);
+
+	private static final List<UpdateMatcher<?>> matchers = new ArrayList<>();
 	static {
 		matchers.add(new EnrichMissingAbstract());
 		matchers.add(new EnrichMissingAuthorOrcid());
@@ -65,22 +73,48 @@ public class EventFinder {
 		matchers.add(new EnrichMissingAbstract());
 	}
 
-	public static EventGroup generateEvents(final ResultGroup results, final DedupConfig dedupConfig) {
+	public static EventGroup generateEvents(final ResultGroup results,
+		final Set<String> dsIdWhitelist,
+		final Set<String> dsIdBlacklist,
+		final Set<String> dsTypeWhitelist,
+		final DedupConfig dedupConfig,
+		final Map<String, LongAccumulator> accumulators) {
+
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
 		for (final OaBrokerMainEntity target : results.getData()) {
-			for (final UpdateMatcher<?> matcher : matchers) {
-				list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), dedupConfig));
+			if (verifyTarget(target, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist)) {
+				for (final UpdateMatcher<?> matcher : matchers) {
+					list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), dedupConfig, accumulators));
+				}
 			}
 		}
 
 		return asEventGroup(list);
 	}
 
+	private static boolean verifyTarget(final OaBrokerMainEntity target,
+		final Set<String> dsIdWhitelist,
+		final Set<String> dsIdBlacklist,
+		final Set<String> dsTypeWhitelist) {
+
+		if (dsIdWhitelist.contains(target.getCollectedFromId())) {
+			return true;
+		} else if (dsIdBlacklist.contains(target.getCollectedFromId())) {
+			return false;
+		} else {
+			return dsTypeWhitelist.contains(target.getCollectedFromType());
+		}
+	}
+
 	private static EventGroup asEventGroup(final List<UpdateInfo<?>> list) {
 		final EventGroup events = new EventGroup();
 		list.stream().map(EventFactory::newBrokerEvent).forEach(events::addElement);
 		return events;
+	}
+
+	public static List<UpdateMatcher<?>> getMatchers() {
+		return matchers;
 	}
 
 }

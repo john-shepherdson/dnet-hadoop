@@ -18,6 +18,9 @@ class CrossrefMappingTest {
   val mapper = new ObjectMapper()
 
 
+
+
+
   @Test
   def testFunderRelationshipsMapping(): Unit = {
     val template = Source.fromInputStream(getClass.getResourceAsStream("article_funder_template.json")).mkString
@@ -57,6 +60,27 @@ class CrossrefMappingTest {
 
   }
 
+
+  @Test
+  def testOrcidID() :Unit = {
+    val json = Source.fromInputStream(getClass.getResourceAsStream("orcid_data.json")).mkString
+
+
+    assertNotNull(json)
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Result])
+
+
+    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
+    items.foreach(p => println(mapper.writeValueAsString(p)))
+
+
+  }
 
   @Test
   def testEmptyTitle() :Unit = {
