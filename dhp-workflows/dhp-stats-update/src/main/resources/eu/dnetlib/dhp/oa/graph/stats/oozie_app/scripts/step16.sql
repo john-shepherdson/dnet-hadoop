@@ -1,6 +1,18 @@
 ----------------------------------------------------
 -- Shortcuts for various definitions in stats db ---
+-- since these statements are executed using Impala,
+-- we'll have to compute the stats for the tables we use
 ----------------------------------------------------
+
+COMPUTE STATS result;
+COMPUTE STATS result_sources;
+COMPUTE STATS datasource;
+COMPUTE STATS result_datasources;
+COMPUTE STATS datasource_sources;
+COMPUTE STATS country;
+COMPUTE STATS result_organization;
+COMPUTE STATS organization;
+COMPUTE STATS datasource_organizations;
 
 -- Peer reviewed:
 -- Results that have been collected from Crossref
@@ -17,6 +29,8 @@ union all
 select distinct r.id as id, false as peer_reviewed
 from ${stats_db_name}.result r
 where r.id not in (select id from peer_reviewed);
+
+COMPUTE STATS result_peerreviewed;
 
 -- Green OA:
 -- OA results that are hosted by an Institutional repository and have NOT been harvested from a DOAJ journal.
@@ -39,6 +53,8 @@ select distinct r.id as id, false as green
 from ${stats_db_name}.result r
 where r.id not in (select id from result_green);
 
+COMPUTE STATS result_greenoa;
+
 -- GOLD OA:
 -- OA results that have been harvested from a DOAJ journal.
 create table ${stats_db_name}.result_gold as
@@ -57,6 +73,8 @@ select distinct r.id, false as gold
 from ${stats_db_name}.result r
 where r.id not in (select id from result_gold);
 
+COMPUTE STATS result_gold;
+
 -- shortcut result-country through the organization affiliation
 create table ${stats_db_name}.result_affiliated_country as
 select r.id as id, o.country as country
@@ -64,6 +82,8 @@ from ${stats_db_name}.result r
 join ${stats_db_name}.result_organization ro on ro.id=r.id
 join ${stats_db_name}.organization o on o.id=ro.organization
 where o.country is not null and o.country!='';
+
+COMPUTE STATS result_affiliated_country;
 
 -- shortcut result-country through datasource of deposition
 create table ${stats_db_name}.result_deposited_country as
@@ -74,3 +94,5 @@ join ${stats_db_name}.datasource d on d.id=rd.datasource
 join ${stats_db_name}.datasource_organizations dor on dor.id=d.id
 join ${stats_db_name}.organization o on o.id=dor.organization
 where o.country is not null and o.country!='';
+
+COMPUTE STATS result_deposited_country;
