@@ -50,8 +50,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
@@ -106,6 +104,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final String dbPassword = parser.get("postgresPassword");
 		log.info("postgresPassword: xxx");
 
+		final String dbSchema = parser.get("dbschema");
+		log.info("dbSchema {}: " + dbSchema);
+
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
@@ -125,7 +126,11 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				smdbe.execute("queryDatasources.sql", smdbe::processDatasource);
 
 				log.info("Processing projects...");
-				smdbe.execute("queryProjects.sql", smdbe::processProject);
+				if (dbSchema.equalsIgnoreCase("beta")) {
+					smdbe.execute("queryProjects.sql", smdbe::processProject);
+				} else {
+					smdbe.execute("queryProjects_production.sql", smdbe::processProject);
+				}
 
 				log.info("Processing orgs...");
 				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization);

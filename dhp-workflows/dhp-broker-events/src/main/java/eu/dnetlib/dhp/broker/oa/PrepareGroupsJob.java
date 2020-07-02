@@ -10,8 +10,8 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.TypedColumn;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class PrepareGroupsJob {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					JoinEntitiesJob.class
+					PrepareGroupsJob.class
 						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
@@ -48,7 +48,7 @@ public class PrepareGroupsJob {
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
-		final String groupsPath = workingPath + "/groups";
+		final String groupsPath = workingPath + "/duplicates";
 		log.info("groupsPath: {}", groupsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -57,8 +57,10 @@ public class PrepareGroupsJob {
 
 			ClusterUtils.removeDir(spark, groupsPath);
 
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_groups");
+
 			final Dataset<OaBrokerMainEntity> results = ClusterUtils
-				.readPath(spark, graphPath + "/joinedEntities", OaBrokerMainEntity.class);
+				.readPath(spark, workingPath + "/joinedEntities_step4", OaBrokerMainEntity.class);
 
 			final Dataset<Relation> mergedRels = ClusterUtils
 				.readPath(spark, graphPath + "/relation", Relation.class)
@@ -67,20 +69,16 @@ public class PrepareGroupsJob {
 			final TypedColumn<Tuple2<OaBrokerMainEntity, Relation>, ResultGroup> aggr = new ResultAggregator()
 				.toColumn();
 
-			final Dataset<ResultGroup> groups = results
+			final Dataset<ResultGroup> dataset = results
 				.joinWith(mergedRels, results.col("openaireId").equalTo(mergedRels.col("source")), "inner")
 				.groupByKey(
 					(MapFunction<Tuple2<OaBrokerMainEntity, Relation>, String>) t -> t._2.getTarget(),
 					Encoders.STRING())
 				.agg(aggr)
-				.map(
-					(MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.bean(ResultGroup.class))
+				.map(t -> t._2, Encoders.bean(ResultGroup.class))
 				.filter(rg -> rg.getData().size() > 1);
 
-			groups
-				.write()
-				.mode(SaveMode.Overwrite)
-				.json(groupsPath);
+			ClusterUtils.save(dataset, groupsPath, ResultGroup.class, total);
 
 		});
 	}

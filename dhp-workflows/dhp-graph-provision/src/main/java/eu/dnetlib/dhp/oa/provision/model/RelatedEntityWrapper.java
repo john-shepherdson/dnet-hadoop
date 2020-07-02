@@ -5,28 +5,26 @@ import java.io.Serializable;
 
 import com.google.common.base.Objects;
 
+import eu.dnetlib.dhp.schema.oaf.Relation;
+
 public class RelatedEntityWrapper implements Serializable {
 
-	private SortableRelation relation;
+	private Relation relation;
 	private RelatedEntity target;
 
 	public RelatedEntityWrapper() {
 	}
 
-	public RelatedEntityWrapper(SortableRelation relation, RelatedEntity target) {
-		this(null, relation, target);
-	}
-
-	public RelatedEntityWrapper(TypedRow entity, SortableRelation relation, RelatedEntity target) {
+	public RelatedEntityWrapper(Relation relation, RelatedEntity target) {
 		this.relation = relation;
 		this.target = target;
 	}
 
-	public SortableRelation getRelation() {
+	public Relation getRelation() {
 		return relation;
 	}
 
-	public void setRelation(SortableRelation relation) {
+	public void setRelation(Relation relation) {
 		this.relation = relation;
 	}
 

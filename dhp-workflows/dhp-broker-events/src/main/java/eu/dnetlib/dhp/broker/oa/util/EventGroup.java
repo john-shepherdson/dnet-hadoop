@@ -14,10 +14,14 @@ public class EventGroup implements Serializable {
 	 */
 	private static final long serialVersionUID = 765977943803533130L;
 
-	private final List<Event> data = new ArrayList<>();
+	private List<Event> data = new ArrayList<>();
 
 	public List<Event> getData() {
 		return data;
+	}
+
+	public void setData(final List<Event> data) {
+		this.data = data;
 	}
 
 	public EventGroup addElement(final Event elem) {

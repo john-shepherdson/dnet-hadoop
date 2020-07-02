@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +15,7 @@ import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 public class EnrichMissingOpenAccess extends UpdateMatcher<OaBrokerInstance> {
 
 	public EnrichMissingOpenAccess() {
-		super(true,
+		super(20,
 			i -> Topic.ENRICH_MISSING_OA_VERSION,
 			(p, i) -> p.getInstances().add(i),
 			OaBrokerInstance::getUrl);
@@ -23,6 +24,11 @@ public class EnrichMissingOpenAccess extends UpdateMatcher<OaBrokerInstance> {
 	@Override
 	protected List<OaBrokerInstance> findDifferences(final OaBrokerMainEntity source,
 		final OaBrokerMainEntity target) {
+
+		if (target.getInstances().size() >= BrokerConstants.MAX_LIST_SIZE) {
+			return new ArrayList<>();
+		}
+
 		final long count = target
 			.getInstances()
 			.stream()

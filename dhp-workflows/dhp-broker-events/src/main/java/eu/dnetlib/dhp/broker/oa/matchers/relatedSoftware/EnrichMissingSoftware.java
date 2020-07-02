@@ -13,10 +13,10 @@ public class EnrichMissingSoftware
 	extends UpdateMatcher<OaBrokerRelatedSoftware> {
 
 	public EnrichMissingSoftware() {
-		super(true,
+		super(10,
 			s -> Topic.ENRICH_MISSING_SOFTWARE,
 			(p, s) -> p.getSoftwares().add(s),
-			s -> s.getName());
+			s -> s.getOpenaireId());
 	}
 
 	@Override
