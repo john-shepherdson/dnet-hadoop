@@ -17,6 +17,21 @@
             <name>dedupConfProfId</name>
             <description>the id of a valid Dedup Configuration Profile</description>
         </property>
+		<property>
+            <name>datasourceIdWhitelist</name>
+            <value>-</value>
+            <description>a white list (comma separeted, - for empty list) of datasource ids</description>
+        </property>
+		<property>
+            <name>datasourceTypeWhitelist</name>
+            <value>-</value>
+            <description>a white list (comma separeted, - for empty list) of datasource types</description>
+        </property>
+		<property>
+            <name>datasourceIdBlacklist</name>
+            <value>-</value>
+            <description>a black list (comma separeted, - for empty list) of datasource ids</description>
+        </property>
         <property>
             <name>esIndexName</name>
             <description>the elasticsearch index name</description>
@@ -96,6 +111,7 @@
     
     <fork name="start_entities_and_rels">
 		<path start="prepare_simple_entities"/>
+		<path start="prepare_related_datasources"/>
         <path start="prepare_related_softwares"/> 
         <path start="prepare_related_datasets"/>
         <path start="prepare_related_projects"/>
@@ -108,6 +124,30 @@
             <mode>cluster</mode>
             <name>PrepareSimpleEntititiesJob</name>
             <class>eu.dnetlib.dhp.broker.oa.PrepareSimpleEntititiesJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+        </spark>
+        <ok to="wait_entities_and_rels"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="prepare_related_datasources">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareRelatedDatasourcesJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.PrepareRelatedDatasourcesJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -223,7 +263,31 @@
         <error to="Kill"/>
     </action>
  
-	<join name="wait_entities_and_rels" to="join_entities_step1"/>
+	<join name="wait_entities_and_rels" to="join_entities_step0"/>
+    
+    <action name="join_entities_step0">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>JoinStep0</name>
+            <class>eu.dnetlib.dhp.broker.oa.JoinStep0Job</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+        </spark>
+        <ok to="join_entities_step1"/>
+        <error to="Kill"/>
+    </action>
     
     <action name="join_entities_step1">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -365,6 +429,9 @@
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--dedupConfProfile</arg><arg>${dedupConfProfId}</arg>
+			<arg>--datasourceIdWhitelist</arg><arg>${datasourceIdWhitelist}</arg>
+			<arg>--datasourceTypeWhitelist</arg><arg>${datasourceTypeWhitelist}</arg>
+			<arg>--datasourceIdBlacklist</arg><arg>${datasourceIdBlacklist}</arg>
         </spark>
         <ok to="index_es"/>
         <error to="Kill"/>

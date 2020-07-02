@@ -113,6 +113,7 @@ public final class UpdateInfo<T> {
 
 		final String provId = getSource().getOpenaireId();
 		final String provRepo = getSource().getCollectedFromName();
+		final String provType = getSource().getCollectedFromType();
 
 		final String provUrl = getSource()
 			.getInstances()
@@ -122,7 +123,7 @@ public final class UpdateInfo<T> {
 			.orElse(null);
 		;
 
-		final OaBrokerProvenance provenance = new OaBrokerProvenance(provId, provRepo, provUrl);
+		final OaBrokerProvenance provenance = new OaBrokerProvenance(provId, provRepo, provType, provUrl);
 
 		final OaBrokerEventPayload res = new OaBrokerEventPayload();
 		res.setResult(target);

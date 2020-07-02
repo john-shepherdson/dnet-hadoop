@@ -48,6 +48,7 @@ public class IndexOnESJob {
 
 		final JavaRDD<String> inputRdd = ClusterUtils
 			.readPath(spark, eventsPath, Event.class)
+			.limit(10000) // TODO REMOVE
 			.map(IndexOnESJob::eventAsJsonString, Encoders.STRING())
 			.javaRDD();
 
