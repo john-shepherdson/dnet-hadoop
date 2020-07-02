@@ -42,6 +42,7 @@ public class EventFactory {
 		res.setCreationDate(now);
 		res.setExpiryDate(calculateExpiryDate(now));
 		res.setInstantMessage(false);
+
 		return res;
 	}
 
@@ -53,6 +54,7 @@ public class EventFactory {
 
 		map.setTargetDatasourceId(target.getCollectedFromId());
 		map.setTargetDatasourceName(target.getCollectedFromName());
+		map.setTargetDatasourceType(target.getCollectedFromType());
 
 		map.setTargetResultId(target.getOpenaireId());
 
@@ -73,6 +75,7 @@ public class EventFactory {
 		map.setTrust(updateInfo.getTrust());
 		map.setProvenanceDatasourceId(source.getCollectedFromId());
 		map.setProvenanceDatasourceName(source.getCollectedFromName());
+		map.setProvenanceDatasourceType(source.getCollectedFromType());
 		map.setProvenanceResultId(source.getOpenaireId());
 
 		return map;

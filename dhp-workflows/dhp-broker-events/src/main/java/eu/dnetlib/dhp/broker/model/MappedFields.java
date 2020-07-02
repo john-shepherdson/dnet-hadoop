@@ -13,6 +13,7 @@ public class MappedFields implements Serializable {
 
 	private String targetDatasourceId;
 	private String targetDatasourceName;
+	private String targetDatasourceType;
 	private String targetResultId;
 	private String targetResultTitle;
 	private long targetDateofacceptance;
@@ -21,6 +22,7 @@ public class MappedFields implements Serializable {
 	private float trust;
 	private String provenanceDatasourceId;
 	private String provenanceDatasourceName;
+	private String provenanceDatasourceType;
 	private String provenanceResultId;
 
 	public String getTargetDatasourceId() {
@@ -37,6 +39,14 @@ public class MappedFields implements Serializable {
 
 	public void setTargetDatasourceName(final String targetDatasourceName) {
 		this.targetDatasourceName = targetDatasourceName;
+	}
+
+	public String getTargetDatasourceType() {
+		return targetDatasourceType;
+	}
+
+	public void setTargetDatasourceType(final String targetDatasourceType) {
+		this.targetDatasourceType = targetDatasourceType;
 	}
 
 	public String getTargetResultId() {
@@ -103,12 +113,24 @@ public class MappedFields implements Serializable {
 		this.provenanceDatasourceName = provenanceDatasourceName;
 	}
 
+	public String getProvenanceDatasourceType() {
+		return provenanceDatasourceType;
+	}
+
+	public void setProvenanceDatasourceType(final String provenanceDatasourceType) {
+		this.provenanceDatasourceType = provenanceDatasourceType;
+	}
+
 	public String getProvenanceResultId() {
 		return provenanceResultId;
 	}
 
 	public void setProvenanceResultId(final String provenanceResultId) {
 		this.provenanceResultId = provenanceResultId;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 }

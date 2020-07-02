@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.TypedColumn;
@@ -18,19 +17,19 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProjectAggregator;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.AddDatasourceTypeAggregator;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.SimpleDatasourceInfo;
 import scala.Tuple2;
 
-public class JoinStep1Job {
+public class JoinStep0Job {
 
-	private static final Logger log = LoggerFactory.getLogger(JoinStep1Job.class);
+	private static final Logger log = LoggerFactory.getLogger(JoinStep0Job.class);
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					JoinStep1Job.class
+					JoinStep0Job.class
 						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
@@ -40,38 +39,39 @@ public class JoinStep1Job {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
+		final String graphPath = parser.get("graphPath");
+		log.info("graphPath: {}", graphPath);
+
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
-		final String joinedEntitiesPath = workingPath + "/joinedEntities_step1";
-		log.info("joinedEntitiesPath: {}", joinedEntitiesPath);
+		final String outputPath = workingPath + "/joinedEntities_step0";
+		log.info("outputPath: {}", outputPath);
 
 		final SparkConf conf = new SparkConf();
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
-			ClusterUtils.removeDir(spark, joinedEntitiesPath);
+			ClusterUtils.removeDir(spark, outputPath);
 
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_entities");
 
 			final Dataset<OaBrokerMainEntity> sources = ClusterUtils
-				.readPath(spark, workingPath + "/joinedEntities_step0", OaBrokerMainEntity.class);
+				.readPath(spark, workingPath + "/simpleEntities", OaBrokerMainEntity.class);
 
-			final Dataset<RelatedProject> typedRels = ClusterUtils
-				.readPath(spark, workingPath + "/relatedProjects", RelatedProject.class);
+			final Dataset<SimpleDatasourceInfo> datasources = ClusterUtils
+				.readPath(spark, workingPath + "/datasources", SimpleDatasourceInfo.class);
 
-			final TypedColumn<Tuple2<OaBrokerMainEntity, RelatedProject>, OaBrokerMainEntity> aggr = new RelatedProjectAggregator()
+			final TypedColumn<Tuple2<OaBrokerMainEntity, SimpleDatasourceInfo>, OaBrokerMainEntity> aggr = new AddDatasourceTypeAggregator()
 				.toColumn();
 
 			final Dataset<OaBrokerMainEntity> dataset = sources
-				.joinWith(typedRels, sources.col("openaireId").equalTo(typedRels.col("source")), "left_outer")
-				.groupByKey(
-					(MapFunction<Tuple2<OaBrokerMainEntity, RelatedProject>, String>) t -> t._1.getOpenaireId(),
-					Encoders.STRING())
+				.joinWith(datasources, sources.col("collectedFromId").equalTo(datasources.col("id")), "inner")
+				.groupByKey(t -> t._1.getOpenaireId(), Encoders.STRING())
 				.agg(aggr)
 				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class));
 
-			ClusterUtils.save(dataset, joinedEntitiesPath, OaBrokerMainEntity.class, total);
+			ClusterUtils.save(dataset, outputPath, OaBrokerMainEntity.class, total);
 
 		});
 

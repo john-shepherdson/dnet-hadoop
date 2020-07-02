@@ -3,11 +3,15 @@ package eu.dnetlib.dhp.broker.oa;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.Dataset;
@@ -59,6 +63,15 @@ public class GenerateEventsJob {
 		final String eventsPath = workingPath + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
+		final Set<String> dsIdWhitelist = parseParamAsList(parser, "datasourceIdWhitelist");
+		log.info("datasourceIdWhitelist: {}", StringUtils.join(dsIdWhitelist, ","));
+
+		final Set<String> dsTypeWhitelist = parseParamAsList(parser, "datasourceTypeWhitelist");
+		log.info("datasourceTypeWhitelist: {}", StringUtils.join(dsTypeWhitelist, ","));
+
+		final Set<String> dsIdBlacklist = parseParamAsList(parser, "datasourceIdBlacklist");
+		log.info("datasourceIdBlacklist: {}", StringUtils.join(dsIdBlacklist, ","));
+
 		final SparkConf conf = new SparkConf();
 
 		// TODO UNCOMMENT
@@ -77,14 +90,33 @@ public class GenerateEventsJob {
 				.readPath(spark, workingPath + "/duplicates", ResultGroup.class);
 
 			final Dataset<Event> dataset = groups
-				.map(g -> EventFinder.generateEvents(g, dedupConfig, accumulators), Encoders.bean(EventGroup.class))
-				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class))
-				.map(e -> ClusterUtils.incrementAccumulator(e, total), Encoders.bean(Event.class));
+				.map(
+					g -> EventFinder
+						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, dedupConfig, accumulators),
+					Encoders
+						.bean(EventGroup.class))
+				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
 
 			ClusterUtils.save(dataset, eventsPath, Event.class, total);
 
 		});
 
+	}
+
+	private static Set<String> parseParamAsList(final ArgumentApplicationParser parser, final String key) {
+		final String s = parser.get(key).trim();
+
+		final Set<String> res = new HashSet<>();
+
+		if (s.length() > 1) { // A value of a single char (for example: '-') indicates an empty list
+			Arrays
+				.stream(s.split(","))
+				.map(String::trim)
+				.filter(StringUtils::isNotBlank)
+				.forEach(res::add);
+		}
+
+		return res;
 	}
 
 	public static Map<String, LongAccumulator> prepareAccumulators(final SparkContext sc) {
