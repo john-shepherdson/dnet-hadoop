@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 ------------------------------------------------------------
 ------------------------------------------------------------
 -- Datasource table/view and Datasource related tables/views
@@ -47,4 +49,10 @@ CREATE TABLE ${stats_db_name}.datasource_oids AS SELECT substr(d.id, 4) AS id, o
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations;
 CREATE TABLE ${stats_db_name}.datasource_organizations AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization FROM ${openaire_db_name}.relation r WHERE r.reltype='datasourceOrganization';
 
+-- datasource sources:
+-- where the datasource info have been collected from.
+create table if not exists ${stats_db_name}.datasource_sources AS select substr(d.id,4) as id, substr(cf.key, 4) as datasource from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf where d.datainfo.deletedbyinference=false;
+
 CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS SELECT datasource AS id, id AS result FROM ${stats_db_name}.result_datasources;
+
+
