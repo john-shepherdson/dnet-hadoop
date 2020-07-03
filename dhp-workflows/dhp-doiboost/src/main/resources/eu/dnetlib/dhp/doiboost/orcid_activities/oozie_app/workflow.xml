@@ -1,0 +1,514 @@
+<workflow-app name="Import Orcid Activities" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>workingPath</name>
+            <description>the working dir base path</description>
+        </property>
+        <property>
+            <name>shell_cmd_0</name>
+            <value>wget -O /tmp/ORCID_2019_activites_0.tar.gz https://orcid.figshare.com/ndownloader/files/18017660 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_0.tar.gz /data/orcid_activities/ORCID_2019_activites_0.tar.gz ; rm -f /tmp/ORCID_2019_activites_0.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 0</description>
+        </property>
+        <property>
+            <name>shell_cmd_1</name>
+            <value>wget -O /tmp/ORCID_2019_activites_1.tar.gz https://orcid.figshare.com/ndownloader/files/18017675 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_1.tar.gz /data/orcid_activities/ORCID_2019_activites_1.tar.gz ; rm -f /tmp/ORCID_2019_activites_1.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 1</description>
+        </property>
+        <property>
+            <name>shell_cmd_2</name>
+            <value>wget -O /tmp/ORCID_2019_activites_2.tar.gz https://orcid.figshare.com/ndownloader/files/18017717 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_2.tar.gz /data/orcid_activities/ORCID_2019_activites_2.tar.gz ; rm -f /tmp/ORCID_2019_activites_2.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 2</description>
+        </property>
+        <property>
+            <name>shell_cmd_3</name>
+            <value>wget -O /tmp/ORCID_2019_activites_3.tar.gz https://orcid.figshare.com/ndownloader/files/18017765 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_3.tar.gz /data/orcid_activities/ORCID_2019_activites_3.tar.gz ; rm -f /tmp/ORCID_2019_activites_3.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 3</description>
+        </property> 
+        <property>
+            <name>shell_cmd_4</name>
+            <value>wget -O /tmp/ORCID_2019_activites_4.tar.gz https://orcid.figshare.com/ndownloader/files/18017831 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_4.tar.gz /data/orcid_activities/ORCID_2019_activites_4.tar.gz ; rm -f /tmp/ORCID_2019_activites_4.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 4</description>
+        </property> 
+        <property>
+            <name>shell_cmd_5</name>
+            <value>wget -O /tmp/ORCID_2019_activites_5.tar.gz https://orcid.figshare.com/ndownloader/files/18017987 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_5.tar.gz /data/orcid_activities/ORCID_2019_activites_5.tar.gz ; rm -f /tmp/ORCID_2019_activites_5.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 5</description>
+        </property>  
+        <property>
+            <name>shell_cmd_6</name>
+            <value>wget -O /tmp/ORCID_2019_activites_6.tar.gz https://orcid.figshare.com/ndownloader/files/18018053 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_6.tar.gz /data/orcid_activities/ORCID_2019_activites_6.tar.gz ; rm -f /tmp/ORCID_2019_activites_6.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 6</description>
+        </property>
+        <property>
+            <name>shell_cmd_7</name>
+            <value>wget -O /tmp/ORCID_2019_activites_7.tar.gz https://orcid.figshare.com/ndownloader/files/18018023 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_7.tar.gz /data/orcid_activities/ORCID_2019_activites_7.tar.gz ; rm -f /tmp/ORCID_2019_activites_7.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 7</description>
+        </property>
+        <property>
+            <name>shell_cmd_8</name>
+            <value>wget -O /tmp/ORCID_2019_activites_8.tar.gz https://orcid.figshare.com/ndownloader/files/18018248 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_8.tar.gz /data/orcid_activities/ORCID_2019_activites_8.tar.gz ; rm -f /tmp/ORCID_2019_activites_8.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 8</description>
+        </property>
+        <property>
+            <name>shell_cmd_9</name>
+            <value>wget -O /tmp/ORCID_2019_activites_9.tar.gz https://orcid.figshare.com/ndownloader/files/18018029 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_9.tar.gz /data/orcid_activities/ORCID_2019_activites_9.tar.gz ; rm -f /tmp/ORCID_2019_activites_9.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file 9</description>
+        </property> 
+        <property>
+            <name>shell_cmd_X</name>
+            <value>wget -O /tmp/ORCID_2019_activites_X.tar.gz https://orcid.figshare.com/ndownloader/files/18018182 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_X.tar.gz /data/orcid_activities/ORCID_2019_activites_X.tar.gz ; rm -f /tmp/ORCID_2019_activites_X.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid activity file X</description>
+        </property>  
+    </parameters>
+
+    <start to="ResetWorkingPath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    
+    <action name="ResetWorkingPath">
+        <fs>
+            <delete path='${workingPath}/no_doi_works/*'/>
+        </fs>
+        <ok to="fork_gen_orcid_author_work"/>
+        <error to="Kill"/>
+    </action>
+    
+    <fork name = "fork_gen_orcid_author_work">
+      <path start = "check_exist_on_hdfs_activities_0"/>
+      <path start = "check_exist_on_hdfs_activities_1"/>
+      <path start = "check_exist_on_hdfs_activities_2"/>
+	  <path start = "check_exist_on_hdfs_activities_3"/>
+	  <path start = "check_exist_on_hdfs_activities_4"/>
+	  <path start = "check_exist_on_hdfs_activities_5"/>
+	  <path start = "check_exist_on_hdfs_activities_6"/>
+	  <path start = "check_exist_on_hdfs_activities_7"/>
+	  <path start = "check_exist_on_hdfs_activities_8"/>
+	  <path start = "check_exist_on_hdfs_activities_9"/>
+	  <path start = "check_exist_on_hdfs_activities_X"/>
+   	</fork>
+   	
+    <decision name="check_exist_on_hdfs_activities_0">
+         <switch>
+            <case to="GenOrcidAuthorWork_0">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_0.tar.gz'))}
+            </case>
+            <default to="Download_0" />
+         </switch>
+	</decision>
+	
+    <action name="Download_0">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_0}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_0"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_0">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_0.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_0.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_1">
+         <switch>
+            <case to="GenOrcidAuthorWork_1">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_1.tar.gz'))}
+            </case>
+            <default to="Download_1" />
+         </switch>
+	</decision>
+	
+    <action name="Download_1">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_1}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_1"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_1">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_1.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_1.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_2">
+         <switch>
+            <case to="GenOrcidAuthorWork_2">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_2.tar.gz'))}
+            </case>
+            <default to="Download_2" />
+         </switch>
+	</decision>
+	
+    <action name="Download_2">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_2}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_2"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_2">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_2.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_2.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_3">
+         <switch>
+            <case to="GenOrcidAuthorWork_3">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_3.tar.gz'))}
+            </case>
+            <default to="Download_3" />
+         </switch>
+	</decision>
+	
+    <action name="Download_3">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_3}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_3"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_3">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_3.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_3.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_4">
+         <switch>
+            <case to="GenOrcidAuthorWork_4">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_4.tar.gz'))}
+            </case>
+            <default to="Download_4" />
+         </switch>
+	</decision>
+	
+    <action name="Download_4">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_4}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_4"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_4">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_4.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_4.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_5">
+         <switch>
+            <case to="GenOrcidAuthorWork_5">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_5.tar.gz'))}
+            </case>
+            <default to="Download_5" />
+         </switch>
+	</decision>
+	
+    <action name="Download_5">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_5}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_5"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_5">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_5.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_5.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_6">
+         <switch>
+            <case to="GenOrcidAuthorWork_6">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_6.tar.gz'))}
+            </case>
+            <default to="Download_6" />
+         </switch>
+	</decision>
+	
+    <action name="Download_6">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_6}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_6"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_6">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_6.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_6.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    
+    <decision name="check_exist_on_hdfs_activities_7">
+         <switch>
+            <case to="GenOrcidAuthorWork_7">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_7.tar.gz'))}
+            </case>
+            <default to="Download_7" />
+         </switch>
+	</decision>
+	
+    <action name="Download_7">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_7}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_7"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_7">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_7.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_7.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_8">
+         <switch>
+            <case to="GenOrcidAuthorWork_8">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_8.tar.gz'))}
+            </case>
+            <default to="Download_8" />
+         </switch>
+	</decision>
+	
+    <action name="Download_8">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_8}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_8"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_8">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_8.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_8.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_9">
+         <switch>
+            <case to="GenOrcidAuthorWork_9">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_9.tar.gz'))}
+            </case>
+            <default to="Download_9" />
+         </switch>
+	</decision>
+	
+    <action name="Download_9">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_9}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_9"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_9">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_9.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_9.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="check_exist_on_hdfs_activities_X">
+         <switch>
+            <case to="GenOrcidAuthorWork_X">
+              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_X.tar.gz'))}
+            </case>
+            <default to="Download_X" />
+         </switch>
+	</decision>
+	
+    <action name="Download_X">
+		<shell xmlns="uri:oozie:shell-action:0.1">
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<exec>bash</exec>
+	    <argument>-c</argument>
+	    <argument>${shell_cmd_X}</argument>
+		<capture-output/>
+		</shell>
+	<ok to="GenOrcidAuthorWork_X"/>
+	<error to="Kill"/>
+	</action>
+	
+	<action name="GenOrcidAuthorWork_X">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2019_activites_X.tar.gz</arg>
+            <arg>-ow</arg><arg>no_doi_works/works_X.seq</arg>
+            <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
+        </java>
+        <ok to="join_node"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name = "join_node" to = "End"/>
+    
+   <end name="End"/>
+</workflow-app>

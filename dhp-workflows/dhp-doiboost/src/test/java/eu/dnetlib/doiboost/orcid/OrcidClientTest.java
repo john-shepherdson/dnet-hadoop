@@ -3,9 +3,8 @@ package eu.dnetlib.doiboost.orcid;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -20,6 +19,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class OrcidClientTest {
 	final String orcidId = "0000-0001-7291-3210";
@@ -32,11 +32,20 @@ public class OrcidClientTest {
 	String lastUpdate = "2019-09-30 00:00:00";
 	String shortDate = "2020-05-06 16:06:11";
 
-//	curl -i -H "Accept: application/vnd.orcid+xml" 
+//	curl -i -H "Accept: application/vnd.orcid+xml"
 //	-H 'Authorization: Bearer 78fdb232-7105-4086-8570-e153f4198e3d'
 //	'https://api.orcid.org/v3.0/0000-0001-7291-3210/record'
 
-	public String testDownloadRecord(String orcidId) throws Exception {
+	@Test
+	public void downloadTest() throws Exception {
+		String record = testDownloadRecord("0000-0002-2536-4498");
+		File f = new File("/tmp/downloaded_0000-0002-2536-4498.xml");
+		OutputStream outStream = new FileOutputStream(f);
+		IOUtils.write(record.getBytes(), outStream);
+		System.out.println("saved to tmp");
+	}
+
+	private String testDownloadRecord(String orcidId) throws Exception {
 		try (CloseableHttpClient client = HttpClients.createDefault()) {
 			HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/record");
 			httpGet.addHeader("Accept", "application/vnd.orcid+xml");
@@ -100,7 +109,7 @@ public class OrcidClientTest {
 	}
 
 //	@Test
-	public void getRecordDatestamp() throws ParseException {
+	private void getRecordDatestamp() throws ParseException {
 		Date toRetrieveDateDt = new SimpleDateFormat(DATE_FORMAT).parse(toRetrieveDate);
 		Date toNotRetrieveDateDt = new SimpleDateFormat(DATE_FORMAT).parse(toNotRetrieveDate);
 		Date lastUpdateDt = new SimpleDateFormat(DATE_FORMAT).parse(lastUpdate);
@@ -108,7 +117,7 @@ public class OrcidClientTest {
 		assertTrue(!toNotRetrieveDateDt.after(lastUpdateDt));
 	}
 
-	public void testDate(String value) throws ParseException {
+	private void testDate(String value) throws ParseException {
 		System.out.println(value.toString());
 		if (value.length() != 19) {
 			value = value.substring(0, 19);
@@ -118,14 +127,16 @@ public class OrcidClientTest {
 	}
 
 //	@Test
-	public void testModifiedDate() throws ParseException {
+	@Ignore
+	private void testModifiedDate() throws ParseException {
 		testDate(toRetrieveDate);
 		testDate(toNotRetrieveDate);
 		testDate(shortDate);
 	}
 
 //	@Test
-	public void testReadBase64CompressedRecord() throws Exception {
+	@Ignore
+	private void testReadBase64CompressedRecord() throws Exception {
 		final String base64CompressedRecord = IOUtils
 			.toString(getClass().getResourceAsStream("0000-0001-6645-509X.compressed.base64"));
 		final String recordFromSeqFile = ArgumentApplicationParser.decompressValue(base64CompressedRecord);

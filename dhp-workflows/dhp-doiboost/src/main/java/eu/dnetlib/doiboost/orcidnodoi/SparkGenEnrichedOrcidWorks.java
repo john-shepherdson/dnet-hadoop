@@ -16,6 +16,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +25,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.doiboost.orcid.json.JsonHelper;
 import eu.dnetlib.doiboost.orcid.model.AuthorData;
 import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 import scala.Tuple2;
 
@@ -59,7 +62,7 @@ public class SparkGenEnrichedOrcidWorks {
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 				JavaPairRDD<Text, Text> summariesRDD = sc
-					.sequenceFile(workingPath + "../orcid_summaries/output/authors.seq", Text.class, Text.class);
+					.sequenceFile(workingPath + "summaries/output/authors.seq", Text.class, Text.class);
 				Dataset<AuthorData> summariesDataset = spark
 					.createDataset(
 						summariesRDD.map(seq -> loadAuthorFromJson(seq._1(), seq._2())).rdd(),
@@ -89,8 +92,19 @@ public class SparkGenEnrichedOrcidWorks {
 					.filter(Objects::nonNull)
 					.toJavaRDD();
 				logger.info("Works enriched data created: " + enrichedWorksRDD.count());
-				enrichedWorksRDD.repartition(10).saveAsTextFile(workingPath + outputEnrichedWorksPath);
+				enrichedWorksRDD.saveAsTextFile(workingPath + outputEnrichedWorksPath);
 				logger.info("Works enriched data saved");
+				JavaRDD<Tuple2<String, Publication>> oafPublicationRDD = enrichedWorksRDD.map(e -> {
+					JsonElement j = new JsonParser().parse(e._2());
+					return new Tuple2<>(e._1(), (Publication) PublicationToOaf
+						.generatePublicationActionsFromDump(j.getAsJsonObject()));
+				});
+
+				Dataset<Tuple2<String, Publication>> publicationDataset = spark
+					.createDataset(
+						oafPublicationRDD.repartition(1).rdd(),
+						Encoders.tuple(Encoders.STRING(), Encoders.bean(Publication.class)));
+				publicationDataset.write().mode(SaveMode.Overwrite).save(workingPath + "no_doi_dataset/output");
 			});
 	}
 

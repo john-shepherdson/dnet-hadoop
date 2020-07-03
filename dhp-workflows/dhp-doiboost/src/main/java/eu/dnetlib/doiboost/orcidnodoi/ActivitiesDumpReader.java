@@ -26,8 +26,8 @@ import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
 
 public class ActivitiesDumpReader {
 
-	private static final int MAX_XML_WORKS_PARSED = 100;
-	private static final int XML_WORKS_PARSED_COUNTER_LOG_INTERVAL = 10;
+	private static final int MAX_XML_WORKS_PARSED = -1;
+	private static final int XML_WORKS_PARSED_COUNTER_LOG_INTERVAL = 100000;
 
 	public static void parseGzActivities(Configuration conf, String inputUri, Path outputPath)
 		throws Exception {
@@ -127,7 +127,7 @@ public class ActivitiesDumpReader {
 						Log
 							.warn(
 								"Parsing work from tar archive and xml work: " + filename + "  " + e.getMessage());
-						Log.warn(e);
+//						Log.warn(e);
 					}
 
 					if ((counter % XML_WORKS_PARSED_COUNTER_LOG_INTERVAL) == 0) {

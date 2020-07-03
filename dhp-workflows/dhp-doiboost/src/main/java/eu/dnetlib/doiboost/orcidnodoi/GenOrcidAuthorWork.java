@@ -16,7 +16,7 @@ public class GenOrcidAuthorWork extends OrcidDSManager {
 
 	private String activitiesFileNameTarGz;
 	private String outputWorksPath;
-	private String workingPath;
+//	private String workingPath;
 
 	public static void main(String[] args) throws IOException, Exception {
 		GenOrcidAuthorWork genOrcidAuthorWork = new GenOrcidAuthorWork();
@@ -45,7 +45,6 @@ public class GenOrcidAuthorWork extends OrcidDSManager {
 		Log.info("HDFS URI: " + hdfsServerUri);
 		workingPath = parser.get("workingPath");
 		Log.info("Working Path: " + workingPath);
-		hdfsOrcidDefaultPath = workingPath;
 		activitiesFileNameTarGz = parser.get("activitiesFileNameTarGz");
 		Log.info("Activities File Name: " + activitiesFileNameTarGz);
 		outputWorksPath = parser.get("outputWorksPath");

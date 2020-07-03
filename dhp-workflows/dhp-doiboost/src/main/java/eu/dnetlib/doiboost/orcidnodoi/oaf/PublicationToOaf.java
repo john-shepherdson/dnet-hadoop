@@ -172,7 +172,7 @@ public class PublicationToOaf {
 				instance.setUrl(urls);
 			}
 
-			final String pubDate = getPublicationDate(rootElement, "publication_date");
+			final String pubDate = getPublicationDate(rootElement, "publicationDates");
 			if (StringUtils.isNotBlank(pubDate)) {
 				instance.setDateofacceptance(mapStringField(pubDate, null));
 			}
@@ -325,7 +325,12 @@ public class PublicationToOaf {
 	private static String getPublicationDate(final JsonObject rootElement,
 		final String jsonKey) {
 
-		final JsonObject pubDateJson = rootElement.getAsJsonObject(jsonKey);
+		JsonObject pubDateJson = null;
+		try {
+			pubDateJson = rootElement.getAsJsonObject(jsonKey);
+		} catch (Exception e) {
+			return null;
+		}
 		if (pubDateJson == null) {
 			return null;
 		}

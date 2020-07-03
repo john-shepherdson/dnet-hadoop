@@ -69,12 +69,12 @@ public class OrcidDownloader extends OrcidDSManager {
 		long startDownload = 0;
 		Configuration conf = initConfigurationObject();
 		FileSystem fs = initFileSystemObject(conf);
-		String lambdaFileUri = hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(lambdaFileName);
+		String lambdaFileUri = hdfsServerUri.concat(workingPath).concat(lambdaFileName);
 		Path hdfsreadpath = new Path(lambdaFileUri);
 		FSDataInputStream lambdaFileStream = fs.open(hdfsreadpath);
 		Path hdfsoutputPath = new Path(
 			hdfsServerUri
-				.concat(hdfsOrcidDefaultPath)
+				.concat(workingPath)
 				.concat(outputPath)
 				.concat("orcid_records.seq"));
 
@@ -176,8 +176,8 @@ public class OrcidDownloader extends OrcidDSManager {
 
 		hdfsServerUri = parser.get("hdfsServerUri");
 		Log.info("HDFS URI: " + hdfsServerUri);
-		hdfsOrcidDefaultPath = parser.get("hdfsOrcidDefaultPath");
-		Log.info("Default Path: " + hdfsOrcidDefaultPath);
+		workingPath = parser.get("workingPath");
+		Log.info("Default Path: " + workingPath);
 		lambdaFileName = parser.get("lambdaFileName");
 		Log.info("Lambda File Name: " + lambdaFileName);
 		outputPath = parser.get("outputPath");

@@ -42,12 +42,12 @@ public class OrcidNoDoiTest {
 
 	@Test
 	@Ignore
-	private void readPublicationFieldsTest()
+	public void readPublicationFieldsTest()
 		throws IOException, XPathEvalException, XPathParseException, NavException, VtdException, ParseException {
 		logger.info("running loadPublicationFieldsTest ....");
 		String xml = IOUtils
 			.toString(
-				OrcidNoDoiTest.class.getResourceAsStream("activity_work_0000-0003-2760-1191.xml"));
+				OrcidNoDoiTest.class.getResourceAsStream("activity_work_0000-0002-2536-4498.xml"));
 
 		if (xml == null) {
 			logger.info("Resource not found");

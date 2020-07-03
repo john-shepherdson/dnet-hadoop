@@ -15,7 +15,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 public class OrcidDSManager {
 
 	protected String hdfsServerUri;
-	protected String hdfsOrcidDefaultPath;
+	protected String workingPath;
 	private String summariesFileNameTarGz;
 	private String outputAuthorsPath;
 
@@ -28,10 +28,10 @@ public class OrcidDSManager {
 	public void generateAuthors() throws Exception {
 		Configuration conf = initConfigurationObject();
 		FileSystem fs = initFileSystemObject(conf);
-		String tarGzUri = hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(summariesFileNameTarGz);
+		String tarGzUri = hdfsServerUri.concat(workingPath).concat(summariesFileNameTarGz);
 		Path outputPath = new Path(
 			hdfsServerUri
-				.concat(hdfsOrcidDefaultPath)
+				.concat(workingPath)
 				.concat(outputAuthorsPath)
 				.concat("authors.seq"));
 		SummariesDecompressor.parseGzSummaries(conf, tarGzUri, outputPath);
@@ -41,7 +41,7 @@ public class OrcidDSManager {
 		// ====== Init HDFS File System Object
 		Configuration conf = new Configuration();
 		// Set FileSystem URI
-		conf.set("fs.defaultFS", hdfsServerUri.concat(hdfsOrcidDefaultPath));
+		conf.set("fs.defaultFS", hdfsServerUri.concat(workingPath));
 		// Because of Maven
 		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
 		conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
@@ -52,7 +52,7 @@ public class OrcidDSManager {
 		// Get the filesystem - HDFS
 		FileSystem fs = null;
 		try {
-			fs = FileSystem.get(URI.create(hdfsServerUri.concat(hdfsOrcidDefaultPath)), conf);
+			fs = FileSystem.get(URI.create(hdfsServerUri.concat(workingPath)), conf);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -71,8 +71,8 @@ public class OrcidDSManager {
 
 		hdfsServerUri = parser.get("hdfsServerUri");
 		Log.info("HDFS URI: " + hdfsServerUri);
-		hdfsOrcidDefaultPath = parser.get("hdfsOrcidDefaultPath");
-		Log.info("Default Path: " + hdfsOrcidDefaultPath);
+		workingPath = parser.get("workingPath");
+		Log.info("Working Path: " + workingPath);
 		summariesFileNameTarGz = parser.get("summariesFileNameTarGz");
 		Log.info("Summaries File Name: " + summariesFileNameTarGz);
 		outputAuthorsPath = parser.get("outputAuthorsPath");

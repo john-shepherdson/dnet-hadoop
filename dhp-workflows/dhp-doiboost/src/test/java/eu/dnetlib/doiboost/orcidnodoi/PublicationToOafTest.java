@@ -13,14 +13,15 @@ import com.google.gson.JsonParser;
 
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class PublicationToOafTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(PublicationToOafTest.class);
 
 	@Test
-//	@Ignore
-	public void convertOafPublicationTest() throws Exception {
+	@Ignore
+	private void convertOafPublicationTest() throws Exception {
 		String jsonPublication = IOUtils
 			.toString(
 				PublicationToOafTest.class.getResourceAsStream("publication.json"));
