@@ -15,7 +15,7 @@ public class EnrichMissingProject extends UpdateMatcher<OaBrokerProject> {
 		super(20,
 			prj -> Topic.ENRICH_MISSING_PROJECT,
 			(p, prj) -> p.getProjects().add(prj),
-			prj -> prj.getFunder() + "::" + prj.getFundingProgram() + prj.getCode());
+			prj -> prj.getOpenaireId());
 	}
 
 	@Override
