@@ -1,18 +1,6 @@
 ----------------------------------------------------
 -- Shortcuts for various definitions in stats db ---
--- since these statements are executed using Impala,
--- we'll have to compute the stats for the tables we use
 ----------------------------------------------------
-
-COMPUTE STATS result;
-COMPUTE STATS result_sources;
-COMPUTE STATS datasource;
-COMPUTE STATS result_datasources;
-COMPUTE STATS datasource_sources;
-COMPUTE STATS country;
-COMPUTE STATS result_organization;
-COMPUTE STATS organization;
-COMPUTE STATS datasource_organizations;
 
 -- Peer reviewed:
 -- Results that have been collected from Crossref
@@ -28,9 +16,8 @@ from peer_reviewed
 union all
 select distinct r.id as id, false as peer_reviewed
 from ${stats_db_name}.result r
-where r.id not in (select id from peer_reviewed);
-
-COMPUTE STATS result_peerreviewed;
+left outer join peer_reviewed pr on pr.id=r.id
+where pr.id is null;
 
 -- Green OA:
 -- OA results that are hosted by an Institutional repository and have NOT been harvested from a DOAJ journal.
@@ -40,20 +27,21 @@ with result_green as (
     from ${stats_db_name}.result r
     join ${stats_db_name}.result_datasources rd on rd.id=r.id
     join ${stats_db_name}.datasource d on d.id=rd.datasource
-    where r.bestlicence in ('Open Access', 'Open Source') and d.type='Institutional Repository' and not exists (
-        select 1 from ${stats_db_name}.result_datasources rd
+    left outer join (
+        select rd.id from ${stats_db_name}.result_datasources rd
         join ${stats_db_name}.datasource d on rd.datasource=d.id
         join ${stats_db_name}.datasource_sources sds on sds.id=d.id
         join ${stats_db_name}.datasource sd on sd.id=sds.datasource
-        where sd.name='DOAJ-ARTICLES' and rd.id=r.id))
+        where sd.name='DOAJ-ARTICLES'
+    ) as doaj on doaj.id=r.id
+    where r.bestlicence in ('Open Access', 'Open Source') and d.type='Institutional Repository' and doaj.id is null)
 select distinct result_green.id, true as green
 from result_green
 union all
 select distinct r.id as id, false as green
 from ${stats_db_name}.result r
-where r.id not in (select id from result_green);
-
-COMPUTE STATS result_greenoa;
+left outer join result_green rg on rg.id=r.id
+where rg.id  is null;
 
 -- GOLD OA:
 -- OA results that have been harvested from a DOAJ journal.
@@ -73,8 +61,6 @@ select distinct r.id, false as gold
 from ${stats_db_name}.result r
 where r.id not in (select id from result_gold);
 
-COMPUTE STATS result_gold;
-
 -- shortcut result-country through the organization affiliation
 create table ${stats_db_name}.result_affiliated_country as
 select r.id as id, o.country as country
@@ -82,8 +68,6 @@ from ${stats_db_name}.result r
 join ${stats_db_name}.result_organization ro on ro.id=r.id
 join ${stats_db_name}.organization o on o.id=ro.organization
 where o.country is not null and o.country!='';
-
-COMPUTE STATS result_affiliated_country;
 
 -- shortcut result-country through datasource of deposition
 create table ${stats_db_name}.result_deposited_country as
@@ -94,5 +78,3 @@ join ${stats_db_name}.datasource d on d.id=rd.datasource
 join ${stats_db_name}.datasource_organizations dor on dor.id=d.id
 join ${stats_db_name}.organization o on o.id=dor.organization
 where o.country is not null and o.country!='';
-
-COMPUTE STATS result_deposited_country;
