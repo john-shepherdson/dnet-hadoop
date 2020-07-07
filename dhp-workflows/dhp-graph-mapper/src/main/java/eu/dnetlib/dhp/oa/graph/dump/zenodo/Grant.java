@@ -13,4 +13,11 @@ public class Grant implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
+
+	public static Grant newInstance(String id) {
+		Grant g = new Grant();
+		g.id = id;
+
+		return g;
+	}
 }
