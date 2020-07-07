@@ -77,10 +77,11 @@
                 <name>oozie.action.sharelib.for.spark</name>
                 <value>${oozieActionShareLibForSpark2}</value>
             </property>
+
         </configuration>
     </global>
 
-    <start to="send_zenodo"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -359,7 +360,6 @@
                 </spark-opts>
                 <arg>--sourcePath</arg><arg>${workingDir}/ext</arg>
                 <arg>--outputPath</arg><arg>${outputPath}</arg>
-<!--                <arg>&#45;&#45;resultTableName</arg><arg>eu.dnetlib.dhp.schema.dump.oaf.Publication</arg>-->
                 <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             </spark>
             <ok to="End"/>
