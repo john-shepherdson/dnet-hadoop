@@ -70,7 +70,6 @@ public class EventFinder {
 		matchers.add(new EnrichMissingDatasetReferences());
 		matchers.add(new EnrichMissingDatasetIsSupplementedTo());
 		matchers.add(new EnrichMissingDatasetIsSupplementedBy());
-		matchers.add(new EnrichMissingAbstract());
 	}
 
 	public static EventGroup generateEvents(final ResultGroup results,
