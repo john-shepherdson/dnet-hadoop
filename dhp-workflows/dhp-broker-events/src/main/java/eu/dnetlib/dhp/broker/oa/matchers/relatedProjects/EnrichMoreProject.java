@@ -25,7 +25,9 @@ public class EnrichMoreProject extends UpdateMatcher<OaBrokerProject> {
 	protected List<OaBrokerProject> findDifferences(final OaBrokerMainEntity source,
 		final OaBrokerMainEntity target) {
 
-		if (target.getProjects().size() >= BrokerConstants.MAX_LIST_SIZE) { return new ArrayList<>(); }
+		if (target.getProjects().size() >= BrokerConstants.MAX_LIST_SIZE) {
+			return new ArrayList<>();
+		}
 
 		final Set<String> existingProjects = target
 			.getProjects()
