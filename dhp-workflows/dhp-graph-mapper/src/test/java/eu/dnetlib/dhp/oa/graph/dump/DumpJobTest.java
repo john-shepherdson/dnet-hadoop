@@ -313,4 +313,38 @@ public class DumpJobTest {
 
 	}
 
+
+	@Test
+	public void testRecord() throws Exception {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/singelRecord_pub.json")
+			.getPath();
+
+		SparkDumpCommunityProducts.main(new String[] {
+			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+			"-isSparkSessionManaged", Boolean.FALSE.toString(),
+			"-outputPath", workingDir.toString() + "/result",
+			"-sourcePath", sourcePath,
+			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
+			"-communityMap", new Gson().toJson(map)
+		});
+
+//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Result.class));
+
+		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Result> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
+
+		Assertions.assertEquals(1, verificationDataset.count());
+		verificationDataset.show(false);
+
+		Assertions.assertEquals(1, verificationDataset.filter("type = 'publication'").count());
+
+	}
+
 }
