@@ -137,7 +137,7 @@ public class Mapper implements Serializable {
 			Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> oar = Optional.ofNullable(input.getBestaccessright());
 			if (oar.isPresent()) {
 				if (Constants.accessRightsCoarMap.containsKey(oar.get().getClassid())) {
-					String code = Constants.accessRightsCoarMap.get(oar.get().getClassid());
+					String code = Constants.accessRightsCoarMap.get(oar.get().getClassname());
 					out
 						.setBestaccessright(
 							AccessRight

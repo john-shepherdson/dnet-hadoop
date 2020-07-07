@@ -3,10 +3,11 @@ package eu.dnetlib.dhp.oa.graph.dump;
 
 import java.io.*;
 import java.io.IOException;
-import okhttp3.*;
-import com.google.gson.Gson;
-import eu.dnetlib.dhp.oa.graph.dump.zenodo.ZenodoModel;
 
+import com.google.gson.Gson;
+
+import eu.dnetlib.dhp.oa.graph.dump.zenodo.ZenodoModel;
+import okhttp3.*;
 
 public class APIClient implements Serializable {
 
@@ -16,11 +17,9 @@ public class APIClient implements Serializable {
 	String deposition_id;
 	String access_token;
 
-	public static final MediaType MEDIA_TYPE_JSON
-			= MediaType.parse("application/json; charset=utf-8");
+	public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
-	private static final MediaType MEDIA_TYPE_ZIP
-			= MediaType.parse("application/zip");
+	private static final MediaType MEDIA_TYPE_ZIP = MediaType.parse("application/zip");
 
 	public String getUrlString() {
 		return urlString;
@@ -44,24 +43,23 @@ public class APIClient implements Serializable {
 		this.access_token = access_token;
 	}
 
-	public int connect() throws IOException{
+	public int connect() throws IOException {
 		String json = "{}";
 		OkHttpClient httpClient = new OkHttpClient();
 
-		RequestBody body = RequestBody.create(json, MEDIA_TYPE_JSON);
+		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
 
 		Request request = new Request.Builder()
-				.url(urlString)
-				.addHeader("Content-Type", "application/json")  // add request headers
-				.addHeader("Authorization", "Bearer " + access_token)
-				.post(body)
-				.build();
-
-
+			.url(urlString)
+			.addHeader("Content-Type", "application/json") // add request headers
+			.addHeader("Authorization", "Bearer " + access_token)
+			.post(body)
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
-			if (!response.isSuccessful()) throw new IOException("Unexpected code " + response + response.body().string());
+			if (!response.isSuccessful())
+				throw new IOException("Unexpected code " + response + response.body().string());
 
 			// Get response body
 			json = response.body().string();
@@ -76,20 +74,20 @@ public class APIClient implements Serializable {
 
 	}
 
-
-	public int upload(File file, String file_name){
+	public int upload(File file, String file_name) {
 
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
-				.url(bucket + "/" + file_name)
-				.addHeader("Content-Type", "application/zip")  // add request headers
-				.addHeader("Authorization", "Bearer " + access_token)
-				.put(RequestBody.create(file, MEDIA_TYPE_ZIP))
-				.build();
+			.url(bucket + "/" + file_name)
+			.addHeader("Content-Type", "application/zip") // add request headers
+			.addHeader("Authorization", "Bearer " + access_token)
+			.put(RequestBody.create(MEDIA_TYPE_ZIP, file))
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
-			if (!response.isSuccessful()) throw new IOException("Unexpected code " + response + response.body().string());
+			if (!response.isSuccessful())
+				throw new IOException("Unexpected code " + response + response.body().string());
 			return response.code();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -99,24 +97,23 @@ public class APIClient implements Serializable {
 		return -1;
 	}
 
-
 	public int sendMretadata(String metadata) throws IOException {
 
 		OkHttpClient httpClient = new OkHttpClient();
 
-		RequestBody body = RequestBody.create(metadata, MEDIA_TYPE_JSON);
+		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, metadata);
 
 		Request request = new Request.Builder()
-				.url(urlString + "/" + deposition_id)
-				.addHeader("Content-Type", "application/json")  // add request headers
-				.addHeader("Authorization", "Bearer " + access_token)
-				.put(body)
-				.build();
-
+			.url(urlString + "/" + deposition_id)
+			.addHeader("Content-Type", "application/json") // add request headers
+			.addHeader("Authorization", "Bearer " + access_token)
+			.put(body)
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
-			if (!response.isSuccessful()) throw new IOException("Unexpected code " + response + response.body().string());
+			if (!response.isSuccessful())
+				throw new IOException("Unexpected code " + response + response.body().string());
 
 			return response.code();
 
@@ -130,23 +127,23 @@ public class APIClient implements Serializable {
 
 		OkHttpClient httpClient = new OkHttpClient();
 
-
 		Request request = new Request.Builder()
-				.url(urlString + "/" + deposition_id + "/actions/publish")
-				.addHeader("Authorization", "Bearer " + access_token)
-				.post(RequestBody.create(json, MEDIA_TYPE_JSON))
-				.build();
+			.url(urlString + "/" + deposition_id + "/actions/publish")
+			.addHeader("Authorization", "Bearer " + access_token)
+			.post(RequestBody.create(MEDIA_TYPE_JSON, json))
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
-			if (!response.isSuccessful()) throw new IOException("Unexpected code " + response + response.body().string());
+			if (!response.isSuccessful())
+				throw new IOException("Unexpected code " + response + response.body().string());
 
 			return response.code();
 
 		}
 	}
 
-	//	public int connect() throws IOException {
+	// public int connect() throws IOException {
 //
 //		String json = "{}";
 //
