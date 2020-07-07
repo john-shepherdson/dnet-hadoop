@@ -63,13 +63,7 @@ public class DumpJobTest {
 
 	}
 
-//	@Mock
-//	private SparkDumpCommunityProducts dumpCommunityProducts;
 
-	// private QueryInformationSystem queryInformationSystem;
-
-//	@Mock
-//	private ISLookUpService isLookUpService;
 
 	List<String> communityMap = Arrays
 		.asList(
@@ -128,12 +122,7 @@ public class DumpJobTest {
 			.getOrCreate();
 	}
 
-//	@BeforeEach
-//	public void setUp() throws ISLookUpException {
-//		lenient().when(isLookUpService.quickSearchProfile(XQUERY)).thenReturn(communityMap);
-//		lenient().when(dumpCommunityProducts.getIsLookUpService(MOCK_IS_LOOK_UP_URL)).thenReturn(isLookUpService);
-//
-//	}
+
 
 	@AfterAll
 	public static void afterAll() throws IOException {
@@ -157,7 +146,6 @@ public class DumpJobTest {
 			"-communityMap", new Gson().toJson(map)
 		});
 
-//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -169,7 +157,6 @@ public class DumpJobTest {
 			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
 
 		Assertions.assertEquals(90, verificationDataset.count());
-		// verificationDataset.show(false);
 
 		Assertions
 			.assertTrue(
@@ -199,7 +186,6 @@ public class DumpJobTest {
 
 		Assertions.assertTrue(verificationDataset.filter("type = 'dataset'").count() == 90);
 
-		// verificationDataset.select("instance.type").show(false);
 
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
 
@@ -220,8 +206,6 @@ public class DumpJobTest {
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
 			"-communityMap", new Gson().toJson(map)
 		});
-
-//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -257,8 +241,6 @@ public class DumpJobTest {
 			"-communityMap", new Gson().toJson(map)
 		});
 
-//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
-
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
@@ -293,7 +275,6 @@ public class DumpJobTest {
 			"-communityMap", new Gson().toJson(map)
 		});
 
-//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -328,8 +309,6 @@ public class DumpJobTest {
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
 			"-communityMap", new Gson().toJson(map)
 		});
-
-//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
