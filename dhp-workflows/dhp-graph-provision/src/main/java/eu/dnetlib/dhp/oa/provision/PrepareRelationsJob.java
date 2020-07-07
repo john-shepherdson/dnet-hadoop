@@ -156,6 +156,7 @@ public class PrepareRelationsJob {
 			.parquet(outputPath);
 	}
 
+	// experimental
 	private static void prepareRelationsDataset(
 		SparkSession spark, String inputRelationsPath, String outputPath, Set<String> relationFilter, int maxRelations,
 		int relPartitions) {
