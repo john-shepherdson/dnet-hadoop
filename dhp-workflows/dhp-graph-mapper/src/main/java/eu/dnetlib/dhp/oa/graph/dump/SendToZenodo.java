@@ -65,7 +65,7 @@ public class SendToZenodo implements Serializable {
 			String tmp = p_string.substring(0, p_string.lastIndexOf("/"));
 			String community = tmp.substring(tmp.lastIndexOf("/") + 1);
 			log.info("Sending information for community: " + community);
-			String community_name = communityMap.get(community).replace(" ", "_") + ".zip";
+			String community_name = communityMap.get(community).replace(" ", "_") + ".json.gz";
 			log.info("Copying information for community: " + community);
 			fileSystem.copyToLocalFile(p, new Path("/tmp/" + community_name));
 			File f = new File("/tmp/" + community_name);
