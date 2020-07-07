@@ -98,13 +98,17 @@ public class SparkSplitForCommunity implements Serializable {
 	}
 
 	private static void printResult(String c, Dataset<Result> result, String outputPath) {
-		result
-			.filter(r -> containsCommunity(r, c))
-			.repartition(1)
-			.write()
-			.option("compression", "gzip")
-			.mode(SaveMode.Append)
-			.json(outputPath + "/" + c);
+		Dataset<Result> community_products = result
+				.filter(r -> containsCommunity(r, c));
+
+ 			if(community_products.count() > 0){
+			community_products.repartition(1)
+					.write()
+					.option("compression", "gzip")
+					.mode(SaveMode.Overwrite)
+					.json(outputPath + "/" + c);
+		}
+
 	}
 
 	private static boolean containsCommunity(Result r, String c) {
