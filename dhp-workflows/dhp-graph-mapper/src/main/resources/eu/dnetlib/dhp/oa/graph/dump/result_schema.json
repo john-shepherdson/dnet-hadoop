@@ -1,0 +1,530 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "author": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "fullname": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "surname": {
+              "type": "string"
+            },
+            "rank": {
+              "type": "integer"
+            },
+            "pid": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "scheme": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "scheme",
+                    "value"
+                  ]
+                }
+              ]
+            },
+            "affiliation": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "required": [
+            "fullname"
+          ]
+        }
+      ]
+    },
+    "type": {
+      "type": "string"
+    },
+    "language": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "label"
+      ]
+    },
+    "country": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "provenance": {
+              "type": "string"
+            },
+            "code": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "provenance",
+            "code",
+            "label"
+          ]
+        }
+      ]
+    },
+    "subject": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "scheme": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "scheme",
+            "value"
+          ]
+        }
+      ]
+    },
+    "maintitle": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "description": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "publicationdate": {
+      "type": "string"
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "embargoenddate": {
+      "type": "string"
+    },
+    "source": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "format": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "contributor": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "coverage": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "bestaccessright": {
+      "type": "object",
+      "properties": {
+        "scheme": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "scheme",
+        "code",
+        "label"
+      ]
+    },
+    "context": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "provenance": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "code": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "provenance",
+            "code",
+            "label"
+          ]
+        }
+      ]
+    },
+    "externalReference": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "typology": {
+              "type": "string"
+            },
+            "provenance": {
+              "type": "string"
+            },
+            "trust": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "typology",
+            "provenance",
+            "trust",
+            "value"
+          ]
+        }
+      ]
+    },
+    "instance": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "license": {
+              "type": "string"
+            },
+            "accessright": {
+              "type": "object",
+              "properties": {
+                "scheme": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "scheme",
+                "code",
+                "label"
+              ]
+            },
+            "type": {
+              "type": "string"
+            },
+            "hostedby": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "value"
+              ]
+            },
+            "url": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "collectedfrom": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "value"
+              ]
+            },
+            "publicationdate": {
+              "type": "string"
+            },
+            "refereed": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "license",
+            "accessright",
+            "type",
+            "hostedby",
+            "url",
+            "collectedfrom",
+            "publicationdate",
+            "refereed"
+          ]
+        }
+      ]
+    },
+    "container": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "issnPrinted": {
+          "type": "string"
+        },
+        "issnOnline": {
+          "type": "string"
+        },
+        "issnLinking": {
+          "type": "string"
+        },
+        "ep": {
+          "type": "string"
+        },
+        "iss": {
+          "type": "string"
+        },
+        "sp": {
+          "type": "string"
+        },
+        "vol": {
+          "type": "string"
+        },
+        "edition": {
+          "type": "string"
+        },
+        "conferenceplace": {
+          "type": "string"
+        },
+        "conferencedate": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "issnPrinted",
+        "issnOnline",
+        "issnLinking",
+        "ep",
+        "iss",
+        "sp",
+        "vol",
+        "edition",
+        "conferenceplace",
+        "conferencedate"
+      ]
+    },
+    "documentationUrl": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "codeRepositoryUrl": {
+      "type": "string"
+    },
+    "programmingLanguage": {
+      "type": "string"
+    },
+    "contactperson": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "contactgroup": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "tool": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "size": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "geolocation": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "point": {
+              "type": "string"
+            },
+            "box": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "point",
+            "box"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "point": {
+              "type": "string"
+            },
+            "box": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "point",
+            "box"
+          ]
+        }
+      ]
+    },
+    "pid": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "scheme": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "scheme",
+            "value"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "author",
+    "type",
+    "language",
+    "country",
+    "subject",
+    "maintitle",
+    "subtitle",
+    "description",
+    "publicationdate",
+    "publisher",
+    "embargoenddate",
+    "source",
+    "format",
+    "contributor",
+    "coverage",
+    "bestaccessright",
+    "context",
+    "externalReference",
+    "instance",
+    "container",
+    "documentationUrl",
+    "codeRepositoryUrl",
+    "programmingLanguage",
+    "contactperson",
+    "contactgroup",
+    "tool",
+    "size",
+    "version",
+    "geolocation",
+    "pid"
+  ]
+}
