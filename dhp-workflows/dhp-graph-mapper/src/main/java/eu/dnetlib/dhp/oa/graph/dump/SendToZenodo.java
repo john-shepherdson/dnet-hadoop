@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.graph.dump;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import javax.management.Query;
 
@@ -15,7 +16,10 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
+import com.google.gson.Gson;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.zenodo.*;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 
 public class SendToZenodo implements Serializable {
@@ -61,14 +65,13 @@ public class SendToZenodo implements Serializable {
 			String tmp = p_string.substring(0, p_string.lastIndexOf("/"));
 			String community = tmp.substring(tmp.lastIndexOf("/") + 1);
 			log.info("Sending information for community: " + community);
-			String community_name = communityMap.get(community).replace(" ", "_");
+			String community_name = communityMap.get(community).replace(" ", "_") + ".zip";
 			log.info("Copying information for community: " + community);
 			fileSystem.copyToLocalFile(p, new Path("/tmp/" + community_name));
 			File f = new File("/tmp/" + community_name);
 			try {
 				apiClient.upload(f, community_name);
-				apiClient.sendMretadata(metadata);
-				apiClient.publish();
+
 			} catch (Exception e) {
 				if (f.exists()) {
 					log.info("Deleting information for community: " + community);
@@ -81,6 +84,9 @@ public class SendToZenodo implements Serializable {
 				}
 			}
 		}
+
+		apiClient.sendMretadata(metadata);
+		apiClient.publish();
 
 	}
 
