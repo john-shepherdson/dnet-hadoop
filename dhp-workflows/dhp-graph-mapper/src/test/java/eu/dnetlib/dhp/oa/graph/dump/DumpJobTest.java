@@ -63,8 +63,6 @@ public class DumpJobTest {
 
 	}
 
-
-
 	List<String> communityMap = Arrays
 		.asList(
 			"<community id=\"egi\" label=\"EGI Federation\"/>",
@@ -122,8 +120,6 @@ public class DumpJobTest {
 			.getOrCreate();
 	}
 
-
-
 	@AfterAll
 	public static void afterAll() throws IOException {
 		FileUtils.deleteDirectory(workingDir.toFile());
@@ -145,7 +141,6 @@ public class DumpJobTest {
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
 			"-communityMap", new Gson().toJson(map)
 		});
-
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -185,7 +180,6 @@ public class DumpJobTest {
 		Assertions.assertTrue(verificationDataset.filter("size(context) > 0").count() == 90);
 
 		Assertions.assertTrue(verificationDataset.filter("type = 'dataset'").count() == 90);
-
 
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
 
@@ -275,7 +269,6 @@ public class DumpJobTest {
 			"-communityMap", new Gson().toJson(map)
 		});
 
-
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
@@ -293,7 +286,6 @@ public class DumpJobTest {
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
 
 	}
-
 
 	@Test
 	public void testRecord() throws Exception {

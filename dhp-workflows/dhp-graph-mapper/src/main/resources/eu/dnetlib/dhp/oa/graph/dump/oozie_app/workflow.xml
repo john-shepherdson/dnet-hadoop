@@ -362,7 +362,7 @@
                 <arg>--outputPath</arg><arg>${outputPath}</arg>
                 <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             </spark>
-            <ok to="End"/>
+            <ok to="send_zenodo"/>
             <error to="Kill"/>
         </action>
 
