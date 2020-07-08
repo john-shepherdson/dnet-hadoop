@@ -57,6 +57,8 @@ public class CleaningFunctionTest {
 		String json = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result.json"));
 		Publication p_in = MAPPER.readValue(json, Publication.class);
 
+		assertNull(p_in.getBestaccessright());
+
 		assertTrue(p_in instanceof Result);
 		assertTrue(p_in instanceof Publication);
 
@@ -83,6 +85,9 @@ public class CleaningFunctionTest {
 				.stream()
 				.map(p -> p.getQualifier())
 				.allMatch(q -> pidTerms.contains(q.getClassid())));
+
+		Publication p_defaults = CleanGraphSparkJob.fixDefaults(p_out);
+		assertEquals("CLOSED", p_defaults.getBestaccessright().getClassid());
 
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_out));
