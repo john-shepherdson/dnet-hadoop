@@ -76,6 +76,12 @@
             <artifactId>okhttp</artifactId>
             <version>4.7.2</version>
         </dependency>
+            <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-generator</artifactId>
+            <version>4.13.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
