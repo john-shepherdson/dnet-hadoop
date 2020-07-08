@@ -134,6 +134,7 @@
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
             <arg>--maxRelations</arg><arg>${maxRelations}</arg>
+            <arg>--relationFilter</arg><arg>${relationFilter}</arg>
             <arg>--relPartitions</arg><arg>5000</arg>
         </spark>
         <ok to="fork_join_related_entities"/>

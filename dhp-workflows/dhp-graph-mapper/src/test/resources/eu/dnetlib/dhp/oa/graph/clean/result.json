@@ -185,12 +185,7 @@
       "surname": ""
     }
   ],
-  "bestaccessright": {
-    "classid": "CLOSED",
-    "classname": "Closed Access",
-    "schemeid": "dnet:access_modes",
-    "schemename": "dnet:access_modes"
-  },
+  "bestaccessright": null,
   "collectedfrom": [
     {
       "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",

@@ -142,11 +142,17 @@ public class ConversionUtils {
 			.filter(pid -> pid.getQualifier().getClassid() != null)
 			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
 			.map(pid -> pid.getValue())
+			.map(pid -> cleanOrcid(pid))
 			.filter(StringUtils::isNotBlank)
 			.findFirst()
 			.orElse(null) : null;
 
 		return new OaBrokerAuthor(author.getFullname(), pids);
+	}
+
+	private static String cleanOrcid(final String s) {
+		final String match = "//orcid.org/";
+		return s.contains(match) ? StringUtils.substringAfter(s, match) : s;
 	}
 
 	private static OaBrokerJournal oafJournalToBrokerJournal(final Journal journal) {
