@@ -1,84 +1,143 @@
 <RESOURCE_PROFILE>
     <HEADER>
-        <RESOURCE_IDENTIFIER value="74d90d54-bea4-4a79-82d9-adddcc89e660_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_IDENTIFIER value="b05c97e6-69b5-497d-87fd-2137d3ff2c2e_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
         <RESOURCE_TYPE value="WorkflowDSResourceType"/>
         <RESOURCE_KIND value="WorkflowDSResources"/>
         <RESOURCE_URI value=""/>
         <DATE_OF_CREATION value="2020-06-15T16:35:09+00:00"/>
     </HEADER>
     <BODY>
-        <WORKFLOW_NAME>Graph Construction [OCEAN]</WORKFLOW_NAME>
+        <WORKFLOW_NAME>Graph Construction [HYBRID]</WORKFLOW_NAME>
         <WORKFLOW_TYPE>Data Provision</WORKFLOW_TYPE>
         <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
         <CONFIGURATION start="manual">
 
-            <NODE isStart="true" name="setReuseContent" type="SetEnvParameter">
-                <DESCRIPTION>reuse cached content from the aggregation system</DESCRIPTION>
+            <NODE isStart="true" name="reuseProdContent" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached content from the PROD aggregation system</DESCRIPTION>
                 <PARAMETERS>
-                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseContent</PARAM>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseProdContent</PARAM>
                     <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
                 </PARAMETERS>
                 <ARCS>
+                    <ARC to="contentPathProd"/>
+                </ARCS>
+            </NODE>
+
+            <NODE name="contentPathProd" type="SetEnvParameter">
+                <DESCRIPTION>set the PROD aggregator content path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">prodContentPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prodAggregatorGraphPath"/>
+                </ARCS>
+            </NODE>
+
+            <NODE name="prodAggregatorGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the path containing the PROD AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">prodAggregatorGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/00_prod_graph_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
 
-            <NODE isStart="true" name="setContentPath" type="SetEnvParameter">
-                <DESCRIPTION>set the aggregator content path</DESCRIPTION>
+            <NODE isStart="true" name="reuseBetaContent" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached content from the BETA aggregation system</DESCRIPTION>
                 <PARAMETERS>
-                    <PARAM managedBy="system" name="parameterName" required="true" type="string">contentPath</PARAM>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseBetaContent</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="contentPathBeta"/>
+                </ARCS>
+            </NODE>
+
+            <NODE name="contentPathBeta" type="SetEnvParameter">
+                <DESCRIPTION>set the BETA aggregator content path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">betaContentPath</PARAM>
                     <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_aggregator</PARAM>
                 </PARAMETERS>
                 <ARCS>
-                    <ARC to="waitConfig"/>
+                    <ARC to="betaAggregatorGraphPath"/>
                 </ARCS>
             </NODE>
 
-            <NODE isStart="true" name="setAggregatorGraphPath" type="SetEnvParameter">
-                <DESCRIPTION>Set the path containing the AGGREGATOR graph</DESCRIPTION>
+            <NODE name="betaAggregatorGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the path containing the BETA AGGREGATOR graph</DESCRIPTION>
                 <PARAMETERS>
-                    <PARAM managedBy="system" name="parameterName" required="true" type="string">aggregatorGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/00_graph_aggregator</PARAM>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">betaAggregatorGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/00_beta_graph_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="setIsLookUpUrl"/>
+                </ARCS>
+            </NODE>
+
+            <NODE name="setIsLookUpUrl" type="SetEnvParameter">
+                <DESCRIPTION>Set the IS lookup service address</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">isLookUpUrl</PARAM>
+                    <PARAM managedBy="system" name="parameterValue" required="true" type="string">http://services.openaire.eu:8280/is/services/isLookUp?wsdl</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
+            <NODE isStart="true" name="setMergedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the MERGED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">mergedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/01_graph_merged</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+
             <NODE isStart="true" name="setRawGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the RAW graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">rawGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/01_graph_raw</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/02_graph_raw</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setDedupGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the DEDUPED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">dedupGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/02_graph_dedup</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/03_graph_dedup</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setInferredGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the INFERRED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">inferredGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/03_graph_inferred</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/04_graph_inferred</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setConsistentGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the CONSISTENCY graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">consistentGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/04_graph_consistent</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/05_graph_consistent</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -89,7 +148,7 @@
                 <DESCRIPTION>Set the target path to store the ORCID enriched graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">orcidGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/05_graph_orcid</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/06_graph_orcid</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -100,7 +159,7 @@
                 <DESCRIPTION>Set the target path to store the BULK TAGGED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">bulkTaggingGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/06_graph_bulktagging</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/07_graph_bulktagging</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -111,7 +170,7 @@
                 <DESCRIPTION>Set the target path to store the AFFILIATION from INSTITUTIONAL REPOS graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">affiliationGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/07_graph_affiliation</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/08_graph_affiliation</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -122,7 +181,7 @@
                 <DESCRIPTION>Set the target path to store the COMMUNITY from SELECTED SOURCES graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">communityOrganizationGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/08_graph_comunity_organization</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/09_graph_comunity_organization</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -133,7 +192,7 @@
                 <DESCRIPTION>Set the target path to store the FUNDING from SEMANTIC RELATION graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">fundingGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/09_graph_funding</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/10_graph_funding</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -144,7 +203,7 @@
                 <DESCRIPTION>Set the target path to store the COMMUNITY from SEMANTIC RELATION graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">communitySemRelGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/10_graph_comunity_sem_rel</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/11_graph_comunity_sem_rel</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -155,7 +214,7 @@
                 <DESCRIPTION>Set the target path to store the COUNTRY enriched graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">countryGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/11_graph_country</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/12_graph_country</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -166,7 +225,7 @@
                 <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/12_graph_cleaned</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/13_graph_cleaned</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -177,18 +236,7 @@
                 <DESCRIPTION>Set the target path to store the blacklisted graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">blacklistedGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/13_graph_blacklisted</PARAM>
-                </PARAMETERS>
-                <ARCS>
-                    <ARC to="waitConfig"/>
-                </ARCS>
-            </NODE>
-
-            <NODE isStart="true" name="setIsLookUpUrl" type="SetEnvParameter">
-                <DESCRIPTION>Set the lookup address</DESCRIPTION>
-                <PARAMETERS>
-                    <PARAM managedBy="system" name="parameterName" required="true" type="string">isLookUpUrl</PARAM>
-                    <PARAM managedBy="system" name="parameterValue" required="true" type="string">http://beta.services.openaire.eu:8280/is/services/isLookUp?wsdl</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/core_provision/graph/14_graph_blacklisted</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -256,21 +304,23 @@
                 <DESCRIPTION>wait configurations</DESCRIPTION>
                 <PARAMETERS/>
                 <ARCS>
-                    <ARC to="aggregatorGraph"/>
+                    <ARC to="betaAggregatorGraph"/>
+                    <ARC to="prodAggregatorGraph"/>
                 </ARCS>
             </NODE>
 
-            <NODE name="aggregatorGraph" type="SubmitHadoopJob">
+
+            <NODE name="betaAggregatorGraph" type="SubmitHadoopJob">
                 <DESCRIPTION>create the AGGREGATOR graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
                     <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
                     <PARAM managedBy="system" name="envParams" required="true" type="string">
                         {
-                        'graphOutputPath' : 'aggregatorGraphPath',
+                        'graphOutputPath' : 'betaAggregatorGraphPath',
                         'isLookupUrl' : 'isLookUpUrl',
-                        'reuseContent' : 'reuseContent',
-                        'contentPath' : 'contentPath'
+                        'reuseContent' : 'reuseBetaContent',
+                        'contentPath' : 'betaContentPath'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="params" required="true" type="string">
@@ -281,7 +331,71 @@
                         'postgresURL' : 'jdbc:postgresql://beta.services.openaire.eu:5432/dnet_openaireplus',
                         'postgresUser' : 'dnet',
                         'postgresPassword' : '',
-                        'workingDir' : '/tmp/beta_provision/working_dir/aggregator'
+                        'workingDir' : '/tmp/core_provision/working_dir/beta_aggregator'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitAggregatorGraph"/>
+                </ARCS>
+            </NODE>
+
+            <NODE name="prodAggregatorGraph" type="SubmitHadoopJob">
+                <DESCRIPTION>create the AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphOutputPath' : 'prodAggregatorGraphPath',
+                        'isLookupUrl' : 'isLookUpUrl',
+                        'reuseContent' : 'reuseProdContent',
+                        'contentPath' : 'prodContentPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/oa/graph/raw_all/oozie_app',
+                        'mongoURL' : 'mongodb://services.openaire.eu',
+                        'mongoDb' : 'mdstore',
+                        'postgresURL' : 'jdbc:postgresql://postgresql.services.openaire.eu:5432/dnet_openaireplus',
+                        'postgresUser' : 'dnet',
+                        'postgresPassword' : '',
+                        'workingDir' : '/tmp/core_provision/working_dir/prod_aggregator'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitAggregatorGraph"/>
+                </ARCS>
+            </NODE>
+
+            <NODE isJoin="true" name="waitAggregatorGraph">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="mergeAggregatorGraphs"/>
+                </ARCS>
+            </NODE>
+
+            <NODE name="mergeAggregatorGraphs" type="SubmitHadoopJob">
+                <DESCRIPTION>create the AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'betaInputGgraphPath' : 'betaAggregatorGraphPath',
+                        'prodInputGgraphPath' : 'prodAggregatorGraphPath',
+                        'graphOutputPath' : 'mergedGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/oa/graph/merge/oozie_app',
+                        'workingDir' : '/tmp/core_provision/working_dir/merge_graph'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
@@ -299,7 +413,7 @@
                     <PARAM managedBy="system" name="envParams" required="true" type="string">
                         {
                         'inputActionSetIds' : 'actionSetIdsRawGraph',
-                        'inputGraphRootPath' : 'aggregatorGraphPath',
+                        'inputGraphRootPath' : 'mergedGraphPath',
                         'outputGraphRootPath' : 'rawGraphPath',
                         'isLookupUrl' : 'isLookUpUrl'
                         }
@@ -319,7 +433,7 @@
                         'activePromoteResultActionPayload' : 'true',
                         'activePromoteSoftwareActionPayload' : 'true',
                         'mergeAndGetStrategy' : 'MERGE_FROM_AND_GET',
-                        'workingDir' : '/tmp/beta_provision/working_dir/promoteActionsRaw'
+                        'workingDir' : '/tmp/core_provision/working_dir/promoteActionsRaw'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
@@ -345,7 +459,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/dedup/scan/oozie_app',
-                        'workingPath' : '/tmp/beta_provision/working_dir/dedup'
+                        'workingPath' : '/tmp/core_provision/working_dir/dedup'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
@@ -383,7 +497,7 @@
                         'activePromoteResultActionPayload' : 'true',
                         'activePromoteSoftwareActionPayload' : 'true',
                         'mergeAndGetStrategy' : 'MERGE_FROM_AND_GET',
-                        'workingDir' : '/tmp/beta_provision/working_dir/promoteActionsIIS'
+                        'workingDir' : '/tmp/core_provision/working_dir/promoteActionsIIS'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
@@ -407,13 +521,13 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/dedup/consistency/oozie_app',
-                        'workingPath' : '/tmp/beta_provision/working_dir/dedup'
+                        'workingPath' : '/tmp/core_provision/working_dir/dedup'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
                 </PARAMETERS>
                 <ARCS>
-                    <ARC to="graphCleaning"/>
+                    <ARC to="orcidPropagation"/>
                 </ARCS>
             </NODE>
 
@@ -431,7 +545,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/orcidtoresultfromsemrel/oozie_app',
-                        'workingDir' : '/tmp/beta_provision/working_dir/orcid',
+                        'workingDir' : '/tmp/core_provision/working_dir/orcid',
                         'allowedsemrels' : 'isSupplementedBy;isSupplementTo',
                         'saveGraph' : 'true'
                         }
@@ -459,7 +573,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/bulktag/oozie_app',
-                        'workingDir' : '/tmp/beta_provision/working_dir/bulktag'
+                        'workingDir' : '/tmp/core_provision/working_dir/bulktag'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
@@ -483,7 +597,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/affiliation/oozie_app',
-                        'workingDir' : '/tmp/beta_provision/working_dir/affiliation',
+                        'workingDir' : '/tmp/core_provision/working_dir/affiliation',
                         'saveGraph' : 'true'
                         }
                     </PARAM>
@@ -509,7 +623,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/community_organization/oozie_app',
-                        'workingDir' : '/tmp/beta_provision/working_dir/community_organization',
+                        'workingDir' : '/tmp/core_provision/working_dir/community_organization',
                         'saveGraph' : 'true'
                         }
                     </PARAM>
@@ -534,7 +648,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/funding/oozie_app',
-                        'workingDir' : '/tmp/beta_provision/working_dir/funding',
+                        'workingDir' : '/tmp/core_provision/working_dir/funding',
                         'allowedsemrels' : 'isSupplementedBy;isSupplementTo',
                         'saveGraph' : 'true'
                         }
@@ -561,7 +675,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/community_semrel/oozie_app',
-                        'workingDir' : '/tmp/beta_provision/working_dir/community_semrel',
+                        'workingDir' : '/tmp/core_provision/working_dir/community_semrel',
                         'allowedsemrels' : 'isSupplementedBy;isSupplementTo',
                         'saveGraph' : 'true'
                         }
@@ -589,7 +703,7 @@
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/country/oozie_app',
                         'sparkExecutorCores' : '3',
                         'sparkExecutorMemory' : '10G',
-                        'workingDir' : '/tmp/beta_provision/working_dir/country',
+                        'workingDir' : '/tmp/core_provision/working_dir/country',
                         'allowedtypes' : 'pubsrepository::institutional',
                         'whitelist' : '10|opendoar____::300891a62162b960cf02ce3827bb363c',
                         'saveGraph' : 'true'
@@ -617,7 +731,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/graph/clean/oozie_app',
-                        'workingPath' : '/tmp/beta_provision/working_dir/clean'
+                        'workingPath' : '/tmp/core_provision/working_dir/clean'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
@@ -641,7 +755,7 @@
                     <PARAM managedBy="system" name="params" required="true" type="string">
                         {
                         'oozie.wf.application.path' : '/lib/dnet/oa/enrichment/blacklist/oozie_app',
-                        'workingDir' : '/tmp/beta_provision/working_dir/blacklist',
+                        'workingDir' : '/tmp/core_provision/working_dir/blacklist',
                         'postgresURL' : 'jdbc:postgresql://beta.services.openaire.eu:5432/dnet_openaireplus',
                         'postgresUser' : 'dnet',
                         'postgresPassword' : ''

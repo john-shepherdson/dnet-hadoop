@@ -1,0 +1,32 @@
+[
+	{
+		"paramName": "issm",
+		"paramLongName": "isSparkSessionManaged",
+		"paramDescription": "when true will stop SparkSession after job execution",
+		"paramRequired": false
+	},
+	{
+		"paramName": "bin",
+		"paramLongName": "betaInputPath",
+		"paramDescription": "the beta graph root path",
+		"paramRequired": true
+	},
+	{
+		"paramName": "pin",
+		"paramLongName": "prodInputPath",
+		"paramDescription": "the production graph root path",
+		"paramRequired": true
+	},
+	{
+		"paramName": "out",
+		"paramLongName": "outputPath",
+		"paramDescription": "the output merged graph root path",
+		"paramRequired": true
+	},
+	{
+		"paramName": "class",
+		"paramLongName": "graphTableClassName",
+		"paramDescription": "class name moelling the graph table",
+		"paramRequired": true
+	}
+]
