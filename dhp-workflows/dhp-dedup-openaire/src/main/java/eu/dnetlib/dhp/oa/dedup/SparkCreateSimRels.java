@@ -95,19 +95,23 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 					});
 
 			// create blocks for deduplication
-			JavaPairRDD<String, Block> blocks = Deduper.createSortedBlocks(mapDocuments, dedupConf);
+			JavaPairRDD<String, Block> blocks = Deduper
+				.createSortedBlocks(mapDocuments, dedupConf)
+				.repartition(10000);
 
 			// create relations by comparing only elements in the same group
-			JavaRDD<Relation> relations = Deduper
+			Deduper
 				.computeRelations(sc, blocks, dedupConf)
-				.map(t -> createSimRel(t._1(), t._2(), entity));
+				.map(t -> createSimRel(t._1(), t._2(), entity))
+				.repartition(10000)
+				.map(r -> OBJECT_MAPPER.writeValueAsString(r))
+				.saveAsTextFile(outputPath);
 
 			// save the simrel in the workingdir
-			spark
-				.createDataset(relations.rdd(), Encoders.bean(Relation.class))
-				.write()
-				.mode(SaveMode.Append)
-				.save(outputPath);
+			/*
+			 * spark .createDataset(relations.rdd(), Encoders.bean(Relation.class)) .write() .mode(SaveMode.Append)
+			 * .save(outputPath);
+			 */
 		}
 	}
 

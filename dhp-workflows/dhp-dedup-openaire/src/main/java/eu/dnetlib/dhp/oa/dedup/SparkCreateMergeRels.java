@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.graphx.Edge;
 import org.apache.spark.rdd.RDD;
@@ -100,8 +101,10 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 			final RDD<Edge<String>> edgeRdd = spark
 				.read()
-				.load(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity))
-				.as(Encoders.bean(Relation.class))
+				.textFile(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity))
+				.map(
+					(MapFunction<String, Relation>) r -> OBJECT_MAPPER.readValue(r, Relation.class),
+					Encoders.bean(Relation.class))
 				.javaRDD()
 				.map(it -> new Edge<>(hash(it.getSource()), hash(it.getTarget()), it.getRelClass()))
 				.rdd();
