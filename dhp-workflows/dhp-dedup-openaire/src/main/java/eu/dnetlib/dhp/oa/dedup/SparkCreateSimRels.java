@@ -88,6 +88,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 			JavaPairRDD<String, MapDocument> mapDocuments = sc
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+				.repartition(10000)
 				.mapToPair(
 					(PairFunction<String, String, MapDocument>) s -> {
 						MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
