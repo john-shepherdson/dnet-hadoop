@@ -161,16 +161,22 @@ public class Mapper implements Serializable {
 				.getContext()
 				.stream()
 				.map(c -> {
-					if (communities.contains(c.getId())
-						|| communities.contains(c.getId().substring(0, c.getId().indexOf("::")))) {
+					String community_id = c.getId();
+					if (community_id.indexOf("::") > 0) {
+						community_id = community_id.substring(0, community_id.indexOf("::"));
+					}
+					if (communities.contains(community_id)) {
+						// || communities.contains(c.getId().substring(0, c.getId().indexOf("::")))) {
 						Context context = new Context();
-						if (!communityMap.containsKey(c.getId())) {
-							context.setCode(c.getId().substring(0, c.getId().indexOf("::")));
-							context.setLabel(communityMap.get(context.getCode()));
-						} else {
-							context.setCode(c.getId());
-							context.setLabel(communityMap.get(c.getId()));
-						}
+						context.setCode(community_id);
+						context.setLabel(communityMap.get(community_id));
+//						if (!communityMap.containsKey(c.getId())) {
+//							context.setCode(c.getId().substring(0, c.getId().indexOf("::")));
+//							context.setLabel(communityMap.get(context.getCode()));
+//						} else {
+//							context.setCode(c.getId());
+//							context.setLabel(communityMap.get(c.getId()));
+//						}
 						Optional<List<DataInfo>> dataInfo = Optional.ofNullable(c.getDataInfo());
 						if (dataInfo.isPresent()) {
 							List<String> provenance = new ArrayList<>();
