@@ -3,8 +3,6 @@ package eu.dnetlib.dhp.broker.oa;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -63,13 +61,13 @@ public class GenerateEventsJob {
 		final String eventsPath = workingPath + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
-		final Set<String> dsIdWhitelist = parseParamAsList(parser, "datasourceIdWhitelist");
+		final Set<String> dsIdWhitelist = ClusterUtils.parseParamAsList(parser, "datasourceIdWhitelist");
 		log.info("datasourceIdWhitelist: {}", StringUtils.join(dsIdWhitelist, ","));
 
-		final Set<String> dsTypeWhitelist = parseParamAsList(parser, "datasourceTypeWhitelist");
+		final Set<String> dsTypeWhitelist = ClusterUtils.parseParamAsList(parser, "datasourceTypeWhitelist");
 		log.info("datasourceTypeWhitelist: {}", StringUtils.join(dsTypeWhitelist, ","));
 
-		final Set<String> dsIdBlacklist = parseParamAsList(parser, "datasourceIdBlacklist");
+		final Set<String> dsIdBlacklist = ClusterUtils.parseParamAsList(parser, "datasourceIdBlacklist");
 		log.info("datasourceIdBlacklist: {}", StringUtils.join(dsIdBlacklist, ","));
 
 		final SparkConf conf = new SparkConf();
@@ -101,22 +99,6 @@ public class GenerateEventsJob {
 
 		});
 
-	}
-
-	private static Set<String> parseParamAsList(final ArgumentApplicationParser parser, final String key) {
-		final String s = parser.get(key).trim();
-
-		final Set<String> res = new HashSet<>();
-
-		if (s.length() > 1) { // A value of a single char (for example: '-') indicates an empty list
-			Arrays
-				.stream(s.split(","))
-				.map(String::trim)
-				.filter(StringUtils::isNotBlank)
-				.forEach(res::add);
-		}
-
-		return res;
 	}
 
 	public static Map<String, LongAccumulator> prepareAccumulators(final SparkContext sc) {

@@ -57,9 +57,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.dnetlib</groupId>
+			<groupId>eu.dnetlib.dhp</groupId>
 			<artifactId>dnet-openaire-broker-common</artifactId>
-			<version>[3.0.4,4.0.0)</version>
+			<version>[3.0.0-SNAPSHOT,)</version>
 		</dependency>
 
 	</dependencies>
