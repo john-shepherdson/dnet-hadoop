@@ -6,18 +6,6 @@
 		"paramRequired": true
 	},
 	{
-		"paramName": "lu",
-		"paramLongName": "isLookupUrl",
-		"paramDescription": "the address of the ISLookUpService",
-		"paramRequired": true
-	},
-	{
-		"paramName": "d",
-		"paramLongName": "dedupConfProfile",
-		"paramDescription": "the id of a valid Dedup Configuration Profile",
-		"paramRequired": true
-	},
-	{
 		"paramName": "datasourceIdWhitelist",
 		"paramLongName": "datasourceIdWhitelist",
 		"paramDescription": "a white list (comma separeted, - for empty list) of datasource ids",

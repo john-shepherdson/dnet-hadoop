@@ -10,15 +10,6 @@
             <description>the path where the the generated data will be stored</description>
         </property>
         <property>
-            <name>isLookupUrl</name>
-            <description>the address of the lookUp service</description>
-        </property>
-        <property>
-            <name>dedupConfProfId</name>
-            <description>the id of a valid Dedup Configuration Profile</description>
-        </property>
-
-        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
