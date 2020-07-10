@@ -17,6 +17,11 @@
             <description>the password postgres</description>
         </property>
         <property>
+            <name>dbSchema</name>
+            <value>beta</value>
+            <description>the database schema according to the D-Net infrastructure (beta or production)</description>
+        </property>
+        <property>
             <name>isLookupUrl</name>
             <description>the address of the lookUp service</description>
         </property>
@@ -93,6 +98,7 @@
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--dbschema</arg><arg>${dbSchema}</arg>
         </java>
         <ok to="ImportDB_claims"/>
         <error to="Kill"/>
@@ -109,6 +115,7 @@
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--action</arg><arg>claims</arg>
         </java>
         <ok to="End"/>

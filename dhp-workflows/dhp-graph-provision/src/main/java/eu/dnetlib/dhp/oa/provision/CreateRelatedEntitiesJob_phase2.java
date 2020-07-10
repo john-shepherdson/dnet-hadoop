@@ -61,12 +61,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private static final int MAX_EXTERNAL_ENTITIES = 50;
-	private static final int MAX_AUTHORS = 200;
-	private static final int MAX_AUTHOR_FULLNAME_LENGTH = 1000;
-	private static final int MAX_TITLE_LENGTH = 5000;
-	private static final int MAX_ABSTRACT_LENGTH = 100000;
-
 	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
@@ -246,15 +240,15 @@ public class CreateRelatedEntitiesJob_phase2 {
 				List<ExternalReference> refs = r
 					.getExternalReference()
 					.stream()
-					.limit(MAX_EXTERNAL_ENTITIES)
+					.limit(ProvisionConstants.MAX_EXTERNAL_ENTITIES)
 					.collect(Collectors.toList());
 				r.setExternalReference(refs);
 			}
 			if (r.getAuthor() != null) {
 				List<Author> authors = Lists.newArrayList();
 				for (Author a : r.getAuthor()) {
-					a.setFullname(StringUtils.left(a.getFullname(), MAX_AUTHOR_FULLNAME_LENGTH));
-					if (authors.size() < MAX_AUTHORS || hasORCID(a)) {
+					a.setFullname(StringUtils.left(a.getFullname(), ProvisionConstants.MAX_AUTHOR_FULLNAME_LENGTH));
+					if (authors.size() < ProvisionConstants.MAX_AUTHORS || hasORCID(a)) {
 						authors.add(a);
 					}
 				}
@@ -266,7 +260,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.stream()
 					.filter(Objects::nonNull)
 					.map(d -> {
-						d.setValue(StringUtils.left(d.getValue(), MAX_ABSTRACT_LENGTH));
+						d.setValue(StringUtils.left(d.getValue(), ProvisionConstants.MAX_ABSTRACT_LENGTH));
 						return d;
 					})
 					.collect(Collectors.toList());
@@ -278,9 +272,10 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.stream()
 					.filter(Objects::nonNull)
 					.map(t -> {
-						t.setValue(StringUtils.left(t.getValue(), MAX_TITLE_LENGTH));
+						t.setValue(StringUtils.left(t.getValue(), ProvisionConstants.MAX_TITLE_LENGTH));
 						return t;
 					})
+					.limit(ProvisionConstants.MAX_TITLES)
 					.collect(Collectors.toList());
 				r.setTitle(titles);
 			}
