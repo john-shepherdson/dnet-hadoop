@@ -62,27 +62,25 @@ public class SendToZenodo implements Serializable {
 
 			Path p = fileStatus.getPath();
 			String p_string = p.toString();
-			String tmp = p_string.substring(0, p_string.lastIndexOf("/"));
-			String community = tmp.substring(tmp.lastIndexOf("/") + 1);
-			log.info("Sending information for community: " + community);
-			String community_name = communityMap.get(community).replace(" ", "_") + ".json.gz";
-			log.info("Copying information for community: " + community);
-			fileSystem.copyToLocalFile(p, new Path("/tmp/" + community_name));
-			File f = new File("/tmp/" + community_name);
-			try {
-				apiClient.upload(f, community_name);
+			if(!p_string.endsWith("_SUCCESS")){
+				String tmp = p_string.substring(0, p_string.lastIndexOf("/"));
+				String community = tmp.substring(tmp.lastIndexOf("/") + 1);
+				log.info("Sending information for community: " + community);
+				String community_name = communityMap.get(community).replace(" ", "_") + ".json.gz";
+				log.info("Copying information for community: " + community);
+				fileSystem.copyToLocalFile(p, new Path("/tmp/" + community_name));
+				File f = new File("/tmp/" + community_name);
+				try {
+					apiClient.upload(f, community_name);
 
-			} catch (Exception e) {
-				if (f.exists()) {
-					log.info("Deleting information for community: " + community);
-					f.delete();
-				}
-			} finally {
-				if (f.exists()) {
-					log.info("Deleting information for community: " + community);
-					f.delete();
+				} finally {
+					if (f.exists()) {
+						log.info("Deleting information for community: " + community);
+						f.delete();
+					}
 				}
 			}
+
 		}
 
 		apiClient.sendMretadata(metadata);
