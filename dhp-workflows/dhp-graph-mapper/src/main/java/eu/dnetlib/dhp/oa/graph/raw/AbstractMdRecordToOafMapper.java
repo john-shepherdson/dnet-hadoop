@@ -378,6 +378,10 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected abstract Field<String> prepareDatasetStorageDate(Document doc, DataInfo info);
 
+	public static Qualifier createBestAccessRights(final List<Instance> instanceList) {
+		return getBestAccessRights(instanceList);
+	}
+
 	protected static Qualifier getBestAccessRights(final List<Instance> instanceList) {
 		if (instanceList != null) {
 			final Optional<Qualifier> min = instanceList

@@ -18,11 +18,7 @@ public class EnrichMoreProject extends UpdateMatcher<OaBrokerProject> {
 		super(20,
 			prj -> Topic.ENRICH_MORE_PROJECT,
 			(p, prj) -> p.getProjects().add(prj),
-			prj -> projectAsString(prj));
-	}
-
-	private static String projectAsString(final OaBrokerProject prj) {
-		return prj.getFunder() + "::" + prj.getFundingProgram() + "::" + prj.getCode();
+			prj -> prj.getOpenaireId());
 	}
 
 	@Override
@@ -36,13 +32,13 @@ public class EnrichMoreProject extends UpdateMatcher<OaBrokerProject> {
 		final Set<String> existingProjects = target
 			.getProjects()
 			.stream()
-			.map(EnrichMoreProject::projectAsString)
+			.map(p -> p.getOpenaireId())
 			.collect(Collectors.toSet());
 
 		return source
 			.getProjects()
 			.stream()
-			.filter(p -> !existingProjects.contains(projectAsString(p)))
+			.filter(p -> !existingProjects.contains(p.getOpenaireId()))
 			.collect(Collectors.toList());
 	}
 
