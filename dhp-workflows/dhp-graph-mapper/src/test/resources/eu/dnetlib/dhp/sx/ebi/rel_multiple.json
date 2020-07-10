@@ -1,0 +1,191 @@
+{
+  "version": "6.3",
+  "hitCount": 4,
+  "request": {
+    "id": "28818901",
+    "source": "MED"
+  },
+  "dataLinkList": {
+    "Category": [
+      {
+        "Name": "Nucleotide Sequences",
+        "CategoryLinkCount": 3,
+        "Section": [
+          {
+            "ObtainedBy": "tm_accession",
+            "Tags": [
+              "supporting_data"
+            ],
+            "SectionLinkCount": 1,
+            "Linklist": {
+              "Link": [
+                {
+                  "ObtainedBy": "tm_accession",
+                  "PublicationDate": "27-02-2020",
+                  "LinkProvider": {
+                    "Name": "Europe PMC"
+                  },
+                  "RelationshipType": {
+                    "Name": "References"
+                  },
+                  "Source": {
+                    "Type": {
+                      "Name": "literature"
+                    },
+                    "Identifier": {
+                      "ID": "28818901",
+                      "IDScheme": "MED"
+                    }
+                  },
+                  "Target": {
+                    "Type": {
+                      "Name": "dataset"
+                    },
+                    "Identifier": {
+                      "ID": "AP008937",
+                      "IDScheme": "ENA",
+                      "IDURL": "http://identifiers.org/ena.embl/AP008937"
+                    },
+                    "Title": "AP008937",
+                    "Publisher": {
+                      "Name": "Europe PMC"
+                    }
+                  },
+                  "Frequency": 1
+                }
+              ]
+            }
+          },
+          {
+            "ObtainedBy": "submission",
+            "Tags": [
+              "related_data"
+            ],
+            "SectionLinkCount": 2,
+            "CollectionURL": "http://www.ebi.ac.uk/ena/data/search?query=28818901",
+            "Linklist": {
+              "Link": [
+                {
+                  "ObtainedBy": "submission",
+                  "PublicationDate": "25-06-2018",
+                  "LinkProvider": {
+                    "Name": "Europe PMC"
+                  },
+                  "RelationshipType": {
+                    "Name": "IsReferencedBy"
+                  },
+                  "Source": {
+                    "Type": {
+                      "Name": "literature"
+                    },
+                    "Identifier": {
+                      "ID": "28818901",
+                      "IDScheme": "PMID"
+                    }
+                  },
+                  "Target": {
+                    "Type": {
+                      "Name": "dataset"
+                    },
+                    "Identifier": {
+                      "ID": "NIWV01000000",
+                      "IDScheme": "ENA",
+                      "IDURL": "http://www.ebi.ac.uk/ena/data/view/NIWV01000000"
+                    },
+                    "Title": "Nucleotide sequences",
+                    "Publisher": {
+                      "Name": "ENA"
+                    }
+                  }
+                },
+                {
+                  "ObtainedBy": "submission",
+                  "PublicationDate": "25-06-2018",
+                  "LinkProvider": {
+                    "Name": "Europe PMC"
+                  },
+                  "RelationshipType": {
+                    "Name": "IsReferencedBy"
+                  },
+                  "Source": {
+                    "Type": {
+                      "Name": "literature"
+                    },
+                    "Identifier": {
+                      "ID": "28818901",
+                      "IDScheme": "PMID"
+                    }
+                  },
+                  "Target": {
+                    "Type": {
+                      "Name": "dataset"
+                    },
+                    "Identifier": {
+                      "ID": "PRJNA390617",
+                      "IDScheme": "ENA",
+                      "IDURL": "http://www.ebi.ac.uk/ena/data/view/PRJNA390617"
+                    },
+                    "Title": "Lactobacillus fermentum strain:BFE 6620",
+                    "Publisher": {
+                      "Name": "ENA"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "Name": "BioStudies: supplemental material and supporting data",
+        "CategoryLinkCount": 1,
+        "Section": [
+          {
+            "ObtainedBy": "ext_links",
+            "Tags": [
+              "supporting_data"
+            ],
+            "SectionLinkCount": 1,
+            "Linklist": {
+              "Link": [
+                {
+                  "ObtainedBy": "ext_links",
+                  "PublicationDate": "24-07-2018",
+                  "LinkProvider": {
+                    "Name": "Europe PMC"
+                  },
+                  "RelationshipType": {
+                    "Name": "IsReferencedBy"
+                  },
+                  "Source": {
+                    "Type": {
+                      "Name": "literature"
+                    },
+                    "Identifier": {
+                      "ID": "28818901",
+                      "IDScheme": "PMID"
+                    }
+                  },
+                  "Target": {
+                    "Type": {
+                      "Name": "dataset"
+                    },
+                    "Identifier": {
+                      "ID": "http://www.ebi.ac.uk/biostudies/studies/S-EPMC5604774?xr=true",
+                      "IDScheme": "URL",
+                      "IDURL": "http://www.ebi.ac.uk/biostudies/studies/S-EPMC5604774?xr=true"
+                    },
+                    "Title": "Draft Genome Sequence of Lactobacillus fermentum BFE 6620, a Potential Starter Culture for African Vegetable Foods, Isolated from Fermented Cassava.",
+                    "Publisher": {
+                      "Name": "BioStudies: supplemental material and supporting data"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

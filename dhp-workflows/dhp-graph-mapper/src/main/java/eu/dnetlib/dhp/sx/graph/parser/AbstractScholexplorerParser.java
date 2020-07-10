@@ -150,16 +150,14 @@ public abstract class AbstractScholexplorerParser {
 		return uk;
 	}
 
-
-	protected Qualifier generateQualifier(final String classId, final String className, final String schemeId, final String schemeName) {
+	protected Qualifier generateQualifier(final String classId, final String className, final String schemeId,
+		final String schemeName) {
 		final Qualifier q = new Qualifier();
 		q.setClassid(classId);
 		q.setClassid(className);
 		q.setSchemeid(schemeId);
 		q.setSchemename(schemeName);
 		return q;
-
-
 
 	}
 

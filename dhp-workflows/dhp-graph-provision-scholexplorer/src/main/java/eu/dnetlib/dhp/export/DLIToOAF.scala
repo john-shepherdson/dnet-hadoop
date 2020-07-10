@@ -5,11 +5,12 @@ import java.time.format.DateTimeFormatter
 
 import eu.dnetlib.dhp.common.PacePerson
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{Author,  Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.jackson.map.ObjectMapper
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils._
 
 import scala.collection.JavaConverters._
 
@@ -426,46 +427,6 @@ object DLIToOAF {
   }
 
 
-  def generateKeyValue(key: String, value: String): KeyValue = {
-    val kv: KeyValue = new KeyValue()
-    kv.setKey(key)
-    kv.setValue(value)
-    kv.setDataInfo(generateDataInfo("0.9"))
-    kv
-  }
 
-
-  def generateDataInfo(trust: String = "0.9", invisibile: Boolean = false): DataInfo = {
-    val di = new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust(trust)
-    di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
-    di
-  }
-
-  def createQualifier(cls: String, sch: String): Qualifier = {
-    createQualifier(cls, cls, sch, sch)
-  }
-
-
-  def createQualifier(classId: String, className: String, schemeId: String, schemeName: String): Qualifier = {
-    val q: Qualifier = new Qualifier
-    q.setClassid(classId)
-    q.setClassname(className)
-    q.setSchemeid(schemeId)
-    q.setSchemename(schemeName)
-    q
-  }
-
-
-  def asField[T](value: T): Field[T] = {
-    val tmp = new Field[T]
-    tmp.setValue(value)
-    tmp
-
-
-  }
 
 }

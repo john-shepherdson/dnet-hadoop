@@ -51,7 +51,7 @@ object SparkCreateEBIDataFrame {
     spark.createDataset(oafPubsRDD).write.mode(SaveMode.Overwrite).save(s"$workingPath/oaf")
 
     logger.info("Extract Publication and relation from dataset_xml")
-    val oafDatsRDD:RDD[Oaf] = sc.textFile(s"$workingPath/_dataset_xml").map(s =>
+    val oafDatsRDD:RDD[Oaf] = sc.textFile(s"$workingPath/dataset_xml").map(s =>
     {
       new ObjectMapper().readValue(s, classOf[String])
     }).flatMap(s => {
@@ -79,5 +79,9 @@ object SparkCreateEBIDataFrame {
       .agg(EBIAggregator.getRelationAggregator().toColumn)
       .map(p => p._2)
       .write.mode(SaveMode.Overwrite).save(s"$workingPath/relation")
+
+
+
+    relations.map(r => (r.getSource, r.getTarget))(Encoders.tuple(Encoders.STRING,Encoders.STRING))
   }
 }
