@@ -96,14 +96,14 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			FieldType.TARGET,
 			getDeletedFn());
 
-		save(distinctRelations(newRels.union(updated).union(mergeRels)), outputRelationPath, SaveMode.Overwrite);
+		save(newRels.union(updated).union(mergeRels).distinct(), outputRelationPath, SaveMode.Overwrite);
 	}
 
 	private Dataset<Relation> distinctRelations(Dataset<Relation> rels) {
 		return rels
-				.groupByKey((MapFunction<Relation, String>) r -> ModelSupport.idFn().apply(r), Encoders.STRING())
-				.agg(new RelationAggregator().toColumn())
-				.map((MapFunction<Tuple2<String, Relation>, Relation>) t -> t._2(), Encoders.bean(Relation.class));
+			.groupByKey((MapFunction<Relation, String>) r -> ModelSupport.idFn().apply(r), Encoders.STRING())
+			.agg(new RelationAggregator().toColumn())
+			.map((MapFunction<Tuple2<String, Relation>, Relation>) t -> t._2(), Encoders.bean(Relation.class));
 	}
 
 	class RelationAggregator extends Aggregator<Relation, Relation, Relation> {
@@ -115,13 +115,11 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 		@Override
 		public Relation reduce(Relation b, Relation a) {
-			b.mergeFrom(a);
 			return b;
 		}
 
 		@Override
 		public Relation merge(Relation b, Relation a) {
-			b.mergeFrom(a);
 			return b;
 		}
 
