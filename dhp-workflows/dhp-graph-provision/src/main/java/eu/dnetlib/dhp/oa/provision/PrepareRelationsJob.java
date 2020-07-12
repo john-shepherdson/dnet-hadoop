@@ -100,11 +100,17 @@ public class PrepareRelationsJob {
 			.orElse(new HashSet<>());
 		log.info("relationFilter: {}", relationFilter);
 
-		int maxRelations = Optional
-			.ofNullable(parser.get("maxRelations"))
+		int sourceMaxRelations = Optional
+			.ofNullable(parser.get("sourceMaxRelations"))
 			.map(Integer::valueOf)
 			.orElse(MAX_RELS);
-		log.info("maxRelations: {}", maxRelations);
+		log.info("sourceMaxRelations: {}", sourceMaxRelations);
+
+		int targetMaxRelations = Optional
+			.ofNullable(parser.get("targetMaxRelations"))
+			.map(Integer::valueOf)
+			.orElse(MAX_RELS);
+		log.info("targetMaxRelations: {}", targetMaxRelations);
 
 		SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -116,7 +122,8 @@ public class PrepareRelationsJob {
 			spark -> {
 				removeOutputDir(spark, outputPath);
 				prepareRelationsRDD(
-					spark, inputRelationsPath, outputPath, relationFilter, maxRelations, relPartitions);
+					spark, inputRelationsPath, outputPath, relationFilter, sourceMaxRelations, targetMaxRelations,
+					relPartitions);
 			});
 	}
 
@@ -129,31 +136,40 @@ public class PrepareRelationsJob {
 	 * @param inputRelationsPath source path for the graph relations
 	 * @param outputPath output path for the processed relations
 	 * @param relationFilter set of relation filters applied to the `relClass` field
-	 * @param maxRelations maximum number of allowed outgoing edges
+	 * @param sourceMaxRelations maximum number of allowed outgoing edges grouping by relation.source
+	 * @param targetMaxRelations maximum number of allowed outgoing edges grouping by relation.target
 	 * @param relPartitions number of partitions for the output RDD
 	 */
 	private static void prepareRelationsRDD(SparkSession spark, String inputRelationsPath, String outputPath,
-		Set<String> relationFilter, int maxRelations, int relPartitions) {
+		Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
 
-		// group by SOURCE and apply limit
-		RDD<Relation> bySource = readPathRelationRDD(spark, inputRelationsPath)
+		JavaRDD<Relation> rels = readPathRelationRDD(spark, inputRelationsPath)
 			.filter(rel -> rel.getDataInfo().getDeletedbyinference() == false)
-			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false)
-			.mapToPair(r -> new Tuple2<>(SortableRelationKey.create(r, r.getSource()), r))
+			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false);
+
+		JavaRDD<Relation> pruned = pruneRels(
+			pruneRels(
+				rels,
+				sourceMaxRelations, relPartitions, (Function<Relation, String>) r -> r.getSource()),
+			targetMaxRelations, relPartitions, (Function<Relation, String>) r -> r.getTarget());
+		spark
+			.createDataset(pruned.rdd(), Encoders.bean(Relation.class))
+			.repartition(relPartitions)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.parquet(outputPath);
+	}
+
+	private static JavaRDD<Relation> pruneRels(JavaRDD<Relation> rels, int maxRelations,
+		int relPartitions, Function<Relation, String> idFn) {
+		return rels
+			.mapToPair(r -> new Tuple2<>(SortableRelationKey.create(r, idFn.call(r)), r))
 			.repartitionAndSortWithinPartitions(new RelationPartitioner(relPartitions))
 			.groupBy(Tuple2::_1)
 			.map(Tuple2::_2)
 			.map(t -> Iterables.limit(t, maxRelations))
 			.flatMap(Iterable::iterator)
-			.map(Tuple2::_2)
-			.rdd();
-
-		spark
-			.createDataset(bySource, Encoders.bean(Relation.class))
-			.repartition(relPartitions)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
+			.map(Tuple2::_2);
 	}
 
 	// experimental

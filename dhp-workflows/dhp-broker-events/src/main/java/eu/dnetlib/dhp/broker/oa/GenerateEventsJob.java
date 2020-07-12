@@ -18,8 +18,6 @@ import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
@@ -27,9 +25,6 @@ import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.EventFinder;
 import eu.dnetlib.dhp.broker.oa.util.EventGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public class GenerateEventsJob {
 
@@ -52,12 +47,6 @@ public class GenerateEventsJob {
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
-		final String isLookupUrl = parser.get("isLookupUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
-
-		final String dedupConfigProfileId = parser.get("dedupConfProfile");
-		log.info("dedupConfigProfileId: {}", dedupConfigProfileId);
-
 		final String eventsPath = workingPath + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
@@ -71,10 +60,6 @@ public class GenerateEventsJob {
 		log.info("datasourceIdBlacklist: {}", StringUtils.join(dsIdBlacklist, ","));
 
 		final SparkConf conf = new SparkConf();
-
-		// TODO UNCOMMENT
-		// final DedupConfig dedupConfig = loadDedupConfig(isLookupUrl, dedupConfigProfileId);
-		final DedupConfig dedupConfig = null;
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
@@ -90,7 +75,7 @@ public class GenerateEventsJob {
 			final Dataset<Event> dataset = groups
 				.map(
 					g -> EventFinder
-						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, dedupConfig, accumulators),
+						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, accumulators),
 					Encoders
 						.bean(EventGroup.class))
 				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
@@ -110,25 +95,6 @@ public class GenerateEventsJob {
 			.distinct()
 			.collect(Collectors.toMap(s -> s, s -> sc.longAccumulator(s)));
 
-	}
-
-	private static DedupConfig loadDedupConfig(final String isLookupUrl, final String profId) throws Exception {
-
-		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
-
-		final String conf = isLookUpService
-			.getResourceProfileByQuery(
-				String
-					.format(
-						"for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
-						profId));
-
-		final DedupConfig dedupConfig = new ObjectMapper().readValue(conf, DedupConfig.class);
-		dedupConfig.getPace().initModel();
-		dedupConfig.getPace().initTranslationMap();
-		// dedupConfig.getWf().setConfigurationId("???");
-
-		return dedupConfig;
 	}
 
 }

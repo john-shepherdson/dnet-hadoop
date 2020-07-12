@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.TypedColumn;
@@ -65,9 +64,7 @@ public class JoinStep2Job {
 
 			final Dataset<OaBrokerMainEntity> dataset = sources
 				.joinWith(typedRels, sources.col("openaireId").equalTo(typedRels.col("source")), "left_outer")
-				.groupByKey(
-					(MapFunction<Tuple2<OaBrokerMainEntity, RelatedSoftware>, String>) t -> t._1.getOpenaireId(),
-					Encoders.STRING())
+				.groupByKey(t -> t._1.getOpenaireId(), Encoders.STRING())
 				.agg(aggr)
 				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class));
 
