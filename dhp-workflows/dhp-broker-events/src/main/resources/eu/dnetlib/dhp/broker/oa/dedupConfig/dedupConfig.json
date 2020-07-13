@@ -1,0 +1,122 @@
+{
+	"wf": {
+		
+	},
+	"pace": {
+		"clustering": [
+			{
+				"name": "wordssuffixprefix",
+				"fields": [
+					"title"
+				],
+				"params": {
+					"max": "2",
+					"len": "3"
+				}
+			},
+			{
+				"name": "lowercase",
+				"fields": [
+					"doi"
+				],
+				"params": {
+					
+				}
+			}
+		],
+		"decisionTree": {
+			"start": {
+				"fields": [
+					{
+						"field": "doi",
+						"comparator": "exactMatch",
+						"weight": 1.0,
+						"countIfUndefined": "false",
+						"params": {
+							
+						}
+					}
+				],
+				"threshold": 0.5,
+				"aggregation": "AVG",
+				"positive": "MATCH",
+				"negative": "layer1",
+				"undefined": "layer1",
+				"ignoreUndefined": "true"
+			},
+			"layer1": {
+				"fields": [
+					{
+						"field": "title",
+						"comparator": "titleVersionMatch",
+						"weight": 0.9,
+						"countIfUndefined": "false",
+						"params": {
+							
+						}
+					},
+					{
+						"field": "authors",
+						"comparator": "sizeMatch",
+						"weight": 0.9,
+						"countIfUndefined": "false",
+						"params": {
+							
+						}
+					}
+				],
+				"threshold": 0.5,
+				"aggregation": "AVG",
+				"positive": "MATCH",
+				"negative": "layer2",
+				"undefined": "layer2",
+				"ignoreUndefined": "true"
+			},
+			"layer2": {
+				"fields": [
+					{
+						"field": "title",
+						"comparator": "levensteinTitle",
+						"weight": 1.0,
+						"countIfUndefined": "true",
+						"params": {
+							
+						}
+					}
+				],
+				"threshold": 0.99,
+				"aggregation": "AVG",
+				"positive": "MATCH",
+				"negative": "NO_MATCH",
+				"undefined": "NO_MATCH",
+				"ignoreUndefined": "true"
+			}
+		},
+		"model": [
+			{
+				"name": "doi",
+				"type": "String",
+				"path": "$.pids[?(@.type == 'doi')].value"
+			},
+			{
+				"name": "title",
+				"type": "String",
+				"path": "$.titles",
+				"length": 250,
+				"size": 5
+			},
+			{
+				"name": "authors",
+				"type": "List",
+				"path": "$.creators[*].fullname",
+				"size": 200
+			}
+		],
+		"blacklists": {
+			
+		},
+		"synonyms": {
+			
+		}
+	}
+}

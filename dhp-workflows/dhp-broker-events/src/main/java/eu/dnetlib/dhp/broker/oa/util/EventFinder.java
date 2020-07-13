@@ -37,7 +37,6 @@ import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreOpenAccess;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMorePid;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreSubject;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public class EventFinder {
 
@@ -76,7 +75,6 @@ public class EventFinder {
 		final Set<String> dsIdWhitelist,
 		final Set<String> dsIdBlacklist,
 		final Set<String> dsTypeWhitelist,
-		final DedupConfig dedupConfig,
 		final Map<String, LongAccumulator> accumulators) {
 
 		final List<UpdateInfo<?>> list = new ArrayList<>();
@@ -84,7 +82,7 @@ public class EventFinder {
 		for (final OaBrokerMainEntity target : results.getData()) {
 			if (verifyTarget(target, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist)) {
 				for (final UpdateMatcher<?> matcher : matchers) {
-					list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), dedupConfig, accumulators));
+					list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), accumulators));
 				}
 			}
 		}

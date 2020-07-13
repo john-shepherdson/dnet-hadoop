@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import eu.dnetlib.broker.objects.OaBrokerAuthor;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerTypedValue;
+
 public class TrustUtilsTest {
 
 	private static final double THRESHOLD = 0.95;
@@ -62,6 +66,23 @@ public class TrustUtilsTest {
 	@Test
 	public void rescaleTest_11() {
 		verifyValue(2.00, BrokerConstants.MAX_TRUST);
+	}
+
+	@Test
+	public void test() throws Exception {
+		final OaBrokerMainEntity r1 = new OaBrokerMainEntity();
+		r1.getTitles().add("D-NET Service Package: Data Import");
+		r1.getPids().add(new OaBrokerTypedValue("doi", "123"));
+		r1.getCreators().add(new OaBrokerAuthor("Michele Artini", null));
+		r1.getCreators().add(new OaBrokerAuthor("Claudio Atzori", null));
+
+		final OaBrokerMainEntity r2 = new OaBrokerMainEntity();
+		r2.getTitles().add("D-NET Service Package: Data Import");
+		// r2.getPids().add(new OaBrokerTypedValue("doi", "123"));
+		r2.getCreators().add(new OaBrokerAuthor("Michele Artini", null));
+		// r2.getCreators().add(new OaBrokerAuthor("Claudio Atzori", null));
+
+		System.out.println("TRUST: " + TrustUtils.calculateTrust(r1, r2));
 	}
 
 	private void verifyValue(final double originalScore, final float expectedTrust) {

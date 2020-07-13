@@ -17,7 +17,6 @@ import org.apache.spark.util.LongAccumulator;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public abstract class UpdateMatcher<T> {
 
@@ -37,7 +36,6 @@ public abstract class UpdateMatcher<T> {
 
 	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OaBrokerMainEntity res,
 		final Collection<OaBrokerMainEntity> others,
-		final DedupConfig dedupConfig,
 		final Map<String, LongAccumulator> accumulators) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
@@ -49,7 +47,7 @@ public abstract class UpdateMatcher<T> {
 					if (topic != null) {
 						final UpdateInfo<T> info = new UpdateInfo<>(topic, hl, source, res,
 							getCompileHighlightFunction(),
-							getHighlightToStringFunction(), dedupConfig);
+							getHighlightToStringFunction());
 
 						final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
 						if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {

@@ -10,15 +10,6 @@
             <description>the path where the the generated data will be stored</description>
         </property>
         <property>
-            <name>isLookupUrl</name>
-            <description>the address of the lookUp service</description>
-        </property>
-        <property>
-            <name>dedupConfProfId</name>
-            <description>the id of a valid Dedup Configuration Profile</description>
-        </property>
-
-        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -73,19 +64,19 @@
         </configuration>
     </global>
 
-    <start to="count"/>
+    <start to="stats"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
    
 
-    <action name="count">
+    <action name="stats">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Count</name>
-            <class>eu.dnetlib.dhp.broker.oa.CheckDuplictedIdsJob</class>
+            <name>GenerateStatsJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.GenerateStatsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
