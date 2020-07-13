@@ -78,9 +78,9 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		final String actionSetId = parser.get("actionSetId");
 		int cut = Optional
-				.ofNullable(parser.get("cutConnectedComponent"))
-				.map(Integer::valueOf)
-				.orElse(0);
+			.ofNullable(parser.get("cutConnectedComponent"))
+			.map(Integer::valueOf)
+			.orElse(0);
 		log.info("connected component cut: '{}'", cut);
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("isLookUpUrl:   '{}'", isLookUpUrl);

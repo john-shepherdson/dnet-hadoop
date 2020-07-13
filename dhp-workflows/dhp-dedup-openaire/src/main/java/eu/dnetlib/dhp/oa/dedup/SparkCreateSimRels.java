@@ -65,9 +65,9 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		final String actionSetId = parser.get("actionSetId");
 		final String workingPath = parser.get("workingPath");
 		final int numPartitions = Optional
-				.ofNullable(parser.get("numPartitions"))
-				.map(Integer::valueOf)
-				.orElse(NUM_PARTITIONS);
+			.ofNullable(parser.get("numPartitions"))
+			.map(Integer::valueOf)
+			.orElse(NUM_PARTITIONS);
 
 		log.info("numPartitions: '{}'", numPartitions);
 		log.info("graphBasePath: '{}'", graphBasePath);
