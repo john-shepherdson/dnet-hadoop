@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -76,14 +77,11 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		final String workingPath = parser.get("workingPath");
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		final String actionSetId = parser.get("actionSetId");
-		int cut = 0;
-		try {
-			cut = Integer.parseInt(parser.get("cutConnectedComponent"));
-
-		} catch (Throwable e) {
-			log.error("unable to parse " + parser.get(" cut-off threshold"));
-		}
-
+		int cut = Optional
+				.ofNullable(parser.get("cutConnectedComponent"))
+				.map(Integer::valueOf)
+				.orElse(0);
+		log.info("connected component cut: '{}'", cut);
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("isLookUpUrl:   '{}'", isLookUpUrl);
 		log.info("actionSetId:   '{}'", actionSetId);
