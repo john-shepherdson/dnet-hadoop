@@ -290,6 +290,12 @@ public class SparkDedupTest implements Serializable {
 		assertEquals(0, sw_mergerel);
 		assertEquals(0, ds_mergerel);
 		assertEquals(0, orp_mergerel);
+
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel"));
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel"));
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/software_mergerel"));
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/dataset_mergerel"));
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_mergerel"));
 	}
 
 	@Test
