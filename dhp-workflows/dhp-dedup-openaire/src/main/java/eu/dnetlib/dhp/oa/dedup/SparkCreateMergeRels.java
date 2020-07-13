@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.graphx.Edge;
 import org.apache.spark.rdd.RDD;
@@ -75,7 +77,11 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		final String workingPath = parser.get("workingPath");
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		final String actionSetId = parser.get("actionSetId");
-
+		int cut = Optional
+				.ofNullable(parser.get("cutConnectedComponent"))
+				.map(Integer::valueOf)
+				.orElse(0);
+		log.info("connected component cut: '{}'", cut);
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("isLookUpUrl:   '{}'", isLookUpUrl);
 		log.info("actionSetId:   '{}'", actionSetId);
@@ -100,8 +106,10 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 			final RDD<Edge<String>> edgeRdd = spark
 				.read()
-				.load(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity))
-				.as(Encoders.bean(Relation.class))
+				.textFile(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity))
+				.map(
+					(MapFunction<String, Relation>) r -> OBJECT_MAPPER.readValue(r, Relation.class),
+					Encoders.bean(Relation.class))
 				.javaRDD()
 				.map(it -> new Edge<>(hash(it.getSource()), hash(it.getTarget()), it.getRelClass()))
 				.rdd();
@@ -109,7 +117,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			final Dataset<Relation> mergeRels = spark
 				.createDataset(
 					GraphProcessor
-						.findCCs(vertexes.rdd(), edgeRdd, maxIterations)
+						.findCCs(vertexes.rdd(), edgeRdd, maxIterations, cut)
 						.toJavaRDD()
 						.filter(k -> k.getDocIds().size() > 1)
 						.flatMap(cc -> ccToMergeRel(cc, dedupConf))
@@ -117,6 +125,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 					Encoders.bean(Relation.class));
 
 			mergeRels.write().mode(SaveMode.Append).parquet(mergeRelPath);
+
 		}
 	}
 
