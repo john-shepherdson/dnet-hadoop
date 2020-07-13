@@ -1,6 +1,8 @@
 package eu.dnetlib.dhp.oa.dedup.model;
 
-public class BlockStats {
+import java.io.Serializable;
+
+public class BlockStats implements Serializable {
 
     private String key; //key of the block
     private Long size; //number of elements in the block
