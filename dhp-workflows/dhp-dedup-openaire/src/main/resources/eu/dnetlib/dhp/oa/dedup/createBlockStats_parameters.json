@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "la",
+    "paramLongName": "isLookUpUrl",
+    "paramDescription": "address for the LookUp",
+    "paramRequired": true
+  },
+  {
+    "paramName": "asi",
+    "paramLongName": "actionSetId",
+    "paramDescription": "action set identifier (name of the orchestrator)",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "the base path of the raw graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "path of the working directory",
+    "paramRequired": true
+  }
+]
