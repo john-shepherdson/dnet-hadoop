@@ -53,7 +53,7 @@ public class EntityMergerTest implements Serializable {
 		Software merged = DedupRecordFactory
 			.entityMerger(dedupId, softwares.iterator(), 0, dataInfo, Software.class);
 
-		System.out.println(merged.getBestaccessright().getClassid());
+		assertEquals(merged.getBestaccessright().getClassid(), "OPEN SOURCE");
 	}
 
 	@Test

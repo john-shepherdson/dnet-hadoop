@@ -30,9 +30,16 @@
     "paramRequired": false
   },
   {
-    "paramName": "mr",
-    "paramLongName": "maxRelations",
-    "paramDescription": "maximum number of relations allowed for a each entity",
+    "paramName": "smr",
+    "paramLongName": "sourceMaxRelations",
+    "paramDescription": "maximum number of relations allowed for a each entity grouping by source",
+    "paramRequired": false
+  },
+  {
+    "paramName": "tmr",
+    "paramLongName": "targetMaxRelations",
+    "paramDescription": "maximum number of relations allowed for a each entity grouping by target",
     "paramRequired": false
   }
+
 ]

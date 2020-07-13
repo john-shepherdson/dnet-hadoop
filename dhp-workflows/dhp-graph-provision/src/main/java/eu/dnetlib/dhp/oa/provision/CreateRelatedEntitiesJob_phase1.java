@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -115,11 +116,21 @@ public class CreateRelatedEntitiesJob_phase1 {
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)))
 			.cache();
 
-		Dataset<Tuple2<String, RelatedEntity>> entities = readPathEntity(spark, inputEntityPath, clazz)
+		final String relatedEntityPath = outputPath + "_relatedEntity";
+		readPathEntity(spark, inputEntityPath, clazz)
 			.filter("dataInfo.invisible == false")
 			.map(
 				(MapFunction<E, RelatedEntity>) value -> asRelatedEntity(value, clazz),
 				Encoders.kryo(RelatedEntity.class))
+			.repartition(5000)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.parquet(relatedEntityPath);
+
+		Dataset<Tuple2<String, RelatedEntity>> entities = spark
+			.read()
+			.load(relatedEntityPath)
+			.as(Encoders.kryo(RelatedEntity.class))
 			.map(
 				(MapFunction<RelatedEntity, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), e),
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntity.class)))
@@ -165,13 +176,21 @@ public class CreateRelatedEntitiesJob_phase1 {
 				Result result = (Result) entity;
 
 				if (result.getTitle() != null && !result.getTitle().isEmpty()) {
-					re.setTitle(result.getTitle().stream().findFirst().get());
+					final StructuredProperty title = result.getTitle().stream().findFirst().get();
+					title.setValue(StringUtils.left(title.getValue(), ProvisionConstants.MAX_TITLE_LENGTH));
+					re.setTitle(title);
 				}
 
 				re.setDateofacceptance(getValue(result.getDateofacceptance()));
 				re.setPublisher(getValue(result.getPublisher()));
 				re.setResulttype(result.getResulttype());
-				re.setInstances(result.getInstance());
+				re
+					.setInstances(
+						result
+							.getInstance()
+							.stream()
+							.limit(ProvisionConstants.MAX_INSTANCES)
+							.collect(Collectors.toList()));
 
 				// TODO still to be mapped
 				// re.setCodeRepositoryUrl(j.read("$.coderepositoryurl"));
