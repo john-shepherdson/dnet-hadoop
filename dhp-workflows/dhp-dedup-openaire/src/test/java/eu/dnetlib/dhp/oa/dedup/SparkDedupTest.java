@@ -160,14 +160,11 @@ public class SparkDedupTest implements Serializable {
 		parser
 			.parseArgument(
 				new String[] {
-					"-i",
-					testGraphBasePath,
-					"-asi",
-					testActionSetId,
-					"-la",
-					"lookupurl",
-					"-w",
-					testOutputBasePath
+					"-i", testGraphBasePath,
+					"-asi", testActionSetId,
+					"-la", "lookupurl",
+					"-w", testOutputBasePath,
+					"-np", "50"
 				});
 
 		new SparkCreateSimRels(parser, spark).run(isLookUpService);
@@ -535,7 +532,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4971, relations);
+		assertEquals(4866, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
