@@ -19,16 +19,16 @@ public class ConnectedComponent implements Serializable {
 	private Set<String> docIds;
 	private String ccId;
 
-	public ConnectedComponent() {
-	}
-
-
 	public ConnectedComponent(Set<String> docIds, final int cut) {
 		this.docIds = docIds;
 		createID();
-		if (cut > 0 && docIds.size() > cut){
-			docIds = docIds.stream().filter(s -> !ccId.equalsIgnoreCase(s)).limit(cut -1).collect(Collectors.toSet());
-			docIds.add(ccId);
+		if (cut > 0 && docIds.size() > cut) {
+			this.docIds = docIds
+				.stream()
+				.filter(s -> !ccId.equalsIgnoreCase(s))
+				.limit(cut - 1)
+				.collect(Collectors.toSet());
+			this.docIds.add(ccId);
 		}
 	}
 
