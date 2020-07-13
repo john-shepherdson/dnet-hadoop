@@ -20,18 +20,29 @@ public class RelationAggregator extends Aggregator<Relation, Relation, Relation>
 
 	@Override
 	public Relation reduce(Relation b, Relation a) {
-		return Objects.equals(a, ZERO) ? b : a;
+		return mergeRel(b, a);
 	}
 
 	@Override
 	public Relation merge(Relation b, Relation a) {
-		b.mergeFrom(a);
-		return b;
+		return mergeRel(b, a);
 	}
 
 	@Override
 	public Relation finish(Relation r) {
 		return r;
+	}
+
+	private Relation mergeRel(Relation b, Relation a) {
+		if (Objects.equals(b, ZERO)) {
+			return a;
+		}
+		if (Objects.equals(a, ZERO)) {
+			return b;
+		}
+
+		b.mergeFrom(a);
+		return b;
 	}
 
 	@Override

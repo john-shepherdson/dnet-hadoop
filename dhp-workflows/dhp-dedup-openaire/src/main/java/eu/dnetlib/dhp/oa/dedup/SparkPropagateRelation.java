@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static org.apache.spark.sql.functions.col;
 
+import com.google.common.base.Joiner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -108,7 +109,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 	private Dataset<Relation> distinctRelations(Dataset<Relation> rels) {
 		return rels
 			.filter(getRelationFilterFunction())
-			.groupByKey((MapFunction<Relation, String>) r -> ModelSupport.idFn().apply(r), Encoders.STRING())
+			.groupByKey((MapFunction<Relation, String>) r -> String.join(r.getSource(), r.getTarget(), r.getRelType(), r.getSubRelType(), r.getRelClass()), Encoders.STRING())
 			.agg(new RelationAggregator().toColumn())
 			.map((MapFunction<Tuple2<String, Relation>, Relation>) t -> t._2(), Encoders.bean(Relation.class));
 	}
