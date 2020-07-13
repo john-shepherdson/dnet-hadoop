@@ -1,4 +1,4 @@
-<workflow-app name="Duplicate Scan" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Create dedup blocks" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>graphBasePath</name>
@@ -11,14 +11,6 @@
         <property>
             <name>actionSetId</name>
             <description>id of the actionSet</description>
-        </property>
-        <property>
-            <name>workingPath</name>
-            <description>path for the working directory</description>
-        </property>
-        <property>
-            <name>dedupGraphPath</name>
-            <description>path for the output graph</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -85,7 +77,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Create Similarity Relations</name>
+            <name>Create deduplication blocks</name>
             <class>eu.dnetlib.dhp.oa.dedup.SparkBlockStats</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
@@ -101,7 +93,7 @@
             <arg>--i</arg><arg>${graphBasePath}</arg>
             <arg>--la</arg><arg>${isLookUpUrl}</arg>
             <arg>--asi</arg><arg>${actionSetId}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
+            <arg>--w</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
