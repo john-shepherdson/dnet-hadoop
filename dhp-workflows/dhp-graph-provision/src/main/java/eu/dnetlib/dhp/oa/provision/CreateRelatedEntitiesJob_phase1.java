@@ -184,13 +184,16 @@ public class CreateRelatedEntitiesJob_phase1 {
 				re.setDateofacceptance(getValue(result.getDateofacceptance()));
 				re.setPublisher(getValue(result.getPublisher()));
 				re.setResulttype(result.getResulttype());
-				re
-					.setInstances(
-						result
-							.getInstance()
-							.stream()
-							.limit(ProvisionConstants.MAX_INSTANCES)
-							.collect(Collectors.toList()));
+				if (Objects.nonNull(result.getInstance())) {
+					re
+						.setInstances(
+							result
+								.getInstance()
+								.stream()
+								.filter(Objects::nonNull)
+								.limit(ProvisionConstants.MAX_INSTANCES)
+								.collect(Collectors.toList()));
+				}
 
 				// TODO still to be mapped
 				// re.setCodeRepositoryUrl(j.read("$.coderepositoryurl"));
