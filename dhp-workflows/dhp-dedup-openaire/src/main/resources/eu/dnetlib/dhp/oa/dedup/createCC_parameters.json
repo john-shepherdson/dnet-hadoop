@@ -18,6 +18,13 @@
     "paramRequired": true
   },
   {
+    "paramName": "cc",
+    "paramLongName": "cutConnectedComponent",
+    "paramDescription": "the number of maximum elements that belongs to a connected components",
+    "paramRequired": false
+  }
+,
+  {
     "paramName": "w",
     "paramLongName": "workingPath",
     "paramDescription": "path for the working directory",

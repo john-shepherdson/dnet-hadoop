@@ -76,6 +76,19 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		final String workingPath = parser.get("workingPath");
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		final String actionSetId = parser.get("actionSetId");
+		int cut = 0;
+		try {
+			cut = Integer.parseInt(parser.get("cutConnectedComponent"));
+
+
+		} catch (Throwable e) {
+			log.error("unable to parse "+parser.get(" cut-off threshold"));
+		}
+
+
+
+
+
 
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("isLookUpUrl:   '{}'", isLookUpUrl);
@@ -112,7 +125,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			final Dataset<Relation> mergeRels = spark
 				.createDataset(
 					GraphProcessor
-						.findCCs(vertexes.rdd(), edgeRdd, maxIterations)
+						.findCCs(vertexes.rdd(), edgeRdd, maxIterations, cut)
 						.toJavaRDD()
 						.filter(k -> k.getDocIds().size() > 1)
 						.flatMap(cc -> ccToMergeRel(cc, dedupConf))
@@ -120,6 +133,10 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 					Encoders.bean(Relation.class));
 
 			mergeRels.write().mode(SaveMode.Append).parquet(mergeRelPath);
+
+
+
+
 		}
 	}
 
