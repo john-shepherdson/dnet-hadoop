@@ -34,6 +34,8 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCreateSimRels.class);
 
+	public static final int NUM_PARTITIONS = 10000;
+
 	public SparkCreateSimRels(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
 	}
@@ -48,13 +50,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		parser.parseArgument(args);
 
 		SparkConf conf = new SparkConf();
-		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf
-			.registerKryoClasses(
-				new Class[] {
-					MapDocument.class, FieldListImpl.class, FieldValueImpl.class, Block.class
-				});
-
 		new SparkCreateSimRels(parser, getSparkSession(conf))
 			.run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
 	}
@@ -88,7 +83,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 			JavaPairRDD<String, MapDocument> mapDocuments = sc
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-				.repartition(10000)
+				.repartition(NUM_PARTITIONS)
 				.mapToPair(
 					(PairFunction<String, String, MapDocument>) s -> {
 						MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
@@ -98,21 +93,15 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			// create blocks for deduplication
 			JavaPairRDD<String, Block> blocks = Deduper
 				.createSortedBlocks(mapDocuments, dedupConf)
-				.repartition(10000);
+				.repartition(NUM_PARTITIONS);
 
 			// create relations by comparing only elements in the same group
 			Deduper
 				.computeRelations(sc, blocks, dedupConf)
 				.map(t -> createSimRel(t._1(), t._2(), entity))
-				.repartition(10000)
+				.repartition(NUM_PARTITIONS)
 				.map(r -> OBJECT_MAPPER.writeValueAsString(r))
 				.saveAsTextFile(outputPath);
-
-			// save the simrel in the workingdir
-			/*
-			 * spark .createDataset(relations.rdd(), Encoders.bean(Relation.class)) .write() .mode(SaveMode.Append)
-			 * .save(outputPath);
-			 */
 		}
 	}
 

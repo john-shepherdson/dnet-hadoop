@@ -22,12 +22,11 @@ public class ConnectedComponent implements Serializable {
 	public ConnectedComponent() {
 	}
 
-
 	public ConnectedComponent(Set<String> docIds, final int cut) {
 		this.docIds = docIds;
 		createID();
-		if (cut > 0 && docIds.size() > cut){
-			docIds = docIds.stream().filter(s -> !ccId.equalsIgnoreCase(s)).limit(cut -1).collect(Collectors.toSet());
+		if (cut > 0 && docIds.size() > cut) {
+			docIds = docIds.stream().filter(s -> !ccId.equalsIgnoreCase(s)).limit(cut - 1).collect(Collectors.toSet());
 			docIds.add(ccId);
 		}
 	}

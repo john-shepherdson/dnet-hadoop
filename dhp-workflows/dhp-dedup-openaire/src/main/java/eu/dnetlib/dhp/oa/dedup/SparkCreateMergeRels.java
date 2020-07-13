@@ -80,15 +80,9 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		try {
 			cut = Integer.parseInt(parser.get("cutConnectedComponent"));
 
-
 		} catch (Throwable e) {
-			log.error("unable to parse "+parser.get(" cut-off threshold"));
+			log.error("unable to parse " + parser.get(" cut-off threshold"));
 		}
-
-
-
-
-
 
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("isLookUpUrl:   '{}'", isLookUpUrl);
@@ -133,9 +127,6 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 					Encoders.bean(Relation.class));
 
 			mergeRels.write().mode(SaveMode.Append).parquet(mergeRelPath);
-
-
-
 
 		}
 	}

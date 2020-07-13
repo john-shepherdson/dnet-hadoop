@@ -4,7 +4,9 @@ package eu.dnetlib.dhp.oa.dedup;
 import static org.apache.spark.sql.functions.col;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
@@ -95,11 +97,17 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			FieldType.TARGET,
 			getDeletedFn());
 
-		save(distinctRelations(newRels.union(updated).union(mergeRels)), outputRelationPath, SaveMode.Overwrite);
+		save(
+			newRels
+				.union(updated)
+				.union(mergeRels)
+				.map((MapFunction<Relation, Relation>) r -> r, Encoders.kryo(Relation.class)),
+			outputRelationPath, SaveMode.Overwrite);
 	}
 
 	private Dataset<Relation> distinctRelations(Dataset<Relation> rels) {
 		return rels
+			.filter(getRelationFilterFunction())
 			.groupByKey((MapFunction<Relation, String>) r -> ModelSupport.idFn().apply(r), Encoders.STRING())
 			.agg(new RelationAggregator().toColumn())
 			.map((MapFunction<Tuple2<String, Relation>, Relation>) t -> t._2(), Encoders.bean(Relation.class));
@@ -117,6 +125,14 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		return mapped
 			.joinWith(mergedIds, mapped.col("_1").equalTo(mergedIds.col("_1")), "left_outer")
 			.map(mapFn, Encoders.bean(Relation.class));
+	}
+
+	private FilterFunction<Relation> getRelationFilterFunction() {
+		return (FilterFunction<Relation>) r -> StringUtils.isNotBlank(r.getSource()) ||
+			StringUtils.isNotBlank(r.getTarget()) ||
+			StringUtils.isNotBlank(r.getRelClass()) ||
+			StringUtils.isNotBlank(r.getSubRelType()) ||
+			StringUtils.isNotBlank(r.getRelClass());
 	}
 
 	private static MapFunction<String, Relation> patchRelFn() {
