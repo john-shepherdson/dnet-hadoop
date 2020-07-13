@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -23,49 +24,41 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.FieldListImpl;
-import eu.dnetlib.pace.model.FieldValueImpl;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
 
 public class SparkBlockStats extends AbstractSparkAction {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkBlockStats.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkBlockStats.class);
 
-    public SparkBlockStats(ArgumentApplicationParser parser, SparkSession spark) {
-        super(parser, spark);
-    }
+	public SparkBlockStats(ArgumentApplicationParser parser, SparkSession spark) {
+		super(parser, spark);
+	}
 
-    public static void main(String[] args) throws Exception {
-        ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils
-                        .toString(
-                                SparkBlockStats.class
-                                        .getResourceAsStream(
-                                                "/eu/dnetlib/dhp/oa/dedup/createBlockStats_parameters.json")));
-        parser.parseArgument(args);
+	public static void main(String[] args) throws Exception {
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkBlockStats.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/dedup/createBlockStats_parameters.json")));
+		parser.parseArgument(args);
 
-        SparkConf conf = new SparkConf();
-        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf
-                .registerKryoClasses(
-                        new Class[] {
-                                MapDocument.class, FieldListImpl.class, FieldValueImpl.class, Block.class
-                        });
+		SparkConf conf = new SparkConf();
 
-        new SparkBlockStats(parser, getSparkSession(conf))
-                .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
-    }
+		new SparkBlockStats(parser, getSparkSession(conf))
+			.run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+	}
 
-    public Long computeComparisons(Long blockSize, Long slidingWindowSize){
+	public Long computeComparisons(Long blockSize, Long slidingWindowSize) {
 
-        if (slidingWindowSize >= blockSize)
-            return (slidingWindowSize * (slidingWindowSize - 1)) / 2;
-        else {
-            return (blockSize - slidingWindowSize + 1) * (slidingWindowSize * (slidingWindowSize - 1)) / 2;
-        }
-    }
+		if (slidingWindowSize >= blockSize)
+			return (slidingWindowSize * (slidingWindowSize - 1)) / 2;
+		else {
+			return (blockSize - slidingWindowSize + 1) * (slidingWindowSize * (slidingWindowSize - 1)) / 2;
+		}
+	}
 
 	@Override
 	public void run(ISLookUpService isLookUpService)
@@ -76,6 +69,10 @@ public class SparkBlockStats extends AbstractSparkAction {
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		final String actionSetId = parser.get("actionSetId");
 		final String workingPath = parser.get("workingPath");
+		final int numPartitions = Optional
+			.ofNullable(parser.get("numPartitions"))
+			.map(Integer::valueOf)
+			.orElse(NUM_PARTITIONS);
 
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("isLookUpUrl:   '{}'", isLookUpUrl);
@@ -95,6 +92,7 @@ public class SparkBlockStats extends AbstractSparkAction {
 
 			JavaPairRDD<String, MapDocument> mapDocuments = sc
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+				.repartition(numPartitions)
 				.mapToPair(
 					(PairFunction<String, String, MapDocument>) s -> {
 						MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
@@ -105,6 +103,7 @@ public class SparkBlockStats extends AbstractSparkAction {
 			JavaPairRDD<String, Block> blocks = Deduper.createSortedBlocks(mapDocuments, dedupConf);
 
 			JavaRDD<BlockStats> blockStats = blocks
+				.repartition(numPartitions)
 				.map(
 					b -> new BlockStats(
 						b._1(),

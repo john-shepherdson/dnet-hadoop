@@ -13,6 +13,10 @@
             <description>id of the actionSet</description>
         </property>
         <property>
+            <name>numPartitions</name>
+            <description>number of partitions for the similarity relations intermediate phases</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -90,10 +94,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--la</arg><arg>${isLookUpUrl}</arg>
-            <arg>--asi</arg><arg>${actionSetId}</arg>
-            <arg>--w</arg><arg>${workingDir}</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--numPartitions</arg><arg>${numPartitions}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

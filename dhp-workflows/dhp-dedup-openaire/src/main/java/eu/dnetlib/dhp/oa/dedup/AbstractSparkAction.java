@@ -28,6 +28,8 @@ import eu.dnetlib.pace.config.DedupConfig;
 
 abstract class AbstractSparkAction implements Serializable {
 
+	protected static final int NUM_PARTITIONS = 1000;
+
 	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 

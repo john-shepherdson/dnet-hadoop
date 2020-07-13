@@ -35,8 +35,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCreateSimRels.class);
 
-	public static final int NUM_PARTITIONS = 1000;
-
 	public SparkCreateSimRels(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
 	}
