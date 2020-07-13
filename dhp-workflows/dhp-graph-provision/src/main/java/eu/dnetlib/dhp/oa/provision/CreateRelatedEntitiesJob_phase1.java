@@ -116,23 +116,10 @@ public class CreateRelatedEntitiesJob_phase1 {
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)))
 			.cache();
 
-		final String relatedEntityPath = outputPath + "_relatedEntity";
-		readPathEntity(spark, inputEntityPath, clazz)
+		Dataset<Tuple2<String, RelatedEntity>> entities = readPathEntity(spark, inputEntityPath, clazz)
 			.filter("dataInfo.invisible == false")
 			.map(
-				(MapFunction<E, RelatedEntity>) value -> asRelatedEntity(value, clazz),
-				Encoders.kryo(RelatedEntity.class))
-			.repartition(5000)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.parquet(relatedEntityPath);
-
-		Dataset<Tuple2<String, RelatedEntity>> entities = spark
-			.read()
-			.load(relatedEntityPath)
-			.as(Encoders.kryo(RelatedEntity.class))
-			.map(
-				(MapFunction<RelatedEntity, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), e),
+				(MapFunction<E, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), asRelatedEntity(e, clazz)),
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntity.class)))
 			.cache();
 
