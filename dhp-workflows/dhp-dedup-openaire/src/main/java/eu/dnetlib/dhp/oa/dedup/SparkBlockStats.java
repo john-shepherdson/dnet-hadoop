@@ -29,7 +29,7 @@ import scala.Tuple2;
 
 public class SparkBlockStats extends AbstractSparkAction {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkCreateSimRels.class);
+    private static final Logger log = LoggerFactory.getLogger(SparkBlockStats.class);
 
     public SparkBlockStats(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
@@ -39,7 +39,7 @@ public class SparkBlockStats extends AbstractSparkAction {
         ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils
                         .toString(
-                                SparkCreateSimRels.class
+                                SparkBlockStats.class
                                         .getResourceAsStream(
                                                 "/eu/dnetlib/dhp/oa/dedup/createBlockStats_parameters.json")));
         parser.parseArgument(args);
@@ -52,7 +52,7 @@ public class SparkBlockStats extends AbstractSparkAction {
                                 MapDocument.class, FieldListImpl.class, FieldValueImpl.class, Block.class
                         });
 
-        new SparkCreateSimRels(parser, getSparkSession(conf))
+        new SparkBlockStats(parser, getSparkSession(conf))
                 .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
