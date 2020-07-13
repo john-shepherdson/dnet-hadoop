@@ -77,11 +77,13 @@ public class SparkDedupTest implements Serializable {
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
 
+		final SparkConf conf = new SparkConf();
+		conf.set("spark.sql.shuffle.partitions", "200");
 		spark = SparkSession
 			.builder()
 			.appName(SparkDedupTest.class.getSimpleName())
 			.master("local[*]")
-			.config(new SparkConf())
+			.config(conf)
 			.getOrCreate();
 
 		jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());

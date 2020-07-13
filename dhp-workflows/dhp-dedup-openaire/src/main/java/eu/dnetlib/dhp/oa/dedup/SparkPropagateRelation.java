@@ -98,10 +98,10 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			getDeletedFn());
 
 		save(
-			newRels
+			distinctRelations(newRels
 				.union(updated)
 				.union(mergeRels)
-				.map((MapFunction<Relation, Relation>) r -> r, Encoders.kryo(Relation.class)),
+				.map((MapFunction<Relation, Relation>) r -> r, Encoders.kryo(Relation.class))),
 			outputRelationPath, SaveMode.Overwrite);
 	}
 

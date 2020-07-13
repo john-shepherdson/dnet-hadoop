@@ -36,11 +36,11 @@ public class RelationAggregator extends Aggregator<Relation, Relation, Relation>
 
 	@Override
 	public Encoder<Relation> bufferEncoder() {
-		return Encoders.bean(Relation.class);
+		return Encoders.kryo(Relation.class);
 	}
 
 	@Override
 	public Encoder<Relation> outputEncoder() {
-		return Encoders.bean(Relation.class);
+		return Encoders.kryo(Relation.class);
 	}
 }
