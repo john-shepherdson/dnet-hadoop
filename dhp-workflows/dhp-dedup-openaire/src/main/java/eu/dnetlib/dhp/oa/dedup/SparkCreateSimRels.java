@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -34,6 +35,8 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCreateSimRels.class);
 
+	public static final int NUM_PARTITIONS = 1000;
+
 	public SparkCreateSimRels(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
 	}
@@ -48,13 +51,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		parser.parseArgument(args);
 
 		SparkConf conf = new SparkConf();
-		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf
-			.registerKryoClasses(
-				new Class[] {
-					MapDocument.class, FieldListImpl.class, FieldValueImpl.class, Block.class
-				});
-
 		new SparkCreateSimRels(parser, getSparkSession(conf))
 			.run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
 	}
@@ -68,7 +64,12 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		final String actionSetId = parser.get("actionSetId");
 		final String workingPath = parser.get("workingPath");
+		final int numPartitions = Optional
+			.ofNullable(parser.get("numPartitions"))
+			.map(Integer::valueOf)
+			.orElse(NUM_PARTITIONS);
 
+		log.info("numPartitions: '{}'", numPartitions);
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("isLookUpUrl:   '{}'", isLookUpUrl);
 		log.info("actionSetId:   '{}'", actionSetId);
@@ -88,6 +89,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 			JavaPairRDD<String, MapDocument> mapDocuments = sc
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+				.repartition(numPartitions)
 				.mapToPair(
 					(PairFunction<String, String, MapDocument>) s -> {
 						MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
@@ -95,19 +97,17 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 					});
 
 			// create blocks for deduplication
-			JavaPairRDD<String, Block> blocks = Deduper.createSortedBlocks(mapDocuments, dedupConf);
+			JavaPairRDD<String, Block> blocks = Deduper
+				.createSortedBlocks(mapDocuments, dedupConf)
+				.repartition(numPartitions);
 
 			// create relations by comparing only elements in the same group
-			JavaRDD<Relation> relations = Deduper
+			Deduper
 				.computeRelations(sc, blocks, dedupConf)
-				.map(t -> createSimRel(t._1(), t._2(), entity));
-
-			// save the simrel in the workingdir
-			spark
-				.createDataset(relations.rdd(), Encoders.bean(Relation.class))
-				.write()
-				.mode(SaveMode.Append)
-				.save(outputPath);
+				.map(t -> createSimRel(t._1(), t._2(), entity))
+				.repartition(numPartitions)
+				.map(r -> OBJECT_MAPPER.writeValueAsString(r))
+				.saveAsTextFile(outputPath);
 		}
 	}
 
