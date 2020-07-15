@@ -9,6 +9,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -100,16 +101,9 @@ public class SparkBlockStats extends AbstractSparkAction {
 					});
 
 			// create blocks for deduplication
-			JavaPairRDD<String, Block> blocks = Deduper.createSortedBlocks(mapDocuments, dedupConf);
-
-			JavaRDD<BlockStats> blockStats = blocks
+			JavaRDD<BlockStats> blockStats = Deduper.createSortedBlocks(mapDocuments, dedupConf)
 				.repartition(numPartitions)
-				.map(
-					b -> new BlockStats(
-						b._1(),
-						(long) b._2().getDocuments().size(),
-						computeComparisons(
-							(long) b._2().getDocuments().size(), (long) dedupConf.getWf().getSlidingWindowSize())));
+				.map(b -> asBlockStats(dedupConf, b));
 
 			// save the blockstats in the workingdir
 			spark
@@ -118,6 +112,14 @@ public class SparkBlockStats extends AbstractSparkAction {
 				.mode(SaveMode.Overwrite)
 				.save(outputPath);
 		}
+	}
+
+	private BlockStats asBlockStats(DedupConfig dedupConf, Tuple2<String, Block> b) {
+		return new BlockStats(
+			b._1(),
+			(long) b._2().getDocuments().size(),
+			computeComparisons(
+				(long) b._2().getDocuments().size(), (long) dedupConf.getWf().getSlidingWindowSize()));
 	}
 
 }

@@ -51,6 +51,7 @@ public class Deduper implements Serializable {
 					.map(it -> Block.from(it, a))
 					.collect(Collectors.toList())
 					.iterator())
+			.filter(b -> b.getDocuments().size() > 1)
 			.mapToPair(block -> new Tuple2<>(block.getKey(), block))
 			.reduceByKey((b1, b2) -> Block.from(b1, b2, of, maxQueueSize));
 	}
