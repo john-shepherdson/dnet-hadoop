@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.dhp.broker.model.EventFactory;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.matchers.relatedDatasets.EnrichMissingDatasetIsReferencedBy;
@@ -80,9 +81,11 @@ public class EventFinder {
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
 		for (final OaBrokerMainEntity target : results.getData()) {
-			if (verifyTarget(target, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist)) {
-				for (final UpdateMatcher<?> matcher : matchers) {
-					list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), accumulators));
+			for (final OaBrokerRelatedDatasource targetDs : target.getDatasources()) {
+				if (verifyTarget(targetDs, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist)) {
+					for (final UpdateMatcher<?> matcher : matchers) {
+						list.addAll(matcher.searchUpdatesForRecord(target, targetDs, results.getData(), accumulators));
+					}
 				}
 			}
 		}
@@ -90,17 +93,17 @@ public class EventFinder {
 		return asEventGroup(list);
 	}
 
-	private static boolean verifyTarget(final OaBrokerMainEntity target,
+	private static boolean verifyTarget(final OaBrokerRelatedDatasource target,
 		final Set<String> dsIdWhitelist,
 		final Set<String> dsIdBlacklist,
 		final Set<String> dsTypeWhitelist) {
 
-		if (dsIdWhitelist.contains(target.getCollectedFromId())) {
+		if (dsIdWhitelist.contains(target.getOpenaireId())) {
 			return true;
-		} else if (dsIdBlacklist.contains(target.getCollectedFromId())) {
+		} else if (dsIdBlacklist.contains(target.getOpenaireId())) {
 			return false;
 		} else {
-			return dsTypeWhitelist.contains(target.getCollectedFromType());
+			return dsTypeWhitelist.contains(target.getType());
 		}
 	}
 

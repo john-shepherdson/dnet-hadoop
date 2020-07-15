@@ -624,6 +624,6 @@
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dnet.openaire.broker.common>3.0.0</dnet.openaire.broker.common>
+		<dnet.openaire.broker.common>3.1.0</dnet.openaire.broker.common>
 	</properties>
 </project>

@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.AddDatasourceTypeAggregator;
-import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.SimpleDatasourceInfo;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDatasource;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDatasourceAggregator;
 import scala.Tuple2;
 
 public class JoinStep0Job {
@@ -45,33 +45,33 @@ public class JoinStep0Job {
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
-		final String outputPath = workingPath + "/joinedEntities_step0";
-		log.info("outputPath: {}", outputPath);
+		final String joinedEntitiesPath = workingPath + "/joinedEntities_step0";
+		log.info("joinedEntitiesPath: {}", joinedEntitiesPath);
 
 		final SparkConf conf = new SparkConf();
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
-			ClusterUtils.removeDir(spark, outputPath);
+			ClusterUtils.removeDir(spark, joinedEntitiesPath);
 
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_entities");
 
 			final Dataset<OaBrokerMainEntity> sources = ClusterUtils
 				.readPath(spark, workingPath + "/simpleEntities", OaBrokerMainEntity.class);
 
-			final Dataset<SimpleDatasourceInfo> datasources = ClusterUtils
-				.readPath(spark, workingPath + "/datasources", SimpleDatasourceInfo.class);
+			final Dataset<RelatedDatasource> typedRels = ClusterUtils
+				.readPath(spark, workingPath + "/relatedDatasources", RelatedDatasource.class);
 
-			final TypedColumn<Tuple2<OaBrokerMainEntity, SimpleDatasourceInfo>, OaBrokerMainEntity> aggr = new AddDatasourceTypeAggregator()
+			final TypedColumn<Tuple2<OaBrokerMainEntity, RelatedDatasource>, OaBrokerMainEntity> aggr = new RelatedDatasourceAggregator()
 				.toColumn();
 
 			final Dataset<OaBrokerMainEntity> dataset = sources
-				.joinWith(datasources, sources.col("collectedFromId").equalTo(datasources.col("id")), "inner")
+				.joinWith(typedRels, sources.col("openaireId").equalTo(typedRels.col("source")), "left_outer")
 				.groupByKey(t -> t._1.getOpenaireId(), Encoders.STRING())
 				.agg(aggr)
 				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class));
 
-			ClusterUtils.save(dataset, outputPath, OaBrokerMainEntity.class, total);
+			ClusterUtils.save(dataset, joinedEntitiesPath, OaBrokerMainEntity.class, total);
 
 		});
 
