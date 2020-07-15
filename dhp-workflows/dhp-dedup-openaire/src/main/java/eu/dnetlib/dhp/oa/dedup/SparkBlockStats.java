@@ -101,7 +101,8 @@ public class SparkBlockStats extends AbstractSparkAction {
 					});
 
 			// create blocks for deduplication
-			JavaRDD<BlockStats> blockStats = Deduper.createSortedBlocks(mapDocuments, dedupConf)
+			JavaRDD<BlockStats> blockStats = Deduper
+				.createSortedBlocks(mapDocuments, dedupConf)
 				.repartition(numPartitions)
 				.map(b -> asBlockStats(dedupConf, b));
 
