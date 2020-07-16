@@ -9,6 +9,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -19,23 +20,20 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.Block;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.oa.dedup.model.BlockStats;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.FieldListImpl;
-import eu.dnetlib.pace.model.FieldValueImpl;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
 
-public class SparkCreateSimRels extends AbstractSparkAction {
+public class SparkBlockStats extends AbstractSparkAction {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkCreateSimRels.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkBlockStats.class);
 
-	public SparkCreateSimRels(ArgumentApplicationParser parser, SparkSession spark) {
+	public SparkBlockStats(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
 	}
 
@@ -43,14 +41,24 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkBlockStats.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/dedup/createSimRels_parameters.json")));
+							"/eu/dnetlib/dhp/oa/dedup/createBlockStats_parameters.json")));
 		parser.parseArgument(args);
 
 		SparkConf conf = new SparkConf();
-		new SparkCreateSimRels(parser, getSparkSession(conf))
+
+		new SparkBlockStats(parser, getSparkSession(conf))
 			.run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+	}
+
+	public Long computeComparisons(Long blockSize, Long slidingWindowSize) {
+
+		if (slidingWindowSize >= blockSize)
+			return (slidingWindowSize * (slidingWindowSize - 1)) / 2;
+		else {
+			return (blockSize - slidingWindowSize + 1) * (slidingWindowSize * (slidingWindowSize - 1)) / 2;
+		}
 	}
 
 	@Override
@@ -67,7 +75,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			.map(Integer::valueOf)
 			.orElse(NUM_PARTITIONS);
 
-		log.info("numPartitions: '{}'", numPartitions);
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("isLookUpUrl:   '{}'", isLookUpUrl);
 		log.info("actionSetId:   '{}'", actionSetId);
@@ -76,11 +83,10 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		// for each dedup configuration
 		for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
 
-			final String entity = dedupConf.getWf().getEntityType();
 			final String subEntity = dedupConf.getWf().getSubEntityValue();
-			log.info("Creating simrels for: '{}'", subEntity);
+			log.info("Creating blockstats for: '{}'", subEntity);
 
-			final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity);
+			final String outputPath = DedupUtility.createBlockStatsPath(workingPath, actionSetId, subEntity);
 			removeOutputDir(spark, outputPath);
 
 			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -95,38 +101,26 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 					});
 
 			// create blocks for deduplication
-			JavaPairRDD<String, Block> blocks = Deduper
+			JavaRDD<BlockStats> blockStats = Deduper
 				.createSortedBlocks(mapDocuments, dedupConf)
-				.repartition(numPartitions);
-
-			// create relations by comparing only elements in the same group
-			Deduper
-				.computeRelations(sc, blocks, dedupConf)
-				.map(t -> createSimRel(t._1(), t._2(), entity))
 				.repartition(numPartitions)
-				.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-				.saveAsTextFile(outputPath);
+				.map(b -> asBlockStats(dedupConf, b));
+
+			// save the blockstats in the workingdir
+			spark
+				.createDataset(blockStats.rdd(), Encoders.bean(BlockStats.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.save(outputPath);
 		}
 	}
 
-	private Relation createSimRel(String source, String target, String entity) {
-		final Relation r = new Relation();
-		r.setSource(source);
-		r.setTarget(target);
-		r.setSubRelType("dedupSimilarity");
-		r.setRelClass("isSimilarTo");
-		r.setDataInfo(new DataInfo());
-
-		switch (entity) {
-			case "result":
-				r.setRelType("resultResult");
-				break;
-			case "organization":
-				r.setRelType("organizationOrganization");
-				break;
-			default:
-				throw new IllegalArgumentException("unmanaged entity type: " + entity);
-		}
-		return r;
+	private BlockStats asBlockStats(DedupConfig dedupConf, Tuple2<String, Block> b) {
+		return new BlockStats(
+			b._1(),
+			(long) b._2().getDocuments().size(),
+			computeComparisons(
+				(long) b._2().getDocuments().size(), (long) dedupConf.getWf().getSlidingWindowSize()));
 	}
+
 }

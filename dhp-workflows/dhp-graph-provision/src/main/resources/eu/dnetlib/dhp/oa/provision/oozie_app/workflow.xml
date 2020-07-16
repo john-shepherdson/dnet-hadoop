@@ -578,9 +578,17 @@
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--otherDsTypeId</arg><arg>${otherDsTypeId}</arg>
         </spark>
-        <ok to="to_solr_index"/>
+        <ok to="should_index"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="should_index">
+        <switch>
+            <case to="to_solr_index">${wf:conf('shouldIndex') eq 'true'}</case>
+            <case to="End">${wf:conf('shouldIndex') eq 'false'}</case>
+            <default to="to_solr_index"/>
+        </switch>
+    </decision>
 
     <action name="to_solr_index">
         <spark xmlns="uri:oozie:spark-action:0.2">

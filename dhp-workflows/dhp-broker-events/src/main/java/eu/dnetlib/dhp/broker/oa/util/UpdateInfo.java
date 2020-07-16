@@ -8,6 +8,7 @@ import eu.dnetlib.broker.objects.OaBrokerEventPayload;
 import eu.dnetlib.broker.objects.OaBrokerInstance;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.broker.objects.OaBrokerProvenance;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.dhp.broker.model.Topic;
 
 public final class UpdateInfo<T> {
@@ -20,6 +21,8 @@ public final class UpdateInfo<T> {
 
 	private final OaBrokerMainEntity target;
 
+	private final OaBrokerRelatedDatasource targetDs;
+
 	private final BiConsumer<OaBrokerMainEntity, T> compileHighlight;
 
 	private final Function<T, String> highlightToString;
@@ -28,12 +31,14 @@ public final class UpdateInfo<T> {
 
 	public UpdateInfo(final Topic topic, final T highlightValue, final OaBrokerMainEntity source,
 		final OaBrokerMainEntity target,
+		final OaBrokerRelatedDatasource targetDs,
 		final BiConsumer<OaBrokerMainEntity, T> compileHighlight,
 		final Function<T, String> highlightToString) {
 		this.topic = topic;
 		this.highlightValue = highlightValue;
 		this.source = source;
 		this.target = target;
+		this.targetDs = targetDs;
 		this.compileHighlight = compileHighlight;
 		this.highlightToString = highlightToString;
 		this.trust = TrustUtils.calculateTrust(source, target);
@@ -49,6 +54,10 @@ public final class UpdateInfo<T> {
 
 	public OaBrokerMainEntity getTarget() {
 		return target;
+	}
+
+	public OaBrokerRelatedDatasource getTargetDs() {
+		return targetDs;
 	}
 
 	protected Topic getTopic() {
@@ -75,8 +84,20 @@ public final class UpdateInfo<T> {
 		compileHighlight.accept(hl, getHighlightValue());
 
 		final String provId = getSource().getOpenaireId();
-		final String provRepo = getSource().getCollectedFromName();
-		final String provType = getSource().getCollectedFromType();
+		final String provRepo = getSource()
+			.getDatasources()
+			.stream()
+			.filter(ds -> ds.getRelType().equals(BrokerConstants.COLLECTED_FROM_REL))
+			.map(ds -> ds.getName())
+			.findFirst()
+			.orElse("");
+		final String provType = getSource()
+			.getDatasources()
+			.stream()
+			.filter(ds -> ds.getRelType().equals(BrokerConstants.COLLECTED_FROM_REL))
+			.map(ds -> ds.getType())
+			.findFirst()
+			.orElse("");
 
 		final String provUrl = getSource()
 			.getInstances()

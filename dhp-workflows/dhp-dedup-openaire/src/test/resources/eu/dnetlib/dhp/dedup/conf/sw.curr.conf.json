@@ -6,10 +6,10 @@
       "subEntityType" : "resulttype",
       "subEntityValue" : "software",
       "orderField" : "title",
-      "queueMaxSize" : "800",
+      "queueMaxSize" : "100",
       "groupMaxSize" : "100",
       "maxChildren" : "100",
-      "slidingWindowSize" : "80",
+      "slidingWindowSize" : "100",
       "rootBuilder" : [ "result", "resultProject_outcome_isProducedBy", "resultResult_publicationDataset_isRelatedTo", "resultResult_similarity_isAmongTopNSimilarDocuments", "resultResult_similarity_hasAmongTopNSimilarDocuments", "resultOrganization_affiliation_hasAuthorInstitution", "resultResult_part_hasPart", "resultResult_part_isPartOf", "resultResult_supplement_isSupplementTo", "resultResult_supplement_isSupplementedBy", "resultResult_version_isVersionOf" ],
       "includeChildren" : "true",
       "idPath" : "$.id",
@@ -17,8 +17,9 @@
     },
     "pace" : {
       "clustering" : [
-        { "name" : "wordssuffixprefix", "fields" : [ "title" ], "params" : { "max" : "2", "len" : "3" } },
-        { "name" : "lowercase", "fields" : [ "doi", "url" ], "params" : { } }
+        { "name" : "ngrampairs", "fields" : [ "title" ], "params" : { "max" : "1", "ngramLen" : "3"} },
+        { "name" : "suffixprefix", "fields" : [ "title" ], "params" : { "max" : "1", "len" : "3" } },
+        { "name" : "lowercase", "fields" : [ "doi" ], "params" : { } }
       ],
       "decisionTree": {
         "start": {

@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.dedup.graph;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -18,12 +19,17 @@ public class ConnectedComponent implements Serializable {
 	private Set<String> docIds;
 	private String ccId;
 
-	public ConnectedComponent() {
-	}
-
-	public ConnectedComponent(Set<String> docIds) {
+	public ConnectedComponent(Set<String> docIds, final int cut) {
 		this.docIds = docIds;
 		createID();
+		if (cut > 0 && docIds.size() > cut) {
+			this.docIds = docIds
+				.stream()
+				.filter(s -> !ccId.equalsIgnoreCase(s))
+				.limit(cut - 1)
+				.collect(Collectors.toSet());
+			this.docIds.add(ccId);
+		}
 	}
 
 	public String createID() {
@@ -41,6 +47,7 @@ public class ConnectedComponent implements Serializable {
 	public String getMin() {
 
 		final StringBuilder min = new StringBuilder();
+
 		docIds
 			.forEach(
 				i -> {
