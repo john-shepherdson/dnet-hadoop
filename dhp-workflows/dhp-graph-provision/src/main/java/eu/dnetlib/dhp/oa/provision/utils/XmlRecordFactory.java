@@ -329,7 +329,7 @@ public class XmlRecordFactory implements Serializable {
 							.stream()
 							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("description", c.getValue()))
-							.collect(Collectors.toList()));
+							.collect(Collectors.toCollection(HashSet::new)));
 			}
 			if (r.getEmbargoenddate() != null) {
 				metadata
@@ -370,7 +370,7 @@ public class XmlRecordFactory implements Serializable {
 							.stream()
 							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("source", c.getValue()))
-							.collect(Collectors.toList()));
+							.collect(Collectors.toCollection(HashSet::new)));
 			}
 			if (r.getFormat() != null) {
 				metadata
