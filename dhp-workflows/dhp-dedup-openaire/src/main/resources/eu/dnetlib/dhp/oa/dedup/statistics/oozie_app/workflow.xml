@@ -1,31 +1,21 @@
-<workflow-app name="import DB entities" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Create dedup blocks" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>contentPath</name>
-            <description>path location to store (or reuse) content from the aggregator</description>
+            <name>graphBasePath</name>
+            <description>the raw graph base path</description>
         </property>
         <property>
-            <name>postgresURL</name>
-            <description>the postgres URL to access to the database</description>
-        </property>
-        <property>
-            <name>postgresUser</name>
-            <description>the user postgres</description>
-        </property>
-        <property>
-            <name>postgresPassword</name>
-            <description>the password postgres</description>
-        </property>
-        <property>
-            <name>dbSchema</name>
-            <value>beta</value>
-            <description>the database schema according to the D-Net infrastructure (beta or production)</description>
-        </property>
-        <property>
-            <name>isLookupUrl</name>
+            <name>isLookUpUrl</name>
             <description>the address of the lookUp service</description>
         </property>
-
+        <property>
+            <name>actionSetId</name>
+            <description>id of the actionSet</description>
+        </property>
+        <property>
+            <name>numPartitions</name>
+            <description>number of partitions for the similarity relations intermediate phases</description>
+        </property>
         <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
@@ -81,46 +71,38 @@
         </configuration>
     </global>
 
-	<start to="ImportDB"/>
+    <start to="CreateBlockStats"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="ImportDB">
-        <java>
-            <prepare>
-                <delete path="${contentPath}/db_records"/>
-            </prepare>
-            <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/db_records</arg>
-            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
-            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
-            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--dbschema</arg><arg>${dbSchema}</arg>
-        </java>
-        <ok to="ImportDB_claims"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="ImportDB_claims">
-        <java>
-            <prepare>
-                <delete path="${contentPath}/db_claims"/>
-            </prepare>
-            <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/db_claims</arg>
-            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
-            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
-            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--dbschema</arg><arg>${dbSchema}</arg>
-            <arg>--action</arg><arg>claims</arg>
-        </java>
+    <action name="CreateBlockStats">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Create deduplication blocks</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkBlockStats</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--numPartitions</arg><arg>${numPartitions}</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-    	
+
     <end name="End"/>
 </workflow-app>

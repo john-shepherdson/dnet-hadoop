@@ -22,11 +22,13 @@ import eu.dnetlib.broker.objects.OaBrokerJournal;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.broker.objects.OaBrokerProject;
 import eu.dnetlib.broker.objects.OaBrokerRelatedDataset;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.ExternalReference;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Instance;
@@ -119,8 +121,6 @@ public class ConversionUtils {
 		res
 			.setJournal(
 				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null);
-		res.setCollectedFromId(mappedFirst(result.getCollectedfrom(), KeyValue::getKey));
-		res.setCollectedFromName(mappedFirst(result.getCollectedfrom(), KeyValue::getValue));
 		res.setPids(mappedList(result.getPid(), ConversionUtils::oafPidToBrokerPid));
 		res.setInstances(flatMappedList(result.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
 		res
@@ -220,6 +220,18 @@ public class ConversionUtils {
 		res.setRepository(fieldValue(sw.getCodeRepositoryUrl()));
 		res.setLandingPage(fieldValue(sw.getDocumentationUrl()));
 
+		return res;
+	}
+
+	public static final OaBrokerRelatedDatasource oafDatasourceToBrokerDatasource(final Datasource ds) {
+		if (ds == null) {
+			return null;
+		}
+
+		final OaBrokerRelatedDatasource res = new OaBrokerRelatedDatasource();
+		res.setName(StringUtils.defaultIfBlank(fieldValue(ds.getOfficialname()), fieldValue(ds.getEnglishname())));
+		res.setOpenaireId(ds.getId());
+		res.setType(classId(ds.getDatasourcetype()));
 		return res;
 	}
 
