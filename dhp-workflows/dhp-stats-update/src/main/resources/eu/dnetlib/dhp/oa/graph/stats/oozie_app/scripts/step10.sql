@@ -18,4 +18,4 @@ CREATE OR REPLACE VIEW  ${stats_db_name}.concept AS SELECT * FROM ${external_sta
 -- Creation date of the database
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
-create table creation_date as select date_format(current_date(), 'dd-MM-yyyy') as date;
+create table ${stats_db_name}.creation_date as select date_format(current_date(), 'dd-MM-yyyy') as date;
