@@ -8,14 +8,22 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingPublicationDate;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 
+@ExtendWith(MockitoExtension.class)
 class UpdateMatcherTest {
 
 	UpdateMatcher<String> matcher = new EnrichMissingPublicationDate();
+
+	@Mock
+	private OaBrokerRelatedDatasource targetDs;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -30,7 +38,7 @@ class UpdateMatcherTest {
 		final OaBrokerMainEntity p4 = new OaBrokerMainEntity();
 
 		final Collection<UpdateInfo<String>> list = matcher
-			.searchUpdatesForRecord(res, Arrays.asList(p1, p2, p3, p4), null);
+			.searchUpdatesForRecord(res, targetDs, Arrays.asList(p1, p2, p3, p4), null);
 
 		assertTrue(list.isEmpty());
 	}
@@ -46,7 +54,7 @@ class UpdateMatcherTest {
 		res.setPublicationdate("2018");
 
 		final Collection<UpdateInfo<String>> list = matcher
-			.searchUpdatesForRecord(res, Arrays.asList(p1, p2, p3, p4), null);
+			.searchUpdatesForRecord(res, targetDs, Arrays.asList(p1, p2, p3, p4), null);
 
 		assertTrue(list.isEmpty());
 	}
@@ -62,7 +70,7 @@ class UpdateMatcherTest {
 		p2.setPublicationdate("2018");
 
 		final Collection<UpdateInfo<String>> list = matcher
-			.searchUpdatesForRecord(res, Arrays.asList(p1, p2, p3, p4), null);
+			.searchUpdatesForRecord(res, targetDs, Arrays.asList(p1, p2, p3, p4), null);
 
 		assertTrue(list.size() == 1);
 	}
@@ -79,7 +87,7 @@ class UpdateMatcherTest {
 		p2.setPublicationdate("2018");
 
 		final Collection<UpdateInfo<String>> list = matcher
-			.searchUpdatesForRecord(res, Arrays.asList(p1, p2, p3, p4), null);
+			.searchUpdatesForRecord(res, targetDs, Arrays.asList(p1, p2, p3, p4), null);
 
 		assertTrue(list.isEmpty());
 	}
@@ -98,7 +106,7 @@ class UpdateMatcherTest {
 		p4.setPublicationdate("2018");
 
 		final Collection<UpdateInfo<String>> list = matcher
-			.searchUpdatesForRecord(res, Arrays.asList(p1, p2, p3, p4), null);
+			.searchUpdatesForRecord(res, targetDs, Arrays.asList(p1, p2, p3, p4), null);
 
 		assertTrue(list.isEmpty());
 	}
@@ -117,7 +125,7 @@ class UpdateMatcherTest {
 		p4.setPublicationdate("2018");
 
 		final Collection<UpdateInfo<String>> list = matcher
-			.searchUpdatesForRecord(res, Arrays.asList(p1, p2, p3, p4), null);
+			.searchUpdatesForRecord(res, targetDs, Arrays.asList(p1, p2, p3, p4), null);
 
 		assertTrue(list.size() == 1);
 	}

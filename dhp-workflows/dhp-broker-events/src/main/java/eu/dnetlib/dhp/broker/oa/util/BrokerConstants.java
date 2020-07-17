@@ -14,6 +14,10 @@ public class BrokerConstants {
 	public static final String OPEN_ACCESS = "OPEN";
 	public static final String IS_MERGED_IN_CLASS = "isMergedIn";
 
+	public static final String COLLECTED_FROM_REL = "collectedFrom";
+
+	public static final String HOSTED_BY_REL = "hostedBy";
+
 	public static final float MIN_TRUST = 0.25f;
 	public static final float MAX_TRUST = 1.00f;
 

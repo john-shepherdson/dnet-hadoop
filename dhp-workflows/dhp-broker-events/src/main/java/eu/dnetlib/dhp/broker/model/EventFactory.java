@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 
 public class EventFactory {
@@ -52,9 +54,11 @@ public class EventFactory {
 		final OaBrokerMainEntity source = updateInfo.getSource();
 		final OaBrokerMainEntity target = updateInfo.getTarget();
 
-		map.setTargetDatasourceId(target.getCollectedFromId());
-		map.setTargetDatasourceName(target.getCollectedFromName());
-		map.setTargetDatasourceType(target.getCollectedFromType());
+		final OaBrokerRelatedDatasource targetDs = updateInfo.getTargetDs();
+
+		map.setTargetDatasourceId(targetDs.getOpenaireId());
+		map.setTargetDatasourceName(targetDs.getName());
+		map.setTargetDatasourceType(targetDs.getType());
 
 		map.setTargetResultId(target.getOpenaireId());
 
@@ -73,10 +77,18 @@ public class EventFactory {
 
 		// PROVENANCE INFO
 		map.setTrust(updateInfo.getTrust());
-		map.setProvenanceDatasourceId(source.getCollectedFromId());
-		map.setProvenanceDatasourceName(source.getCollectedFromName());
-		map.setProvenanceDatasourceType(source.getCollectedFromType());
 		map.setProvenanceResultId(source.getOpenaireId());
+
+		source
+			.getDatasources()
+			.stream()
+			.filter(ds -> ds.getRelType().equals(BrokerConstants.COLLECTED_FROM_REL))
+			.findFirst()
+			.ifPresent(ds -> {
+				map.setProvenanceDatasourceId(ds.getOpenaireId());
+				map.setProvenanceDatasourceName(ds.getName());
+				map.setProvenanceDatasourceType(ds.getType());
+			});
 
 		return map;
 	}

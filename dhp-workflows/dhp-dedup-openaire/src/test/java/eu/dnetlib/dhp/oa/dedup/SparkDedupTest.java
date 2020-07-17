@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static java.nio.file.Files.createTempDirectory;
 
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.count;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.lenient;
 
@@ -11,6 +13,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -18,6 +23,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
@@ -71,11 +77,13 @@ public class SparkDedupTest implements Serializable {
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
 
+		final SparkConf conf = new SparkConf();
+		conf.set("spark.sql.shuffle.partitions", "200");
 		spark = SparkSession
 			.builder()
 			.appName(SparkDedupTest.class.getSimpleName())
 			.master("local[*]")
-			.config(new SparkConf())
+			.config(conf)
 			.getOrCreate();
 
 		jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -152,37 +160,42 @@ public class SparkDedupTest implements Serializable {
 		parser
 			.parseArgument(
 				new String[] {
-					"-i",
-					testGraphBasePath,
-					"-asi",
-					testActionSetId,
-					"-la",
-					"lookupurl",
-					"-w",
-					testOutputBasePath
+					"-i", testGraphBasePath,
+					"-asi", testActionSetId,
+					"-la", "lookupurl",
+					"-w", testOutputBasePath,
+					"-np", "50"
 				});
 
 		new SparkCreateSimRels(parser, spark).run(isLookUpService);
 
 		long orgs_simrel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
+			.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
 			.count();
+
 		long pubs_simrel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
+			.textFile(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
 			.count();
-		long sw_simrel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/software_simrel").count();
 
-		long ds_simrel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/dataset_simrel").count();
+		long sw_simrel = spark
+			.read()
+			.textFile(testOutputBasePath + "/" + testActionSetId + "/software_simrel")
+			.count();
+
+		long ds_simrel = spark
+			.read()
+			.textFile(testOutputBasePath + "/" + testActionSetId + "/dataset_simrel")
+			.count();
 
 		long orp_simrel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
+			.textFile(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
 			.count();
 
 		assertEquals(3432, orgs_simrel);
-		assertEquals(7054, pubs_simrel);
+		assertEquals(7152, pubs_simrel);
 		assertEquals(344, sw_simrel);
 		assertEquals(458, ds_simrel);
 		assertEquals(6750, orp_simrel);
@@ -190,6 +203,101 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(2)
+	public void cutMergeRelsTest() throws Exception {
+
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkCreateMergeRels.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
+		parser
+			.parseArgument(
+				new String[] {
+					"-i",
+					testGraphBasePath,
+					"-asi",
+					testActionSetId,
+					"-la",
+					"lookupurl",
+					"-w",
+					testOutputBasePath,
+					"-cc",
+					"3"
+				});
+
+		new SparkCreateMergeRels(parser, spark).run(isLookUpService);
+
+		long orgs_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
+			.as(Encoders.bean(Relation.class))
+			.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("merges"))
+			.groupBy("source")
+			.agg(count("target").alias("cnt"))
+			.select("source", "cnt")
+			.where("cnt > 3")
+			.count();
+
+		long pubs_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel")
+			.as(Encoders.bean(Relation.class))
+			.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("merges"))
+			.groupBy("source")
+			.agg(count("target").alias("cnt"))
+			.select("source", "cnt")
+			.where("cnt > 3")
+			.count();
+		long sw_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/software_mergerel")
+			.as(Encoders.bean(Relation.class))
+			.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("merges"))
+			.groupBy("source")
+			.agg(count("target").alias("cnt"))
+			.select("source", "cnt")
+			.where("cnt > 3")
+			.count();
+
+		long ds_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/dataset_mergerel")
+			.as(Encoders.bean(Relation.class))
+			.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("merges"))
+			.groupBy("source")
+			.agg(count("target").alias("cnt"))
+			.select("source", "cnt")
+			.where("cnt > 3")
+			.count();
+
+		long orp_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_mergerel")
+			.as(Encoders.bean(Relation.class))
+			.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("merges"))
+			.groupBy("source")
+			.agg(count("target").alias("cnt"))
+			.select("source", "cnt")
+			.where("cnt > 3")
+			.count();
+
+		assertEquals(0, orgs_mergerel);
+		assertEquals(0, pubs_mergerel);
+		assertEquals(0, sw_mergerel);
+		assertEquals(0, ds_mergerel);
+		assertEquals(0, orp_mergerel);
+
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel"));
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel"));
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/software_mergerel"));
+		FileUtils.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/dataset_mergerel"));
+		FileUtils
+			.deleteDirectory(new File(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_mergerel"));
+	}
+
+	@Test
+	@Order(3)
 	public void createMergeRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -225,8 +333,10 @@ public class SparkDedupTest implements Serializable {
 			.read()
 			.load(testOutputBasePath + "/" + testActionSetId + "/software_mergerel")
 			.count();
-
-		long ds_mergerel = spark.read().load(testOutputBasePath + "/" + testActionSetId + "/dataset_mergerel").count();
+		long ds_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/dataset_mergerel")
+			.count();
 
 		long orp_mergerel = spark
 			.read()
@@ -234,14 +344,14 @@ public class SparkDedupTest implements Serializable {
 			.count();
 
 		assertEquals(1276, orgs_mergerel);
-		assertEquals(1440, pubs_mergerel);
+		assertEquals(1442, pubs_mergerel);
 		assertEquals(288, sw_mergerel);
 		assertEquals(472, ds_mergerel);
 		assertEquals(718, orp_mergerel);
 	}
 
 	@Test
-	@Order(3)
+	@Order(4)
 	public void createDedupRecordTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -288,7 +398,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(4)
+	@Order(5)
 	public void updateEntityTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -404,7 +514,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(5)
+	@Order(6)
 	public void propagateRelationTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -423,7 +533,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4971, relations);
+		assertEquals(4866, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
@@ -454,7 +564,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(6)
+	@Order(7)
 	public void testRelations() throws Exception {
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_1.json", 12, 10);
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_2.json", 10, 2);
