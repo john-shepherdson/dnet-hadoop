@@ -39,10 +39,9 @@ public class AbstractMigrationApplication implements Closeable {
 
 		this.writer = SequenceFile
 			.createWriter(
-				getConf(),
-				SequenceFile.Writer.file(new Path(hdfsPath)),
-				SequenceFile.Writer.keyClass(Text.class),
-				SequenceFile.Writer.valueClass(Text.class));
+				getConf(), SequenceFile.Writer.file(new Path(hdfsPath)), SequenceFile.Writer.keyClass(Text.class),
+				SequenceFile.Writer
+					.valueClass(Text.class));
 	}
 
 	private Configuration getConf() throws IOException {
