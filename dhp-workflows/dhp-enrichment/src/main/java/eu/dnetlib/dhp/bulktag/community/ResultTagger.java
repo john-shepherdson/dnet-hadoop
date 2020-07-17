@@ -72,8 +72,9 @@ public class ResultTagger implements Serializable {
 		// tagging for Subject
 		final Set<String> subjects = new HashSet<>();
 
-		if (Objects.nonNull(result.getSubject())){
-			result.getSubject()
+		if (Objects.nonNull(result.getSubject())) {
+			result
+				.getSubject()
 				.stream()
 				.map(subject -> subject.getValue())
 				.filter(StringUtils::isNotBlank)
@@ -91,13 +92,13 @@ public class ResultTagger implements Serializable {
 
 		if (Objects.nonNull(result.getInstance())) {
 			for (Instance i : result.getInstance()) {
-				if(Objects.nonNull(i.getCollectedfrom())){
-					if(Objects.nonNull(i.getCollectedfrom().getKey())){
+				if (Objects.nonNull(i.getCollectedfrom())) {
+					if (Objects.nonNull(i.getCollectedfrom().getKey())) {
 						tmp.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
 					}
 				}
-				if(Objects.nonNull(i.getHostedby())){
-					if(Objects.nonNull(i.getHostedby().getKey())){
+				if (Objects.nonNull(i.getHostedby())) {
+					if (Objects.nonNull(i.getHostedby().getKey())) {
 						tmp.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
 					}
 				}
