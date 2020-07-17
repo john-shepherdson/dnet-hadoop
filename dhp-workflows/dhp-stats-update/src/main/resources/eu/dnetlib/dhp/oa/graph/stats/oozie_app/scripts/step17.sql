@@ -83,7 +83,7 @@ DROP VIEW IF EXISTS ${stats_db_shadow_name}.software_topics;
 
 
 -- Creating the shadow database, in case it doesn't exist
-CREATE database ${stats_db_shadow_name};
+CREATE database IF NOT EXISTS ${stats_db_shadow_name};
 
 -- Creating new views
 CREATE VIEW IF NOT EXISTS ${stats_db_shadow_name}.country AS SELECT * FROM ${stats_db_name}.country;
