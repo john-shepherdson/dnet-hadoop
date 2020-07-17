@@ -96,11 +96,11 @@ public class MergeGraphSparkJob {
 			.map((MapFunction<Tuple2<Tuple2<String, P>, Tuple2<String, B>>, P>) value -> {
 				Optional<P> p = Optional.ofNullable(value._1()).map(Tuple2::_2);
 				Optional<B> b = Optional.ofNullable(value._2()).map(Tuple2::_2);
-				if (p.isPresent() & !b.isPresent()) {
-					return p.get();
+				if (b.isPresent() & !p.isPresent()) {
+					return (P)b.get();
 				}
-				if (b.isPresent()) {
-					return (P) b.get();
+				if (p.isPresent()) {
+					return p.get();
 				}
 				return null;
 			}, Encoders.bean(p_clazz))
