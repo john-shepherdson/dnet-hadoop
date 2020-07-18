@@ -34,7 +34,10 @@ public class EventFactory {
 		final MappedFields map = createMapFromResult(updateInfo);
 
 		final String eventId = calculateEventId(
-			updateInfo.getTopicPath(), updateInfo.getTarget().getOpenaireId(), updateInfo.getHighlightValueAsString());
+			updateInfo.getTopicPath(), updateInfo.getTargetDs().getOpenaireId(), updateInfo
+				.getTarget()
+				.getOpenaireId(),
+			updateInfo.getHighlightValueAsString());
 
 		res.setEventId(eventId);
 		res.setProducerId(PRODUCER_ID);
@@ -93,11 +96,13 @@ public class EventFactory {
 		return map;
 	}
 
-	private static String calculateEventId(final String topic, final String publicationId, final String value) {
+	private static String calculateEventId(final String topic, final String dsId, final String publicationId,
+		final String value) {
 		return "event-"
-			+ DigestUtils.md5Hex(topic).substring(0, 6) + "-"
-			+ DigestUtils.md5Hex(publicationId).substring(0, 8) + "-"
-			+ DigestUtils.md5Hex(value).substring(0, 8);
+			+ DigestUtils.md5Hex(topic).substring(0, 4) + "-"
+			+ DigestUtils.md5Hex(dsId).substring(0, 4) + "-"
+			+ DigestUtils.md5Hex(publicationId).substring(0, 7) + "-"
+			+ DigestUtils.md5Hex(value).substring(0, 5);
 	}
 
 	private static long calculateExpiryDate(final long now) {
