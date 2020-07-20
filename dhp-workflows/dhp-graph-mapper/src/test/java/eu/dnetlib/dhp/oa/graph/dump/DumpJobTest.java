@@ -5,9 +5,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Software;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -19,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 //@ExtendWith(MockitoExtension.class)
 public class DumpJobTest {
@@ -34,7 +37,7 @@ public class DumpJobTest {
 
 	private static final Logger log = LoggerFactory.getLogger(DumpJobTest.class);
 
-	private static HashMap<String, String> map = new HashMap<>();
+	private static CommunityMap map = new CommunityMap();
 
 	static {
 		map.put("egi", "EGI Federation");
@@ -127,20 +130,14 @@ public class DumpJobTest {
 	}
 
 	@Test
-	public void testDataset() throws Exception {
+	public void testDataset() {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset.json")
 			.getPath();
+		DumpProducts dump = new DumpProducts();
+		dump.run(false, sourcePath, workingDir.toString() + "/result", map, Dataset.class, false);
 
-		SparkDumpCommunityProducts.main(new String[] {
-			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/result",
-			"-sourcePath", sourcePath,
-			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-			"-communityMap", new Gson().toJson(map)
-		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -186,20 +183,13 @@ public class DumpJobTest {
 	}
 
 	@Test
-	public void testPublication() throws Exception {
+	public void testPublication() {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication.json")
 			.getPath();
-
-		SparkDumpCommunityProducts.main(new String[] {
-			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/result",
-			"-sourcePath", sourcePath,
-			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-			"-communityMap", new Gson().toJson(map)
-		});
+		DumpProducts dump = new DumpProducts();
+		dump.run(false, sourcePath, workingDir.toString() + "/result", map, Publication.class, false);
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -220,20 +210,15 @@ public class DumpJobTest {
 	}
 
 	@Test
-	public void testSoftware() throws Exception {
+	public void testSoftware() {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/software.json")
 			.getPath();
 
-		SparkDumpCommunityProducts.main(new String[] {
-			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/result",
-			"-sourcePath", sourcePath,
-			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
-			"-communityMap", new Gson().toJson(map)
-		});
+		DumpProducts dump = new DumpProducts();
+		dump.run(false, sourcePath, workingDir.toString() + "/result", map, Software.class, false);
+
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -254,20 +239,15 @@ public class DumpJobTest {
 	}
 
 	@Test
-	public void testORP() throws Exception {
+	public void testORP() {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/orp.json")
 			.getPath();
 
-		SparkDumpCommunityProducts.main(new String[] {
-			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/result",
-			"-sourcePath", sourcePath,
-			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
-			"-communityMap", new Gson().toJson(map)
-		});
+		DumpProducts dump = new DumpProducts();
+		dump.run(false, sourcePath, workingDir.toString() + "/result", map, OtherResearchProduct.class, false);
+
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -288,19 +268,13 @@ public class DumpJobTest {
 	}
 
 	@Test
-	public void testRecord() throws Exception {
+	public void testRecord()  {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/singelRecord_pub.json")
 			.getPath();
 
-		SparkDumpCommunityProducts.main(new String[] {
-			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/result",
-			"-sourcePath", sourcePath,
-			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-			"-communityMap", new Gson().toJson(map)
-		});
+		DumpProducts dump = new DumpProducts();
+		dump.run(false, sourcePath, workingDir.toString() + "/result", map, Publication.class, false);
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 

@@ -3,25 +3,13 @@ package eu.dnetlib.dhp.oa.graph.dump;
 
 import java.io.*;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import org.apache.commons.io.IOUtils;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
-import org.apache.spark.SparkConf;
-import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.google.gson.Gson;
-
-import eu.dnetlib.dhp.oa.graph.dump.zenodo.*;
-import eu.dnetlib.dhp.schema.dump.oaf.*;
 
 public class ZenodoUploadTest {
 
