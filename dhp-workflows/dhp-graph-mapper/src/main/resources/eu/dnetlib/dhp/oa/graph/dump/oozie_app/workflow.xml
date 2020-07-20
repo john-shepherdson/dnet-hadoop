@@ -109,7 +109,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table publication for community related products</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkDumpCommunityProducts</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkDumpCommunityProducts</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -135,7 +135,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table dataset for community related products</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkDumpCommunityProducts</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkDumpCommunityProducts</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -161,7 +161,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table ORP for community related products</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkDumpCommunityProducts</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkDumpCommunityProducts</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -187,7 +187,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table software for community related products</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkDumpCommunityProducts</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkDumpCommunityProducts</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -245,7 +245,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Extend dumped publications with information about projects</name>
+            <name>Extend dumped publications with information about project</name>
             <class>eu.dnetlib.dhp.oa.graph.dump.SparkUpdateProjectInfo</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -270,7 +270,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Extend dumped dataset with information about projects</name>
+            <name>Extend dumped dataset with information about project</name>
             <class>eu.dnetlib.dhp.oa.graph.dump.SparkUpdateProjectInfo</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -294,7 +294,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Extend dumped ORP with information about projects</name>
+            <name>Extend dumped ORP with information about project</name>
             <class>eu.dnetlib.dhp.oa.graph.dump.SparkUpdateProjectInfo</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -318,7 +318,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Extend dumped software with information about projects</name>
+            <name>Extend dumped software with information about project</name>
             <class>eu.dnetlib.dhp.oa.graph.dump.SparkUpdateProjectInfo</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -346,7 +346,7 @@
                 <master>yarn</master>
                 <mode>cluster</mode>
                 <name>Split dumped result for community</name>
-                <class>eu.dnetlib.dhp.oa.graph.dump.SparkSplitForCommunity</class>
+                <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkSplitForCommunity</class>
                 <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
                 <spark-opts>
                     --executor-memory=${sparkExecutorMemory}
