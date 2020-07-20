@@ -15,9 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.util.LongAccumulator;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public abstract class UpdateMatcher<T> {
 
@@ -35,21 +35,21 @@ public abstract class UpdateMatcher<T> {
 		this.highlightToStringFunction = highlightToStringFunction;
 	}
 
-	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OaBrokerMainEntity res,
+	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OaBrokerMainEntity target,
+		final OaBrokerRelatedDatasource targetDs,
 		final Collection<OaBrokerMainEntity> others,
-		final DedupConfig dedupConfig,
 		final Map<String, LongAccumulator> accumulators) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
 
 		for (final OaBrokerMainEntity source : others) {
-			if (source != res) {
-				for (final T hl : findDifferences(source, res)) {
+			if (source != target) {
+				for (final T hl : findDifferences(source, target)) {
 					final Topic topic = getTopicFunction().apply(hl);
 					if (topic != null) {
-						final UpdateInfo<T> info = new UpdateInfo<>(topic, hl, source, res,
+						final UpdateInfo<T> info = new UpdateInfo<>(topic, hl, source, target, targetDs,
 							getCompileHighlightFunction(),
-							getHighlightToStringFunction(), dedupConfig);
+							getHighlightToStringFunction());
 
 						final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
 						if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {

@@ -7,10 +7,33 @@
         <DATE_OF_CREATION value="2020-06-15T16:35:09+00:00"/>
     </HEADER>
     <BODY>
-        <WORKFLOW_NAME>Graph Construction [OCEAN]</WORKFLOW_NAME>
+        <WORKFLOW_NAME>Graph Construction [PROD]</WORKFLOW_NAME>
         <WORKFLOW_TYPE>Data Provision</WORKFLOW_TYPE>
         <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
         <CONFIGURATION start="manual">
+
+            <NODE isStart="true" name="setReuseContent" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached content from the aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseContent</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+
+            <NODE isStart="true" name="setContentPath" type="SetEnvParameter">
+                <DESCRIPTION>set the aggregator content path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">contentPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+
             <NODE isStart="true" name="setAggregatorGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the path containing the AGGREGATOR graph</DESCRIPTION>
                 <PARAMETERS>
@@ -62,87 +85,94 @@
                 </ARCS>
             </NODE>
 
-            <NODE isStart="true" name="setCleanedGraphPath" type="SetEnvParameter">
-                <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
+            <NODE isStart="true" name="setOrcidGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the ORCID enriched graph</DESCRIPTION>
                 <PARAMETERS>
-                    <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/05_graph_cleaned</PARAM>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">orcidGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/05_graph_orcid</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
 
-            <NODE isStart="true" name="setOrcidGraphPath" type="SetEnvParameter">
-                <DESCRIPTION>Set the target path to store the ORCID enriched graph</DESCRIPTION>
-                <PARAMETERS>
-                    <PARAM managedBy="system" name="parameterName" required="true" type="string">orcidGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/06_graph_orcid</PARAM>
-                </PARAMETERS>
-                <ARCS>
-                    <ARC to="waitConfig"/>
-                </ARCS>
-            </NODE>
             <NODE isStart="true" name="setBulkTaggingGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the BULK TAGGED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">bulkTaggingGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/07_graph_bulktagging</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/06_graph_bulktagging</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setAffiliationGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the AFFILIATION from INSTITUTIONAL REPOS graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">affiliationGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/08_graph_affiliation</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/07_graph_affiliation</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setCommunityOrganizationGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the COMMUNITY from SELECTED SOURCES graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">communityOrganizationGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/09_graph_comunity_organization</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/08_graph_comunity_organization</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setFundingGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the FUNDING from SEMANTIC RELATION graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">fundingGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/10_graph_funding</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/09_graph_funding</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setCommunitySemRelGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the COMMUNITY from SEMANTIC RELATION graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">communitySemRelGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/11_graph_comunity_sem_rel</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/10_graph_comunity_sem_rel</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setCountryGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the COUNTRY enriched graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">countryGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/12_graph_country</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/11_graph_country</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
+            <NODE isStart="true" name="setCleanedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/12_graph_cleaned</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+
             <NODE isStart="true" name="setBlacklistedGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the blacklisted graph</DESCRIPTION>
                 <PARAMETERS>
@@ -153,6 +183,7 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setIsLookUpUrl" type="SetEnvParameter">
                 <DESCRIPTION>Set the lookup address</DESCRIPTION>
                 <PARAMETERS>
@@ -163,6 +194,7 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setBulkTaggingPathMap" type="SetEnvParameter">
                 <DESCRIPTION>Set the map of paths for the Bulk Tagging</DESCRIPTION>
                 <PARAMETERS>
@@ -173,6 +205,7 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setPropagationOrganizationCommunityMap" type="SetEnvParameter">
                 <DESCRIPTION>Set the map of associations organization, community list for the propagation of community to result through organization</DESCRIPTION>
                 <PARAMETERS>
@@ -185,6 +218,7 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setDedupConfig" type="SetEnvParameter">
                 <DESCRIPTION>Set the dedup orchestrator name</DESCRIPTION>
                 <PARAMETERS>
@@ -195,6 +229,7 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="actionSetsRaw" type="SetEnvParameter">
                 <DESCRIPTION>declares the ActionSet ids to promote in the RAW graph</DESCRIPTION>
                 <PARAMETERS>
@@ -205,6 +240,7 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="actionSetsIIS" type="SetEnvParameter">
                 <DESCRIPTION>declares the ActionSet ids to promote in the INFERRED graph</DESCRIPTION>
                 <PARAMETERS>
@@ -215,6 +251,7 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isJoin="true" name="waitConfig">
                 <DESCRIPTION>wait configurations</DESCRIPTION>
                 <PARAMETERS/>
@@ -222,6 +259,7 @@
                     <ARC to="aggregatorGraph"/>
                 </ARCS>
             </NODE>
+
             <NODE name="aggregatorGraph" type="SubmitHadoopJob">
                 <DESCRIPTION>create the AGGREGATOR graph</DESCRIPTION>
                 <PARAMETERS>
@@ -230,7 +268,9 @@
                     <PARAM managedBy="system" name="envParams" required="true" type="string">
                         {
                         'graphOutputPath' : 'aggregatorGraphPath',
-                        'isLookupUrl' : 'isLookUpUrl'
+                        'isLookupUrl' : 'isLookUpUrl',
+                        'reuseContent' : 'reuseContent',
+                        'contentPath' : 'contentPath'
                         }
                     </PARAM>
                     <PARAM managedBy="system" name="params" required="true" type="string">
@@ -241,8 +281,6 @@
                         'postgresURL' : 'jdbc:postgresql://beta.services.openaire.eu:5432/dnet_openaireplus',
                         'postgresUser' : 'dnet',
                         'postgresPassword' : '',
-                        'reuseContent' : 'false',
-                        'contentPath' : '/tmp/beta_provision/aggregator',
                         'workingDir' : '/tmp/beta_provision/working_dir/aggregator'
                         }
                     </PARAM>
@@ -252,6 +290,7 @@
                     <ARC to="promoteActionsRaw"/>
                 </ARCS>
             </NODE>
+
             <NODE name="promoteActionsRaw" type="SubmitHadoopJob">
                 <DESCRIPTION>create the RAW graph</DESCRIPTION>
                 <PARAMETERS>
@@ -289,6 +328,7 @@
                     <ARC to="duplicateScan"/>
                 </ARCS>
             </NODE>
+
             <NODE name="duplicateScan" type="SubmitHadoopJob">
                 <DESCRIPTION>search for duplicates in the raw graph</DESCRIPTION>
                 <PARAMETERS>
@@ -314,6 +354,7 @@
                     <ARC to="promoteActionsIIS"/>
                 </ARCS>
             </NODE>
+
             <NODE name="promoteActionsIIS" type="SubmitHadoopJob">
                 <DESCRIPTION>create the INFERRED graph</DESCRIPTION>
                 <PARAMETERS>
@@ -351,6 +392,7 @@
                     <ARC to="dedupConsistency"/>
                 </ARCS>
             </NODE>
+
             <NODE name="dedupConsistency" type="SubmitHadoopJob">
                 <DESCRIPTION>mark duplicates as deleted and redistribute the relationships</DESCRIPTION>
                 <PARAMETERS>
@@ -371,45 +413,10 @@
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
                 </PARAMETERS>
                 <ARCS>
-                    <ARC to="graphCleaning"/>
+                    <ARC to="orcidPropagation"/>
                 </ARCS>
             </NODE>
 
-            <NODE name="graphCleaning" type="SubmitHadoopJob">
-                <DESCRIPTION>clean the properties in the graph typed as Qualifier according to the vocabulary indicated in schemeid</DESCRIPTION>
-                <PARAMETERS>
-                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
-                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
-                    <PARAM managedBy="system" name="envParams" required="true" type="string">
-                        {
-                        'graphInputPath' : 'consistentGraphPath',
-                        'graphOutputPath': 'cleanedGraphPath',
-                        'isLookupUrl': 'isLookUpUrl'
-                        }
-                    </PARAM>
-                    <PARAM managedBy="system" name="params" required="true" type="string">
-                        {
-                        'oozie.wf.application.path' : '/lib/dnet/oa/graph/clean/oozie_app',
-                        'workingPath' : '/tmp/beta_provision/working_dir/clean'
-                        }
-                    </PARAM>
-                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
-                </PARAMETERS>
-                <ARCS>
-                    <ARC to="SKIP_ENRICHMENT"/>
-                </ARCS>
-            </NODE>
-
-            <NODE name="SKIP_ENRICHMENT" type="Selection">
-                <DESCRIPTION>Do we skip the graph enrichment steps? (Yes to prepare the graph for the IIS)</DESCRIPTION>
-                <PARAMETERS>
-                    <PARAM function="validValues(['YES', 'NO'])" managedBy="user" name="selection" required="true" type="string">NO</PARAM>
-                </PARAMETERS>
-                <ARCS>
-                    <ARC name="YES" to="success"/>
-                    <ARC name="NO" to="orcidPropagation"/>
-                </ARCS>
-            </NODE>
             <NODE name="orcidPropagation" type="SubmitHadoopJob">
                 <DESCRIPTION>propagates ORCID among results linked by allowedsemrels semantic relationships</DESCRIPTION>
                 <PARAMETERS>
@@ -417,7 +424,7 @@
                     <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
                     <PARAM managedBy="system" name="envParams" required="true" type="string">
                         {
-                        'sourcePath' : 'cleanedGraphPath',
+                        'sourcePath' : 'consistentGraphPath',
                         'outputPath': 'orcidGraphPath'
                         }
                     </PARAM>
@@ -435,6 +442,7 @@
                     <ARC to="bulkTagging"/>
                 </ARCS>
             </NODE>
+
             <NODE name="bulkTagging" type="SubmitHadoopJob">
                 <DESCRIPTION>mark results respecting some rules as belonging to communities</DESCRIPTION>
                 <PARAMETERS>
@@ -460,6 +468,7 @@
                     <ARC to="affiliationPropagation"/>
                 </ARCS>
             </NODE>
+
             <NODE name="affiliationPropagation" type="SubmitHadoopJob">
                 <DESCRIPTION>creates relashionships between results and organizations when the organizations are associated to institutional repositories</DESCRIPTION>
                 <PARAMETERS>
@@ -484,6 +493,7 @@
                     <ARC to="communityOrganizationPropagation"/>
                 </ARCS>
             </NODE>
+
             <NODE name="communityOrganizationPropagation" type="SubmitHadoopJob">
                 <DESCRIPTION>marks as belonging to communities the result collected from datasources related to the organizations specified in the organizationCommunityMap</DESCRIPTION>
                 <PARAMETERS>
@@ -509,6 +519,7 @@
                     <ARC to="resultProjectPropagation"/>
                 </ARCS>
             </NODE>
+
             <NODE name="resultProjectPropagation" type="SubmitHadoopJob">
                 <DESCRIPTION>created relation between projects and results linked to other results trough allowedsemrel semantic relations linked to projects</DESCRIPTION>
                 <PARAMETERS>
@@ -534,6 +545,7 @@
                     <ARC to="communitySemrelPropagation"/>
                 </ARCS>
             </NODE>
+
             <NODE name="communitySemrelPropagation" type="SubmitHadoopJob">
                 <DESCRIPTION>tag as belonging to communitites result in in allowedsemrels relation with other result already linked to communities </DESCRIPTION>
                 <PARAMETERS>
@@ -560,6 +572,7 @@
                     <ARC to="countryPropagation"/>
                 </ARCS>
             </NODE>
+
             <NODE name="countryPropagation" type="SubmitHadoopJob">
                 <DESCRIPTION>associated to results colleced from allowedtypes and those in the whithelist the country of the organization(s) handling the datasource it is collected from </DESCRIPTION>
                 <PARAMETERS>
@@ -585,9 +598,35 @@
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
                 </PARAMETERS>
                 <ARCS>
+                    <ARC to="graphCleaning"/>
+                </ARCS>
+            </NODE>
+
+            <NODE name="graphCleaning" type="SubmitHadoopJob">
+                <DESCRIPTION>clean the properties in the graph typed as Qualifier according to the vocabulary indicated in schemeid</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphInputPath' : 'countryGraphPath',
+                        'graphOutputPath': 'cleanedGraphPath',
+                        'isLookupUrl': 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/oa/graph/clean/oozie_app',
+                        'workingPath' : '/tmp/beta_provision/working_dir/clean'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
                     <ARC to="blacklistRelations"/>
                 </ARCS>
             </NODE>
+
             <NODE name="blacklistRelations" type="SubmitHadoopJob">
                 <DESCRIPTION>removes blacklisted relations </DESCRIPTION>
                 <PARAMETERS>
@@ -595,7 +634,7 @@
                     <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
                     <PARAM managedBy="system" name="envParams" required="true" type="string">
                         {
-                        'sourcePath' : 'countryGraphPath',
+                        'sourcePath' : 'cleanedGraphPath',
                         'outputPath': 'blacklistedGraphPath'
                         }
                     </PARAM>

@@ -18,8 +18,12 @@
             <description>filter applied reading relations (by relClass)</description>
         </property>
         <property>
-            <name>maxRelations</name>
-            <description>maximum number of relations allowed for a each entity</description>
+            <name>sourceMaxRelations</name>
+            <description>maximum number of relations allowed for a each entity grouping by source</description>
+        </property>
+        <property>
+            <name>targetMaxRelations</name>
+            <description>maximum number of relations allowed for a each entity grouping by target</description>
         </property>
         <property>
             <name>otherDsTypeId</name>
@@ -133,7 +137,9 @@
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
-            <arg>--maxRelations</arg><arg>${maxRelations}</arg>
+            <arg>--sourceMaxRelations</arg><arg>${sourceMaxRelations}</arg>
+            <arg>--targetMaxRelations</arg><arg>${targetMaxRelations}</arg>
+            <arg>--relationFilter</arg><arg>${relationFilter}</arg>
             <arg>--relPartitions</arg><arg>5000</arg>
         </spark>
         <ok to="fork_join_related_entities"/>
@@ -165,7 +171,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -192,7 +198,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -219,7 +225,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -246,7 +252,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -273,7 +279,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -300,7 +306,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -327,7 +333,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -366,7 +372,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15360
+                --conf spark.sql.shuffle.partitions=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
@@ -394,7 +400,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
@@ -422,7 +428,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
@@ -450,7 +456,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
@@ -478,7 +484,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=8000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
@@ -506,7 +512,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
@@ -534,7 +540,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
@@ -572,9 +578,17 @@
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--otherDsTypeId</arg><arg>${otherDsTypeId}</arg>
         </spark>
-        <ok to="to_solr_index"/>
+        <ok to="should_index"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="should_index">
+        <switch>
+            <case to="to_solr_index">${wf:conf('shouldIndex') eq 'true'}</case>
+            <case to="End">${wf:conf('shouldIndex') eq 'false'}</case>
+            <default to="to_solr_index"/>
+        </switch>
+    </decision>
 
     <action name="to_solr_index">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -606,5 +620,4 @@
     </action>
 
     <end name="End"/>
-
 </workflow-app>

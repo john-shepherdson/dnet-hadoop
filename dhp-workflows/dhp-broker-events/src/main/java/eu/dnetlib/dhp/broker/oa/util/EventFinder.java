@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.dhp.broker.model.EventFactory;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.matchers.relatedDatasets.EnrichMissingDatasetIsReferencedBy;
@@ -37,7 +38,6 @@ import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreOpenAccess;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMorePid;
 import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMoreSubject;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public class EventFinder {
 
@@ -70,22 +70,22 @@ public class EventFinder {
 		matchers.add(new EnrichMissingDatasetReferences());
 		matchers.add(new EnrichMissingDatasetIsSupplementedTo());
 		matchers.add(new EnrichMissingDatasetIsSupplementedBy());
-		matchers.add(new EnrichMissingAbstract());
 	}
 
 	public static EventGroup generateEvents(final ResultGroup results,
 		final Set<String> dsIdWhitelist,
 		final Set<String> dsIdBlacklist,
 		final Set<String> dsTypeWhitelist,
-		final DedupConfig dedupConfig,
 		final Map<String, LongAccumulator> accumulators) {
 
 		final List<UpdateInfo<?>> list = new ArrayList<>();
 
 		for (final OaBrokerMainEntity target : results.getData()) {
-			if (verifyTarget(target, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist)) {
-				for (final UpdateMatcher<?> matcher : matchers) {
-					list.addAll(matcher.searchUpdatesForRecord(target, results.getData(), dedupConfig, accumulators));
+			for (final OaBrokerRelatedDatasource targetDs : target.getDatasources()) {
+				if (verifyTarget(targetDs, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist)) {
+					for (final UpdateMatcher<?> matcher : matchers) {
+						list.addAll(matcher.searchUpdatesForRecord(target, targetDs, results.getData(), accumulators));
+					}
 				}
 			}
 		}
@@ -93,17 +93,17 @@ public class EventFinder {
 		return asEventGroup(list);
 	}
 
-	private static boolean verifyTarget(final OaBrokerMainEntity target,
+	private static boolean verifyTarget(final OaBrokerRelatedDatasource target,
 		final Set<String> dsIdWhitelist,
 		final Set<String> dsIdBlacklist,
 		final Set<String> dsTypeWhitelist) {
 
-		if (dsIdWhitelist.contains(target.getCollectedFromId())) {
+		if (dsIdWhitelist.contains(target.getOpenaireId())) {
 			return true;
-		} else if (dsIdBlacklist.contains(target.getCollectedFromId())) {
+		} else if (dsIdBlacklist.contains(target.getOpenaireId())) {
 			return false;
 		} else {
-			return dsTypeWhitelist.contains(target.getCollectedFromType());
+			return dsTypeWhitelist.contains(target.getType());
 		}
 	}
 
