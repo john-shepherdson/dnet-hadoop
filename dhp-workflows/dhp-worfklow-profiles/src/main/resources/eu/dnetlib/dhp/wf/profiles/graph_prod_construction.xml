@@ -7,7 +7,7 @@
         <DATE_OF_CREATION value="2020-06-15T16:35:09+00:00"/>
     </HEADER>
     <BODY>
-        <WORKFLOW_NAME>Graph Construction [OCEAN]</WORKFLOW_NAME>
+        <WORKFLOW_NAME>Graph Construction [PROD]</WORKFLOW_NAME>
         <WORKFLOW_TYPE>Data Provision</WORKFLOW_TYPE>
         <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
         <CONFIGURATION start="manual">
@@ -413,7 +413,7 @@
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
                 </PARAMETERS>
                 <ARCS>
-                    <ARC to="graphCleaning"/>
+                    <ARC to="orcidPropagation"/>
                 </ARCS>
             </NODE>
 

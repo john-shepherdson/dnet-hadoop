@@ -1,0 +1,55 @@
+{
+  "Category": [
+    {
+      "Section": [
+        {
+          "Linklist": {
+            "Link": [
+              {
+                "LinkProvider": {
+                  "Name": "Europe PMC"
+                },
+                "Target": {
+                  "Publisher": {
+                    "Name": "Altmetric"
+                  },
+                  "ImageURL": "https://api.altmetric.com/v1/donut/58578459_64.png",
+                  "Identifier": {
+                    "ID": "https://www.altmetric.com/details/58578459",
+                    "IDScheme": "URL",
+                    "IDURL": "https://www.altmetric.com/details/58578459"
+                  },
+                  "Type": {
+                    "Name": "dataset"
+                  },
+                  "Title": "Optical clumped isotope thermometry of carbon dioxide"
+                },
+                "Source": {
+                  "Identifier": {
+                    "ID": "30886173",
+                    "IDScheme": "PMID"
+                  },
+                  "Type": {
+                    "Name": "literature"
+                  }
+                },
+                "PublicationDate": "06-04-2019",
+                "RelationshipType": {
+                  "Name": "IsReferencedBy"
+                },
+                "ObtainedBy": "ext_links"
+              }
+            ]
+          },
+          "ObtainedBy": "ext_links",
+          "SectionLinkCount": 1,
+          "Tags": [
+            "altmetrics"
+          ]
+        }
+      ],
+      "CategoryLinkCount": 1,
+      "Name": "Altmetric"
+    }
+  ]
+}
