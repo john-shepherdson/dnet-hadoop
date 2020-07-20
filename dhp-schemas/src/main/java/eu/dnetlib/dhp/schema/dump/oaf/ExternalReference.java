@@ -6,15 +6,13 @@ import java.util.Objects;
 
 import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
 
-//ExtraInfo
+//ExtraInfo renamed ExternalReference do not confuse with ExternalReference in oaf schema
 public class ExternalReference implements Serializable {
 	private String name;
 
 	private String typology;
 
-	private String provenance;
-
-	private String trust;
+	private Provenance provenance;
 
 	// json containing a Citation or Statistics
 	private String value;
@@ -35,20 +33,12 @@ public class ExternalReference implements Serializable {
 		this.typology = typology;
 	}
 
-	public String getProvenance() {
+	public Provenance getProvenance() {
 		return provenance;
 	}
 
-	public void setProvenance(String provenance) {
+	public void setProvenance(Provenance provenance) {
 		this.provenance = provenance;
-	}
-
-	public String getTrust() {
-		return trust;
-	}
-
-	public void setTrust(String trust) {
-		this.trust = trust;
 	}
 
 	public String getValue() {
@@ -64,8 +54,7 @@ public class ExternalReference implements Serializable {
 
 		er.name = ei.getName();
 		er.typology = ei.getTypology();
-		er.provenance = ei.getProvenance();
-		er.trust = ei.getTrust();
+		er.provenance = Provenance.newInstance(ei.getProvenance(), ei.getTrust());
 		er.value = ei.getValue();
 		return er;
 	}

@@ -1,11 +1,12 @@
 
-package eu.dnetlib.dhp.schema.dump.oaf;
+package eu.dnetlib.dhp.schema.dump.oaf.community;
 
-import java.util.List;
+import eu.dnetlib.dhp.schema.dump.oaf.Funder;
+import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 
-import eu.dnetlib.dhp.schema.oaf.Project;
+import java.io.Serializable;
 
-public class Projects {
+public class Project implements Serializable {
 
 	private String id;// OpenAIRE id
 	private String code;
@@ -15,6 +16,16 @@ public class Projects {
 	private String title;
 
 	private Funder funder;
+
+	private Provenance provenance;
+
+	public Provenance getProvenance() {
+		return provenance;
+	}
+
+	public void setProvenance(Provenance provenance) {
+		this.provenance = provenance;
+	}
 
 	public String getId() {
 		return id;
@@ -56,13 +67,13 @@ public class Projects {
 		this.funder = funders;
 	}
 
-	public static Projects newInstance(String id, String code, String acronym, String title, Funder funder) {
-		Projects projects = new Projects();
-		projects.setAcronym(acronym);
-		projects.setCode(code);
-		projects.setFunder(funder);
-		projects.setId(id);
-		projects.setTitle(title);
-		return projects;
+	public static Project newInstance(String id, String code, String acronym, String title, Funder funder) {
+		Project project = new Project();
+		project.setAcronym(acronym);
+		project.setCode(code);
+		project.setFunder(funder);
+		project.setId(id);
+		project.setTitle(title);
+		return project;
 	}
 }

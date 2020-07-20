@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf;
 
+import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,7 +16,7 @@ public abstract class OafEntity extends Oaf implements Serializable {
 
 	private String dateofcollection;
 
-	private List<Projects> projects;
+	private List<Project> projects;
 
 	public String getId() {
 		return id;
@@ -48,11 +50,11 @@ public abstract class OafEntity extends Oaf implements Serializable {
 		this.dateofcollection = dateofcollection;
 	}
 
-	public List<Projects> getProjects() {
+	public List<Project> getProjects() {
 		return projects;
 	}
 
-	public void setProjects(List<Projects> projects) {
+	public void setProjects(List<Project> projects) {
 		this.projects = projects;
 	}
 

@@ -16,7 +16,7 @@ public class Result extends OafEntity implements Serializable {
 
 	private List<Country> country;
 
-	private List<ControlledField> subject;
+	private List<Subject> subjects;
 
 	private String maintitle;
 
@@ -106,12 +106,12 @@ public class Result extends OafEntity implements Serializable {
 		this.country = country;
 	}
 
-	public List<ControlledField> getSubject() {
-		return subject;
+	public List<Subject> getSubjects() {
+		return subjects;
 	}
 
-	public void setSubject(List<ControlledField> subject) {
-		this.subject = subject;
+	public void setSubjects(List<Subject> subjects) {
+		this.subjects = subjects;
 	}
 
 	public String getMaintitle() {

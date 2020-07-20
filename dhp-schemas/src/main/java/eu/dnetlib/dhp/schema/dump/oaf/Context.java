@@ -4,13 +4,13 @@ package eu.dnetlib.dhp.schema.dump.oaf;
 import java.util.List;
 
 public class Context extends Qualifier {
-	private List<String> provenance;
+	private List<Provenance> provenance;
 
-	public List<String> getProvenance() {
+	public List<Provenance> getProvenance() {
 		return provenance;
 	}
 
-	public void setProvenance(List<String> provenance) {
+	public void setProvenance(List<Provenance> provenance) {
 		this.provenance = provenance;
 	}
 }

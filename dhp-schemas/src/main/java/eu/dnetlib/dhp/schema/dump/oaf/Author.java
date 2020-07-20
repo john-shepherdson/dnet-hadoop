@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.schema.dump.oaf;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
 
 public class Author implements Serializable {
 
@@ -15,7 +14,7 @@ public class Author implements Serializable {
 
 	private Integer rank;
 
-	private List<ControlledField> pid;
+	private List<Pid> pids;
 
 	private List<String> affiliation;
 
@@ -51,12 +50,12 @@ public class Author implements Serializable {
 		this.rank = rank;
 	}
 
-	public List<ControlledField> getPid() {
-		return pid;
+	public List<Pid> getPids() {
+		return pids;
 	}
 
-	public void setPid(List<ControlledField> pid) {
-		this.pid = pid;
+	public void setPids(List<Pid> pids) {
+		this.pids = pids;
 	}
 
 	public List<String> getAffiliation() {

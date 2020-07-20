@@ -57,21 +57,12 @@ public class SparkDumpCommunityProducts implements Serializable {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-//		final String dumpClassName = parser.get("dumpTableName");
-//		log.info("dumpClassName: {}", dumpClassName);
-
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
-
-//        final String resultType = parser.get("resultType");
-//        log.info("resultType: {}", resultType);
 
 		final Optional<String> cm = Optional.ofNullable(parser.get("communityMap"));
 
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
-//		Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result> dumpClazz = (Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result>) Class
-//			.forName(dumpClassName);
-
 		SparkConf conf = new SparkConf();
 
 		CommunityMap communityMap;

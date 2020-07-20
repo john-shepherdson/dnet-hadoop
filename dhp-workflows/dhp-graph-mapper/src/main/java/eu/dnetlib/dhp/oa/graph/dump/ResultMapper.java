@@ -5,10 +5,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.swing.text.html.Option;
-
-import org.apache.avro.generic.GenericData;
-
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -166,17 +162,9 @@ public class Mapper implements Serializable {
 						community_id = community_id.substring(0, community_id.indexOf("::"));
 					}
 					if (communities.contains(community_id)) {
-						// || communities.contains(c.getId().substring(0, c.getId().indexOf("::")))) {
 						Context context = new Context();
 						context.setCode(community_id);
 						context.setLabel(communityMap.get(community_id));
-//						if (!communityMap.containsKey(c.getId())) {
-//							context.setCode(c.getId().substring(0, c.getId().indexOf("::")));
-//							context.setLabel(communityMap.get(context.getCode()));
-//						} else {
-//							context.setCode(c.getId());
-//							context.setLabel(communityMap.get(c.getId()));
-//						}
 						Optional<List<DataInfo>> dataInfo = Optional.ofNullable(c.getDataInfo());
 						if (dataInfo.isPresent()) {
 							List<String> provenance = new ArrayList<>();
@@ -368,16 +356,18 @@ public class Mapper implements Serializable {
 				.ofNullable(input.getSource())
 				.ifPresent(value -> value.stream().forEach(s -> sourceList.add(s.getValue())));
 			// out.setSource(input.getSource().stream().map(s -> s.getValue()).collect(Collectors.toList()));
-			List<ControlledField> subjectList = new ArrayList<>();
-			Optional
-				.ofNullable(input.getSubject())
-				.ifPresent(
-					value -> value
-						.stream()
-						.forEach(
-							s -> subjectList
-								.add(ControlledField.newInstance(s.getQualifier().getClassid(), s.getValue()))));
-			out.setSubject(subjectList);
+			List<Subject> subjectList = new ArrayList<>();
+			Optional.ofNullable(input.getSubject())
+					.ifPresent(value -> value
+					.forEach(s->subjectList.add(getSubject(s))));
+
+			List<ExternalReference> erList = new ArrayList<>();
+			Optional.ofNullable(input.getExtraInfo())
+					.ifPresent(value -> value.forEach(
+							er -> erList.add(ExternalReference.newInstance(er))
+					));
+
+			out.setSubjects(subjectList);
 
 			out.setType(input.getResulttype().getClassid());
 		}
@@ -385,6 +375,19 @@ public class Mapper implements Serializable {
 		return out;
 	}
 
+	private static Subject getSubject(StructuredProperty s){
+		Subject subject = new Subject();
+		subject.setSubject(ControlledField.newInstance(s.getQualifier().getClassid(), s.getValue()));
+		Optional<DataInfo> di = Optional.of(s.getDataInfo());
+		Provenance p = new Provenance();
+		if (di.isPresent()){
+			p.setProvenance(di.get().getProvenanceaction().getClassname());
+			p.setTrust(di.get().getTrust());
+			subject.setProvenance(p);
+		}
+
+		return subject;
+	}
 	private static Author getAuthor(eu.dnetlib.dhp.schema.oaf.Author oa) {
 		Author a = new Author();
 		Optional
@@ -404,12 +407,26 @@ public class Mapper implements Serializable {
 			.ofNullable(oa.getPid())
 			.ifPresent(
 				value -> a
-					.setPid(
+					.setPids(
 						value
 							.stream()
-							.map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+							.map(p -> getPid(p))
 							.collect(Collectors.toList())));
 		return a;
+	}
+
+	private static Pid getPid(StructuredProperty p){
+		Pid pid = new Pid();
+		pid.setPid(ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()));
+		Optional<DataInfo> di = Optional.of(p.getDataInfo());
+		Provenance provenance = new Provenance();
+		if (di.isPresent()){
+			provenance.setProvenance(di.get().getProvenanceaction().getClassname());
+			provenance.setTrust(di.get().getTrust());
+			pid.setProvenance(provenance);
+		}
+
+		return pid;
 	}
 
 }

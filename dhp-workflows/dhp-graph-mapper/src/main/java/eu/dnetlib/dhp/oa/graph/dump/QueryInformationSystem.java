@@ -1,15 +1,15 @@
 
-package eu.dnetlib.dhp.oa.graph.dump;
+package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import java.io.StringReader;
 import java.util.List;
 
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
