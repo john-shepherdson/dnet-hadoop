@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump;
+package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.oa.graph.dump.QueryInformationSystem;
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;

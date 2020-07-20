@@ -12,12 +12,13 @@ import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class Mapper implements Serializable {
+public class ResultMapper implements Serializable {
 
-	public static <I extends eu.dnetlib.dhp.schema.oaf.Result> Result map(
-		I input, Map<String, String> communityMap) {
+	public static <I extends eu.dnetlib.dhp.schema.oaf.OafEntity> Result map(
+		I in, Map<String, String> communityMap) {
 
 		final Result out = new Result();
+		eu.dnetlib.dhp.schema.oaf.Result input = (eu.dnetlib.dhp.schema.oaf.Result)in;
 		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> ort = Optional.ofNullable(input.getResulttype());
 		if (ort.isPresent()) {
 			switch (ort.get().getClassid()) {
@@ -152,43 +153,46 @@ public class Mapper implements Serializable {
 						.map(cf -> KeyValue.newInstance(cf.getKey(), cf.getValue()))
 						.collect(Collectors.toList()));
 
-			Set<String> communities = communityMap.keySet();
-			List<Context> contextList = input
-				.getContext()
-				.stream()
-				.map(c -> {
-					String community_id = c.getId();
-					if (community_id.indexOf("::") > 0) {
-						community_id = community_id.substring(0, community_id.indexOf("::"));
-					}
-					if (communities.contains(community_id)) {
-						Context context = new Context();
-						context.setCode(community_id);
-						context.setLabel(communityMap.get(community_id));
-						Optional<List<DataInfo>> dataInfo = Optional.ofNullable(c.getDataInfo());
-						if (dataInfo.isPresent()) {
-							List<String> provenance = new ArrayList<>();
-							provenance
-								.addAll(
-									dataInfo
-										.get()
-										.stream()
-										.map(di -> {
-											if (di.getInferred()) {
-												return di.getProvenanceaction().getClassname();
-											}
-											return null;
-										})
-										.filter(Objects::nonNull)
-										.collect(Collectors.toSet()));
-							context.setProvenance(provenance);
-						}
-						return context;
-					}
-					return null;
-				})
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList());
+
+				Set<String> communities = communityMap.keySet();
+				List<Context> contextList = Optional.ofNullable(input
+						.getContext())
+						.map(value -> value.stream()
+						.map(c -> {
+							String community_id = c.getId();
+							if (community_id.indexOf("::") > 0) {
+								community_id = community_id.substring(0, community_id.indexOf("::"));
+							}
+							if (communities.contains(community_id)) {
+								Context context = new Context();
+								context.setCode(community_id);
+								context.setLabel(communityMap.get(community_id));
+								Optional<List<DataInfo>> dataInfo = Optional.ofNullable(c.getDataInfo());
+								if (dataInfo.isPresent()) {
+									List<Provenance> provenance = new ArrayList<>();
+									provenance
+											.addAll(
+													dataInfo
+															.get()
+															.stream()
+															.map(di -> {
+																if (di.getInferred()) {
+																	return Provenance.newInstance(di.getProvenanceaction().getClassname(), di.getTrust());
+																}
+																return null;
+															})
+															.filter(Objects::nonNull)
+															.collect(Collectors.toSet()));
+									context.setProvenance(provenance);
+								}
+								return context;
+							}
+							return null;
+						})
+						.filter(Objects::nonNull)
+						.collect(Collectors.toList()))
+						.orElse(new ArrayList<>());
+
 			if (contextList.size() > 0) {
 				out.setContext(contextList);
 			}
@@ -214,9 +218,9 @@ public class Mapper implements Serializable {
 									.ifPresent(
 										provenance -> country
 											.setProvenance(
-												provenance
+												Provenance.newInstance(provenance
 													.getProvenanceaction()
-													.getClassname()));
+													.getClassname(), c.getDataInfo().getTrust())));
 								countryList
 									.add(country);
 							}));
@@ -378,9 +382,9 @@ public class Mapper implements Serializable {
 	private static Subject getSubject(StructuredProperty s){
 		Subject subject = new Subject();
 		subject.setSubject(ControlledField.newInstance(s.getQualifier().getClassid(), s.getValue()));
-		Optional<DataInfo> di = Optional.of(s.getDataInfo());
-		Provenance p = new Provenance();
+		Optional<DataInfo> di = Optional.ofNullable(s.getDataInfo());
 		if (di.isPresent()){
+			Provenance p = new Provenance();
 			p.setProvenance(di.get().getProvenanceaction().getClassname());
 			p.setTrust(di.get().getTrust());
 			subject.setProvenance(p);

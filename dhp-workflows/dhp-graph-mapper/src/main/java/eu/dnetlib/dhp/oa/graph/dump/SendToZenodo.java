@@ -3,10 +3,8 @@ package eu.dnetlib.dhp.oa.graph.dump;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Arrays;
 
-import javax.management.Query;
-
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,10 +14,7 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
-import com.google.gson.Gson;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.dump.zenodo.*;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 
 public class SendToZenodo implements Serializable {

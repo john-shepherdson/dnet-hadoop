@@ -1,30 +1,18 @@
 
-package eu.dnetlib.dhp.oa.graph.dump;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import javax.management.Query;
-
+import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
+import eu.dnetlib.dhp.oa.graph.dump.QueryInformationSystem;
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import org.apache.commons.io.IOUtils;
-import org.apache.spark.SparkConf;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class SparkDumpCommunityProducts implements Serializable {
@@ -63,74 +51,18 @@ public class SparkDumpCommunityProducts implements Serializable {
 		final Optional<String> cm = Optional.ofNullable(parser.get("communityMap"));
 
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
-		SparkConf conf = new SparkConf();
 
-		CommunityMap communityMap;
+		queryInformationSystem = new QueryInformationSystem();
+		queryInformationSystem.setIsLookUp(Utils.getIsLookUpService(isLookUpUrl));
+		CommunityMap communityMap = queryInformationSystem.getCommunityMap();
 
-		if (!isLookUpUrl.equals("BASEURL:8280/is/services/isLookUp")) {
-			queryInformationSystem = new QueryInformationSystem();
-			queryInformationSystem.setIsLookUp(getIsLookUpService(isLookUpUrl));
-			communityMap = queryInformationSystem.getCommunityMap();
-		} else {
-			communityMap = new Gson().fromJson(cm.get(), CommunityMap.class);
-		}
+		DumpProducts dump = new DumpProducts();
 
-		runWithSparkSession(
-			conf,
-			isSparkSessionManaged,
-			spark -> {
-				Utils.removeOutputDir(spark, outputPath);
-				execDump(spark, inputPath, outputPath, communityMap, inputClazz);// , dumpClazz);
-
-			});
+		dump.run(isSparkSessionManaged, inputPath, outputPath, communityMap, inputClazz, false);
 
 	}
 
-	public static ISLookUpService getIsLookUpService(String isLookUpUrl) {
-		return ISLookupClientFactory.getLookUpService(isLookUpUrl);
-	}
 
-	public static <I extends Result, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> void execDump(SparkSession spark,
-		String inputPath,
-		String outputPath,
-		CommunityMap communityMap,
-		Class<I> inputClazz) {// Class<O> dumpClazz) {
 
-		// Set<String> communities = communityMap.keySet();
-		Dataset<I> tmp = Utils.readPath(spark, inputPath, inputClazz);
-
-		tmp
-			.map(value -> execMap(value, communityMap), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class))
-			.filter(Objects::nonNull)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
-
-	}
-
-	private static <I extends Result> eu.dnetlib.dhp.schema.dump.oaf.Result execMap(I value,
-		CommunityMap communityMap) {
-		{
-			Set<String> communities = communityMap.keySet();
-			Optional<List<Context>> inputContext = Optional.ofNullable(value.getContext());
-			if (!inputContext.isPresent()) {
-				return null;
-			}
-			List<String> toDumpFor = inputContext.get().stream().map(c -> {
-				if (communities.contains(c.getId())) {
-					return c.getId();
-				}
-				if (c.getId().contains("::") && communities.contains(c.getId().substring(0, c.getId().indexOf("::")))) {
-					return c.getId().substring(0, 3);
-				}
-				return null;
-			}).filter(Objects::nonNull).collect(Collectors.toList());
-			if (toDumpFor.size() == 0) {
-				return null;
-			}
-			return Mapper.map(value, communityMap);
-		}
-	}
 
 }

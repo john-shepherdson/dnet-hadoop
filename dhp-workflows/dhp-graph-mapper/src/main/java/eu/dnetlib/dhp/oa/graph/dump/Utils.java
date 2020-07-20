@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -23,5 +25,9 @@ public class Utils {
 			.read()
 			.textFile(inputPath)
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+	}
+
+	public static ISLookUpService getIsLookUpService(String isLookUpUrl) {
+		return ISLookupClientFactory.getLookUpService(isLookUpUrl);
 	}
 }

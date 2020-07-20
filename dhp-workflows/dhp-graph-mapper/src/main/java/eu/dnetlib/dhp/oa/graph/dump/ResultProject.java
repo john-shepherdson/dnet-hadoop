@@ -4,11 +4,11 @@ package eu.dnetlib.dhp.oa.graph.dump;
 import java.io.Serializable;
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.dump.oaf.Projects;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 
 public class ResultProject implements Serializable {
 	private String resultId;
-	private List<Projects> projectsList;
+	private List<Project> projectsList;
 
 	public String getResultId() {
 		return resultId;
@@ -18,11 +18,11 @@ public class ResultProject implements Serializable {
 		this.resultId = resultId;
 	}
 
-	public List<Projects> getProjectsList() {
+	public List<Project> getProjectsList() {
 		return projectsList;
 	}
 
-	public void setProjectsList(List<Projects> projectsList) {
+	public void setProjectsList(List<Project> projectsList) {
 		this.projectsList = projectsList;
 	}
 }

@@ -1,8 +1,11 @@
-package eu.dnetlib.dhp.oa.graph.dump.community;
+package eu.dnetlib.dhp.oa.graph.dump;
 
 import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.oaf.Context;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
@@ -21,7 +24,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class DumpProducts implements Serializable {
 
-    public void run(Boolean isSparkSessionManaged, String inputPath, String outputPath, CommunityMap communityMap, Class<? extends Result> inputClazz, boolean graph) {
+    public void run(Boolean isSparkSessionManaged, String inputPath, String outputPath, CommunityMap communityMap, Class<? extends OafEntity> inputClazz, boolean graph) {
 
         SparkConf conf = new SparkConf();
 
@@ -35,12 +38,12 @@ public class DumpProducts implements Serializable {
                 });
     }
 
-    public static <I extends Result, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> void execDump(SparkSession spark,
-                                                                                                    String inputPath,
-                                                                                                    String outputPath,
-                                                                                                    CommunityMap communityMap,
-                                                                                                    Class<I> inputClazz,
-                                                                                                    boolean graph) {
+    public static <I extends OafEntity, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> void execDump(SparkSession spark,
+                                                                                                       String inputPath,
+                                                                                                       String outputPath,
+                                                                                                       CommunityMap communityMap,
+                                                                                                       Class<I> inputClazz,
+                                                                                                       boolean graph) {
 
         Dataset<I> tmp = Utils.readPath(spark, inputPath, inputClazz);
 
@@ -54,14 +57,14 @@ public class DumpProducts implements Serializable {
 
     }
 
-    private static <I extends Result> eu.dnetlib.dhp.schema.dump.oaf.Result execMap(I value,
+    private static <I extends OafEntity> eu.dnetlib.dhp.schema.dump.oaf.Result execMap(I value,
                                                                                     CommunityMap communityMap,
                                                                                     boolean graph) {
 
         if (!graph) {
             Set<String> communities = communityMap.keySet();
 
-            Optional<List<Context>> inputContext = Optional.ofNullable(value.getContext());
+            Optional<List<Context>> inputContext = Optional.ofNullable(((eu.dnetlib.dhp.schema.oaf.Result)value).getContext());
             if (!inputContext.isPresent()) {
                 return null;
             }
