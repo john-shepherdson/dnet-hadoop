@@ -68,6 +68,10 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(p.getId());
+
+		assertTrue(p.getOriginalId().size() == 1);
+		assertEquals("10.3897/oneeco.2.e13718", p.getOriginalId().get(0));
+
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertFalse(p.getDataInfo().getInvisible());
@@ -169,6 +173,8 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
+		assertTrue(d.getOriginalId().size() == 1);
+		assertEquals("oai:zenodo.org:3234526", d.getOriginalId().get(0));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
