@@ -75,6 +75,7 @@ public class MappersTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertFalse(p.getDataInfo().getInvisible());
+		assertTrue(p.getSource().size() == 1);
 
 		assertTrue(p.getAuthor().size() > 0);
 		final Optional<Author> author = p
@@ -83,6 +84,7 @@ public class MappersTest {
 			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.findFirst();
 		assertTrue(author.isPresent());
+
 		final StructuredProperty pid = author
 			.get()
 			.getPid()
