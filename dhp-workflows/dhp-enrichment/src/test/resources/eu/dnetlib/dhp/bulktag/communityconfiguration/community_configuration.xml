@@ -17,23 +17,23 @@
     </community>
     <community id="ee">
         <subjects>
-            <subject>SDG13 - Climate action</subject>
-            <subject>SDG8 - Decent work and economic growth</subject>
-            <subject>SDG15 - Life on land</subject>
-            <subject>SDG2 - Zero hunger</subject>
-            <subject>SDG17 - Partnerships for the goals</subject>
-            <subject>SDG10 - Reduced inequalities</subject>
-            <subject>SDG5 - Gender equality</subject>
-            <subject>SDG12 - Responsible consumption and production</subject>
-            <subject>SDG14 - Life below water</subject>
-            <subject>SDG6 - Clean water and sanitation</subject>
-            <subject>SDG11 - Sustainable cities and communities</subject>
-            <subject>SDG1 - No poverty</subject>
-            <subject>SDG3 - Good health and well being</subject>
-            <subject>SDG7 - Affordable and clean energy</subject>
-            <subject>SDG4 - Quality education</subject>
-            <subject>SDG9 - Industry innovation and infrastructure</subject>
-            <subject>SDG16 - Peace justice and strong institutions</subject>
+            <subjects>SDG13 - Climate action</subjects>
+            <subjects>SDG8 - Decent work and economic growth</subjects>
+            <subjects>SDG15 - Life on land</subjects>
+            <subjects>SDG2 - Zero hunger</subjects>
+            <subjects>SDG17 - Partnerships for the goals</subjects>
+            <subjects>SDG10 - Reduced inequalities</subjects>
+            <subjects>SDG5 - Gender equality</subjects>
+            <subjects>SDG12 - Responsible consumption and production</subjects>
+            <subjects>SDG14 - Life below water</subjects>
+            <subjects>SDG6 - Clean water and sanitation</subjects>
+            <subjects>SDG11 - Sustainable cities and communities</subjects>
+            <subjects>SDG1 - No poverty</subjects>
+            <subjects>SDG3 - Good health and well being</subjects>
+            <subjects>SDG7 - Affordable and clean energy</subjects>
+            <subjects>SDG4 - Quality education</subjects>
+            <subjects>SDG9 - Industry innovation and infrastructure</subjects>
+            <subjects>SDG16 - Peace justice and strong institutions</subjects>
         </subjects>
         <providers/>
         <zenodocommunities>
@@ -55,24 +55,24 @@
     </community>
     <community id="ni">
         <subjects>
-            <subject>brain mapping</subject>
-            <subject>brain imaging</subject>
-            <subject>electroencephalography</subject>
-            <subject>arterial spin labelling</subject>
-            <subject>brain fingerprinting</subject>
-            <subject>brain</subject>
-            <subject>neuroimaging</subject>
-            <subject>Multimodal Brain Image Analysis</subject>
-            <subject>fMRI</subject>
-            <subject>neuroinformatics</subject>
-            <subject>fetal brain</subject>
-            <subject>brain ultrasonic imaging</subject>
-            <subject>topographic brain mapping</subject>
-            <subject>diffusion tensor imaging</subject>
-            <subject>computerized knowledge assessment</subject>
-            <subject>connectome mapping</subject>
-            <subject>brain magnetic resonance imaging</subject>
-            <subject>brain abnormalities</subject>
+            <subjects>brain mapping</subjects>
+            <subjects>brain imaging</subjects>
+            <subjects>electroencephalography</subjects>
+            <subjects>arterial spin labelling</subjects>
+            <subjects>brain fingerprinting</subjects>
+            <subjects>brain</subjects>
+            <subjects>neuroimaging</subjects>
+            <subjects>Multimodal Brain Image Analysis</subjects>
+            <subjects>fMRI</subjects>
+            <subjects>neuroinformatics</subjects>
+            <subjects>fetal brain</subjects>
+            <subjects>brain ultrasonic imaging</subjects>
+            <subjects>topographic brain mapping</subjects>
+            <subjects>diffusion tensor imaging</subjects>
+            <subjects>computerized knowledge assessment</subjects>
+            <subjects>connectome mapping</subjects>
+            <subjects>brain magnetic resonance imaging</subjects>
+            <subjects>brain abnormalities</subjects>
         </subjects>
         <providers>
             <datasource>
@@ -100,11 +100,11 @@
     </community>
     <community id="mes">
         <subjects>
-            <subject>marine</subject>
-            <subject>ocean</subject>
-            <subject>fish</subject>
-            <subject>aqua</subject>
-            <subject>sea</subject>
+            <subjects>marine</subjects>
+            <subjects>ocean</subjects>
+            <subjects>fish</subjects>
+            <subjects>aqua</subjects>
+            <subjects>sea</subjects>
         </subjects>
         <providers>
             <datasource>
@@ -116,23 +116,23 @@
     </community>
     <community id="aginfra">
         <subjects>
-            <subject>animal production and health</subject>
-            <subject>fisheries and aquaculture</subject>
-            <subject>food safety and human nutrition</subject>
-            <subject>information management</subject>
-            <subject>food technology</subject>
-            <subject>agri-food education and extension</subject>
-            <subject>natural resources and environment</subject>
-            <subject>food system</subject>
-            <subject>engineering technology and Research</subject>
-            <subject>agriculture</subject>
-            <subject>food safety risk assessment</subject>
-            <subject>food security</subject>
-            <subject>farming practices and systems</subject>
-            <subject>plant production and protection</subject>
-            <subject>agri-food economics and policy</subject>
-            <subject>food distribution</subject>
-            <subject>forestry</subject>
+            <subjects>animal production and health</subjects>
+            <subjects>fisheries and aquaculture</subjects>
+            <subjects>food safety and human nutrition</subjects>
+            <subjects>information management</subjects>
+            <subjects>food technology</subjects>
+            <subjects>agri-food education and extension</subjects>
+            <subjects>natural resources and environment</subjects>
+            <subjects>food system</subjects>
+            <subjects>engineering technology and Research</subjects>
+            <subjects>agriculture</subjects>
+            <subjects>food safety risk assessment</subjects>
+            <subjects>food security</subjects>
+            <subjects>farming practices and systems</subjects>
+            <subjects>plant production and protection</subjects>
+            <subjects>agri-food economics and policy</subjects>
+            <subjects>food distribution</subjects>
+            <subjects>forestry</subjects>
         </subjects>
         <providers>
             <datasource>
