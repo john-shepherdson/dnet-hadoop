@@ -2,7 +2,7 @@
     <parameters>
         <property>
             <name>projectFileURL</name>
-            <description>the url where to get the projects file</description>
+            <description>the url where to get the project file</description>
         </property>
 
         <property>
@@ -36,7 +36,7 @@
             <main-class>eu.dnetlib.dhp.actionmanager.project.csvutils.ReadCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${projectFileURL}</arg>
-            <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/project</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProject</arg>
         </java>
         <ok to="get_programme_file"/>
@@ -109,7 +109,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--projectPath</arg><arg>${workingDir}/projects</arg>
+            <arg>--projectPath</arg><arg>${workingDir}/project</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedProjects</arg>
             <arg>--dbProjectPath</arg><arg>${workingDir}/dbProjects</arg>
         </spark>
