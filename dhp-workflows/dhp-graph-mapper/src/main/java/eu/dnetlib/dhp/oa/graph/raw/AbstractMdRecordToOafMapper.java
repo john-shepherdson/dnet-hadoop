@@ -32,7 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyTerm;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.sql.sources.In;
+import org.apache.zookeeper.Op;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
@@ -99,7 +103,6 @@ public abstract class AbstractMdRecordToOafMapper {
 			final Document doc = DocumentHelper
 				.parseText(xml.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3));
 
-			final String type = doc.valueOf("//dr:CobjCategory/@type");
 			final KeyValue collectedFrom = getProvenanceDatasource(
 				doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
 
@@ -118,10 +121,30 @@ public abstract class AbstractMdRecordToOafMapper {
 			final DataInfo info = prepareDataInfo(doc, invisible);
 			final long lastUpdateTimestamp = new Date().getTime();
 
-			return createOafs(doc, type, collectedFrom, hostedBy, info, lastUpdateTimestamp);
+			final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+
+			final String type = getResultType(doc, instances);
+
+			return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	protected String getResultType(final Document doc, final List<Instance> instances) {
+		String type = doc.valueOf("//dr:CobjCategory/@type");
+
+		if (StringUtils.isBlank(type) & vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
+			String instanceType = instances
+					.stream()
+					.map(i -> i.getInstancetype().getClassid())
+					.findFirst()
+					.orElse("0000"); // Unknown
+			Qualifier resultType = vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType);
+			return resultType.getClassid();
+		}
+
+		return type;
 	}
 
 	private KeyValue getProvenanceDatasource(final Document doc, final String xpathId, final String xpathName) {
@@ -138,8 +161,8 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected List<Oaf> createOafs(
 		final Document doc,
 		final String type,
+		final List<Instance> instances,
 		final KeyValue collectedFrom,
-		final KeyValue hostedBy,
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
 
@@ -148,14 +171,14 @@ public abstract class AbstractMdRecordToOafMapper {
 		switch (type.toLowerCase()) {
 			case "publication":
 				final Publication p = new Publication();
-				populateResultFields(p, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
+				populateResultFields(p, doc, instances, collectedFrom, info, lastUpdateTimestamp);
 				p.setResulttype(PUBLICATION_DEFAULT_RESULTTYPE);
 				p.setJournal(prepareJournal(doc, info));
 				oafs.add(p);
 				break;
 			case "dataset":
 				final Dataset d = new Dataset();
-				populateResultFields(d, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
+				populateResultFields(d, doc, instances, collectedFrom, info, lastUpdateTimestamp);
 				d.setResulttype(DATASET_DEFAULT_RESULTTYPE);
 				d.setStoragedate(prepareDatasetStorageDate(doc, info));
 				d.setDevice(prepareDatasetDevice(doc, info));
@@ -168,7 +191,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				break;
 			case "software":
 				final Software s = new Software();
-				populateResultFields(s, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
+				populateResultFields(s, doc, instances, collectedFrom, info, lastUpdateTimestamp);
 				s.setResulttype(SOFTWARE_DEFAULT_RESULTTYPE);
 				s.setDocumentationUrl(prepareSoftwareDocumentationUrls(doc, info));
 				s.setLicense(prepareSoftwareLicenses(doc, info));
@@ -180,7 +203,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			case "otherresearchproducts":
 			default:
 				final OtherResearchProduct o = new OtherResearchProduct();
-				populateResultFields(o, doc, collectedFrom, hostedBy, info, lastUpdateTimestamp);
+				populateResultFields(o, doc, instances, collectedFrom, info, lastUpdateTimestamp);
 				o.setResulttype(ORP_DEFAULT_RESULTTYPE);
 				o.setContactperson(prepareOtherResearchProductContactPersons(doc, info));
 				o.setContactgroup(prepareOtherResearchProductContactGroups(doc, info));
@@ -259,8 +282,8 @@ public abstract class AbstractMdRecordToOafMapper {
 	private void populateResultFields(
 		final Result r,
 		final Document doc,
+		final List<Instance> instances,
 		final KeyValue collectedFrom,
-		final KeyValue hostedBy,
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
 		r.setDataInfo(info);
@@ -293,7 +316,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setCoverage(prepareCoverages(doc, info));
 		r.setContext(prepareContexts(doc, info));
 		r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
-		final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+
 		r.setInstance(instances);
 		r.setBestaccessright(getBestAccessRights(instances));
 	}

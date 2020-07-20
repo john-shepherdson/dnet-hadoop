@@ -6,12 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,19 +39,19 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 public class MappersTest {
 
 	@Mock
+	private ISLookUpService isLookUpService;
+
+	@Mock
 	private VocabularyGroup vocs;
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		when(vocs.getTermAsQualifier(anyString(), anyString()))
-			.thenAnswer(
-				invocation -> OafMapperUtils
-					.qualifier(
-						invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0),
-						invocation.getArgument(0)));
+		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
+		lenient()
+				.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
+				.thenReturn(synonyms());
 
-		when(vocs.termExists(anyString(), anyString())).thenReturn(true);
-
+		vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
 	}
 
 	@Test
@@ -269,4 +272,15 @@ public class MappersTest {
 		assertEquals(':', id.charAt(15));
 		assertEquals(':', id.charAt(16));
 	}
+
+	private List<String> vocs() throws IOException {
+		return IOUtils
+				.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+	}
+
+	private List<String> synonyms() throws IOException {
+		return IOUtils
+				.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+	}
+
 }

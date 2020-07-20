@@ -52,7 +52,8 @@
           subjectScheme="EDAM Ontology" valueURI="http://edamontology.org/topic_3534">Protein binding sites</datacite:subject>
       </datacite:subjects>
     </datacite:resource>
-    <dr:CobjCategory type="software">0029</dr:CobjCategory>
+    <!--<dr:CobjCategory type="software">0029</dr:CobjCategory>-->
+    <dr:CobjCategory>0029</dr:CobjCategory>
     <oaf:hostedBy id="rest________::bioTools" name="bio.tools"/>
     <oaf:collectedFrom id="rest________::bioTools" name="bio.tools"/>
     <oaf:dateAccepted>2018-06-06</oaf:dateAccepted>
