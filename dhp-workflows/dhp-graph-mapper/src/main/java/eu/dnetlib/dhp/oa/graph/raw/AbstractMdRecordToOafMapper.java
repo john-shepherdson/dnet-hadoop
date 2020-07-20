@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyTerm;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.sql.sources.In;
 import org.apache.zookeeper.Op;
@@ -43,7 +41,9 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyTerm;
 import eu.dnetlib.dhp.schema.common.LicenseComparator;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -136,10 +136,10 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		if (StringUtils.isBlank(type) & vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
 			String instanceType = instances
-					.stream()
-					.map(i -> i.getInstancetype().getClassid())
-					.findFirst()
-					.orElse("0000"); // Unknown
+				.stream()
+				.map(i -> i.getInstancetype().getClassid())
+				.findFirst()
+				.orElse("0000"); // Unknown
 			Qualifier resultType = vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType);
 			return resultType.getClassid();
 		}

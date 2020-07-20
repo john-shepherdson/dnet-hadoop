@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
 import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -34,6 +33,7 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
 public class MappersTest {
@@ -48,8 +48,8 @@ public class MappersTest {
 	public void setUp() throws Exception {
 		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
 		lenient()
-				.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
-				.thenReturn(synonyms());
+			.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
+			.thenReturn(synonyms());
 
 		vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
 	}
@@ -275,12 +275,12 @@ public class MappersTest {
 
 	private List<String> vocs() throws IOException {
 		return IOUtils
-				.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
-				.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 
 }
