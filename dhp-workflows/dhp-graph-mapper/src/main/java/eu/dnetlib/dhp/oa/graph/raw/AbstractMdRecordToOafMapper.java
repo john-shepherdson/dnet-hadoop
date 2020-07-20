@@ -266,7 +266,9 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setDataInfo(info);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
-		r.setOriginalId(Arrays.asList(doc.valueOf("//dri:objIdentifier")));
+
+		r.setOriginalId(Arrays.asList(findOriginalId(doc)));
+
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
 		r.setPid(prepareResultPids(doc, info));
 		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection"));
@@ -427,6 +429,18 @@ public abstract class AbstractMdRecordToOafMapper {
 			}
 		}
 		return null;
+	}
+
+	private String findOriginalId(final Document doc) {
+		final Node n = doc.selectSingleNode("//*[local-name()='provenance']/*[local-name()='originDescription']");
+		if (n != null) {
+			final String id = n.valueOf("./*[local-name()='identifier']");
+			if (StringUtils.isNotBlank(id)) {
+				return id;
+			}
+		}
+		return doc.valueOf("//*[local-name()='header']/*[local-name()='identifier']");
+
 	}
 
 	protected Qualifier prepareQualifier(final Node node, final String xpath, final String schemeId) {
