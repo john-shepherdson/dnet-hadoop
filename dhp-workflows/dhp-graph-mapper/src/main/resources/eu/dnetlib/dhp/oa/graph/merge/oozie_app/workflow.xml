@@ -13,6 +13,10 @@
             <name>graphOutputPath</name>
             <description>the output merged graph root path</description>
         </property>
+        <property>
+            <name>priority</name>
+            <description>decides from which infrastructure the content must win in case of ID clash</description>
+        </property>
 
         <property>
             <name>sparkDriverMemory</name>
@@ -88,6 +92,7 @@
             <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/publication</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>
@@ -114,6 +119,7 @@
             <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/dataset</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>
@@ -140,6 +146,7 @@
             <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/otherresearchproduct</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>
@@ -166,6 +173,7 @@
             <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/software</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>
@@ -192,6 +200,7 @@
             <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/datasource</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>
@@ -218,6 +227,7 @@
             <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/organization</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>
@@ -244,6 +254,7 @@
             <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/project</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>
@@ -266,11 +277,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-
             <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/relation</arg>
             <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/relation</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>

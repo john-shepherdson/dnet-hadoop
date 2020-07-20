@@ -28,5 +28,11 @@
 		"paramLongName": "graphTableClassName",
 		"paramDescription": "class name moelling the graph table",
 		"paramRequired": true
+	},
+	{
+		"paramName": "pr",
+		"paramLongName": "priority",
+		"paramDescription": "decides from which infrastructure the content must win in case of ID clash",
+		"paramRequired": false
 	}
 ]

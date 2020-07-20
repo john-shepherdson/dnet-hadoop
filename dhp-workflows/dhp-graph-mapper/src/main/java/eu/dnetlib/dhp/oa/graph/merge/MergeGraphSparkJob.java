@@ -37,6 +37,8 @@ public class MergeGraphSparkJob {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+	private static final String PRIORITY_DEFAULT = "BETA"; // BETA | PROD
+
 	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
@@ -46,6 +48,11 @@ public class MergeGraphSparkJob {
 						"/eu/dnetlib/dhp/oa/graph/merge_graphs_parameters.json"));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
+
+		String priority = Optional
+			.ofNullable(parser.get("priority"))
+			.orElse(PRIORITY_DEFAULT);
+		log.info("priority: {}", priority);
 
 		Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
@@ -76,12 +83,13 @@ public class MergeGraphSparkJob {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				mergeGraphTable(spark, betaInputPath, prodInputPath, entityClazz, entityClazz, outputPath);
+				mergeGraphTable(spark, priority, betaInputPath, prodInputPath, entityClazz, entityClazz, outputPath);
 			});
 	}
 
 	private static <P extends Oaf, B extends Oaf> void mergeGraphTable(
 		SparkSession spark,
+		String priority,
 		String betaInputPath,
 		String prodInputPath,
 		Class<P> p_clazz,
@@ -96,19 +104,39 @@ public class MergeGraphSparkJob {
 			.map((MapFunction<Tuple2<Tuple2<String, P>, Tuple2<String, B>>, P>) value -> {
 				Optional<P> p = Optional.ofNullable(value._1()).map(Tuple2::_2);
 				Optional<B> b = Optional.ofNullable(value._2()).map(Tuple2::_2);
-				if (b.isPresent() & !p.isPresent()) {
-					return (P)b.get();
+				switch (priority) {
+					default:
+					case "BETA":
+						return mergeWithPriorityToBETA(p, b);
+					case "PROD":
+						return mergeWithPriorityToPROD(p, b);
 				}
-				if (p.isPresent()) {
-					return p.get();
-				}
-				return null;
 			}, Encoders.bean(p_clazz))
 			.filter((FilterFunction<P>) Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+	}
+
+	private static <P extends Oaf, B extends Oaf> P mergeWithPriorityToPROD(Optional<P> p, Optional<B> b) {
+		if (b.isPresent() & !p.isPresent()) {
+			return (P) b.get();
+		}
+		if (p.isPresent()) {
+			return p.get();
+		}
+		return null;
+	}
+
+	private static <P extends Oaf, B extends Oaf> P mergeWithPriorityToBETA(Optional<P> p, Optional<B> b) {
+		if (p.isPresent() & !b.isPresent()) {
+			return p.get();
+		}
+		if (b.isPresent()) {
+			return (P) b.get();
+		}
+		return null;
 	}
 
 	private static <T extends Oaf> Dataset<Tuple2<String, T>> readTableFromPath(
