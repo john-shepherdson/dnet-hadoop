@@ -1,67 +1,21 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.keyValue;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.oaiIProvenance;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.NOT_AVAILABLE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
+import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.sql.sources.In;
-import org.apache.zookeeper.Op;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyTerm;
 import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Context;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public abstract class AbstractMdRecordToOafMapper {
 
