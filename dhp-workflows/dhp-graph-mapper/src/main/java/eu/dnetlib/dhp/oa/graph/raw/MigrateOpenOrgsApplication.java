@@ -9,12 +9,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 public class MigrateOpenOrgsApplication extends AbstractDbApplication {
 
-	public MigrateOpenOrgsApplication(final String hdfsPath, final String dbUrl, final String dbUser,
-		final String dbPassword, final String isLookupUrl)
-		throws Exception {
-		super(hdfsPath, dbUrl, dbUser, dbPassword, isLookupUrl);
-	}
-
 	private static final Logger log = LoggerFactory.getLogger(MigrateOpenOrgsApplication.class);
 
 	public static final String SOURCE_TYPE = "source_type";
@@ -47,7 +41,7 @@ public class MigrateOpenOrgsApplication extends AbstractDbApplication {
 		try (final MigrateOpenOrgsApplication mapper = new MigrateOpenOrgsApplication(hdfsPath, dbUrl, dbUser,
 			dbPassword, isLookupUrl)) {
 
-			log.info("Processing orgs...");
+			log.info("Processing open orgs...");
 			mapper.execute("queryOrganizationsFromOpenOrgsDB.sql", mapper::processOrganization);
 
 			log.info("Processing simrels...");
@@ -55,6 +49,13 @@ public class MigrateOpenOrgsApplication extends AbstractDbApplication {
 
 			log.info("All done.");
 		}
+
+	}
+
+	public MigrateOpenOrgsApplication(final String hdfsPath, final String dbUrl, final String dbUser,
+		final String dbPassword, final String isLookupUrl)
+		throws Exception {
+		super(hdfsPath, dbUrl, dbUser, dbPassword, isLookupUrl);
 	}
 
 }

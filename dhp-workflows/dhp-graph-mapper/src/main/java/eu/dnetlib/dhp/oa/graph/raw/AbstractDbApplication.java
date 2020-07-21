@@ -85,10 +85,17 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 		final String hdfsPath, final String dbUrl, final String dbUser, final String dbPassword,
 		final String isLookupUrl)
 		throws Exception {
-
+		super(hdfsPath);
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
-		this.lastUpdateTimestamp = new Date().getTime();
 		this.vocs = VocabularyGroup.loadVocsFromIS(ISLookupClientFactory.getLookUpService(isLookupUrl));
+		this.lastUpdateTimestamp = new Date().getTime();
+	}
+
+	protected AbstractDbApplication(final DbClient dbClient, final VocabularyGroup vocs) { // ONLY FOT TESTS
+		super();
+		this.dbClient = dbClient;
+		this.vocs = vocs;
+		this.lastUpdateTimestamp = new Date().getTime();
 	}
 
 	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer)
@@ -164,6 +171,7 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 	}
 
 	public List<Oaf> processProject(final ResultSet rs) {
+
 		try {
 			final DataInfo info = prepareDataInfo(rs);
 
@@ -219,6 +227,7 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 	}
 
 	public List<Oaf> processOrganization(final ResultSet rs) {
+
 		try {
 			final DataInfo info = prepareDataInfo(rs);
 
@@ -238,7 +247,7 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 			o.setOaiprovenance(null); // Values not present in the DB
 			o.setLegalshortname(field(rs.getString("legalshortname"), info));
 			o.setLegalname(field(rs.getString("legalname"), info));
-			o.setAlternativeNames(new ArrayList<>()); // Values not returned by the SQL query
+			o.setAlternativeNames(prepareListFields(rs.getArray("alternativenames"), info));
 			o.setWebsiteurl(field(rs.getString("websiteurl"), info));
 			o.setLogourl(field(rs.getString("logourl"), info));
 			o.setEclegalbody(field(Boolean.toString(rs.getBoolean("eclegalbody")), info));

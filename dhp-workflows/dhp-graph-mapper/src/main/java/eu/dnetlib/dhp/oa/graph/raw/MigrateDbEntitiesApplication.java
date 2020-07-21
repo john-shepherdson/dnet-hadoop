@@ -6,14 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.DbClient;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 
 public class MigrateDbEntitiesApplication extends AbstractDbApplication {
-
-	public MigrateDbEntitiesApplication(final String hdfsPath, final String dbUrl, final String dbUser,
-		final String dbPassword, final String isLookupUrl)
-		throws Exception {
-		super(hdfsPath, dbUrl, dbUser, dbPassword, isLookupUrl);
-	}
 
 	private static final Logger log = LoggerFactory.getLogger(MigrateDbEntitiesApplication.class);
 
@@ -78,6 +74,16 @@ public class MigrateDbEntitiesApplication extends AbstractDbApplication {
 			}
 			log.info("All done.");
 		}
+	}
+
+	public MigrateDbEntitiesApplication(final String hdfsPath, final String dbUrl, final String dbUser,
+		final String dbPassword, final String isLookupUrl)
+		throws Exception {
+		super(hdfsPath, dbUrl, dbUser, dbPassword, isLookupUrl);
+	}
+
+	protected MigrateDbEntitiesApplication(final DbClient dbClient, final VocabularyGroup vocs) { // ONLY FOT TESTS
+		super(dbClient, vocs);
 	}
 
 }

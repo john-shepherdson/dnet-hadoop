@@ -27,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -47,6 +48,9 @@ public class MigrateDbEntitiesApplicationTest {
 	@Mock
 	private VocabularyGroup vocs;
 
+	@Mock
+	private DbClient dbClient;
+
 	@BeforeEach
 	public void setUp() {
 		lenient()
@@ -59,7 +63,7 @@ public class MigrateDbEntitiesApplicationTest {
 
 		lenient().when(vocs.termExists(anyString(), anyString())).thenReturn(true);
 
-		this.app = new MigrateDbEntitiesApplication(vocs);
+		this.app = new MigrateDbEntitiesApplication(dbClient, vocs);
 	}
 
 	@Test
