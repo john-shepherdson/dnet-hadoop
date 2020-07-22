@@ -1,0 +1,97 @@
+<workflow-app name="Create EBI Dataset" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>workingPath</name>
+            <description>the Working Path</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
+    </parameters>
+
+    <start to="GenerateUpdates"/>
+
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+    <action name="GenerateBaselineDataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Baselnie DataSet</name>
+
+            <class>eu.dnetlib.dhp.sx.ebi.SparkCreateBaselineDataFrame</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=1
+                --driver-memory=${sparkDriverMemory}
+                --executor-cores=${sparkExecutorCores}
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="GenerateUpdates">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Baselnie DataSet</name>
+
+            <class>eu.dnetlib.dhp.sx.ebi.SparkAddLinkUpdates</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=1
+                --driver-memory=${sparkDriverMemory}
+                --executor-cores=${sparkExecutorCores}
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="CreateEBIDataSet">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create EBI DataSet</name>
+
+            <class>eu.dnetlib.dhp.sx.ebi.SparkCreateEBIDataFrame</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=1000
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>
