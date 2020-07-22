@@ -45,7 +45,7 @@ public class MigrateOpenOrgsApplication extends AbstractDbApplication {
 			mapper.execute("queryOrganizationsFromOpenOrgsDB.sql", mapper::processOrganization);
 
 			log.info("Processing simrels...");
-			// smdbe.execute("querySimilarityFromOpenOrgsDB.sql", smdbe::xxxx);
+			mapper.execute("querySimilarityFromOpenOrgsDB.sql", mapper::processOrgOrgSimRels);
 
 			log.info("All done.");
 		}

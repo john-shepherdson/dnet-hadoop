@@ -60,7 +60,7 @@ SELECT
 	false                                                                   AS ecsmevalidated,
 	false                                                                   AS inferred,
 	false                                                                   AS deletedbyinference,
-	0.88                                                                    AS trust,
+	0.5                                                                     AS trust,
 	''                                                                      AS inferenceprovenance,
 	'openaire____::openorgs'                                                AS collectedfromid,
 	'OpenOrgs Database'                                                     AS collectedfromname,

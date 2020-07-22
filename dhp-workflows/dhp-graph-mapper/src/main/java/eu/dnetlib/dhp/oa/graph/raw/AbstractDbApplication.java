@@ -75,6 +75,10 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 	public static final String SOURCE_TYPE = "source_type";
 	public static final String TARGET_TYPE = "target_type";
 
+	private static final String ORG_ORG_RELTYPE = "organizationOrganization";
+	private static final String ORG_ORG_SUBRELTYPE = "dedup";
+	private static final String ORG_ORG_CLASS = "isSimilarTo";
+
 	private final DbClient dbClient;
 
 	private final long lastUpdateTimestamp;
@@ -418,6 +422,42 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 				return Arrays.asList(r1, r2);
 			}
 
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public List<Oaf> processOrgOrgSimRels(final ResultSet rs) {
+		try {
+			final DataInfo info = prepareDataInfo(rs); // TODO
+
+			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
+			final String orgId2 = createOpenaireId(40, rs.getString("id2"), true);
+
+			final List<KeyValue> collectedFrom = listKeyValues(
+				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
+
+			final Relation r1 = new Relation();
+			r1.setRelType(ORG_ORG_RELTYPE);
+			r1.setSubRelType(ORG_ORG_SUBRELTYPE);
+			r1.setRelClass(ORG_ORG_CLASS);
+			r1.setSource(orgId1);
+			r1.setTarget(orgId2);
+			r1.setCollectedfrom(collectedFrom);
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+
+			final Relation r2 = new Relation();
+			r2.setRelType(ORG_ORG_RELTYPE);
+			r2.setSubRelType(ORG_ORG_SUBRELTYPE);
+			r2.setRelClass(ORG_ORG_CLASS);
+			r2.setSource(orgId2);
+			r2.setTarget(orgId1);
+			r2.setCollectedfrom(collectedFrom);
+			r2.setDataInfo(info);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+
+			return Arrays.asList(r1, r2);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
