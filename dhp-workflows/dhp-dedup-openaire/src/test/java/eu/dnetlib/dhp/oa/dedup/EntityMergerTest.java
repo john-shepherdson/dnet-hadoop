@@ -22,10 +22,11 @@ public class EntityMergerTest implements Serializable {
 
 	List<Tuple2<String, Publication>> publications;
 	List<Tuple2<String, Publication>> publications2;
+	List<Tuple2<String, Publication>> publications3;
 
 	String testEntityBasePath;
 	DataInfo dataInfo;
-	String dedupId = "dedup_id";
+	String dedupId = "00|dedup_id::1";
 	Publication pub_top;
 
 	@BeforeEach
@@ -38,6 +39,8 @@ public class EntityMergerTest implements Serializable {
 
 		publications = readSample(testEntityBasePath + "/publication_merge.json", Publication.class);
 		publications2 = readSample(testEntityBasePath + "/publication_merge2.json", Publication.class);
+		publications3 = readSample(testEntityBasePath + "/publication_merge3.json", Publication.class);
+
 
 		pub_top = getTopPub(publications);
 
@@ -54,6 +57,9 @@ public class EntityMergerTest implements Serializable {
 			.entityMerger(dedupId, softwares.iterator(), 0, dataInfo, Software.class);
 
 		assertEquals(merged.getBestaccessright().getClassid(), "OPEN SOURCE");
+
+		assertEquals(merged.getId(), "00|dedup_doi___::0968af610a356656706657e4f234b340");
+
 	}
 
 	@Test
@@ -62,7 +68,8 @@ public class EntityMergerTest implements Serializable {
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications.iterator(), 0, dataInfo, Publication.class);
 
-		assertEquals(dedupId, pub_merged.getId());
+		// verify id
+		assertEquals(pub_merged.getId(), "00|dedup_doi___::0968af610a356656706657e4f234b340");
 
 		assertEquals(pub_merged.getJournal(), pub_top.getJournal());
 		assertEquals(pub_merged.getBestaccessright(), pub_top.getBestaccessright());
@@ -117,10 +124,24 @@ public class EntityMergerTest implements Serializable {
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications2.iterator(), 0, dataInfo, Publication.class);
 
+		// verify id
+		assertEquals(pub_merged.getId(), "00|dedup_doi___::0ca46ff10b2b4c756191719d85302b14");
+
 		assertEquals(pub_merged.getAuthor().size(), 27);
-		// insert assertions here
 
 	}
+
+	@Test
+	public void publicationMergerTest3() throws InstantiationException, IllegalAccessException {
+
+		Publication pub_merged = DedupRecordFactory
+				.entityMerger(dedupId, publications3.iterator(), 0, dataInfo, Publication.class);
+
+		// verify id
+		assertEquals(pub_merged.getId(), "00|dedup_doi___::0ca46ff10b2b4c756191719d85302b14");
+
+	}
+
 
 	public DataInfo setDI() {
 		DataInfo dataInfo = new DataInfo();

@@ -114,7 +114,7 @@ public class DatePicker {
 		}
 	}
 
-	private static boolean inRange(final String date) {
+	public static boolean inRange(final String date) {
 		final int year = Integer.parseInt(substringBefore(date, "-"));
 		return year >= YEAR_LB && year <= YEAR_UB;
 	}
