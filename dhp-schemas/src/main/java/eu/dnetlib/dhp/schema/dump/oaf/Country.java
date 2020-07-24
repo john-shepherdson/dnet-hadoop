@@ -21,7 +21,7 @@ public class Country extends Qualifier {
 		return c;
 	}
 
-	public static Country newInstance(String code, String label, String provenance, String trust){
+	public static Country newInstance(String code, String label, String provenance, String trust) {
 		return newInstance(code, label, Provenance.newInstance(provenance, trust));
 	}
 

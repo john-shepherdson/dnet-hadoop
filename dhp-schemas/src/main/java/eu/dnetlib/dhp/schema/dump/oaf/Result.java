@@ -4,7 +4,9 @@ package eu.dnetlib.dhp.schema.dump.oaf;
 import java.io.Serializable;
 import java.util.List;
 
-public class Result extends OafEntity implements Serializable {
+import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
+
+public class Result implements Serializable {
 
 	private List<Author> author;
 
@@ -40,8 +42,6 @@ public class Result extends OafEntity implements Serializable {
 
 	private AccessRight bestaccessright;
 
-	private List<Context> context;
-
 	private List<ExternalReference> externalReference;
 
 	private List<Instance> instance;
@@ -65,6 +65,56 @@ public class Result extends OafEntity implements Serializable {
 	private String version; // dataset
 
 	private List<GeoLocation> geolocation; // dataset
+
+	private String id;
+
+	private List<String> originalId;
+
+	private List<ControlledField> pid;
+
+	private String dateofcollection;
+
+	private Long lastupdatetimestamp;
+
+	public Long getLastupdatetimestamp() {
+		return lastupdatetimestamp;
+	}
+
+	public void setLastupdatetimestamp(Long lastupdatetimestamp) {
+		this.lastupdatetimestamp = lastupdatetimestamp;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public List<String> getOriginalId() {
+		return originalId;
+	}
+
+	public void setOriginalId(List<String> originalId) {
+		this.originalId = originalId;
+	}
+
+	public List<ControlledField> getPid() {
+		return pid;
+	}
+
+	public void setPid(List<ControlledField> pid) {
+		this.pid = pid;
+	}
+
+	public String getDateofcollection() {
+		return dateofcollection;
+	}
+
+	public void setDateofcollection(String dateofcollection) {
+		this.dateofcollection = dateofcollection;
+	}
 
 	public List<Author> getAuthor() {
 		return author;
@@ -200,14 +250,6 @@ public class Result extends OafEntity implements Serializable {
 
 	public void setBestaccessright(AccessRight bestaccessright) {
 		this.bestaccessright = bestaccessright;
-	}
-
-	public List<Context> getContext() {
-		return context;
-	}
-
-	public void setContext(List<Context> context) {
-		this.context = context;
 	}
 
 	public List<ExternalReference> getExternalReference() {
