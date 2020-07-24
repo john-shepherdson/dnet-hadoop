@@ -1,24 +1,32 @@
+
 package eu.dnetlib.dhp.schema.dump.oaf.graph;
 
 import java.io.Serializable;
 
 public class RelType implements Serializable {
-    private String name ; //relclass
-    private String type ; //subreltype
+	private String name; // relclass
+	private String type; // subreltype
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public static RelType newInstance(String name, String type) {
+		RelType rel = new RelType();
+		rel.name = name;
+		rel.type = type;
+		return rel;
+	}
 }

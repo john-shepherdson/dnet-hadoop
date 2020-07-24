@@ -1,10 +1,10 @@
 
 package eu.dnetlib.dhp.schema.dump.oaf.community;
 
+import java.io.Serializable;
+
 import eu.dnetlib.dhp.schema.dump.oaf.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
-
-import java.io.Serializable;
 
 public class Project implements Serializable {
 

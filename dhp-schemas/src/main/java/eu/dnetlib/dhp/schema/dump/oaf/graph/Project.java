@@ -1,173 +1,182 @@
+
 package eu.dnetlib.dhp.schema.dump.oaf.graph;
-
-
-
-
 
 import java.io.Serializable;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
+
 public class Project implements Serializable {
-    private String id;
-    private String websiteurl;
-    private String code;
-    private String acronym;
-    private String title;
-    private String startdate;
+	private String id;
+	private List<KeyValue> collectedfrom;
+	private String websiteurl;
+	private String code;
+	private String acronym;
+	private String title;
+	private String startdate;
 
-    private String enddate;
+	private String enddate;
 
-    private String callidentifier;
+	private String callidentifier;
 
-    private String keywords;
+	private String keywords;
 
-    private String duration;
+	private String duration;
 
-    private boolean openaccessmandateforpublications;
+	private boolean openaccessmandateforpublications;
 
-    private boolean openaccessmandatefordataset;
-    private List<String> subject;
-    private Funder funding;
+	private boolean openaccessmandatefordataset;
+	private List<String> subject;
 
-    private String summary;
+	private List<Funder> funding;
 
-    private Granted granted;
+	private String summary;
 
-    private Programme programme;
+	private Granted granted;
 
-    public String getId() {
-        return id;
-    }
+	private List<Programme> programme;
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public String getWebsiteurl() {
-        return websiteurl;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setWebsiteurl(String websiteurl) {
-        this.websiteurl = websiteurl;
-    }
+	public String getWebsiteurl() {
+		return websiteurl;
+	}
 
-    public String getCode() {
-        return code;
-    }
+	public void setWebsiteurl(String websiteurl) {
+		this.websiteurl = websiteurl;
+	}
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+	public String getCode() {
+		return code;
+	}
 
-    public String getAcronym() {
-        return acronym;
-    }
+	public void setCode(String code) {
+		this.code = code;
+	}
 
-    public void setAcronym(String acronym) {
-        this.acronym = acronym;
-    }
+	public String getAcronym() {
+		return acronym;
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public void setAcronym(String acronym) {
+		this.acronym = acronym;
+	}
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public String getStartdate() {
-        return startdate;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public void setStartdate(String startdate) {
-        this.startdate = startdate;
-    }
+	public String getStartdate() {
+		return startdate;
+	}
 
-    public String getEnddate() {
-        return enddate;
-    }
+	public void setStartdate(String startdate) {
+		this.startdate = startdate;
+	}
 
-    public void setEnddate(String enddate) {
-        this.enddate = enddate;
-    }
+	public String getEnddate() {
+		return enddate;
+	}
 
-    public String getCallidentifier() {
-        return callidentifier;
-    }
+	public void setEnddate(String enddate) {
+		this.enddate = enddate;
+	}
 
-    public void setCallidentifier(String callidentifier) {
-        this.callidentifier = callidentifier;
-    }
+	public String getCallidentifier() {
+		return callidentifier;
+	}
 
-    public String getKeywords() {
-        return keywords;
-    }
+	public void setCallidentifier(String callidentifier) {
+		this.callidentifier = callidentifier;
+	}
 
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
-    }
+	public String getKeywords() {
+		return keywords;
+	}
 
-    public String getDuration() {
-        return duration;
-    }
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
+	}
 
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
+	public String getDuration() {
+		return duration;
+	}
 
-    public boolean isOpenaccessmandateforpublications() {
-        return openaccessmandateforpublications;
-    }
+	public void setDuration(String duration) {
+		this.duration = duration;
+	}
 
-    public void setOpenaccessmandateforpublications(boolean openaccessmandateforpublications) {
-        this.openaccessmandateforpublications = openaccessmandateforpublications;
-    }
+	public boolean isOpenaccessmandateforpublications() {
+		return openaccessmandateforpublications;
+	}
 
-    public boolean isOpenaccessmandatefordataset() {
-        return openaccessmandatefordataset;
-    }
+	public void setOpenaccessmandateforpublications(boolean openaccessmandateforpublications) {
+		this.openaccessmandateforpublications = openaccessmandateforpublications;
+	}
 
-    public void setOpenaccessmandatefordataset(boolean openaccessmandatefordataset) {
-        this.openaccessmandatefordataset = openaccessmandatefordataset;
-    }
+	public boolean isOpenaccessmandatefordataset() {
+		return openaccessmandatefordataset;
+	}
 
-    public List<String> getSubject() {
-        return subject;
-    }
+	public void setOpenaccessmandatefordataset(boolean openaccessmandatefordataset) {
+		this.openaccessmandatefordataset = openaccessmandatefordataset;
+	}
 
-    public void setSubject(List<String> subject) {
-        this.subject = subject;
-    }
+	public List<String> getSubject() {
+		return subject;
+	}
 
-    public Funder getFunding() {
-        return funding;
-    }
+	public void setSubject(List<String> subject) {
+		this.subject = subject;
+	}
 
-    public void setFunding(Funder funding) {
-        this.funding = funding;
-    }
+	public List<Funder> getFunding() {
+		return funding;
+	}
 
-    public String getSummary() {
-        return summary;
-    }
+	public void setFunding(List<Funder> funding) {
+		this.funding = funding;
+	}
 
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
+	public String getSummary() {
+		return summary;
+	}
 
-    public Granted getGranted() {
-        return granted;
-    }
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
 
-    public void setGranted(Granted granted) {
-        this.granted = granted;
-    }
+	public Granted getGranted() {
+		return granted;
+	}
 
-    public Programme getProgramme() {
-        return programme;
-    }
+	public void setGranted(Granted granted) {
+		this.granted = granted;
+	}
 
-    public void setProgramme(Programme programme) {
-        this.programme = programme;
-    }
+	public List<Programme> getProgramme() {
+		return programme;
+	}
+
+	public void setProgramme(List<Programme> programme) {
+		this.programme = programme;
+	}
+
+	public List<KeyValue> getCollectedfrom() {
+		return collectedfrom;
+	}
+
+	public void setCollectedfrom(List<KeyValue> collectedfrom) {
+		this.collectedfrom = collectedfrom;
+	}
 }
