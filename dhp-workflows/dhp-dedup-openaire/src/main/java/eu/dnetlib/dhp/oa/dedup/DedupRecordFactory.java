@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.dedup;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang.StringUtils;
@@ -75,8 +76,6 @@ public class DedupRecordFactory {
 		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo, Class<T> clazz)
 		throws IllegalAccessException, InstantiationException {
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
 		T entity = clazz.newInstance();
 
 		final Collection<String> dates = Lists.newArrayList();
@@ -88,9 +87,8 @@ public class DedupRecordFactory {
 				t -> {
 					T duplicate = t._2();
 
-					StructuredProperty bestPid = bestPid(duplicate.getPid());
-					if (bestPid != null)
-						bestPids.add(new Identifier(bestPid, extractDate(duplicate, sdf), PidType.classidValueOf(bestPid.getQualifier().getClassid())));
+					//prepare the list of pids to use for the id generation
+					bestPids.addAll(IdGenerator.bestPidtoIdentifier(duplicate));
 
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
@@ -109,11 +107,7 @@ public class DedupRecordFactory {
 			((Result) entity).setAuthor(AuthorMerger.merge(authors));
 		}
 
-		Identifier bestPid = winnerPid(bestPids);
-		if (bestPid == null)
-			entity.setId(id);
-		else
-			entity.setId(id.split("\\|")[0] + "|" + createPrefix(bestPid.getPid().getQualifier().getClassid()) + "::" + DedupUtility.md5(bestPid.getPid().getValue()));
+		entity.setId(IdGenerator.generate(bestPids, id));
 
 		entity.setLastupdatetimestamp(ts);
 		entity.setDataInfo(dataInfo);
@@ -121,61 +115,5 @@ public class DedupRecordFactory {
 		return entity;
 	}
 
-	//pick the best pid from the list (consider date and pidtype)
-	public static Identifier winnerPid(List<Identifier> pids) {
-		if (pids == null || pids.size() == 0)
-			return null;
-		Optional<Identifier> bp = pids.stream()
-				.filter(pid -> pid.getType() != PidType.undefined)
-				.max(Identifier::compareTo);
-		return bp.orElse(null);
-	}
-
-	//pick the best pid from the entity
-	public static StructuredProperty bestPid(List<StructuredProperty> pids) {
-
-		if (pids == null || pids.size() == 0)
-			return null;
-		Optional<StructuredProperty> bp = pids.stream()
-				.filter(pid -> PidType.classidValueOf(pid.getQualifier().getClassid()) != PidType.undefined)
-				.max(Comparator.comparing(pid -> PidType.classidValueOf(pid.getQualifier().getClassid())));
-
-		return bp.orElse(null);
-	}
-
-	//create the prefix (length = 12): dedup_+ pidType
-	public static String createPrefix(String pidType) {
-
-		StringBuilder prefix = new StringBuilder("dedup_" + pidType);
-
-		while (prefix.length() < 12) {
-			prefix.append("_");
-		}
-		return prefix.toString().substring(0, 12);
-
-	}
-
-	//extracts the date from the record. If the date is not available or is not wellformed, it returns a base date: 00-01-01
-	public static <T extends OafEntity> Date extractDate(T duplicate, SimpleDateFormat sdf){
-
-		String date = "2000-01-01";
-		if (ModelSupport.isSubClass(duplicate, Result.class)) {
-			Result result = (Result) duplicate;
-			if (isWellformed(result.getDateofacceptance())){
-				date = result.getDateofacceptance().getValue();
-			}
-		}
-
-		try {
-			return sdf.parse(date);
-		} catch (ParseException e) {
-			return new Date();
-		}
-
-	}
-
-	public static boolean isWellformed(Field<String> date) {
-		return date != null && StringUtils.isNotBlank(date.getValue()) && date.getValue().matches("\\d{4}-\\d{2}-\\d{2}") && DatePicker.inRange(date.getValue());
-	}
 
 }
