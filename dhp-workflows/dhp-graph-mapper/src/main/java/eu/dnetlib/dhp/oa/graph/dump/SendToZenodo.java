@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.graph.dump;
 import java.io.File;
 import java.io.Serializable;
 
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,6 +14,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 
 public class SendToZenodo implements Serializable {
@@ -57,7 +57,7 @@ public class SendToZenodo implements Serializable {
 
 			Path p = fileStatus.getPath();
 			String p_string = p.toString();
-			if(!p_string.endsWith("_SUCCESS")){
+			if (!p_string.endsWith("_SUCCESS")) {
 				String tmp = p_string.substring(0, p_string.lastIndexOf("/"));
 				String community = tmp.substring(tmp.lastIndexOf("/") + 1);
 				log.info("Sending information for community: " + community);
