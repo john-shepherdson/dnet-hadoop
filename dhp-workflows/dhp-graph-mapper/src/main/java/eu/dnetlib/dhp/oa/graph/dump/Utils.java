@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -11,6 +9,10 @@ import org.apache.spark.sql.SparkSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.Constants;
+import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class Utils {
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -29,5 +31,13 @@ public class Utils {
 
 	public static ISLookUpService getIsLookUpService(String isLookUpUrl) {
 		return ISLookupClientFactory.getLookUpService(isLookUpUrl);
+	}
+
+	public static String getContextId(String id) {
+
+		return String
+			.format(
+				"%s|%s::%s", eu.dnetlib.dhp.schema.dump.oaf.graph.Constants.CONTEXT_ID, Constants.CONTEXT_NS_PREFIX,
+				DHPUtils.md5(id));
 	}
 }
