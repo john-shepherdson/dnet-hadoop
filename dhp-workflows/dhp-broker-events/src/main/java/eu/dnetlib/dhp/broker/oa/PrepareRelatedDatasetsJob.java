@@ -9,7 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +54,8 @@ public class PrepareRelatedDatasetsJob {
 
 			ClusterUtils.removeDir(spark, relsPath);
 
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_rels");
+
 			final Dataset<OaBrokerRelatedDataset> datasets = ClusterUtils
 				.readPath(spark, graphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class)
 				.filter(d -> !ClusterUtils.isDedupRoot(d.getId()))
@@ -67,16 +69,15 @@ public class PrepareRelatedDatasetsJob {
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
-			rels
+			final Dataset<RelatedDataset> dataset = rels
 				.joinWith(datasets, datasets.col("openaireId").equalTo(rels.col("target")), "inner")
 				.map(t -> {
 					final RelatedDataset rel = new RelatedDataset(t._1.getSource(), t._2);
 					rel.getRelDataset().setRelType(t._1.getRelClass());
 					return rel;
-				}, Encoders.bean(RelatedDataset.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.json(relsPath);
+				}, Encoders.bean(RelatedDataset.class));
+
+			ClusterUtils.save(dataset, relsPath, RelatedDataset.class, total);
 
 		});
 

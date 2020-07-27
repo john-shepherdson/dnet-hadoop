@@ -121,10 +121,6 @@ public class XmlRecordFactory implements Serializable {
 		}
 	}
 
-	private static OafEntity toOafEntity(TypedRow typedRow) {
-		return parseOaf(typedRow.getOaf(), typedRow.getType());
-	}
-
 	private static OafEntity parseOaf(final String json, final String type) {
 		try {
 			switch (EntityType.valueOf(type)) {
@@ -333,7 +329,7 @@ public class XmlRecordFactory implements Serializable {
 							.stream()
 							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("description", c.getValue()))
-							.collect(Collectors.toList()));
+							.collect(Collectors.toCollection(HashSet::new)));
 			}
 			if (r.getEmbargoenddate() != null) {
 				metadata
@@ -374,7 +370,7 @@ public class XmlRecordFactory implements Serializable {
 							.stream()
 							.filter(Objects::nonNull)
 							.map(c -> XmlSerializationUtils.asXmlElement("source", c.getValue()))
-							.collect(Collectors.toList()));
+							.collect(Collectors.toCollection(HashSet::new)));
 			}
 			if (r.getFormat() != null) {
 				metadata

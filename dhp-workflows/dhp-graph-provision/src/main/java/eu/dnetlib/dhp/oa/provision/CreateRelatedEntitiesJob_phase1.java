@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -118,10 +119,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 		Dataset<Tuple2<String, RelatedEntity>> entities = readPathEntity(spark, inputEntityPath, clazz)
 			.filter("dataInfo.invisible == false")
 			.map(
-				(MapFunction<E, RelatedEntity>) value -> asRelatedEntity(value, clazz),
-				Encoders.kryo(RelatedEntity.class))
-			.map(
-				(MapFunction<RelatedEntity, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), e),
+				(MapFunction<E, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), asRelatedEntity(e, clazz)),
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntity.class)))
 			.cache();
 
@@ -165,13 +163,24 @@ public class CreateRelatedEntitiesJob_phase1 {
 				Result result = (Result) entity;
 
 				if (result.getTitle() != null && !result.getTitle().isEmpty()) {
-					re.setTitle(result.getTitle().stream().findFirst().get());
+					final StructuredProperty title = result.getTitle().stream().findFirst().get();
+					title.setValue(StringUtils.left(title.getValue(), ProvisionConstants.MAX_TITLE_LENGTH));
+					re.setTitle(title);
 				}
 
 				re.setDateofacceptance(getValue(result.getDateofacceptance()));
 				re.setPublisher(getValue(result.getPublisher()));
 				re.setResulttype(result.getResulttype());
-				re.setInstances(result.getInstance());
+				if (Objects.nonNull(result.getInstance())) {
+					re
+						.setInstances(
+							result
+								.getInstance()
+								.stream()
+								.filter(Objects::nonNull)
+								.limit(ProvisionConstants.MAX_INSTANCES)
+								.collect(Collectors.toList()));
+				}
 
 				// TODO still to be mapped
 				// re.setCodeRepositoryUrl(j.read("$.coderepositoryurl"));

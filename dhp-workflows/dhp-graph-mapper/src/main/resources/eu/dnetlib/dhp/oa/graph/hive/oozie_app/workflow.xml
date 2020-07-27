@@ -282,6 +282,7 @@
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--numPartitions</arg><arg>100</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>

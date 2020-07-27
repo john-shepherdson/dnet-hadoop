@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.schema.common;
 
-import java.security.Key;
-
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;

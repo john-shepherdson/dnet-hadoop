@@ -7,11 +7,10 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.TypedColumn;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +51,8 @@ public class JoinStep2Job {
 
 			ClusterUtils.removeDir(spark, joinedEntitiesPath);
 
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_entities");
+
 			final Dataset<OaBrokerMainEntity> sources = ClusterUtils
 				.readPath(spark, workingPath + "/joinedEntities_step1", OaBrokerMainEntity.class);
 
@@ -61,16 +62,13 @@ public class JoinStep2Job {
 			final TypedColumn<Tuple2<OaBrokerMainEntity, RelatedSoftware>, OaBrokerMainEntity> aggr = new RelatedSoftwareAggregator()
 				.toColumn();
 
-			sources
+			final Dataset<OaBrokerMainEntity> dataset = sources
 				.joinWith(typedRels, sources.col("openaireId").equalTo(typedRels.col("source")), "left_outer")
-				.groupByKey(
-					(MapFunction<Tuple2<OaBrokerMainEntity, RelatedSoftware>, String>) t -> t._1.getOpenaireId(),
-					Encoders.STRING())
+				.groupByKey(t -> t._1.getOpenaireId(), Encoders.STRING())
 				.agg(aggr)
-				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.json(joinedEntitiesPath);
+				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class));
+
+			ClusterUtils.save(dataset, joinedEntitiesPath, OaBrokerMainEntity.class, total);
 
 		});
 

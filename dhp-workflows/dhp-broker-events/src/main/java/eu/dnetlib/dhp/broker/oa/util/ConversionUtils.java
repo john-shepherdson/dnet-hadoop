@@ -22,11 +22,13 @@ import eu.dnetlib.broker.objects.OaBrokerJournal;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.broker.objects.OaBrokerProject;
 import eu.dnetlib.broker.objects.OaBrokerRelatedDataset;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.ExternalReference;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Instance;
@@ -119,11 +121,10 @@ public class ConversionUtils {
 		res
 			.setJournal(
 				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null);
-		res.setCollectedFromId(mappedFirst(result.getCollectedfrom(), KeyValue::getKey));
-		res.setCollectedFromName(mappedFirst(result.getCollectedfrom(), KeyValue::getValue));
 		res.setPids(mappedList(result.getPid(), ConversionUtils::oafPidToBrokerPid));
 		res.setInstances(flatMappedList(result.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
-		res.setExternalReferences(mappedList(result.getExternalReference(), ConversionUtils::oafExtRefToBrokerExtRef));
+		res
+			.setExternalReferences(mappedList(result.getExternalReference(), ConversionUtils::oafExtRefToBrokerExtRef));
 
 		return res;
 	}
@@ -141,11 +142,17 @@ public class ConversionUtils {
 			.filter(pid -> pid.getQualifier().getClassid() != null)
 			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
 			.map(pid -> pid.getValue())
+			.map(pid -> cleanOrcid(pid))
 			.filter(StringUtils::isNotBlank)
 			.findFirst()
 			.orElse(null) : null;
 
 		return new OaBrokerAuthor(author.getFullname(), pids);
+	}
+
+	private static String cleanOrcid(final String s) {
+		final String match = "//orcid.org/";
+		return s.contains(match) ? StringUtils.substringAfter(s, match) : s;
 	}
 
 	private static OaBrokerJournal oafJournalToBrokerJournal(final Journal journal) {
@@ -216,6 +223,18 @@ public class ConversionUtils {
 		return res;
 	}
 
+	public static final OaBrokerRelatedDatasource oafDatasourceToBrokerDatasource(final Datasource ds) {
+		if (ds == null) {
+			return null;
+		}
+
+		final OaBrokerRelatedDatasource res = new OaBrokerRelatedDatasource();
+		res.setName(StringUtils.defaultIfBlank(fieldValue(ds.getOfficialname()), fieldValue(ds.getEnglishname())));
+		res.setOpenaireId(ds.getId());
+		res.setType(classId(ds.getDatasourcetype()));
+		return res;
+	}
+
 	private static String first(final List<String> list) {
 		return list != null && list.size() > 0 ? list.get(0) : null;
 	}
@@ -245,7 +264,13 @@ public class ConversionUtils {
 
 	private static List<String> fieldList(final List<Field<String>> fl) {
 		return fl != null
-			? fl.stream().map(Field::getValue).filter(StringUtils::isNotBlank).collect(Collectors.toList())
+			? fl
+				.stream()
+				.map(Field::getValue)
+				.map(s -> StringUtils.abbreviate(s, BrokerConstants.MAX_STRING_SIZE))
+				.filter(StringUtils::isNotBlank)
+				.limit(BrokerConstants.MAX_LIST_SIZE)
+				.collect(Collectors.toList())
 			: new ArrayList<>();
 	}
 
@@ -255,6 +280,7 @@ public class ConversionUtils {
 				.stream()
 				.map(StructuredProperty::getValue)
 				.filter(StringUtils::isNotBlank)
+				.limit(BrokerConstants.MAX_LIST_SIZE)
 				.collect(Collectors.toList())
 			: new ArrayList<>();
 	}
@@ -280,6 +306,7 @@ public class ConversionUtils {
 			.stream()
 			.map(func::apply)
 			.filter(Objects::nonNull)
+			.limit(BrokerConstants.MAX_LIST_SIZE)
 			.collect(Collectors.toList());
 	}
 
@@ -293,6 +320,7 @@ public class ConversionUtils {
 			.map(func::apply)
 			.flatMap(List::stream)
 			.filter(Objects::nonNull)
+			.limit(BrokerConstants.MAX_LIST_SIZE)
 			.collect(Collectors.toList());
 	}
 

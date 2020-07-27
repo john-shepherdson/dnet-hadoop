@@ -37,7 +37,7 @@ public class Deduper implements Serializable {
 	public static JavaPairRDD<String, Block> createSortedBlocks(
 		JavaPairRDD<String, MapDocument> mapDocs, DedupConfig config) {
 		final String of = config.getWf().getOrderField();
-		final int maxQueueSize = config.getWf().getGroupMaxSize();
+		final int maxQueueSize = config.getWf().getQueueMaxSize();
 
 		return mapDocs
 			// the reduce is just to be sure that we haven't document with same id
@@ -52,6 +52,7 @@ public class Deduper implements Serializable {
 					.collect(Collectors.toList())
 					.iterator())
 			.mapToPair(block -> new Tuple2<>(block.getKey(), block))
-			.reduceByKey((b1, b2) -> Block.from(b1, b2, of, maxQueueSize));
+			.reduceByKey((b1, b2) -> Block.from(b1, b2, of, maxQueueSize))
+			.filter(b -> b._2().getDocuments().size() > 1);
 	}
 }

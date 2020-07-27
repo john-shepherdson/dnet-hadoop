@@ -21,6 +21,10 @@
             <description>path for the output graph</description>
         </property>
         <property>
+            <name>cutConnectedComponent</name>
+            <description>max number of elements in a connected component</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -106,10 +110,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--la</arg><arg>${isLookUpUrl}</arg>
-            <arg>--asi</arg><arg>${actionSetId}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
         <ok to="CreateMergeRel"/>
         <error to="Kill"/>
@@ -132,10 +137,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
-            <arg>--la</arg><arg>${isLookUpUrl}</arg>
-            <arg>--asi</arg><arg>${actionSetId}</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--cutConnectedComponent</arg><arg>${cutConnectedComponent}</arg>
         </spark>
         <ok to="CreateDedupRecord"/>
         <error to="Kill"/>
@@ -158,10 +164,10 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
-            <arg>--la</arg><arg>${isLookUpUrl}</arg>
-            <arg>--asi</arg><arg>${actionSetId}</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
         </spark>
         <ok to="UpdateEntity"/>
         <error to="Kill"/>
@@ -184,9 +190,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
-            <arg>--o</arg><arg>${dedupGraphPath}</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--dedupGraphPath</arg><arg>${dedupGraphPath}</arg>
         </spark>
         <ok to="copyRelations"/>
         <error to="Kill"/>

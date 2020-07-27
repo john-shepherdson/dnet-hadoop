@@ -4,7 +4,11 @@ package eu.dnetlib.dhp.oa.graph.raw.common;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +61,7 @@ public class OafMapperUtils {
 			.stream(values)
 			.map(v -> field(v, info))
 			.filter(Objects::nonNull)
+			.filter(distinctByKey(f -> f.getValue()))
 			.collect(Collectors.toList());
 	}
 
@@ -65,6 +70,7 @@ public class OafMapperUtils {
 			.stream()
 			.map(v -> field(v, info))
 			.filter(Objects::nonNull)
+			.filter(distinctByKey(f -> f.getValue()))
 			.collect(Collectors.toList());
 	}
 
@@ -236,5 +242,11 @@ public class OafMapperUtils {
 
 	public static String asString(final Object o) {
 		return o == null ? "" : o.toString();
+	}
+
+	public static <T> Predicate<T> distinctByKey(
+		final Function<? super T, ?> keyExtractor) {
+		final Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
 	}
 }

@@ -100,6 +100,11 @@ public class DedupUtility {
 		return String.format("%s/%s/%s_mergerel", basePath, actionSetId, entityType);
 	}
 
+	public static String createBlockStatsPath(
+		final String basePath, final String actionSetId, final String entityType) {
+		return String.format("%s/%s/%s_blockstats", basePath, actionSetId, entityType);
+	}
+
 	public static List<DedupConfig> getConfigurations(String isLookUpUrl, String orchestrator)
 		throws ISLookUpException, DocumentException {
 		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookUpUrl);

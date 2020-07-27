@@ -34,6 +34,8 @@
     <dc:relation>info:eu-repo/semantics/altIdentifier/eissn/2367-8194</dc:relation>
     <dc:relation>info:eu-repo/grantAgreement/EC/FP7/226852</dc:relation>
     <dc:source>One Ecosystem 2: e13718</dc:source>
+    <dc:source>One Ecosystem 2: e13718</dc:source>
+    <dc:source>One Ecosystem 2: e13718</dc:source>
     <dc:subject>Ecosystem Services hotspots</dc:subject>
     <dc:subject>Natura 2000</dc:subject>
     <dc:subject>Quiet Protected Areas</dc:subject>
@@ -47,7 +49,8 @@
     <dc:subject>regulating services</dc:subject>
     <dc:subject>supporting services</dc:subject>
     <dc:type>Research Article</dc:type>
-    <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+    <!--<dr:CobjCategory type="publication">0001</dr:CobjCategory>-->
+    <dr:CobjCategory>0001</dr:CobjCategory>
     <oaf:dateAccepted>2017-01-01</oaf:dateAccepted>
     <oaf:projectid>corda_______::226852</oaf:projectid>
     <oaf:accessrights>OPEN</oaf:accessrights>

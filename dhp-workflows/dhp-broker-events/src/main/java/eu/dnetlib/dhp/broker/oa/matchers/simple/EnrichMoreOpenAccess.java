@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,6 +24,11 @@ public class EnrichMoreOpenAccess extends UpdateMatcher<OaBrokerInstance> {
 	@Override
 	protected List<OaBrokerInstance> findDifferences(final OaBrokerMainEntity source,
 		final OaBrokerMainEntity target) {
+
+		if (target.getInstances().size() >= BrokerConstants.MAX_LIST_SIZE) {
+			return new ArrayList<>();
+		}
+
 		final Set<String> urls = target
 			.getInstances()
 			.stream()

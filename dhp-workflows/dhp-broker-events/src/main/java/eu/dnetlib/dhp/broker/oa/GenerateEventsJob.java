@@ -3,28 +3,28 @@ package eu.dnetlib.dhp.broker.oa;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.SparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
+import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.EventFinder;
 import eu.dnetlib.dhp.broker.oa.util.EventGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public class GenerateEventsJob {
 
@@ -47,57 +47,54 @@ public class GenerateEventsJob {
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
-		final String isLookupUrl = parser.get("isLookupUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
-
-		final String dedupConfigProfileId = parser.get("dedupConfProfile");
-		log.info("dedupConfigProfileId: {}", dedupConfigProfileId);
-
 		final String eventsPath = workingPath + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
-		final SparkConf conf = new SparkConf();
+		final Set<String> dsIdWhitelist = ClusterUtils.parseParamAsList(parser, "datasourceIdWhitelist");
+		log.info("datasourceIdWhitelist: {}", StringUtils.join(dsIdWhitelist, ","));
 
-		// TODO UNCOMMENT
-		// final DedupConfig dedupConfig = loadDedupConfig(isLookupUrl, dedupConfigProfileId);
-		final DedupConfig dedupConfig = null;
+		final Set<String> dsTypeWhitelist = ClusterUtils.parseParamAsList(parser, "datasourceTypeWhitelist");
+		log.info("datasourceTypeWhitelist: {}", StringUtils.join(dsTypeWhitelist, ","));
+
+		final Set<String> dsIdBlacklist = ClusterUtils.parseParamAsList(parser, "datasourceIdBlacklist");
+		log.info("datasourceIdBlacklist: {}", StringUtils.join(dsIdBlacklist, ","));
+
+		final SparkConf conf = new SparkConf();
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
 			ClusterUtils.removeDir(spark, eventsPath);
 
+			final Map<String, LongAccumulator> accumulators = prepareAccumulators(spark.sparkContext());
+
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_events");
+
 			final Dataset<ResultGroup> groups = ClusterUtils
 				.readPath(spark, workingPath + "/duplicates", ResultGroup.class);
 
-			final Dataset<Event> events = groups
+			final Dataset<Event> dataset = groups
 				.map(
-					(MapFunction<ResultGroup, EventGroup>) g -> EventFinder.generateEvents(g, dedupConfig),
-					Encoders.bean(EventGroup.class))
-				.flatMap(group -> group.getData().iterator(), Encoders.bean(Event.class));
+					g -> EventFinder
+						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, accumulators),
+					Encoders
+						.bean(EventGroup.class))
+				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
 
-			events.write().mode(SaveMode.Overwrite).json(eventsPath);
+			ClusterUtils.save(dataset, eventsPath, Event.class, total);
 
 		});
 
 	}
 
-	private static DedupConfig loadDedupConfig(final String isLookupUrl, final String profId) throws Exception {
+	public static Map<String, LongAccumulator> prepareAccumulators(final SparkContext sc) {
 
-		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+		return EventFinder
+			.getMatchers()
+			.stream()
+			.map(UpdateMatcher::accumulatorName)
+			.distinct()
+			.collect(Collectors.toMap(s -> s, s -> sc.longAccumulator(s)));
 
-		final String conf = isLookUpService
-			.getResourceProfileByQuery(
-				String
-					.format(
-						"for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
-						profId));
-
-		final DedupConfig dedupConfig = new ObjectMapper().readValue(conf, DedupConfig.class);
-		dedupConfig.getPace().initModel();
-		dedupConfig.getPace().initTranslationMap();
-		// dedupConfig.getWf().setConfigurationId("???");
-
-		return dedupConfig;
 	}
 
 }

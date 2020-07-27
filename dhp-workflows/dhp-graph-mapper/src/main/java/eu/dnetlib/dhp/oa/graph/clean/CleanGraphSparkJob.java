@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.graph.raw.AbstractMdRecordToOafMapper;
 import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -97,7 +98,7 @@ public class CleanGraphSparkJob {
 			.json(outputPath);
 	}
 
-	private static <T extends Oaf> T fixDefaults(T value) {
+	protected static <T extends Oaf> T fixDefaults(T value) {
 		if (value instanceof Datasource) {
 			// nothing to clean here
 		} else if (value instanceof Project) {
@@ -134,11 +135,6 @@ public class CleanGraphSparkJob {
 					.setResourcetype(
 						qualifier("UNKNOWN", "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
 			}
-			if (Objects.isNull(r.getBestaccessright()) || StringUtils.isBlank(r.getBestaccessright().getClassid())) {
-				r
-					.setBestaccessright(
-						qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
-			}
 			if (Objects.nonNull(r.getInstance())) {
 				for (Instance i : r.getInstance()) {
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
@@ -150,6 +146,16 @@ public class CleanGraphSparkJob {
 					if (Objects.isNull(i.getRefereed())) {
 						i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 					}
+				}
+			}
+			if (Objects.isNull(r.getBestaccessright()) || StringUtils.isBlank(r.getBestaccessright().getClassid())) {
+				Qualifier bestaccessrights = AbstractMdRecordToOafMapper.createBestAccessRights(r.getInstance());
+				if (Objects.isNull(bestaccessrights)) {
+					r
+						.setBestaccessright(
+							qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
+				} else {
+					r.setBestaccessright(bestaccessrights);
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
