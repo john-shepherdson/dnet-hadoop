@@ -6,7 +6,7 @@ class TestEBI {
 
 
 
-  @Test
+//  @Test
   def testEBIData() = {
     SparkAddLinkUpdates.main("-mt local[*] -w /home/sandro/Downloads".split(" "))
 
