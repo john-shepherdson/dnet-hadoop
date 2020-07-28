@@ -1,8 +1,25 @@
-<workflow-app name="import OpenOrgs" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="create RAW Graph (openorgs and cordaorgs)" xmlns="uri:oozie:workflow:0.5">
+
     <parameters>
+        <property>
+            <name>graphOutputPath</name>
+            <description>the target path to store raw graph</description>
+        </property>
         <property>
             <name>contentPath</name>
             <description>path location to store (or reuse) content from the aggregator</description>
+        </property>
+        <property>
+            <name>postgresURL</name>
+            <description>the postgres URL to access to the database</description>
+        </property>
+        <property>
+            <name>postgresUser</name>
+            <description>the user postgres</description>
+        </property>
+        <property>
+            <name>postgresPassword</name>
+            <description>the password postgres</description>
         </property>
         <property>
             <name>postgresOpenOrgsURL</name>
@@ -15,6 +32,19 @@
         <property>
             <name>postgresOpenOrgsPassword</name>
             <description>the password of OpenOrgs database</description>
+        </property>
+		<property>
+            <name>dbSchema</name>
+            <value>beta</value>
+            <description>the database schema according to the D-Net infrastructure (beta or production)</description>
+        </property>
+        <property>
+            <name>mongoURL</name>
+            <description>mongoDB url, example: mongodb://[username:password@]host[:port]</description>
+        </property>
+        <property>
+            <name>mongoDb</name>
+            <description>mongo database</description>
         </property>
         <property>
             <name>isLookupUrl</name>
@@ -76,13 +106,18 @@
         </configuration>
     </global>
 
-	<start to="ImportDB_openorgs"/>
+    <start to="start_import"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="ImportDB_openorgs">
+    <fork name="start_import">
+        <path start="ImportDB_corda_orgs"/>
+       	<path start="ImportDB_openorgs"/>
+    </fork>
+
+	<action name="ImportDB_openorgs">
         <java>
             <prepare>
                 <delete path="${contentPath}/db_openorgs"/>
@@ -94,9 +129,76 @@
             <arg>--postgresPassword</arg><arg>${postgresOpenOrgsPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </java>
+        <ok to="wait_import"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ImportDB_corda_orgs">
+        <java>
+            <prepare>
+                <delete path="${contentPath}/db_records"/>
+            </prepare>
+            <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateCordaOrgsApplication</main-class>
+            <arg>--hdfsPath</arg><arg>${contentPath}/db_cordaorgs</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+        </java>
+        <ok to="wait_import"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_import" to="GenerateEntities"/>
+
+    <action name="GenerateEntities">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateEntities</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.GenerateEntitiesApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_openorgs,${contentPath}/db_cordaorgs</arg>
+            <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+        </spark>
+        <ok to="GenerateGraph"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="GenerateGraph">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateGraph</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.DispatchEntitiesApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/entities</arg>
+            <arg>--graphRawPath</arg><arg>${graphOutputPath}</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-    	
+
     <end name="End"/>
+
 </workflow-app>

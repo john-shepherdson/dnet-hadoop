@@ -244,7 +244,7 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 					listKeyValues(
 						createOpenaireId(10, rs.getString("collectedfromid"), true),
 						rs.getString("collectedfromname")));
-			o.setPid(new ArrayList<>());
+			o.setPid(prepareListOfStructProps(rs.getArray("pid"), info));
 			o.setDateofcollection(asString(rs.getDate("dateofcollection")));
 			o.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
 			o.setExtraInfo(new ArrayList<>()); // Values not present in the DB
