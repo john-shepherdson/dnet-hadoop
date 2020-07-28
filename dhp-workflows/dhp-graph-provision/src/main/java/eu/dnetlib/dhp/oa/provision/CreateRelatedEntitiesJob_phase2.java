@@ -19,7 +19,6 @@ import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
@@ -28,8 +27,6 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.oa.provision.model.TypedRow;
-import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -63,12 +60,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 	private static final Logger log = LoggerFactory.getLogger(CreateRelatedEntitiesJob_phase2.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-	private static final int MAX_EXTERNAL_ENTITIES = 50;
-	private static final int MAX_AUTHORS = 200;
-	private static final int MAX_AUTHOR_FULLNAME_LENGTH = 1000;
-	private static final int MAX_TITLE_LENGTH = 5000;
-	private static final int MAX_ABSTRACT_LENGTH = 100000;
 
 	public static void main(String[] args) throws Exception {
 
@@ -249,15 +240,15 @@ public class CreateRelatedEntitiesJob_phase2 {
 				List<ExternalReference> refs = r
 					.getExternalReference()
 					.stream()
-					.limit(MAX_EXTERNAL_ENTITIES)
+					.limit(ProvisionConstants.MAX_EXTERNAL_ENTITIES)
 					.collect(Collectors.toList());
 				r.setExternalReference(refs);
 			}
 			if (r.getAuthor() != null) {
 				List<Author> authors = Lists.newArrayList();
 				for (Author a : r.getAuthor()) {
-					a.setFullname(StringUtils.left(a.getFullname(), MAX_AUTHOR_FULLNAME_LENGTH));
-					if (authors.size() < MAX_AUTHORS || hasORCID(a)) {
+					a.setFullname(StringUtils.left(a.getFullname(), ProvisionConstants.MAX_AUTHOR_FULLNAME_LENGTH));
+					if (authors.size() < ProvisionConstants.MAX_AUTHORS || hasORCID(a)) {
 						authors.add(a);
 					}
 				}
@@ -269,7 +260,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.stream()
 					.filter(Objects::nonNull)
 					.map(d -> {
-						d.setValue(StringUtils.left(d.getValue(), MAX_ABSTRACT_LENGTH));
+						d.setValue(StringUtils.left(d.getValue(), ProvisionConstants.MAX_ABSTRACT_LENGTH));
 						return d;
 					})
 					.collect(Collectors.toList());
@@ -281,9 +272,10 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.stream()
 					.filter(Objects::nonNull)
 					.map(t -> {
-						t.setValue(StringUtils.left(t.getValue(), MAX_TITLE_LENGTH));
+						t.setValue(StringUtils.left(t.getValue(), ProvisionConstants.MAX_TITLE_LENGTH));
 						return t;
 					})
+					.limit(ProvisionConstants.MAX_TITLES)
 					.collect(Collectors.toList());
 				r.setTitle(titles);
 			}
@@ -305,20 +297,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 	private static FilterFunction<JoinedEntity> filterEmptyEntityFn() {
 		return (FilterFunction<JoinedEntity>) v -> Objects.nonNull(v.getEntity());
-		/*
-		 * return (FilterFunction<JoinedEntity>) v -> Optional .ofNullable(v.getEntity()) .map(e ->
-		 * StringUtils.isNotBlank(e.getId())) .orElse(false);
-		 */
-	}
-
-	private static TypedRow getTypedRow(String type, OafEntity entity)
-		throws JsonProcessingException {
-		TypedRow t = new TypedRow();
-		t.setType(type);
-		t.setDeleted(entity.getDataInfo().getDeletedbyinference());
-		t.setId(entity.getId());
-		t.setOaf(OBJECT_MAPPER.writeValueAsString(entity));
-		return t;
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

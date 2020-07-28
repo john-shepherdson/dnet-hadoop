@@ -22,9 +22,8 @@ public class EnrichMissingPid extends UpdateMatcher<OaBrokerTypedValue> {
 	@Override
 	protected List<OaBrokerTypedValue> findDifferences(final OaBrokerMainEntity source,
 		final OaBrokerMainEntity target) {
-		final long count = target.getPids().size();
 
-		if (count > 0) {
+		if (target.getPids().size() > 0) {
 			return Arrays.asList();
 		}
 

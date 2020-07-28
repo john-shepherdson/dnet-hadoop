@@ -202,6 +202,11 @@ public class PublicationScholexplorerParser extends AbstractScholexplorerParser 
 								t -> {
 									final StructuredProperty st = new StructuredProperty();
 									st.setValue(t);
+									st
+										.setQualifier(
+											generateQualifier(
+												"main title", "main title", "dnet:dataCite_title",
+												"dnet:dataCite_title"));
 									return st;
 								})
 							.collect(Collectors.toList()));

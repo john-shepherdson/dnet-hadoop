@@ -6,10 +6,10 @@
     "subEntityType": "resulttype",
     "subEntityValue": "publication",
     "orderField": "title",
-    "queueMaxSize": "2000",
+    "queueMaxSize": "100",
     "groupMaxSize": "100",
     "maxChildren": "100",
-    "slidingWindowSize": "200",
+    "slidingWindowSize": "100",
     "rootBuilder": [
       "result",
       "resultProject_outcome_isProducedBy",

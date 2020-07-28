@@ -64,7 +64,6 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
 				currentDate.setQualifier(dateQualifier);
 				parsedObject.setRelevantdate(Collections.singletonList(currentDate));
 			}
-
 			final String completionStatus = VtdUtilityParser
 				.getSingleValue(ap, vn, "//*[local-name()='completionStatus']");
 			final String provisionMode = VtdUtilityParser.getSingleValue(ap, vn, "//*[local-name()='provisionMode']");
@@ -148,6 +147,37 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
 				return null;
 			inferPid(currentPid);
 			parsedObject.setPid(Collections.singletonList(currentPid));
+
+			String resolvedURL = null;
+
+			switch (currentPid.getQualifier().getClassname().toLowerCase()) {
+				case "uniprot":
+					resolvedURL = "https://www.uniprot.org/uniprot/" + currentPid.getValue();
+					break;
+				case "ena":
+					if (StringUtils.isNotBlank(currentPid.getValue()) && currentPid.getValue().length() > 7)
+						resolvedURL = "https://www.ebi.ac.uk/ena/data/view/" + currentPid.getValue().substring(0, 8);
+					break;
+				case "chembl":
+					resolvedURL = "https://www.ebi.ac.uk/chembl/compound_report_card/" + currentPid.getValue();
+					break;
+
+				case "ncbi-n":
+					resolvedURL = "https://www.ncbi.nlm.nih.gov/nuccore/" + currentPid.getValue();
+					break;
+				case "ncbi-p":
+					resolvedURL = "https://www.ncbi.nlm.nih.gov/nuccore/" + currentPid.getValue();
+					break;
+				case "genbank":
+					resolvedURL = "https://www.ncbi.nlm.nih.gov/nuccore/" + currentPid.getValue();
+					break;
+				case "pdb":
+					resolvedURL = "https://www.ncbi.nlm.nih.gov/nuccore/" + currentPid.getValue();
+					break;
+				case "url":
+					resolvedURL = currentPid.getValue();
+					break;
+			}
 
 			final String sourceId = generateId(
 				currentPid.getValue(), currentPid.getQualifier().getClassid(), "dataset");
@@ -251,6 +281,11 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
 								t -> {
 									final StructuredProperty st = new StructuredProperty();
 									st.setValue(t);
+									st
+										.setQualifier(
+											generateQualifier(
+												"main title", "main title", "dnet:dataCite_title",
+												"dnet:dataCite_title"));
 									return st;
 								})
 							.collect(Collectors.toList()));
@@ -280,6 +315,13 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
 									return date;
 								})
 							.collect(Collectors.toList()));
+			}
+
+			if (StringUtils.isNotBlank(resolvedURL)) {
+				Instance i = new Instance();
+				i.setCollectedfrom(parsedObject.getCollectedfrom().get(0));
+				i.setUrl(Collections.singletonList(resolvedURL));
+				parsedObject.setInstance(Collections.singletonList(i));
 			}
 
 			result.add(parsedObject);

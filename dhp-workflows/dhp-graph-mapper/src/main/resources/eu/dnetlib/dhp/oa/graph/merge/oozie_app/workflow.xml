@@ -1,0 +1,293 @@
+<workflow-app name="merge graphs" xmlns="uri:oozie:workflow:0.5">
+
+    <parameters>
+        <property>
+            <name>betaInputGgraphPath</name>
+            <description>the beta graph root path</description>
+        </property>
+        <property>
+            <name>prodInputGgraphPath</name>
+            <description>the production graph root path</description>
+        </property>
+        <property>
+            <name>graphOutputPath</name>
+            <description>the output merged graph root path</description>
+        </property>
+        <property>
+            <name>priority</name>
+            <description>decides from which infrastructure the content must win in case of ID clash</description>
+        </property>
+
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
+        <property>
+            <name>oozieActionShareLibForSpark2</name>
+            <description>oozie action sharelib for spark 2.*</description>
+        </property>
+        <property>
+            <name>spark2ExtraListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
+            <description>spark 2.* extra listeners classname</description>
+        </property>
+        <property>
+            <name>spark2SqlQueryExecutionListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
+            <description>spark 2.* sql query execution listeners classname</description>
+        </property>
+        <property>
+            <name>spark2YarnHistoryServerAddress</name>
+            <description>spark 2.* yarn history server address</description>
+        </property>
+        <property>
+            <name>spark2EventLogDir</name>
+            <description>spark 2.* event log dir location</description>
+        </property>
+    </parameters>
+
+	<start to="fork_merge_graph"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <fork name="fork_merge_graph">
+        <path start="merge_publication"/>
+        <path start="merge_dataset"/>
+        <path start="merge_otherresearchproduct"/>
+        <path start="merge_software"/>
+        <path start="merge_datasource"/>
+        <path start="merge_organization"/>
+        <path start="merge_project"/>
+        <path start="merge_relation"/>
+    </fork>
+
+    <action name="merge_publication">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Merge publications</name>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/publication</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/publication</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
+        </spark>
+        <ok to="wait_merge"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="merge_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Merge datasets</name>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/dataset</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/dataset</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
+        </spark>
+        <ok to="wait_merge"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="merge_otherresearchproduct">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Merge otherresearchproducts</name>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/otherresearchproduct</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
+        </spark>
+        <ok to="wait_merge"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="merge_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Merge softwares</name>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/software</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/software</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
+        </spark>
+        <ok to="wait_merge"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="merge_datasource">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Merge datasources</name>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/datasource</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/datasource</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
+        </spark>
+        <ok to="wait_merge"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="merge_organization">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Merge organizations</name>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/organization</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/organization</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
+        </spark>
+        <ok to="wait_merge"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="merge_project">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Merge projects</name>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/project</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/project</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
+        </spark>
+        <ok to="wait_merge"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="merge_relation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Merge relations</name>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/relation</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/relation</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
+            <arg>--priority</arg><arg>${priority}</arg>
+        </spark>
+        <ok to="wait_merge"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_merge" to="End"/>
+
+    <end name="End"/>
+</workflow-app>

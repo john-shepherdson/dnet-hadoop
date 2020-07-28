@@ -12,11 +12,12 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.util.LongAccumulator;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.pace.config.DedupConfig;
 
 public abstract class UpdateMatcher<T> {
 
@@ -34,20 +35,21 @@ public abstract class UpdateMatcher<T> {
 		this.highlightToStringFunction = highlightToStringFunction;
 	}
 
-	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OaBrokerMainEntity res,
+	public Collection<UpdateInfo<T>> searchUpdatesForRecord(final OaBrokerMainEntity target,
+		final OaBrokerRelatedDatasource targetDs,
 		final Collection<OaBrokerMainEntity> others,
-		final DedupConfig dedupConfig) {
+		final Map<String, LongAccumulator> accumulators) {
 
 		final Map<String, UpdateInfo<T>> infoMap = new HashMap<>();
 
 		for (final OaBrokerMainEntity source : others) {
-			if (source != res) {
-				for (final T hl : findDifferences(source, res)) {
+			if (source != target) {
+				for (final T hl : findDifferences(source, target)) {
 					final Topic topic = getTopicFunction().apply(hl);
 					if (topic != null) {
-						final UpdateInfo<T> info = new UpdateInfo<>(topic, hl, source, res,
+						final UpdateInfo<T> info = new UpdateInfo<>(topic, hl, source, target, targetDs,
 							getCompileHighlightFunction(),
-							getHighlightToStringFunction(), dedupConfig);
+							getHighlightToStringFunction());
 
 						final String s = DigestUtils.md5Hex(info.getHighlightValueAsString());
 						if (!infoMap.containsKey(s) || infoMap.get(s).getTrust() < info.getTrust()) {
@@ -67,9 +69,10 @@ public abstract class UpdateMatcher<T> {
 		if (values.isEmpty()) {
 			return new ArrayList<>();
 		} else if (values.size() > maxNumber) {
-			System.err.println("Too many events (" + values.size() + ") matched by " + getClass().getSimpleName());
+			incrementAccumulator(accumulators, maxNumber);
 			return values.subList(0, maxNumber);
 		} else {
+			incrementAccumulator(accumulators, values.size());
 			return values;
 		}
 	}
@@ -80,8 +83,8 @@ public abstract class UpdateMatcher<T> {
 		return list == null || list.isEmpty() || StringUtils.isBlank(list.get(0));
 	}
 
-	protected boolean isMissing(final String field) {
-		return StringUtils.isBlank(field);
+	protected boolean isMissing(final String s) {
+		return StringUtils.isBlank(s);
 	}
 
 	public int getMaxNumber() {
@@ -98,6 +101,16 @@ public abstract class UpdateMatcher<T> {
 
 	public Function<T, String> getHighlightToStringFunction() {
 		return highlightToStringFunction;
+	}
+
+	public String accumulatorName() {
+		return "event_matcher_" + getClass().getSimpleName().toLowerCase();
+	}
+
+	public void incrementAccumulator(final Map<String, LongAccumulator> accumulators, final long n) {
+		if (accumulators != null && accumulators.containsKey(accumulatorName())) {
+			accumulators.get(accumulatorName()).add(n);
+		}
 	}
 
 }

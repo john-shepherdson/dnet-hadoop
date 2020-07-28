@@ -7,7 +7,7 @@ import scala.collection.JavaConversions;
 
 object GraphProcessor {
 
-  def findCCs(vertexes: RDD[(VertexId, String)], edges: RDD[Edge[String]], maxIterations: Int): RDD[ConnectedComponent] = {
+  def findCCs(vertexes: RDD[(VertexId, String)], edges: RDD[Edge[String]], maxIterations: Int, cut:Int): RDD[ConnectedComponent] = {
     val graph: Graph[String, String] = Graph(vertexes, edges).partitionBy(PartitionStrategy.RandomVertexCut) //TODO remember to remove partitionby
     val cc = graph.connectedComponents(maxIterations).vertices
 
@@ -22,15 +22,15 @@ object GraphProcessor {
       }
     }
     val connectedComponents = joinResult.groupByKey()
-      .map[ConnectedComponent](cc => asConnectedComponent(cc))
+      .map[ConnectedComponent](cc => asConnectedComponent(cc, cut))
     connectedComponents
   }
 
 
 
-  def asConnectedComponent(group: (VertexId, Iterable[String])): ConnectedComponent = {
+  def asConnectedComponent(group: (VertexId, Iterable[String]), cut:Int): ConnectedComponent = {
     val docs = group._2.toSet[String]
-    val connectedComponent = new ConnectedComponent(JavaConversions.setAsJavaSet[String](docs));
+    val connectedComponent = new ConnectedComponent(JavaConversions.setAsJavaSet[String](docs), cut);
     connectedComponent
   }
 

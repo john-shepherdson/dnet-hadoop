@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
 import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -31,24 +33,25 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
 public class MappersTest {
+
+	@Mock
+	private ISLookUpService isLookUpService;
 
 	@Mock
 	private VocabularyGroup vocs;
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		when(vocs.getTermAsQualifier(anyString(), anyString()))
-			.thenAnswer(
-				invocation -> OafMapperUtils
-					.qualifier(
-						invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0),
-						invocation.getArgument(0)));
+		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
+		lenient()
+			.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
+			.thenReturn(synonyms());
 
-		when(vocs.termExists(anyString(), anyString())).thenReturn(true);
-
+		vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
 	}
 
 	@Test
@@ -68,9 +71,14 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(p.getId());
+
+		assertTrue(p.getOriginalId().size() == 1);
+		assertEquals("10.3897/oneeco.2.e13718", p.getOriginalId().get(0));
+
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertFalse(p.getDataInfo().getInvisible());
+		assertTrue(p.getSource().size() == 1);
 
 		assertTrue(p.getAuthor().size() > 0);
 		final Optional<Author> author = p
@@ -79,6 +87,7 @@ public class MappersTest {
 			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.findFirst();
 		assertTrue(author.isPresent());
+
 		final StructuredProperty pid = author
 			.get()
 			.getPid()
@@ -169,6 +178,8 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
+		assertTrue(d.getOriginalId().size() == 1);
+		assertEquals("oai:zenodo.org:3234526", d.getOriginalId().get(0));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
@@ -261,4 +272,15 @@ public class MappersTest {
 		assertEquals(':', id.charAt(15));
 		assertEquals(':', id.charAt(16));
 	}
+
+	private List<String> vocs() throws IOException {
+		return IOUtils
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+	}
+
+	private List<String> synonyms() throws IOException {
+		return IOUtils
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+	}
+
 }
