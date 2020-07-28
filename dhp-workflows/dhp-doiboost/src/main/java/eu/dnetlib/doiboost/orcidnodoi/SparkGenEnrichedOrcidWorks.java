@@ -91,19 +91,18 @@ public class SparkGenEnrichedOrcidWorks {
 						Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
 					.filter(Objects::nonNull)
 					.toJavaRDD();
-				logger.info("Works enriched data created: " + enrichedWorksRDD.count());
 				enrichedWorksRDD.saveAsTextFile(workingPath + outputEnrichedWorksPath);
 				logger.info("Works enriched data saved");
-				JavaRDD<Tuple2<String, Publication>> oafPublicationRDD = enrichedWorksRDD.map(e -> {
+				JavaRDD<Publication> oafPublicationRDD = enrichedWorksRDD.map(e -> {
 					JsonElement j = new JsonParser().parse(e._2());
-					return new Tuple2<>(e._1(), (Publication) PublicationToOaf
-						.generatePublicationActionsFromDump(j.getAsJsonObject()));
-				});
+					return (Publication) PublicationToOaf
+						.generatePublicationActionsFromDump(j.getAsJsonObject());
+				}).filter(p -> p != null);
 
-				Dataset<Tuple2<String, Publication>> publicationDataset = spark
+				Dataset<Publication> publicationDataset = spark
 					.createDataset(
 						oafPublicationRDD.repartition(1).rdd(),
-						Encoders.tuple(Encoders.STRING(), Encoders.bean(Publication.class)));
+						Encoders.bean(Publication.class));
 				publicationDataset.write().mode(SaveMode.Overwrite).save(workingPath + "no_doi_dataset/output");
 			});
 	}

@@ -12,7 +12,7 @@ import eu.dnetlib.doiboost.orcid.model.WorkData;
 public class XMLRecordParserTest {
 
 	@Test
-	public void testOrcidAuthorDataXMLParser() throws Exception {
+	private void testOrcidAuthorDataXMLParser() throws Exception {
 
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("summary_0000-0001-6828-479X.xml"));
 
@@ -27,7 +27,7 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testOrcidXMLErrorRecordParser() throws Exception {
+	private void testOrcidXMLErrorRecordParser() throws Exception {
 
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("summary_error.xml"));
 
@@ -40,7 +40,7 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testOrcidWorkDataXMLParser() throws Exception {
+	private void testOrcidWorkDataXMLParser() throws Exception {
 
 		String xml = IOUtils
 			.toString(
