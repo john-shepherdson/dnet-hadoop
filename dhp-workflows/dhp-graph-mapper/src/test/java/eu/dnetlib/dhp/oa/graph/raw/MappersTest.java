@@ -5,9 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,8 +19,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
-import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
@@ -264,6 +263,17 @@ public class MappersTest {
 		assertTrue(s.getAuthor().size() > 0);
 		assertTrue(s.getSubject().size() > 0);
 		assertTrue(s.getInstance().size() > 0);
+	}
+
+	// @Test
+	void testDataset_2() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset_2.xml"));
+
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
 	}
 
 	private void assertValidId(final String id) {
