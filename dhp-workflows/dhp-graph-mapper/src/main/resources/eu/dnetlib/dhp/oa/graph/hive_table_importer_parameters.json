@@ -6,6 +6,12 @@
     "paramRequired": false
   },
   {
+    "paramName": "np",
+    "paramLongName": "numPartitions",
+    "paramDescription": "number of dataset partitions",
+    "paramRequired": false
+  },
+  {
     "paramName": "in",
     "paramLongName": "inputPath",
     "paramDescription": "the path to the graph data dump to read",

@@ -93,9 +93,16 @@ public abstract class AbstractMdRecordToOafMapper {
 				.stream()
 				.map(i -> i.getInstancetype().getClassid())
 				.findFirst()
+				.map(s -> UNKNOWN.equalsIgnoreCase(s) ? "0000" : s)
 				.orElse("0000"); // Unknown
-			Qualifier resultType = vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType);
-			return resultType.getClassid();
+			return Optional
+				.ofNullable(vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType))
+				.map(q -> q.getClassid())
+				.orElse("0000");
+			/*
+			 * .orElseThrow( () -> new IllegalArgumentException( String.format("'%s' not mapped in %s", instanceType,
+			 * DNET_RESULT_TYPOLOGIES)));
+			 */
 		}
 
 		return type;
