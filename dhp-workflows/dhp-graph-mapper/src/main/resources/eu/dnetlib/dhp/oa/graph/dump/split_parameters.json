@@ -23,12 +23,6 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
-	},
-	{
-		"paramName":"map",
-		"paramLongName":"communityMap",
-		"paramDescription": "communityMap when testing",
-		"paramRequired": false
 	}
 ]
 

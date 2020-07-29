@@ -1,12 +1,5 @@
-
-
 [
-	{
-		"paramName":"map",
-		"paramLongName":"communityMap",
-		"paramDescription": "communityMap when testing",
-		"paramRequired": false
-	},
+
 	{
 		"paramName":"is",
 		"paramLongName":"isLookUpUrl",
