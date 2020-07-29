@@ -18,7 +18,7 @@ public class Organization implements Serializable {
 	private Qualifier country;
 	private String id;
 	private List<ControlledField> pid;
-	private List<KeyValue> collectedfrom;
+	// private List<KeyValue> collectedfrom;
 
 	public String getLegalshortname() {
 		return legalshortname;
@@ -76,11 +76,11 @@ public class Organization implements Serializable {
 		this.pid = pid;
 	}
 
-	public List<KeyValue> getCollectedfrom() {
-		return collectedfrom;
-	}
-
-	public void setCollectedfrom(List<KeyValue> collectedfrom) {
-		this.collectedfrom = collectedfrom;
-	}
+//	public List<KeyValue> getCollectedfrom() {
+//		return collectedfrom;
+//	}
+//
+//	public void setCollectedfrom(List<KeyValue> collectedfrom) {
+//		this.collectedfrom = collectedfrom;
+//	}
 }
