@@ -30,7 +30,7 @@ public class Provenance implements Serializable {
 		return p;
 	}
 
-	public String toString(){
+	public String toString() {
 		return provenance + trust;
 	}
 }

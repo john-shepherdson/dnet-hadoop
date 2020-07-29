@@ -15,14 +15,11 @@ public class Context extends Qualifier {
 		this.provenance = provenance;
 	}
 
-
 	@Override
 	public int hashCode() {
 		String provenance = new String();
 		this.provenance.forEach(p -> provenance.concat(p.toString()));
 		return Objects.hash(getCode(), getLabel(), provenance);
 	}
-
-
 
 }
