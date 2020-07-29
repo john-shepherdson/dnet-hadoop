@@ -12,6 +12,12 @@ public class Constants {
 
 	public static String COAR_ACCESS_RIGHT_SCHEMA = "http://vocabularies.coar-repositories.org/documentation/access_rights/";
 
+	public static String ZENODO_COMMUNITY_PREFIX = "https://zenodo.org/communities/";
+
+	public static String RESEARCH_COMMUNITY = "Research Community";
+
+	public static String RESEARCH_INFRASTRUCTURE = "Research Infrastructure/Initiative";
+
 	static {
 		accessRightsCoarMap.put("OPEN", "c_abf2");
 		accessRightsCoarMap.put("RESTRICTED", "c_16ec");
