@@ -103,13 +103,13 @@ public class DumpGraphEntities implements Serializable {
 	private static Datasource mapDatasource(eu.dnetlib.dhp.schema.oaf.Datasource d) {
 		Datasource datasource = new Datasource();
 
-		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> odstype = Optional.ofNullable(d.getDatasourcetype());
-
-		if(odstype.isPresent()){
-			if (odstype.get().getClassid().equals(Constants.FUNDER_DS)){
-				return null;
-			}
-		}
+//		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> odstype = Optional.ofNullable(d.getDatasourcetype());
+//
+//		if(odstype.isPresent()){
+//			if (odstype.get().getClassid().equals(Constants.FUNDER_DS)){
+//				return null;
+//			}
+//		}
 
 		datasource.setId(d.getId());
 
