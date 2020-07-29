@@ -40,7 +40,7 @@ public class CreateContextRelation implements Serializable {
 			.toString(
 				CreateContextRelation.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_entity_parameters.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_entity_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

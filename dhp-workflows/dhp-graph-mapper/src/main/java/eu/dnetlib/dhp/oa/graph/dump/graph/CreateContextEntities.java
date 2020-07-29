@@ -41,7 +41,7 @@ public class CreateContextEntities implements Serializable {
 			.toString(
 				CreateContextEntities.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_entity_parameters.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_entity_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
