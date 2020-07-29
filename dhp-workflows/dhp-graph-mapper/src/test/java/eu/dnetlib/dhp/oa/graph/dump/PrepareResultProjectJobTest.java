@@ -6,10 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+import eu.dnetlib.dhp.oa.graph.dump.community.ResultProject;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -21,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.oa.graph.dump.community.SparkPrepareResultProject;
 
 public class PrepareResultProjectJobTest {
 
@@ -77,7 +81,6 @@ public class PrepareResultProjectJobTest {
 			"-sourcePath", sourcePath
 		});
 
-//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -105,8 +108,6 @@ public class PrepareResultProjectJobTest {
 			"-sourcePath", sourcePath
 		});
 
-//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
-
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<ResultProject> tmp = sc
@@ -122,6 +123,16 @@ public class PrepareResultProjectJobTest {
 			.assertEquals(
 				1,
 				verificationDataset.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
+
+		verificationDataset.createOrReplaceTempView("table");
+
+		Dataset<Row> check = spark.sql("Select projList.provenance.provenance  " +
+				"from table " +
+				"lateral view explode (projectsList) pl as projList");
+
+		Assertions.assertEquals(1, check.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
+
+		verificationDataset.show(false);
 
 	}
 
@@ -160,7 +171,7 @@ public class PrepareResultProjectJobTest {
 
 		verificationDataset.createOrReplaceTempView("dataset");
 
-		String query = "select resultId, MyT.id project , MyT.title title, MyT.acronym acronym "
+		String query = "select resultId, MyT.id project , MyT.title title, MyT.acronym acronym , MyT.provenance.provenance provenance "
 			+ "from dataset "
 			+ "lateral view explode(projectsList) p as MyT ";
 
@@ -218,7 +229,8 @@ public class PrepareResultProjectJobTest {
 						"project = '40|aka_________::03376222b28a3aebf2730ac514818d04' and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
 					.count());
 
-		resultExplodedProvenance.show(false);
+		Assertions.assertEquals(3, resultExplodedProvenance.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
+
 	}
 
 }
