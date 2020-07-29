@@ -1,77 +1,104 @@
+
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import javax.rmi.CORBA.Util;
 
-import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchCommunity;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.Optional;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchCommunity;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 
-public class SparkCreateContextEntities implements Serializable {
+public class CreateContextEntities implements Serializable {
 
-    //leggo i context dall'is e mi faccio la mappa id -> contextinfo
+	// leggo i context dall'is e mi faccio la mappa id -> contextinfo
 
-    //creo le entities con le info generali
+	// creo le entities con le info generali
 
-    //creo le relazioni con le info in projectList e datasourceList. Le relazioni sono di tipo isRelatedTo da una parte e dall'altra
+	private static final Logger log = LoggerFactory.getLogger(CreateContextEntities.class);
+	private final Configuration conf;
+	private final BufferedWriter writer;
 
-    //prendo un parametro community_organization per creare relazioni fra community ed organizzazioni . n.b. l'id dell'organizzazione
-    //e' non deduplicato => bisogna risolverlo e prendere i dedup id distinti
+	public static void main(String[] args) throws Exception {
+		String jsonConfiguration = IOUtils
+			.toString(
+				CreateContextEntities.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_entity_parameters.json"));
 
-    private static final Logger log = LoggerFactory.getLogger(SparkCreateContextEntities.class);
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		parser.parseArgument(args);
 
-    public static void main(String[] args) throws Exception {
-        String jsonConfiguration = IOUtils
-                .toString(
-                        SparkCreateContextEntities.class
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/graph/dump/input_parameters.json"));
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(args);
+		final String hdfsPath = parser.get("hdfsPath");
+		log.info("hdfsPath: {}", hdfsPath);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		final String hdfsNameNode = parser.get("nameNode");
+		log.info("nameNode: {}", hdfsNameNode);
 
-        final String inputPath = parser.get("sourcePath");
-        log.info("inputPath: {}", inputPath);
+		final String isLookUpUrl = parser.get("isLookUpUrl");
+		log.info("isLookUpUrl: {}", isLookUpUrl);
 
-        final String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+		final CreateContextEntities cce = new CreateContextEntities(hdfsPath, hdfsNameNode);
 
-        final String isLookUpUrl = parser.get("isLookUpUrl");
-        log.info("isLookUpUrl: {}", isLookUpUrl);
+		log.info("Processing contexts...");
+		cce.execute(Process::getEntity, isLookUpUrl);
 
-        QueryInformationSystem queryInformationSystem = new QueryInformationSystem();
-        queryInformationSystem.setIsLookUp(Utils.getIsLookUpService(isLookUpUrl));
-        CommunityMap communityMap = queryInformationSystem.getCommunityMap();
+	}
 
-        createEntities(communityMap, outputPath + "/context");
+	public CreateContextEntities(String hdfsPath, String hdfsNameNode) throws IOException {
+		this.conf = new Configuration();
+		this.conf.set("fs.defaultFS", hdfsNameNode);
+		FileSystem fileSystem = FileSystem.get(this.conf);
+		Path hdfsWritePath = new Path(hdfsPath);
+		FSDataOutputStream fsDataOutputStream = null;
+		if (fileSystem.exists(hdfsWritePath)) {
+			fsDataOutputStream = fileSystem.append(hdfsWritePath);
+		} else {
+			fsDataOutputStream = fileSystem.create(hdfsWritePath);
+		}
 
-    }
+		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
 
-    private static void createEntities(CommunityMap communityMap, String s) {
-        communityMap.keySet().stream()
-                .map(key -> {
-                    ResearchInitiative community;
-                    ContextInfo cinfo = communityMap.get(key);
-                    if(cinfo.getType().equals("community")){
-                        community = new ResearchCommunity();
-                    }else{
-                        community = new ResearchInitiative();
-                    }
-                    return community;
-                })
-    }
+	}
 
+	public <R extends ResearchInitiative> void execute(final Function<ContextInfo, R> producer, String isLookUpUrl)
+		throws Exception {
+
+		QueryInformationSystem queryInformationSystem = new QueryInformationSystem();
+		queryInformationSystem.setIsLookUp(Utils.getIsLookUpService(isLookUpUrl));
+
+		final Consumer<ContextInfo> consumer = ci -> writeEntity(producer.apply(ci));
+
+		queryInformationSystem.getContextInformation(consumer);
+	}
+
+
+
+	protected <R extends ResearchInitiative> void writeEntity(final R r) {
+		try {
+			writer.write(Utils.OBJECT_MAPPER.writeValueAsString(r));
+			writer.newLine();
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }

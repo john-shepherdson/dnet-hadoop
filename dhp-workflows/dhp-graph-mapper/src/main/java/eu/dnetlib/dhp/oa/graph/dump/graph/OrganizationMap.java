@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.resulttocommunityfromorganization;
+package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
