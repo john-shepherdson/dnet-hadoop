@@ -7,7 +7,8 @@ import java.util.List;
 import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
 
 //At the moment the funder is map in the project.
-//We will reserve to decide if to create specific entities for funders or let them in the project
+//We will reserve to decide if to create specific entities for funders (and related relations to the organization)
+// or let them in the project
 public class Project implements Serializable {
 	private String id;
 	// private List<KeyValue> collectedfrom;
