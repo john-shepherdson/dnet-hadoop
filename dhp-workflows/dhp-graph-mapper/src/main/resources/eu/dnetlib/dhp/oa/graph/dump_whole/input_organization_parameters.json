@@ -1,11 +1,9 @@
-
-
 [
 
 	{
-		"paramName":"is",
-		"paramLongName":"isLookUpUrl",
-		"paramDescription": "URL of the isLookUp Service",
+		"paramName":"ocm",
+		"paramLongName":"organizationCommunityMap",
+		"paramDescription": "the organization community map association",
 		"paramRequired": false
 	},
 	{
