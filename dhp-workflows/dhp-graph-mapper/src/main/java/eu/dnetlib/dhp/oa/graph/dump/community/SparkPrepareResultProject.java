@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.schema.dump.oaf.community.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;

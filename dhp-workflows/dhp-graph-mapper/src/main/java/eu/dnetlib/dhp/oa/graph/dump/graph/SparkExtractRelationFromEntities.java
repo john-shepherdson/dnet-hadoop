@@ -1,9 +1,9 @@
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
-
 import java.io.Serializable;
 import java.util.*;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,6 @@ import eu.dnetlib.dhp.oa.graph.dump.QueryInformationSystem;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.oaf.Result;
-
 
 public class SparkExtractRelationFromEntities implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkExtractRelationFromEntities.class);
@@ -55,8 +54,6 @@ public class SparkExtractRelationFromEntities implements Serializable {
 		Extractor extractor = new Extractor();
 		extractor.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMap);
 
-
 	}
-
 
 }

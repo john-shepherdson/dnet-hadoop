@@ -29,9 +29,9 @@ public class SparkDumpRelationJob implements Serializable {
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
-					SparkDumpRelationJob.class
+				SparkDumpRelationJob.class
 					.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/dump_whole/input_relationdump_parameters.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_relationdump_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

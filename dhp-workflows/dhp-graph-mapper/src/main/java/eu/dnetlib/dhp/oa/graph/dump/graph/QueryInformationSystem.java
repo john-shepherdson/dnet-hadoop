@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -17,6 +16,7 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -52,7 +52,7 @@ public class QueryInformationSystem {
 				cinfo.setId(cSplit[0]);
 				cinfo.setName(cSplit[1]);
 				cinfo.setDescription(cSplit[2]);
-				if (!cSplit[3].trim().equals("")){
+				if (!cSplit[3].trim().equals("")) {
 					cinfo.setSubject(Arrays.asList(cSplit[3].split(",")));
 				}
 				cinfo.setZenodocommunity(cSplit[4]);
@@ -98,7 +98,7 @@ public class QueryInformationSystem {
 				Iterator it = root.elementIterator();
 				while (it.hasNext()) {
 					Element el = (Element) it.next();
-					if(el.getName().equals("category")){
+					if (el.getName().equals("category")) {
 						String categoryId = el.attributeValue("id");
 						categoryId = categoryId.substring(categoryId.lastIndexOf("::") + 2);
 						if (categoryId.equals(category)) {
@@ -119,9 +119,9 @@ public class QueryInformationSystem {
 	@NotNull
 	private List<String> getCategoryList(Element el, String prefix) {
 		List<String> datasourceList = new ArrayList<>();
-		for(Object node : el.selectNodes(".//param")){
-			Node n = (Node)node;
-			if(n.valueOf("./@name").equals("openaireId")){
+		for (Object node : el.selectNodes(".//param")) {
+			Node n = (Node) node;
+			if (n.valueOf("./@name").equals("openaireId")) {
 				datasourceList.add(prefix + "|" + n.getText());
 			}
 		}

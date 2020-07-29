@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
-
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 
 public class SparkUpdateProjectInfo implements Serializable {

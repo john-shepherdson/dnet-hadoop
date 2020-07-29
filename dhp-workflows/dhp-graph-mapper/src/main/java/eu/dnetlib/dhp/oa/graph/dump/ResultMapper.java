@@ -396,8 +396,8 @@ public class ResultMapper implements Serializable {
 			if (contextList.size() > 0) {
 				Set<Integer> hashValue = new HashSet<>();
 				List<Context> remainigContext = new ArrayList<>();
-				contextList.forEach(c ->{
-					if(!hashValue.contains(c.hashCode())){
+				contextList.forEach(c -> {
+					if (!hashValue.contains(c.hashCode())) {
 						remainigContext.add(c);
 						hashValue.add(c.hashCode());
 					}

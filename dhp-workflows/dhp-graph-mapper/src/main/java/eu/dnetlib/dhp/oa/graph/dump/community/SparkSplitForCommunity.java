@@ -64,16 +64,10 @@ public class SparkSplitForCommunity implements Serializable {
 
 		split.run(isSparkSessionManaged, inputPath, outputPath, communityMap);
 
-
-
-
 	}
 
 	public static ISLookUpService getIsLookUpService(String isLookUpUrl) {
 		return ISLookupClientFactory.getLookUpService(isLookUpUrl);
 	}
-
-
-
 
 }

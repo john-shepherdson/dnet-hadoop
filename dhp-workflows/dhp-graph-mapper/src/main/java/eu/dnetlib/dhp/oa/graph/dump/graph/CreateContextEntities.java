@@ -46,7 +46,6 @@ public class CreateContextEntities implements Serializable {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
-
 		final String hdfsPath = parser.get("hdfsPath");
 		log.info("hdfsPath: {}", hdfsPath);
 
@@ -89,8 +88,6 @@ public class CreateContextEntities implements Serializable {
 
 		queryInformationSystem.getContextInformation(consumer);
 	}
-
-
 
 	protected <R extends ResearchInitiative> void writeEntity(final R r) {
 		try {

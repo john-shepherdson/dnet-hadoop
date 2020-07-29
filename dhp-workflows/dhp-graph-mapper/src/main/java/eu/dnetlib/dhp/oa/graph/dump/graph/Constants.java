@@ -25,6 +25,6 @@ public class Constants implements Serializable {
 	public static final String CONTEXT_ID = "00";
 	public static final String CONTEXT_NS_PREFIX = "context____";
 
-    public static final String HARVESTED = "Harvested";
+	public static final String HARVESTED = "Harvested";
 	public static final String DEFAULT_TRUST = "0.9";
 }

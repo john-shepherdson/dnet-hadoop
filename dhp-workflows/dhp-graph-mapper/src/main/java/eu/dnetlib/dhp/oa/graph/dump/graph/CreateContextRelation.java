@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import eu.dnetlib.dhp.schema.oaf.Datasource;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -24,6 +23,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 public class CreateContextRelation implements Serializable {
@@ -66,7 +66,10 @@ public class CreateContextRelation implements Serializable {
 		cce.execute(Process::getRelation, CONTEX_RELATION_DATASOURCE, ModelSupport.getIdPrefix(Datasource.class));
 
 		log.info("Creating relations for projects... ");
-		cce.execute(Process::getRelation, CONTEX_RELATION_PROJECT, ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
+		cce
+			.execute(
+				Process::getRelation, CONTEX_RELATION_PROJECT,
+				ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
 
 	}
 
@@ -92,13 +95,13 @@ public class CreateContextRelation implements Serializable {
 
 	}
 
-	public void execute(final Function<ContextInfo, List<Relation>> producer, String category, String prefix) throws Exception {
+	public void execute(final Function<ContextInfo, List<Relation>> producer, String category, String prefix)
+		throws Exception {
 
 		final Consumer<ContextInfo> consumer = ci -> producer.apply(ci).forEach(c -> writeEntity(c));
 
 		queryInformationSystem.getContextRelation(consumer, category, prefix);
 	}
-
 
 	protected void writeEntity(final Relation r) {
 		try {
