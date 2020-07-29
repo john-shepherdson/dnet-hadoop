@@ -215,7 +215,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Prepare association result subset of project info</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkPrepareResultProject</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkPrepareResultProject</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -246,7 +246,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Extend dumped publications with information about project</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkUpdateProjectInfo</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -271,7 +271,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Extend dumped dataset with information about project</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkUpdateProjectInfo</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -295,7 +295,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Extend dumped ORP with information about project</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkUpdateProjectInfo</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -319,7 +319,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Extend dumped software with information about project</name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.SparkUpdateProjectInfo</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
