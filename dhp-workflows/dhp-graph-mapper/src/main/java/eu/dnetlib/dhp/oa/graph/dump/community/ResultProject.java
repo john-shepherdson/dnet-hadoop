@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump;
+package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import java.io.Serializable;
 import java.util.List;

@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump;
+package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -8,9 +8,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
-import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -27,7 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.dump.oaf.Funder;
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Funder;
+import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -71,37 +72,43 @@ public class SparkPrepareResultProject implements Serializable {
 		Dataset<Relation> relation = Utils
 			.readPath(spark, inputPath + "/relation", Relation.class)
 			.filter("dataInfo.deletedbyinference = false and relClass = 'produces'");
-		Dataset<eu.dnetlib.dhp.schema.oaf.Project> projects = Utils.readPath(spark, inputPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
+		Dataset<eu.dnetlib.dhp.schema.oaf.Project> projects = Utils
+			.readPath(spark, inputPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
 
 		projects
 			.joinWith(relation, projects.col("id").equalTo(relation.col("source")))
 			.groupByKey(
-				(MapFunction<Tuple2<eu.dnetlib.dhp.schema.oaf.Project, Relation>, String>) value -> value._2().getTarget(), Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, Tuple2<eu.dnetlib.dhp.schema.oaf.Project, Relation>, ResultProject>) (s, it) -> {
-				Set<String> projectSet = new HashSet<>();
-				Tuple2<eu.dnetlib.dhp.schema.oaf.Project, Relation> first = it.next();
-				ResultProject rp = new ResultProject();
-				rp.setResultId(first._2().getTarget());
-				eu.dnetlib.dhp.schema.oaf.Project p = first._1();
-				projectSet.add(p.getId());
-				Project ps = getProject(p);
+				(MapFunction<Tuple2<eu.dnetlib.dhp.schema.oaf.Project, Relation>, String>) value -> value
+					._2()
+					.getTarget(),
+				Encoders.STRING())
+			.mapGroups(
+				(MapGroupsFunction<String, Tuple2<eu.dnetlib.dhp.schema.oaf.Project, Relation>, ResultProject>) (s,
+					it) -> {
+					Set<String> projectSet = new HashSet<>();
+					Tuple2<eu.dnetlib.dhp.schema.oaf.Project, Relation> first = it.next();
+					ResultProject rp = new ResultProject();
+					rp.setResultId(first._2().getTarget());
+					eu.dnetlib.dhp.schema.oaf.Project p = first._1();
+					projectSet.add(p.getId());
+					Project ps = getProject(p);
 
-				List<Project> projList = new ArrayList<>();
-				projList.add(ps);
-				rp.setProjectsList(projList);
-				it.forEachRemaining(c -> {
-					eu.dnetlib.dhp.schema.oaf.Project op = c._1();
-					if (!projectSet.contains(op.getId())) {
-						projList
-							.add(getProject(op));
+					List<Project> projList = new ArrayList<>();
+					projList.add(ps);
+					rp.setProjectsList(projList);
+					it.forEachRemaining(c -> {
+						eu.dnetlib.dhp.schema.oaf.Project op = c._1();
+						if (!projectSet.contains(op.getId())) {
+							projList
+								.add(getProject(op));
 
-						projectSet.add(op.getId());
+							projectSet.add(op.getId());
 
-					}
+						}
 
-				});
-				return rp;
-			}, Encoders.bean(ResultProject.class))
+					});
+					return rp;
+				}, Encoders.bean(ResultProject.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -109,31 +116,31 @@ public class SparkPrepareResultProject implements Serializable {
 	}
 
 	private static Project getProject(eu.dnetlib.dhp.schema.oaf.Project op) {
-		Project p =  Project
-				.newInstance(
-						op.getId(),
-						op.getCode().getValue(),
-						Optional
-								.ofNullable(op.getAcronym())
-								.map(a -> a.getValue())
-								.orElse(null),
-						Optional
-								.ofNullable(op.getTitle())
-								.map(v -> v.getValue())
-								.orElse(null),
-						Optional
-								.ofNullable(op.getFundingtree())
-								.map(
-										value -> value
-												.stream()
-												.map(ft -> getFunder(ft.getValue()))
-												.collect(Collectors.toList())
-												.get(0))
-								.orElse(null));
+		Project p = Project
+			.newInstance(
+				op.getId(),
+				op.getCode().getValue(),
+				Optional
+					.ofNullable(op.getAcronym())
+					.map(a -> a.getValue())
+					.orElse(null),
+				Optional
+					.ofNullable(op.getTitle())
+					.map(v -> v.getValue())
+					.orElse(null),
+				Optional
+					.ofNullable(op.getFundingtree())
+					.map(
+						value -> value
+							.stream()
+							.map(ft -> getFunder(ft.getValue()))
+							.collect(Collectors.toList())
+							.get(0))
+					.orElse(null));
 
 		Optional<DataInfo> di = Optional.ofNullable(op.getDataInfo());
 		Provenance provenance = new Provenance();
-		if(di.isPresent()){
+		if (di.isPresent()) {
 			provenance.setProvenance(di.get().getProvenanceaction().getClassname());
 			provenance.setTrust(di.get().getTrust());
 			p.setProvenance(provenance);

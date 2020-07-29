@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump;
+package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -8,8 +8,6 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -20,10 +18,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.dump.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import scala.Tuple2;
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
+
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 
 public class SparkUpdateProjectInfo implements Serializable {
 
@@ -70,22 +67,20 @@ public class SparkUpdateProjectInfo implements Serializable {
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
-		String preparedInfoPath) {// ,
-		// Class<R> inputClazz) {
-
-		Dataset<Result> result = Utils.readPath(spark, inputPath, Result.class);
+		String preparedInfoPath) {
+		Dataset<CommunityResult> result = Utils.readPath(spark, inputPath, CommunityResult.class);
 		Dataset<ResultProject> resultProject = Utils.readPath(spark, preparedInfoPath, ResultProject.class);
 		result
 			.joinWith(
 				resultProject, result.col("id").equalTo(resultProject.col("resultId")),
 				"left")
 			.map(value -> {
-				Result r = value._1();
+				CommunityResult r = value._1();
 				Optional.ofNullable(value._2()).ifPresent(rp -> {
 					r.setProjects(rp.getProjectsList());
 				});
 				return r;
-			}, Encoders.bean(Result.class))
+			}, Encoders.bean(CommunityResult.class))
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Append)

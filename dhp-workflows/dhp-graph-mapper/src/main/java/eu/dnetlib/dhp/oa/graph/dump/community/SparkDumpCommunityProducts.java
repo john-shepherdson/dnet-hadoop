@@ -4,16 +4,16 @@ package eu.dnetlib.dhp.oa.graph.dump.community;
 import java.io.Serializable;
 import java.util.*;
 
-import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
-import eu.dnetlib.dhp.oa.graph.dump.QueryInformationSystem;
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
+import eu.dnetlib.dhp.oa.graph.dump.QueryInformationSystem;
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class SparkDumpCommunityProducts implements Serializable {
 
@@ -48,8 +48,6 @@ public class SparkDumpCommunityProducts implements Serializable {
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
 
-		final Optional<String> cm = Optional.ofNullable(parser.get("communityMap"));
-
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		queryInformationSystem = new QueryInformationSystem();
@@ -58,11 +56,8 @@ public class SparkDumpCommunityProducts implements Serializable {
 
 		DumpProducts dump = new DumpProducts();
 
-		dump.run(isSparkSessionManaged, inputPath, outputPath, communityMap, inputClazz, false);
+		dump.run(isSparkSessionManaged, inputPath, outputPath, communityMap, inputClazz, CommunityResult.class, false);
 
 	}
-
-
-
 
 }
