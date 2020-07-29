@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunitySplit;
-import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -24,7 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunitySplit;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 
 public class SplitForCommunityTest {
 
@@ -87,7 +87,6 @@ public class SplitForCommunityTest {
 			.getOrCreate();
 	}
 
-
 	@AfterAll
 	public static void afterAll() throws IOException {
 		FileUtils.deleteDirectory(workingDir.toFile());
@@ -95,7 +94,7 @@ public class SplitForCommunityTest {
 	}
 
 	@Test
-	public void test1()  {
+	public void test1() {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/splitForCommunity")

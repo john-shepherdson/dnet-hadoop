@@ -28,7 +28,9 @@ public class FunderParsingTest {
 		Assertions.assertEquals("US", f.getJurisdiction());
 
 		Assertions.assertEquals("NSF::CISE/OAD::CISE/CCF", f.getFunding_stream().getId());
-		Assertions.assertEquals("Directorate for Computer & Information Science & Engineering - Division of Computing and Communication Foundations",
+		Assertions
+			.assertEquals(
+				"Directorate for Computer & Information Science & Engineering - Division of Computing and Communication Foundations",
 				f.getFunding_stream().getDescription());
 
 	}
@@ -57,9 +59,10 @@ public class FunderParsingTest {
 		Assertions.assertEquals("EU", f.getJurisdiction());
 
 		Assertions.assertEquals("EC::H2020::ERC::ERC-COG", f.getFunding_stream().getId());
-		Assertions.assertEquals("Horizon 2020 Framework Programme - European Research Council - Consolidator Grant",
+		Assertions
+			.assertEquals(
+				"Horizon 2020 Framework Programme - European Research Council - Consolidator Grant",
 				f.getFunding_stream().getDescription());
-
 
 	}
 }

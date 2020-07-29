@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -25,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 
 public class UpdateProjectInfoTest {
 
