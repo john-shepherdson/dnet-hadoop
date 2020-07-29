@@ -5,10 +5,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.swing.text.html.Option;
@@ -85,6 +82,7 @@ public class DumpGraphEntities implements Serializable {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
 			.map(d -> mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) d), Encoders.bean(Datasource.class))
+				.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -104,6 +102,14 @@ public class DumpGraphEntities implements Serializable {
 
 	private static Datasource mapDatasource(eu.dnetlib.dhp.schema.oaf.Datasource d) {
 		Datasource datasource = new Datasource();
+
+		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> odstype = Optional.ofNullable(d.getDatasourcetype());
+
+		if(odstype.isPresent()){
+			if (odstype.get().getClassid().equals(Constants.FUNDER_DS)){
+				return null;
+			}
+		}
 
 		datasource.setId(d.getId());
 
