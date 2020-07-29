@@ -5,11 +5,12 @@ import java.io.*;
 import java.io.File;
 import java.nio.file.Files;
 
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 
 public class ZenodoUploadTest {
 
