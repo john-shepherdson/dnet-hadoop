@@ -1,14 +1,14 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
-import eu.dnetlib.dhp.oa.graph.dump.community.SparkSplitForCommunity;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunitySplit;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
 
@@ -35,11 +34,9 @@ public class SplitForCommunityTest {
 
 	private static Path workingDir;
 
-	private static String MOCK_IS_LOOK_UP_URL = "BASEURL:8280/is/services/isLookUp";
-
 	private static final Logger log = LoggerFactory.getLogger(DumpJobTest.class);
 
-	private static HashMap<String, String> map = new HashMap<>();
+	private static CommunityMap map = new CommunityMap();
 
 	static {
 		map.put("egi", "EGI Federation");
@@ -68,49 +65,6 @@ public class SplitForCommunityTest {
 
 	}
 
-//	@Mock
-//	private SparkDumpCommunityProducts dumpCommunityProducts;
-
-	// private QueryInformationSystem queryInformationSystem;
-
-//	@Mock
-//	private ISLookUpService isLookUpService;
-
-	List<String> communityMap = Arrays
-		.asList(
-			"<community id=\"egi\" label=\"EGI Federation\"/>",
-			"<community id=\"fet-fp7\" label=\"FET FP7\"/>",
-			"<community id=\"fet-h2020\" label=\"FET H2020\"/>",
-			"<community id=\"clarin\" label=\"CLARIN\"/>",
-			"<community id=\"rda\" label=\"Research Data Alliance\"/>",
-			"<community id=\"ee\" label=\"SDSN - Greece\"/>",
-			"<community id=\"dh-ch\" label=\"Digital Humanities and Cultural Heritage\"/>",
-			"<community id=\"fam\" label=\"Fisheries and Aquaculture Management\"/>",
-			"<community id=\"ni\" label=\"Neuroinformatics\"/>",
-			"<community id=\"mes\" label=\"European Marine Science\"/>",
-			"<community id=\"instruct\" label=\"Instruct-ERIC\"/>",
-			"<community id=\"elixir-gr\" label=\"ELIXIR GR\"/>",
-			"<community id=\"aginfra\" label=\"Agricultural and Food Sciences\"/>",
-			"<community id=\"dariah\" label=\"DARIAH EU\"/>",
-			"<community id=\"risis\" label=\"RISIS\"/>",
-			"<community id=\"epos\" label=\"EPOS\"/>",
-			"<community id=\"beopen\" label=\"Transport Research\"/>",
-			"<community id=\"euromarine\" label=\"EuroMarine\"/>",
-			"<community id=\"ifremer\" label=\"Ifremer\"/>",
-			"<community id=\"oa-pg\" label=\"EC Post-Grant Open Access Pilot\"/>",
-			"<community id=\"science-innovation-policy\" label=\"Science and Innovation Policy Studies\"/>",
-			"<community id=\"covid-19\" label=\"COVID-19\"/>",
-			"<community id=\"enermaps\" label=\"Energy Research\"/>");
-
-	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
-		+
-		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-		"  return " +
-		"<community> " +
-		"{$x//CONFIGURATION/context/@id}" +
-		"{$x//CONFIGURATION/context/@label}" +
-		"</community>";
-
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files.createTempDirectory(SplitForCommunityTest.class.getSimpleName());
@@ -133,12 +87,6 @@ public class SplitForCommunityTest {
 			.getOrCreate();
 	}
 
-//	@BeforeEach
-//	public void setUp() throws ISLookUpException {
-//		lenient().when(isLookUpService.quickSearchProfile(XQUERY)).thenReturn(communityMap);
-//		lenient().when(dumpCommunityProducts.getIsLookUpService(MOCK_IS_LOOK_UP_URL)).thenReturn(isLookUpService);
-//
-//	}
 
 	@AfterAll
 	public static void afterAll() throws IOException {
@@ -147,28 +95,24 @@ public class SplitForCommunityTest {
 	}
 
 	@Test
-	public void test1() throws Exception {
+	public void test1()  {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/splitForCommunity")
 			.getPath();
 
-		SparkSplitForCommunity.main(new String[] {
-			"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-			"-isSparkSessionManaged", Boolean.FALSE.toString(),
-			"-outputPath", workingDir.toString() + "/split",
-			"-sourcePath", sourcePath,
-			"-communityMap", new Gson().toJson(map)
-		});
+		CommunitySplit split = new CommunitySplit();
+
+		split.run(false, sourcePath, workingDir.toString() + "/split", map);
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<Result> tmp = sc
+		JavaRDD<CommunityResult> tmp = sc
 			.textFile(workingDir.toString() + "/split/dh-ch")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
-		org.apache.spark.sql.Dataset<Result> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(Result.class));
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
 		Assertions.assertEquals(19, verificationDataset.count());
 
@@ -178,10 +122,10 @@ public class SplitForCommunityTest {
 
 		tmp = sc
 			.textFile(workingDir.toString() + "/split/egi")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(Result.class));
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
 		Assertions.assertEquals(1, verificationDataset.count());
 
@@ -191,10 +135,10 @@ public class SplitForCommunityTest {
 
 		tmp = sc
 			.textFile(workingDir.toString() + "/split/ni")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(Result.class));
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
 		Assertions.assertEquals(5, verificationDataset.count());
 
@@ -204,12 +148,12 @@ public class SplitForCommunityTest {
 
 		tmp = sc
 			.textFile(workingDir.toString() + "/split/science-innovation-policy")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(Result.class));
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
-		Assertions.assertEquals(5, verificationDataset.count());
+		Assertions.assertEquals(4, verificationDataset.count());
 
 		Assertions
 			.assertEquals(
@@ -223,120 +167,6 @@ public class SplitForCommunityTest {
 		Assertions
 			.assertEquals(
 				1, verificationDataset.filter("id = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'").count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/fet-fp7")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/fet-h2020")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/clarin")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/rda")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/ee")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/fam")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/mes")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/instruct")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/elixir-gr")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/aginfra")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/dariah")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/risis")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/epos")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/beopen")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/euromarine")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/ifremer")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/oa-pg")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/covid-19")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
-
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/enermaps")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(0, tmp.count());
 
 	}
 }

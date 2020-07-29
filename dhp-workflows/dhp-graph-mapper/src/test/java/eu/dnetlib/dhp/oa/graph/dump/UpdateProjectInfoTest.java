@@ -6,8 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.FileUtils;
-import org.apache.neethi.Assertion;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
 
 public class UpdateProjectInfoTest {
@@ -82,12 +83,12 @@ public class UpdateProjectInfoTest {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<Result> tmp = sc
+		JavaRDD<CommunityResult> tmp = sc
 			.textFile(workingDir.toString() + "/result")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
-		org.apache.spark.sql.Dataset<Result> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(Result.class));
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
 		verificationDataset.show(false);
 

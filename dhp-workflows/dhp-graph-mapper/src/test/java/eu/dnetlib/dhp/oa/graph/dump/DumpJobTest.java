@@ -27,7 +27,6 @@ import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Software;
 
-//@ExtendWith(MockitoExtension.class)
 public class DumpJobTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -35,8 +34,6 @@ public class DumpJobTest {
 	private static SparkSession spark;
 
 	private static Path workingDir;
-
-	private static String MOCK_IS_LOOK_UP_URL = "BASEURL:8280/is/services/isLookUp";
 
 	private static final Logger log = LoggerFactory.getLogger(DumpJobTest.class);
 
