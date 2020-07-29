@@ -82,7 +82,7 @@ public class DumpGraphEntities implements Serializable {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
 			.map(d -> mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) d), Encoders.bean(Datasource.class))
-				.filter(Objects::nonNull)
+			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -113,7 +113,7 @@ public class DumpGraphEntities implements Serializable {
 
 		datasource.setId(d.getId());
 
-		Optional.ofNullable(d.getOriginalId()).ifPresent(oId -> datasource.setOriginalId(oId));
+		Optional.ofNullable(d.getOriginalId()).ifPresent(oId -> datasource.setOriginalId(oId.stream().filter(Objects::nonNull).collect(Collectors.toList())));
 
 		Optional
 			.ofNullable(d.getPid())
