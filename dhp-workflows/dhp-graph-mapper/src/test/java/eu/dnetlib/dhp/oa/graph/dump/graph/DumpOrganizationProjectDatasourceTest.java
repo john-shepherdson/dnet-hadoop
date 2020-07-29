@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Project;
 
-public class DumpOrganizationProjectTest {
+public class DumpOrganizationProjectDatasourceTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -33,18 +34,18 @@ public class DumpOrganizationProjectTest {
 	private static Path workingDir;
 
 	private static final Logger log = LoggerFactory
-		.getLogger(DumpOrganizationProjectTest.class);
+		.getLogger(DumpOrganizationProjectDatasourceTest.class);
 
 	private static HashMap<String, String> map = new HashMap<>();
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files
-			.createTempDirectory(DumpOrganizationProjectTest.class.getSimpleName());
+			.createTempDirectory(DumpOrganizationProjectDatasourceTest.class.getSimpleName());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
-		conf.setAppName(DumpOrganizationProjectTest.class.getSimpleName());
+		conf.setAppName(DumpOrganizationProjectDatasourceTest.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
@@ -55,7 +56,7 @@ public class DumpOrganizationProjectTest {
 
 		spark = SparkSession
 			.builder()
-			.appName(DumpOrganizationProjectTest.class.getSimpleName())
+			.appName(DumpOrganizationProjectDatasourceTest.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}
@@ -116,6 +117,30 @@ public class DumpOrganizationProjectTest {
 
 		verificationDataset.foreach(o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
 
+	}
+
+	@Test
+	public void dumpDatasourceTest(){
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/graph/datasource")
+				.getPath();
+
+		DumpGraphEntities dg = new DumpGraphEntities();
+
+		dg.run(false, sourcePath, workingDir.toString() + "/dump", Datasource.class, null);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource> tmp = sc
+				.textFile(workingDir.toString() + "/dump")
+				.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource.class));
+
+		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource> verificationDataset = spark
+				.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource.class));
+
+		Assertions.assertEquals(5, verificationDataset.count());
+
+		verificationDataset.foreach(o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
 	}
 
 }
