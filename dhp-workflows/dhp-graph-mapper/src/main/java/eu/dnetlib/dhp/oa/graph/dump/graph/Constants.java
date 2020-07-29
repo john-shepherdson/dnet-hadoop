@@ -27,4 +27,5 @@ public class Constants implements Serializable {
 
 	public static final String HARVESTED = "Harvested";
 	public static final String DEFAULT_TRUST = "0.9";
+    public static final String FUNDER_DS = "entityregistry::projects";
 }
