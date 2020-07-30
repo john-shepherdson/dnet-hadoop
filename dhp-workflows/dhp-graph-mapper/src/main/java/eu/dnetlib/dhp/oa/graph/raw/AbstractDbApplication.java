@@ -77,7 +77,6 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 
 	private static final String ORG_ORG_RELTYPE = "organizationOrganization";
 	private static final String ORG_ORG_SUBRELTYPE = "dedup";
-	private static final String ORG_ORG_CLASS = "isSimilarTo";
 
 	private final DbClient dbClient;
 
@@ -433,6 +432,7 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 
 			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
 			final String orgId2 = createOpenaireId(40, rs.getString("id2"), true);
+			final String relClass = rs.getString("reltype");
 
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
@@ -440,7 +440,7 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 			final Relation r1 = new Relation();
 			r1.setRelType(ORG_ORG_RELTYPE);
 			r1.setSubRelType(ORG_ORG_SUBRELTYPE);
-			r1.setRelClass(ORG_ORG_CLASS);
+			r1.setRelClass(relClass);
 			r1.setSource(orgId1);
 			r1.setTarget(orgId2);
 			r1.setCollectedfrom(collectedFrom);
@@ -450,7 +450,7 @@ public abstract class AbstractDbApplication extends AbstractMigrationApplication
 			final Relation r2 = new Relation();
 			r2.setRelType(ORG_ORG_RELTYPE);
 			r2.setSubRelType(ORG_ORG_SUBRELTYPE);
-			r2.setRelClass(ORG_ORG_CLASS);
+			r2.setRelClass(relClass);
 			r2.setSource(orgId2);
 			r2.setTarget(orgId1);
 			r2.setCollectedfrom(collectedFrom);
