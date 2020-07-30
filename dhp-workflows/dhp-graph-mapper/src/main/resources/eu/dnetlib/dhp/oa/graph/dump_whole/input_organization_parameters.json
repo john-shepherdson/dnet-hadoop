@@ -23,12 +23,6 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
-	},
-	{
-		"paramName":"tn",
-		"paramLongName":"resultTableName",
-		"paramDescription": "the name of the result table we are currently working on",
-		"paramRequired": true
 	}
 ]
 

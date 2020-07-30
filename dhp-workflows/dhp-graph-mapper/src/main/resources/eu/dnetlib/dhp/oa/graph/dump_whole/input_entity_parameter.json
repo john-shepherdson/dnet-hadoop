@@ -14,7 +14,7 @@
 	},
 	{
 		"paramName": "nn",
-		"paramLongName": "nameNode",
+		"paramLongName": "hdfsNameNode",
 		"paramDescription": "the name node",
 		"paramRequired": true
 	}
