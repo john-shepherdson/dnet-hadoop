@@ -7,6 +7,8 @@ import static org.mockito.Mockito.lenient;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
@@ -19,9 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -62,7 +62,7 @@ public class CleaningFunctionTest {
 		assertTrue(p_in instanceof Result);
 		assertTrue(p_in instanceof Publication);
 
-		Publication p_out = OafCleaner.apply(p_in, mapping);
+		Publication p_out = OafCleaner.apply(CleanGraphSparkJob.fixVocabularyNames(p_in), mapping);
 
 		assertNotNull(p_out);
 
@@ -89,6 +89,15 @@ public class CleaningFunctionTest {
 		Publication p_defaults = CleanGraphSparkJob.fixDefaults(p_out);
 		assertEquals("CLOSED", p_defaults.getBestaccessright().getClassid());
 
+		getAuthorPids(p_defaults).forEach(pid -> {
+			System.out
+				.println(
+					String
+						.format(
+							"%s [%s - %s]", pid.getValue(), pid.getQualifier().getClassid(),
+							pid.getQualifier().getClassname()));
+		});
+
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_out));
 
@@ -97,13 +106,21 @@ public class CleaningFunctionTest {
 		 */
 	}
 
-	private Stream<Qualifier> getAuthorPidTypes(Publication pub) {
+	private Stream<Qualifier> getAuthorPidTypes(Result pub) {
 		return pub
 			.getAuthor()
 			.stream()
 			.map(a -> a.getPid())
 			.flatMap(p -> p.stream())
 			.map(s -> s.getQualifier());
+	}
+
+	private Stream<StructuredProperty> getAuthorPids(Result pub) {
+		return pub
+			.getAuthor()
+			.stream()
+			.map(a -> a.getPid())
+			.flatMap(p -> p.stream());
 	}
 
 	private List<String> vocs() throws IOException {
