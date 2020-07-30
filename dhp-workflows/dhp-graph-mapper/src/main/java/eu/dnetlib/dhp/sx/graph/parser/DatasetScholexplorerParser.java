@@ -317,6 +317,15 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
 							.collect(Collectors.toList()));
 			}
 
+			// TERRIBLE HACK TO AVOID EMPTY COLLECTED FROM
+			if (parsedObject.getDlicollectedfrom() == null) {
+
+				final KeyValue cf = new KeyValue();
+				cf.setKey("dli_________::europe_pmc__");
+				cf.setValue("Europe PMC");
+				parsedObject.setCollectedfrom(Collections.singletonList(cf));
+			}
+
 			if (StringUtils.isNotBlank(resolvedURL)) {
 				Instance i = new Instance();
 				i.setCollectedfrom(parsedObject.getCollectedfrom().get(0));

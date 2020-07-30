@@ -18,7 +18,7 @@
         </property>
     </parameters>
 
-    <start to="GenerateUpdates"/>
+    <start to="CreateEBIDataSet"/>
 
 
     <kill name="Kill">
@@ -48,6 +48,28 @@
         <error to="Kill"/>
     </action>
 
+    <action name="CreateEBIDataSet">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create EBI DataSet</name>
+
+            <class>eu.dnetlib.dhp.sx.ebi.SparkCreateEBIDataFrame</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=1000
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="GenerateUpdates"/>
+        <error to="Kill"/>
+    </action>
+
     <action name="GenerateUpdates">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
@@ -71,27 +93,7 @@
     </action>
 
 
-    <action name="CreateEBIDataSet">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>Create EBI DataSet</name>
 
-            <class>eu.dnetlib.dhp.sx.ebi.SparkCreateEBIDataFrame</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.sql.shuffle.partitions=1000
-                ${sparkExtraOPT}
-            </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--master</arg><arg>yarn</arg>
-        </spark>
-        <ok to="End"/>
-        <error to="Kill"/>
-    </action>
 
     <end name="End"/>
 </workflow-app>
