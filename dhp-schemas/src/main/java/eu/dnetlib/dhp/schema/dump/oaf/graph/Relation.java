@@ -49,4 +49,13 @@ public class Relation implements Serializable {
 
 		return Objects.hash(source.getId(), target.getId(), reltype.getType() + ":" + reltype.getName());
 	}
+
+	public static Relation newInstance(Node source, Node target, RelType reltype, Provenance provenance) {
+		Relation relation = new Relation();
+		relation.source = source;
+		relation.target = target;
+		relation.reltype = reltype;
+		relation.provenance = provenance;
+		return relation;
+	}
 }
