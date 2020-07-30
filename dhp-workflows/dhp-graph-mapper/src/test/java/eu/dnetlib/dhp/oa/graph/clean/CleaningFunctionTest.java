@@ -66,6 +66,8 @@ public class CleaningFunctionTest {
 
 		assertNotNull(p_out);
 
+		assertNotNull(p_out.getPublisher());
+		assertNull(p_out.getPublisher().getValue());
 		assertEquals("und", p_out.getLanguage().getClassid());
 		assertEquals("Undetermined", p_out.getLanguage().getClassname());
 
@@ -88,6 +90,7 @@ public class CleaningFunctionTest {
 
 		Publication p_defaults = CleanGraphSparkJob.fixDefaults(p_out);
 		assertEquals("CLOSED", p_defaults.getBestaccessright().getClassid());
+		assertNull(p_out.getPublisher());
 
 		getAuthorPids(p_defaults).forEach(pid -> {
 			System.out

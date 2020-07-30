@@ -173,6 +173,9 @@ public class CleanGraphSparkJob {
 		} else if (value instanceof Result) {
 
 			Result r = (Result) value;
+			if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getValue())) {
+				r.setPublisher(null);
+			}
 			if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
 				r
 					.setLanguage(

@@ -208,6 +208,9 @@
     }
   ],
   "bestaccessright": null,
+  "publisher": {
+    "value": null
+  },
   "collectedfrom": [
     {
       "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
