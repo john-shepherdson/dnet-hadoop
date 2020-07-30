@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
@@ -28,7 +27,7 @@ public class SparkCollectAndSave implements Serializable {
 			.toString(
 				SparkCollectAndSave.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump/input_collect_and_save.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_collect_and_save.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
@@ -67,7 +66,7 @@ public class SparkCollectAndSave implements Serializable {
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
-			.json(outputPath);
+			.json(outputPath + "/result");
 
 		Utils
 			.readPath(spark, inputPath + "/relation/publication", Relation.class)
