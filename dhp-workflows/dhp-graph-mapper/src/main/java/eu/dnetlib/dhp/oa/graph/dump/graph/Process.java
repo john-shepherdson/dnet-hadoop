@@ -54,8 +54,8 @@ public class Process implements Serializable {
 				.forEach(ds -> {
 
 					String nodeType = ModelSupport.idPrefixEntity.get(ds.substring(0, 2));
-					String contextId = Utils.getContextId(ci.getId());
 
+					String contextId = Utils.getContextId(ci.getId());
 					relationList.add(Relation.newInstance(
 							Node.newInstance(contextId, eu.dnetlib.dhp.schema.dump.oaf.graph.Constants.CONTEXT_ENTITY),
 							Node.newInstance(ds, nodeType),
