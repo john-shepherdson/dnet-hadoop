@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import eu.dnetlib.dhp.schema.oaf.Datasource;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Project;
 
@@ -120,10 +120,10 @@ public class DumpOrganizationProjectDatasourceTest {
 	}
 
 	@Test
-	public void dumpDatasourceTest(){
+	public void dumpDatasourceTest() {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/graph/datasource")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/graph/datasource")
+			.getPath();
 
 		DumpGraphEntities dg = new DumpGraphEntities();
 
@@ -132,11 +132,11 @@ public class DumpOrganizationProjectDatasourceTest {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource> tmp = sc
-				.textFile(workingDir.toString() + "/dump")
-				.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource.class));
+			.textFile(workingDir.toString() + "/dump")
+			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource.class));
 
 		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource.class));
+			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource.class));
 
 		Assertions.assertEquals(5, verificationDataset.count());
 
