@@ -5,6 +5,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+
 import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -13,6 +18,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 
 public class Process implements Serializable {
+	private static final Logger log = LoggerFactory.getLogger(Process.class);
 
 	public static <R extends ResearchInitiative> R getEntity(ContextInfo ci) {
 		try {
@@ -31,6 +37,7 @@ public class Process implements Serializable {
 			ri.setDescription(ci.getDescription());
 			ri.setName(ci.getName());
 			ri.setZenodo_community(Constants.ZENODO_COMMUNITY_PREFIX + ci.getZenodocommunity());
+			// log.info("created context: {}", new Gson().toJson(ri));
 			return (R) ri;
 
 		} catch (final Exception e) {
@@ -45,20 +52,28 @@ public class Process implements Serializable {
 			ci
 				.getDatasourceList()
 				.forEach(ds -> {
-					Relation direct = new Relation();
-					Relation inverse = new Relation();
-					String nodeType = ModelSupport.idPrefixEntity.get(ds.substring(0, 2));
-					direct.setSource(Node.newInstance(Utils.getContextId(ci.getId()), "context"));
-					direct.setTarget(Node.newInstance(ds, nodeType));
-					direct.setReltype(RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP));
-					direct.setProvenance(Provenance.newInstance("Harvested", "09"));
-					relationList.add(direct);
 
-					inverse.setTarget(Node.newInstance(Utils.getContextId(ci.getId()), "context"));
-					inverse.setSource(Node.newInstance(ds, nodeType));
-					inverse.setReltype(RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP));
-					inverse.setProvenance(Provenance.newInstance("Harvested", "09"));
-					relationList.add(inverse);
+					String nodeType = ModelSupport.idPrefixEntity.get(ds.substring(0, 2));
+					String contextId = Utils.getContextId(ci.getId());
+
+					relationList.add(Relation.newInstance(
+							Node.newInstance(contextId, eu.dnetlib.dhp.schema.dump.oaf.graph.Constants.CONTEXT_ENTITY),
+							Node.newInstance(ds, nodeType),
+							RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+							Provenance
+									.newInstance(
+											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.USER_CLAIM,
+											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.DEFAULT_TRUST)
+					));
+
+					relationList.add(Relation.newInstance(Node.newInstance(ds, nodeType),
+							Node.newInstance(contextId, eu.dnetlib.dhp.schema.dump.oaf.graph.Constants.CONTEXT_ENTITY),
+							RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+							Provenance
+									.newInstance(
+											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.USER_CLAIM,
+											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.DEFAULT_TRUST)
+							));
 
 				});
 
