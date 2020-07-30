@@ -24,7 +24,7 @@ public class Project implements Serializable {
 
 	private String keywords;
 
-	private String duration;
+	// private String duration; removed because the most of the times is set to 0
 
 	private boolean openaccessmandateforpublications;
 
@@ -111,13 +111,13 @@ public class Project implements Serializable {
 		this.keywords = keywords;
 	}
 
-	public String getDuration() {
-		return duration;
-	}
-
-	public void setDuration(String duration) {
-		this.duration = duration;
-	}
+//	public String getDuration() {
+//		return duration;
+//	}
+//
+//	public void setDuration(String duration) {
+//		this.duration = duration;
+//	}
 
 	public boolean isOpenaccessmandateforpublications() {
 		return openaccessmandateforpublications;
