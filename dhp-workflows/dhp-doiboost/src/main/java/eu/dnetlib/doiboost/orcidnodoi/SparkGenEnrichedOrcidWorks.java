@@ -17,10 +17,12 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -93,17 +95,48 @@ public class SparkGenEnrichedOrcidWorks {
 					.toJavaRDD();
 				enrichedWorksRDD.saveAsTextFile(workingPath + outputEnrichedWorksPath);
 				logger.info("Works enriched data saved");
-				JavaRDD<Publication> oafPublicationRDD = enrichedWorksRDD.map(e -> {
-					JsonElement j = new JsonParser().parse(e._2());
-					return (Publication) PublicationToOaf
-						.generatePublicationActionsFromDump(j.getAsJsonObject());
-				}).filter(p -> p != null);
+
+				final LongAccumulator parsedPublications = spark.sparkContext().longAccumulator("parsedPublications");
+				final LongAccumulator enrichedPublications = spark
+					.sparkContext()
+					.longAccumulator("enrichedPublications");
+				final LongAccumulator errorsGeneric = spark.sparkContext().longAccumulator("errorsGeneric");
+				final LongAccumulator errorsInvalidTitle = spark.sparkContext().longAccumulator("errorsInvalidTitle");
+				final LongAccumulator errorsNotFoundAuthors = spark
+					.sparkContext()
+					.longAccumulator("errorsNotFoundAuthors");
+				final LongAccumulator errorsInvalidType = spark.sparkContext().longAccumulator("errorsInvalidType");
+				final PublicationToOaf publicationToOaf = new PublicationToOaf(
+					parsedPublications,
+					enrichedPublications,
+					errorsGeneric,
+					errorsInvalidTitle,
+					errorsNotFoundAuthors,
+					errorsInvalidType);
+				JavaRDD<Publication> oafPublicationRDD = enrichedWorksRDD
+					.map(
+						e -> {
+							return (Publication) publicationToOaf
+								.generatePublicationActionsFromJson(e._2());
+						})
+					.filter(p -> p != null);
 
 				Dataset<Publication> publicationDataset = spark
 					.createDataset(
-						oafPublicationRDD.repartition(1).rdd(),
+						oafPublicationRDD.rdd(),
 						Encoders.bean(Publication.class));
-				publicationDataset.write().mode(SaveMode.Overwrite).save(workingPath + "no_doi_dataset/output");
+				publicationDataset
+					.write()
+					.format("parquet")
+					.mode(SaveMode.Overwrite)
+					.save(workingPath + "no_doi_dataset/output");
+
+				logger.info("parsedPublications: " + parsedPublications.value().toString());
+				logger.info("enrichedPublications: " + enrichedPublications.value().toString());
+				logger.info("errorsGeneric: " + errorsGeneric.value().toString());
+				logger.info("errorsInvalidTitle: " + errorsInvalidTitle.value().toString());
+				logger.info("errorsNotFoundAuthors: " + errorsNotFoundAuthors.value().toString());
+				logger.info("errorsInvalidType: " + errorsInvalidType.value().toString());
 			});
 	}
 

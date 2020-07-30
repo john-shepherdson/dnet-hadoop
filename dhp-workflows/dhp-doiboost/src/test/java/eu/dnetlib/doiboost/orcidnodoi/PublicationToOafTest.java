@@ -27,7 +27,8 @@ public class PublicationToOafTest {
 				PublicationToOafTest.class.getResourceAsStream("publication.json"));
 		JsonElement j = new JsonParser().parse(jsonPublication);
 		logger.info("json publication loaded: " + j.toString());
-		Publication oafPublication = (Publication) PublicationToOaf
+		PublicationToOaf publicationToOaf = new PublicationToOaf();
+		Publication oafPublication = (Publication) publicationToOaf
 			.generatePublicationActionsFromDump(j.getAsJsonObject());
 		assertNotNull(oafPublication.getId());
 		assertNotNull(oafPublication.getOriginalId());

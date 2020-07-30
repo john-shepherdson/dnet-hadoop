@@ -3,18 +3,17 @@ package eu.dnetlib.doiboost.orcidnodoi.oaf;
 
 import static eu.dnetlib.doiboost.orcidnodoi.util.DumpToActionsUtility.*;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -22,7 +21,7 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.doiboost.orcidnodoi.util.DumpToActionsUtility;
 import eu.dnetlib.doiboost.orcidnodoi.util.Pair;
 
-public class PublicationToOaf {
+public class PublicationToOaf implements Serializable {
 
 	static Logger logger = LoggerFactory.getLogger(PublicationToOaf.class);
 
@@ -30,6 +29,37 @@ public class PublicationToOaf {
 	public final static String orcidPREFIX = "orcid_______";
 	public static final String OPENAIRE_PREFIX = "openaire____";
 	public static final String SEPARATOR = "::";
+
+	private final LongAccumulator parsedPublications;
+	private final LongAccumulator enrichedPublications;
+	private final LongAccumulator errorsGeneric;
+	private final LongAccumulator errorsInvalidTitle;
+	private final LongAccumulator errorsNotFoundAuthors;
+	private final LongAccumulator errorsInvalidType;
+
+	public PublicationToOaf(
+		LongAccumulator parsedPublications,
+		LongAccumulator enrichedPublications,
+		LongAccumulator errorsGeneric,
+		LongAccumulator errorsInvalidTitle,
+		LongAccumulator errorsNotFoundAuthors,
+		LongAccumulator errorsInvalidType) {
+		this.parsedPublications = parsedPublications;
+		this.enrichedPublications = enrichedPublications;
+		this.errorsGeneric = errorsGeneric;
+		this.errorsInvalidTitle = errorsInvalidTitle;
+		this.errorsNotFoundAuthors = errorsNotFoundAuthors;
+		this.errorsInvalidType = errorsInvalidType;
+	}
+
+	public PublicationToOaf() {
+		this.parsedPublications = null;
+		this.enrichedPublications = null;
+		this.errorsGeneric = null;
+		this.errorsInvalidTitle = null;
+		this.errorsNotFoundAuthors = null;
+		this.errorsInvalidType = null;
+	}
 
 	private static Map<String, Pair<String, String>> datasources = new HashMap<String, Pair<String, String>>() {
 
@@ -69,11 +99,27 @@ public class PublicationToOaf {
 
 	public static final String PID_TYPES = "dnet:pid_types";
 
-	public static Oaf generatePublicationActionsFromDump(final JsonObject rootElement) {
+	public Oaf generatePublicationActionsFromJson(final String json) {
+		try {
+			if (parsedPublications != null) {
+				parsedPublications.add(1);
+			}
+			JsonElement jElement = new JsonParser().parse(json);
+			JsonObject jObject = jElement.getAsJsonObject();
+			return generatePublicationActionsFromDump(jObject);
+		} catch (Throwable t) {
+			logger.error("creating publication: " + t.getMessage());
+			if (errorsGeneric != null) {
+				errorsGeneric.add(1);
+			}
+			return null;
+		}
+	}
+
+	public Oaf generatePublicationActionsFromDump(final JsonObject rootElement) {
 
 		logger.debug("generatePublicationActionsFromDump ...");
-		if (!isValid(rootElement/* , context */)) {
-			logger.error("publication not valid");
+		if (!isValid(rootElement)) {
 			return null;
 		}
 
@@ -122,8 +168,9 @@ public class PublicationToOaf {
 		// Adding titles
 		final List<String> titles = createRepeatedField(rootElement, "titles");
 		if (titles == null || titles.isEmpty()) {
-			logger.error("titles not found");
-//            context.incrementCounter("filtered", "title_not_found", 1);
+			if (errorsInvalidTitle != null) {
+				errorsInvalidTitle.add(1);
+			}
 			return null;
 		}
 		Qualifier q = mapQualifier("main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
@@ -189,8 +236,9 @@ public class PublicationToOaf {
 
 			publication.setInstance(Arrays.asList(instance));
 		} else {
-			logger.error("type not found");
-//            context.incrementCounter("filtered", "type_not_found", 1);
+			if (errorsInvalidType != null) {
+				errorsInvalidType.add(1);
+			}
 			return null;
 		}
 
@@ -199,17 +247,21 @@ public class PublicationToOaf {
 		if (authors != null && authors.size() > 0) {
 			publication.setAuthor(authors);
 		} else {
-			logger.error("authors not found");
-//            context.incrementCounter("filtered", "author_not_found", 1);
+			if (errorsNotFoundAuthors != null) {
+				errorsNotFoundAuthors.add(1);
+			}
 			return null;
 		}
 		String classValue = getDefaultResulttype(cobjValue);
 		publication
 			.setResulttype(mapQualifier(classValue, classValue, "dnet:result_typologies", "dnet:result_typologies"));
+		if (enrichedPublications != null) {
+			enrichedPublications.add(1);
+		}
 		return publication;
 	}
 
-	public static List<Author> createAuthors(final JsonObject root) {
+	public List<Author> createAuthors(final JsonObject root) {
 
 		final String authorsJSONFieldName = "contributors";
 
@@ -273,7 +325,7 @@ public class PublicationToOaf {
 		return null;
 	}
 
-	private static List<String> createRepeatedField(final JsonObject rootElement, final String fieldName) {
+	private List<String> createRepeatedField(final JsonObject rootElement, final String fieldName) {
 		if (!rootElement.has(fieldName)) {
 			return null;
 		}
@@ -291,14 +343,14 @@ public class PublicationToOaf {
 		}
 	}
 
-	private static String cleanField(String value) {
+	private String cleanField(String value) {
 		if (value != null && !value.isEmpty() && value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"') {
 			value = value.substring(1, value.length() - 1);
 		}
 		return value;
 	}
 
-	private static void settingRelevantDate(final JsonObject rootElement,
+	private void settingRelevantDate(final JsonObject rootElement,
 		final Publication publication,
 		final String jsonKey,
 		final String dictionaryKey,
@@ -322,7 +374,7 @@ public class PublicationToOaf {
 		}
 	}
 
-	private static String getPublicationDate(final JsonObject rootElement,
+	private String getPublicationDate(final JsonObject rootElement,
 		final String jsonKey) {
 
 		JsonObject pubDateJson = null;
@@ -358,24 +410,27 @@ public class PublicationToOaf {
 		return null;
 	}
 
-	protected static boolean isValid(final JsonObject rootElement/* , final Reporter context */) {
+	protected boolean isValid(final JsonObject rootElement/* , final Reporter context */) {
 
 		final String type = getStringValue(rootElement, "type");
 		if (!typologiesMapping.containsKey(type)) {
 			logger.error("unknowntype_" + type);
-//            context.incrementCounter("filtered", "unknowntype_" + type, 1);
+			if (errorsInvalidType != null) {
+				errorsInvalidType.add(1);
+			}
 			return false;
 		}
 
 		if (!isValidJsonArray(rootElement, "titles")) {
-			logger.error("invalid_title");
-//            context.incrementCounter("filtered", "invalid_title", 1);
+			if (errorsInvalidTitle != null) {
+				errorsInvalidTitle.add(1);
+			}
 			return false;
 		}
 		return true;
 	}
 
-	private static boolean isValidJsonArray(final JsonObject rootElement, final String fieldName) {
+	private boolean isValidJsonArray(final JsonObject rootElement, final String fieldName) {
 		if (!rootElement.has(fieldName)) {
 			return false;
 		}
@@ -395,7 +450,7 @@ public class PublicationToOaf {
 		return true;
 	}
 
-	private static Qualifier mapQualifier(String classId, String className, String schemeId, String schemeName) {
+	private Qualifier mapQualifier(String classId, String className, String schemeId, String schemeName) {
 		final Qualifier qualifier = new Qualifier();
 		qualifier.setClassid(classId);
 		qualifier.setClassname(className);
@@ -404,7 +459,7 @@ public class PublicationToOaf {
 		return qualifier;
 	}
 
-	private static ExternalReference convertExtRef(String extId, String classId, String className, String schemeId,
+	private ExternalReference convertExtRef(String extId, String classId, String className, String schemeId,
 		String schemeName) {
 		ExternalReference ex = new ExternalReference();
 		ex.setRefidentifier(extId);
@@ -412,7 +467,7 @@ public class PublicationToOaf {
 		return ex;
 	}
 
-	private static StructuredProperty mapStructuredProperty(String value, Qualifier qualifier, DataInfo dataInfo) {
+	private StructuredProperty mapStructuredProperty(String value, Qualifier qualifier, DataInfo dataInfo) {
 		if (value == null | StringUtils.isBlank(value)) {
 			return null;
 		}
@@ -424,7 +479,7 @@ public class PublicationToOaf {
 		return structuredProperty;
 	}
 
-	private static Field<String> mapStringField(String value, DataInfo dataInfo) {
+	private Field<String> mapStringField(String value, DataInfo dataInfo) {
 		if (value == null || StringUtils.isBlank(value)) {
 			return null;
 		}
@@ -435,21 +490,21 @@ public class PublicationToOaf {
 		return stringField;
 	}
 
-	private static KeyValue createCollectedFrom() {
+	private KeyValue createCollectedFrom() {
 		KeyValue cf = new KeyValue();
 		cf.setValue(ORCID);
 		cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + "806360c771262b4d6770e7cdf04b5c5a");
 		return cf;
 	}
 
-	private static KeyValue createHostedBy() {
+	private KeyValue createHostedBy() {
 		KeyValue hb = new KeyValue();
 		hb.setValue("Unknown Repository");
 		hb.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + "55045bd2a65019fd8e6741a755395c8c");
 		return hb;
 	}
 
-	private static StructuredProperty mapAuthorId(String orcidId) {
+	private StructuredProperty mapAuthorId(String orcidId) {
 		final StructuredProperty sp = new StructuredProperty();
 		sp.setValue(orcidId);
 		final Qualifier q = new Qualifier();
