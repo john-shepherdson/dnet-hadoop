@@ -113,7 +113,10 @@ public class DumpGraphEntities implements Serializable {
 
 		datasource.setId(d.getId());
 
-		Optional.ofNullable(d.getOriginalId()).ifPresent(oId -> datasource.setOriginalId(oId.stream().filter(Objects::nonNull).collect(Collectors.toList())));
+		Optional
+			.ofNullable(d.getOriginalId())
+			.ifPresent(
+				oId -> datasource.setOriginalId(oId.stream().filter(Objects::nonNull).collect(Collectors.toList())));
 
 		Optional
 			.ofNullable(d.getPid())
@@ -334,9 +337,9 @@ public class DumpGraphEntities implements Serializable {
 			.ofNullable(p.getKeywords())
 			.ifPresent(key -> project.setKeywords(key.getValue()));
 
-		Optional
-			.ofNullable(p.getDuration())
-			.ifPresent(duration -> project.setDuration(duration.getValue()));
+//		Optional
+//			.ofNullable(p.getDuration())
+//			.ifPresent(duration -> project.setDuration(duration.getValue()));
 
 		Optional<Field<String>> omandate = Optional.ofNullable(p.getOamandatepublications());
 		Optional<Field<String>> oecsc39 = Optional.ofNullable(p.getEcsc39());
