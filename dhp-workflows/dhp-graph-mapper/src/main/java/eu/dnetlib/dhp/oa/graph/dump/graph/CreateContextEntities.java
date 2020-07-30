@@ -21,6 +21,8 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchCommunity;
@@ -49,7 +51,7 @@ public class CreateContextEntities implements Serializable {
 		final String hdfsPath = parser.get("hdfsPath");
 		log.info("hdfsPath: {}", hdfsPath);
 
-		final String hdfsNameNode = parser.get("nameNode");
+		final String hdfsNameNode = parser.get("hdfsNameNode");
 		log.info("nameNode: {}", hdfsNameNode);
 
 		final String isLookUpUrl = parser.get("isLookUpUrl");
@@ -60,6 +62,12 @@ public class CreateContextEntities implements Serializable {
 		log.info("Processing contexts...");
 		cce.execute(Process::getEntity, isLookUpUrl);
 
+		cce.close();
+
+	}
+
+	private void close() throws IOException {
+		writer.close();
 	}
 
 	public CreateContextEntities(String hdfsPath, String hdfsNameNode) throws IOException {
@@ -92,6 +100,7 @@ public class CreateContextEntities implements Serializable {
 	protected <R extends ResearchInitiative> void writeEntity(final R r) {
 		try {
 			writer.write(Utils.OBJECT_MAPPER.writeValueAsString(r));
+			//log.info("writing context : {}", new Gson().toJson(r));
 			writer.newLine();
 		} catch (final Exception e) {
 			throw new RuntimeException(e);

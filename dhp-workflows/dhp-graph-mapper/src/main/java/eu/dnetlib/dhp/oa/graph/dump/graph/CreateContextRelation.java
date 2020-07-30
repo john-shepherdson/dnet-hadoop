@@ -54,7 +54,7 @@ public class CreateContextRelation implements Serializable {
 		final String hdfsPath = parser.get("hdfsPath");
 		log.info("hdfsPath: {}", hdfsPath);
 
-		final String hdfsNameNode = parser.get("nameNode");
+		final String hdfsNameNode = parser.get("hdfsNameNode");
 		log.info("nameNode: {}", hdfsNameNode);
 
 		final String isLookUpUrl = parser.get("isLookUpUrl");
@@ -66,11 +66,17 @@ public class CreateContextRelation implements Serializable {
 		cce.execute(Process::getRelation, CONTEX_RELATION_DATASOURCE, ModelSupport.getIdPrefix(Datasource.class));
 
 		log.info("Creating relations for projects... ");
-		cce
-			.execute(
-				Process::getRelation, CONTEX_RELATION_PROJECT,
-				ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
+//		cce
+//			.execute(
+//				Process::getRelation, CONTEX_RELATION_PROJECT,
+//				ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
 
+		cce.close();
+
+	}
+
+	private void close() throws IOException {
+		writer.close();
 	}
 
 	public CreateContextRelation(String hdfsPath, String hdfsNameNode, String isLookUpUrl)
