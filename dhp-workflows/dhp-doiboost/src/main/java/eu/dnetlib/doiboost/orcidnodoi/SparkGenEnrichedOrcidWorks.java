@@ -123,7 +123,7 @@ public class SparkGenEnrichedOrcidWorks {
 
 				Dataset<Publication> publicationDataset = spark
 					.createDataset(
-						oafPublicationRDD.rdd(),
+						oafPublicationRDD.repartition(1).rdd(),
 						Encoders.bean(Publication.class));
 				publicationDataset
 					.write()

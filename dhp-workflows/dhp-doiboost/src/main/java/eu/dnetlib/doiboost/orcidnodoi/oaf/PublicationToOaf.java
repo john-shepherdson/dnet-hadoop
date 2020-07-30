@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.*;
 
 import eu.dnetlib.dhp.common.PacePerson;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.doiboost.orcidnodoi.util.DumpToActionsUtility;
@@ -217,6 +218,8 @@ public class PublicationToOaf implements Serializable {
 			final List<String> urls = createRepeatedField(rootElement, "urls");
 			if (urls != null && !urls.isEmpty()) {
 				instance.setUrl(urls);
+			} else {
+				dataInfo.setInvisible(true);
 			}
 
 			final String pubDate = getPublicationDate(rootElement, "publicationDates");
@@ -508,8 +511,10 @@ public class PublicationToOaf implements Serializable {
 		final StructuredProperty sp = new StructuredProperty();
 		sp.setValue(orcidId);
 		final Qualifier q = new Qualifier();
-		q.setClassid("ORCID");
-		q.setClassname("ORCID");
+		q.setClassid(ORCID.toLowerCase());
+		q.setClassname(ORCID.toLowerCase());
+		q.setSchemeid(ModelConstants.DNET_PID_TYPES);
+		q.setSchemename(ModelConstants.DNET_PID_TYPES);
 		sp.setQualifier(q);
 		return sp;
 	}
