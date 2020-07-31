@@ -90,12 +90,72 @@ public class CleanGraphSparkJob {
 		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
 
 		readTableFromPath(spark, inputPath, clazz)
+			.map((MapFunction<T, T>) value -> fixVocabularyNames(value), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> fixDefaults(value), Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+	}
+
+	protected static <T extends Oaf> T fixVocabularyNames(T value) {
+		if (value instanceof Datasource) {
+			// nothing to clean here
+		} else if (value instanceof Project) {
+			// nothing to clean here
+		} else if (value instanceof Organization) {
+			Organization o = (Organization) value;
+			if (Objects.nonNull(o.getCountry())) {
+				fixVocabName(o.getCountry(), ModelConstants.DNET_COUNTRY_TYPE);
+			}
+		} else if (value instanceof Relation) {
+			// nothing to clean here
+		} else if (value instanceof Result) {
+
+			Result r = (Result) value;
+
+			fixVocabName(r.getLanguage(), ModelConstants.DNET_LANGUAGES);
+			fixVocabName(r.getResourcetype(), ModelConstants.DNET_DATA_CITE_RESOURCE);
+			fixVocabName(r.getBestaccessright(), ModelConstants.DNET_ACCESS_MODES);
+
+			if (Objects.nonNull(r.getSubject())) {
+				r.getSubject().forEach(s -> fixVocabName(s.getQualifier(), ModelConstants.DNET_SUBJECT_TYPOLOGIES));
+			}
+			if (Objects.nonNull(r.getInstance())) {
+				for (Instance i : r.getInstance()) {
+					fixVocabName(i.getAccessright(), ModelConstants.DNET_ACCESS_MODES);
+					fixVocabName(i.getRefereed(), ModelConstants.DNET_REVIEW_LEVELS);
+				}
+			}
+			if (Objects.nonNull(r.getAuthor())) {
+				r.getAuthor().forEach(a -> {
+					if (Objects.nonNull(a.getPid())) {
+						a.getPid().forEach(p -> {
+							fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES);
+						});
+					}
+				});
+			}
+			if (value instanceof Publication) {
+
+			} else if (value instanceof eu.dnetlib.dhp.schema.oaf.Dataset) {
+
+			} else if (value instanceof OtherResearchProduct) {
+
+			} else if (value instanceof Software) {
+
+			}
+		}
+
+		return value;
+	}
+
+	private static void fixVocabName(Qualifier q, String vocabularyName) {
+		if (Objects.nonNull(q) && StringUtils.isBlank(q.getSchemeid())) {
+			q.setSchemeid(vocabularyName);
+			q.setSchemename(vocabularyName);
+		}
 	}
 
 	protected static <T extends Oaf> T fixDefaults(T value) {
@@ -113,6 +173,9 @@ public class CleanGraphSparkJob {
 		} else if (value instanceof Result) {
 
 			Result r = (Result) value;
+			if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getValue())) {
+				r.setPublisher(null);
+			}
 			if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
 				r
 					.setLanguage(
