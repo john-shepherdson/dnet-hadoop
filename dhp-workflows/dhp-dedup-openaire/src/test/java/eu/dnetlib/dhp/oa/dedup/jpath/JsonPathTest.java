@@ -289,4 +289,12 @@ public class JsonPathTest {
 
 		System.out.println("d = " + d);
 	}
+
+	@Test
+	public void testNull() throws Exception {
+		final Object p = null;
+
+		System.out.println((String) p);
+
+	}
 }

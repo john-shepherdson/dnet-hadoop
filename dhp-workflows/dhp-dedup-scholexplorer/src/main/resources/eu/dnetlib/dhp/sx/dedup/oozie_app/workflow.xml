@@ -144,7 +144,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Update ${entity} and add DedupRecord</name>
-            <class>eu.dnetlib.dedup.sx.SparkUpdateEntityJob</class>
+            <class>eu.dnetlib.dedup.sx.SparkUpdateEntityWithDedupInfo</class>
             <jar>dhp-dedup-scholexplorer-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
