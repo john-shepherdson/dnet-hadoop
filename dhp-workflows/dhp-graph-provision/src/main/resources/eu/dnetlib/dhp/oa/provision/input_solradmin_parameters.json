@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "isu",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "the URL to the ISLookUp Service",
+    "paramRequired": true
+  },
+  {
+    "paramName": "f",
+    "paramLongName": "format",
+    "paramDescription": "metadata format profile name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "a",
+    "paramLongName": "action",
+    "paramDescription": "the action to be performed by the application",
+    "paramRequired": true
+  },
+  {
+    "paramName": "q",
+    "paramLongName": "query",
+    "paramDescription": "the query",
+    "paramRequired": false
+  },
+  {
+    "paramName": "c",
+    "paramLongName": "commit",
+    "paramDescription": "should the action be followed by a commit?",
+    "paramRequired": false
+  }
+]
