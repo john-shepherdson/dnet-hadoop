@@ -20,7 +20,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 /** Created by miriam on 02/08/2018. */
 public class ResultTagger implements Serializable {
 
-	private String trust = "0.8";
+
 
 	private boolean clearContext(Result result) {
 		int tmp = result.getContext().size();
@@ -171,21 +171,24 @@ public class ResultTagger implements Serializable {
 									getDataInfo(
 										BULKTAG_DATA_INFO_TYPE,
 										CLASS_ID_SUBJECT,
-										CLASS_NAME_BULKTAG_SUBJECT));
+										CLASS_NAME_BULKTAG_SUBJECT,
+											TAGGING_TRUST));
 						if (datasources.contains(c.getId()))
 							dataInfoList
 								.add(
 									getDataInfo(
 										BULKTAG_DATA_INFO_TYPE,
 										CLASS_ID_DATASOURCE,
-										CLASS_NAME_BULKTAG_DATASOURCE));
+										CLASS_NAME_BULKTAG_DATASOURCE,
+											TAGGING_TRUST));
 						if (czenodo.contains(c.getId()))
 							dataInfoList
 								.add(
 									getDataInfo(
 										BULKTAG_DATA_INFO_TYPE,
 										CLASS_ID_CZENODO,
-										CLASS_NAME_BULKTAG_ZENODO));
+										CLASS_NAME_BULKTAG_ZENODO,
+											TAGGING_TRUST));
 					}
 					return c;
 				})
@@ -211,21 +214,24 @@ public class ResultTagger implements Serializable {
 								getDataInfo(
 									BULKTAG_DATA_INFO_TYPE,
 									CLASS_ID_SUBJECT,
-									CLASS_NAME_BULKTAG_SUBJECT));
+									CLASS_NAME_BULKTAG_SUBJECT,
+										TAGGING_TRUST));
 					if (datasources.contains(c))
 						dataInfoList
 							.add(
 								getDataInfo(
 									BULKTAG_DATA_INFO_TYPE,
 									CLASS_ID_DATASOURCE,
-									CLASS_NAME_BULKTAG_DATASOURCE));
+									CLASS_NAME_BULKTAG_DATASOURCE,
+										TAGGING_TRUST));
 					if (czenodo.contains(c))
 						dataInfoList
 							.add(
 								getDataInfo(
 									BULKTAG_DATA_INFO_TYPE,
 									CLASS_ID_CZENODO,
-									CLASS_NAME_BULKTAG_ZENODO));
+									CLASS_NAME_BULKTAG_ZENODO,
+										TAGGING_TRUST));
 					context.setDataInfo(dataInfoList);
 					return context;
 				})
@@ -236,11 +242,12 @@ public class ResultTagger implements Serializable {
 	}
 
 	public static DataInfo getDataInfo(
-		String inference_provenance, String inference_class_id, String inference_class_name) {
+		String inference_provenance, String inference_class_id, String inference_class_name, String trust) {
 		DataInfo di = new DataInfo();
 		di.setInferred(true);
 		di.setInferenceprovenance(inference_provenance);
 		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name));
+		di.setTrust(trust);
 		return di;
 	}
 
