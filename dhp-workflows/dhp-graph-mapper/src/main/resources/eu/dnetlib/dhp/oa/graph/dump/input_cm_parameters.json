@@ -1,11 +1,6 @@
 
 [
-	{
-		"paramName":"cmp",
-		"paramLongName":"communityMapPath",
-		"paramDescription": "the path to the serialization of the community map",
-		"paramRequired": false
-	},
+
 	{
 		"paramName":"is",
 		"paramLongName":"isLookUpUrl",
@@ -13,9 +8,9 @@
 		"paramRequired": true
 	},
 	{
-		"paramName":"s",
-		"paramLongName":"sourcePath",
-		"paramDescription": "the path of the sequencial file to read",
+		"paramName":"nn",
+		"paramLongName":"nameNode",
+		"paramDescription": "the name node",
 		"paramRequired": true
 	},
 	{
@@ -23,12 +18,6 @@
 		"paramLongName": "outputPath",
 		"paramDescription": "the path used to store temporary output files",
 		"paramRequired": true
-	},
-	{
-		"paramName": "ssm",
-		"paramLongName": "isSparkSessionManaged",
-		"paramDescription": "true if the spark session is managed, false otherwise",
-		"paramRequired": false
 	}
 ]
 

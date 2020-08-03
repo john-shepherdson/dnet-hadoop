@@ -81,7 +81,7 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="save_community_map"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -92,10 +92,20 @@
             <delete path="${outputPath}"/>
             <mkdir path="${outputPath}"/>
         </fs>
-        <ok to="fork_dump"/>
+        <ok to="save_community_map"/>
         <error to="Kill"/>
     </action>
 
+    <action name="save_community_map">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.community.SaveCommunityMap</main-class>
+            <arg>--outputPath</arg><arg>${workingDir}/communityMap</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+        </java>
+        <ok to="fork_dump"/>
+        <error to="Kill"/>
+    </action>
 
     <fork name="fork_dump">
         <path start="dump_publication"/>
@@ -124,6 +134,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
@@ -150,6 +161,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
@@ -176,6 +188,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
@@ -202,6 +215,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/software</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
@@ -346,7 +360,7 @@
                 <master>yarn</master>
                 <mode>cluster</mode>
                 <name>Split dumped result for community</name>
-                <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkSplitForCommunity</class>
+                <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkSplitForCommunityS3</class>
                 <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
                 <spark-opts>
                     --executor-memory=${sparkExecutorMemory}
@@ -360,9 +374,10 @@
                 </spark-opts>
                 <arg>--sourcePath</arg><arg>${workingDir}/ext</arg>
                 <arg>--outputPath</arg><arg>${outputPath}</arg>
+                <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
                 <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             </spark>
-            <ok to="send_zenodo"/>
+            <ok to="End"/>
             <error to="Kill"/>
         </action>
 
@@ -374,6 +389,7 @@
             <arg>--accessToken</arg><arg>${accessToken}</arg>
             <arg>--connectionUrl</arg><arg>${connectionUrl}</arg>
             <arg>--metadata</arg><arg>${metadata}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </java>
         <ok to="End"/>
