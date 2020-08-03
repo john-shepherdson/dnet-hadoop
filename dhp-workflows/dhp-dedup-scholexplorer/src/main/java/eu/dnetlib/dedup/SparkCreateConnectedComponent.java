@@ -9,18 +9,21 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.graphx.Edge;
 import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.hash.Hashing;
 
 import eu.dnetlib.dedup.graph.ConnectedComponent;
 import eu.dnetlib.dedup.graph.GraphProcessor;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.util.MapDocumentUtil;
@@ -42,7 +45,6 @@ public class SparkCreateConnectedComponent {
 			.master(parser.get("master"))
 			.getOrCreate();
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 		final String inputPath = parser.get("sourcePath");
 		final String entity = parser.get("entity");
 		final String targetPath = parser.get("targetPath");
@@ -50,8 +52,12 @@ public class SparkCreateConnectedComponent {
 		// DedupConfig.load(IOUtils.toString(SparkCreateConnectedComponent.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf2.json")));
 		final DedupConfig dedupConf = DedupConfig.load(parser.get("dedupConf"));
 
-		final JavaPairRDD<Object, String> vertexes = sc
-			.textFile(inputPath + "/" + entity)
+		final JavaPairRDD<Object, String> vertexes = spark
+			.read()
+			.load(inputPath + "/" + entity)
+			.as(Encoders.kryo(Oaf.class))
+			.map((MapFunction<Oaf, String>) p -> new ObjectMapper().writeValueAsString(p), Encoders.STRING())
+			.javaRDD()
 			.map(s -> MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), s))
 			.mapToPair(
 				(PairFunction<String, Object, String>) s -> new Tuple2<Object, String>(getHashcode(s), s));

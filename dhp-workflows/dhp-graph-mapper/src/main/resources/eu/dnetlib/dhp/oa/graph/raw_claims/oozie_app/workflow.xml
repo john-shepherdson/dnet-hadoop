@@ -38,7 +38,11 @@
             <name>isLookupUrl</name>
             <description>the address of the lookUp service</description>
         </property>
-
+        <property>
+            <name>nsPrefixBlacklist</name>
+            <value></value>
+            <description>a blacklist of nsprefixes (comma separeted)</description>
+        </property>
         <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
@@ -113,6 +117,7 @@
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--action</arg><arg>claims</arg>
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
+            <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
         <ok to="ImportODF_claims"/>
         <error to="Kill"/>

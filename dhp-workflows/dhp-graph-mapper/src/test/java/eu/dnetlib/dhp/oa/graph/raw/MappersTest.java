@@ -276,6 +276,17 @@ public class MappersTest {
 		System.out.println("***************");
 	}
 
+
+	@Test
+	void testClaimDedup() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_dedup.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+	}
+
 	private void assertValidId(final String id) {
 		assertEquals(49, id.length());
 		assertEquals('|', id.charAt(2));

@@ -1,7 +1,7 @@
 <configuration>
 
     <!-- OCEAN  -->
-    <!--
+
     <property>
         <name>jobTracker</name>
         <value>yarnRM</value>
@@ -18,26 +18,26 @@
         <name>spark2YarnHistoryServerAddress</name>
         <value>http://iis-cdh5-test-gw.ocean.icm.edu.pl:18089</value>
     </property>
-    -->
+
 
     <!-- GARR  -->
 
-    <property>
-        <name>jobTracker</name>
-        <value>yarn</value>
-    </property>
-    <property>
-        <name>nameNode</name>
-        <value>hdfs://hadoop-rm1.garr-pa1.d4science.org:8020</value>
-    </property>
-    <property>
-        <name>hive_metastore_uris</name>
-        <value>thrift://hadoop-edge3.garr-pa1.d4science.org:9083</value>
-    </property>
-    <property>
-        <name>spark2YarnHistoryServerAddress</name>
-        <value>http://hadoop-rm2.garr-pa1.d4science.org:19888</value>
-    </property>
+<!--    <property>-->
+<!--        <name>jobTracker</name>-->
+<!--        <value>yarn</value>-->
+<!--    </property>-->
+<!--    <property>-->
+<!--        <name>nameNode</name>-->
+<!--        <value>hdfs://hadoop-rm1.garr-pa1.d4science.org:8020</value>-->
+<!--    </property>-->
+<!--    <property>-->
+<!--        <name>hive_metastore_uris</name>-->
+<!--        <value>thrift://hadoop-edge3.garr-pa1.d4science.org:9083</value>-->
+<!--    </property>-->
+<!--    <property>-->
+<!--        <name>spark2YarnHistoryServerAddress</name>-->
+<!--        <value>http://hadoop-rm2.garr-pa1.d4science.org:19888</value>-->
+<!--    </property>-->
 
 
     <property>

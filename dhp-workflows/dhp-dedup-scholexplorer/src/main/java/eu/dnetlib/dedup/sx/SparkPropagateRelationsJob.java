@@ -14,16 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class SparkPropagateRelationsJob {
-	enum FieldType {
-		SOURCE, TARGET
-	}
-
-	static final String SOURCEJSONPATH = "$.source";
-	static final String TARGETJSONPATH = "$.target";
 
 	public static void main(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -39,7 +34,6 @@ public class SparkPropagateRelationsJob {
 			.master(parser.get("master"))
 			.getOrCreate();
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 		final String relationPath = parser.get("relationPath");
 		final String mergeRelPath = parser.get("mergeRelPath");
 		final String targetRelPath = parser.get("targetRelPath");
@@ -50,63 +44,38 @@ public class SparkPropagateRelationsJob {
 			.as(Encoders.bean(Relation.class))
 			.where("relClass == 'merges'");
 
-		final Dataset<Relation> rels = spark.read().load(relationPath).as(Encoders.bean(Relation.class));
+		final Dataset<DLIRelation> rels = spark
+			.read()
+			.load(relationPath)
+			.as(Encoders.kryo(DLIRelation.class))
+			.map(
+				(MapFunction<DLIRelation, DLIRelation>) r -> r,
+				Encoders.bean(DLIRelation.class));
 
-		final Dataset<Relation> firstJoin = rels
+		final Dataset<DLIRelation> firstJoin = rels
 			.joinWith(merge, merge.col("target").equalTo(rels.col("source")), "left_outer")
 			.map(
-				(MapFunction<Tuple2<Relation, Relation>, Relation>) r -> {
+				(MapFunction<Tuple2<DLIRelation, Relation>, DLIRelation>) r -> {
 					final Relation mergeRelation = r._2();
-					final Relation relation = r._1();
-
+					final DLIRelation relation = r._1();
 					if (mergeRelation != null)
 						relation.setSource(mergeRelation.getSource());
 					return relation;
 				},
-				Encoders.bean(Relation.class));
+				Encoders.bean(DLIRelation.class));
 
-		final Dataset<Relation> secondJoin = firstJoin
+		final Dataset<DLIRelation> secondJoin = firstJoin
 			.joinWith(merge, merge.col("target").equalTo(firstJoin.col("target")), "left_outer")
 			.map(
-				(MapFunction<Tuple2<Relation, Relation>, Relation>) r -> {
+				(MapFunction<Tuple2<DLIRelation, Relation>, DLIRelation>) r -> {
 					final Relation mergeRelation = r._2();
-					final Relation relation = r._1();
+					final DLIRelation relation = r._1();
 					if (mergeRelation != null)
 						relation.setTarget(mergeRelation.getSource());
 					return relation;
 				},
-				Encoders.bean(Relation.class));
+				Encoders.kryo(DLIRelation.class));
 
 		secondJoin.write().mode(SaveMode.Overwrite).save(targetRelPath);
-	}
-
-	private static boolean containsDedup(final String json) {
-		final String source = DHPUtils.getJPathString(SOURCEJSONPATH, json);
-		final String target = DHPUtils.getJPathString(TARGETJSONPATH, json);
-
-		return source.toLowerCase().contains("dedup") || target.toLowerCase().contains("dedup");
-	}
-
-	private static String replaceField(final String json, final String id, final FieldType type) {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		try {
-			Relation relation = mapper.readValue(json, Relation.class);
-			if (relation.getDataInfo() == null)
-				relation.setDataInfo(new DataInfo());
-			relation.getDataInfo().setDeletedbyinference(false);
-			switch (type) {
-				case SOURCE:
-					relation.setSource(id);
-					return mapper.writeValueAsString(relation);
-				case TARGET:
-					relation.setTarget(id);
-					return mapper.writeValueAsString(relation);
-				default:
-					throw new IllegalArgumentException("");
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("unable to deserialize json relation: " + json, e);
-		}
 	}
 }

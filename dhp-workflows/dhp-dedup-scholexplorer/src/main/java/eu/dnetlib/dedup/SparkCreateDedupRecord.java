@@ -4,9 +4,9 @@ package eu.dnetlib.dedup;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
@@ -41,12 +41,19 @@ public class SparkCreateDedupRecord {
 				DedupUtility.createEntityPath(sourcePath, entity),
 				OafEntityType.valueOf(entity),
 				dedupConf);
-		dedupRecord
-			.map(
-				r -> {
-					ObjectMapper mapper = new ObjectMapper();
-					return mapper.writeValueAsString(r);
-				})
-			.saveAsTextFile(dedupPath + "/" + entity + "/dedup_records");
+		spark
+			.createDataset(dedupRecord.rdd(), Encoders.kryo(OafEntity.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.save(dedupPath + "/" + entity + "/dedup_records");
+//
+//
+//		dedupRecord
+//			.map(
+//				r -> {
+//					ObjectMapper mapper = new ObjectMapper();
+//					return mapper.writeValueAsString(r);
+//				})
+//			.saveAsTextFile(dedupPath + "/" + entity + "/dedup_records");
 	}
 }
