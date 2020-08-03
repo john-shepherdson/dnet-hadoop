@@ -124,17 +124,14 @@ public class ResultMapper implements Serializable {
 
 					break;
 			}
-			Optional<List<eu.dnetlib.dhp.schema.oaf.Author>> oAuthor = Optional.ofNullable(input.getAuthor());
-			if (oAuthor.isPresent()) {
-				// List<eu.dnetlib.dhp.schema.dump.oaf.Author> authorList = new ArrayList<>();
-				out
-					.setAuthor(
-						oAuthor
-							.get()
-							.stream()
-							.map(oa -> getAuthor(oa))
-							.collect(Collectors.toList()));
-			}
+
+			Optional
+				.ofNullable(input.getFulltext())
+				.ifPresent(fts -> out.setFulltext(fts.stream().map(ft -> ft.getValue()).collect(Collectors.toList())));
+
+			Optional
+				.ofNullable(input.getAuthor())
+				.ifPresent(ats -> out.setAuthor(ats.stream().map(at -> getAuthor(at)).collect(Collectors.toList())));
 
 			// I do not map Access Right UNKNOWN or OTHER
 
