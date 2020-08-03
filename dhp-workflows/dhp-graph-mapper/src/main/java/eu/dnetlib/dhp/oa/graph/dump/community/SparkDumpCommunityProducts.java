@@ -45,6 +45,8 @@ public class SparkDumpCommunityProducts implements Serializable {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
+		String communityMapPath = parser.get("communityMapPath");
+
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
 
@@ -56,7 +58,15 @@ public class SparkDumpCommunityProducts implements Serializable {
 
 		DumpProducts dump = new DumpProducts();
 
-		dump.run(isSparkSessionManaged, inputPath, outputPath, communityMap, inputClazz, CommunityResult.class, false);
+		dump
+			.run(
+				isSparkSessionManaged, inputPath, outputPath, communityMapPath, inputClazz, CommunityResult.class,
+				false);
+
+//		dump
+//			.run(
+//				isSparkSessionManaged, inputPath, outputPath, communityMap, inputClazz, CommunityResult.class,
+//				false);
 
 	}
 
