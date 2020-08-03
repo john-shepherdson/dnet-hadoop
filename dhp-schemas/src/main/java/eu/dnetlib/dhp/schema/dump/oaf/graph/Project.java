@@ -6,12 +6,20 @@ import java.util.List;
 
 import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
 
-//At the moment the funder is map in the project.
-//We will reserve to decide if to create specific entities for funders (and related relations to the organization)
-// or let them in the project
+/**
+ * This is the class representing the Project in the model used for the dumps of the whole graph. At the moment the dump
+ * of the Projects differs from the other dumps because we do not create relations between Funders (Organization) and
+ * Projects but to take the information about the Funder within the Project representation. We also removed the
+ * collected from element from the Project. No relation between the Project and the Datasource entity from which it is
+ * collected will be created. We will never create relations between Project and Datasource. In case some relation will
+ * be extracted from the Project they will refer the Funder and will be of type ( organization -> funds -> project,
+ * project -> isFundedBy -> organization) We also removed the duration parameter because the most of times it is set to
+ * 0
+ */
+
 public class Project implements Serializable {
 	private String id;
-	// private List<KeyValue> collectedfrom;
+
 	private String websiteurl;
 	private String code;
 	private String acronym;
@@ -23,8 +31,6 @@ public class Project implements Serializable {
 	private String callidentifier;
 
 	private String keywords;
-
-	// private String duration; removed because the most of the times is set to 0
 
 	private boolean openaccessmandateforpublications;
 
@@ -111,14 +117,6 @@ public class Project implements Serializable {
 		this.keywords = keywords;
 	}
 
-//	public String getDuration() {
-//		return duration;
-//	}
-//
-//	public void setDuration(String duration) {
-//		this.duration = duration;
-//	}
-
 	public boolean isOpenaccessmandateforpublications() {
 		return openaccessmandateforpublications;
 	}
@@ -175,11 +173,4 @@ public class Project implements Serializable {
 		this.programme = programme;
 	}
 
-//	public List<KeyValue> getCollectedfrom() {
-//		return collectedfrom;
-//	}
-//
-//	public void setCollectedfrom(List<KeyValue> collectedfrom) {
-//		this.collectedfrom = collectedfrom;
-//	}
 }
