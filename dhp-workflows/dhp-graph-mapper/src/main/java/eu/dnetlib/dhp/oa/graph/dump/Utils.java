@@ -7,8 +7,10 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.oa.graph.dump.graph.Constants;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -39,5 +41,11 @@ public class Utils {
 			.format(
 				"%s|%s::%s", Constants.CONTEXT_ID, Constants.CONTEXT_NS_PREFIX,
 				DHPUtils.md5(id));
+	}
+
+	public static CommunityMap getCommunityMap(SparkSession spark, String communityMapPath) {
+
+		return new Gson().fromJson(spark.read().textFile(communityMapPath).collectAsList().get(0), CommunityMap.class);
+
 	}
 }

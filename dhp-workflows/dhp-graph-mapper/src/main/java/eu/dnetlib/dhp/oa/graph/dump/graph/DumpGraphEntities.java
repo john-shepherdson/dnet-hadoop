@@ -35,13 +35,19 @@ public class DumpGraphEntities implements Serializable {
 		String inputPath,
 		String outputPath,
 		Class<? extends OafEntity> inputClazz,
-		CommunityMap communityMap) {
+		String communityMapPath) {
+		// CommunityMap communityMap) {
 
 		SparkConf conf = new SparkConf();
+
 		switch (ModelSupport.idPrefixMap.get(inputClazz)) {
 			case "50":
 				DumpProducts d = new DumpProducts();
-				d.run(isSparkSessionManaged, inputPath, outputPath, communityMap, inputClazz, Result.class, true);
+				d
+					.run(
+						isSparkSessionManaged, inputPath, outputPath, communityMapPath, inputClazz, Result.class,
+						true);
+				// d.run(isSparkSessionManaged, inputPath, outputPath, communityMap, inputClazz, Result.class, true);
 				break;
 			case "40":
 				runWithSparkSession(

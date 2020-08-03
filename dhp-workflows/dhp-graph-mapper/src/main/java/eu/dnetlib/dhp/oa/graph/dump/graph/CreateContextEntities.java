@@ -100,7 +100,7 @@ public class CreateContextEntities implements Serializable {
 	protected <R extends ResearchInitiative> void writeEntity(final R r) {
 		try {
 			writer.write(Utils.OBJECT_MAPPER.writeValueAsString(r));
-			//log.info("writing context : {}", new Gson().toJson(r));
+			// log.info("writing context : {}", new Gson().toJson(r));
 			writer.newLine();
 		} catch (final Exception e) {
 			throw new RuntimeException(e);

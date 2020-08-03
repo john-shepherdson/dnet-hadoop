@@ -8,13 +8,17 @@ import java.util.*;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 
+import com.google.gson.Gson;
+
 import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.oa.graph.dump.zenodo.Community;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
@@ -27,6 +31,24 @@ import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class Extractor implements Serializable {
+
+//	public void run(Boolean isSparkSessionManaged,
+//		String inputPath,
+//		String outputPath,
+//		Class<? extends Result> inputClazz,
+//		String communityMapPath) {
+//
+//		SparkConf conf = new SparkConf();
+//
+//		runWithSparkSession(
+//			conf,
+//			isSparkSessionManaged,
+//			spark -> {
+//				Utils.removeOutputDir(spark, outputPath);
+//				extractRelationResult(
+//					spark, inputPath, outputPath, inputClazz, Utils.getCommunityMap(spark, communityMapPath));
+//			});
+//	}
 
 	public void run(Boolean isSparkSessionManaged,
 		String inputPath,
@@ -41,7 +63,8 @@ public class Extractor implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				extractRelationResult(spark, inputPath, outputPath, inputClazz, communityMap);
+				extractRelationResult(
+					spark, inputPath, outputPath, inputClazz, communityMap);
 			});
 	}
 

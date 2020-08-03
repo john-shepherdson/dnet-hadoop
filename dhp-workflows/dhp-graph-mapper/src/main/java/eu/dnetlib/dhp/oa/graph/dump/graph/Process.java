@@ -56,24 +56,33 @@ public class Process implements Serializable {
 					String nodeType = ModelSupport.idPrefixEntity.get(ds.substring(0, 2));
 
 					String contextId = Utils.getContextId(ci.getId());
-					relationList.add(Relation.newInstance(
-							Node.newInstance(contextId, eu.dnetlib.dhp.schema.dump.oaf.graph.Constants.CONTEXT_ENTITY),
-							Node.newInstance(ds, nodeType),
-							RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
-							Provenance
-									.newInstance(
+					relationList
+						.add(
+							Relation
+								.newInstance(
+									Node
+										.newInstance(
+											contextId, eu.dnetlib.dhp.schema.dump.oaf.graph.Constants.CONTEXT_ENTITY),
+									Node.newInstance(ds, nodeType),
+									RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+									Provenance
+										.newInstance(
 											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.USER_CLAIM,
-											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.DEFAULT_TRUST)
-					));
+											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.DEFAULT_TRUST)));
 
-					relationList.add(Relation.newInstance(Node.newInstance(ds, nodeType),
-							Node.newInstance(contextId, eu.dnetlib.dhp.schema.dump.oaf.graph.Constants.CONTEXT_ENTITY),
-							RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
-							Provenance
-									.newInstance(
+					relationList
+						.add(
+							Relation
+								.newInstance(
+									Node.newInstance(ds, nodeType),
+									Node
+										.newInstance(
+											contextId, eu.dnetlib.dhp.schema.dump.oaf.graph.Constants.CONTEXT_ENTITY),
+									RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+									Provenance
+										.newInstance(
 											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.USER_CLAIM,
-											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.DEFAULT_TRUST)
-							));
+											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.DEFAULT_TRUST)));
 
 				});
 

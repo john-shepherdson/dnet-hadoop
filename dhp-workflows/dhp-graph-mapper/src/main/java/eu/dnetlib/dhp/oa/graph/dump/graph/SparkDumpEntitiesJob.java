@@ -42,6 +42,8 @@ public class SparkDumpEntitiesJob implements Serializable {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
+		final String communityMapPath = parser.get("communityMapPath");
+
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
 
@@ -52,7 +54,8 @@ public class SparkDumpEntitiesJob implements Serializable {
 		CommunityMap communityMap = queryInformationSystem.getCommunityMap();
 
 		DumpGraphEntities dg = new DumpGraphEntities();
-		dg.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMap);
+		dg.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMapPath);
+		// dg.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMap);
 
 	}
 
