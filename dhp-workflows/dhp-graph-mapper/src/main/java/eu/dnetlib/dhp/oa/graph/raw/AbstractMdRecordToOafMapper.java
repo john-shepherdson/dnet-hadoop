@@ -57,7 +57,11 @@ public abstract class AbstractMdRecordToOafMapper {
 			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
 			final Document doc = DocumentHelper
-				.parseText(xml.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3).replaceAll(DATACITE_SCHEMA_KERNEL_4_SLASH, DATACITE_SCHEMA_KERNEL_3).replaceAll(DATACITE_SCHEMA_KERNEL_3_SLASH, DATACITE_SCHEMA_KERNEL_3));
+				.parseText(
+					xml
+						.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3)
+						.replaceAll(DATACITE_SCHEMA_KERNEL_4_SLASH, DATACITE_SCHEMA_KERNEL_3)
+						.replaceAll(DATACITE_SCHEMA_KERNEL_3_SLASH, DATACITE_SCHEMA_KERNEL_3));
 
 			final KeyValue collectedFrom = getProvenanceDatasource(
 				doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");

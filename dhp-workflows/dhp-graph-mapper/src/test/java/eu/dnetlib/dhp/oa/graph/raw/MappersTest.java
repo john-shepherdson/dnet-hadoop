@@ -276,7 +276,6 @@ public class MappersTest {
 		System.out.println("***************");
 	}
 
-
 	@Test
 	void testClaimDedup() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_dedup.xml"));
