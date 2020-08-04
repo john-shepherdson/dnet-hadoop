@@ -25,7 +25,8 @@ public class PMAuthor implements Serializable {
 	}
 
 	public String getFullName() {
-		return String.format("%s, %s", this.foreName, this.lastName);
+		return String
+			.format("%s, %s", this.foreName != null ? this.foreName : "", this.lastName != null ? this.lastName : "");
 	}
 
 }

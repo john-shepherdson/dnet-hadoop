@@ -101,12 +101,17 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Import ${entity} and related entities</name>
-            <class>eu.dnetlib.dhp.sx.graph.SparkScholexplorerGraphImporter</class>
+            <class>eu.dnetlib.dhp.sx.graph.SparkXMLToOAFDataset</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT}</spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg> <arg>yarn</arg>
             <arg>--sourcePath</arg><arg>${targetXMLPath}</arg>
-            <arg>--targetPath</arg><arg>${targetEntityPath}</arg>
+            <arg>--targetPath</arg><arg>${workingPath}/input/OAFDataset</arg>
             <arg>--entity</arg><arg>${entity}</arg>
         </spark>
         <ok to="End"/>
