@@ -13,14 +13,15 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+
 public class CommunitySplitS3 implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(CommunitySplitS3.class);
+
 	public void run(Boolean isSparkSessionManaged, String inputPath, String outputPath, String communityMapPath) {
 		// public void run(Boolean isSparkSessionManaged, String inputPath, String outputPath, CommunityMap
 		// communityMap) {
@@ -33,9 +34,9 @@ public class CommunitySplitS3 implements Serializable {
 				sc.hadoopConfiguration().set("fs.s3.impl", "org.apache.hadoop.fs.s3native.NativeS3FileSystem");
 				sc.hadoopConfiguration().set("fs.s3.awsAccessKeyId", "AK0MM6C2BYA0K1PNJYYX");
 				sc.hadoopConfiguration().set("fs.s3.awsSecretAccessKey", "fpeiqUUpKAUOtO6JWMWLTxxlSxJ+yGYwHozm3jHK");
+				sc.hadoopConfiguration().set("fs.s3.endpoint", "s3.acm.edu.pl");
 				execSplit(spark, inputPath, outputPath, communityMapPath); // communityMap.keySet());// ,
-				// inputClazz);
-				// execSplit(spark, inputPath, outputPath, communityMap.keySet());
+				
 			});
 	}
 
