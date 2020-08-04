@@ -20,8 +20,6 @@ import eu.dnetlib.dhp.schema.oaf.*;
 /** Created by miriam on 02/08/2018. */
 public class ResultTagger implements Serializable {
 
-
-
 	private boolean clearContext(Result result) {
 		int tmp = result.getContext().size();
 		List<Context> clist = result
@@ -172,7 +170,7 @@ public class ResultTagger implements Serializable {
 										BULKTAG_DATA_INFO_TYPE,
 										CLASS_ID_SUBJECT,
 										CLASS_NAME_BULKTAG_SUBJECT,
-											TAGGING_TRUST));
+										TAGGING_TRUST));
 						if (datasources.contains(c.getId()))
 							dataInfoList
 								.add(
@@ -180,7 +178,7 @@ public class ResultTagger implements Serializable {
 										BULKTAG_DATA_INFO_TYPE,
 										CLASS_ID_DATASOURCE,
 										CLASS_NAME_BULKTAG_DATASOURCE,
-											TAGGING_TRUST));
+										TAGGING_TRUST));
 						if (czenodo.contains(c.getId()))
 							dataInfoList
 								.add(
@@ -188,7 +186,7 @@ public class ResultTagger implements Serializable {
 										BULKTAG_DATA_INFO_TYPE,
 										CLASS_ID_CZENODO,
 										CLASS_NAME_BULKTAG_ZENODO,
-											TAGGING_TRUST));
+										TAGGING_TRUST));
 					}
 					return c;
 				})
@@ -215,7 +213,7 @@ public class ResultTagger implements Serializable {
 									BULKTAG_DATA_INFO_TYPE,
 									CLASS_ID_SUBJECT,
 									CLASS_NAME_BULKTAG_SUBJECT,
-										TAGGING_TRUST));
+									TAGGING_TRUST));
 					if (datasources.contains(c))
 						dataInfoList
 							.add(
@@ -223,7 +221,7 @@ public class ResultTagger implements Serializable {
 									BULKTAG_DATA_INFO_TYPE,
 									CLASS_ID_DATASOURCE,
 									CLASS_NAME_BULKTAG_DATASOURCE,
-										TAGGING_TRUST));
+									TAGGING_TRUST));
 					if (czenodo.contains(c))
 						dataInfoList
 							.add(
@@ -231,7 +229,7 @@ public class ResultTagger implements Serializable {
 									BULKTAG_DATA_INFO_TYPE,
 									CLASS_ID_CZENODO,
 									CLASS_NAME_BULKTAG_ZENODO,
-										TAGGING_TRUST));
+									TAGGING_TRUST));
 					context.setDataInfo(dataInfoList);
 					return context;
 				})
