@@ -97,6 +97,28 @@ public class APIClient implements Serializable {
 		return -1;
 	}
 
+	public int uploadIS(InputStream is, String file_name){
+		OkHttpClient httpClient = new OkHttpClient();
+
+		Request request = new Request.Builder()
+				.url(bucket + "/" + file_name)
+				.addHeader("Content-Type", "application/zip") // add request headers
+				.addHeader("Authorization", "Bearer " + access_token)
+				.put(InputStreamRequestBody.create(MEDIA_TYPE_ZIP, is))
+				.build();
+
+		try (Response response = httpClient.newCall(request).execute()) {
+			if (!response.isSuccessful())
+				throw new IOException("Unexpected code " + response + response.body().string());
+			return response.code();
+		} catch (IOException e) {
+			e.printStackTrace();
+
+		}
+
+		return -1;
+	}
+
 	public int sendMretadata(String metadata) throws IOException {
 
 		OkHttpClient httpClient = new OkHttpClient();
