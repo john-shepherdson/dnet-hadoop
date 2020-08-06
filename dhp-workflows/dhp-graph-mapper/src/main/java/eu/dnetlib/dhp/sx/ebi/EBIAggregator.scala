@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.sx.ebi
 import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Dataset => OafDataset}
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation, DLIUnknown}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIUnknown}
 import org.apache.spark.sql.{Encoder, Encoders}
 import org.apache.spark.sql.expressions.Aggregator
 
@@ -168,26 +168,7 @@ object EBIAggregator {
   }
 
 
-  def getDLIRelationAggregator(): Aggregator[(String, DLIRelation), DLIRelation, DLIRelation] = new Aggregator[(String, DLIRelation), DLIRelation, DLIRelation]{
 
-    override def zero: DLIRelation = new DLIRelation()
-
-    override def reduce(b: DLIRelation, a: (String, DLIRelation)): DLIRelation = {
-      a._2
-    }
-
-
-    override def merge(a: DLIRelation, b: DLIRelation): DLIRelation = {
-      if(b!= null) b else a
-    }
-    override def finish(reduction: DLIRelation): DLIRelation = reduction
-
-    override def bufferEncoder: Encoder[DLIRelation] =
-      Encoders.kryo(classOf[DLIRelation])
-
-    override def outputEncoder: Encoder[DLIRelation] =
-      Encoders.kryo(classOf[DLIRelation])
-  }
 
 
 

@@ -1,21 +1,16 @@
 
 package eu.dnetlib.dedup.sx;
 
-import java.io.IOException;
-
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.*;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class SparkPropagateRelationsJob {
@@ -44,37 +39,39 @@ public class SparkPropagateRelationsJob {
 			.as(Encoders.bean(Relation.class))
 			.where("relClass == 'merges'");
 
-		final Dataset<DLIRelation> rels = spark
+		final Dataset<Relation> rels = spark
 			.read()
 			.load(relationPath)
-			.as(Encoders.kryo(DLIRelation.class))
+			.as(Encoders.kryo(Relation.class))
 			.map(
-				(MapFunction<DLIRelation, DLIRelation>) r -> r,
-				Encoders.bean(DLIRelation.class));
+				(MapFunction<Relation, Relation>) r -> r,
+				Encoders.bean(Relation.class));
 
-		final Dataset<DLIRelation> firstJoin = rels
+		final Dataset<Relation> firstJoin = rels
 			.joinWith(merge, merge.col("target").equalTo(rels.col("source")), "left_outer")
 			.map(
-				(MapFunction<Tuple2<DLIRelation, Relation>, DLIRelation>) r -> {
+				(MapFunction<Tuple2<Relation, Relation>, Relation>) r -> {
 					final Relation mergeRelation = r._2();
-					final DLIRelation relation = r._1();
+					final Relation relation = r._1();
 					if (mergeRelation != null)
 						relation.setSource(mergeRelation.getSource());
+					if (relation.getDataInfo()==null)
+						relation.setDataInfo(OafUtils.generateDataInfo("0.9",false));
 					return relation;
 				},
-				Encoders.bean(DLIRelation.class));
+				Encoders.bean(Relation.class));
 
-		final Dataset<DLIRelation> secondJoin = firstJoin
+		final Dataset<Relation> secondJoin = firstJoin
 			.joinWith(merge, merge.col("target").equalTo(firstJoin.col("target")), "left_outer")
 			.map(
-				(MapFunction<Tuple2<DLIRelation, Relation>, DLIRelation>) r -> {
+				(MapFunction<Tuple2<Relation, Relation>, Relation>) r -> {
 					final Relation mergeRelation = r._2();
-					final DLIRelation relation = r._1();
+					final Relation relation = r._1();
 					if (mergeRelation != null)
 						relation.setTarget(mergeRelation.getSource());
 					return relation;
 				},
-				Encoders.kryo(DLIRelation.class));
+				Encoders.kryo(Relation.class));
 
 		secondJoin.write().mode(SaveMode.Overwrite).save(targetRelPath);
 	}

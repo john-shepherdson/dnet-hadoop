@@ -53,6 +53,7 @@
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --executor-cores=${sparkExecutorCores}
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
@@ -77,6 +78,7 @@
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --executor-cores=${sparkExecutorCores}
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
@@ -101,6 +103,7 @@
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --executor-cores=${sparkExecutorCores}
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
@@ -125,6 +128,7 @@
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --executor-cores=${sparkExecutorCores}
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>
@@ -149,6 +153,7 @@
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --executor-cores=${sparkExecutorCores}
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>-mt</arg><arg>yarn-cluster</arg>

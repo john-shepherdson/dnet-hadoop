@@ -2,7 +2,7 @@ package eu.dnetlib.dedup.sx
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.{Oaf, OafEntity, Relation}
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation, DLIUnknown, OafUtils}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication,  DLIUnknown, OafUtils}
 import org.apache.commons.io.IOUtils
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.LoggerFactory
@@ -11,7 +11,7 @@ import org.apache.spark.sql.functions.col
 object SparkUpdateEntityWithDedupInfo {
 
   def main(args: Array[String]): Unit = {
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkUpdateEntityWithDedupInfo.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/argumentparser/input_extract_entities_parameters.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkUpdateEntityWithDedupInfo.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/dedup/dedup_delete_by_inference_parameters.json")))
     val logger = LoggerFactory.getLogger(SparkUpdateEntityWithDedupInfo.getClass)
     parser.parseArgument(args)
 
@@ -24,7 +24,7 @@ object SparkUpdateEntityWithDedupInfo {
     implicit val pubEncoder: Encoder[DLIPublication] = Encoders.kryo[DLIPublication]
     implicit val datEncoder: Encoder[DLIDataset] = Encoders.kryo[DLIDataset]
     implicit val unkEncoder: Encoder[DLIUnknown] = Encoders.kryo[DLIUnknown]
-    implicit val dlirelEncoder: Encoder[DLIRelation] = Encoders.kryo[DLIRelation]
+
 
 
     val spark: SparkSession = SparkSession

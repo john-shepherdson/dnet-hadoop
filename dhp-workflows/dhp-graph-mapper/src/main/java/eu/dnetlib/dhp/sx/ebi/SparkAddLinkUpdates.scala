@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.sx.ebi
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Author, Instance, Journal, KeyValue, Oaf, Publication, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{Author, Instance, Journal, KeyValue, Oaf, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils.createQualifier
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation, OafUtils, ProvenaceInfo}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, OafUtils, ProvenaceInfo}
 import eu.dnetlib.dhp.sx.ebi.model.{PMArticle, PMAuthor, PMJournal}
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.scholexplorer.relation.RelationMapper
@@ -115,8 +115,8 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
     val dnetPublicationId = s"50|${DHPUtils.md5(s"$pmid::pmid")}"
 
     targets.flatMap(l => {
-      val relation = new DLIRelation
-      val inverseRelation = new DLIRelation
+      val relation = new Relation
+      val inverseRelation = new Relation
       val targetDnetId =  s"50|${DHPUtils.md5(s"${l.tpid.toLowerCase.trim}::${l.tpidType.toLowerCase.trim}")}"
       val relInfo = relationMapper.get(l.relation.toLowerCase)
       val relationSemantic = relInfo.getOriginal
@@ -177,7 +177,7 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
     val workingPath = parser.get("workingPath")
     implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
     implicit val oafpubEncoder: Encoder[Publication] = Encoders.kryo[Publication]
-    implicit val relEncoder: Encoder[DLIRelation] = Encoders.kryo(classOf[DLIRelation])
+    implicit val relEncoder: Encoder[Relation] = Encoders.kryo(classOf[Relation])
     implicit val datEncoder: Encoder[DLIDataset] = Encoders.kryo(classOf[DLIDataset])
     implicit val pubEncoder: Encoder[DLIPublication] = Encoders.kryo(classOf[DLIPublication])
     implicit val atEncoder: Encoder[Author] = Encoders.kryo(classOf[Author])
@@ -197,7 +197,7 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
 
     val oDataset:Dataset[Oaf] = spark.read.load(s"$workingPath/baseline_links_updates_oaf").as[Oaf]
 
-    oDataset.filter(p =>p.isInstanceOf[DLIRelation]).map(p => p.asInstanceOf[DLIRelation]).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_links_updates_relation")
+    oDataset.filter(p =>p.isInstanceOf[Relation]).map(p => p.asInstanceOf[Relation]).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_links_updates_relation")
     oDataset.filter(p =>p.isInstanceOf[DLIDataset]).map(p => p.asInstanceOf[DLIDataset]).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_links_updates_dataset")
 
 
@@ -230,14 +230,14 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
       .write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_dataset_ebi")
 
 
-    val rel: Dataset[DLIRelation] = spark.read.load(s"$workingPath/relation").as[DLIRelation]
-    val relupdate : Dataset[DLIRelation] = spark.read.load(s"$workingPath/ebi_garr/baseline_links_updates_relation").as[DLIRelation]
+    val rel: Dataset[Relation] = spark.read.load(s"$workingPath/relation").as[Relation]
+    val relupdate : Dataset[Relation] = spark.read.load(s"$workingPath/ebi_garr/baseline_links_updates_relation").as[Relation]
 
 
     rel.union(relupdate)
       .map(d => (s"${d.getSource}::${d.getRelType}::${d.getTarget}", d))(Encoders.tuple(Encoders.STRING, relEncoder))
       .groupByKey(_._1)(Encoders.STRING)
-      .agg(EBIAggregator.getDLIRelationAggregator().toColumn)
+      .agg(EBIAggregator.getRelationAggregator().toColumn)
       .map(p => p._2)
       .write.mode(SaveMode.Overwrite)
       .save(s"$workingPath/baseline_relation_ebi")

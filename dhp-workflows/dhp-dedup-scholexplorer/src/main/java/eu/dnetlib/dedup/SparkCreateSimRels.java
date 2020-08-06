@@ -55,6 +55,7 @@ public class SparkCreateSimRels {
 			.as(Encoders.kryo(Oaf.class))
 			.map((MapFunction<Oaf, String>) p -> new ObjectMapper().writeValueAsString(p), Encoders.STRING())
 			.javaRDD()
+			.repartition(1000)
 			.mapToPair(
 				s -> {
 					MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
