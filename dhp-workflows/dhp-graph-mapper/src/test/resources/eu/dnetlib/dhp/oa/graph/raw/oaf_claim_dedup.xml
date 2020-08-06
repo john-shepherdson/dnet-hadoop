@@ -1,0 +1,182 @@
+<oai:record xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+            xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+            xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:dr="http://www.driver-repository.eu/namespace/dr">
+    <oai:header>
+        <dri:objIdentifier>dedup_wf_001::534276867e917fe9efe0cca10e363457</dri:objIdentifier>
+        <dri:dateOfCollection>2020-08-02T22:55:40.866Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>openaire____</oaf:datasourceprefix>
+        <dr:dateOfTransformation>2020-08-02T23:53:04.582Z</dr:dateOfTransformation>
+    </oai:header>
+    <oai:metadata>
+        <dc:contributor>ATLAS (IHEF, IoP, FNWI)</dc:contributor>
+        <dc:contributor>Doğuş Üniversitesi, Fen Edebiyat Fakültesi, Fizik Bölümü</dc:contributor>
+        <dc:contributor>TR3959</dc:contributor>
+        <dc:contributor>Doğuş Üniversitesi, Fen Edebiyat Fakültesi, Fizik Bölümü</dc:contributor>
+        <dc:contributor>TR3959</dc:contributor>
+        <dc:source>urn:issn:1748-0221</dc:source>
+        <dc:source>VOLUME=7;ISSUE=1;ISSN=1748-0221;TITLE=Journal of Instrumentation</dc:source>
+        <dc:source>ATLAS Collaboration Mitsou, Vasiliki Fiorini, Luca Ros Martínez, Eduardo Castillo
+            Giménez, María Victoria Fuster Verdú, Juan A. García García, Carmen Cabrera Urbán,
+            Susana Martí García, Salvador Salt Cairols, José Lacasta Llácer, Carlos Valls Ferrer,
+            Juan Antonio Higón Rodríguez, Emilio Ferrer Soria, Antonio González de la Hoz, Santiago
+            Kaci, Mohammed Hernández Jiménez, Yesenia Villaplana Pérez, Miguel 2012 A study of the
+            material in the ATLAS inner detector using secondary hadronic interactions Journal Of
+            Instrumentation 7 P01013 1 41</dc:source>
+        <dc:source>Journal of Instrumentation, 7(1)</dc:source>
+        <dc:source>Aad, G; Abbott, B; Abdallah, J; Abdelalim, AA; Abdesselam, A; Abdinov, O;  et
+            al.(2012). A study of the material in the ATLAS inner detector using secondary hadronic
+            interactions. Journal of Instrumentation, 7(1). doi: 10.1088/1748-0221/7/01/P01013. UC
+            Santa Cruz: Retrieved from: http://www.escholarship.org/uc/item/05j2j2br</dc:source>
+        <dc:source>Journal of Instrumentation, 7</dc:source>
+        <dc:source>VOLUME=7;ISSN=1748-0221;TITLE=Journal of Instrumentation</dc:source>
+        <dc:source>1748-0221</dc:source>
+        <dc:source>Journal of Instrumentation 7, P01013 (2012).
+            doi:10.1088/1748-0221/7/01/P01013</dc:source>
+        <dc:title>A measurement of the material in the ATLAS inner detector using secondary hadronic
+            interactions</dc:title>
+        <dc:language>und</dc:language>
+        <dc:subject classid="keyword" classname="keyword">Detector modelling and simulations I
+            (interaction of radiation with matter, interaction of photons with matter, interaction
+            of hadrons with matter, etc); Particle tracking detectors (Solid-state detectors); Si
+            microstrip and pad detectors; Large detector systems for particle and astroparticle
+            physics</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">of photons with matter, interaction of
+            hadrons with matter, etc)</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Particle Physics - Experiment</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Detector Modelling and
+            Simulations</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Detector modelling and simulations I
+            (interaction of radiation with matter, interaction of photons with matter, interaction
+            of hadrons with matter, etc)</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Large detector systems for particle and
+            astroparticle physics</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Detector modelling and simulations I
+            (interaction of radiation with matter, interaction</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Large Detector Systems</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">530</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Science &amp; Technology</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">:Ciências Físicas [Ciências
+            Naturais]</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">High Energy Physics -
+            Experiment</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Detectors de radiació</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Física nuclear</dc:subject>
+        <dc:subject classid="ddc" classname="ddc">ddc:610</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Si microstrip and pad
+            detectors</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Particle tracking detectors (Solid-state
+            detectors)</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Col·lisions (Física nuclear)</dc:subject>
+        <dc:subject classid="keyword" classname="keyword">Particle Tracking Detectors</dc:subject>
+        <dc:publisher>IOP Publishing</dc:publisher>
+        <dc:format>application/pdf</dc:format>
+        <dc:format>application/pdf</dc:format>
+        <dc:format>application/pdf</dc:format>
+        <dc:format>application/pdf</dc:format>
+        <dc:format>application/pdf</dc:format>
+        <dc:format>application/pdf</dc:format>
+        <dc:date>2016-05-02</dc:date>
+        <dc:description>The ATLAS inner detector is used to reconstruct secondary vertices due to
+            hadronic interactions of primary collision products, so probing the location and amount
+            of material in the inner region of ATLAS. Data collected in 7 TeV pp collisions at the
+            LHC, with a minimum bias trigger, are used for comparisons with simulated events. The
+            reconstructed secondary vertices have spatial resolutions ranging from ~ 200μm to 1 mm.
+            The overall material description in the simulation is validated to within an
+            experimental uncertainty of about 7%. This will lead to a better understanding of the
+            reconstruction of various objects such as tracks, leptons, jets, and missing transverse
+            momentum. We acknowledge the support of ANPCyT, Argentina; YerPhI, Armenia; ARC,
+            Australia; BMWF, Austria; ANAS, Azerbaijan; SSTC, Belarus; CNPq and FAPESP, Brazil;
+            NSERC, NRC and CFI, Canada; CERN; CONICYT, Chile; CAS, MOST and NSFC, China;
+            COLCIENCIAS, Colombia; MSMT CR, MPO CR and VSC CR, Czech Republic; DNRF, DNSRC and
+            Lundbeck Foundation, Denmark; ARTEMIS, European Union; IN2P3-CNRS, CEA-DSM/IRFU, France;
+            GNAS, Georgia; BMBF, DFG, HGF, MPG and AvH Foundation, Germany; GSRT, Greece; ISF,
+            MINERVA, GIF, DIP and Benoziyo Center, Israel; INFN, Italy; MEXT and JSPS, Japan; CNRST,
+            Morocco; FOM and NWO, Netherlands; RCN, Norway; MNiSW, Poland; GRICES and FCT, Portugal;
+            MERYS (MECTS), Romania; MES of Russia and ROSATOM, Russian Federation; JINR; MSTD,
+            Serbia; MSSR, Slovakia; ARRS and MVZT, Slovenia; DST/NRF, South Africa; MICINN, Spain;
+            SRC and Wallenberg Foundation, Sweden; SER, SNSF and Cantons of Bern and Geneva,
+            Switzerland; NSC, Taiwan; TAEK, Turkey; STFC, the Royal Society and Leverhulme Trust,
+            United Kingdom; DOE and NSF, United States of America.
+            info:eu-repo/semantics/publishedVersion</dc:description>
+        <dc:source>NARCIS</dc:source>
+        <dc:source>DSpace@Dogus</dc:source>
+        <dc:source>Lancaster EPrints</dc:source>
+        <dc:source>CERN Document Server</dc:source>
+        <dc:source>DESY Publication Database</dc:source>
+        <dc:source>OpenAIRE</dc:source>
+        <dc:source>Publikationenserver der Georg-August-Universität Göttingen</dc:source>
+        <dc:source>arXiv.org e-Print Archive</dc:source>
+        <dc:source>CORE (RIOXX-UK Aggregator)</dc:source>
+        <dc:source>eScholarship - University of California</dc:source>
+        <dc:source>Universidade do Minho: RepositoriUM</dc:source>
+        <dc:source>Dokuz Eylul University Open Archive System</dc:source>
+        <dc:source>Repositori d'Objectes Digitals per a l'Ensenyament la Recerca i la
+            Cultura</dc:source>
+        <dc:relation>info:eu-repo/semantics/altIdentifier/doi/10.1088/1748-0221/7/01/P01013</dc:relation>
+        <dc:relation>info:eu-repo/semantics/altIdentifier/doi/10.1088/1748-0221/7/01/P01013.</dc:relation>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://hdl.handle.net/11376/1605</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://www.escholarship.org/uc/item/05j2j2br</dc:identifier>
+        <dc:type>Unknown</dc:type>
+        <dc:identifier>http://cds.cern.ch/record/1394292</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://eprints.lancs.ac.uk/68235/</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://hdl.handle.net/10550/36188</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://eprints.gla.ac.uk/65933/1/65933.pdf</dc:identifier>
+        <dc:type>Preprint</dc:type>
+        <dc:identifier>http://arxiv.org/abs/1110.6191</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://dare.uva.nl/personal/pure/en/publications/a-study-of-the-material-in-the-atlas-inner-detector-using-secondary-hadronic-interactions(6b7667e2-04e2-4a66-92a8-ff4edbf61a17).html</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://hdl.handle.net/1822/48768</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://resolver.sub.uni-goettingen.de/purl?gs-1/12231</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://bib-pubdb1.desy.de/search?p=id:%22PHPPUBDB-21212%22</dc:identifier>
+        <dc:identifier>http://bib-pubdb1.desy.de/record/96807/files/CERN-PH-EP-2011-147_1110.6191v2.pdf</dc:identifier>
+        <dc:identifier>http://bib-pubdb1.desy.de//record/96807/files/CERN-PH-EP-2011-147_1110.6191v2.pdf</dc:identifier>
+        <dc:identifier>http://bib-pubdb1.desy.de/record/96807</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://arxiv.org/abs/1110.6191</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://hdl.handle.net/11376/1605</dc:identifier>
+        <dc:identifier>http://dx.doi.org/10.1088/1748-0221/7/01/P01013</dc:identifier>
+        <dc:type>Article</dc:type>
+        <dc:identifier>http://hdl.handle.net/2066/93736</dc:identifier>
+        <dc:creator>ATLAS Collaboration</dc:creator>
+        <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+        <oaf:refereed>0002</oaf:refereed>
+        <oaf:dateAccepted>2016-05-02</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:language>und</oaf:language>
+        <oaf:embargoenddate/>
+        <oaf:hostedBy id="infrastruct_::openaire" name="OpenAIRE"/>
+        <oaf:collectedFrom id="infrastruct_::openaire" name="OpenAIRE"/>
+        <oaf:journal eissn="" ep="" iss="1748-0221" issn="1748-0221" lissn="" sp="" vol=""/>
+    </oai:metadata>
+    <about>
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription harvestDate="2020-08-02T22:55:40.866Z" altered="true">
+                <baseURL>file%3A%2F%2F%2Fsrv%2Fclaims%2Frecords%2Fpublication%2Fopenaire</baseURL>
+                <identifier/>
+                <datestamp/>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction schemename="dnet:provenanceActions"
+                                  schemeid="dnet:provenanceActions" classname="user:claim" classid="user:claim"/>
+        </oaf:datainfo>
+    </about>
+</oai:record>

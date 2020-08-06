@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
+import com.google.common.collect.Lists;
+
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Author;
@@ -366,7 +368,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
-		final List<StructuredProperty> res = new ArrayList<>();
+		final Set<StructuredProperty> res = new HashSet();
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
@@ -382,7 +384,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					doc,
 					"//datacite:alternateIdentifier[@alternateIdentifierType != 'URL' and @alternateIdentifierType != 'landingPage']",
 					"@alternateIdentifierType", DNET_PID_TYPES, info));
-		return res;
+		return Lists.newArrayList(res);
 	}
 
 }

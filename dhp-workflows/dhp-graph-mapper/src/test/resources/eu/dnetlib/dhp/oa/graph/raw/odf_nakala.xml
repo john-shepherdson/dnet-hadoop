@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <oai:header xmlns="http://namespace.openaire.eu/"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <dri:objIdentifier>r3f5b9831893::cca7367159bc3ff90cd2f75bf9dc21c4</dri:objIdentifier>
+        <dri:recordIdentifier>oai:nakala.fr:hdl_11280_847e01df</dri:recordIdentifier>
+        <dri:dateOfCollection>2020-08-01T00:16:24.742Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>r3f5b9831893</oaf:datasourceprefix>
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">oai:nakala.fr:hdl_11280_847e01df</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2020-06-08T01:01:38Z</datestamp>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">hdl_11280_2b09fc10</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">hdl_11280_c1bc48d0</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">hdl_11280_57c8db3a</setSpec>
+        <dr:dateOfTransformation>2020-08-01T00:31:35.625Z</dr:dateOfTransformation>
+    </oai:header>
+    <metadata>
+        <datacite:resource xmlns="http://www.openarchives.org/OAI/2.0/"
+                           xmlns:datacite="http://datacite.org/schema/kernel-4"
+                           xmlns:dc="http://purl.org/dc/elements/1.1/"
+                           xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+                           xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                           xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://datacite.org/schema/kernel-4 https://schema.datacite.org/meta/kernel-4/metadata.xsd">
+            <datacite:alternateIdentifier identifierType="URL" xmlns:datacite="http://datacite.org/schema/kernel-4/">277</datacite:alternateIdentifier>
+            <datacite:identifier identifierType="Handle" xmlns:datacite="http://datacite.org/schema/kernel-4/">http://hdl.handle.net/11280/847e01df</datacite:identifier>
+            <alternateIdentifiers>
+                <alternateIdentifier alternateIdentifierType="URL">http://hdl.handle.net/http://hdl.handle.net/11280/847e01df</alternateIdentifier>
+            </alternateIdentifiers>
+            <datacite:alternateIdentifier identifierType="URL" xmlns:datacite="http://datacite.org/schema/kernel-4/">http://nakala.fr/data/11280/847e01df</datacite:alternateIdentifier>
+            <datacite:creators xmlns:datacite="http://datacite.org/schema/kernel-4/">
+                <datacite:creator>
+                    <datacite:creatorName>DHAAP</datacite:creatorName>
+                </datacite:creator>
+            </datacite:creators>
+            <datacite:titles xmlns:datacite="http://datacite.org/schema/kernel-4/">
+                <datacite:title>CVP_Notice277-1 place du Docteur Antoine Béclère _PHO02.jpg</datacite:title>
+            </datacite:titles>
+            <datacite:descriptions xmlns:datacite="http://datacite.org/schema/kernel-4/">
+                <datacite:description descriptionType="Abstract">Hôpital Saint-Antoine. Fragment de dalle funéraire trouvée en décembre 1932. Paris (XIIème arr.). Photographie d'Albert Citerne (1876-1970). Plaque de verre, 1932. Département Histoire de l'Architecture et Archéologie de Paris.</datacite:description>
+                <datacite:description descriptionType="Abstract">Nfa_1146</datacite:description>
+                <datacite:description descriptionType="Abstract">Hôpital Saint-Antoine. Fragment de dalle funéraire trouvée en décembre 1932. Paris (XIIème arr.). Photographie d'Albert Citerne (1876-1970). Plaque de verre, 1932. Département Histoire de l'Architecture et Archéologie de Paris.</datacite:description>
+            </datacite:descriptions>
+            <datacite:publisher xmlns:datacite="http://datacite.org/schema/kernel-4/">Nakala by Huma-Num</datacite:publisher>
+            <datacite:contributors xmlns:datacite="http://datacite.org/schema/kernel-4/">
+                <datacite:contributor contributorType="Other">
+                    <datacite:contributorName>DHAAP, Pôle Archéologique</datacite:contributorName>
+                </datacite:contributor>
+            </datacite:contributors>
+            <datacite:dates xmlns:datacite="http://datacite.org/schema/kernel-4/">
+                <datacite:date dateType="Created">1932</datacite:date>
+            </datacite:dates>
+            <datacite:resourceType resourceTypeGeneral="Image" xmlns:datacite="http://datacite.org/schema/kernel-4/">StillImage</datacite:resourceType>
+            <datacite:rightsList xmlns:datacite="http://datacite.org/schema/kernel-4/">
+                <datacite:rights rightsURI="info:eu-repo/semantics/openAccess"/>
+            </datacite:rightsList>
+        </datacite:resource>
+        <oaf:identifier identifierType="handle">http://hdl.handle.net/11280/847e01df</oaf:identifier>
+        <dr:CobjCategory type="dataset">0025</dr:CobjCategory>
+        <oaf:dateAccepted/>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:language>und</oaf:language>
+        <oaf:hostedBy id="re3data_____::r3d100012102" name="NAKALA"/>
+        <oaf:collectedFrom id="re3data_____::r3d100012102" name="NAKALA"/>
+    </metadata>
+    <about xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+           xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2020-08-01T00:16:24.742Z">
+                <baseURL>https%3A%2F%2Fwww.nakala.fr%2Foai_oa%2F11280%2F8892ab4b</baseURL>
+                <identifier>oai:nakala.fr:hdl_11280_847e01df</identifier>
+                <datestamp>2020-06-08T01:01:38Z</datestamp>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+                                  classname="sysimport:crosswalk:datasetarchive"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>

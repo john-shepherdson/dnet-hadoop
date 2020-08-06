@@ -276,6 +276,39 @@ public class MappersTest {
 		System.out.println("***************");
 	}
 
+	@Test
+	void testClaimDedup() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_dedup.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+	}
+
+	@Test
+	void testNakala() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_nakala.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Dataset);
+
+		final Dataset d = (Dataset) list.get(0);
+
+		assertValidId(d.getId());
+		assertValidId(d.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
+		assertEquals(1, d.getAuthor().size());
+		assertEquals(0, d.getSubject().size());
+		assertEquals(1, d.getInstance().size());
+		assertEquals(1, d.getPid().size());
+	}
+
 	private void assertValidId(final String id) {
 		assertEquals(49, id.length());
 		assertEquals('|', id.charAt(2));

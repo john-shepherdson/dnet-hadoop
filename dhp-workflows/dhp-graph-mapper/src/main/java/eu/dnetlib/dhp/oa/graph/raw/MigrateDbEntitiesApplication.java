@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.oa.graph.raw.common.VerifyNsPrefixPredicate;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -113,6 +115,11 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final String hdfsPath = parser.get("hdfsPath");
 		log.info("hdfsPath: {}", hdfsPath);
 
+		final String nsPrefixBlacklist = parser.get("nsPrefixBlacklist");
+		log.info("nsPrefixBlacklist: {}", nsPrefixBlacklist);
+
+		final Predicate<Oaf> verifyNamespacePrefix = new VerifyNsPrefixPredicate(nsPrefixBlacklist);
+
 		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
 		log.info("processClaims: {}", processClaims);
 
@@ -123,23 +130,25 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				smdbe.execute("queryClaims.sql", smdbe::processClaims);
 			} else {
 				log.info("Processing datasources...");
-				smdbe.execute("queryDatasources.sql", smdbe::processDatasource);
+				smdbe.execute("queryDatasources.sql", smdbe::processDatasource, verifyNamespacePrefix);
 
 				log.info("Processing projects...");
 				if (dbSchema.equalsIgnoreCase("beta")) {
-					smdbe.execute("queryProjects.sql", smdbe::processProject);
+					smdbe.execute("queryProjects.sql", smdbe::processProject, verifyNamespacePrefix);
 				} else {
-					smdbe.execute("queryProjects_production.sql", smdbe::processProject);
+					smdbe.execute("queryProjects_production.sql", smdbe::processProject, verifyNamespacePrefix);
 				}
 
 				log.info("Processing orgs...");
-				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization);
+				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
 				log.info("Processing relationsNoRemoval ds <-> orgs ...");
-				smdbe.execute("queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization);
+				smdbe
+					.execute(
+						"queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization, verifyNamespacePrefix);
 
 				log.info("Processing projects <-> orgs ...");
-				smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization);
+				smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
 			}
 			log.info("All done.");
 		}
@@ -164,9 +173,19 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer)
 		throws Exception {
+		execute(sqlFile, producer, oaf -> true);
+	}
+
+	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer,
+		final Predicate<Oaf> predicate)
+		throws Exception {
 		final String sql = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/sql/" + sqlFile));
 
-		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(oaf -> emitOaf(oaf));
+		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(oaf -> {
+			if (predicate.test(oaf)) {
+				emitOaf(oaf);
+			}
+		});
 
 		dbClient.processResults(sql, consumer);
 	}
