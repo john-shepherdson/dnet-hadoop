@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dedup.sx;
 
-import eu.dnetlib.dhp.schema.scholexplorer.OafUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -11,6 +10,7 @@ import org.apache.spark.sql.SparkSession;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils;
 import scala.Tuple2;
 
 public class SparkPropagateRelationsJob {
@@ -55,8 +55,8 @@ public class SparkPropagateRelationsJob {
 					final Relation relation = r._1();
 					if (mergeRelation != null)
 						relation.setSource(mergeRelation.getSource());
-					if (relation.getDataInfo()==null)
-						relation.setDataInfo(OafUtils.generateDataInfo("0.9",false));
+					if (relation.getDataInfo() == null)
+						relation.setDataInfo(OafUtils.generateDataInfo("0.9", false));
 					return relation;
 				},
 				Encoders.bean(Relation.class));
