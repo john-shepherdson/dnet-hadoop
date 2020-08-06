@@ -1,9 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "https://www.openaire.eu/schema/json/1.0/openaire-schema.json",
-  "type": "object",
-  "title": "OpenAIRE Json dump schema v1.0",
-  "description": "This json schema describes the format of the dumps of research results provided by OpenAIRE",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "AccessRight": {
       "type": "object",
@@ -27,11 +23,11 @@
       "properties": {
         "scheme": {
           "type": "string",
-          "description": "Description of scheme"
+          "description": "The scheme for the resource"
         },
         "value": {
           "type": "string",
-          "description": "Description of value"
+          "description": "the value in the scheme"
         }
       }
     },
@@ -45,6 +41,19 @@
         "value": {
           "type": "string",
           "description": "Description of value"
+        }
+      }
+    },
+    "Provenance": {
+      "type": "object",
+      "properties": {
+        "provenance": {
+          "type": "string",
+          "description": "The provenance of the information"
+        },
+        "trust": {
+          "type": "string",
+          "description": "The trust associated to the information"
         }
       }
     }
@@ -74,21 +83,22 @@
             "description": "First name of the author"
           },
           "pid": {
-            "description": "Persistent identifier of the author (e.g. ORCID)",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "scheme": {
-                  "type": "string",
-                  "description": "PID scheme. For authors, OpenAIRE currently supports 'ORCID' "
-                },
-                "value": {
-                  "type": "string",
-                  "description": "The PID of the author"
-                }
+            "type": "object",
+            "properties": {
+              "id": {
+                "allOf": [
+                  {"$ref": "#/definitions/ControlledField"},
+                  {"description": "The author's id and scheme. OpenAIRE currently supports 'ORCID'"}
+                ]
+              },
+              "provenance": {
+                "allOf": [
+                  {"$ref": "#/definitions/Provenance"},
+                  {"description": "The provenance of the author's pid"}
+                ]
               }
-            }
+            },
+            "description": "Persistent identifier of the author (e.g. ORCID)"
           },
           "rank": {
             "type": "integer",
@@ -104,12 +114,8 @@
     },
     "bestaccessright": {
       "allOf": [
-        {
-          "$ref": "#/definitions/AccessRight"
-        },
-        {
-          "description": "The openest access right associated to the manifestations of this research results"
-        }
+        {"$ref": "#/definitions/AccessRight"},
+        {"description": "The openest access right associated to the manifestations of this research results"}
       ]
     },
     "codeRepositoryUrl": {
@@ -121,12 +127,8 @@
       "type": "array",
       "items": {
         "allOf": [
-          {
-            "$ref": "#/definitions/KeyValue"
-          },
-          {
-            "description": "Key is the OpenAIRE identifier of the data source, value is its name"
-          }
+          {"$ref": "#/definitions/KeyValue"},
+          {"description": "Key is the OpenAIRE identifier of the data source, value is its name"}
         ]
       }
     },
@@ -169,7 +171,7 @@
         },
         "issnLinking": {
           "type": "string",
-          "description": "Journal linking issn"
+          "description": "Description of issnLinking"
         },
         "issnOnline": {
           "type": "string",
@@ -209,10 +211,13 @@
             "description": "Label of the RI/RC"
           },
           "provenance": {
-            "description": "Why this result is relevant for the RI/RC.",
+            "description": "Why this result is associated to the RI/RC.",
             "type": "array",
             "items": {
-              "type": "string"
+              "allOf": [
+                {"$ref": "#/definitions/Provenance"}
+
+              ]
             }
           }
         }
@@ -240,8 +245,10 @@
             "description": "English label of the country"
           },
           "provenance": {
-            "type": "string",
-            "description": "Why this result is associated to the country."
+            "allOf": [
+              {"$ref": "#/definitions/Provenance"},
+              {"description": "Why this result is associated to the country."}
+            ]
           }
         }
       }
@@ -267,6 +274,7 @@
       "type": "array",
       "items": {
         "type": "string"
+
       }
     },
     "embargoenddate": {
@@ -283,12 +291,10 @@
             "type": "string"
           },
           "provenance": {
-            "type": "string",
-            "description": "Why this result is linked to the external resource"
-          },
-          "trust": {
-            "type": "string",
-            "description": "Level of confidence that the link is correct"
+            "allOf": [
+              {"$ref": "#/definitions/Provenance"},
+              {"description": "Why this result is linked to the external resource"}
+            ]
           },
           "typology": {
             "type": "string"
@@ -300,6 +306,7 @@
       }
     },
     "format": {
+
       "type": "array",
       "items": {
         "type": "string"
@@ -335,28 +342,20 @@
         "properties": {
           "accessright": {
             "allOf": [
-              {
-                "$ref": "#/definitions/AccessRight"
-              },
-              {
-                "description": "Access right of this instance"
-              }
+              {"$ref": "#/definitions/AccessRight"},
+              {"description": "Access right of this instance"}
             ]
           },
           "collectedfrom": {
-            "description": "Information about the source from which the instance has been collected. Key is the OpenAIRE identifier of the data source, value is its name",
             "allOf": [
-              {
-                "$ref": "#/definitions/KeyValue"
-              }
+              {"$ref": "#/definitions/KeyValue"},
+              {"description": "Information about the source from which the instance has been collected. Key is the OpenAIRE identifier of the data source, value is its name"}
             ]
           },
           "hostedby": {
-            "description": "Information about the source from which the instance can be viewed or downloaded. Key is the OpenAIRE identifier of the data source, value is its name",
             "allOf": [
-              {
-                "$ref": "#/definitions/KeyValue"
-              }
+              {"$ref": "#/definitions/KeyValue"},
+              {"description": "Information about the source from which the instance can be viewed or downloaded. Key is the OpenAIRE identifier of the data source, value is its name"}
             ]
           },
           "license": {
@@ -376,7 +375,7 @@
             "description": "Type of the instance. Possible values are listed at https://api.openaire.eu/vocabularies/dnet:publication_resource"
           },
           "url": {
-            "description": "Location where the instance is accessible",
+            "description":"Location where the instance is accessible",
             "type": "array",
             "items": {
               "type": "string"
@@ -417,17 +416,10 @@
       "description": "Persistent identifiers of the result",
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "scheme": {
-            "type": "string",
-            "description": "PID scheme. List of available schemes are at https://api.openaire.eu/vocabularies/dnet:pid_types "
-          },
-          "value": {
-            "type": "string",
-            "description": "The PID of the result"
-          }
-        }
+        "allOf": [
+          {"$ref": "#/definitions/ControlledField"},
+          {"description": "scheme: list of available schemes are at https://api.openaire.eu/vocabularies/dnet:pid_types, value: the PID of the result "}
+        ]
       }
     },
     "programmingLanguage": {
@@ -474,6 +466,12 @@
             "type": "string",
             "description": "OpenAIRE identifier of the project"
           },
+          "provenance": {
+            "allOf": [
+              {"$ref": "#/definitions/Provenance"},
+              {"description": "Why this project is associated to the result"}
+            ]
+          },
           "title": {
             "type": "string",
             "description": "Title of the project"
@@ -500,19 +498,23 @@
         "type": "string"
       }
     },
-    "subject": {
+    "subjects": {
       "description": "Keywords associated to the result",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "scheme": {
-            "type": "string",
-            "description": "Subject classification scheme. List of available schemes are at https://api.openaire.eu/vocabularies/dnet:subject_classification_typologies. When the scheme is 'keyword', it means that the subject is free-text (i.e. not a term from a controlled vocabulary). "
+          "provenance": {
+            "allOf": [
+              {"$ref": "#/definitions/Provenance"},
+              {"description": "Why this subject is associated to the result"}
+            ]
           },
-          "value": {
-            "type": "string",
-            "description": "The subject term"
+          "subject": {
+            "allOf": [
+              {"$ref": "#/definitions/ControlledField"},
+              {"description": "OpenAIRE subject classification scheme (https://api.openaire.eu/vocabularies/dnet:subject_classification_typologies) and value. When the scheme is 'keyword', it means that the subject is free-text (i.e. not a term from a controlled vocabulary). "}
+            ]
           }
         }
       }
