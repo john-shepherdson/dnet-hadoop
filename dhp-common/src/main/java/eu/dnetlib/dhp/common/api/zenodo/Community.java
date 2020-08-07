@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.zenodo;
+package eu.dnetlib.dhp.common.api.zenodo;
 
 public class Community {
 	private String identifier;
