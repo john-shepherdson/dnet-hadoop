@@ -14,7 +14,7 @@ public class Author implements Serializable {
 
 	private Integer rank;
 
-	private List<Pid> pids;
+	private Pid pid;
 
 	private List<String> affiliation;
 
@@ -50,12 +50,12 @@ public class Author implements Serializable {
 		this.rank = rank;
 	}
 
-	public List<Pid> getPids() {
-		return pids;
+	public Pid getPid() {
+		return pid;
 	}
 
-	public void setPids(List<Pid> pids) {
-		this.pids = pids;
+	public void setPid(Pid pid) {
+		this.pid = pid;
 	}
 
 	public List<String> getAffiliation() {
