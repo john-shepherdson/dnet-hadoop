@@ -28,8 +28,6 @@ public class Result implements Serializable {
 
 	private String publicationdate; // dateofacceptance;
 
-	private List<String> fulltext;
-
 	private String publisher;
 
 	private String embargoenddate;
@@ -77,14 +75,6 @@ public class Result implements Serializable {
 	private String dateofcollection;
 
 	private Long lastupdatetimestamp;
-
-	public List<String> getFulltext() {
-		return fulltext;
-	}
-
-	public void setFulltext(List<String> fulltext) {
-		this.fulltext = fulltext;
-	}
 
 	public Long getLastupdatetimestamp() {
 		return lastupdatetimestamp;
