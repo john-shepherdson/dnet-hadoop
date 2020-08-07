@@ -1,6 +1,18 @@
 
 [
   {
+    "paramName":"nd",
+    "paramLongName":"newDeposition",
+    "paramDescription": "if it is a new deposition (true) or a new versione (false)",
+    "paramRequired": true
+  },
+  {
+    "paramName":"cri",
+    "paramLongName":"conceptRecordId",
+    "paramDescription": "The id of the concept record for a new version",
+    "paramRequired": false
+  },
+  {
     "paramName":"is",
     "paramLongName":"isLookUpUrl",
     "paramDescription": "URL of the isLookUp Service",
