@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
@@ -126,10 +128,6 @@ public class ResultMapper implements Serializable {
 			}
 
 			Optional
-				.ofNullable(input.getFulltext())
-				.ifPresent(fts -> out.setFulltext(fts.stream().map(ft -> ft.getValue()).collect(Collectors.toList())));
-
-			Optional
 				.ofNullable(input.getAuthor())
 				.ifPresent(ats -> out.setAuthor(ats.stream().map(at -> getAuthor(at)).collect(Collectors.toList())));
 
@@ -155,33 +153,39 @@ public class ResultMapper implements Serializable {
 				.ifPresent(value -> value.stream().forEach(c -> contributorList.add(c.getValue())));
 			out.setContributor(contributorList);
 
-			List<Country> countryList = new ArrayList<>();
+			// List<Country> countryList = new ArrayList<>();
 			Optional
 				.ofNullable(input.getCountry())
 				.ifPresent(
-					value -> value
-						.stream()
-						.forEach(
-							c -> {
-								Country country = new Country();
-								country.setCode(c.getClassid());
-								country.setLabel(c.getClassname());
-								Optional
-									.ofNullable(c.getDataInfo())
-									.ifPresent(
-										provenance -> country
-											.setProvenance(
-												Provenance
-													.newInstance(
-														provenance
-															.getProvenanceaction()
-															.getClassname(),
-														c.getDataInfo().getTrust())));
-								countryList
-									.add(country);
-							}));
+					value -> out
+						.setCountry(
+							value
+								.stream()
+								.map(
+									c -> {
+										if (c.getClassid().equals((ModelConstants.UNKNOWN))) {
+											return null;
+										}
+										Country country = new Country();
+										country.setCode(c.getClassid());
+										country.setLabel(c.getClassname());
+										Optional
+											.ofNullable(c.getDataInfo())
+											.ifPresent(
+												provenance -> country
+													.setProvenance(
+														Provenance
+															.newInstance(
+																provenance
+																	.getProvenanceaction()
+																	.getClassid(),
+																c.getDataInfo().getTrust())));
+										return country;
+									})
+								.filter(Objects::nonNull)
+								.collect(Collectors.toList())));
 
-			out.setCountry(countryList);
+			// out.setCountry(countryList);
 
 			final List<String> coverageList = new ArrayList<>();
 			Optional
@@ -380,7 +384,8 @@ public class ResultMapper implements Serializable {
 														.orElse(null))
 												.filter(Objects::nonNull)
 												.collect(Collectors.toSet()));
-									context.setProvenance(provenance);
+
+									context.setProvenance(getUniqueProvenance(provenance));
 								}
 								return context;
 							}
@@ -403,6 +408,50 @@ public class ResultMapper implements Serializable {
 			}
 		}
 		return out;
+
+	}
+
+	private static List<Provenance> getUniqueProvenance(List<Provenance> provenance) {
+		Provenance iProv = new Provenance();
+		// iProv.setProvenance(Constants.INFERRED);
+
+		Provenance hProv = new Provenance();
+		// hProv.setProvenance(Constants.HARVESTED);
+		Provenance lProv = new Provenance();
+
+		for (Provenance p : provenance) {
+			switch (p.getProvenance()) {
+				case Constants.HARVESTED:
+					hProv = getHighestTrust(hProv, p);
+					break;
+				case Constants.INFERRED:
+					iProv = getHighestTrust(iProv, p);
+					// To be removed as soon as the new beta run has been done
+					// this fixex issue of not set trust during bulktagging
+					if (StringUtils.isEmpty(iProv.getTrust())) {
+						iProv.setTrust(Constants.DEFAULT_TRUST);
+					}
+					break;
+				case Constants.USER_CLAIM:
+					lProv = getHighestTrust(lProv, p);
+					break;
+			}
+
+		}
+
+		return Arrays
+			.asList(iProv, hProv, lProv)
+			.stream()
+			.filter(p -> !StringUtils.isEmpty(p.getProvenance()))
+			.collect(Collectors.toList());
+
+	}
+
+	private static Provenance getHighestTrust(Provenance hProv, Provenance p) {
+		if (StringUtils.isNoneEmpty(hProv.getTrust(), p.getTrust()))
+			return hProv.getTrust().compareTo(p.getTrust()) > 0 ? hProv : p;
+
+		return (StringUtils.isEmpty(p.getTrust()) && !StringUtils.isEmpty(hProv.getTrust())) ? hProv : p;
 
 	}
 
@@ -435,21 +484,53 @@ public class ResultMapper implements Serializable {
 		a.setName(oa.getName());
 		a.setSurname(oa.getSurname());
 		a.setRank(oa.getRank());
-		Optional
-			.ofNullable(oa.getPid())
-			.ifPresent(
-				value -> a
-					.setPids(
-						value
-							.stream()
-							.map(p -> getPid(p))
-							.collect(Collectors.toList())));
+
+		Optional<List<StructuredProperty>> oPids = Optional
+			.ofNullable(oa.getPid());
+		if (oPids.isPresent()) {
+			Pid pid = getOrcid(oPids.get());
+			if (pid != null) {
+				a.setPid(pid);
+			}
+		}
+
 		return a;
+	}
+
+	private static Pid getOrcid(List<StructuredProperty> p) {
+		for (StructuredProperty pid : p) {
+			if (pid.getQualifier().getClassid().equals(Constants.ORCID)) {
+				Optional<DataInfo> di = Optional.ofNullable(pid.getDataInfo());
+				if (di.isPresent()) {
+					return Pid
+						.newInstance(
+							ControlledField
+								.newInstance(
+									pid.getQualifier().getClassid(),
+									pid.getValue()),
+							Provenance
+								.newInstance(
+									di.get().getProvenanceaction().getClassname(),
+									di.get().getTrust()));
+				} else {
+					return Pid
+						.newInstance(
+							ControlledField
+								.newInstance(
+									pid.getQualifier().getClassid(),
+									pid.getValue())
+
+						);
+				}
+
+			}
+		}
+		return null;
 	}
 
 	private static Pid getPid(StructuredProperty p) {
 		Pid pid = new Pid();
-		pid.setPid(ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()));
+		pid.setId(ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()));
 		Optional<DataInfo> di = Optional.ofNullable(p.getDataInfo());
 		Provenance provenance = new Provenance();
 		if (di.isPresent()) {
