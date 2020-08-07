@@ -127,7 +127,10 @@ public class SparkOrganizationRelation implements Serializable {
 						Node.newInstance(id, Constants.CONTEXT_ENTITY),
 						Node.newInstance(organization, ModelSupport.idPrefixEntity.get(organization.substring(0, 2))),
 						RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
-						Provenance.newInstance(Constants.USER_CLAIM, Constants.DEFAULT_TRUST)));
+						Provenance
+							.newInstance(
+								eu.dnetlib.dhp.oa.graph.dump.Constants.USER_CLAIM,
+								eu.dnetlib.dhp.oa.graph.dump.Constants.DEFAULT_TRUST)));
 
 		relList
 			.add(
@@ -136,7 +139,10 @@ public class SparkOrganizationRelation implements Serializable {
 						Node.newInstance(organization, ModelSupport.idPrefixEntity.get(organization.substring(0, 2))),
 						Node.newInstance(id, Constants.CONTEXT_ENTITY),
 						RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
-						Provenance.newInstance(Constants.USER_CLAIM, Constants.DEFAULT_TRUST)));
+						Provenance
+							.newInstance(
+								eu.dnetlib.dhp.oa.graph.dump.Constants.USER_CLAIM,
+								eu.dnetlib.dhp.oa.graph.dump.Constants.DEFAULT_TRUST)));
 	}
 
 }
