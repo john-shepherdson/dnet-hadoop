@@ -25,8 +25,5 @@ public class Constants implements Serializable {
 	public static final String CONTEXT_ID = "00";
 	public static final String CONTEXT_NS_PREFIX = "context____";
 
-	public static final String HARVESTED = "Harvested";
-	public static final String DEFAULT_TRUST = "0.9";
-	public static final String USER_CLAIM = "Linked by user";
 	// public static final String FUNDER_DS = "entityregistry::projects";
 }
