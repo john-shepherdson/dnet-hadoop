@@ -67,8 +67,8 @@ public class Process implements Serializable {
 									RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
 									Provenance
 										.newInstance(
-											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.USER_CLAIM,
-											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.DEFAULT_TRUST)));
+											Constants.USER_CLAIM,
+											Constants.DEFAULT_TRUST)));
 
 					relationList
 						.add(
@@ -81,8 +81,8 @@ public class Process implements Serializable {
 									RelType.newInstance(ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
 									Provenance
 										.newInstance(
-											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.USER_CLAIM,
-											eu.dnetlib.dhp.oa.graph.dump.graph.Constants.DEFAULT_TRUST)));
+											Constants.USER_CLAIM,
+											Constants.DEFAULT_TRUST)));
 
 				});
 
