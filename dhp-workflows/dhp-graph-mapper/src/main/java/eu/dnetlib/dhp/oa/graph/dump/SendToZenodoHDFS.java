@@ -1,23 +1,26 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import java.io.Serializable;
+import java.util.Optional;
+
+import eu.dnetlib.dhp.common.api.ZenodoAPIClient;
+import eu.dnetlib.dhp.common.api.MissingConceptDoiException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 
-import java.io.File;
-import java.io.Serializable;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 
 public class SendToZenodoHDFS implements Serializable {
 
 	private static final Log log = LogFactory.getLog(SendToZenodoHDFS.class);
 
-	public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) throws Exception, MissingConceptDoiException {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
@@ -33,6 +36,9 @@ public class SendToZenodoHDFS implements Serializable {
 		final String connection_url = parser.get("connectionUrl");
 		final String metadata = parser.get("metadata");
 		final String isLookUpUrl = parser.get("isLookUpUrl");
+		final Boolean newDeposition = Boolean.valueOf(parser.get("newDeposition"));
+		final String concept_rec_id = Optional.ofNullable(parser.get("conceptRecordId"))
+				.orElse(null);
 
 		QueryInformationSystem qis = new QueryInformationSystem();
 		qis.setIsLookUp(ISLookupClientFactory.getLookUpService(isLookUpUrl));
@@ -46,8 +52,16 @@ public class SendToZenodoHDFS implements Serializable {
 		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
 			.listFiles(
 				new Path(hdfsPath), true);
-		APIClient apiClient = new APIClient(connection_url, access_token);
-		apiClient.connect();
+		ZenodoAPIClient zenodoApiClient = new ZenodoAPIClient(connection_url, access_token);
+		if (newDeposition){
+			zenodoApiClient.newDeposition();
+		}else{
+			if (concept_rec_id == null){
+				throw new MissingConceptDoiException("No concept record id has been provided");
+			}
+			zenodoApiClient.newVersion(concept_rec_id);
+		}
+
 		while (fileStatusListIterator.hasNext()) {
 			LocatedFileStatus fileStatus = fileStatusListIterator.next();
 
@@ -58,22 +72,16 @@ public class SendToZenodoHDFS implements Serializable {
 				String community = tmp.substring(tmp.lastIndexOf("/") + 1);
 				log.info("Sending information for community: " + community);
 				String community_name = communityMap.get(community).replace(" ", "_") + ".json.gz";
-				//log.info("Copying information for community: " + community);
-				//fileSystem.copyToLocalFile(p, new Path("/tmp/" + community_name));
-				//File f = new File("/tmp/" + community_name);
-				try {
-					FSDataInputStream inputStream = fileSystem.open(p);
-					apiClient.uploadIS(inputStream, community_name);
 
-				} catch(Exception e){
+				FSDataInputStream inputStream = fileSystem.open(p);
+				zenodoApiClient.uploadIS(inputStream, community_name, fileStatus.getLen());
 
-				}
 			}
 
 		}
 
-		apiClient.sendMretadata(metadata);
-		apiClient.publish();
+		zenodoApiClient.sendMretadata(metadata);
+		zenodoApiClient.publish();
 
 	}
 
