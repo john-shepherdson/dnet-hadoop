@@ -12,12 +12,7 @@
 		"paramDescription": "the path to the serialization of the community map",
 		"paramRequired": false
 	},
-	{
-		"paramName":"is",
-		"paramLongName":"isLookUpUrl",
-		"paramDescription": "URL of the isLookUp Service",
-		"paramRequired": true
-	},
+
 	{
 		"paramName":"s",
 		"paramLongName":"sourcePath",
