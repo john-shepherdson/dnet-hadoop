@@ -14,6 +14,26 @@
                 <description>the output path</description>
             </property>
         <property>
+            <name>accessToken</name>
+            <description>the access token used for the deposition in Zenodo</description>
+        </property>
+        <property>
+            <name>connectionUrl</name>
+            <description>the connection url for Zenodo</description>
+        </property>
+        <property>
+            <name>metadata</name>
+            <description> the metadata associated to the deposition</description>
+        </property>
+        <property>
+            <name>newDeposition</name>
+            <description>true if it is a brand new depositon. false for new version of an old deposition</description>
+        </property>
+        <property>
+            <name>conceptRecordId</name>
+            <description>for new version, the id of the record for the old deposition</description>
+        </property>
+        <property>
             <name>hiveDbName</name>
             <description>the target hive database name</description>
         </property>
@@ -81,7 +101,7 @@
         </configuration>
     </global>
 
-    <start to="save_community_map"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -135,7 +155,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -162,7 +181,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -189,7 +207,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -216,7 +233,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/software</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -360,7 +376,7 @@
                 <master>yarn</master>
                 <mode>cluster</mode>
                 <name>Split dumped result for community</name>
-                <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkSplitForCommunityS3</class>
+                <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkSplitForCommunity</class>
                 <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
                 <spark-opts>
                     --executor-memory=${sparkExecutorMemory}
@@ -375,22 +391,22 @@
                 <arg>--sourcePath</arg><arg>${workingDir}/ext</arg>
                 <arg>--outputPath</arg><arg>${outputPath}</arg>
                 <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-                <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             </spark>
-            <ok to="End"/>
+            <ok to="send_zenodo"/>
             <error to="Kill"/>
         </action>
 
     <action name="send_zenodo">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.dump.SendToZenodo</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.SendToZenodoHDFS</main-class>
             <arg>--hdfsPath</arg><arg>${outputPath}</arg>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--accessToken</arg><arg>${accessToken}</arg>
             <arg>--connectionUrl</arg><arg>${connectionUrl}</arg>
             <arg>--metadata</arg><arg>${metadata}</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--conceptRecordId</arg><arg>${conceptRecordId}</arg>
+            <arg>--newDeposition</arg><arg>${newDeposition}</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>
