@@ -28,7 +28,7 @@ import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Software;
 
-@Disabled
+//@Disabled
 public class DumpJobTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -131,275 +131,275 @@ public class DumpJobTest {
 		spark.stop();
 	}
 
-//	@Test
-//	public void testMap() {
-//		System.out.println(new Gson().toJson(map));
-//	}
-//
-//	@Test
-//	public void testDataset() {
-//
-//		final String sourcePath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset.json")
-//			.getPath();
-//
-//		final String communityMapPath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-//			.getPath();
-//
-//		DumpProducts dump = new DumpProducts();
-//		dump
-//			.run(
-//				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
-//				false, sourcePath, workingDir.toString() + "/result", map, Dataset.class,
-//				CommunityResult.class, false);
-//
-//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-//
-//		JavaRDD<CommunityResult> tmp = sc
-//			.textFile(workingDir.toString() + "/result")
-//			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-//
-//		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-//			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
-//
-//		Assertions.assertEquals(90, verificationDataset.count());
-//
-//		Assertions
-//			.assertTrue(
-//				verificationDataset.filter("bestAccessright.code = 'c_abf2'").count() == verificationDataset
-//					.filter("bestAccessright.code = 'c_abf2' and bestAccessright.label = 'OPEN'")
-//					.count());
-//
-//		Assertions
-//			.assertTrue(
-//				verificationDataset.filter("bestAccessright.code = 'c_16ec'").count() == verificationDataset
-//					.filter("bestAccessright.code = 'c_16ec' and bestAccessright.label = 'RESTRICTED'")
-//					.count());
-//
-//		Assertions
-//			.assertTrue(
-//				verificationDataset.filter("bestAccessright.code = 'c_14cb'").count() == verificationDataset
-//					.filter("bestAccessright.code = 'c_14cb' and bestAccessright.label = 'CLOSED'")
-//					.count());
-//
-//		Assertions
-//			.assertTrue(
-//				verificationDataset.filter("bestAccessright.code = 'c_f1cf'").count() == verificationDataset
-//					.filter("bestAccessright.code = 'c_f1cf' and bestAccessright.label = 'EMBARGO'")
-//					.count());
-//
-//		Assertions.assertTrue(verificationDataset.filter("size(context) > 0").count() == 90);
-//
-//		Assertions.assertTrue(verificationDataset.filter("type = 'dataset'").count() == 90);
-//
-////TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
-//
-//	}
-//
-//	@Test
-//	public void testDataset2All() {
-//
-//		final String sourcePath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset_cleaned")
-//			.getPath();
-//
-//		final String communityMapPath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-//			.getPath();
-//
-//		DumpProducts dump = new DumpProducts();
-//		dump
-//			.run(
-//				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
-//				false, sourcePath, workingDir.toString() + "/result", map, Dataset.class,
-//				Result.class, true);
-//
-//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-//
-//		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
-//			.textFile(workingDir.toString() + "/result")
-//			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Result.class));
-//
-//		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Result> verificationDataset = spark
-//			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
-//
-//		Assertions.assertEquals(5, verificationDataset.count());
-//
-//		verificationDataset.show(false);
-//	}
-//
-//	@Test
-//	public void testDataset2Communities() {
-//
-//		final String sourcePath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset_cleaned")
-//			.getPath();
-//
-//		final String communityMapPath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-//			.getPath();
-//
-//		DumpProducts dump = new DumpProducts();
-//		dump
-//			.run(
-//				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
-//				false, sourcePath, workingDir.toString() + "/result", map, Dataset.class,
-//				CommunityResult.class, false);
-//
-//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-//
-//		JavaRDD<CommunityResult> tmp = sc
-//			.textFile(workingDir.toString() + "/result")
-//			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-//
-//		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-//			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
-//
-//		Assertions.assertEquals(0, verificationDataset.count());
-//
-//		verificationDataset.show(false);
-//	}
-//
-//	@Test
-//	public void testPublication() {
-//
-//		final String sourcePath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication.json")
-//			.getPath();
-//
-//		final String communityMapPath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-//			.getPath();
-//
-//		DumpProducts dump = new DumpProducts();
-//		dump
-//			.run(
-//				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-//				false, sourcePath, workingDir.toString() + "/result", map, Publication.class,
-//				CommunityResult.class, false);
-//
-//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-//
-//		JavaRDD<CommunityResult> tmp = sc
-//			.textFile(workingDir.toString() + "/result")
-//			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-//
-//		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-//			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
-//
-//		Assertions.assertEquals(74, verificationDataset.count());
-//		verificationDataset.show(false);
-//
-//		Assertions.assertEquals(74, verificationDataset.filter("type = 'publication'").count());
-//
-////TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
-//
-//	}
-//
-//	@Test
-//	public void testSoftware() {
-//
-//		final String sourcePath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/software.json")
-//			.getPath();
-//
-//		final String communityMapPath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-//			.getPath();
-//
-//		DumpProducts dump = new DumpProducts();
-//		dump
-//			.run(
-//				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Software.class,
-//				false, sourcePath, workingDir.toString() + "/result", map, Software.class,
-//				CommunityResult.class, false);
-//
-//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-//
-//		JavaRDD<CommunityResult> tmp = sc
-//			.textFile(workingDir.toString() + "/result")
-//			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-//
-//		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-//			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
-//
-//		Assertions.assertEquals(6, verificationDataset.count());
-//
-//		Assertions.assertEquals(6, verificationDataset.filter("type = 'software'").count());
-//		verificationDataset.show(false);
-//
-////TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
-//
-//	}
-//
-//	@Test
-//	public void testORP() {
-//
-//		final String sourcePath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/orp.json")
-//			.getPath();
-//
-//		final String communityMapPath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-//			.getPath();
-//
-//		DumpProducts dump = new DumpProducts();
-//		dump
-//			.run(
-//				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, OtherResearchProduct.class,
-//				false, sourcePath, workingDir.toString() + "/result", map, OtherResearchProduct.class,
-//				CommunityResult.class, false);
-//
-//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-//
-//		JavaRDD<CommunityResult> tmp = sc
-//			.textFile(workingDir.toString() + "/result")
-//			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-//
-//		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-//			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
-//
-//		Assertions.assertEquals(3, verificationDataset.count());
-//
-//		Assertions.assertEquals(3, verificationDataset.filter("type = 'other'").count());
-//		verificationDataset.show(false);
-//
-////TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
-//
-//	}
-//
-//	@Test
-//	public void testRecord() {
-//		final String sourcePath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/singelRecord_pub.json")
-//			.getPath();
-//
-//		final String communityMapPath = getClass()
-//			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-//			.getPath();
-//
-//		DumpProducts dump = new DumpProducts();
-//		dump
-//			.run(
-//				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-//				false, sourcePath, workingDir.toString() + "/result", map, Publication.class,
-//				CommunityResult.class, false);
-//
-//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-//
-//		JavaRDD<CommunityResult> tmp = sc
-//			.textFile(workingDir.toString() + "/result")
-//			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-//
-//		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-//			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
-//
-//		Assertions.assertEquals(2, verificationDataset.count());
-//		verificationDataset.show(false);
-//
-//		Assertions.assertEquals(2, verificationDataset.filter("type = 'publication'").count());
-//
-//	}
+	@Test
+	public void testMap() {
+		System.out.println(new Gson().toJson(map));
+	}
+
+	@Test
+	public void testDataset() {
+
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset.json")
+			.getPath();
+
+		final String communityMapPath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
+				CommunityResult.class, false);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<CommunityResult> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+
+		Assertions.assertEquals(90, verificationDataset.count());
+
+		Assertions
+			.assertTrue(
+				verificationDataset.filter("bestAccessright.code = 'c_abf2'").count() == verificationDataset
+					.filter("bestAccessright.code = 'c_abf2' and bestAccessright.label = 'OPEN'")
+					.count());
+
+		Assertions
+			.assertTrue(
+				verificationDataset.filter("bestAccessright.code = 'c_16ec'").count() == verificationDataset
+					.filter("bestAccessright.code = 'c_16ec' and bestAccessright.label = 'RESTRICTED'")
+					.count());
+
+		Assertions
+			.assertTrue(
+				verificationDataset.filter("bestAccessright.code = 'c_14cb'").count() == verificationDataset
+					.filter("bestAccessright.code = 'c_14cb' and bestAccessright.label = 'CLOSED'")
+					.count());
+
+		Assertions
+			.assertTrue(
+				verificationDataset.filter("bestAccessright.code = 'c_f1cf'").count() == verificationDataset
+					.filter("bestAccessright.code = 'c_f1cf' and bestAccessright.label = 'EMBARGO'")
+					.count());
+
+		Assertions.assertTrue(verificationDataset.filter("size(context) > 0").count() == 90);
+
+		Assertions.assertTrue(verificationDataset.filter("type = 'dataset'").count() == 90);
+
+//TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
+
+	}
+
+	@Test
+	public void testDataset2All() {
+
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset_cleaned")
+			.getPath();
+
+		final String communityMapPath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
+				Result.class, true);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Result.class));
+
+		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Result> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
+
+		Assertions.assertEquals(5, verificationDataset.count());
+
+		verificationDataset.show(false);
+	}
+
+	@Test
+	public void testDataset2Communities() {
+
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset_cleaned")
+			.getPath();
+
+		final String communityMapPath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
+				CommunityResult.class, false);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<CommunityResult> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+
+		Assertions.assertEquals(0, verificationDataset.count());
+
+		verificationDataset.show(false);
+	}
+
+	@Test
+	public void testPublication() {
+
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication.json")
+			.getPath();
+
+		final String communityMapPath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				CommunityResult.class, false);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<CommunityResult> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+
+		Assertions.assertEquals(74, verificationDataset.count());
+		verificationDataset.show(false);
+
+		Assertions.assertEquals(74, verificationDataset.filter("type = 'publication'").count());
+
+//TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
+
+	}
+
+	@Test
+	public void testSoftware() {
+
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/software.json")
+			.getPath();
+
+		final String communityMapPath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Software.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Software.class,
+				CommunityResult.class, false);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<CommunityResult> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+
+		Assertions.assertEquals(6, verificationDataset.count());
+
+		Assertions.assertEquals(6, verificationDataset.filter("type = 'software'").count());
+		verificationDataset.show(false);
+
+//TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
+
+	}
+
+	@Test
+	public void testORP() {
+
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/orp.json")
+			.getPath();
+
+		final String communityMapPath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, OtherResearchProduct.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, OtherResearchProduct.class,
+				CommunityResult.class, false);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<CommunityResult> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+
+		Assertions.assertEquals(3, verificationDataset.count());
+
+		Assertions.assertEquals(3, verificationDataset.filter("type = 'other'").count());
+		verificationDataset.show(false);
+
+//TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
+
+	}
+
+	@Test
+	public void testRecord() {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/singelRecord_pub.json")
+			.getPath();
+
+		final String communityMapPath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				CommunityResult.class, false);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<CommunityResult> tmp = sc
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+
+		Assertions.assertEquals(2, verificationDataset.count());
+		verificationDataset.show(false);
+
+		Assertions.assertEquals(2, verificationDataset.filter("type = 'publication'").count());
+
+	}
 
 }
