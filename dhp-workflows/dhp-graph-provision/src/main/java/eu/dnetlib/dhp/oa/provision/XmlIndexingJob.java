@@ -35,16 +35,11 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpDocumentNotFoundException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
-public class XmlIndexingJob {
+public class XmlIndexingJob extends SolrApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(XmlIndexingJob.class);
 
 	private static final Integer DEFAULT_BATCH_SIZE = 1000;
-
-	private static final String LAYOUT = "index";
-	private static final String INTERPRETATION = "openaire";
-	private static final String SEPARATOR = "-";
-	public static final String DATE_FORMAT = "yyyy-MM-dd'T'hh:mm:ss'Z'";
 
 	public static void main(String[] args) throws Exception {
 
@@ -208,23 +203,4 @@ public class XmlIndexingJob {
 					format));
 	}
 
-	/**
-	 * Method retrieves from the information system the zookeeper quorum of the Solr server
-	 *
-	 * @param isLookup
-	 * @return the zookeeper quorum of the Solr server
-	 * @throws ISLookUpException
-	 */
-	private static String getZkHost(ISLookUpService isLookup) throws ISLookUpException {
-		return doLookup(
-			isLookup,
-			"for $x in /RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='IndexServiceResourceType'] return $x//PROTOCOL[./@name='solr']/@address/string()");
-	}
-
-	private static String doLookup(ISLookUpService isLookup, String xquery) throws ISLookUpException {
-		log.info(String.format("running xquery: %s", xquery));
-		final String res = isLookup.getResourceProfileByQuery(xquery);
-		log.info(String.format("got response (100 chars): %s", StringUtils.left(res, 100) + " ..."));
-		return res;
-	}
 }
