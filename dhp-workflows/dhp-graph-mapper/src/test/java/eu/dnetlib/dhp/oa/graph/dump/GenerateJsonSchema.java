@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.victools.jsonschema.generator.*;
 
-import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 
 public class GenerateJsonSchema {
 
@@ -19,7 +19,7 @@ public class GenerateJsonSchema {
 		configBuilder.forFields().withDescriptionResolver(field -> "Description of " + field.getDeclaredName());
 		SchemaGeneratorConfig config = configBuilder.build();
 		SchemaGenerator generator = new SchemaGenerator(config);
-		JsonNode jsonSchema = generator.generateSchema(Result.class);
+		JsonNode jsonSchema = generator.generateSchema(CommunityResult.class);
 
 		System.out.println(jsonSchema.toString());
 	}
