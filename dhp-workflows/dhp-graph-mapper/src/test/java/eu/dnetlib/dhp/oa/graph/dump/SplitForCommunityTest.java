@@ -1,11 +1,8 @@
-
 package eu.dnetlib.dhp.oa.graph.dump;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -18,12 +15,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunitySplit;
-import eu.dnetlib.dhp.schema.dump.oaf.Result;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 
 public class SplitForCommunityTest {
@@ -36,34 +29,34 @@ public class SplitForCommunityTest {
 
 	private static final Logger log = LoggerFactory.getLogger(DumpJobTest.class);
 
-	private static CommunityMap map = new CommunityMap();
-
-	static {
-		map.put("egi", "EGI Federation");
-		map.put("fet-fp7", "FET FP7");
-		map.put("fet-h2020", "FET H2020");
-		map.put("clarin", "CLARIN");
-		map.put("fam", "Fisheries and Aquaculture Management");
-		map.put("ni", "Neuroinformatics");
-		map.put("mes", "European Marine Scinece");
-		map.put("instruct", "Instruct-Eric");
-		map.put("rda", "Research Data Alliance");
-		map.put("elixir-gr", "ELIXIR GR");
-		map.put("aginfra", "Agricultural and Food Sciences");
-		map.put("dariah", "DARIAH EU");
-		map.put("risis", "RISI");
-		map.put("ee", "SDSN - Greece");
-		map.put("oa-pg", "EC Post-Grant Open Access Pilot");
-		map.put("beopen", "Transport Research");
-		map.put("euromarine", "Euromarine");
-		map.put("ifremer", "Ifremer");
-		map.put("dh-ch", "Digital Humanities and Cultural Heritage");
-		map.put("science-innovation-policy", "Science and Innovation Policy Studies");
-		map.put("covid-19", "COVID-19");
-		map.put("enermaps", "Energy Research");
-		map.put("epos", "EPOS");
-
-	}
+//	private static CommunityMap map = new CommunityMap();
+//
+//	static {
+//		map.put("egi", "EGI Federation");
+//		map.put("fet-fp7", "FET FP7");
+//		map.put("fet-h2020", "FET H2020");
+//		map.put("clarin", "CLARIN");
+//		map.put("fam", "Fisheries and Aquaculture Management");
+//		map.put("ni", "Neuroinformatics");
+//		map.put("mes", "European Marine Scinece");
+//		map.put("instruct", "Instruct-Eric");
+//		map.put("rda", "Research Data Alliance");
+//		map.put("elixir-gr", "ELIXIR GR");
+//		map.put("aginfra", "Agricultural and Food Sciences");
+//		map.put("dariah", "DARIAH EU");
+//		map.put("risis", "RISI");
+//		map.put("ee", "SDSN - Greece");
+//		map.put("oa-pg", "EC Post-Grant Open Access Pilot");
+//		map.put("beopen", "Transport Research");
+//		map.put("euromarine", "Euromarine");
+//		map.put("ifremer", "Ifremer");
+//		map.put("dh-ch", "Digital Humanities and Cultural Heritage");
+//		map.put("science-innovation-policy", "Science and Innovation Policy Studies");
+//		map.put("covid-19", "COVID-19");
+//		map.put("enermaps", "Energy Research");
+//		map.put("epos", "EPOS");
+//
+//	}
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -100,9 +93,13 @@ public class SplitForCommunityTest {
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/splitForCommunity")
 			.getPath();
 
+		final String communityMapPath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+				.getPath();
+
 		CommunitySplit split = new CommunitySplit();
 
-		split.run(false, sourcePath, workingDir.toString() + "/split", map);
+		split.run(false, sourcePath, workingDir.toString() + "/split", communityMapPath);
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
