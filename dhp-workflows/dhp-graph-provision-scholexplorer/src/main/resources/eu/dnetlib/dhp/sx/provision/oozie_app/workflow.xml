@@ -157,7 +157,7 @@
             <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
             <spark-opts>--executor-memory ${sparkExecutorMemory}  --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="8" </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingDirPath}/summary_json</arg>
+            <arg>--sourcePath</arg><arg>${workingDirPath}/scholix_json</arg>
             <arg>--index</arg><arg>${index}_scholix</arg>
             <arg>--idPath</arg><arg>identifier</arg>
             <arg>--cluster</arg><arg>${esCluster}</arg>
