@@ -28,7 +28,7 @@ import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Software;
 
-//@Disabled
+@Disabled
 public class DumpJobTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

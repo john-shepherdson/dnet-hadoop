@@ -30,35 +30,6 @@ public class SplitForCommunityTest {
 
 	private static final Logger log = LoggerFactory.getLogger(DumpJobTest.class);
 
-//	private static CommunityMap map = new CommunityMap();
-//
-//	static {
-//		map.put("egi", "EGI Federation");
-//		map.put("fet-fp7", "FET FP7");
-//		map.put("fet-h2020", "FET H2020");
-//		map.put("clarin", "CLARIN");
-//		map.put("fam", "Fisheries and Aquaculture Management");
-//		map.put("ni", "Neuroinformatics");
-//		map.put("mes", "European Marine Scinece");
-//		map.put("instruct", "Instruct-Eric");
-//		map.put("rda", "Research Data Alliance");
-//		map.put("elixir-gr", "ELIXIR GR");
-//		map.put("aginfra", "Agricultural and Food Sciences");
-//		map.put("dariah", "DARIAH EU");
-//		map.put("risis", "RISI");
-//		map.put("ee", "SDSN - Greece");
-//		map.put("oa-pg", "EC Post-Grant Open Access Pilot");
-//		map.put("beopen", "Transport Research");
-//		map.put("euromarine", "Euromarine");
-//		map.put("ifremer", "Ifremer");
-//		map.put("dh-ch", "Digital Humanities and Cultural Heritage");
-//		map.put("science-innovation-policy", "Science and Innovation Policy Studies");
-//		map.put("covid-19", "COVID-19");
-//		map.put("enermaps", "Energy Research");
-//		map.put("epos", "EPOS");
-//
-//	}
-
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files.createTempDirectory(SplitForCommunityTest.class.getSimpleName());
