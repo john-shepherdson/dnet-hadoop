@@ -126,13 +126,6 @@ public class QueryInformationSystem {
 			}
 		}
 
-//		cat_iterator = el.elementIterator();
-//		while (cat_iterator.hasNext()) {
-//			Element catEl = (Element) cat_iterator.next();
-//			if (catEl.getName().equals("param") && catEl.attribute("name").getValue().equals("openaireId")) {
-//				datasourceList.add(catEl.getText());
-//			}
-//		}
 		return datasourceList;
 	}
 

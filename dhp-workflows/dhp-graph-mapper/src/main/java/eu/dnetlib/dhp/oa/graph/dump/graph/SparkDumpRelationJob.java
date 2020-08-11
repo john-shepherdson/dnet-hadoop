@@ -1,4 +1,6 @@
-
+/**
+ * Dumps eu.dnetlib.dhp.schema.oaf.Relation in eu.dnetlib.dhp.schema.dump.oaf.graph.Relation
+ */
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;

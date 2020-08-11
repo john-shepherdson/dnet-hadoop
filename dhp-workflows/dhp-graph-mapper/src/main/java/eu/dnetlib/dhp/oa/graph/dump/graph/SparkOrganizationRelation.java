@@ -1,4 +1,7 @@
-
+/**
+ * Create new Relations between Context Entities and Organizations whose products are associated to the context.
+ * It produces relation such as: organization <-> isRelatedTo <-> context
+ */
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;

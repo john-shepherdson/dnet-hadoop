@@ -1,4 +1,7 @@
-
+/**
+ * Reads all the entities of the same type (Relation / Results) and saves them in the same folder
+ *
+ */
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -75,8 +78,9 @@ public class SparkCollectAndSave implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/relation/software", Relation.class))
 			.union(Utils.readPath(spark, inputPath + "/relation/contextOrg", Relation.class))
 			.union(Utils.readPath(spark, inputPath + "/relation/context", Relation.class))
+			.union(Utils.readPath(spark, inputPath + "/relation/relation", Relation.class))
 			.write()
-			.mode(SaveMode.Append)
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath + "/relation");
 

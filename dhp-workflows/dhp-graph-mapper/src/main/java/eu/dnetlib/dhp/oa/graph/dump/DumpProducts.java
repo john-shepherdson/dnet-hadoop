@@ -1,3 +1,6 @@
+/**
+ *
+ */
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
@@ -36,49 +39,9 @@ public class DumpProducts implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				execDump(spark, inputPath, outputPath, communityMapPath, inputClazz, outputClazz, graph);// ,
-																											// dumpClazz);
+				execDump(spark, inputPath, outputPath, communityMapPath, inputClazz, outputClazz, graph);
 			});
 	}
-
-//	public void run(Boolean isSparkSessionManaged, String inputPath, String outputPath, CommunityMap communityMap,
-//		Class<? extends OafEntity> inputClazz,
-//		Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result> outputClazz,
-//		boolean graph) {
-//
-//		SparkConf conf = new SparkConf();
-//
-//		runWithSparkSession(
-//			conf,
-//			isSparkSessionManaged,
-//			spark -> {
-//				Utils.removeOutputDir(spark, outputPath);
-//				execDump(spark, inputPath, outputPath, communityMap, inputClazz, outputClazz, graph);// ,
-//				// dumpClazz);
-//			});
-//	}
-
-//	public static <I extends OafEntity, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> void execDump(
-//		SparkSession spark,
-//		String inputPath,
-//		String outputPath,
-//		CommunityMap communityMap,
-//		Class<I> inputClazz,
-//		Class<O> outputClazz,
-//		boolean graph) {
-//
-//		// CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
-//
-//		Utils
-//			.readPath(spark, inputPath, inputClazz)
-//			.map(value -> execMap(value, communityMap, graph), Encoders.bean(outputClazz))
-//			.filter(Objects::nonNull)
-//			.write()
-//			.mode(SaveMode.Overwrite)
-//			.option("compression", "gzip")
-//			.json(outputPath);
-//
-//	}
 
 	public static <I extends OafEntity, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> void execDump(
 		SparkSession spark,

@@ -1,3 +1,8 @@
+/**
+ * Writes the set of new Relation between the context and datasources. At the moment the relation
+ * between the context and the project is not created because of a low coverage in the profiles of
+ * openaire ids related to projects
+ */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -54,7 +59,7 @@ public class CreateContextRelation implements Serializable {
 		final String hdfsPath = parser.get("hdfsPath");
 		log.info("hdfsPath: {}", hdfsPath);
 
-		final String hdfsNameNode = parser.get("hdfsNameNode");
+		final String hdfsNameNode = parser.get("nameNode");
 		log.info("nameNode: {}", hdfsNameNode);
 
 		final String isLookUpUrl = parser.get("isLookUpUrl");
@@ -101,8 +106,7 @@ public class CreateContextRelation implements Serializable {
 
 	}
 
-	public void execute(final Function<ContextInfo, List<Relation>> producer, String category, String prefix)
-		throws Exception {
+	public void execute(final Function<ContextInfo, List<Relation>> producer, String category, String prefix) {
 
 		final Consumer<ContextInfo> consumer = ci -> producer.apply(ci).forEach(c -> writeEntity(c));
 

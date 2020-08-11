@@ -1,3 +1,8 @@
+/**
+ * It process the ContextInfo information to produce a new Context Entity or a set of Relations between the
+ * generic context entity and datasource/projects related to the context.
+ *
+ */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -7,8 +12,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
@@ -37,7 +40,6 @@ public class Process implements Serializable {
 			ri.setDescription(ci.getDescription());
 			ri.setName(ci.getName());
 			ri.setZenodo_community(Constants.ZENODO_COMMUNITY_PREFIX + ci.getZenodocommunity());
-			// log.info("created context: {}", new Gson().toJson(ri));
 			return (R) ri;
 
 		} catch (final Exception e) {

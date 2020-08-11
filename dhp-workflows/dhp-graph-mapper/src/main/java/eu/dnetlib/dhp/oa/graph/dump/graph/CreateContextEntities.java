@@ -1,3 +1,9 @@
+/**
+ * Writes on HDFS Context entities. It queries the Information System at the lookup url provided as parameter
+ * and collects the general information for contexes of type community or ri. The general information is
+ * the id of the context, its label, the subjects associated to the context, its zenodo community, description and type.
+ * This information is used to create a new Context Entity
+ */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -6,12 +12,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import javax.rmi.CORBA.Util;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -21,18 +23,11 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchCommunity;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 
 public class CreateContextEntities implements Serializable {
-
-	// leggo i context dall'is e mi faccio la mappa id -> contextinfo
-
-	// creo le entities con le info generali
 
 	private static final Logger log = LoggerFactory.getLogger(CreateContextEntities.class);
 	private final Configuration conf;
@@ -51,7 +46,7 @@ public class CreateContextEntities implements Serializable {
 		final String hdfsPath = parser.get("hdfsPath");
 		log.info("hdfsPath: {}", hdfsPath);
 
-		final String hdfsNameNode = parser.get("hdfsNameNode");
+		final String hdfsNameNode = parser.get("nameNode");
 		log.info("nameNode: {}", hdfsNameNode);
 
 		final String isLookUpUrl = parser.get("isLookUpUrl");

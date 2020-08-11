@@ -1,17 +1,14 @@
-
+/**
+ * Spark Job that fires the dump for the entites
+ */
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import java.io.Serializable;
 import java.util.Optional;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.dump.QueryInformationSystem;
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
 public class SparkDumpEntitiesJob implements Serializable {
@@ -44,18 +41,10 @@ public class SparkDumpEntitiesJob implements Serializable {
 
 		final String communityMapPath = parser.get("communityMapPath");
 
-		final String isLookUpUrl = parser.get("isLookUpUrl");
-		log.info("isLookUpUrl: {}", isLookUpUrl);
-
 		Class<? extends OafEntity> inputClazz = (Class<? extends OafEntity>) Class.forName(resultClassName);
-
-		QueryInformationSystem queryInformationSystem = new QueryInformationSystem();
-		queryInformationSystem.setIsLookUp(Utils.getIsLookUpService(isLookUpUrl));
-		CommunityMap communityMap = queryInformationSystem.getCommunityMap();
 
 		DumpGraphEntities dg = new DumpGraphEntities();
 		dg.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMapPath);
-		// dg.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMap);
 
 	}
 

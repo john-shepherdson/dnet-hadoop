@@ -1,3 +1,12 @@
+/**
+ * Creates new Relations (as in eu.dnetlib.dhp.schema.dump.oaf.graph.Relation) from the information in the Entity.
+ * The new Relations are created for the datasource in the collectedfrom and hostedby elements and for the context
+ * related to communities and research initiative/infrastructures.
+ *
+ * For collectedfrom elements it creates: datasource -> provides -> result and result -> isProvidedBy -> datasource
+ * For hostedby elements it creates: datasource -> hosts -> result and result -> isHostedBy -> datasource
+ * For context elements it creates: context <-> isRelatedTo <-> result
+ */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -24,12 +33,11 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class Extractor implements Serializable {
 
-
 	public void run(Boolean isSparkSessionManaged,
 		String inputPath,
 		String outputPath,
 		Class<? extends Result> inputClazz,
-		CommunityMap communityMap) {
+		String communityMapPath) {
 
 		SparkConf conf = new SparkConf();
 
@@ -39,10 +47,9 @@ public class Extractor implements Serializable {
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
 				extractRelationResult(
-					spark, inputPath, outputPath, inputClazz, communityMap);
+					spark, inputPath, outputPath, inputClazz, Utils.getCommunityMap(spark, communityMapPath));
 			});
 	}
-
 
 	private <R extends Result> void extractRelationResult(SparkSession spark,
 		String inputPath,

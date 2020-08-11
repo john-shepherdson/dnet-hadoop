@@ -1,3 +1,7 @@
+/**
+ * Deserialization of the information in the context needed to create Context Entities, and relations between
+ * context entities and datasources and projects
+ */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 

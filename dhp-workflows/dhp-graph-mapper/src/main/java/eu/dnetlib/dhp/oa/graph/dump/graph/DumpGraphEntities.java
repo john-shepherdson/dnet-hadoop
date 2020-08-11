@@ -1,3 +1,8 @@
+/**
+ * Dumps of entities in the model defined in eu.dnetlib.dhp.schema.dump.oaf.graph.
+ * Results are dumped using the same Mapper as for eu.dnetlib.dhp.schema.dump.oaf.community, while for
+ * the other entities the mapping is defined below
+ */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -103,7 +108,6 @@ public class DumpGraphEntities implements Serializable {
 
 	private static Datasource mapDatasource(eu.dnetlib.dhp.schema.oaf.Datasource d) {
 		Datasource datasource = new Datasource();
-
 
 		datasource.setId(d.getId());
 

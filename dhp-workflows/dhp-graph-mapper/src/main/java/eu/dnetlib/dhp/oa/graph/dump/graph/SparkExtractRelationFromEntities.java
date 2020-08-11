@@ -1,4 +1,6 @@
-
+/**
+ * Spark job that fires the extraction of relations from entities
+ */
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import java.io.Serializable;
@@ -42,20 +44,12 @@ public class SparkExtractRelationFromEntities implements Serializable {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-//		final String communityMapPath = parser.get("communityMapPath");
-
-		final String isLookUpUrl = parser.get("isLookUpUrl");
-		log.info("isLookUpUrl: {}", isLookUpUrl);
+		final String communityMapPath = parser.get("communityMapPath");
 
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
-		QueryInformationSystem queryInformationSystem = new QueryInformationSystem();
-		queryInformationSystem.setIsLookUp(Utils.getIsLookUpService(isLookUpUrl));
-		CommunityMap communityMap = queryInformationSystem.getCommunityMap();
-
 		Extractor extractor = new Extractor();
-		// extractor.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMapPath);
-		extractor.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMap);
+		extractor.run(isSparkSessionManaged, inputPath, outputPath, inputClazz, communityMapPath);
 
 	}
 
