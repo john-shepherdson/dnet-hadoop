@@ -1,6 +1,12 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -47,5 +53,21 @@ public class Utils {
 
 		return new Gson().fromJson(spark.read().textFile(communityMapPath).collectAsList().get(0), CommunityMap.class);
 
+	}
+
+	public static CommunityMap readCommunityMap(FileSystem fileSystem, String communityMapPath) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(fileSystem.open(new Path(communityMapPath))));
+		StringBuffer sb = new StringBuffer();
+		try {
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+		} finally {
+			br.close();
+
+		}
+
+		return new Gson().fromJson(sb.toString(), CommunityMap.class);
 	}
 }
