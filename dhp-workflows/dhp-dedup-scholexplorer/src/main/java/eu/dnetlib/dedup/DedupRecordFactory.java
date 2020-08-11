@@ -100,7 +100,7 @@ public class DedupRecordFactory {
 				.forEach(
 					pub -> {
 						try {
-							Publication publication = mapper.readValue(pub, Publication.class);
+							DLIPublication publication = mapper.readValue(pub, DLIPublication.class);
 
 							p.mergeFrom(publication);
 							p.setAuthor(DedupUtility.mergeAuthor(p.getAuthor(), publication.getAuthor()));

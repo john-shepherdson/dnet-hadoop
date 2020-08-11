@@ -951,6 +951,7 @@ dnet:countries @=@ ZW @=@ ABW
 dnet:protocols @=@ oai @=@ OAI-PMH
 dnet:protocols @=@ oai @=@ OAI_PMH
 dnet:pid_types @=@ orcid @=@ ORCID12
+dnet:pid_types @=@ handle @=@ hdl
 dnet:review_levels @=@ 0000 @=@ UNKNOWN
 dnet:review_levels @=@ 0002 @=@ 80 大阪経大学会「Working Paper」
 dnet:review_levels @=@ 0002 @=@ AO

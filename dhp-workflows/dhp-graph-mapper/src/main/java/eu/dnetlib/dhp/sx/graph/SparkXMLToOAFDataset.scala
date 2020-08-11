@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.Oaf
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import eu.dnetlib.dhp.sx.graph.parser.{DatasetScholexplorerParser, PublicationScholexplorerParser}
 import eu.dnetlib.scholexplorer.relation.RelationMapper
 import org.apache.commons.io.IOUtils
@@ -40,7 +40,7 @@ object SparkXMLToOAFDataset {
     implicit  val oafEncoder:Encoder[Oaf] = Encoders.kryo[Oaf]
     implicit  val datasetEncoder:Encoder[DLIDataset] = Encoders.kryo[DLIDataset]
     implicit  val publicationEncoder:Encoder[DLIPublication] = Encoders.kryo[DLIPublication]
-    implicit  val relationEncoder:Encoder[DLIRelation] = Encoders.kryo[DLIRelation]
+    implicit  val relationEncoder:Encoder[Relation] = Encoders.kryo[Relation]
 
     val relationMapper = RelationMapper.load
 

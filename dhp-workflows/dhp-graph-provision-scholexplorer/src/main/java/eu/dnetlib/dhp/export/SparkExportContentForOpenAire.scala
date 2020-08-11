@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.`export`
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.{Instance, Publication, Relation, Dataset => OafDataset}
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.io.compress.GzipCodec
@@ -39,14 +39,13 @@ object SparkExportContentForOpenAire {
     implicit  val pubEncoder: Encoder[Publication] = Encoders.bean(classOf[Publication])
     implicit  val datEncoder: Encoder[OafDataset] = Encoders.bean(classOf[OafDataset])
     implicit  val relEncoder: Encoder[Relation] = Encoders.bean(classOf[Relation])
-    implicit  val dliRelEncoder: Encoder[DLIRelation] = Encoders.bean(classOf[DLIRelation])
+
     import spark.implicits._
 
 
     val relRDD:RDD[Relation] = sc.textFile(s"$workingPath/relation_j")
-      .map(s => new ObjectMapper().readValue(s, classOf[DLIRelation]))
+      .map(s => new ObjectMapper().readValue(s, classOf[Relation]))
       .filter(p => p.getDataInfo.getDeletedbyinference == false)
-      .map(DLIToOAF.convertDLIRelation).filter(p=>p!= null)
     spark.createDataset(relRDD).write.mode(SaveMode.Overwrite).save(s"$workingPath/relationDS")
 
     val datRDD:RDD[OafDataset] = sc.textFile(s"$workingPath/dataset")

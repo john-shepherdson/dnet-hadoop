@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import eu.dnetlib.dhp.schema.oaf.Relation
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
@@ -65,7 +65,7 @@ class ExportDLITOOAFTest {
     val json = Source.fromInputStream(getClass.getResourceAsStream("relation.json")).mkString
 
 
-    val oaf =DLIToOAF.convertDLIRelation(mapper.readValue(json, classOf[DLIRelation]))
+    val oaf =mapper.readValue(json, classOf[Relation])
 
     println(mapper.writeValueAsString(oaf))
 

@@ -13,7 +13,7 @@
   "lastupdatetimestamp": null,
   "relType": "IsReferencedBy",
   "source": "60|4ee78ab329b49416b45c3774c132f244",
-  "collectedFrom": [
+  "collectedfrom": [
     {
       "dataInfo": null,
       "value": "Europe PMC",

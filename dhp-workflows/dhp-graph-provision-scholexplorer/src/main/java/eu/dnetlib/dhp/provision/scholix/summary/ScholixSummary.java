@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.provision.RelatedItemInfo;
 import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
@@ -138,54 +140,20 @@ public class ScholixSummary implements Serializable {
 		this.datasources = datasources;
 	}
 
-	public static ScholixSummary fromJsonOAF(final Typology oafType, final String oafJson) {
+	public static ScholixSummary fromOAF(final Oaf oaf) {
 		try {
-			final ObjectMapper mapper = new ObjectMapper();
 			final RelatedItemInfo relatedItemInfo = new RelatedItemInfo();
-			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			switch (oafType) {
-				case dataset:
-					return summaryFromDataset(mapper.readValue(oafJson, DLIDataset.class), relatedItemInfo);
-				case publication:
-					return summaryFromPublication(
-						mapper.readValue(oafJson, DLIPublication.class), relatedItemInfo);
-				case unknown:
-					return summaryFromUnknown(mapper.readValue(oafJson, DLIUnknown.class), relatedItemInfo);
-			}
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-		return null;
-	}
 
-	public static String fromJsonOAF(
-		final Typology oafType, final String oafJson, final String relEntityJson) {
-		try {
-			final ObjectMapper mapper = new ObjectMapper();
-			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-			RelatedItemInfo relatedItemInfo = mapper.readValue(relEntityJson, RelatedItemInfo.class);
-
-			switch (oafType) {
-				case dataset:
-					return mapper
-						.writeValueAsString(
-							summaryFromDataset(mapper.readValue(oafJson, DLIDataset.class), relatedItemInfo));
-				case publication:
-					return mapper
-						.writeValueAsString(
-							summaryFromPublication(
-								mapper.readValue(oafJson, DLIPublication.class), relatedItemInfo));
-				case unknown:
-					return mapper
-						.writeValueAsString(
-							summaryFromUnknown(mapper.readValue(oafJson, DLIUnknown.class), relatedItemInfo));
-			}
+			if (oaf instanceof DLIPublication)
+				return summaryFromPublication((DLIPublication) oaf, relatedItemInfo);
+			if (oaf instanceof DLIDataset)
+				return summaryFromDataset((DLIDataset) oaf, relatedItemInfo);
+			if (oaf instanceof DLIUnknown)
+				return summaryFromUnknown((DLIUnknown) oaf, relatedItemInfo);
 
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
-
 		return null;
 	}
 

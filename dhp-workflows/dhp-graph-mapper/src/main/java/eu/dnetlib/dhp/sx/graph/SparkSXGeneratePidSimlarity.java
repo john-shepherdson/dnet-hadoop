@@ -10,7 +10,7 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 
-import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
@@ -55,18 +55,18 @@ public class SparkSXGeneratePidSimlarity {
 					.equalsIgnoreCase(StringUtils.substringAfter(t._2(), "::")))
 			.distinct();
 
-		JavaRDD<DLIRelation> simRel = datasetSimRel
+		JavaRDD<Relation> simRel = datasetSimRel
 			.union(publicationSimRel)
 			.map(
 				s -> {
-					final DLIRelation r = new DLIRelation();
+					final Relation r = new Relation();
 					r.setSource(s._1());
 					r.setTarget(s._2());
 					r.setRelType("similar");
 					return r;
 				});
 		spark
-			.createDataset(simRel.rdd(), Encoders.bean(DLIRelation.class))
+			.createDataset(simRel.rdd(), Encoders.bean(Relation.class))
 			.distinct()
 			.write()
 			.mode(SaveMode.Overwrite)
