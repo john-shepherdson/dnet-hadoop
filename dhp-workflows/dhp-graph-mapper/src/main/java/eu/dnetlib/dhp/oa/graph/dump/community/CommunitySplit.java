@@ -59,7 +59,6 @@ public class CommunitySplit implements Serializable {
 		try {
 			community_products.first();
 			community_products
-				.repartition(1)
 				.write()
 				.option("compression", "gzip")
 				.mode(SaveMode.Overwrite)
