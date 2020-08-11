@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.sx.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Dataset => OafDataset}
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import eu.dnetlib.dhp.sx.graph.parser.{DatasetScholexplorerParser, PublicationScholexplorerParser}
 import eu.dnetlib.scholexplorer.relation.RelationMapper
 import org.apache.commons.io.IOUtils
@@ -38,7 +38,7 @@ object SparkCreateEBIDataFrame {
     implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
     implicit val datasetEncoder: Encoder[DLIDataset] = Encoders.kryo(classOf[DLIDataset])
     implicit val pubEncoder: Encoder[DLIPublication] = Encoders.kryo(classOf[DLIPublication])
-    implicit val relEncoder: Encoder[DLIRelation] = Encoders.kryo(classOf[DLIRelation])
+    implicit val relEncoder: Encoder[Relation] = Encoders.kryo(classOf[Relation])
 
 //    logger.info("Extract Publication and relation from publication_xml")
 //    val oafPubsRDD:RDD[Oaf] = sc.textFile(s"$workingPath/publication_xml").map(s =>
@@ -63,7 +63,7 @@ object SparkCreateEBIDataFrame {
 //    spark.createDataset(oafDatsRDD).write.mode(SaveMode.Append).save(s"$workingPath/oaf")
     val dataset: Dataset[DLIDataset] = spark.read.load(s"$workingPath/oaf").as[Oaf].filter(o => o.isInstanceOf[DLIDataset]).map(d => d.asInstanceOf[DLIDataset])
     val publication: Dataset[DLIPublication] = spark.read.load(s"$workingPath/oaf").as[Oaf].filter(o => o.isInstanceOf[DLIPublication]).map(d => d.asInstanceOf[DLIPublication])
-    val relations: Dataset[DLIRelation] = spark.read.load(s"$workingPath/oaf").as[Oaf].filter(o => o.isInstanceOf[DLIRelation]).map(d => d.asInstanceOf[DLIRelation])
+    val relations: Dataset[Relation] = spark.read.load(s"$workingPath/oaf").as[Oaf].filter(o => o.isInstanceOf[Relation]).map(d => d.asInstanceOf[Relation])
     publication.map(d => (d.getId, d))(Encoders.tuple(Encoders.STRING, pubEncoder))
       .groupByKey(_._1)(Encoders.STRING)
       .agg(EBIAggregator.getDLIPublicationAggregator().toColumn)
@@ -78,7 +78,7 @@ object SparkCreateEBIDataFrame {
 
     relations.map(d => (s"${d.getSource}::${d.getRelType}::${d.getTarget}", d))(Encoders.tuple(Encoders.STRING, relEncoder))
       .groupByKey(_._1)(Encoders.STRING)
-      .agg(EBIAggregator.getDLIRelationAggregator().toColumn)
+      .agg(EBIAggregator.getRelationAggregator().toColumn)
       .map(p => p._2)
       .write.mode(SaveMode.Overwrite).save(s"$workingPath/relation")
 

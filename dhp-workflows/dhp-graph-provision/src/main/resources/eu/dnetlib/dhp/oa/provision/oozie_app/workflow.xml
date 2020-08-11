@@ -37,7 +37,11 @@
             <name>batchSize</name>
             <description>number of records to be included in each indexing request</description>
         </property>
-
+        <property>
+            <name>solrDeletionQuery</name>
+            <value>*:*</value>
+            <description>query used in the deleted by query operation</description>
+        </property>
         <property>
             <name>sparkDriverMemoryForJoining</name>
             <description>memory for driver process</description>
@@ -109,6 +113,7 @@
             <case to="fork_join_related_entities">${wf:conf('resumeFrom') eq 'fork_join_related_entities'}</case>
             <case to="fork_join_all_entities">${wf:conf('resumeFrom') eq 'fork_join_all_entities'}</case>
             <case to="convert_to_xml">${wf:conf('resumeFrom') eq 'convert_to_xml'}</case>
+            <case to="drop_solr_collection">${wf:conf('resumeFrom') eq 'drop_solr_collection'}</case>
             <case to="to_solr_index">${wf:conf('resumeFrom') eq 'to_solr_index'}</case>
             <default to="prepare_relations"/>
         </switch>
@@ -584,11 +589,24 @@
 
     <decision name="should_index">
         <switch>
-            <case to="to_solr_index">${wf:conf('shouldIndex') eq 'true'}</case>
+            <case to="drop_solr_collection">${wf:conf('shouldIndex') eq 'true'}</case>
             <case to="End">${wf:conf('shouldIndex') eq 'false'}</case>
-            <default to="to_solr_index"/>
+            <default to="drop_solr_collection"/>
         </switch>
     </decision>
+
+    <action name="drop_solr_collection">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--format</arg><arg>${format}</arg>
+            <arg>--action</arg><arg>DELETE_BY_QUERY</arg>
+            <arg>--query</arg><arg>${solrDeletionQuery}</arg>
+            <arg>--commit</arg><arg>true</arg>
+        </java>
+        <ok to="to_solr_index"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="to_solr_index">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -615,6 +633,17 @@
             <arg>--format</arg><arg>${format}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
         </spark>
+        <ok to="commit_solr_collection"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="commit_solr_collection">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--format</arg><arg>${format}</arg>
+            <arg>--action</arg><arg>COMMIT</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

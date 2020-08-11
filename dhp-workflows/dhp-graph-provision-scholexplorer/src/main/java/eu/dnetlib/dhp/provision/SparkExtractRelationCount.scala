@@ -1,12 +1,32 @@
 package eu.dnetlib.dhp.provision
 
-import org.apache.spark.sql.SparkSession
+import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.schema.oaf.Relation
+import org.apache.commons.io.IOUtils
+import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.apache.spark.sql.functions.{coalesce, col, count, lit}
 
-object DatasetJoiner {
 
-  def startJoin(spark: SparkSession, relPath:String, targetPath:String) {
-    val relation = spark.read.load(relPath)
+/**
+ * SparkExtractRelationCount is a spark job that takes in input relation RDD and retrieve for each item in relation
+ * which are the number of - Related Dataset - Related Publication - Related Unknown
+ */
+object SparkExtractRelationCount {
+
+
+  def main(args: Array[String]): Unit = {
+
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkExtractRelationCount.getClass.getResourceAsStream("/eu/dnetlib/dhp/provision/input_related_entities_parameters.json")))
+    parser.parseArgument(args)
+    val spark = SparkSession.builder.appName(SparkExtractRelationCount.getClass.getSimpleName).master(parser.get("master")).getOrCreate
+
+    val workingDirPath = parser.get("workingDirPath")
+
+    val relationPath = parser.get("relationPath")
+
+    implicit val relEncoder: Encoder[Relation] = Encoders.kryo[Relation]
+
+    val relation = spark.read.load(relationPath).as[Relation].map(r =>r)(Encoders.bean(classOf[Relation]))
 
     val relatedPublication = relation
         .where("target like '50%'")
@@ -34,7 +54,7 @@ object DatasetJoiner {
                     coalesce(col("dataset"),lit(0)).alias("relatedDataset"),
                     coalesce(col("unknown"),lit(0)).alias("relatedUnknown")
                 )
-    firstJoin.write.mode("overwrite").save(targetPath)
+    firstJoin.write.mode(SaveMode.Overwrite).save(s"$workingDirPath/relatedItemCount")
   }
 
 }
