@@ -1,3 +1,7 @@
+/**
+ * Spark job to trigger the split of results associated to research community - reseach initiative/infrasctructure.
+ * The actual split is performed by the class CommunitySplit
+ */
 
 package eu.dnetlib.dhp.oa.graph.dump.community;
 
