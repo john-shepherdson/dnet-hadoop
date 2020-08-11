@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -23,11 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.EntityRelEntity;
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
-import eu.dnetlib.dhp.oa.provision.model.SortableRelation;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
 
@@ -91,7 +89,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 
 		SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
 		runWithSparkSession(
 			conf,
@@ -109,18 +107,19 @@ public class CreateRelatedEntitiesJob_phase1 {
 		Class<E> clazz,
 		String outputPath) {
 
-		Dataset<Tuple2<String, SortableRelation>> relsByTarget = readPathRelation(spark, inputRelationsPath)
+		Dataset<Tuple2<String, Relation>> relsByTarget = readPathRelation(spark, inputRelationsPath)
 			.filter("dataInfo.deletedbyinference == false")
 			.map(
-				(MapFunction<SortableRelation, Tuple2<String, SortableRelation>>) r -> new Tuple2<>(r.getTarget(), r),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(SortableRelation.class)))
+				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(r.getTarget(),
+					r),
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)))
 			.cache();
 
 		Dataset<Tuple2<String, RelatedEntity>> entities = readPathEntity(spark, inputEntityPath, clazz)
 			.filter("dataInfo.invisible == false")
 			.map(
 				(MapFunction<E, RelatedEntity>) value -> asRelatedEntity(value, clazz),
-				Encoders.bean(RelatedEntity.class))
+				Encoders.kryo(RelatedEntity.class))
 			.map(
 				(MapFunction<RelatedEntity, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), e),
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntity.class)))
@@ -129,12 +128,12 @@ public class CreateRelatedEntitiesJob_phase1 {
 		relsByTarget
 			.joinWith(entities, entities.col("_1").equalTo(relsByTarget.col("_1")), "inner")
 			.map(
-				(MapFunction<Tuple2<Tuple2<String, SortableRelation>, Tuple2<String, RelatedEntity>>, EntityRelEntity>) t -> new EntityRelEntity(
+				(MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, RelatedEntity>>, RelatedEntityWrapper>) t -> new RelatedEntityWrapper(
 					t._1()._2(), t._2()._2()),
-				Encoders.bean(EntityRelEntity.class))
+				Encoders.kryo(RelatedEntityWrapper.class))
 			.write()
 			.mode(SaveMode.Overwrite)
-			.parquet(outputPath + "/" + EntityType.fromClass(clazz));
+			.parquet(outputPath);
 	}
 
 	private static <E extends OafEntity> Dataset<E> readPathEntity(
@@ -232,11 +231,11 @@ public class CreateRelatedEntitiesJob_phase1 {
 	 * @param relationPath
 	 * @return the Dataset<SortableRelation> containing all the relationships
 	 */
-	private static Dataset<SortableRelation> readPathRelation(
+	private static Dataset<Relation> readPathRelation(
 		SparkSession spark, final String relationPath) {
 
 		log.info("Reading relations from: {}", relationPath);
-		return spark.read().load(relationPath).as(Encoders.bean(SortableRelation.class));
+		return spark.read().load(relationPath).as(Encoders.bean(Relation.class));
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

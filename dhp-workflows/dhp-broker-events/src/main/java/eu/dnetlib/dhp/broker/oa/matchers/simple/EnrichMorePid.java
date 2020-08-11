@@ -1,47 +1,48 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.broker.objects.Pid;
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 
-public class EnrichMorePid extends UpdateMatcher<Result, Pid> {
+public class EnrichMorePid extends UpdateMatcher<OaBrokerTypedValue> {
 
 	public EnrichMorePid() {
-		super(true);
+		super(20,
+			pid -> Topic.ENRICH_MORE_PID,
+			(p, pid) -> p.getPids().add(pid),
+			pid -> pidAsString(pid));
 	}
 
 	@Override
-	protected List<UpdateInfo<Pid>> findUpdates(final Result source, final Result target) {
+	protected List<OaBrokerTypedValue> findDifferences(final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
+
+		if (target.getPids().size() >= BrokerConstants.MAX_LIST_SIZE) {
+			return new ArrayList<>();
+		}
+
 		final Set<String> existingPids = target
-			.getPid()
+			.getPids()
 			.stream()
-			.map(pid -> pid.getQualifier().getClassid() + "::" + pid.getValue())
+			.map(pid -> pidAsString(pid))
 			.collect(Collectors.toSet());
 
 		return source
-			.getPid()
+			.getPids()
 			.stream()
-			.filter(pid -> !existingPids.contains(pid.getQualifier().getClassid() + "::" + pid.getValue()))
-			.map(ConversionUtils::oafPidToBrokerPid)
-			.map(i -> generateUpdateInfo(i, source, target))
+			.filter(pid -> !existingPids.contains(pidAsString(pid)))
 			.collect(Collectors.toList());
 	}
 
-	@Override
-	public UpdateInfo<Pid> generateUpdateInfo(final Pid highlightValue, final Result source, final Result target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MORE_PID,
-			highlightValue, source, target,
-			(p, pid) -> p.getPids().add(pid),
-			pid -> pid.getType() + "::" + pid.getValue());
+	private static String pidAsString(final OaBrokerTypedValue pid) {
+		return pid.getType() + "::" + pid.getValue();
 	}
-
 }

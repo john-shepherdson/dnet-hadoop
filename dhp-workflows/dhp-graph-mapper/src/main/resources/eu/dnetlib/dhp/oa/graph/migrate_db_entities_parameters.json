@@ -28,5 +28,17 @@
 		"paramLongName": "action",
 		"paramDescription": "process claims",
 		"paramRequired": false
+	},
+	{
+		"paramName": "isu",
+		"paramLongName": "isLookupUrl",
+		"paramDescription": "the url of the ISLookupService",
+		"paramRequired": true
+	},
+	{
+		"paramName": "dbschema",
+		"paramLongName": "dbschema",
+		"paramDescription": "the database schema according to the D-Net infrastructure (beta or production)",
+		"paramRequired": true
 	}
 ]

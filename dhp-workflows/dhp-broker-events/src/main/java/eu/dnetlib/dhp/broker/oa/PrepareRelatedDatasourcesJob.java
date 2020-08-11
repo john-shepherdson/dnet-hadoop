@@ -1,0 +1,68 @@
+
+package eu.dnetlib.dhp.broker.oa;
+
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.util.Optional;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.util.LongAccumulator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
+import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.SimpleDatasourceInfo;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
+
+public class PrepareRelatedDatasourcesJob {
+
+	private static final Logger log = LoggerFactory.getLogger(PrepareRelatedDatasourcesJob.class);
+
+	public static void main(final String[] args) throws Exception {
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					PrepareRelatedDatasourcesJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+		parser.parseArgument(args);
+
+		final Boolean isSparkSessionManaged = Optional
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+
+		final String graphPath = parser.get("graphPath");
+		log.info("graphPath: {}", graphPath);
+
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath: {}", workingPath);
+
+		final String relsPath = workingPath + "/datasources";
+		log.info("relsPath: {}", relsPath);
+
+		final SparkConf conf = new SparkConf();
+
+		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
+
+			ClusterUtils.removeDir(spark, relsPath);
+
+			final LongAccumulator total = spark.sparkContext().longAccumulator("total_datasources");
+
+			final Dataset<SimpleDatasourceInfo> dataset = ClusterUtils
+				.readPath(spark, graphPath + "/datasource", Datasource.class)
+				.map(
+					ds -> new SimpleDatasourceInfo(ds.getId(), ds.getDatasourcetype().getClassid()),
+					Encoders.bean(SimpleDatasourceInfo.class));
+
+			ClusterUtils.save(dataset, relsPath, SimpleDatasourceInfo.class, total);
+
+		});
+
+	}
+
+}

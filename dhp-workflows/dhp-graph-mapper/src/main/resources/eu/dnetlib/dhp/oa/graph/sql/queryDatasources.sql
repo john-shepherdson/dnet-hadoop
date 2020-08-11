@@ -7,36 +7,36 @@ SELECT
 	CASE
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['openaire-cris_1.1'])
     			THEN
-    				'openaire-cris_1.1@@@OpenAIRE CRIS v1.1@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+    				'openaire-cris_1.1@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['openaire4.0'])
                 	THEN
-                    		'openaire4.0@@@OpenAIRE 4.0@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+                    		'openaire4.0@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['driver', 'openaire2.0'])
 			THEN
-				'driver-openaire2.0@@@OpenAIRE 2.0+ (DRIVER OA, EC funding)@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+				'driver-openaire2.0@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['driver'])
 			THEN
-				'driver@@@OpenAIRE Basic (DRIVER OA)@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+				'driver@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['openaire2.0'])
 			THEN
-				'openaire2.0@@@OpenAIRE 2.0 (EC funding)@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+				'openaire2.0@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['openaire3.0'])
 			THEN
-				'openaire3.0@@@OpenAIRE 3.0 (OA, funding)@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+				'openaire3.0@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['openaire2.0_data'])
 			THEN
-				'openaire2.0_data@@@OpenAIRE Data (funded, referenced datasets)@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+				'openaire2.0_data@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['native'])
 			THEN
-				'native@@@proprietary@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+				'native@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['hostedBy'])
 			THEN
-				'hostedBy@@@collected from a compatible aggregator@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+				'hostedBy@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['notCompatible'])
 			THEN
-			'notCompatible@@@under validation@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+			'notCompatible@@@dnet:datasourceCompatibilityLevel'
 	ELSE
-		'UNKNOWN@@@not available@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel'
+		'UNKNOWN@@@dnet:datasourceCompatibilityLevel'
 	END                                                                                                        AS openairecompatibility,
 	d.websiteurl                                                                                               AS websiteurl,
 	d.logourl                                                                                                  AS logourl,
@@ -47,7 +47,7 @@ SELECT
 	NULL                                                                                                       AS odnumberofitems,
 	NULL                                                                                                       AS odnumberofitemsdate,
 
-	(SELECT array_agg(s|| '###keywords@@@keywords@@@dnet:subject_classification_typologies@@@dnet:subject_classification_typologies')
+	(SELECT array_agg(s|| '###keywords@@@dnet:subject_classification_typologies')
 		FROM UNNEST(
 			ARRAY(
 				SELECT trim(s)
@@ -83,32 +83,9 @@ SELECT
 	ARRAY[]::text[]                                                                                            AS policies,
 	dc.id                                                                                                      AS collectedfromid,
 	dc.officialname                                                                                            AS collectedfromname,
-	d.typology || '@@@' || CASE
-		WHEN (d.typology = 'crissystem') THEN 'CRIS System'
-		WHEN (d.typology = 'datarepository::unknown') THEN 'Data Repository'
-		WHEN (d.typology = 'aggregator::datarepository') THEN 'Data Repository Aggregator'
-		WHEN (d.typology = 'infospace') THEN 'Information Space'
-		WHEN (d.typology = 'pubsrepository::institutional') THEN 'Institutional Repository'
-		WHEN (d.typology = 'aggregator::pubsrepository::institutional') THEN 'Institutional Repository Aggregator'
-		WHEN (d.typology = 'pubsrepository::journal') THEN 'Journal'
-		WHEN (d.typology = 'aggregator::pubsrepository::journals') THEN 'Journal Aggregator/Publisher'
-		WHEN (d.typology = 'pubsrepository::mock') THEN 'Other'
-		WHEN (d.typology = 'pubscatalogue::unknown') THEN 'Publication Catalogue'
-		WHEN (d.typology = 'pubsrepository::unknown') THEN 'Publication Repository'
-		WHEN (d.typology = 'aggregator::pubsrepository::unknown') THEN 'Publication Repository Aggregator'
-		WHEN (d.typology = 'entityregistry') THEN 'Registry'
-		WHEN (d.typology = 'scholarcomminfra') THEN 'Scholarly Comm. Infrastructure'
-		WHEN (d.typology = 'pubsrepository::thematic') THEN 'Thematic Repository'
-		WHEN (d.typology = 'websource') THEN 'Web Source'
-		WHEN (d.typology = 'entityregistry::projects') THEN 'Funder database'
-		WHEN (d.typology = 'entityregistry::repositories') THEN 'Registry of repositories'
-		WHEN (d.typology = 'softwarerepository') THEN 'Software Repository'
-		WHEN (d.typology = 'aggregator::softwarerepository') THEN 'Software Repository Aggregator'
-		WHEN (d.typology = 'orprepository') THEN 'Repository'
-		ELSE 'Other'
-	END || '@@@dnet:datasource_typologies@@@dnet:datasource_typologies'                               AS datasourcetype,
-	'sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions' AS provenanceaction,
-	CONCAT(d.issn, ' @@@ ', d.eissn, ' @@@ ', d.lissn)                                                    AS journal
+	d.typology||'@@@dnet:datasource_typologies'                                                                AS datasourcetype,
+	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
+	d.issn || ' @@@ ' || d.eissn || ' @@@ ' || d.lissn                                                       AS journal
 
 FROM dsm_datasources d
 

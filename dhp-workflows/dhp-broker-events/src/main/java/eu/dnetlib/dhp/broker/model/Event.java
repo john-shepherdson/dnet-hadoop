@@ -1,9 +1,14 @@
 
 package eu.dnetlib.dhp.broker.model;
 
-import java.util.Map;
+import java.io.Serializable;
 
-public class Event {
+public class Event implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -5936790326505781395L;
 
 	private String eventId;
 
@@ -19,7 +24,7 @@ public class Event {
 
 	private boolean instantMessage;
 
-	private Map<String, Object> map;
+	private MappedFields map;
 
 	public Event() {
 	}
@@ -27,7 +32,7 @@ public class Event {
 	public Event(final String producerId, final String eventId, final String topic, final String payload,
 		final Long creationDate, final Long expiryDate,
 		final boolean instantMessage,
-		final Map<String, Object> map) {
+		final MappedFields map) {
 		this.producerId = producerId;
 		this.eventId = eventId;
 		this.topic = topic;
@@ -94,11 +99,11 @@ public class Event {
 		this.instantMessage = instantMessage;
 	}
 
-	public Map<String, Object> getMap() {
+	public MappedFields getMap() {
 		return this.map;
 	}
 
-	public void setMap(final Map<String, Object> map) {
+	public void setMap(final MappedFields map) {
 		this.map = map;
 	}
 }

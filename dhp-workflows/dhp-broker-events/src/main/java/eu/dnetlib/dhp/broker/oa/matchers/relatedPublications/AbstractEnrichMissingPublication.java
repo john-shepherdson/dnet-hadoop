@@ -1,63 +1,51 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.relatedPublications;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 
-public abstract class AbstractEnrichMissingPublication
-	extends UpdateMatcher<Pair<Result, List<Publication>>, eu.dnetlib.broker.objects.Publication> {
-
-	private final Topic topic;
+public abstract class AbstractEnrichMissingPublication extends UpdateMatcher<OaBrokerRelatedPublication> {
 
 	public AbstractEnrichMissingPublication(final Topic topic) {
-		super(true);
-		this.topic = topic;
+		super(10,
+			rel -> topic,
+			(p, rel) -> p.getPublications().add(rel),
+			rel -> rel.getOpenaireId());
+
 	}
 
+	protected abstract boolean filterByType(String relType);
+
 	@Override
-	protected final List<UpdateInfo<eu.dnetlib.broker.objects.Publication>> findUpdates(
-		final Pair<Result, List<Publication>> source,
-		final Pair<Result, List<Publication>> target) {
+	protected final List<OaBrokerRelatedPublication> findDifferences(
+		final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
+
+		if (target.getPublications().size() >= BrokerConstants.MAX_LIST_SIZE) {
+			return new ArrayList<>();
+		}
 
 		final Set<String> existingPublications = target
-			.getRight()
+			.getPublications()
 			.stream()
-			.map(Publication::getId)
+			.filter(rel -> filterByType(rel.getRelType()))
+			.map(OaBrokerRelatedPublication::getOpenaireId)
 			.collect(Collectors.toSet());
 
 		return source
-			.getRight()
+			.getPublications()
 			.stream()
-			.filter(d -> !existingPublications.contains(d.getId()))
-			.map(ConversionUtils::oafPublicationToBrokerPublication)
-			.map(i -> generateUpdateInfo(i, source, target))
+			.filter(rel -> filterByType(rel.getRelType()))
+			.filter(p -> !existingPublications.contains(p.getOpenaireId()))
 			.collect(Collectors.toList());
-
 	}
 
-	@Override
-	protected final UpdateInfo<eu.dnetlib.broker.objects.Publication> generateUpdateInfo(
-		final eu.dnetlib.broker.objects.Publication highlightValue,
-		final Pair<Result, List<Publication>> source,
-		final Pair<Result, List<Publication>> target) {
-		return new UpdateInfo<>(
-			getTopic(),
-			highlightValue, source.getLeft(), target.getLeft(),
-			(p, rel) -> p.getPublications().add(rel),
-			rel -> rel.getInstances().get(0).getUrl());
-	}
-
-	public Topic getTopic() {
-		return topic;
-	}
 }

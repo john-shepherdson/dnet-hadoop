@@ -47,8 +47,8 @@
 
     <decision name="ReuseContent">
         <switch>
-            <case to="ResetWorkingPath">${wf:conf('reuseContent') eq false}</case>
-            <case to="ResetTargetPath">${wf:conf('reuseContent') eq true}</case>
+            <case to="ImportEntitiesFromMongo">${wf:conf('reuseContent') eq false}</case>
+            <case to="ConvertXML2Entity">${wf:conf('reuseContent') eq true}</case>
             <default to="ResetWorkingPath"/>
         </switch>
     </decision>

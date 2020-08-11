@@ -1,63 +1,50 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.relatedDatasets;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerRelatedDataset;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 
-public abstract class AbstractEnrichMissingDataset
-	extends UpdateMatcher<Pair<Result, List<Dataset>>, eu.dnetlib.broker.objects.Dataset> {
-
-	private final Topic topic;
+public abstract class AbstractEnrichMissingDataset extends UpdateMatcher<OaBrokerRelatedDataset> {
 
 	public AbstractEnrichMissingDataset(final Topic topic) {
-		super(true);
-		this.topic = topic;
+		super(10,
+			rel -> topic,
+			(p, rel) -> p.getDatasets().add(rel),
+			rel -> rel.getOpenaireId());
 	}
 
+	protected abstract boolean filterByType(String relType);
+
 	@Override
-	protected final List<UpdateInfo<eu.dnetlib.broker.objects.Dataset>> findUpdates(
-		final Pair<Result, List<Dataset>> source,
-		final Pair<Result, List<Dataset>> target) {
+	protected final List<OaBrokerRelatedDataset> findDifferences(final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
+
+		if (target.getDatasets().size() >= BrokerConstants.MAX_LIST_SIZE) {
+			return new ArrayList<>();
+		}
 
 		final Set<String> existingDatasets = target
-			.getRight()
+			.getDatasets()
 			.stream()
-			.map(Dataset::getId)
+			.filter(rel -> filterByType(rel.getRelType()))
+			.map(OaBrokerRelatedDataset::getOpenaireId)
 			.collect(Collectors.toSet());
 
 		return source
-			.getRight()
+			.getDatasets()
 			.stream()
-			.filter(d -> !existingDatasets.contains(d.getId()))
-			.map(ConversionUtils::oafDatasetToBrokerDataset)
-			.map(i -> generateUpdateInfo(i, source, target))
+			.filter(rel -> filterByType(rel.getRelType()))
+			.filter(d -> !existingDatasets.contains(d.getOpenaireId()))
 			.collect(Collectors.toList());
 
 	}
 
-	@Override
-	protected final UpdateInfo<eu.dnetlib.broker.objects.Dataset> generateUpdateInfo(
-		final eu.dnetlib.broker.objects.Dataset highlightValue,
-		final Pair<Result, List<Dataset>> source,
-		final Pair<Result, List<Dataset>> target) {
-		return new UpdateInfo<>(
-			getTopic(),
-			highlightValue, source.getLeft(), target.getLeft(),
-			(p, rel) -> p.getDatasets().add(rel),
-			rel -> rel.getInstances().get(0).getUrl());
-	}
-
-	public Topic getTopic() {
-		return topic;
-	}
 }

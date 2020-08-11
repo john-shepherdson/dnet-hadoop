@@ -4,24 +4,12 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
 import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_DATE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_DATA_CITE_RESOURCE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_LANGUAGES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PUBLICATION_RESOURCE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PART_OF;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_SUPPLEMENTED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_SUPPLEMENT_TO;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PART;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.SUPPLEMENT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +17,7 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 
 import eu.dnetlib.dhp.common.PacePerson;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -43,8 +32,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
 
-	public OdfToOafMapper(final Map<String, String> code2name) {
-		super(code2name);
+	public OdfToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
+		super(vocs, invisible);
 	}
 
 	@Override
@@ -120,16 +109,15 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 		final Instance instance = new Instance();
 		instance
-			.setInstancetype(
-				prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE));
+			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
-			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES, DNET_ACCESS_MODES));
+			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
-		instance.setRefereed(field(doc.valueOf("//oaf:refereed"), info));
+		instance.setRefereed(prepareQualifier(doc, "//oaf:refereed", DNET_REVIEW_LEVELS));
 		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
@@ -138,7 +126,14 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
 			url.add(((Node) o).getText().trim());
 		}
+		for (final Object o : doc
+			.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='landingPage']")) {
+			url.add(((Node) o).getText().trim());
+		}
 		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='URL']")) {
+			url.add(((Node) o).getText().trim());
+		}
+		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='landingPage']")) {
 			url.add(((Node) o).getText().trim());
 		}
 		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='DOI']")) {
@@ -211,7 +206,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareLanguages(final Document doc) {
-		return prepareQualifier(doc, "//datacite:language", DNET_LANGUAGES, DNET_LANGUAGES);
+		return prepareQualifier(doc, "//datacite:language", DNET_LANGUAGES);
 	}
 
 	@Override
@@ -239,7 +234,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
-		return prepareQualifier(doc, "//datacite:format", "dnet:programming_languages", "dnet:programming_languages");
+		return prepareQualifier(doc, "//datacite:format", "dnet:programming_languages");
 	}
 
 	@Override
@@ -366,7 +361,28 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
 		return prepareQualifier(
-			doc, "//*[local-name() = 'resource']//*[local-name() = 'resourceType']", DNET_DATA_CITE_RESOURCE,
-			DNET_DATA_CITE_RESOURCE);
+			doc, "//*[local-name() = 'resource']//*[local-name() = 'resourceType']", DNET_DATA_CITE_RESOURCE);
 	}
+
+	@Override
+	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
+		final List<StructuredProperty> res = new ArrayList<>();
+		res
+			.addAll(
+				prepareListStructPropsWithValidQualifier(
+					doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info));
+		res
+			.addAll(
+				prepareListStructPropsWithValidQualifier(
+					doc, "//datacite:identifier[@identifierType != 'URL' and @identifierType != 'landingPage']",
+					"@identifierType", DNET_PID_TYPES, info));
+		res
+			.addAll(
+				prepareListStructPropsWithValidQualifier(
+					doc,
+					"//datacite:alternateIdentifier[@alternateIdentifierType != 'URL' and @alternateIdentifierType != 'landingPage']",
+					"@alternateIdentifierType", DNET_PID_TYPES, info));
+		return res;
+	}
+
 }

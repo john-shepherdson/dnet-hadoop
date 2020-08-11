@@ -31,7 +31,7 @@ public class Instance implements Serializable {
 	// typed results
 	private Field<String> processingchargecurrency;
 
-	private Field<String> refereed; // peer-review status
+	private Qualifier refereed; // peer-review status
 
 	public Field<String> getLicense() {
 		return license;
@@ -113,11 +113,11 @@ public class Instance implements Serializable {
 		this.processingchargecurrency = processingchargecurrency;
 	}
 
-	public Field<String> getRefereed() {
+	public Qualifier getRefereed() {
 		return refereed;
 	}
 
-	public void setRefereed(Field<String> refereed) {
+	public void setRefereed(Qualifier refereed) {
 		this.refereed = refereed;
 	}
 

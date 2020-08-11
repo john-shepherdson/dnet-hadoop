@@ -4,8 +4,10 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -24,10 +26,21 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
+import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
 public class GenerateEntitiesApplication {
@@ -40,44 +53,43 @@ public class GenerateEntitiesApplication {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					MigrateMongoMdstoresApplication.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/generate_entities_parameters.json")));
+					GenerateEntitiesApplication.class
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/generate_entities_parameters.json")));
 
 		parser.parseArgument(args);
 
-		Boolean isSparkSessionManaged = Optional
+		final Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String sourcePaths = parser.get("sourcePaths");
+		log.info("sourcePaths: {}", sourcePaths);
+
 		final String targetPath = parser.get("targetPath");
+		log.info("targetPath: {}", targetPath);
 
-		final String dbUrl = parser.get("postgresUrl");
-		final String dbUser = parser.get("postgresUser");
-		final String dbPassword = parser.get("postgresPassword");
+		final String isLookupUrl = parser.get("isLookupUrl");
+		log.info("isLookupUrl: {}", isLookupUrl);
 
-		final Map<String, String> code2name = loadClassNames(dbUrl, dbUser, dbPassword);
+		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);
 
-		SparkConf conf = new SparkConf();
-		runWithSparkSession(
-			conf,
-			isSparkSessionManaged,
-			spark -> {
-				removeOutputDir(spark, targetPath);
-				generateEntities(spark, code2name, sourcePaths, targetPath);
-			});
+		final SparkConf conf = new SparkConf();
+		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
+			removeOutputDir(spark, targetPath);
+			generateEntities(spark, vocs, sourcePaths, targetPath);
+		});
 	}
 
 	private static void generateEntities(
 		final SparkSession spark,
-		final Map<String, String> code2name,
+		final VocabularyGroup vocs,
 		final String sourcePaths,
 		final String targetPath) {
 
-		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		final List<String> existingSourcePaths = Arrays
 			.stream(sourcePaths.split(","))
 			.filter(p -> exists(sc, p))
@@ -94,7 +106,7 @@ public class GenerateEntitiesApplication {
 					sc
 						.sequenceFile(sp, Text.class, Text.class)
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
-						.map(k -> convertToListOaf(k._1(), k._2(), code2name))
+						.map(k -> convertToListOaf(k._1(), k._2(), vocs))
 						.filter(Objects::nonNull)
 						.flatMap(list -> list.iterator()));
 		}
@@ -110,7 +122,7 @@ public class GenerateEntitiesApplication {
 			.saveAsTextFile(targetPath, GzipCodec.class);
 	}
 
-	private static Oaf merge(Oaf o1, Oaf o2) {
+	private static Oaf merge(final Oaf o1, final Oaf o2) {
 		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
 			((OafEntity) o1).mergeFrom((OafEntity) o2);
 		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
@@ -122,14 +134,22 @@ public class GenerateEntitiesApplication {
 	}
 
 	private static List<Oaf> convertToListOaf(
-		final String id, final String s, final Map<String, String> code2name) {
+		final String id,
+		final String s,
+		final VocabularyGroup vocs) {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
-			case "native_oaf":
-				return new OafToOafMapper(code2name).processMdRecord(s);
-			case "native_odf":
-				return new OdfToOafMapper(code2name).processMdRecord(s);
+			case "oaf-store-cleaned":
+			case "oaf-store-claim":
+				return new OafToOafMapper(vocs, false).processMdRecord(s);
+			case "odf-store-cleaned":
+			case "odf-store-claim":
+				return new OdfToOafMapper(vocs, false).processMdRecord(s);
+			case "oaf-store-intersection":
+				return new OafToOafMapper(vocs, true).processMdRecord(s);
+			case "odf-store-intersection":
+				return new OdfToOafMapper(vocs, true).processMdRecord(s);
 			case "datasource":
 				return Arrays.asList(convertFromJson(s, Datasource.class));
 			case "organization":
@@ -149,31 +169,6 @@ public class GenerateEntitiesApplication {
 			default:
 				throw new RuntimeException("type not managed: " + type.toLowerCase());
 		}
-	}
-
-	private static Map<String, String> loadClassNames(
-		final String dbUrl, final String dbUser, final String dbPassword) throws IOException {
-
-		log.info("Loading vocabulary terms from db...");
-
-		final Map<String, String> map = new HashMap<>();
-
-		try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
-			dbClient
-				.processResults(
-					"select code, name from class",
-					rs -> {
-						try {
-							map.put(rs.getString("code"), rs.getString("name"));
-						} catch (final SQLException e) {
-							e.printStackTrace();
-						}
-					});
-		}
-
-		log.info("Found " + map.size() + " terms.");
-
-		return map;
 	}
 
 	private static Oaf convertFromJson(final String s, final Class<? extends Oaf> clazz) {
@@ -196,7 +191,7 @@ public class GenerateEntitiesApplication {
 		}
 	}
 
-	private static void removeOutputDir(SparkSession spark, String path) {
+	private static void removeOutputDir(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 }

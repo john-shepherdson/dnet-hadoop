@@ -6,9 +6,10 @@
 	},
 	{
 		"field": "identities",
-		"type": "not_used",
+		"type": "array",
 		"value": [
 			"274269ac6f3b::2579-5449",
+			"piwik:13",
 			null
 		]
 	},
@@ -30,7 +31,7 @@
 	{
 		"field": "openairecompatibility",
 		"type": "string",
-		"value": "hostedBy@@@collected from a compatible aggregator@@@dnet:datasourceCompatibilityLevel@@@dnet:datasourceCompatibilityLevel"
+		"value": "hostedBy@@@dnet:datasourceCompatibilityLevel"
 	},
 	{
 		"field": "websiteurl",
@@ -219,16 +220,16 @@
 	{
 		"field": "datasourcetype",
 		"type": "string",
-		"value": "pubsrepository::journal@@@Journal@@@dnet:datasource_typologies@@@dnet:datasource_typologies"
+		"value": "pubsrepository::journal@@@dnet:datasource_typologies"
 	},
 	{
 		"field": "provenanceaction",
 		"type": "not_used",
-		"value": "sysimport:crosswalk:entityregistry@@@sysimport:crosswalk:entityregistry@@@dnet:provenance_actions@@@dnet:provenance_actions"
+		"value": "sysimport:crosswalk:entityregistry@@@dnet:provenance_actions"
 	},
 	{
 		"field": "journal",
 		"type": "string",
-		"value": "2579-5449@@@2597-6540@@@"
+		"value": "2579-5449 @@@ 2597-6540 @@@ "
 	}
 ]

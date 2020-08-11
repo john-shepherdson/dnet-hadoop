@@ -26,6 +26,11 @@
             <name>postgresPassword</name>
             <description>the password postgres</description>
         </property>
+		<property>
+            <name>dbSchema</name>
+            <value>beta</value>
+            <description>the database schema according to the D-Net infrastructure (beta or production)</description>
+        </property>
         <property>
             <name>mongoURL</name>
             <description>mongoDB url, example: mongodb://[username:password@]host[:port]</description>
@@ -33,6 +38,10 @@
         <property>
             <name>mongoDb</name>
             <description>mongo database</description>
+        </property>
+        <property>
+            <name>isLookupUrl</name>
+            <description>the address of the lookUp service</description>
         </property>
 
         <property>
@@ -119,7 +128,9 @@
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--action</arg><arg>claims</arg>
+            <arg>--dbschema</arg><arg>${dbSchema}</arg>
         </java>
         <ok to="ImportODF_claims"/>
         <error to="Kill"/>
@@ -169,6 +180,8 @@
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--dbschema</arg><arg>${dbSchema}</arg>
         </java>
         <ok to="ImportODF"/>
         <error to="Kill"/>
@@ -204,6 +217,23 @@
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
         </java>
+        <ok to="ImportOAF_invisible"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="ImportOAF_invisible">
+        <java>
+            <prepare>
+                <delete path="${contentPath}/oaf_records_invisible"/>
+            </prepare>
+            <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
+            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_records_invisible</arg>
+            <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
+            <arg>--mongoDb</arg><arg>${mongoDb}</arg>
+            <arg>--mdFormat</arg><arg>OAF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>intersection</arg>
+        </java>
         <ok to="wait_import"/>
         <error to="Kill"/>
     </action>
@@ -231,11 +261,9 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims,${contentPath}/oaf_records_invisible</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
-            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
-            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
-            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="GenerateGraph_claims"/>
         <error to="Kill"/>
@@ -282,9 +310,7 @@
             </spark-opts>
             <arg>--sourcePaths</arg><arg>${contentPath}/db_records,${contentPath}/oaf_records,${contentPath}/odf_records</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
-            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
-            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
-            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>

@@ -21,6 +21,10 @@
             <name>hiveJdbcUrl</name>
             <description>hive server jdbc url</description>
         </property>
+        <property>
+            <name>hive_timeout</name>
+            <description>the time period, in seconds, after which Hive fails a transaction if a Hive client has not sent a hearbeat. The default value is 300 seconds.</description>
+        </property>
     </parameters>
 
     <global>
@@ -30,6 +34,10 @@
             <property>
                 <name>hive.metastore.uris</name>
                 <value>${hiveMetastoreUris}</value>
+            </property>
+            <property>
+            	<name>hive.txn.timeout</name>
+            	<value>${hive_timeout}</value>
             </property>
         </configuration>
     </global>

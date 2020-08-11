@@ -90,6 +90,7 @@
     <oaf:hostedBy id="re3data_____::r3d100010468" name="Zenodo"/>
     <oaf:projectid>corda_______::226852</oaf:projectid>
     <oaf:collectedFrom id="re3data_____::r3d100010468" name="Zenodo"/>
+    <oaf:refereed>0001</oaf:refereed>s
   </metadata>
   <about xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:dri="http://www.driver-repository.eu/namespace/dri"

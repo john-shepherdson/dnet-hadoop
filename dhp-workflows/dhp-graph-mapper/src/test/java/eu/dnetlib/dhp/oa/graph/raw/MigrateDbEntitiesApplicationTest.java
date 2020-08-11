@@ -4,6 +4,8 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
 import java.sql.Array;
@@ -25,6 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
@@ -40,9 +44,22 @@ public class MigrateDbEntitiesApplicationTest {
 	@Mock
 	private ResultSet rs;
 
+	@Mock
+	private VocabularyGroup vocs;
+
 	@BeforeEach
 	public void setUp() {
-		this.app = new MigrateDbEntitiesApplication();
+		lenient()
+			.when(vocs.getTermAsQualifier(anyString(), anyString()))
+			.thenAnswer(
+				invocation -> OafMapperUtils
+					.qualifier(
+						invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0),
+						invocation.getArgument(0)));
+
+		lenient().when(vocs.termExists(anyString(), anyString())).thenReturn(true);
+
+		this.app = new MigrateDbEntitiesApplication(vocs);
 	}
 
 	@Test
@@ -61,8 +78,7 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(ds.getContactemail().getValue(), getValueAsString("contactemail", fields));
 		assertEquals(ds.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
 		assertEquals(ds.getNamespaceprefix().getValue(), getValueAsString("namespaceprefix", fields));
-		assertEquals(
-			ds.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(ds.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test
@@ -78,8 +94,7 @@ public class MigrateDbEntitiesApplicationTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertEquals(p.getAcronym().getValue(), getValueAsString("acronym", fields));
 		assertEquals(p.getTitle().getValue(), getValueAsString("title", fields));
-		assertEquals(
-			p.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(p.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test
@@ -99,13 +114,10 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(o.getLegalname().getValue(), getValueAsString("legalname", fields));
 		assertEquals(o.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
 		assertEquals(o.getCountry().getClassid(), getValueAsString("country", fields).split("@@@")[0]);
-		assertEquals(
-			o.getCountry().getClassname(), getValueAsString("country", fields).split("@@@")[1]);
-		assertEquals(o.getCountry().getSchemeid(), getValueAsString("country", fields).split("@@@")[2]);
-		assertEquals(
-			o.getCountry().getSchemename(), getValueAsString("country", fields).split("@@@")[3]);
-		assertEquals(
-			o.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(o.getCountry().getClassname(), getValueAsString("country", fields).split("@@@")[0]);
+		assertEquals(o.getCountry().getSchemeid(), getValueAsString("country", fields).split("@@@")[1]);
+		assertEquals(o.getCountry().getSchemename(), getValueAsString("country", fields).split("@@@")[1]);
+		assertEquals(o.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
 	}
 
 	@Test

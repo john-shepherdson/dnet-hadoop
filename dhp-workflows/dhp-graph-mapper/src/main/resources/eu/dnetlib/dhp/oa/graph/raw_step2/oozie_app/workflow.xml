@@ -9,17 +9,10 @@
             <description>the temporary path to store entities before dispatching</description>
         </property>
         <property>
-            <name>postgresURL</name>
-            <description>the postgres URL to access to the database</description>
+            <name>isLookupUrl</name>
+            <description>the address of the lookUp service</description>
         </property>
-        <property>
-            <name>postgresUser</name>
-            <description>the user postgres</description>
-        </property>
-        <property>
-            <name>postgresPassword</name>
-            <description>the password postgres</description>
-        </property>
+ 
         <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
@@ -62,9 +55,7 @@
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>-s</arg><arg>${migrationPathStep1}/db_records,${migrationPathStep1}/oaf_records,${migrationPathStep1}/odf_records</arg>
             <arg>-t</arg><arg>${migrationPathStep2}/all_entities</arg>
-            <arg>-pgurl</arg><arg>${postgresURL}</arg>
-            <arg>-pguser</arg><arg>${postgresUser}</arg>
-            <arg>-pgpasswd</arg><arg>${postgresPassword}</arg>
+            <arg>--islookup</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

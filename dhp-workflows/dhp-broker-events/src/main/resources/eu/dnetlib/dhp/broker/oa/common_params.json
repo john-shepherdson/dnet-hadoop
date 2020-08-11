@@ -1,0 +1,14 @@
+[
+	{
+		"paramName": "g",
+		"paramLongName": "graphPath",
+		"paramDescription": "the path where there the graph is stored",
+		"paramRequired": true
+	},
+	{
+		"paramName": "o",
+		"paramLongName": "workingPath",
+		"paramDescription": "the path where the temporary data will be stored",
+		"paramRequired": true
+	}
+]

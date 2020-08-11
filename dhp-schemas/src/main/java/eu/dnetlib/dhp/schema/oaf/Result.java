@@ -2,10 +2,14 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Result extends OafEntity implements Serializable {
+
+	private List<Measure> measures;
 
 	private List<Author> author;
 
@@ -50,6 +54,14 @@ public class Result extends OafEntity implements Serializable {
 	private List<ExternalReference> externalReference;
 
 	private List<Instance> instance;
+
+	public List<Measure> getMeasures() {
+		return measures;
+	}
+
+	public void setMeasures(List<Measure> measures) {
+		this.measures = measures;
+	}
 
 	public List<Author> getAuthor() {
 		return author;
@@ -229,6 +241,8 @@ public class Result extends OafEntity implements Serializable {
 
 		Result r = (Result) e;
 
+		// TODO consider merging also Measures
+
 		instance = mergeLists(instance, r.getInstance());
 
 		if (r.getBestaccessright() != null && compareTrust(this, r) < 0)
@@ -244,25 +258,33 @@ public class Result extends OafEntity implements Serializable {
 
 		subject = mergeLists(subject, r.getSubject());
 
-		//merge title lists: main title with higher trust and distinct between the others
+		// merge title lists: main title with higher trust and distinct between the others
 		StructuredProperty baseMainTitle = null;
-		if(title != null) {
+		if (title != null) {
 			baseMainTitle = getMainTitle(title);
-			title.remove(baseMainTitle);
+			if (baseMainTitle != null) {
+				final StructuredProperty p = baseMainTitle;
+				title = title.stream().filter(t -> t != p).collect(Collectors.toList());
+			}
 		}
 
 		StructuredProperty newMainTitle = null;
-		if(r.getTitle() != null) {
+		if (r.getTitle() != null) {
 			newMainTitle = getMainTitle(r.getTitle());
-			r.getTitle().remove(newMainTitle);
+			if (newMainTitle != null) {
+				final StructuredProperty p = newMainTitle;
+				r.setTitle(r.getTitle().stream().filter(t -> t != p).collect(Collectors.toList()));
+			}
 		}
 
-		if (newMainTitle != null && compareTrust(this, r) < 0 )
+		if (newMainTitle != null && compareTrust(this, r) < 0) {
 			baseMainTitle = newMainTitle;
+		}
 
 		title = mergeLists(title, r.getTitle());
-		if (title != null && baseMainTitle != null)
+		if (title != null && baseMainTitle != null) {
 			title.add(baseMainTitle);
+		}
 
 		relevantdate = mergeLists(relevantdate, r.getRelevantdate());
 
@@ -314,8 +336,9 @@ public class Result extends OafEntity implements Serializable {
 	}
 
 	private StructuredProperty getMainTitle(List<StructuredProperty> titles) {
-		//need to check if the list of titles contains more than 1 main title? (in that case, we should chose which main title select in the list)
-		for (StructuredProperty title: titles) {
+		// need to check if the list of titles contains more than 1 main title? (in that case, we should chose which
+		// main title select in the list)
+		for (StructuredProperty title : titles) {
 			if (title.getQualifier() != null && title.getQualifier().getClassid() != null)
 				if (title.getQualifier().getClassid().equals("main title"))
 					return title;

@@ -8,6 +8,7 @@ import java.io.File;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +20,7 @@ import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
 
+@Disabled
 public class DnetCollectorWorkerApplicationTests {
 
 	private final ArgumentApplicationParser argumentParser = mock(ArgumentApplicationParser.class);

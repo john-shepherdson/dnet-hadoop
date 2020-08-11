@@ -1,40 +1,45 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.relatedProjects;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
-
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.broker.objects.OaBrokerProject;
 import eu.dnetlib.dhp.broker.model.Topic;
 import eu.dnetlib.dhp.broker.oa.matchers.UpdateMatcher;
-import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 
-public class EnrichMoreProject extends UpdateMatcher<Pair<Result, List<Project>>, eu.dnetlib.broker.objects.Project> {
+public class EnrichMoreProject extends UpdateMatcher<OaBrokerProject> {
 
 	public EnrichMoreProject() {
-		super(true);
-	}
-
-	@Override
-	protected List<UpdateInfo<eu.dnetlib.broker.objects.Project>> findUpdates(final Pair<Result, List<Project>> source,
-		final Pair<Result, List<Project>> target) {
-		// TODO
-		return Arrays.asList();
-	}
-
-	@Override
-	public UpdateInfo<eu.dnetlib.broker.objects.Project> generateUpdateInfo(
-		final eu.dnetlib.broker.objects.Project highlightValue,
-		final Pair<Result, List<Project>> source,
-		final Pair<Result, List<Project>> target) {
-		return new UpdateInfo<>(
-			Topic.ENRICH_MORE_PROJECT,
-			highlightValue, source.getLeft(), target.getLeft(),
+		super(20,
+			prj -> Topic.ENRICH_MORE_PROJECT,
 			(p, prj) -> p.getProjects().add(prj),
-			prj -> prj.getFunder() + "::" + prj.getFundingProgram() + prj.getCode());
+			prj -> prj.getOpenaireId());
+	}
+
+	@Override
+	protected List<OaBrokerProject> findDifferences(final OaBrokerMainEntity source,
+		final OaBrokerMainEntity target) {
+
+		if (target.getProjects().size() >= BrokerConstants.MAX_LIST_SIZE) {
+			return new ArrayList<>();
+		}
+
+		final Set<String> existingProjects = target
+			.getProjects()
+			.stream()
+			.map(p -> p.getOpenaireId())
+			.collect(Collectors.toSet());
+
+		return source
+			.getProjects()
+			.stream()
+			.filter(p -> !existingProjects.contains(p.getOpenaireId()))
+			.collect(Collectors.toList());
 	}
 
 }
