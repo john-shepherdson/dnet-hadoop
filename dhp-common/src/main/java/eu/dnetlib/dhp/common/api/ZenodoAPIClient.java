@@ -140,7 +140,7 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * To publish the current deposition. It works for both new deposition or new version of an old deposition
-	 * @return
+	 * @return response code
 	 * @throws IOException
 	 */
 	public int publish() throws IOException {
@@ -169,7 +169,7 @@ public class ZenodoAPIClient implements Serializable {
 	 * To create a new version of an already published deposition.
 	 * It sets the deposition_id and the bucket to be used for the new version.
 	 * @param concept_rec_id the concept record id of the deposition for which to create a new version. It is
-	 *                       the last part of the url for the DOI Zenodo suggest to use to cite all versions:
+	 *                       the last part of the url for the DOI Zenodo suggests to use to cite all versions:
 	 *                       DOI: 10.xxx/zenodo.656930 concept_rec_id = 656930
 	 * @return response code
 	 * @throws IOException
@@ -262,97 +262,5 @@ public class ZenodoAPIClient implements Serializable {
 
 	}
 
-	// public int newDeposition() throws IOException {
-//
-//		String json = "{}";
-//
-//		HttpClient client = new DefaultHttpClient();
-//
-//		HttpPost post = new HttpPost(urlString);
-//
-//		StringEntity input = new StringEntity(json);
-//		post.setEntity(input);
-//		post.addHeader("Content-Type", "application/json");
-//		post.setHeader("Authorization", "Bearer " + access_token);
-//
-//
-//		HttpResponse response = client.execute(post);
-//
-//		json = EntityUtils.toString(response.getEntity());
-//
-//		ZenodoModel newSubmission = new Gson().fromJson(json, ZenodoModel.class);
-//		this.bucket = newSubmission.getLinks().getBucket();
-//		this.deposition_id = newSubmission.getId();
-//
-//		return response.getStatusLine().getStatusCode();
-//
-//	}
-
-//	public int upload(InputStream is, String file_name) throws IOException {
-//		HttpClient client = new DefaultHttpClient();
-//
-//		HttpPut put = new HttpPut(bucket + "/" + file_name);
-//		put.setHeader("Authorization", "Bearer " + access_token);
-//		put.addHeader("Content-Type", "application/zip");
-//
-//		HttpEntity data = MultipartEntityBuilder
-//			.create()
-//			// .addPart("file", new ByteArrayInputStream(is));
-//			.addBinaryBody(file_name, is, ContentType.APPLICATION_OCTET_STREAM, file_name)
-//			.build();
-//		put.setEntity(data);
-//
-//		HttpResponse response = client.execute(put);
-//
-//		return response.getStatusLine().getStatusCode();
-//	}
-
-//	public int upload(File file, String file_name) throws IOException {
-//		HttpClient client = new DefaultHttpClient();
-//
-//		HttpPut put = new HttpPut(bucket + "/" + file_name);
-//		put.setHeader("Authorization", "Bearer " + access_token);
-//		put.addHeader("Content-Type", "application/zip");
-//		InputStreamEntity data = new InputStreamEntity(new FileInputStream(file), -1);
-//		data.setContentType("binary/octet-stream");
-//		data.setChunked(true); // Send in multiple parts if needed
-////		ByteArrayInputStream bais = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
-////		EntityUtils.toByteArray(new ByteArrayInputStream(FileUtils.readFileToByteArray(file)));
-////		InputStream targetStream = new FileInputStream(file);
-////		DataInputStream tmp = new DataInputStream(targetStream);
-////		HttpEntity data = new ByteArrayEntity(tmp.);
-////		HttpEntity data = MultipartEntityBuilder.create().addBinaryBody(file_name, file).build();
-//		put.setEntity(data);
-//
-//		HttpResponse response = client.execute(put);
-//
-//		return response.getStatusLine().getStatusCode();
-//
-//	}
-
-//	public int sendMretadata(String metadata) throws IOException {
-//
-//		HttpClient client = new DefaultHttpClient();
-//		HttpPut post = new HttpPut(urlString + "/" + deposition_id);
-//		post.setHeader("Authorization", "Bearer " + access_token);
-//		post.addHeader("Content-Type", "application/json");
-//		StringEntity entity = new StringEntity(metadata, StandardCharsets.UTF_8);
-//		post.setEntity(entity);
-//
-//		HttpResponse response = client.execute(post);
-//
-//		return response.getStatusLine().getStatusCode();
-//
-//	}
-
-//	public int publish() throws IOException {
-//		HttpClient client = new DefaultHttpClient();
-//		HttpPost post = new HttpPost(urlString + "/" + deposition_id + "/actions/publish");
-//		post.setHeader("Authorization", "Bearer " + access_token);
-//
-//		HttpResponse response = client.execute(post);
-//
-//		return response.getStatusLine().getStatusCode();
-//	}
 
 }
