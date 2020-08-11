@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.oa.graph.dump;
 
 import java.io.IOException;
@@ -94,8 +95,8 @@ public class SplitForCommunityTest {
 			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
 
 		CommunitySplit split = new CommunitySplit();
 

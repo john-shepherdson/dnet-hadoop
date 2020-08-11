@@ -22,7 +22,7 @@ public class ZenodoUploadTest {
 	private static String workingDir;
 
 	private final String URL_STRING = "https://sandbox.zenodo.org/api/deposit/depositions";
-	private final String ACCESS_TOKEN = "5ImUj0VC1ICg4ifK5dc3AGzJhcfAB4osxrFlsr8WxHXxjaYgCE0hY8HZcDoe";
+	private final String ACCESS_TOKEN = "";
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -143,7 +143,7 @@ public class ZenodoUploadTest {
 			.println(
 				new Gson()
 					.toJson(
-						SendToZenodoHDFS
+						Utils
 							.readCommunityMap(
 								fs, getClass()
 									.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
