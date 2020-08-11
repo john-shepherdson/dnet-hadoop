@@ -61,8 +61,6 @@ public class CreateEntityTest {
 
 	private QueryInformationSystem queryInformationSystem;
 
-	private Map<String, String> map;
-
 	@BeforeEach
 	public void setUp() throws ISLookUpException {
 		lenient().when(isLookUpService.quickSearchProfile(XQUERY_ENTITY)).thenReturn(communityMap);
