@@ -14,6 +14,26 @@
                 <description>the output path</description>
             </property>
         <property>
+            <name>accessToken</name>
+            <description>the access token used for the deposition in Zenodo</description>
+        </property>
+        <property>
+            <name>connectionUrl</name>
+            <description>the connection url for Zenodo</description>
+        </property>
+        <property>
+            <name>metadata</name>
+            <description> the metadata associated to the deposition</description>
+        </property>
+        <property>
+            <name>newDeposition</name>
+            <description>true if it is a brand new depositon. false for new version of an old deposition</description>
+        </property>
+        <property>
+            <name>conceptRecordId</name>
+            <description>for new version, the id of the record for the old deposition</description>
+        </property>
+        <property>
             <name>organizationCommunityMap</name>
             <description>the organization community map</description>
         </property>
@@ -97,13 +117,13 @@
             <delete path="${outputPath}"/>
             <mkdir path="${outputPath}"/>
         </fs>
-        <ok to="fork_dump"/>
+        <ok to="save_community_map"/>
         <error to="Kill"/>
     </action>
 
     <action name="save_community_map">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.dump.community.SaveCommunityMap</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.SaveCommunityMap</main-class>
             <arg>--outputPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
@@ -143,8 +163,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/publication</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -170,8 +189,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/dataset</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -197,8 +215,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/otherresearchproduct</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -224,8 +241,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/software</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -250,9 +266,9 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/organization</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/organization</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/collect/organization</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -277,9 +293,9 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/project</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/project</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/collect/project</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -304,9 +320,9 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/datasource</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/datasource</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/collect/datasource</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -330,7 +346,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/relation/relation</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -349,8 +365,8 @@
     <action name="create_entities_fromcontext">
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.dump.graph.CreateContextEntities</main-class>
-            <arg>--hdfsPath</arg><arg>${outputPath}/context</arg>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/collect/context</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </java>
         <ok to="join_context"/>
@@ -361,7 +377,7 @@
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.dump.graph.CreateContextRelation</main-class>
             <arg>--hdfsPath</arg><arg>${workingDir}/relation/context</arg>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </java>
         <ok to="join_context"/>
@@ -424,8 +440,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/publication</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -451,8 +467,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/dataset</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -478,8 +494,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/orp</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -505,8 +521,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/software</arg>
-<!--            <arg>&#45;&#45;communityMapPath</arg><arg>${workingDir}/communityMap</arg>-->
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -533,13 +549,39 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}</arg>
-            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/collect</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="make_archive"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="make_archive">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.MakeTar</main-class>
+            <arg>--hdfsPath</arg><arg>${outputPath}</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/collect</arg>
+        </java>
+        <ok to="send_zenodo"/>
         <error to="Kill"/>
     </action>
 
 
+    <action name="send_zenodo">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.SendToZenodoHDFS</main-class>
+            <arg>--hdfsPath</arg><arg>${outputPath}</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--accessToken</arg><arg>${accessToken}</arg>
+            <arg>--connectionUrl</arg><arg>${connectionUrl}</arg>
+            <arg>--metadata</arg><arg>${metadata}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+            <arg>--conceptRecordId</arg><arg>${conceptRecordId}</arg>
+            <arg>--newDeposition</arg><arg>${newDeposition}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
     <end name="End"/>
 
