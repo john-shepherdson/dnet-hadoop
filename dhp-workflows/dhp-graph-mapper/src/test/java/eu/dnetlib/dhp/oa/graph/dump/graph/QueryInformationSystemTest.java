@@ -539,7 +539,7 @@ public class QueryInformationSystemTest {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.execContextRelationQuery();
-		queryInformationSystem.getContextRelation(consumer, "contentproviders", "10|");
+		queryInformationSystem.getContextRelation(consumer, "contentproviders", "10");
 
 		cInfoList.forEach(contextInfo -> {
 			switch (contextInfo.getId()) {
@@ -559,7 +559,7 @@ public class QueryInformationSystemTest {
 						.assertTrue(
 							contextInfo
 								.getDatasourceList()
-								.contains(("10|rest________::fb1a3d4523c95e63496e3bc7ba36244b")));
+								.contains("10|rest________::fb1a3d4523c95e63496e3bc7ba36244b"));
 					break;
 				case "dh-ch":
 					Assertions.assertEquals(10, contextInfo.getDatasourceList().size());
