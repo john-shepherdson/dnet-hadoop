@@ -163,7 +163,11 @@
         <zenodocommunities/>
     </community>
     <community id="clarin">
-        <oacommunity>oac_clarin</oacommunity>
+        <zenodocommunities>
+            <zenodocommunity>
+                <zenodoid>oac_clarin</zenodoid>
+            </zenodocommunity>
+        </zenodocommunities>
         <subjects/>
         <providers>
             <datasource>
