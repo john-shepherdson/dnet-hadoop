@@ -71,10 +71,9 @@ public class ResultTagger implements Serializable {
 
 		// tagging for Subject
 		final Set<String> subjects = new HashSet<>();
-		Optional<List<StructuredProperty>> oresultsubj = Optional.ofNullable(result.getSubject());
-		if (oresultsubj.isPresent()) {
-			oresultsubj
-				.get()
+
+		if (Objects.nonNull(result.getSubject())){
+			result.getSubject()
 				.stream()
 				.map(subject -> subject.getValue())
 				.filter(StringUtils::isNotBlank)
@@ -90,15 +89,23 @@ public class ResultTagger implements Serializable {
 		final Set<String> datasources = new HashSet<>();
 		final Set<String> tmp = new HashSet<>();
 
-		Optional<List<Instance>> oresultinstance = Optional.ofNullable(result.getInstance());
-		if (oresultinstance.isPresent()) {
-			for (Instance i : oresultinstance.get()) {
-				tmp.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
-				tmp.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
+		if (Objects.nonNull(result.getInstance())) {
+			for (Instance i : result.getInstance()) {
+				if(Objects.nonNull(i.getCollectedfrom())){
+					if(Objects.nonNull(i.getCollectedfrom().getKey())){
+						tmp.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
+					}
+				}
+				if(Objects.nonNull(i.getHostedby())){
+					if(Objects.nonNull(i.getHostedby().getKey())){
+						tmp.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
+					}
+				}
+
 			}
 
-			oresultinstance
-				.get()
+			result
+				.getInstance()
 				.stream()
 				.map(i -> new Pair<>(i.getCollectedfrom().getKey(), i.getHostedby().getKey()))
 				.flatMap(p -> Stream.of(p.getFst(), p.getSnd()))

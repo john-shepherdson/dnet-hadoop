@@ -44,7 +44,7 @@ public class Provider implements Serializable {
 	}
 
 	private void setSelCriteria(String json, VerbResolver resolver) {
-		log.info("Selection constraints for datasource = " + json);
+		log.debug("Selection constraints for datasource = " + json);
 		selectionConstraints = new Gson().fromJson(json, SelectionConstraints.class);
 
 		selectionConstraints.setSelection(resolver);
@@ -54,7 +54,7 @@ public class Provider implements Serializable {
 		try {
 			setSelCriteria(n.getText(), resolver);
 		} catch (Exception e) {
-			log.info("not set selection criteria... ");
+			log.debug("not set selection criteria... ");
 			selectionConstraints = null;
 		}
 	}
