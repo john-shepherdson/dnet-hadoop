@@ -8,11 +8,13 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +76,6 @@ public class SparkOrganizationRelation implements Serializable {
 		Dataset<Relation> relationDataset = Utils.readPath(spark, inputPath, Relation.class);
 
 		relationDataset.createOrReplaceTempView("relation");
-		Set<String> organizationSet = organizationMap.keySet();
 
 		List<eu.dnetlib.dhp.schema.dump.oaf.graph.Relation> relList = new ArrayList<>();
 
@@ -95,15 +96,9 @@ public class SparkOrganizationRelation implements Serializable {
 		}, Encoders.bean(MergedRels.class))
 			.filter(Objects::nonNull)
 			.collectAsList()
-			.forEach(mergedRels -> {
-				String oId = mergedRels.getOrganizationId();
-				organizationSet.remove(oId);
-				organizationMap
-					.get(oId)
-					.forEach(community -> addRelations(relList, community, mergedRels.getRepresentativeId()));
-			});
+			.forEach(getMergedRelsConsumer(organizationMap, relList));
 
-		organizationSet
+		organizationMap.keySet()
 			.forEach(
 				oId -> organizationMap
 					.get(oId)
@@ -116,6 +111,17 @@ public class SparkOrganizationRelation implements Serializable {
 			.option("compression", "gzip")
 			.json(outputPath);
 
+	}
+
+	@NotNull
+	private static Consumer<MergedRels> getMergedRelsConsumer(OrganizationMap organizationMap, List<eu.dnetlib.dhp.schema.dump.oaf.graph.Relation> relList) {
+		return mergedRels -> {
+			String oId = mergedRels.getOrganizationId();
+			organizationMap
+				.get(oId)
+				.forEach(community -> addRelations(relList, community, mergedRels.getRepresentativeId()));
+			organizationMap.remove(oId);
+		};
 	}
 
 	private static void addRelations(List<eu.dnetlib.dhp.schema.dump.oaf.graph.Relation> relList, String community,
