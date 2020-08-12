@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.schema.dump.oaf.community;
 
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.dump.oaf.Context;
 import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
 

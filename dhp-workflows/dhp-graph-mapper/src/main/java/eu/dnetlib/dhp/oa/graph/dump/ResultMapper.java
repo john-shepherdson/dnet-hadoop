@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -178,7 +179,7 @@ public class ResultMapper implements Serializable {
 															.newInstance(
 																provenance
 																	.getProvenanceaction()
-																	.getClassid(),
+																	.getClassname(),
 																c.getDataInfo().getTrust())));
 										return country;
 									})

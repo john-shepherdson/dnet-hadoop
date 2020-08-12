@@ -1,5 +1,8 @@
 
-package eu.dnetlib.dhp.schema.dump.oaf;
+package eu.dnetlib.dhp.schema.dump.oaf.community;
+
+import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
+import eu.dnetlib.dhp.schema.dump.oaf.Qualifier;
 
 import java.util.List;
 import java.util.Objects;
