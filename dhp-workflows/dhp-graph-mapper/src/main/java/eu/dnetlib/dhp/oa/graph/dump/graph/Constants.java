@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.graph.dump.graph;
 import java.io.Serializable;
 
 public class Constants implements Serializable {
-	// collectedFrom va con isProvidedBy -> becco da ModelSupport
 
 	public static final String IS_HOSTED_BY = "isHostedBy";
 	public static final String HOSTS = "hosts";
@@ -13,8 +12,6 @@ public class Constants implements Serializable {
 	public static final String FUNDS = "funds";
 
 	public static final String FUNDINGS = "fundings";
-
-	// community result uso isrelatedto
 
 	public static final String RESULT_ENTITY = "result";
 	public static final String DATASOURCE_ENTITY = "datasource";
