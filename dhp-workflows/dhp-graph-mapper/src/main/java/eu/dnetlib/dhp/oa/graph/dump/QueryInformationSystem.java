@@ -29,7 +29,7 @@ public class QueryInformationSystem {
 		"</community>";
 
 	public CommunityMap getCommunityMap()
-		throws ISLookUpException {
+		throws ISLookUpException, DocumentException {
 		return getMap(isLookUp.quickSearchProfile(XQUERY));
 
 	}
@@ -42,20 +42,15 @@ public class QueryInformationSystem {
 		this.isLookUp = isLookUpService;
 	}
 
-	private CommunityMap getMap(List<String> communityMap) {
+	private CommunityMap getMap(List<String> communityMap) throws DocumentException {
 		final CommunityMap map = new CommunityMap();
 
-		communityMap.stream().forEach(xml -> {
+		for (String xml : communityMap) {
 			final Document doc;
-			try {
-				doc = new SAXReader().read(new StringReader(xml));
-				Element root = doc.getRootElement();
-				map.put(root.attribute("id").getValue(), root.attribute("label").getValue());
-			} catch (DocumentException e) {
-				e.printStackTrace();
-			}
-
-		});
+			doc = new SAXReader().read(new StringReader(xml));
+			Element root = doc.getRootElement();
+			map.put(root.attribute("id").getValue(), root.attribute("label").getValue());
+		}
 
 		return map;
 	}
