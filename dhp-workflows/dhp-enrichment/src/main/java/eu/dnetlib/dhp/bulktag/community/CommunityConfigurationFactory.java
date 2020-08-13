@@ -110,13 +110,6 @@ public class CommunityConfigurationFactory {
 	}
 
 	private static List<ZenodoCommunity> parseZenodoCommunities(final Node node) {
-//		final Node oacommunitynode = node.selectSingleNode("./oacommunity");
-//		String oacommunity = null;
-//		if (oacommunitynode != null) {
-//			String tmp = oacommunitynode.getText();
-//			if (StringUtils.isNotBlank(tmp))
-//				oacommunity = tmp;
-//		}
 
 		final List<Node> list = node.selectNodes("./zenodocommunities/zenodocommunity");
 		final List<ZenodoCommunity> zenodoCommunityList = new ArrayList<>();
@@ -127,11 +120,7 @@ public class CommunityConfigurationFactory {
 
 			zenodoCommunityList.add(zc);
 		}
-//		if (oacommunity != null) {
-//			ZenodoCommunity zc = new ZenodoCommunity();
-//			zc.setZenodoCommunityId(oacommunity);
-//			zenodoCommunityList.add(zc);
-//		}
+
 		log.info("size of the zenodo community list " + zenodoCommunityList.size());
 		return zenodoCommunityList;
 	}
