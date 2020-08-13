@@ -7,6 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Represents the geolocation information. It has three parameters:
+ * - point of type String to store the point information. It corresponds to eu.dnetlib.dhp.schema.oaf.GeoLocation point
+ * - box ot type String to store the box information. It corresponds to eu.dnetlib.dhp.schema.oaf.GeoLocation box
+ * - place of type String to store the place information. It corresponds to eu.dnetlib.dhp.schema.oaf.GeoLocation place
+ */
 public class GeoLocation implements Serializable {
 
 	private String point;

@@ -7,6 +7,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * To represent the information described by a code and a value It has two parameters:
+ * - code to store the code (generally the classid of the eu.dnetlib.dhp.schema.oaf.Qualifier element)
+ * - label to store the label (generally the classname of the eu.dnetlib.dhp.schema.oaf.Qualifier element
+ */
 public class Qualifier implements Serializable {
 
 	private String code; // the classid in the Qualifier

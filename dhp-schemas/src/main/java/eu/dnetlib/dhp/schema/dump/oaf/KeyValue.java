@@ -7,6 +7,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * To represent the information described by a key and a value. It has two parameters:
+ * - key to store the key (generally the OpenAIRE id for some entity)
+ * - value to store the value (generally the OpenAIRE name for the key)
+ */
 public class KeyValue implements Serializable {
 
 	private String key;
