@@ -328,14 +328,6 @@ public class ResultMapper implements Serializable {
 					value -> value
 						.forEach(s -> subjectList.add(getSubject(s))));
 
-			List<ExternalReference> erList = new ArrayList<>();
-			Optional
-				.ofNullable(input.getExtraInfo())
-				.ifPresent(
-					value -> value
-						.forEach(
-							er -> erList.add(ExternalReference.newInstance(er))));
-
 			out.setSubjects(subjectList);
 
 			out.setType(input.getResulttype().getClassid());

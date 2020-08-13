@@ -42,8 +42,6 @@ public class Result implements Serializable {
 
 	private AccessRight bestaccessright;
 
-	private List<ExternalReference> externalReference;
-
 	private List<Instance> instance;
 
 	private Container container;// Journal
@@ -250,14 +248,6 @@ public class Result implements Serializable {
 
 	public void setBestaccessright(AccessRight bestaccessright) {
 		this.bestaccessright = bestaccessright;
-	}
-
-	public List<ExternalReference> getExternalReference() {
-		return externalReference;
-	}
-
-	public void setExternalReference(List<ExternalReference> externalReference) {
-		this.externalReference = externalReference;
 	}
 
 	public List<Instance> getInstance() {
