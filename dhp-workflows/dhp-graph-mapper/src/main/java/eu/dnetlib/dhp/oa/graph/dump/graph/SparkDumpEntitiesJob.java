@@ -1,16 +1,19 @@
-/**
- * Spark Job that fires the dump for the entites
- */
+
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import java.io.Serializable;
 import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
+/**
+ * Spark Job that fires the dump for the entites
+ */
 public class SparkDumpEntitiesJob implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkDumpEntitiesJob.class);
 
