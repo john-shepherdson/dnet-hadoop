@@ -5,12 +5,12 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
@@ -472,15 +472,6 @@ public class ResultMapper implements Serializable {
 
 	private static Author getAuthor(eu.dnetlib.dhp.schema.oaf.Author oa) {
 		Author a = new Author();
-		Optional
-			.ofNullable(oa.getAffiliation())
-			.ifPresent(
-				value -> a
-					.setAffiliation(
-						value
-							.stream()
-							.map(aff -> aff.getValue())
-							.collect(Collectors.toList())));
 		a.setFullname(oa.getFullname());
 		a.setName(oa.getName());
 		a.setSurname(oa.getSurname());
@@ -529,18 +520,5 @@ public class ResultMapper implements Serializable {
 		return null;
 	}
 
-	private static Pid getPid(StructuredProperty p) {
-		Pid pid = new Pid();
-		pid.setId(ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()));
-		Optional<DataInfo> di = Optional.ofNullable(p.getDataInfo());
-		Provenance provenance = new Provenance();
-		if (di.isPresent()) {
-			provenance.setProvenance(di.get().getProvenanceaction().getClassname());
-			provenance.setTrust(di.get().getTrust());
-			pid.setProvenance(provenance);
-		}
-
-		return pid;
-	}
 
 }
