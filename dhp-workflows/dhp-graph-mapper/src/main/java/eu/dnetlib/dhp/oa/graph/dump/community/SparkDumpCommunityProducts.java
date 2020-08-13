@@ -1,7 +1,3 @@
-/**
- *Spark action to trigger the dump of results associated to research community - reseach initiative/infrasctructure
- * The actual dump if performed via the class DumpProducts that is used also for the entire graph dump
- */
 
 package eu.dnetlib.dhp.oa.graph.dump.community;
 
@@ -17,6 +13,10 @@ import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
+/**
+ * Spark action to trigger the dump of results associated to research community - reseach initiative/infrasctructure The
+ * actual dump if performed via the class DumpProducts that is used also for the entire graph dump
+ */
 public class SparkDumpCommunityProducts implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkDumpCommunityProducts.class);
