@@ -41,43 +41,12 @@
     </build>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hadoop</groupId>-->
-<!--            <artifactId>hadoop-common</artifactId>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>com.sun.xml.bind</groupId>-->
-<!--                    <artifactId>jaxb-impl</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.1</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hadoop</groupId>-->
-<!--            <artifactId>hadoop-aws</artifactId>-->
-<!--            <version>3.0.0</version>-->
-<!--        </dependency>-->
-
-<!--&lt;!&ndash;         https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.sun.xml.bind</groupId>-->
-<!--            <artifactId>jaxb-impl</artifactId>-->
-<!--            <version>2.2.11</version>-->
-<!--        </dependency>-->
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-core &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.sun.xml.bind</groupId>-->
-<!--            <artifactId>jaxb-core</artifactId>-->
-<!--            <version>2.2.11</version>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -140,21 +109,14 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.squareup.okhttp3</groupId>-->
-<!--            <artifactId>okhttp</artifactId>-->
-<!--            <version>4.7.2</version>-->
-<!--        </dependency>-->
-            <dependency>
+        <dependency>
             <groupId>com.github.victools</groupId>
             <artifactId>jsonschema-generator</artifactId>
-            <version>4.13.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s-jackson_2.11</artifactId>
-            <version>3.5.3</version>
         </dependency>
 
     </dependencies>
