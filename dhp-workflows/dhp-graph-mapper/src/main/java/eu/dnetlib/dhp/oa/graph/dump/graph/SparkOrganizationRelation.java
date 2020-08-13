@@ -1,7 +1,5 @@
-/**
- * Create new Relations between Context Entities and Organizations whose products are associated to the context.
- * It produces relation such as: organization <-> isRelatedTo <-> context
- */
+
+
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -29,6 +27,10 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.Node;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.RelType;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
+/**
+ * Create new Relations between Context Entities and Organizations whose products are associated to the context.
+ * It produces relation such as: organization <-> isRelatedTo <-> context
+ */
 public class SparkOrganizationRelation implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkOrganizationRelation.class);
 
@@ -98,7 +100,8 @@ public class SparkOrganizationRelation implements Serializable {
 			.collectAsList()
 			.forEach(getMergedRelsConsumer(organizationMap, relList));
 
-		organizationMap.keySet()
+		organizationMap
+			.keySet()
 			.forEach(
 				oId -> organizationMap
 					.get(oId)
@@ -114,7 +117,8 @@ public class SparkOrganizationRelation implements Serializable {
 	}
 
 	@NotNull
-	private static Consumer<MergedRels> getMergedRelsConsumer(OrganizationMap organizationMap, List<eu.dnetlib.dhp.schema.dump.oaf.graph.Relation> relList) {
+	private static Consumer<MergedRels> getMergedRelsConsumer(OrganizationMap organizationMap,
+		List<eu.dnetlib.dhp.schema.dump.oaf.graph.Relation> relList) {
 		return mergedRels -> {
 			String oId = mergedRels.getOrganizationId();
 			organizationMap
