@@ -1,8 +1,3 @@
-/**
- * Dumps of entities in the model defined in eu.dnetlib.dhp.schema.dump.oaf.graph.
- * Results are dumped using the same Mapper as for eu.dnetlib.dhp.schema.dump.oaf.community, while for
- * the other entities the mapping is defined below
- */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -31,6 +26,10 @@ import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
+/**
+ * Dumps of entities in the model defined in eu.dnetlib.dhp.schema.dump.oaf.graph. Results are dumped using the same
+ * Mapper as for eu.dnetlib.dhp.schema.dump.oaf.community, while for the other entities the mapping is defined below
+ */
 public class DumpGraphEntities implements Serializable {
 
 	public void run(Boolean isSparkSessionManaged,
@@ -285,7 +284,7 @@ public class DumpGraphEntities implements Serializable {
 		return c;
 	}
 
-	private static Project mapProject(eu.dnetlib.dhp.schema.oaf.Project p) {
+	private static Project mapProject(eu.dnetlib.dhp.schema.oaf.Project p) throws DocumentException {
 		Project project = new Project();
 
 		Optional
@@ -383,61 +382,57 @@ public class DumpGraphEntities implements Serializable {
 							.collect(Collectors.toList()))
 					.orElse(new ArrayList<>()));
 
-		project
-			.setFunding(
-				Optional
-					.ofNullable(p.getFundingtree())
-					.map(
-						value -> value
-							.stream()
-							.map(fundingtree -> getFunder(fundingtree.getValue()))
-							.collect(Collectors.toList()))
-					.orElse(new ArrayList<>()));
+		Optional<List<Field<String>>> ofundTree = Optional
+			.ofNullable(p.getFundingtree());
+		List<Funder> funList = new ArrayList<>();
+		if (ofundTree.isPresent()) {
+			for (Field<String> fundingtree : ofundTree.get()) {
+				funList.add(getFunder(fundingtree.getValue()));
+			}
+		}
+		project.setFunding(funList);
+
 		return project;
 	}
 
-	public static Funder getFunder(String fundingtree) {
+	public static Funder getFunder(String fundingtree) throws DocumentException {
 
 		Funder f = new Funder();
 		final Document doc;
-		try {
-			doc = new SAXReader().read(new StringReader(fundingtree));
-			f.setShortName(((org.dom4j.Node) (doc.selectNodes("//funder/shortname").get(0))).getText());
-			f.setName(((org.dom4j.Node) (doc.selectNodes("//funder/name").get(0))).getText());
-			f.setJurisdiction(((org.dom4j.Node) (doc.selectNodes("//funder/jurisdiction").get(0))).getText());
-			// f.setId(((org.dom4j.Node) (doc.selectNodes("//funder/id").get(0))).getText());
 
-			String id = "";
-			String description = "";
-			// List<Levels> fundings = new ArrayList<>();
-			int level = 0;
-			List<org.dom4j.Node> nodes = doc.selectNodes("//funding_level_" + level);
-			while (nodes.size() > 0) {
-				for (org.dom4j.Node n : nodes) {
+		doc = new SAXReader().read(new StringReader(fundingtree));
+		f.setShortName(((org.dom4j.Node) (doc.selectNodes("//funder/shortname").get(0))).getText());
+		f.setName(((org.dom4j.Node) (doc.selectNodes("//funder/name").get(0))).getText());
+		f.setJurisdiction(((org.dom4j.Node) (doc.selectNodes("//funder/jurisdiction").get(0))).getText());
+		// f.setId(((org.dom4j.Node) (doc.selectNodes("//funder/id").get(0))).getText());
 
-					List node = n.selectNodes("./id");
-					id = ((org.dom4j.Node) node.get(0)).getText();
-					id = id.substring(id.indexOf("::") + 2);
+		String id = "";
+		String description = "";
+		// List<Levels> fundings = new ArrayList<>();
+		int level = 0;
+		List<org.dom4j.Node> nodes = doc.selectNodes("//funding_level_" + level);
+		while (nodes.size() > 0) {
+			for (org.dom4j.Node n : nodes) {
 
-					node = n.selectNodes("./description");
-					description += ((Node) node.get(0)).getText() + " - ";
+				List node = n.selectNodes("./id");
+				id = ((org.dom4j.Node) node.get(0)).getText();
+				id = id.substring(id.indexOf("::") + 2);
 
-				}
-				level += 1;
-				nodes = doc.selectNodes("//funding_level_" + level);
+				node = n.selectNodes("./description");
+				description += ((Node) node.get(0)).getText() + " - ";
+
 			}
-
-			if (!id.equals("")) {
-				Fundings fundings = new Fundings();
-				fundings.setId(id);
-				fundings.setDescription(description.substring(0, description.length() - 3).trim());
-				f.setFunding_stream(fundings);
-			}
-
-			return f;
-		} catch (DocumentException e) {
-			e.printStackTrace();
+			level += 1;
+			nodes = doc.selectNodes("//funding_level_" + level);
 		}
+
+		if (!id.equals("")) {
+			Fundings fundings = new Fundings();
+			fundings.setId(id);
+			fundings.setDescription(description.substring(0, description.length() - 3).trim());
+			f.setFunding_stream(fundings);
+		}
+
 		return f;
 
 	}
