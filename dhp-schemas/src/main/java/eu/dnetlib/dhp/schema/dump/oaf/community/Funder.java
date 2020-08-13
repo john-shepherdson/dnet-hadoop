@@ -4,7 +4,7 @@ package eu.dnetlib.dhp.schema.dump.oaf.community;
 import java.io.Serializable;
 
 /**
- * to store information about the funder funding the project related to the result. It has the following parameters:
+ * To store information about the funder funding the project related to the result. It has the following parameters:
  *     - shortName of type String to store the funder short name (e.c. AKA).
  *     - name of type String to store the funder name (e.c. Akademy of Finland)
  *     - fundingStream of type String to store the funding stream

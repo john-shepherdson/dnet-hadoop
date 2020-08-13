@@ -10,43 +10,76 @@ import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
  * To represent the dumped result. It will be extended in the dump for Research Communities -
  * Research Initiative/Infrastructures. It has the following parameters:
  * - author of type List<eu.dnetlib.dhpschema.dump.oaf.Author> to describe the authors of a result.
- *   For each author is applied a dump as described previously
- * - type of type String to represent the category of the result. Possible values are publication, dataset, software, other. It corresponds to resulttype.classname of the dumped result
- * - language of type eu.dnetlib.dhp.schema.dump.oaf.Qualifier to store information about the language of the result. It is dumped as
+ *   For each author in the result represented in the internal model one author in the esternal model is produced.
+ * - type of type String to represent the category of the result. Possible values are publication, dataset, software,
+ *   other. It corresponds to resulttype.classname of the dumped result
+ * - language of type eu.dnetlib.dhp.schema.dump.oaf.Qualifier to store information about the language of the result.
+ *   It is dumped as
  *         - code corresponds to language.classid
  *         - value corresponds to language.classname
- * - country of type List<eu.dnetlib.dhp.schema.dump.oaf.Country> to store the country list to which the result is associated. For each country in the result respresented in the internal model one country in the external model is produces as described above
- * - subjects of type List<eu.dnetlib.dhp.dump.oaf.Subject> to store the subjects for the result. For each subject in the result represented in the internal model one subject in the external model is produced as described above
- * - maintitle of type String to store the main title of the result. It corresponds to the value of the first title in the resul to be dumped having classid equals to "main title"
- * - subtitle of type String to store the subtitle of the result. It corresponds to the value of the first title in the resul to be dumped having classid equals to "subtitle"
- * - description of type List<String> to store the description of the result. It corresponds to the list of description.value in the result represented in the internal model
- * - publicationdate of type String to store the pubblication date. It corresponds to dateofacceptance.value in the result represented in the internal model
- * - publisher of type String to store information about the publisher. It corresponds to publisher.value of the result represented in the intrenal model
- * - embargoenddate of type String to store the embargo end date. It corresponds to embargoenddate.value of the result represented in the internal model
- * - source of type List<String> See definition of Dublin Core field dc:source. It corresponds to the list of source.value in the result represented in the internal model
+ * - country of type List<eu.dnetlib.dhp.schema.dump.oaf.Country> to store the country list to which the result is
+ *   associated. For each country in the result respresented in the internal model one country in the external model
+ *   is produces
+ * - subjects of type List<eu.dnetlib.dhp.dump.oaf.Subject> to store the subjects for the result. For each subject in
+ *   the result represented in the internal model one subject in the external model is produced
+ * - maintitle of type String to store the main title of the result. It corresponds to the value of the first title in
+ *   the resul to be dumped having classid equals to "main title"
+ * - subtitle of type String to store the subtitle of the result. It corresponds to the value of the first title in the
+ *   resul to be dumped having classid equals to "subtitle"
+ * - description of type List<String> to store the description of the result. It corresponds to the list of
+ *   description.value in the result represented in the internal model
+ * - publicationdate of type String to store the pubblication date. It corresponds to dateofacceptance.value in the
+ *   result represented in the internal model
+ * - publisher of type String to store information about the publisher. It corresponds to publisher.value of the result
+ *   represented in the intrenal model
+ * - embargoenddate of type String to store the embargo end date. It corresponds to embargoenddate.value of the result
+ *   represented in the internal model
+ * - source of type List<String> See definition of Dublin Core field dc:source. It corresponds to the list of
+ *   source.value in the result represented in the internal model
  * - format of type List<String> It corresponds to the list of format.value in the result represented in the internal model
- * - contributor of type List<String> to represent contributors for this result. It corresponds to the list of contributor.value in the result represented in the internal model
+ * - contributor of type List<String> to represent contributors for this result. It corresponds to the list of
+ *   contributor.value in the result represented in the internal model
  * - coverage of type String. It corresponds to the list of coverage.value in the result represented in the internal model
- * - bestaccessright of type eu.dnetlib.dhp.schema.dump.oaf.AccessRight to store informatin about the openest access right associated to the manifestations of this research results. It corresponds to the same parameter in the result represented in the internal model and it is dumped as descriveb above
- * - externalReference of type List<ExternalReference>. It will not be described here. ExternalReference to be changed in the mapping
- * - instance of type List<eu.dnetlib.dhp.schema.dump.oaf.Instance> to store all the instances associated to the result. It corresponds to the same parameter in the result represented in the internal model and it is mapped as described previously
- * - container of type eu.dnetlib.dhp.schema/dump.oaf.Container (only for result of type publication). It corresponds to the parameter journal of the result represented in the internal model and it is mapped as described prevoiusly
- * - documentationUrl of type List<String> (only for results of type software) to store the URLs to the software documentation. It corresponds to the list of documentationUrl.value of the result represented in the internal model
- * - codeRepositoryUrl of type String (only for results of type software) to store the URL to the repository with the source code. It corresponds to codeRepositoryUrl.value of the result represented in the internal model
- * - programmingLanguage of type String (only for results of type software) to store the programming language. It corresponds to programmingLanguaga.classid of the result represented in the internal model
- * - contactperson of type List<String> (only for results of type other) to store the contact person for this result. It corresponds to the list of contactperson.value of the result represented in the internal model
- * - contactgroup of type List<String> (only for results of type other) to store the information for the contact group. It corresponds to the list of contactgroup.value of the result represented in the internal model
- * - tool of type List<String> (only fro results of type other) to store information about tool useful for the interpretation and/or re-used of the research product. It corresponds to the list of tool.value in the result represented in the internal modelt
- * - size of type String (only for results of type dataset) to store the size of the dataset. It corresponds to size.value in the result represented in the internal model
- * - version of type String (only for results of type dataset) to store the version. It corresponds to version.value of the result represented in the internal model
- * - geolocation fo type List<eu.dnetlib.dhp.schema.dump.oaf.GeoLocation> (only for results of type dataset) to store geolocation information. For each geolocation element in the result represented in the internal model a GeoLocation in the external model il produces ad described above
- * - id of type String to store the OpenAIRE id of the result. It corresponds to the id of the result represented in the internal model
- * - originalId of type List<String> to store the original ids of the result. It corresponds to the originalId of the result represented in the internal model
- * - pid of type List<eu.dnetlib.dhp.schema.dump.oaf.ControlledField> to store the persistent identifiers for the result. For each pid in the results represented in the internal model one pid in the external model is produced. The value correspondence is:
+ * - bestaccessright of type eu.dnetlib.dhp.schema.dump.oaf.AccessRight to store informatin about the openest access
+ *   right associated to the manifestations of this research results. It corresponds to the same parameter in the result
+ *   represented in the internal model
+ * - instance of type List<eu.dnetlib.dhp.schema.dump.oaf.Instance> to store all the instances associated to the result.
+ *   It corresponds to the same parameter in the result represented in the internal model
+ * - container of type eu.dnetlib.dhp.schema/dump.oaf.Container (only for result of type publication). It corresponds
+ *   to the parameter journal of the result represented in the internal model
+ * - documentationUrl of type List<String> (only for results of type software) to store the URLs to the software
+ *   documentation. It corresponds to the list of documentationUrl.value of the result represented in the internal model
+ * - codeRepositoryUrl of type String (only for results of type software) to store the URL to the repository with the
+ *   source code. It corresponds to codeRepositoryUrl.value of the result represented in the internal model
+ * - programmingLanguage of type String (only for results of type software) to store the programming language. It
+ *   corresponds to programmingLanguaga.classid of the result represented in the internal model
+ * - contactperson of type List<String> (only for results of type other) to store the contact person for this result.
+ *   It corresponds to the list of contactperson.value of the result represented in the internal model
+ * - contactgroup of type List<String> (only for results of type other) to store the information for the contact group.
+ *   It corresponds to the list of contactgroup.value of the result represented in the internal model
+ * - tool of type List<String> (only fro results of type other) to store information about tool useful for the
+ *   interpretation and/or re-used of the research product. It corresponds to the list of tool.value in the result
+ *   represented in the internal modelt
+ * - size of type String (only for results of type dataset) to store the size of the dataset. It corresponds to
+ *   size.value in the result represented in the internal model
+ * - version of type String (only for results of type dataset) to store the version. It corresponds to version.value of
+ *   the result represented in the internal model
+ * - geolocation fo type List<eu.dnetlib.dhp.schema.dump.oaf.GeoLocation> (only for results of type dataset) to store
+ *   geolocation information. For each geolocation element in the result represented in the internal model a GeoLocation
+ *   in the external model il produced
+ * - id of type String to store the OpenAIRE id of the result. It corresponds to the id of the result represented in
+ *   the internal model
+ * - originalId of type List<String> to store the original ids of the result. It corresponds to the originalId of the
+ *   result represented in the internal model
+ * - pid of type List<eu.dnetlib.dhp.schema.dump.oaf.ControlledField> to store the persistent identifiers for the result.
+ *   For each pid in the results represented in the internal model one pid in the external model is produced.
+ *   The value correspondence is:
  *        - scheme corresponds to pid.qualifier.classid of the result represented in the internal model
  *        - value corresponds to the pid.value of the result represented in the internal model
- * - dateofcollection of type String to store information about the time OpenAIRE collected the record. It corresponds to dateofcollection of the result represented in the internal model
- * - lasteupdatetimestamp of type String to store the timestamp of the last update of the record. It corresponds to lastupdatetimestamp of the resord represented in the internal model
+ * - dateofcollection of type String to store information about the time OpenAIRE collected the record. It corresponds
+ *   to dateofcollection of the result represented in the internal model
+ * - lasteupdatetimestamp of type String to store the timestamp of the last update of the record. It corresponds to
+ *   lastupdatetimestamp of the resord represented in the internal model
  */
 public class Result implements Serializable {
 

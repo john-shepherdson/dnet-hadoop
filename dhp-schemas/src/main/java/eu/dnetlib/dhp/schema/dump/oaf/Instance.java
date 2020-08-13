@@ -7,18 +7,24 @@ import java.util.List;
 /**
  * Represents the manifestations (i.e. different versions) of the result. For example: the pre-print and the published
  * versions are two manifestations of the same research result. It has the following parameters:
- * - license  of type String to store the license applied to the instance. It corresponds to the value of the licence in the isntance to be dumped
- * - accessright of type eu.dnetlib.dhp.schema.dump.oaf.AccessRight to store the accessright of the instance. It is mapped as specified above
- * - type of type String to store the type of the instance as defined in the corresponding dnet vocabulary (dnet:pubication_resource). It corresponds to the instancetype.classname of the instance to be mapped
- * - hostedby of type eu.dnetlib.dhp.schema.dump.oaf.KeyValue to store the information about the source from which the instance can be viewed or downloaded. It is mapped agaist the hostedby parameter of the instance to be dumped and
+ * - license  of type String to store the license applied to the instance. It corresponds to the value of the licence in
+ *   the instance to be dumped
+ * - accessright of type eu.dnetlib.dhp.schema.dump.oaf.AccessRight to store the accessright of the instance.
+ * - type of type String to store the type of the instance as defined in the corresponding dnet vocabulary
+ *   (dnet:pubication_resource). It corresponds to the instancetype.classname of the instance to be mapped
+ * - hostedby of type eu.dnetlib.dhp.schema.dump.oaf.KeyValue to store the information about the source from which the
+ *   instance can be viewed or downloaded. It is mapped against the hostedby parameter of the instance to be dumped and
  *   - key corresponds to hostedby.key
  *   - value corresponds to hostedby.value
- * - url of type List<String> list of locations where the instance is accessible. It corresponds to url of the instance to be dumped
- * - collectedfrom of type eu.dnetlib.dhp.schema.dump.oaf.KeyValue to store the information about the source from which the instance has been collected. It is mapped against the collectedfrom parameter of the instance to be dumped and
+ * - url of type List<String> list of locations where the instance is accessible. It corresponds to url of the instance
+ *   to be dumped
+ * - collectedfrom of type eu.dnetlib.dhp.schema.dump.oaf.KeyValue to store the information about the source from which
+ *   the instance has been collected. It is mapped against the collectedfrom parameter of the instance to be dumped and
  *   - key corresponds to collectedfrom.key
  *   - value corresponds to collectedfrom.value
  * - publicationdate of type String to store the publication date of the instance ;// dateofacceptance;
- * - refereed of type String to store information abour tthe review status of the instance. Possible values are 'Unknown', 'nonPeerReviewed', 'peerReviewed'. It corresponds to refereed.classname of the instance to be dumped
+ * - refereed of type String to store information abour tthe review status of the instance. Possible values are
+ *   'Unknown', 'nonPeerReviewed', 'peerReviewed'. It corresponds to refereed.classname of the instance to be dumped
  */
 public class Instance implements Serializable {
 

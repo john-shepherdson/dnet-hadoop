@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.schema.dump.oaf.graph;
 
 import java.io.Serializable;
 
+/**
+ * To store information about the funder funding the project related to the result. It has the following parameters:
+ */
 public class Funder implements Serializable {
 
 	private String shortName;
