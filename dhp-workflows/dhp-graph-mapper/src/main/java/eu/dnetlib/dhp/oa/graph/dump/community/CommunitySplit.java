@@ -1,12 +1,4 @@
-/**
- * This class splits the dumped results according to the research community - research initiative/infrastructure
- * they are related to. The information about the community is found in the element "context.id" in the result.
- * Since the context that can be found in the result can be associated not only to communities, a community Map
- * is provided. It will guide the splitting process.
- * Note: the repartition(1) just before writing the results related to a community. This is a choice due
- * to uploading constraints (just one file for each community) As soon as a better solution will be in place
- * remove the repartition
- */
+
 package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -24,6 +16,14 @@ import org.apache.spark.sql.SparkSession;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 
+/**
+ * This class splits the dumped results according to the research community - research initiative/infrastructure they
+ * are related to. The information about the community is found in the element "context.id" in the result. Since the
+ * context that can be found in the result can be associated not only to communities, a community Map is provided. It
+ * will guide the splitting process. Note: the repartition(1) just before writing the results related to a community.
+ * This is a choice due to uploading constraints (just one file for each community) As soon as a better solution will be
+ * in place remove the repartition
+ */
 public class CommunitySplit implements Serializable {
 
 	public void run(Boolean isSparkSessionManaged, String inputPath, String outputPath, String communityMapPath) {
