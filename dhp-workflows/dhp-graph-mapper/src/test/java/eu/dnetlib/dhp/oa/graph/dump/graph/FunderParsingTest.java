@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
+import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.Funder;
 public class FunderParsingTest {
 
 	@Test
-	public void testFunderTwoLevels() {
+	public void testFunderTwoLevels() throws DocumentException {
 
 		String funding_Stream = "<fundingtree><funder><id>nsf_________::NSF</id><shortname>NSF</shortname><name>National Science "
 			+
@@ -36,7 +37,7 @@ public class FunderParsingTest {
 	}
 
 	@Test
-	public void testFunderThreeeLevels() {
+	public void testFunderThreeeLevels() throws DocumentException {
 		String funding_stream = "<fundingtree><funder><id>ec__________::EC</id>" +
 			"<shortname>EC</shortname>" +
 			"<name>European Commission</name>" +
