@@ -220,47 +220,7 @@ public class ResultMapper implements Serializable {
 				.ifPresent(
 					inst -> inst
 						.stream()
-						.forEach(i -> {
-							Instance instance = new Instance();
-
-							Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> opAr = Optional
-								.ofNullable(i.getAccessright());
-							if (opAr.isPresent()) {
-								if (Constants.accessRightsCoarMap.containsKey(opAr.get().getClassid())) {
-									String code = Constants.accessRightsCoarMap.get(opAr.get().getClassid());
-									instance
-										.setAccessright(
-											AccessRight
-												.newInstance(
-													code,
-													Constants.coarCodeLabelMap.get(code),
-													Constants.COAR_ACCESS_RIGHT_SCHEMA));
-								}
-							}
-
-							instance
-								.setCollectedfrom(
-									KeyValue
-										.newInstance(i.getCollectedfrom().getKey(), i.getCollectedfrom().getValue()));
-							instance
-								.setHostedby(
-									KeyValue.newInstance(i.getHostedby().getKey(), i.getHostedby().getValue()));
-							Optional
-								.ofNullable(i.getLicense())
-								.ifPresent(value -> instance.setLicense(value.getValue()));
-							Optional
-								.ofNullable(i.getDateofacceptance())
-								.ifPresent(value -> instance.setPublicationdate(value.getValue()));
-							Optional
-								.ofNullable(i.getRefereed())
-								.ifPresent(value -> instance.setRefereed(value.getClassname()));
-							// .ifPresent(value -> instance.setRefereed(value.getValue()));
-							Optional
-								.ofNullable(i.getInstancetype())
-								.ifPresent(value -> instance.setType(value.getClassname()));
-							Optional.ofNullable(i.getUrl()).ifPresent(value -> instance.setUrl(value));
-							instanceList.add(instance);
-						}));
+						.forEach(i -> instanceList.add(getInstance(i, graph))));
 			out
 				.setInstance(instanceList);
 
@@ -404,6 +364,54 @@ public class ResultMapper implements Serializable {
 
 	}
 
+	private static Instance getInstance(eu.dnetlib.dhp.schema.oaf.Instance i, boolean graph) {
+
+			Instance instance = new Instance();
+
+			if(!graph){
+				instance
+						.setCollectedfrom(
+								KeyValue
+										.newInstance(i.getCollectedfrom().getKey(), i.getCollectedfrom().getValue()));
+				instance
+						.setHostedby(
+								KeyValue.newInstance(i.getHostedby().getKey(), i.getHostedby().getValue()));
+			}
+
+			Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> opAr = Optional
+					.ofNullable(i.getAccessright());
+			if (opAr.isPresent()) {
+				if (Constants.accessRightsCoarMap.containsKey(opAr.get().getClassid())) {
+					String code = Constants.accessRightsCoarMap.get(opAr.get().getClassid());
+					instance
+							.setAccessright(
+									AccessRight
+											.newInstance(
+													code,
+													Constants.coarCodeLabelMap.get(code),
+													Constants.COAR_ACCESS_RIGHT_SCHEMA));
+				}
+			}
+
+
+			Optional
+					.ofNullable(i.getLicense())
+					.ifPresent(value -> instance.setLicense(value.getValue()));
+			Optional
+					.ofNullable(i.getDateofacceptance())
+					.ifPresent(value -> instance.setPublicationdate(value.getValue()));
+			Optional
+					.ofNullable(i.getRefereed())
+					.ifPresent(value -> instance.setRefereed(value.getClassname()));
+			// .ifPresent(value -> instance.setRefereed(value.getValue()));
+			Optional
+					.ofNullable(i.getInstancetype())
+					.ifPresent(value -> instance.setType(value.getClassname()));
+			Optional.ofNullable(i.getUrl()).ifPresent(value -> instance.setUrl(value));
+
+		return instance;
+	}
+
 	private static List<Provenance> getUniqueProvenance(List<Provenance> provenance) {
 		Provenance iProv = new Provenance();
 		// iProv.setProvenance(Constants.INFERRED);
@@ -511,6 +519,5 @@ public class ResultMapper implements Serializable {
 		}
 		return null;
 	}
-
 
 }
