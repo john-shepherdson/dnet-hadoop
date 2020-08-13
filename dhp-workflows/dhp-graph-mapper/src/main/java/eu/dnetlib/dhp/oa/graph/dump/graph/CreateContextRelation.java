@@ -1,8 +1,3 @@
-/**
- * Writes the set of new Relation between the context and datasources. At the moment the relation
- * between the context and the project is not created because of a low coverage in the profiles of
- * openaire ids related to projects
- */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -31,6 +26,10 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
+/**
+ * Writes the set of new Relation between the context and datasources. At the moment the relation between the context
+ * and the project is not created because of a low coverage in the profiles of openaire ids related to projects
+ */
 public class CreateContextRelation implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(CreateContextEntities.class);
 	private final Configuration conf;
