@@ -396,7 +396,6 @@ public class DumpGraphEntities implements Serializable {
 	}
 
 	public static Funder getFunder(String fundingtree) throws DocumentException {
-
 		Funder f = new Funder();
 		final Document doc;
 
