@@ -1,10 +1,3 @@
-/**
- * Preparation of the Project information to be added to the dumped results.
- * For each result associated to at least one Project, a serialization of an instance af ResultProject closs is done.
- * ResultProject contains the resultId, and the list of Projects (as in eu.dnetlib.dhp.schema.dump.oaf.community.Project)
- * it is associated to
- *
- */
 
 package eu.dnetlib.dhp.oa.graph.dump.community;
 
@@ -39,6 +32,11 @@ import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
+/**
+ * Preparation of the Project information to be added to the dumped results. For each result associated to at least one
+ * Project, a serialization of an instance af ResultProject closs is done. ResultProject contains the resultId, and the
+ * list of Projects (as in eu.dnetlib.dhp.schema.dump.oaf.community.Project) it is associated to
+ */
 public class SparkPrepareResultProject implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkPrepareResultProject.class);
 
