@@ -1,13 +1,13 @@
-/**
- * Deserialization of the information in the context needed to create Context Entities, and relations between
- * context entities and datasources and projects
- */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Deserialization of the information in the context needed to create Context Entities, and relations between context
+ * entities and datasources and projects
+ */
 public class ContextInfo implements Serializable {
 	private String id;
 	private String description;
