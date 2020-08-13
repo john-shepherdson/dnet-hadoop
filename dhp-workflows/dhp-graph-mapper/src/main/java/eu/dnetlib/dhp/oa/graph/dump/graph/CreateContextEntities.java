@@ -1,9 +1,3 @@
-/**
- * Writes on HDFS Context entities. It queries the Information System at the lookup url provided as parameter
- * and collects the general information for contexes of type community or ri. The general information is
- * the id of the context, its label, the subjects associated to the context, its zenodo community, description and type.
- * This information is used to create a new Context Entity
- */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -27,6 +21,12 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 
+/**
+ * Writes on HDFS Context entities. It queries the Information System at the lookup url provided as parameter and
+ * collects the general information for contexes of type community or ri. The general information is the id of the
+ * context, its label, the subjects associated to the context, its zenodo community, description and type. This
+ * information is used to create a new Context Entity
+ */
 public class CreateContextEntities implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(CreateContextEntities.class);
