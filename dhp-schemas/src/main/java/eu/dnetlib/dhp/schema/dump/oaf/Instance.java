@@ -20,14 +20,6 @@ public class Instance implements Serializable {
 
 	private String publicationdate;// dateofacceptance;
 
-	// ( article | book ) processing charges. Defined here to cope with possible wrongly typed
-	// results
-//	private Field<String> processingchargeamount;
-//
-//	// currency - alphabetic code describe in ISO-4217. Defined here to cope with possible wrongly
-//	// typed results
-//	private Field<String> processingchargecurrency;
-
 	private String refereed; // peer-review status
 
 	public String getLicense() {
