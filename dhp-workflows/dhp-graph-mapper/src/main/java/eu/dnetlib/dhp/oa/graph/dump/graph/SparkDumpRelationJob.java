@@ -1,6 +1,4 @@
-/**
- * Dumps eu.dnetlib.dhp.schema.oaf.Relation in eu.dnetlib.dhp.schema.dump.oaf.graph.Relation
- */
+
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -24,6 +22,9 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.Node;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.RelType;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
+/**
+ * Dumps eu.dnetlib.dhp.schema.oaf.Relation in eu.dnetlib.dhp.schema.dump.oaf.graph.Relation
+ */
 public class SparkDumpRelationJob implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkDumpRelationJob.class);
