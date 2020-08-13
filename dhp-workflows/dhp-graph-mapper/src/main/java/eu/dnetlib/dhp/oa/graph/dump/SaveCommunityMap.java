@@ -1,10 +1,3 @@
-/**
- * This class connects with the IS related to the isLookUpUrl got as parameter.
- * It saves the information about the context that will guide the dump of the results.
- * The information saved is a HashMap. The key is the id of a community - research infrastructure/initiative , the
- * value is the label of the research community - research infrastructure/initiative.
- *
- */
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
@@ -19,11 +12,19 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+
+/**
+ * This class connects with the IS related to the isLookUpUrl got as parameter. It saves the information about the
+ * context that will guide the dump of the results. The information saved is a HashMap. The key is the id of a community
+ * - research infrastructure/initiative , the value is the label of the research community - research
+ * infrastructure/initiative.
+ */
 
 public class SaveCommunityMap implements Serializable {
 
@@ -40,10 +41,9 @@ public class SaveCommunityMap implements Serializable {
 		Path hdfsWritePath = new Path(hdfsPath);
 		FSDataOutputStream fsDataOutputStream = null;
 		if (fileSystem.exists(hdfsWritePath)) {
-			fsDataOutputStream = fileSystem.append(hdfsWritePath);
-		} else {
-			fsDataOutputStream = fileSystem.create(hdfsWritePath);
+			fileSystem.delete(hdfsWritePath);
 		}
+		fsDataOutputStream = fileSystem.create(hdfsWritePath);
 
 		queryInformationSystem = new QueryInformationSystem();
 		queryInformationSystem.setIsLookUp(Utils.getIsLookUpService(isLookUpUrl));
@@ -77,7 +77,7 @@ public class SaveCommunityMap implements Serializable {
 
 	}
 
-	private void saveCommunityMap() throws ISLookUpException, IOException {
+	private void saveCommunityMap() throws ISLookUpException, IOException, DocumentException {
 		writer.write(Utils.OBJECT_MAPPER.writeValueAsString(queryInformationSystem.getCommunityMap()));
 		writer.close();
 	}
