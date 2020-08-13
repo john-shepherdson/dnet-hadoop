@@ -4,10 +4,9 @@ package eu.dnetlib.dhp.schema.dump.oaf;
 import java.io.Serializable;
 
 /**
- * Indicates the process that produced (or provided) the information, and the trust associated to the information.
- * It has two parameters:
- *      -  provenance of type String to store the provenance of the information,
- *      -  trust of type String to store the trust associated to the information
+ * Indicates the process that produced (or provided) the information, and the trust associated to the information. It
+ * has two parameters: - provenance of type String to store the provenance of the information, - trust of type String to
+ * store the trust associated to the information
  */
 public class Provenance implements Serializable {
 	private String provenance;

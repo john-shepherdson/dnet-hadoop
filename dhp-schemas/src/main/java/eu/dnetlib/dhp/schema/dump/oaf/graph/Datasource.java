@@ -9,37 +9,29 @@ import eu.dnetlib.dhp.schema.dump.oaf.ControlledField;
 import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
 
 /**
- * To store information about the datasource OpenAIRE collects information from. It contains the following parameters:
- *     - id of type String to store the OpenAIRE id for the datasource. It corresponds to the parameter id of the
- *       datasource represented in the internal model
- *     - originalId of type List<String> to store the list of original ids associated to the datasource. It corresponds
- *       to the parameter originalId of the datasource represented in the internal model. The null values are filtered out
- *     - pid of type List<eu.dnetlib.shp.schema.dump.oaf.ControlledField> to store the persistent identifiers for the
- *       datasource. For each pid in the datasource represented in the internal model one pid in the external model is
- *       produced as :
- *       - schema corresponds to pid.qualifier.classid of the datasource represented in the internal model
- *       - value corresponds to pid.value of the datasource represented in the internal model
- *     - datasourceType of type eu.dnetlib.dhp.schema.dump.oaf.ControlledField to store the datasource type
- *       (e.g. pubsrepository::institutional, Institutional Repository) as in the dnet vocabulary
- *       dnet:datasource_typologies. It corresponds to datasourcetype of the datasource represented in the internal
- *       model and :
- *       - code corresponds to datasourcetype.classid
- *       - value corresponds to datasourcetype.classname
- *     - openairecompatibility of type String to store information about the OpenAIRE compatibility of the ingested
- *       results (which guidelines they are compliant to). It corresponds to openairecompatibility.classname of the
- *       datasource represented in the internal model
- *     - officialname of type Sgtring to store the official name of the datasource. It correspond to officialname.value
- *       of the datasource represented in the internal model
- *     - englishname of type String to store the English name of the datasource. It corresponds to englishname.value of
- *       the datasource represented in the internal model
- *     - websiteurl of type String to store the URL of the website of the datasource. It corresponds to websiteurl.value
- *       of the datasource represented in the internal model
- *     - logourl of type String to store the URL of the logo for the datasource. It corresponds to logourl.value of the
- *       datasource represented in the internal model
- *     - dateofvalidation of type String to store the data of validation against the guidelines for the datasource
- *       records. It corresponds to dateofvalidation.value of the datasource represented in the internal model
- *     - description of type String to store the description for the datasource. It corresponds to description.value of
- *       the datasource represented in the internal model
+ * To store information about the datasource OpenAIRE collects information from. It contains the following parameters: -
+ * id of type String to store the OpenAIRE id for the datasource. It corresponds to the parameter id of the datasource
+ * represented in the internal model - originalId of type List<String> to store the list of original ids associated to
+ * the datasource. It corresponds to the parameter originalId of the datasource represented in the internal model. The
+ * null values are filtered out - pid of type List<eu.dnetlib.shp.schema.dump.oaf.ControlledField> to store the
+ * persistent identifiers for the datasource. For each pid in the datasource represented in the internal model one pid
+ * in the external model is produced as : - schema corresponds to pid.qualifier.classid of the datasource represented in
+ * the internal model - value corresponds to pid.value of the datasource represented in the internal model -
+ * datasourceType of type eu.dnetlib.dhp.schema.dump.oaf.ControlledField to store the datasource type (e.g.
+ * pubsrepository::institutional, Institutional Repository) as in the dnet vocabulary dnet:datasource_typologies. It
+ * corresponds to datasourcetype of the datasource represented in the internal model and : - code corresponds to
+ * datasourcetype.classid - value corresponds to datasourcetype.classname - openairecompatibility of type String to
+ * store information about the OpenAIRE compatibility of the ingested results (which guidelines they are compliant to).
+ * It corresponds to openairecompatibility.classname of the datasource represented in the internal model - officialname
+ * of type Sgtring to store the official name of the datasource. It correspond to officialname.value of the datasource
+ * represented in the internal model - englishname of type String to store the English name of the datasource. It
+ * corresponds to englishname.value of the datasource represented in the internal model - websiteurl of type String to
+ * store the URL of the website of the datasource. It corresponds to websiteurl.value of the datasource represented in
+ * the internal model - logourl of type String to store the URL of the logo for the datasource. It corresponds to
+ * logourl.value of the datasource represented in the internal model - dateofvalidation of type String to store the data
+ * of validation against the guidelines for the datasource records. It corresponds to dateofvalidation.value of the
+ * datasource represented in the internal model - description of type String to store the description for the
+ * datasource. It corresponds to description.value of the datasource represented in the internal model
  */
 public class Datasource implements Serializable {
 

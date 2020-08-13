@@ -6,6 +6,13 @@ import java.util.Objects;
 
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 
+/**
+ * To represent the gereric relation between two entities. It has the following parameters:
+ * - private Node source to represent the entity source of the relation
+ * - private Node target to represent the entity target of the relation
+ * - private RelType reltype to represent the semantics of the relation
+ * - private Provenance provenance to represent the provenance of the relation
+ */
 public class Relation implements Serializable {
 	private Node source;
 	private Node target;

@@ -4,9 +4,9 @@ package eu.dnetlib.dhp.schema.dump.oaf;
 import java.io.Serializable;
 
 /**
- * To represent the generic persistent identifier. It has two parameters:
- *      - id of type eu.dnetlib.dhp.schema.dump.oaf.ControlledField to store the scheme and value of the Persistent  Identifier.
- *      - provenance of type eu.dnetlib.dhp.schema.dump.oaf.Provenance to store the provenance and trust of the information
+ * To represent the generic persistent identifier. It has two parameters: - id of type
+ * eu.dnetlib.dhp.schema.dump.oaf.ControlledField to store the scheme and value of the Persistent Identifier. -
+ * provenance of type eu.dnetlib.dhp.schema.dump.oaf.Provenance to store the provenance and trust of the information
  */
 public class Pid implements Serializable {
 	private ControlledField id;

@@ -5,6 +5,10 @@ import java.io.Serializable;
 
 /**
  * To store information about the funder funding the project related to the result. It has the following parameters:
+ * - private String shortName to store the short name of the funder (e.g. AKA)
+ * - private String name to store information about the name of the funder (e.g. Akademy of Finland)
+ * - private Fundings funding_stream to store the fundingstream
+ * - private String jurisdiction to store information about the jurisdiction of the funder
  */
 public class Funder implements Serializable {
 
