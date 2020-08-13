@@ -1,6 +1,3 @@
-/**
- *
- */
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
@@ -25,6 +22,10 @@ import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 import eu.dnetlib.dhp.schema.oaf.*;
 
+/**
+ * It fires the execution of the actual dump for result entities. If the dump is for RC/RI products its checks for each
+ * result its belongingess to at least one RC/RI before "asking" for its mapping.
+ */
 public class DumpProducts implements Serializable {
 
 	public void run(Boolean isSparkSessionManaged, String inputPath, String outputPath, String communityMapPath,
