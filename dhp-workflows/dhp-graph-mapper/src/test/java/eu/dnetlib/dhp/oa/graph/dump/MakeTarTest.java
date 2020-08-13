@@ -7,8 +7,10 @@ import java.nio.file.Files;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 public class MakeTarTest {
 	private static String workingDir;
 

@@ -1,13 +1,15 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
-import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.victools.jsonschema.generator.*;
 
+import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 
+@Disabled
 public class GenerateJsonSchema {
 
 	@Test
