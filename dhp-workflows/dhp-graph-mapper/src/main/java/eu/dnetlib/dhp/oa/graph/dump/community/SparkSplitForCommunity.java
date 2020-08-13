@@ -1,17 +1,19 @@
-/**
- * Spark job to trigger the split of results associated to research community - reseach initiative/infrasctructure.
- * The actual split is performed by the class CommunitySplit
- */
 
 package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import java.io.Serializable;
 import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
+/**
+ * Spark job to trigger the split of results associated to research community - reseach initiative/infrasctructure. The
+ * actual split is performed by the class CommunitySplit
+ */
 public class SparkSplitForCommunity implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkSplitForCommunity.class);
