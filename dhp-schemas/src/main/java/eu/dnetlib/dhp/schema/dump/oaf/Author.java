@@ -16,8 +16,6 @@ public class Author implements Serializable {
 
 	private Pid pid;
 
-	private List<String> affiliation;
-
 	public String getFullname() {
 		return fullname;
 	}
@@ -56,14 +54,6 @@ public class Author implements Serializable {
 
 	public void setPid(Pid pid) {
 		this.pid = pid;
-	}
-
-	public List<String> getAffiliation() {
-		return affiliation;
-	}
-
-	public void setAffiliation(List<String> affiliation) {
-		this.affiliation = affiliation;
 	}
 
 }
