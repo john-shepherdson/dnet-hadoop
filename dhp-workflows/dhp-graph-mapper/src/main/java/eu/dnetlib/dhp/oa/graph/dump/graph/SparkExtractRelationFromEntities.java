@@ -1,6 +1,4 @@
-/**
- * Spark job that fires the extraction of relations from entities
- */
+
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import java.io.Serializable;
@@ -16,6 +14,9 @@ import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
+/**
+ * Spark job that fires the extraction of relations from entities
+ */
 public class SparkExtractRelationFromEntities implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkExtractRelationFromEntities.class);
 
