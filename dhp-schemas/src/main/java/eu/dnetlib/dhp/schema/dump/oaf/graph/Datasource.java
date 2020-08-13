@@ -35,7 +35,6 @@ public class Datasource implements Serializable {
 	private List<String> subjects; // List<String>
 
 	// opendoar specific fields (od*)
-	// private String policies; //odpolicies string
 
 	private List<String> languages; // odlanguages List<String>
 
@@ -169,14 +168,6 @@ public class Datasource implements Serializable {
 	public void setSubjects(List<String> subjects) {
 		this.subjects = subjects;
 	}
-
-//    public String getPolicies() {
-//        return policies;
-//    }
-//
-//    public void setPolicies(String policies) {
-//        this.policies = policies;
-//    }
 
 	public List<String> getLanguages() {
 		return languages;
