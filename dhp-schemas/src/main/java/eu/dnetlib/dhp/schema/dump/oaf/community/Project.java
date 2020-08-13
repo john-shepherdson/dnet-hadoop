@@ -5,6 +5,15 @@ import java.io.Serializable;
 
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 
+/**
+ * to store information about the project related to the result. This information is not directly mapped from the result represented in the internal model because it is not there. The mapped result will be enriched with project information derived by relation between results and projects. The way used to do it will be described afterwards. Project class has the following parameters:
+ *     - id of type String to store the OpenAIRE id for the Project
+ *     - code of type String to store the grant agreement
+ *     - acronym of type String to store the acronym for the project
+ *     - title of type String to store the title of the project
+ *     - funder of type eu.dnetlib.dhp.schema.dump.oaf.community.Funder to store information about the funder funding the project
+ *     - provenance of type eu.dnetlib.dhp.schema.dump.oaf.Provenance to store information about the. provenance of the association between the result and the project
+ */
 public class Project implements Serializable {
 
 	private String id;// OpenAIRE id
