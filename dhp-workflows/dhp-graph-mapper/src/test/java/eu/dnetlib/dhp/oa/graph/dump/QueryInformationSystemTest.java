@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,15 +22,15 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 public class QueryInformationSystemTest {
 
 	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
-			+
-			"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-			" and ($x//context/param[./@name = 'status']/text() = 'manager'  or $x//context/param[./@name = 'status']/text() = 'all') "
-			+
-			"  return " +
-			"<community> " +
-			"{$x//CONFIGURATION/context/@id}" +
-			"{$x//CONFIGURATION/context/@label}" +
-			"</community>";
+		+
+		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
+		" and ($x//context/param[./@name = 'status']/text() = 'manager'  or $x//context/param[./@name = 'status']/text() = 'all') "
+		+
+		"  return " +
+		"<community> " +
+		"{$x//CONFIGURATION/context/@id}" +
+		"{$x//CONFIGURATION/context/@label}" +
+		"</community>";
 
 	List<String> communityMap = Arrays
 		.asList(
@@ -65,7 +66,7 @@ public class QueryInformationSystemTest {
 	private Map<String, String> map;
 
 	@BeforeEach
-	public void setUp() throws ISLookUpException {
+	public void setUp() throws ISLookUpException, DocumentException {
 		lenient().when(isLookUpService.quickSearchProfile(XQUERY)).thenReturn(communityMap);
 		queryInformationSystem = new QueryInformationSystem();
 		queryInformationSystem.setIsLookUp(isLookUpService);
