@@ -1,7 +1,4 @@
-/**
- * Reads all the entities of the same type (Relation / Results) and saves them in the same folder
- *
- */
+
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -21,6 +18,10 @@ import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Relation;
 
+/**
+ * Reads all the entities of the same type (Relation / Results) and saves them in the same folder
+ *
+ */
 public class SparkCollectAndSave implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCollectAndSave.class);
