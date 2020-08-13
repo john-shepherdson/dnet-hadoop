@@ -1,8 +1,3 @@
-/**
- * It process the ContextInfo information to produce a new Context Entity or a set of Relations between the
- * generic context entity and datasource/projects related to the context.
- *
- */
 
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
@@ -20,6 +15,11 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 
+/**
+ * It process the ContextInfo information to produce a new Context Entity or a set of Relations between the
+ * generic context entity and datasource/projects related to the context.
+ *
+ */
 public class Process implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(Process.class);
 
