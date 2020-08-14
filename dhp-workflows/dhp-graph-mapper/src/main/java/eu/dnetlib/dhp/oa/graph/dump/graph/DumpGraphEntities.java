@@ -8,6 +8,8 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.dump.oaf.graph.Funder;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.Project;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
