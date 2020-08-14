@@ -412,7 +412,7 @@
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.dump.SendToZenodoHDFS</main-class>
             <arg>--hdfsPath</arg><arg>${outputPath}</arg>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--accessToken</arg><arg>${accessToken}</arg>
             <arg>--connectionUrl</arg><arg>${connectionUrl}</arg>
             <arg>--metadata</arg><arg>${metadata}</arg>
