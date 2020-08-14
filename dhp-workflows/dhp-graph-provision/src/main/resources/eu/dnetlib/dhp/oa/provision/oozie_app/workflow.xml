@@ -597,6 +597,12 @@
 
     <action name="drop_solr_collection">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
@@ -639,6 +645,12 @@
 
     <action name="commit_solr_collection">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
