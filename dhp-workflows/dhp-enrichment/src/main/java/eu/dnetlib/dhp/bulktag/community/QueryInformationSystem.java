@@ -19,7 +19,7 @@ public class QueryInformationSystem {
 		+ "  let $communities := $x//CONFIGURATION/context/category[./@id=concat($x//CONFIGURATION/context/@id,'::zenodocommunities')]/concept  "
 		+
 		"let $zenodo := $x//param[./@name='zenodoCommunity']/text() "
-		+ "  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] and $x//context/param[./@name = 'status']/text() != 'hidden' "
+		+ "  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] and $x//context/param[./@name = 'status']/text() != 'hidden'  "
 		+ "  return  "
 		+ "  <community>  "
 		+ "  { $x//CONFIGURATION/context/@id}  "
