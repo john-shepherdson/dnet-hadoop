@@ -79,6 +79,15 @@ public class ModelSupport {
 		entityIdPrefix.put("result", "50");
 	}
 
+	public static final Map<String, String> idPrefixEntity = Maps.newHashMap();
+
+	static {
+		idPrefixEntity.put("10", "datasource");
+		idPrefixEntity.put("20", "organization");
+		idPrefixEntity.put("40", "project");
+		idPrefixEntity.put("50", "result");
+	}
+
 	public static final Map<String, RelationInverse> relationInverseMap = Maps.newHashMap();
 
 	static {

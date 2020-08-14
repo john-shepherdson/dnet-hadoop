@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Node": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Description of id"
+        },
+        "type": {
+          "type": "string",
+          "description": "Description of type"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "provenance": {
+          "type": "string",
+          "description": "Description of provenance"
+        },
+        "trust": {
+          "type": "string",
+          "description": "Description of trust"
+        }
+      },
+      "description": "Description of provenance"
+    },
+    "reltype": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Description of name"
+        },
+        "type": {
+          "type": "string",
+          "description": "Description of type"
+        }
+      },
+      "description": "Description of reltype"
+    },
+    "source": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Node"
+        },
+        {
+          "description": "Description of source"
+        }
+      ]
+    },
+    "target": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Node"
+        },
+        {
+          "description": "Description of target"
+        }
+      ]
+    }
+  }
+}
