@@ -46,7 +46,7 @@ object DLIToOAF {
     "IsReferencedBy" -> ("isRelatedTo", "relationship"),
     "References" -> ("isRelatedTo", "relationship"),
     "IsRelatedTo" -> ("isRelatedTo", "relationship"),
-    "IsSupplementedBy" -> ("IsSupplementedBy", "supplement"),
+    "IsSupplementedBy" -> ("isSupplementedBy", "supplement"),
     "Cites" -> ("cites", "citation"),
     "Unknown" -> ("isRelatedTo", "relationship"),
     "IsSourceOf" -> ("isRelatedTo", "relationship"),
