@@ -76,14 +76,14 @@ public class PrepareResultCommunitySet {
 			+ "FROM (SELECT source, target "
 			+ "      FROM relation "
 			+ "      WHERE datainfo.deletedbyinference = false "
-			+ "      AND relClass = '"
-			+ ModelConstants.HAS_AUTHOR_INSTITUTION
+			+ "      AND lower(relClass) = '"
+			+ ModelConstants.HAS_AUTHOR_INSTITUTION.toLowerCase()
 			+ "') result_organization "
 			+ "LEFT JOIN (SELECT source, collect_set(target) org_set "
 			+ "      FROM relation "
 			+ "      WHERE datainfo.deletedbyinference = false "
-			+ "      AND relClass = '"
-			+ ModelConstants.MERGES
+			+ "      AND lower(relClass) = '"
+			+ ModelConstants.MERGES.toLowerCase()
 			+ "' "
 			+ "      GROUP BY source) organization_organization "
 			+ "ON result_organization.target = organization_organization.source ";
