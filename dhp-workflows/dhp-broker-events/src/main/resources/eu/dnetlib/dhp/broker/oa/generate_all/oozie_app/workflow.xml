@@ -25,12 +25,16 @@
             <description>a black list (comma separeted, - for empty list) of datasource ids</description>
         </property>
         <property>
-            <name>esIndexName</name>
+            <name>esEventIndexName</name>
             <description>the elasticsearch index name</description>
         </property>
         <property>
             <name>esIndexHost</name>
             <description>the elasticsearch host</description>
+        </property>
+        <property>
+        	<name>maxIndexedEventsForDsAndTopic</name>
+        	<description>the max number of events for each couple (ds/topic)</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -423,16 +427,16 @@
 			<arg>--datasourceTypeWhitelist</arg><arg>${datasourceTypeWhitelist}</arg>
 			<arg>--datasourceIdBlacklist</arg><arg>${datasourceIdBlacklist}</arg>
         </spark>
-        <ok to="index_es"/>
+        <ok to="index_event_subset"/>
         <error to="Kill"/>
     </action>
     
-     <action name="index_es">
+     <action name="index_event_subset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>IndexOnESJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.IndexOnESJob</class>
+            <name>IndexEventSubsetOnESJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.IndexEventSubsetJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -445,8 +449,9 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--index</arg><arg>${esIndexName}</arg>
+            <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
+            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
         </spark>
         <ok to="stats"/>
         <error to="Kill"/>

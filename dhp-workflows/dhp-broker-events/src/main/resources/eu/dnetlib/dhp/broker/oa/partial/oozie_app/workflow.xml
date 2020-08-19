@@ -9,6 +9,33 @@
             <name>workingPath</name>
             <description>the path where the the generated data will be stored</description>
         </property>
+		<property>
+            <name>datasourceIdWhitelist</name>
+            <value>-</value>
+            <description>a white list (comma separeted, - for empty list) of datasource ids</description>
+        </property>
+		<property>
+            <name>datasourceTypeWhitelist</name>
+            <value>-</value>
+            <description>a white list (comma separeted, - for empty list) of datasource types</description>
+        </property>
+		<property>
+            <name>datasourceIdBlacklist</name>
+            <value>-</value>
+            <description>a black list (comma separeted, - for empty list) of datasource ids</description>
+        </property>
+        <property>
+            <name>esEventIndexName</name>
+            <description>the elasticsearch index name</description>
+        </property>
+        <property>
+            <name>esIndexHost</name>
+            <description>the elasticsearch host</description>
+        </property>
+        <property>
+        	<name>maxIndexedEventsForDsAndTopic</name>
+        	<description>the max number of events for each couple (ds/topic)</description>
+        </property>
         <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
@@ -64,18 +91,18 @@
         </configuration>
     </global>
 
-    <start to="index_es"/>
+    <start to="index_event_subset"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     
-     <action name="index_es">
+     <action name="index_event_subset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>IndexOnESJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.IndexOnESJob</class>
+            <name>IndexEventSubsetOnESJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.IndexEventSubsetJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -88,8 +115,9 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--index</arg><arg>${esIndexName}</arg>
+            <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
+            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
