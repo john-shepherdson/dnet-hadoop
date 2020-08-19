@@ -34,8 +34,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
  * to the list of coverage.value in the result represented in the internal model - bestaccessright of type
  * eu.dnetlib.dhp.schema.dump.oaf.AccessRight to store informatin about the openest access right associated to the
  * manifestations of this research results. It corresponds to the same parameter in the result represented in the
- * internal model - instance of type List<eu.dnetlib.dhp.schema.dump.oaf.Instance> to store all the instances associated
- * to the result. It corresponds to the same parameter in the result represented in the internal model - container of
+ * internal model - container of
  * type eu.dnetlib.dhp.schema/dump.oaf.Container (only for result of type publication). It corresponds to the parameter
  * journal of the result represented in the internal model - documentationUrl of type List<String> (only for results of
  * type software) to store the URLs to the software documentation. It corresponds to the list of documentationUrl.value
@@ -65,7 +64,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
  * represented in the internal model - lasteupdatetimestamp of type String to store the timestamp of the last update of
  * the record. It corresponds to lastupdatetimestamp of the resord represented in the internal model
  */
-public class Result implements Serializable {
+public  class Result implements Serializable {
 
 	private List<Author> author;
 
@@ -100,8 +99,6 @@ public class Result implements Serializable {
 	private List<String> coverage;
 
 	private AccessRight bestaccessright;
-
-	private List<Instance> instance;
 
 	private Container container;// Journal
 
@@ -307,14 +304,6 @@ public class Result implements Serializable {
 
 	public void setBestaccessright(AccessRight bestaccessright) {
 		this.bestaccessright = bestaccessright;
-	}
-
-	public List<Instance> getInstance() {
-		return instance;
-	}
-
-	public void setInstance(List<Instance> instance) {
-		this.instance = instance;
 	}
 
 	public List<String> getDocumentationUrl() {
