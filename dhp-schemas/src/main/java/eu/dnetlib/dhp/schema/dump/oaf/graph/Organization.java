@@ -10,16 +10,13 @@ import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.dump.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 
-
 /**
- * To represent the generic organizaiton. It has the following parameters:
- * - private String legalshortname to store the legalshortname of the organizaiton
- * - private String legalname to store the legal name of the organization
- * - private String websiteurl to store the websiteurl of the organization
- * - private List<String> alternativenames to store the alternative names of the organization
- * - private Qualifier country to store the country of the organization
- * - private String id to store the id of the organization
- * - private List<ControlledField> pid to store the list of pids for the organization
+ * To represent the generic organizaiton. It has the following parameters: - private String legalshortname to store the
+ * legalshortname of the organizaiton - private String legalname to store the legal name of the organization - private
+ * String websiteurl to store the websiteurl of the organization - private List<String> alternativenames to store the
+ * alternative names of the organization - private Qualifier country to store the country of the organization - private
+ * String id to store the id of the organization - private List<ControlledField> pid to store the list of pids for the
+ * organization
  */
 public class Organization implements Serializable {
 	private String legalshortname;
