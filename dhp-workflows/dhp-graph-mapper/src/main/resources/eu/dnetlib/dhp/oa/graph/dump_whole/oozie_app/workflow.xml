@@ -14,6 +14,10 @@
                 <description>the output path</description>
             </property>
         <property>
+            <name>resultAggregation</name>
+            <description>true if all the result type have to be dumped under result. false otherwise</description>
+        </property>
+        <property>
             <name>accessToken</name>
             <description>the access token used for the deposition in Zenodo</description>
         </property>
@@ -268,7 +272,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--outputPath</arg><arg>${workingDir}/collect/organization</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -295,7 +298,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--outputPath</arg><arg>${workingDir}/collect/project</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -322,7 +324,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--outputPath</arg><arg>${workingDir}/collect/datasource</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -441,7 +442,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/publication</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -468,7 +468,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/dataset</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -495,7 +494,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/orp</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -522,7 +520,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/software</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -561,6 +558,7 @@
             <arg>--hdfsPath</arg><arg>${outputPath}</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--sourcePath</arg><arg>${workingDir}/collect</arg>
+            <arg>--resultAggregation</arg><arg>${resultAggregation}</arg>
         </java>
         <ok to="send_zenodo"/>
         <error to="Kill"/>
