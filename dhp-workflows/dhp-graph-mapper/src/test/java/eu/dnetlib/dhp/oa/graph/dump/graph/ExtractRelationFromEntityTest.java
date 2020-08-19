@@ -38,7 +38,6 @@ public class ExtractRelationFromEntityTest {
 	private static final Logger log = LoggerFactory
 		.getLogger(ExtractRelationFromEntityTest.class);
 
-
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files
