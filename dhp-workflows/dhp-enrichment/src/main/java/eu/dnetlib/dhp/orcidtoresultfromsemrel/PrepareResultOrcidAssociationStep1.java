@@ -102,15 +102,17 @@ public class PrepareResultOrcidAssociationStep1 {
 			+ "               FROM result "
 			+ "               LATERAL VIEW EXPLODE (author) a AS MyT "
 			+ "               LATERAL VIEW EXPLODE (MyT.pid) p AS MyP "
-			+ "               WHERE MyP.qualifier.classid = 'ORCID') tmp "
+			+ "               WHERE lower(MyP.qualifier.classid) = 'orcid') tmp "
 			+ "               GROUP BY id) r_t "
 			+ " JOIN ("
 			+ "        SELECT source, target "
 			+ "        FROM relation "
 			+ "        WHERE datainfo.deletedbyinference = false "
-			+ getConstraintList(" relclass = '", allowedsemrel)
+			+ getConstraintList(" lower(relclass) = '", allowedsemrel)
 			+ "              ) rel_rel "
 			+ " ON source = id";
+
+		log.info("executedQuery: {}", query);
 		spark
 			.sql(query)
 			.as(Encoders.bean(ResultOrcidList.class))
