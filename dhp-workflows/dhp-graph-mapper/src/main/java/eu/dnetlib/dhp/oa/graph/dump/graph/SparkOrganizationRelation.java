@@ -1,5 +1,4 @@
 
-
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -28,8 +27,8 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.RelType;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 /**
- * Create new Relations between Context Entities and Organizations whose products are associated to the context.
- * It produces relation such as: organization <-> isRelatedTo <-> context
+ * Create new Relations between Context Entities and Organizations whose products are associated to the context. It
+ * produces relation such as: organization <-> isRelatedTo <-> context
  */
 public class SparkOrganizationRelation implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkOrganizationRelation.class);
