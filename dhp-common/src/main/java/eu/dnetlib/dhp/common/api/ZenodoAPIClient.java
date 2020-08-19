@@ -12,13 +12,11 @@ import okhttp3.*;
 
 public class ZenodoAPIClient implements Serializable {
 
-
 	String urlString;
 	String bucket;
 
 	String deposition_id;
 	String access_token;
-
 
 	public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -40,7 +38,9 @@ public class ZenodoAPIClient implements Serializable {
 		this.bucket = bucket;
 	}
 
-	public void setDeposition_id(String deposition_id){this.deposition_id = deposition_id;}
+	public void setDeposition_id(String deposition_id) {
+		this.deposition_id = deposition_id;
+	}
 
 	public ZenodoAPIClient(String urlString, String access_token) throws IOException {
 
@@ -50,6 +50,7 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Brand new deposition in Zenodo. It sets the deposition_id and the bucket where to store the files to upload
+	 * 
 	 * @return response code
 	 * @throws IOException
 	 */
@@ -86,6 +87,7 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Upload files in Zenodo.
+	 * 
 	 * @param is the inputStream for the file to upload
 	 * @param file_name the name of the file as it will appear on Zenodo
 	 * @param len the size of the file
@@ -110,6 +112,7 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Associates metadata information to the current deposition
+	 * 
 	 * @param metadata the metadata
 	 * @return response code
 	 * @throws IOException
@@ -140,6 +143,7 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * To publish the current deposition. It works for both new deposition or new version of an old deposition
+	 * 
 	 * @return response code
 	 * @throws IOException
 	 */
@@ -166,11 +170,12 @@ public class ZenodoAPIClient implements Serializable {
 	}
 
 	/**
-	 * To create a new version of an already published deposition.
-	 * It sets the deposition_id and the bucket to be used for the new version.
-	 * @param concept_rec_id the concept record id of the deposition for which to create a new version. It is
-	 *                       the last part of the url for the DOI Zenodo suggests to use to cite all versions:
-	 *                       DOI: 10.xxx/zenodo.656930 concept_rec_id = 656930
+	 * To create a new version of an already published deposition. It sets the deposition_id and the bucket to be used
+	 * for the new version.
+	 * 
+	 * @param concept_rec_id the concept record id of the deposition for which to create a new version. It is the last
+	 *            part of the url for the DOI Zenodo suggests to use to cite all versions: DOI: 10.xxx/zenodo.656930
+	 *            concept_rec_id = 656930
 	 * @return response code
 	 * @throws IOException
 	 * @throws MissingConceptDoiException
@@ -182,10 +187,10 @@ public class ZenodoAPIClient implements Serializable {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
-				.url(urlString + "/" + deposition_id + "/actions/newversion")
-				.addHeader("Authorization", "Bearer " + access_token)
-				.post(RequestBody.create(MEDIA_TYPE_JSON, json))
-				.build();
+			.url(urlString + "/" + deposition_id + "/actions/newversion")
+			.addHeader("Authorization", "Bearer " + access_token)
+			.post(RequestBody.create(MEDIA_TYPE_JSON, json))
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
@@ -205,9 +210,9 @@ public class ZenodoAPIClient implements Serializable {
 
 		ZenodoModelList zenodoModelList = new Gson().fromJson(getPrevDepositions(), ZenodoModelList.class);
 
-		for(ZenodoModel zm : zenodoModelList){
-			if (zm.getConceptrecid().equals(concept_rec_id)){
-				deposition_id =  zm.getId();
+		for (ZenodoModel zm : zenodoModelList) {
+			if (zm.getConceptrecid().equals(concept_rec_id)) {
+				deposition_id = zm.getId();
 				return;
 			}
 		}
@@ -220,11 +225,11 @@ public class ZenodoAPIClient implements Serializable {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
-				.url(urlString)
-				.addHeader("Content-Type", "application/json") // add request headers
-				.addHeader("Authorization", "Bearer " + access_token)
-				.get()
-				.build();
+			.url(urlString)
+			.addHeader("Content-Type", "application/json") // add request headers
+			.addHeader("Authorization", "Bearer " + access_token)
+			.get()
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
@@ -241,11 +246,11 @@ public class ZenodoAPIClient implements Serializable {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
-				.url(url)
-				.addHeader("Content-Type", "application/json") // add request headers
-				.addHeader("Authorization", "Bearer " + access_token)
-				.get()
-				.build();
+			.url(url)
+			.addHeader("Content-Type", "application/json") // add request headers
+			.addHeader("Authorization", "Bearer " + access_token)
+			.get()
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
@@ -255,12 +260,10 @@ public class ZenodoAPIClient implements Serializable {
 			// Get response body
 			ZenodoModel zenodoModel = new Gson().fromJson(response.body().string(), ZenodoModel.class);
 
-
 			return zenodoModel.getLinks().getBucket();
 
 		}
 
 	}
-
 
 }
