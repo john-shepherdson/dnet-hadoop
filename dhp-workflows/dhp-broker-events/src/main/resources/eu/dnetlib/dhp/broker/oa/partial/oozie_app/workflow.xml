@@ -37,6 +37,10 @@
         	<description>the max number of events for each couple (ds/topic)</description>
         </property>
         <property>
+        	<name>brokerApiBaseUrl</name>
+        	<description>the url of the broker service api</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -118,6 +122,7 @@
             <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
             <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
+            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

@@ -7,6 +7,10 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.Dataset;
@@ -54,6 +58,9 @@ public class IndexEventSubsetJob {
 		final int maxEventsForTopic = NumberUtils.toInt(parser.get("maxEventsForTopic"));
 		log.info("maxEventsForTopic: {}", maxEventsForTopic);
 
+		final String brokerApiBaseUrl = parser.get("brokerApiBaseUrl");
+		log.info("brokerApiBaseUrl: {}", brokerApiBaseUrl);
+
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
 		final TypedColumn<Event, EventGroup> aggr = new EventSubsetAggregator(maxEventsForTopic).toColumn();
@@ -84,7 +91,26 @@ public class IndexEventSubsetJob {
 		esCfg.put("es.batch.size.entries", "200");
 		esCfg.put("es.nodes.wan.only", "true");
 
+		log.info("*** Start indexing");
 		JavaEsSpark.saveJsonToEs(inputRdd, index, esCfg);
+		log.info("*** End indexing");
+
+		log.info("*** Deleting old events");
+		final String message = deleteOldEvents(brokerApiBaseUrl, now - 1000);
+		log.info("*** Deleted events: " + message);
+
+	}
+
+	private static String deleteOldEvents(final String brokerApiBaseUrl, final long l) throws Exception {
+		final String url = brokerApiBaseUrl + "/api/events/byCreationDate/0/" + l;
+		final HttpDelete req = new HttpDelete(url);
+
+		try (final CloseableHttpClient client = HttpClients.createDefault()) {
+			try (final CloseableHttpResponse response = client.execute(req)) {
+				return IOUtils.toString(response.getEntity().getContent());
+			}
+		}
+
 	}
 
 	private static String prepareEventForIndexing(final Event e, final long creationDate, final LongAccumulator acc)
