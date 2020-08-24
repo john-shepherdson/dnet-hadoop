@@ -13,18 +13,18 @@ import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
  * from element from the Project. No relation between the Project and the Datasource entity from which it is collected
  * will be created. We will never create relations between Project and Datasource. In case some relation will be
  * extracted from the Project they will refer the Funder and will be of type ( organization -> funds -> project, project
- * -> isFundedBy -> organization) We also removed the duration parameter because the most of times it is set to 0. It extends
- * eu.dnetlib.dhp.schema.dump.oaf.Project with the following parameters:  - private String
- * websiteurl to store the websiteurl of the project  -
- * private String startdate to store the start date - private String enddate to store the end date - private String
- * callidentifier to store the call indentifier - private String keywords to store the keywords - private boolean
- * openaccessmandateforpublications to store if the project must accomplish to the open access mandate for publications.
- * This value will be set to true if one of the field in the project represented in the internal model is set to true -
- * private boolean openaccessmandatefordataset to store if the project must accomplish to the open access mandate for
- * dataset. It is set to the value in the corresponding filed of the project represented in the internal model - private
- * List<String> subject to store the list of subjects of the project - private List<Funder> funding to store the list of
- * funder of the project - private String summary to store the summary of the project - private Granted granted to store
- * the granted amount - private List<Programme> programme to store the list of programmes the project is related to
+ * -> isFundedBy -> organization) We also removed the duration parameter because the most of times it is set to 0. It
+ * extends eu.dnetlib.dhp.schema.dump.oaf.Project with the following parameters: - private String websiteurl to store
+ * the websiteurl of the project - private String startdate to store the start date - private String enddate to store
+ * the end date - private String callidentifier to store the call indentifier - private String keywords to store the
+ * keywords - private boolean openaccessmandateforpublications to store if the project must accomplish to the open
+ * access mandate for publications. This value will be set to true if one of the field in the project represented in the
+ * internal model is set to true - private boolean openaccessmandatefordataset to store if the project must accomplish
+ * to the open access mandate for dataset. It is set to the value in the corresponding filed of the project represented
+ * in the internal model - private List<String> subject to store the list of subjects of the project - private
+ * List<Funder> funding to store the list of funder of the project - private String summary to store the summary of the
+ * project - private Granted granted to store the granted amount - private List<Programme> programme to store the list
+ * of programmes the project is related to
  */
 
 public class Project extends eu.dnetlib.dhp.schema.dump.oaf.Project {
