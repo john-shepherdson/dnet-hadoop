@@ -5,14 +5,14 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
@@ -216,16 +216,17 @@ public class ResultMapper implements Serializable {
 			out.setId(input.getId());
 			out.setOriginalId(input.getOriginalId());
 
-
 			Optional<List<eu.dnetlib.dhp.schema.oaf.Instance>> oInst = Optional
-					.ofNullable(input.getInstance());
+				.ofNullable(input.getInstance());
 
-			if(oInst.isPresent()){
-				if (graph){
-					((GraphResult)out).setInstance(oInst.get().stream().map(i -> getGraphInstance(i)).collect(Collectors.toList()));
-				}
-				else{
-					((CommunityResult)out).setInstance(oInst.get().stream().map(i -> getCommunityInstance(i)).collect(Collectors.toList()));
+			if (oInst.isPresent()) {
+				if (graph) {
+					((GraphResult) out)
+						.setInstance(oInst.get().stream().map(i -> getGraphInstance(i)).collect(Collectors.toList()));
+				} else {
+					((CommunityResult) out)
+						.setInstance(
+							oInst.get().stream().map(i -> getCommunityInstance(i)).collect(Collectors.toList()));
 				}
 			}
 
@@ -369,7 +370,7 @@ public class ResultMapper implements Serializable {
 
 	}
 
-	private static Instance getGraphInstance (eu.dnetlib.dhp.schema.oaf.Instance i){
+	private static Instance getGraphInstance(eu.dnetlib.dhp.schema.oaf.Instance i) {
 		Instance instance = new Instance();
 
 		setCommonValue(i, instance);
@@ -378,28 +379,30 @@ public class ResultMapper implements Serializable {
 
 	}
 
-
-	private static CommunityInstance getCommunityInstance (eu.dnetlib.dhp.schema.oaf.Instance i){
+	private static CommunityInstance getCommunityInstance(eu.dnetlib.dhp.schema.oaf.Instance i) {
 		CommunityInstance instance = new CommunityInstance();
 
 		setCommonValue(i, instance);
 
-		instance.setCollectedfrom(KeyValue
-				.newInstance(i.getCollectedfrom().getKey(), i.getCollectedfrom().getValue()));
-
+		instance
+			.setCollectedfrom(
+				KeyValue
+					.newInstance(i.getCollectedfrom().getKey(), i.getCollectedfrom().getValue()));
 
 		instance
-				.setHostedby(
-						KeyValue.newInstance(i.getHostedby().getKey(), i.getHostedby().getValue()));
+			.setHostedby(
+				KeyValue.newInstance(i.getHostedby().getKey(), i.getHostedby().getValue()));
 
 		return instance;
 
 	}
 
-
-	private static <I extends Instance> void setCommonValue(eu.dnetlib.dhp.schema.oaf.Instance i, I instance) {// <I extends Instance> I
-																								// getInstance(eu.dnetlib.dhp.schema.oaf.Instance
-																								// i, boolean graph) {
+	private static <I extends Instance> void setCommonValue(eu.dnetlib.dhp.schema.oaf.Instance i, I instance) {// <I
+																												// extends
+																												// Instance>
+																												// I
+		// getInstance(eu.dnetlib.dhp.schema.oaf.Instance
+		// i, boolean graph) {
 		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> opAr = Optional
 			.ofNullable(i.getAccessright());
 		if (opAr.isPresent()) {
@@ -429,8 +432,6 @@ public class ResultMapper implements Serializable {
 			.ofNullable(i.getInstancetype())
 			.ifPresent(value -> instance.setType(value.getClassname()));
 		Optional.ofNullable(i.getUrl()).ifPresent(value -> instance.setUrl(value));
-
-
 
 	}
 
