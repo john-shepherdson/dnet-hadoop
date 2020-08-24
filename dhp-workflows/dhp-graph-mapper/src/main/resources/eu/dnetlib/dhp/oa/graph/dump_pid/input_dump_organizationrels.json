@@ -1,0 +1,34 @@
+[
+	{
+		"paramName":"aop",
+		"paramLongName":"allowedOrganizationPids",
+		"paramDescription": "the set of pid allowed to be dumped for the organization",
+		"paramRequired": true
+	},
+	{
+		"paramName":"s",
+		"paramLongName":"sourcePath",
+		"paramDescription": "the path of the information to be dumped",
+		"paramRequired": true
+	},
+	{
+		"paramName": "out",
+		"paramLongName": "outputPath",
+		"paramDescription": "the path used to store the dumped relation",
+		"paramRequired": true
+	},
+	{
+		"paramName": "ssm",
+		"paramLongName": "isSparkSessionManaged",
+		"paramDescription": "true if the spark session is managed, false otherwise",
+		"paramRequired": false
+	},
+	{
+		"paramName":"ppi",
+		"paramLongName":"preparedInfoPath",
+		"paramDescription": "the path of the prepared info",
+		"paramRequired": true
+	}
+]
+
+

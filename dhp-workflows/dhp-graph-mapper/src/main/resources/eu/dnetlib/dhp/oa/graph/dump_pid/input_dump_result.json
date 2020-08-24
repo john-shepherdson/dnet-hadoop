@@ -1,0 +1,22 @@
+[
+	{
+		"paramName":"ppi",
+		"paramLongName":"preparedInfoPath",
+		"paramDescription": "the path of the prepared resultid sequence of allowed pids file to read",
+		"paramRequired": true
+	},
+	{
+		"paramName": "out",
+		"paramLongName": "outputPath",
+		"paramDescription": "the path used to store the dumped entities",
+		"paramRequired": true
+	},
+	{
+		"paramName": "ssm",
+		"paramLongName": "isSparkSessionManaged",
+		"paramDescription": "true if the spark session is managed, false otherwise",
+		"paramRequired": false
+	}
+]
+
+
