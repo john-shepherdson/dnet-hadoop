@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -67,7 +68,7 @@ public class SparkDumpRelationJob implements Serializable {
 	private static void dumpRelation(SparkSession spark, String inputPath, String outputPath) {
 		Utils
 			.readPath(spark, inputPath, Relation.class)
-			.map(relation -> {
+			.map((MapFunction<Relation, eu.dnetlib.dhp.schema.dump.oaf.graph.Relation>) relation -> {
 				eu.dnetlib.dhp.schema.dump.oaf.graph.Relation rel = new eu.dnetlib.dhp.schema.dump.oaf.graph.Relation();
 				rel
 					.setSource(

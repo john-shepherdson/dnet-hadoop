@@ -49,9 +49,9 @@ public class SparkCollectAndSave implements Serializable {
 		log.info("outputPath: {}", outputPath);
 
 		final Boolean aggregateResult = Optional
-				.ofNullable(parser.get("resultAggregation"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+			.ofNullable(parser.get("resultAggregation"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 
 		SparkConf conf = new SparkConf();
 

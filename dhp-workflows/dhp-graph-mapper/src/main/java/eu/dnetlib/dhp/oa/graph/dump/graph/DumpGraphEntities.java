@@ -8,8 +8,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.dump.oaf.graph.Funder;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.Project;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
@@ -91,7 +89,9 @@ public class DumpGraphEntities implements Serializable {
 		Class<E> inputClazz) {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
-			.map((MapFunction<E, Datasource>) d -> mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) d), Encoders.bean(Datasource.class))
+			.map(
+				(MapFunction<E, Datasource>) d -> mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) d),
+				Encoders.bean(Datasource.class))
 			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -103,7 +103,9 @@ public class DumpGraphEntities implements Serializable {
 		Class<E> inputClazz) {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
-			.map((MapFunction<E,Project>) p -> mapProject((eu.dnetlib.dhp.schema.oaf.Project) p), Encoders.bean(Project.class))
+			.map(
+				(MapFunction<E, Project>) p -> mapProject((eu.dnetlib.dhp.schema.oaf.Project) p),
+				Encoders.bean(Project.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -445,7 +447,9 @@ public class DumpGraphEntities implements Serializable {
 		Class<E> inputClazz) {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
-			.map((MapFunction<E, Organization>) o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o), Encoders.bean(Organization.class))
+			.map(
+				(MapFunction<E, Organization>) o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o),
+				Encoders.bean(Organization.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
