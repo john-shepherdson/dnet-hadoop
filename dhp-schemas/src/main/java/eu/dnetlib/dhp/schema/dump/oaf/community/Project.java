@@ -8,12 +8,10 @@ import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 /**
  * To store information about the project related to the result. This information is not directly mapped from the result
  * represented in the internal model because it is not there. The mapped result will be enriched with project
- * information derived by relation between results and projects.
- * Project extends eu.dnetlib.dhp.schema.dump.oaf.Project with the following parameters:
- * - funder of
- * type eu.dnetlib.dhp.schema.dump.oaf.community.Funder to store information about the funder funding the project -
- * provenance of type eu.dnetlib.dhp.schema.dump.oaf.Provenance to store information about the. provenance of the
- * association between the result and the project
+ * information derived by relation between results and projects. Project extends eu.dnetlib.dhp.schema.dump.oaf.Project
+ * with the following parameters: - funder of type eu.dnetlib.dhp.schema.dump.oaf.community.Funder to store information
+ * about the funder funding the project - provenance of type eu.dnetlib.dhp.schema.dump.oaf.Provenance to store
+ * information about the. provenance of the association between the result and the project
  */
 public class Project extends eu.dnetlib.dhp.schema.dump.oaf.Project {
 
@@ -28,8 +26,6 @@ public class Project extends eu.dnetlib.dhp.schema.dump.oaf.Project {
 	public void setProvenance(Provenance provenance) {
 		this.provenance = provenance;
 	}
-
-
 
 	public Funder getFunder() {
 		return funder;

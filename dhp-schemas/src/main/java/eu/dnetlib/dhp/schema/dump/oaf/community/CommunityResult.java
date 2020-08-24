@@ -14,9 +14,9 @@ import eu.dnetlib.dhp.schema.dump.oaf.Result;
  * For each context in the result represented in the internal model one context in the external model is produced -
  * collectedfrom of type List<eu.dnetliv.dhp.schema.dump.oaf.KeyValue> to store information about the sources from which
  * the record has been collected. For each collectedfrom in the result represented in the internal model one
- * collectedfrom in the external model is produced
- * - instance of type List<eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance> to store all the instances associated
- * to the result. It corresponds to the same parameter in the result represented in the internal model
+ * collectedfrom in the external model is produced - instance of type
+ * List<eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance> to store all the instances associated to the result.
+ * It corresponds to the same parameter in the result represented in the internal model
  */
 public class CommunityResult extends Result {
 
@@ -26,7 +26,7 @@ public class CommunityResult extends Result {
 
 	protected List<KeyValue> collectedfrom;
 
-	private List<CommunityInstance> instance ;
+	private List<CommunityInstance> instance;
 
 	public List<CommunityInstance> getInstance() {
 		return instance;
@@ -35,7 +35,6 @@ public class CommunityResult extends Result {
 	public void setInstance(List<CommunityInstance> instance) {
 		this.instance = instance;
 	}
-
 
 	public List<KeyValue> getCollectedfrom() {
 		return collectedfrom;
