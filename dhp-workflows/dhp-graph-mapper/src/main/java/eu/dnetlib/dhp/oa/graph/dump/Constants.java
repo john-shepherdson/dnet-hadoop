@@ -15,6 +15,19 @@ public class Constants {
 	public static final String HARVESTED = "Harvested";
 	public static final String DEFAULT_TRUST = "0.9";
 	public static final String USER_CLAIM = "Linked by user";;
+	public static final String SIMILARITY = "similarity";
+
+	public static final String RESULT = "result";
+	public static final String AUTHOR = "author";
+	public static final String ORGANIZATION = "organization";
+	public static final String PROJECT = "project";
+
+	public static final String RESPID_RESPID_RELATION = "hasOtherManifestation";
+	public static final String RES_AUTHOR_RELATION = "hasAuthor";
+	public static final String AUTHOR_RES_RELATION = "isAuthorOf";
+	public static final String AUTHOR_AUTHOR_RELATION = "hasCoAuthor";
+	public static final String AUTHORSHIP = "authorship";
+	public static final String SAME_AS = "sameAs";
 
 	public static String COAR_ACCESS_RIGHT_SCHEMA = "http://vocabularies.coar-repositories.org/documentation/access_rights/";
 
