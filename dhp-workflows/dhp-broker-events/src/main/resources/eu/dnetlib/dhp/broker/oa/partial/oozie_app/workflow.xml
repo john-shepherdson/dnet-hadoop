@@ -26,7 +26,11 @@
         </property>
         <property>
             <name>esEventIndexName</name>
-            <description>the elasticsearch index name</description>
+            <description>the elasticsearch index name for events</description>
+        </property>
+        <property>
+            <name>esNotificationsIndexName</name>
+            <description>the elasticsearch index name for notifications</description>
         </property>
         <property>
             <name>esIndexHost</name>
@@ -95,18 +99,18 @@
         </configuration>
     </global>
 
-    <start to="index_event_subset"/>
+    <start to="index_notifications"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     
-     <action name="index_event_subset">
+    <action name="index_notifications">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>IndexEventSubsetOnESJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.IndexEventSubsetJob</class>
+            <name>IndexNotificationsOnESJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.IndexNotificationsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -119,14 +123,14 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--index</arg><arg>${esEventIndexName}</arg>
+            <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
-            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+    
     	
     <end name="End"/>
 
