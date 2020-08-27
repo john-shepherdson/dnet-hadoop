@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -105,7 +106,7 @@ public class IndexNotificationsJob {
 		final long date) {
 		final List<Notification> list = subscriptions
 			.stream()
-			.filter(s -> s.getTopic().equals(e.getTopic()))
+			.filter(s -> StringUtils.isBlank(s.getTopic()) || s.getTopic().equals(e.getTopic()))
 			.filter(s -> verifyConditions(e.getMap(), s.conditionsAsMap()))
 			.map(s -> generateNotification(s, e, date))
 			.collect(Collectors.toList());
