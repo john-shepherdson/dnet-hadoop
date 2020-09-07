@@ -10,7 +10,6 @@ import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.dump.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 
-
 /**
  * To represent the generic organizaiton. It has the following parameters:
  * - private String legalshortname to store the legalshortname of the organizaiton

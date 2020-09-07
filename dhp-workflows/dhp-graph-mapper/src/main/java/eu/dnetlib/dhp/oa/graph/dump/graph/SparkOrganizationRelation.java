@@ -1,5 +1,4 @@
 
-
 package eu.dnetlib.dhp.oa.graph.dump.graph;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;

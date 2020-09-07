@@ -12,13 +12,11 @@ import okhttp3.*;
 
 public class ZenodoAPIClient implements Serializable {
 
-
 	String urlString;
 	String bucket;
 
 	String deposition_id;
 	String access_token;
-
 
 	public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -40,7 +38,9 @@ public class ZenodoAPIClient implements Serializable {
 		this.bucket = bucket;
 	}
 
-	public void setDeposition_id(String deposition_id){this.deposition_id = deposition_id;}
+	public void setDeposition_id(String deposition_id) {
+		this.deposition_id = deposition_id;
+	}
 
 	public ZenodoAPIClient(String urlString, String access_token) throws IOException {
 
@@ -182,10 +182,10 @@ public class ZenodoAPIClient implements Serializable {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
-				.url(urlString + "/" + deposition_id + "/actions/newversion")
-				.addHeader("Authorization", "Bearer " + access_token)
-				.post(RequestBody.create(MEDIA_TYPE_JSON, json))
-				.build();
+			.url(urlString + "/" + deposition_id + "/actions/newversion")
+			.addHeader("Authorization", "Bearer " + access_token)
+			.post(RequestBody.create(MEDIA_TYPE_JSON, json))
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
@@ -205,9 +205,9 @@ public class ZenodoAPIClient implements Serializable {
 
 		ZenodoModelList zenodoModelList = new Gson().fromJson(getPrevDepositions(), ZenodoModelList.class);
 
-		for(ZenodoModel zm : zenodoModelList){
-			if (zm.getConceptrecid().equals(concept_rec_id)){
-				deposition_id =  zm.getId();
+		for (ZenodoModel zm : zenodoModelList) {
+			if (zm.getConceptrecid().equals(concept_rec_id)) {
+				deposition_id = zm.getId();
 				return;
 			}
 		}
@@ -220,11 +220,11 @@ public class ZenodoAPIClient implements Serializable {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
-				.url(urlString)
-				.addHeader("Content-Type", "application/json") // add request headers
-				.addHeader("Authorization", "Bearer " + access_token)
-				.get()
-				.build();
+			.url(urlString)
+			.addHeader("Content-Type", "application/json") // add request headers
+			.addHeader("Authorization", "Bearer " + access_token)
+			.get()
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
@@ -241,11 +241,11 @@ public class ZenodoAPIClient implements Serializable {
 		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
-				.url(url)
-				.addHeader("Content-Type", "application/json") // add request headers
-				.addHeader("Authorization", "Bearer " + access_token)
-				.get()
-				.build();
+			.url(url)
+			.addHeader("Content-Type", "application/json") // add request headers
+			.addHeader("Authorization", "Bearer " + access_token)
+			.get()
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
@@ -255,12 +255,10 @@ public class ZenodoAPIClient implements Serializable {
 			// Get response body
 			ZenodoModel zenodoModel = new Gson().fromJson(response.body().string(), ZenodoModel.class);
 
-
 			return zenodoModel.getLinks().getBucket();
 
 		}
 
 	}
-
 
 }

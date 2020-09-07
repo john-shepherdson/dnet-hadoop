@@ -8,8 +8,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.dump.oaf.graph.Funder;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.Project;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -24,6 +22,8 @@ import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.Funder;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.Project;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
