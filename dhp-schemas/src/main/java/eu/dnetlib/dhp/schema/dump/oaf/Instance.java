@@ -30,11 +30,11 @@ public class Instance implements Serializable {
 
 	private String type;
 
-	 private KeyValue hostedby;
+	private KeyValue hostedby;
 
 	private List<String> url;
 
-	 private KeyValue collectedfrom;
+	private KeyValue collectedfrom;
 
 	private String publicationdate;// dateofacceptance;
 
