@@ -106,7 +106,8 @@ public class IndexNotificationsJob {
 		final long date) {
 		final List<Notification> list = subscriptions
 			.stream()
-			.filter(s -> StringUtils.isBlank(s.getTopic()) || s.getTopic().equals(e.getTopic()))
+			.filter(
+				s -> StringUtils.isBlank(s.getTopic()) || s.getTopic().equals("*") || s.getTopic().equals(e.getTopic()))
 			.filter(s -> verifyConditions(e.getMap(), s.conditionsAsMap()))
 			.map(s -> generateNotification(s, e, date))
 			.collect(Collectors.toList());
