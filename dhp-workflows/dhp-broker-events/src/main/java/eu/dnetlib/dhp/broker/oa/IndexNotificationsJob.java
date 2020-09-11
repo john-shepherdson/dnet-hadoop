@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +103,11 @@ public class IndexNotificationsJob {
 			log.info("*** Deleting old notifications");
 			final String message = deleteOldNotifications(brokerApiBaseUrl, startTime - 1000);
 			log.info("*** Deleted notifications: " + message);
+
+			log.info("*** sendNotifications (emails, ...)");
+			sendNotifications(brokerApiBaseUrl, startTime - 1000);
+			log.info("*** ALL done.");
+
 		}
 	}
 
@@ -194,7 +200,6 @@ public class IndexNotificationsJob {
 					.readValue(s, mapper.getTypeFactory().constructCollectionType(List.class, Subscription.class));
 			}
 		}
-
 	}
 
 	private static String deleteOldNotifications(final String brokerApiBaseUrl, final long l) throws Exception {
@@ -206,7 +211,17 @@ public class IndexNotificationsJob {
 				return IOUtils.toString(response.getEntity().getContent());
 			}
 		}
+	}
 
+	private static String sendNotifications(final String brokerApiBaseUrl, final long l) throws IOException {
+		final String url = brokerApiBaseUrl + "/api/openaireBroker/notifications/send/" + l;
+		final HttpGet req = new HttpGet(url);
+
+		try (final CloseableHttpClient client = HttpClients.createDefault()) {
+			try (final CloseableHttpResponse response = client.execute(req)) {
+				return IOUtils.toString(response.getEntity().getContent());
+			}
+		}
 	}
 
 	private static String prepareForIndexing(final Notification n, final LongAccumulator acc)
