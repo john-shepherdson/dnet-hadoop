@@ -28,7 +28,7 @@ public class GenerateStatsJob {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					IndexOnESJob.class
+					GenerateStatsJob.class
 						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 

@@ -222,7 +222,7 @@
 			<dependency>
 				<groupId>org.apache.solr</groupId>
 				<artifactId>solr-solrj</artifactId>
-				<version>7.5.0</version>
+				<version>${solr.version}</version>
 				<exclusions>
 					<exclusion>
 						<artifactId>*</artifactId>
@@ -241,6 +241,19 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.solr</groupId>
+				<artifactId>solr-test-framework</artifactId>
+				<version>${solr.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-core</artifactId>
+				<version>3.2.6</version>
+				<scope>test</scope>
+			</dependency>
+
 
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -404,6 +417,32 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+
+
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>okhttp</artifactId>
+				<version>${okhttp.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-compress</artifactId>
+				<version>${common.compress.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.json4s</groupId>
+				<artifactId>json4s-jackson_2.11</artifactId>
+				<version>${json4s.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.victools</groupId>
+				<artifactId>jsonschema-generator</artifactId>
+				<version>${jsonschemagenerator.version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -625,5 +664,10 @@
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
 		<dnet.openaire.broker.common>3.1.0</dnet.openaire.broker.common>
+		<solr.version>7.5.0</solr.version>
+		<okhttp.version>4.7.2</okhttp.version>
+		<common.compress.version>1.1</common.compress.version>
+		<json4s.version>3.5.3</json4s.version>
+		<jsonschemagenerator.version>4.13.0</jsonschemagenerator.version>
 	</properties>
 </project>

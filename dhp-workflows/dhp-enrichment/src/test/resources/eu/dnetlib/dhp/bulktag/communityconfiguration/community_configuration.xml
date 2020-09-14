@@ -106,12 +106,6 @@
             <subject>aqua</subject>
             <subject>sea</subject>
         </subjects>
-        <providers>
-            <datasource>
-                <openaireId>re3data_____::9633d1e8c4309c833c2c442abeb0cfeb</openaireId>
-                <selcriteria/>
-            </datasource>
-        </providers>
         <zenodocommunities/>
     </community>
     <community id="aginfra">
@@ -163,7 +157,11 @@
         <zenodocommunities/>
     </community>
     <community id="clarin">
-        <oacommunity>oac_clarin</oacommunity>
+        <zenodocommunities>
+            <zenodocommunity>
+                <zenodoid>oac_clarin</zenodoid>
+            </zenodocommunity>
+        </zenodocommunities>
         <subjects/>
         <providers>
             <datasource>

@@ -257,6 +257,9 @@
             <zenodoid>bodhgaya</zenodoid>
             <selcriteria/>
         </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>oac_dh-ch</zenodoid>
+        </zenodocommunity>
     </zenodocommunities>
     <organizations/>
 </community>

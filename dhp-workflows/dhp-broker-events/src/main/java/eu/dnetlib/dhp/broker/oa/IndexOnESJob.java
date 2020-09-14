@@ -20,6 +20,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 
+@Deprecated
 public class IndexOnESJob {
 
 	private static final Logger log = LoggerFactory.getLogger(IndexOnESJob.class);
@@ -48,12 +49,13 @@ public class IndexOnESJob {
 
 		final JavaRDD<String> inputRdd = ClusterUtils
 			.readPath(spark, eventsPath, Event.class)
-			// .limit(10000) // TODO REMOVE
 			.map(IndexOnESJob::eventAsJsonString, Encoders.STRING())
 			.javaRDD();
 
 		final Map<String, String> esCfg = new HashMap<>();
 		// esCfg.put("es.nodes", "10.19.65.51, 10.19.65.52, 10.19.65.53, 10.19.65.54");
+
+		esCfg.put("es.index.auto.create", "false");
 		esCfg.put("es.nodes", indexHost);
 		esCfg.put("es.mapping.id", "eventId"); // THE PRIMARY KEY
 		esCfg.put("es.batch.write.retry.count", "8");

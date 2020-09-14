@@ -109,9 +109,9 @@ public class PropagationConstant {
 	}
 
 	public static String getConstraintList(String text, List<String> constraints) {
-		String ret = " and (" + text + constraints.get(0) + "'";
+		String ret = " and (" + text + constraints.get(0).toLowerCase() + "'";
 		for (int i = 1; i < constraints.size(); i++) {
-			ret += " OR " + text + constraints.get(i) + "'";
+			ret += " OR " + text + constraints.get(i).toLowerCase() + "'";
 		}
 		ret += ")";
 		return ret;

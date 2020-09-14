@@ -1,8 +1,9 @@
 package eu.dnetlib.dhp.sx.ebi
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Instance, KeyValue, Oaf}
+import eu.dnetlib.dhp.schema.oaf.{Author, Instance, Journal, KeyValue, Oaf, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils.createQualifier
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIRelation, OafUtils, ProvenaceInfo}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, OafUtils, ProvenaceInfo}
+import eu.dnetlib.dhp.sx.ebi.model.{PMArticle, PMAuthor, PMJournal}
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.scholexplorer.relation.RelationMapper
 import org.apache.commons.io.IOUtils
@@ -12,6 +13,7 @@ import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
+import org.apache.spark.sql.functions._
 
 import scala.collection.JavaConverters._
 
@@ -25,6 +27,64 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
 
   def generatePubmedDLICollectedFrom(): KeyValue = {
     OafUtils.generateKeyValue("dli_________::europe_pmc__", "Europe PMC")
+  }
+
+
+
+  def journalToOAF(pj:PMJournal): Journal = {
+    val j = new Journal
+    j.setIssnPrinted(pj.getIssn)
+    j.setVol(pj.getVolume)
+    j.setName(pj.getTitle)
+    j.setIss(pj.getIssue)
+    j.setDataInfo(OafUtils.generateDataInfo())
+    j
+  }
+
+
+  def pubmedTOPublication(input:PMArticle):DLIPublication = {
+
+
+    val dnetPublicationId = s"50|${DHPUtils.md5(s"${input.getPmid}::pmid")}"
+
+    val p = new DLIPublication
+    p.setId(dnetPublicationId)
+    p.setDataInfo(OafUtils.generateDataInfo())
+    p.setPid(List(OafUtils.createSP(input.getPmid.toLowerCase.trim, "pmid", "dnet:pid_types")).asJava)
+    p.setCompletionStatus("complete")
+    val pi = new ProvenaceInfo
+    pi.setId("dli_________::europe_pmc__")
+    pi.setName( "Europe PMC")
+    pi.setCompletionStatus("complete")
+    pi.setCollectionMode("collected")
+    p.setDlicollectedfrom(List(pi).asJava)
+    p.setCollectedfrom(List(generatePubmedDLICollectedFrom()).asJava)
+
+    if (input.getAuthors != null && input.getAuthors.size() >0) {
+      var aths: List[Author] = List()
+      input.getAuthors.asScala.filter(a=> a!= null).foreach(a => {
+        val c = new Author
+        c.setFullname(a.getFullName)
+        c.setName(a.getForeName)
+        c.setSurname(a.getLastName)
+        aths =  aths ::: List(c)
+      })
+      if (aths.nonEmpty)
+        p.setAuthor(aths.asJava)
+    }
+
+
+    if (input.getJournal != null)
+      p.setJournal(journalToOAF(input.getJournal))
+    p.setTitle(List(OafUtils.createSP(input.getTitle, "main title", "dnet:dataCite_title")).asJava)
+    p.setDateofacceptance(OafUtils.asField(input.getDate))
+    val i = new Instance
+    i.setCollectedfrom(generatePubmedDLICollectedFrom())
+    i.setDateofacceptance(p.getDateofacceptance)
+    i.setUrl(List(s"https://pubmed.ncbi.nlm.nih.gov/${input.getPmid}").asJava)
+    i.setInstancetype(createQualifier("0001", "Article", "dnet:publication_resource", "dnet:publication_resource"))
+    p.setInstance(List(i).asJava)
+    p
   }
 
 
@@ -55,8 +115,8 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
     val dnetPublicationId = s"50|${DHPUtils.md5(s"$pmid::pmid")}"
 
     targets.flatMap(l => {
-      val relation = new DLIRelation
-      val inverseRelation = new DLIRelation
+      val relation = new Relation
+      val inverseRelation = new Relation
       val targetDnetId =  s"50|${DHPUtils.md5(s"${l.tpid.toLowerCase.trim}::${l.tpidType.toLowerCase.trim}")}"
       val relInfo = relationMapper.get(l.relation.toLowerCase)
       val relationSemantic = relInfo.getOriginal
@@ -116,8 +176,16 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
 
     val workingPath = parser.get("workingPath")
     implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
-    implicit val relEncoder: Encoder[DLIRelation] = Encoders.kryo(classOf[DLIRelation])
+    implicit val oafpubEncoder: Encoder[Publication] = Encoders.kryo[Publication]
+    implicit val relEncoder: Encoder[Relation] = Encoders.kryo(classOf[Relation])
     implicit val datEncoder: Encoder[DLIDataset] = Encoders.kryo(classOf[DLIDataset])
+    implicit val pubEncoder: Encoder[DLIPublication] = Encoders.kryo(classOf[DLIPublication])
+    implicit val atEncoder: Encoder[Author] = Encoders.kryo(classOf[Author])
+    implicit  val strEncoder:Encoder[String] = Encoders.STRING
+    implicit  val PMEncoder: Encoder[PMArticle] = Encoders.kryo(classOf[PMArticle])
+    implicit  val PMJEncoder: Encoder[PMJournal] = Encoders.kryo(classOf[PMJournal])
+    implicit  val PMAEncoder: Encoder[PMAuthor] = Encoders.kryo(classOf[PMAuthor])
+
 
     val ds:Dataset[(String,String)] = spark.read.load(s"$workingPath/baseline_links_updates").as[(String,String)](Encoders.tuple(Encoders.STRING, Encoders.STRING))
 
@@ -129,10 +197,50 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
 
     val oDataset:Dataset[Oaf] = spark.read.load(s"$workingPath/baseline_links_updates_oaf").as[Oaf]
 
-    oDataset.filter(p =>p.isInstanceOf[DLIRelation]).map(p => p.asInstanceOf[DLIRelation]).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_links_updates_relation")
+    oDataset.filter(p =>p.isInstanceOf[Relation]).map(p => p.asInstanceOf[Relation]).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_links_updates_relation")
     oDataset.filter(p =>p.isInstanceOf[DLIDataset]).map(p => p.asInstanceOf[DLIDataset]).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_links_updates_dataset")
 
 
+    val idPublicationSolved:Dataset[String] = spark.read.load(s"$workingPath/baseline_links_updates").where(col("links").isNotNull).select("pmid").as[String]
+    val baseline:Dataset[(String, PMArticle)]= spark.read.load(s"$workingPath/baseline_dataset").as[PMArticle].map(p=> (p.getPmid, p))(Encoders.tuple(strEncoder,PMEncoder))
+    idPublicationSolved.joinWith(baseline, idPublicationSolved("pmid").equalTo(baseline("_1"))).map(k => pubmedTOPublication(k._2._2)).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_links_updates_publication")
+
+
+    val pmaDatasets = spark.read.load("/user/sandro.labruzzo/scholix/EBI/ebi_garr/baseline_dataset").as[PMArticle]
+
+    pmaDatasets.map(p => pubmedTOPublication(p)).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_publication_all")
+
+    val pubs: Dataset[(String,Publication)] = spark.read.load("/user/sandro.labruzzo/scholix/EBI/publication").as[Publication].map(p => (p.getId, p))(Encoders.tuple(Encoders.STRING,oafpubEncoder))
+    val pubdate:Dataset[(String,DLIPublication)] = spark.read.load(s"$workingPath/baseline_publication_all").as[DLIPublication].map(p => (p.getId, p))(Encoders.tuple(Encoders.STRING,pubEncoder))
+
+
+
+    pubs.joinWith(pubdate, pubs("_1").equalTo(pubdate("_1"))).map(k => k._2._2).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_publication_ebi")
+
+
+
+    val dt : Dataset[DLIDataset] = spark.read.load(s"$workingPath/dataset").as[DLIDataset]
+    val update : Dataset[DLIDataset] = spark.read.load(s"$workingPath/ebi_garr/baseline_links_updates_dataset").as[DLIDataset]
+
+
+    dt.union(update).map(d => (d.getId,d))(Encoders.tuple(Encoders.STRING, datEncoder))
+      .groupByKey(_._1)(Encoders.STRING)
+      .agg(EBIAggregator.getDLIDatasetAggregator().toColumn)
+      .map(p => p._2)
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_dataset_ebi")
+
+
+    val rel: Dataset[Relation] = spark.read.load(s"$workingPath/relation").as[Relation]
+    val relupdate : Dataset[Relation] = spark.read.load(s"$workingPath/ebi_garr/baseline_links_updates_relation").as[Relation]
+
+
+    rel.union(relupdate)
+      .map(d => (s"${d.getSource}::${d.getRelType}::${d.getTarget}", d))(Encoders.tuple(Encoders.STRING, relEncoder))
+      .groupByKey(_._1)(Encoders.STRING)
+      .agg(EBIAggregator.getRelationAggregator().toColumn)
+      .map(p => p._2)
+      .write.mode(SaveMode.Overwrite)
+      .save(s"$workingPath/baseline_relation_ebi")
 
   }
 }

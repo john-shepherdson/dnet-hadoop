@@ -2,10 +2,8 @@
 package eu.dnetlib.dhp.schema.scholexplorer;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -78,6 +76,25 @@ public class DLIUnknown extends Oaf implements Serializable {
 		if ("complete".equalsIgnoreCase(p.completionStatus))
 			completionStatus = "complete";
 		dlicollectedfrom = mergeProvenance(dlicollectedfrom, p.getDlicollectedfrom());
+		if (StringUtils.isEmpty(id) && StringUtils.isNoneEmpty(p.getId()))
+			id = p.getId();
+		if (StringUtils.isEmpty(dateofcollection) && StringUtils.isNoneEmpty(p.getDateofcollection()))
+			dateofcollection = p.getDateofcollection();
+
+		if (StringUtils.isEmpty(dateoftransformation) && StringUtils.isNoneEmpty(p.getDateoftransformation()))
+			dateofcollection = p.getDateoftransformation();
+		pid = mergeLists(pid, p.getPid());
+	}
+
+	protected <T> List<T> mergeLists(final List<T>... lists) {
+
+		return Arrays
+			.stream(lists)
+			.filter(Objects::nonNull)
+			.flatMap(List::stream)
+			.filter(Objects::nonNull)
+			.distinct()
+			.collect(Collectors.toList());
 	}
 
 	private List<ProvenaceInfo> mergeProvenance(

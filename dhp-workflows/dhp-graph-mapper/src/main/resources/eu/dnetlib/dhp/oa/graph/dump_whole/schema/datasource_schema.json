@@ -1,0 +1,210 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ControlledField": {
+      "type": "object",
+      "properties": {
+        "scheme": {
+          "type": "string",
+          "description": "Description of scheme"
+        },
+        "value": {
+          "type": "string",
+          "description": "Description of value"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "accessrights": {
+      "type": "string",
+      "description": "Description of accessrights"
+    },
+    "certificates": {
+      "type": "string",
+      "description": "Description of certificates"
+    },
+    "citationguidelineurl": {
+      "type": "string",
+      "description": "Description of citationguidelineurl"
+    },
+    "contenttypes": {
+      "description": "Description of contenttypes",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Description of contenttypes"
+      }
+    },
+    "databaseaccessrestriction": {
+      "type": "string",
+      "description": "Description of databaseaccessrestriction"
+    },
+    "datasourcetype": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ControlledField"
+        },
+        {
+          "description": "Description of datasourcetype"
+        }
+      ]
+    },
+    "datauploadrestriction": {
+      "type": "string",
+      "description": "Description of datauploadrestriction"
+    },
+    "dateofvalidation": {
+      "type": "string",
+      "description": "Description of dateofvalidation"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of description"
+    },
+    "englishname": {
+      "type": "string",
+      "description": "Description of englishname"
+    },
+    "id": {
+      "type": "string",
+      "description": "Description of id"
+    },
+    "journal": {
+      "type": "object",
+      "properties": {
+        "conferencedate": {
+          "type": "string",
+          "description": "Description of conferencedate"
+        },
+        "conferenceplace": {
+          "type": "string",
+          "description": "Description of conferenceplace"
+        },
+        "edition": {
+          "type": "string",
+          "description": "Description of edition"
+        },
+        "ep": {
+          "type": "string",
+          "description": "Description of ep"
+        },
+        "iss": {
+          "type": "string",
+          "description": "Description of iss"
+        },
+        "issnLinking": {
+          "type": "string",
+          "description": "Description of issnLinking"
+        },
+        "issnOnline": {
+          "type": "string",
+          "description": "Description of issnOnline"
+        },
+        "issnPrinted": {
+          "type": "string",
+          "description": "Description of issnPrinted"
+        },
+        "name": {
+          "type": "string",
+          "description": "Description of name"
+        },
+        "sp": {
+          "type": "string",
+          "description": "Description of sp"
+        },
+        "vol": {
+          "type": "string",
+          "description": "Description of vol"
+        }
+      },
+      "description": "Description of journal"
+    },
+    "languages": {
+      "description": "Description of languages",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Description of languages"
+      }
+    },
+    "logourl": {
+      "type": "string",
+      "description": "Description of logourl"
+    },
+    "missionstatementurl": {
+      "type": "string",
+      "description": "Description of missionstatementurl"
+    },
+    "officialname": {
+      "type": "string",
+      "description": "Description of officialname"
+    },
+    "openairecompatibility": {
+      "type": "string",
+      "description": "Description of openairecompatibility"
+    },
+    "originalId": {
+      "description": "Description of originalId",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Description of originalId"
+      }
+    },
+    "pid": {
+      "description": "Description of pid",
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/definitions/ControlledField"
+          },
+          {
+            "description": "Description of pid"
+          }
+        ]
+      }
+    },
+    "pidsystems": {
+      "type": "string",
+      "description": "Description of pidsystems"
+    },
+    "policies": {
+      "description": "Description of policies",
+      "type": "array",
+      "items": {
+        "description": "Description of policies"
+      }
+    },
+    "releaseenddate": {
+      "type": "string",
+      "description": "Description of releaseenddate"
+    },
+    "releasestartdate": {
+      "type": "string",
+      "description": "Description of releasestartdate"
+    },
+    "subjects": {
+      "description": "Description of subjects",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Description of subjects"
+      }
+    },
+    "uploadrights": {
+      "type": "string",
+      "description": "Description of uploadrights"
+    },
+    "versioning": {
+      "type": "boolean",
+      "description": "Description of versioning"
+    },
+    "websiteurl": {
+      "type": "string",
+      "description": "Description of websiteurl"
+    }
+  }
+}

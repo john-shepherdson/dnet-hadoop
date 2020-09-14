@@ -1,0 +1,24 @@
+[
+
+	{
+		"paramName":"s",
+		"paramLongName":"sourcePath",
+		"paramDescription": "the path of the sequencial file to read",
+		"paramRequired": true
+	},
+	{
+		"paramName": "hdp",
+		"paramLongName": "hdfsPath",
+		"paramDescription": "the path used to store the output archive",
+		"paramRequired": true
+	},
+	{
+		"paramName":"nn",
+		"paramLongName":"nameNode",
+		"paramDescription": "the name node",
+		"paramRequired": true
+	}
+]
+
+
+

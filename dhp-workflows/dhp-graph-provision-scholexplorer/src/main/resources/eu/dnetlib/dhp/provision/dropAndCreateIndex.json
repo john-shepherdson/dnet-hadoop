@@ -1,0 +1,14 @@
+[
+{
+  "paramName": "c",
+  "paramLongName": "cluster",
+  "paramDescription": "should be cluster1 or cluster2",
+  "paramRequired": true
+},
+  {
+    "paramName": "i",
+    "paramLongName": "index",
+    "paramDescription": "index name",
+    "paramRequired": true
+  }
+]

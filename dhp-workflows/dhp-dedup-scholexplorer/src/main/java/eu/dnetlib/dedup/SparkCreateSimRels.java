@@ -7,10 +7,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
@@ -46,8 +49,13 @@ public class SparkCreateSimRels {
 		// DedupConfig.load(IOUtils.toString(SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
 		final DedupConfig dedupConf = DedupConfig.load(parser.get("dedupConf"));
 
-		JavaPairRDD<String, MapDocument> mapDocument = sc
-			.textFile(inputPath + "/" + entity)
+		JavaPairRDD<String, MapDocument> mapDocument = spark
+			.read()
+			.load(inputPath + "/" + entity)
+			.as(Encoders.kryo(Oaf.class))
+			.map((MapFunction<Oaf, String>) p -> new ObjectMapper().writeValueAsString(p), Encoders.STRING())
+			.javaRDD()
+			.repartition(1000)
 			.mapToPair(
 				s -> {
 					MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);

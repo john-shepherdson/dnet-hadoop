@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
 import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
 import eu.dnetlib.dhp.utils.DHPUtils;
@@ -175,8 +174,8 @@ public abstract class AbstractScholexplorerParser {
 						.stream()
 						.flatMap(
 							n -> {
-								final List<DLIRelation> rels = new ArrayList<>();
-								DLIRelation r = new DLIRelation();
+								final List<Relation> rels = new ArrayList<>();
+								Relation r = new Relation();
 								r.setSource(parsedObject.getId());
 								final String relatedPid = n.getTextValue();
 								final String relatedPidType = n.getAttributes().get("relatedIdentifierType");
@@ -184,7 +183,6 @@ public abstract class AbstractScholexplorerParser {
 								String relationSemantic = n.getAttributes().get("relationType");
 								String inverseRelation;
 								final String targetId = generateId(relatedPid, relatedPidType, relatedType);
-								r.setDateOfCollection(dateOfCollection);
 								if (relationMapper.containsKey(relationSemantic.toLowerCase())) {
 									RelInfo relInfo = relationMapper.get(relationSemantic.toLowerCase());
 									relationSemantic = relInfo.getOriginal();
@@ -199,14 +197,13 @@ public abstract class AbstractScholexplorerParser {
 								r.setCollectedfrom(parsedObject.getCollectedfrom());
 								r.setDataInfo(di);
 								rels.add(r);
-								r = new DLIRelation();
+								r = new Relation();
 								r.setDataInfo(di);
 								r.setSource(targetId);
 								r.setTarget(parsedObject.getId());
 								r.setRelType(inverseRelation);
 								r.setRelClass("datacite");
 								r.setCollectedfrom(parsedObject.getCollectedfrom());
-								r.setDateOfCollection(dateOfCollection);
 								rels.add(r);
 								if ("unknown".equalsIgnoreCase(relatedType))
 									result

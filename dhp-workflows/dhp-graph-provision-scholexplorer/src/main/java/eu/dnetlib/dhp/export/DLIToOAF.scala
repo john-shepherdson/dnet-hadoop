@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 import eu.dnetlib.dhp.common.PacePerson
 import eu.dnetlib.dhp.schema.action.AtomicAction
 import eu.dnetlib.dhp.schema.oaf.{Author,  Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.jackson.map.ObjectMapper
@@ -46,7 +46,7 @@ object DLIToOAF {
     "IsReferencedBy" -> ("isRelatedTo", "relationship"),
     "References" -> ("isRelatedTo", "relationship"),
     "IsRelatedTo" -> ("isRelatedTo", "relationship"),
-    "IsSupplementedBy" -> ("IsSupplementedBy", "supplement"),
+    "IsSupplementedBy" -> ("isSupplementedBy", "supplement"),
     "Cites" -> ("cites", "citation"),
     "Unknown" -> ("isRelatedTo", "relationship"),
     "IsSourceOf" -> ("isRelatedTo", "relationship"),
@@ -273,29 +273,29 @@ object DLIToOAF {
   }
 
 
-  def convertDLIRelation(r: DLIRelation): Relation = {
-
-    val result = new Relation
-    if (!relationTypeMapping.contains(r.getRelType))
-      return null
-
-    if (r.getCollectedFrom == null || r.getCollectedFrom.size() == 0 || (r.getCollectedFrom.size() == 1 && r.getCollectedFrom.get(0) == null))
-      return null
-    val t = relationTypeMapping.get(r.getRelType)
-
-    result.setRelType("resultResult")
-    result.setRelClass(t.get._1)
-    result.setSubRelType(t.get._2)
-    result.setCollectedfrom(r.getCollectedFrom.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).filter(p => p != null).asJava)
-    result.setSource(generateId(r.getSource))
-    result.setTarget(generateId(r.getTarget))
-
-    if (result.getSource.equals(result.getTarget))
-      return null
-    result.setDataInfo(generateDataInfo())
-
-    result
-  }
+//  def convertDLIRelation(r: DLIRelation): Relation = {
+//
+//    val result = new Relation
+//    if (!relationTypeMapping.contains(r.getRelType))
+//      return null
+//
+//    if (r.getProperties == null || r.getProperties.size() == 0 || (r.getProperties.size() == 1 && r.getProperties.get(0) == null))
+//      return null
+//    val t = relationTypeMapping.get(r.getRelType)
+//
+//    result.setRelType("resultResult")
+//    result.setRelClass(t.get._1)
+//    result.setSubRelType(t.get._2)
+//    result.setCollectedfrom(r.getProperties.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).filter(p => p != null).asJava)
+//    result.setSource(generateId(r.getSource))
+//    result.setTarget(generateId(r.getTarget))
+//
+//    if (result.getSource.equals(result.getTarget))
+//      return null
+//    result.setDataInfo(generateDataInfo())
+//
+//    result
+//  }
 
 
   def convertDLIDatasetTOOAF(d: DLIDataset): Dataset = {

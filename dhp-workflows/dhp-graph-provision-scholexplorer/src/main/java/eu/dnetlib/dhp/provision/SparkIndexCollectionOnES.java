@@ -8,15 +8,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
 
 public class SparkIndexCollectionOnES {
 
@@ -39,33 +36,20 @@ public class SparkIndexCollectionOnES {
 		final String sourcePath = parser.get("sourcePath");
 		final String index = parser.get("index");
 		final String idPath = parser.get("idPath");
-		final String type = parser.get("type");
-		final String indexHost = parser.get("esHost");
+		final String cluster = parser.get("cluster");
+		final String clusterJson = IOUtils
+			.toString(DropAndCreateESIndex.class.getResourceAsStream("/eu/dnetlib/dhp/provision/cluster.json"));
+
+		final Map<String, String> clusterMap = new ObjectMapper().readValue(clusterJson, Map.class);
 
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-		JavaRDD<String> inputRdd;
-
-		if ("summary".equalsIgnoreCase(type))
-			inputRdd = spark
-				.read()
-				.load(sourcePath)
-				.as(Encoders.bean(ScholixSummary.class))
-				.map(
-					(MapFunction<ScholixSummary, String>) f -> {
-						final ObjectMapper mapper = new ObjectMapper();
-						return mapper.writeValueAsString(f);
-					},
-					Encoders.STRING())
-				.javaRDD();
-		else
-			inputRdd = sc.textFile(sourcePath);
+		JavaRDD<String> inputRdd = sc.textFile(sourcePath);
 
 		Map<String, String> esCfg = new HashMap<>();
-		// esCfg.put("es.nodes", "10.19.65.51, 10.19.65.52, 10.19.65.53, 10.19.65.54");
-		esCfg.put("es.nodes", indexHost);
+		esCfg.put("es.nodes", clusterMap.get(cluster));
 		esCfg.put("es.mapping.id", idPath);
 		esCfg.put("es.batch.write.retry.count", "8");
 		esCfg.put("es.batch.write.retry.wait", "60s");
