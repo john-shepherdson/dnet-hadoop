@@ -90,7 +90,10 @@ public class DumpOrganizationProjectDatasourceTest {
 
 		Assertions.assertEquals(34, verificationDataset.count());
 
-		verificationDataset.foreach((ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Organization>) o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
+		verificationDataset
+			.foreach(
+				(ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Organization>) o -> System.out
+					.println(OBJECT_MAPPER.writeValueAsString(o)));
 
 	}
 
@@ -116,7 +119,10 @@ public class DumpOrganizationProjectDatasourceTest {
 
 		Assertions.assertEquals(12, verificationDataset.count());
 
-		verificationDataset.foreach((ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Project>) o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
+		verificationDataset
+			.foreach(
+				(ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Project>) o -> System.out
+					.println(OBJECT_MAPPER.writeValueAsString(o)));
 
 	}
 
@@ -141,7 +147,10 @@ public class DumpOrganizationProjectDatasourceTest {
 
 		Assertions.assertEquals(5, verificationDataset.count());
 
-		verificationDataset.foreach((ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource>) o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
+		verificationDataset
+			.foreach(
+				(ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource>) o -> System.out
+					.println(OBJECT_MAPPER.writeValueAsString(o)));
 	}
 
 }
