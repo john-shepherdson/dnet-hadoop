@@ -23,6 +23,12 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
+	},
+	{
+		"paramName":"cmp",
+		"paramLongName":"communityMapPath",
+		"paramDescription": "the path to the serialization of the community map",
+		"paramRequired": true
 	}
 ]
 
