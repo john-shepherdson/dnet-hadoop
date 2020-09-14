@@ -484,7 +484,12 @@ public class DumpGraphEntities implements Serializable {
 		Optional
 			.ofNullable(org.getCountry())
 			.ifPresent(
-				value -> organization.setCountry(Qualifier.newInstance(value.getClassid(), value.getClassname())));
+				value -> {
+					if (!value.getClassid().equals(Constants.UNKNOWN)) {
+						organization.setCountry(Qualifier.newInstance(value.getClassid(), value.getClassname()));
+					}
+
+				});
 
 		Optional
 			.ofNullable(org.getId())

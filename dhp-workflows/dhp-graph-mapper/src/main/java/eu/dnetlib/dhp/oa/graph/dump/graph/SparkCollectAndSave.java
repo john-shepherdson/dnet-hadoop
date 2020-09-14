@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Relation;
 
 /**
@@ -69,10 +69,10 @@ public class SparkCollectAndSave implements Serializable {
 	private static void run(SparkSession spark, String inputPath, String outputPath, boolean aggregate) {
 		if (aggregate) {
 			Utils
-				.readPath(spark, inputPath + "/result/publication", Result.class)
-				.union(Utils.readPath(spark, inputPath + "/result/dataset", Result.class))
-				.union(Utils.readPath(spark, inputPath + "/result/otherresearchproduct", Result.class))
-				.union(Utils.readPath(spark, inputPath + "/result/software", Result.class))
+				.readPath(spark, inputPath + "/result/publication", GraphResult.class)
+				.union(Utils.readPath(spark, inputPath + "/result/dataset", GraphResult.class))
+				.union(Utils.readPath(spark, inputPath + "/result/otherresearchproduct", GraphResult.class))
+				.union(Utils.readPath(spark, inputPath + "/result/software", GraphResult.class))
 				.write()
 				.option("compression", "gzip")
 				.mode(SaveMode.Overwrite)
@@ -80,19 +80,19 @@ public class SparkCollectAndSave implements Serializable {
 		} else {
 			write(
 				Utils
-					.readPath(spark, inputPath + "/result/publication", Result.class),
+					.readPath(spark, inputPath + "/result/publication", GraphResult.class),
 				outputPath + "/publication");
 			write(
 				Utils
-					.readPath(spark, inputPath + "/result/dataset", Result.class),
+					.readPath(spark, inputPath + "/result/dataset", GraphResult.class),
 				outputPath + "/dataset");
 			write(
 				Utils
-					.readPath(spark, inputPath + "/result/otherresearchproduct", Result.class),
+					.readPath(spark, inputPath + "/result/otherresearchproduct", GraphResult.class),
 				outputPath + "/otheresearchproduct");
 			write(
 				Utils
-					.readPath(spark, inputPath + "/result/software", Result.class),
+					.readPath(spark, inputPath + "/result/software", GraphResult.class),
 				outputPath + "/software");
 
 		}
@@ -112,7 +112,7 @@ public class SparkCollectAndSave implements Serializable {
 
 	}
 
-	private static void write(Dataset<Result> dataSet, String outputPath) {
+	private static void write(Dataset<GraphResult> dataSet, String outputPath) {
 		dataSet
 			.write()
 			.option("compression", "gzip")

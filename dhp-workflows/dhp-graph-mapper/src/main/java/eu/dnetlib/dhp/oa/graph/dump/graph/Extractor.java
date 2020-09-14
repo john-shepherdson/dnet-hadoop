@@ -27,7 +27,8 @@ import eu.dnetlib.dhp.schema.oaf.Result;
  * new Relations are created for the datasource in the collectedfrom and hostedby elements and for the context related
  * to communities and research initiative/infrastructures. For collectedfrom elements it creates: datasource -> provides
  * -> result and result -> isProvidedBy -> datasource For hostedby elements it creates: datasource -> hosts -> result
- * and result -> isHostedBy -> datasource For context elements it creates: context <-> isRelatedTo <-> result
+ * and result -> isHostedBy -> datasource For context elements it creates: context <-> isRelatedTo <-> result. Note for
+ * context: it gets the first provenance in the dataInfo. If more than one is present the others are not dumped
  */
 public class Extractor implements Serializable {
 

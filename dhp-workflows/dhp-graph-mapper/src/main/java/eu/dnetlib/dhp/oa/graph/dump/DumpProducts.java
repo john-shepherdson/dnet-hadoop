@@ -59,7 +59,7 @@ public class DumpProducts implements Serializable {
 
 		Utils
 			.readPath(spark, inputPath, inputClazz)
-			.map((MapFunction<I, O>)  value -> execMap(value, communityMap, graph), Encoders.bean(outputClazz))
+			.map((MapFunction<I, O>) value -> execMap(value, communityMap, graph), Encoders.bean(outputClazz))
 			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)

@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,9 @@ public class Process implements Serializable {
 
 			ri.setDescription(ci.getDescription());
 			ri.setName(ci.getName());
-			ri.setZenodo_community(Constants.ZENODO_COMMUNITY_PREFIX + ci.getZenodocommunity());
+			if (StringUtils.isNotEmpty(ci.getZenodocommunity())) {
+				ri.setZenodo_community(Constants.ZENODO_COMMUNITY_PREFIX + ci.getZenodocommunity());
+			}
 			return (R) ri;
 
 		} catch (final Exception e) {
