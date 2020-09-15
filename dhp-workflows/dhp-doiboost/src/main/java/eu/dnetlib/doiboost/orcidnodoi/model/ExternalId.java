@@ -1,6 +1,10 @@
 
 package eu.dnetlib.doiboost.orcidnodoi.model;
 
+/**
+ * This class models the data related to external id, that are retrieved from an orcid publication
+ */
+
 public class ExternalId {
 	private String type;
 	private String value;

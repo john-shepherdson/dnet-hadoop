@@ -9,6 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+/**
+ * Utility class
+ */
+
 public class DumpToActionsUtility {
 
 	private static final SimpleDateFormat ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);

@@ -21,6 +21,14 @@ import eu.dnetlib.doiboost.orcid.model.AuthorData;
 import eu.dnetlib.doiboost.orcidnodoi.model.Contributor;
 import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 
+/**
+ * This class is used for searching from a list of publication contributors a
+ * specific author making a similarity check on both name and surname of the
+ * author with the credit name of each contributor of the list; as soon as
+ * the match is found (if exist) author informations are used to enrich the
+ * matched contribuotr inside contributors list
+ */
+
 public class AuthorMatcher {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthorMatcher.class);

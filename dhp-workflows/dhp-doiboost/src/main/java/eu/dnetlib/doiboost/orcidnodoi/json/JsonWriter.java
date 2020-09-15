@@ -6,6 +6,10 @@ import com.google.gson.JsonObject;
 import eu.dnetlib.doiboost.orcid.model.AuthorData;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 
+/**
+ * This class converts an object to json and viceversa
+ */
+
 public class JsonWriter {
 
 	public static String create(AuthorData authorData) {

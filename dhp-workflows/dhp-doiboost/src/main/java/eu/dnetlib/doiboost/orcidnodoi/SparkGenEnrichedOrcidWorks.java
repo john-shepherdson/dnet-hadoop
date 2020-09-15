@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -34,6 +33,10 @@ import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 import scala.Tuple2;
+
+/**
+ * This spark job generates one parquet file, containing orcid publications dataset
+ */
 
 public class SparkGenEnrichedOrcidWorks {
 

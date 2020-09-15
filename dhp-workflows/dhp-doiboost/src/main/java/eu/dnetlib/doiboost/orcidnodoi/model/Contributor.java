@@ -5,6 +5,10 @@ import java.io.Serializable;
 
 import eu.dnetlib.doiboost.orcid.model.AuthorData;
 
+/**
+ * This class models the data related to a contributor, that are retrieved from an orcid publication
+ */
+
 public class Contributor extends AuthorData implements Serializable {
 	private String sequence;
 	private String role;

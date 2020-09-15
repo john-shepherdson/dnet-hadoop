@@ -4,6 +4,10 @@ package eu.dnetlib.doiboost.orcidnodoi.model;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * This class models the data that are retrieved from orcid publication
+ */
+
 public class WorkDataNoDoi implements Serializable {
 
 	private String oid;

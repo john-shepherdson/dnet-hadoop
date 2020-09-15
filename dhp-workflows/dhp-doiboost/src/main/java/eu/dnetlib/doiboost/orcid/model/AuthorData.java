@@ -3,6 +3,10 @@ package eu.dnetlib.doiboost.orcid.model;
 
 import java.io.Serializable;
 
+/**
+ * This class models the data that are retrieved from orcid publication
+ */
+
 public class AuthorData implements Serializable {
 
 	private String oid;

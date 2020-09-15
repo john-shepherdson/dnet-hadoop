@@ -12,11 +12,15 @@ import org.mortbay.log.Log;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.doiboost.orcid.OrcidDSManager;
 
+/**
+ * This job generates one sequence file, the key is an orcid identifier and the
+ * value is an orcid publication in json format
+ */
+
 public class GenOrcidAuthorWork extends OrcidDSManager {
 
 	private String activitiesFileNameTarGz;
 	private String outputWorksPath;
-//	private String workingPath;
 
 	public static void main(String[] args) throws IOException, Exception {
 		GenOrcidAuthorWork genOrcidAuthorWork = new GenOrcidAuthorWork();

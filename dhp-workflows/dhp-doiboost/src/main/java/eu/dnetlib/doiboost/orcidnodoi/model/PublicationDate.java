@@ -1,6 +1,10 @@
 
 package eu.dnetlib.doiboost.orcidnodoi.model;
 
+/**
+ * This class models the data related to a publication date, that are retrieved from an orcid publication
+ */
+
 public class PublicationDate {
 	private String year;
 	private String month;

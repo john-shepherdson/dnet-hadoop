@@ -17,6 +17,10 @@ import eu.dnetlib.doiboost.orcidnodoi.model.ExternalId;
 import eu.dnetlib.doiboost.orcidnodoi.model.PublicationDate;
 import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 
+/**
+ * This class is used for parsing xml data with vtd parser
+ */
+
 public class XMLRecordParserNoDoi {
 
 	private static final Logger logger = LoggerFactory.getLogger(XMLRecordParserNoDoi.class);

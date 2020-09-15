@@ -20,9 +20,13 @@ import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.mortbay.log.Log;
 
 import eu.dnetlib.doiboost.orcid.json.JsonHelper;
-import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
+
+/**
+ * This class write on hdfs one sequence file, the key is an orcid identifier and the
+ * value is an orcid publication in json format
+ */
 
 public class ActivitiesDumpReader {
 

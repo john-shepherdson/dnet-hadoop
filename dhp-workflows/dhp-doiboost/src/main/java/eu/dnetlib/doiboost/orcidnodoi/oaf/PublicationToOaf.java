@@ -22,6 +22,10 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.doiboost.orcidnodoi.util.DumpToActionsUtility;
 import eu.dnetlib.doiboost.orcidnodoi.util.Pair;
 
+/**
+ * This class converts an orcid publication from json format to oaf
+ */
+
 public class PublicationToOaf implements Serializable {
 
 	static Logger logger = LoggerFactory.getLogger(PublicationToOaf.class);
@@ -119,7 +123,6 @@ public class PublicationToOaf implements Serializable {
 
 	public Oaf generatePublicationActionsFromDump(final JsonObject rootElement) {
 
-		logger.debug("generatePublicationActionsFromDump ...");
 		if (!isValid(rootElement)) {
 			return null;
 		}
