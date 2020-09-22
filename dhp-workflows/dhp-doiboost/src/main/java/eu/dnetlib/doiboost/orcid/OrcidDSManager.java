@@ -48,15 +48,10 @@ public class OrcidDSManager {
 		return conf;
 	}
 
-	protected FileSystem initFileSystemObject(Configuration conf) {
+	protected FileSystem initFileSystemObject(Configuration conf) throws IOException {
 		// Get the filesystem - HDFS
 		FileSystem fs = null;
-		try {
-			fs = FileSystem.get(URI.create(hdfsServerUri.concat(workingPath)), conf);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		fs = FileSystem.get(URI.create(hdfsServerUri.concat(workingPath)), conf);
 		return fs;
 	}
 
