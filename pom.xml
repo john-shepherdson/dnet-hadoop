@@ -669,5 +669,6 @@
 		<common.compress.version>1.1</common.compress.version>
 		<json4s.version>3.5.3</json4s.version>
 		<jsonschemagenerator.version>4.13.0</jsonschemagenerator.version>
+		<common.text.version>1.8</common.text.version>
 	</properties>
 </project>
