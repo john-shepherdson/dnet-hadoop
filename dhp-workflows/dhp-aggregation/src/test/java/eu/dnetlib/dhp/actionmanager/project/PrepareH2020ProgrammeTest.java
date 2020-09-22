@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProject;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -88,7 +90,29 @@ public class PrepareProgrammeTest {
 
 		Dataset<CSVProgramme> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(CSVProgramme.class));
 
-		Assertions.assertEquals(0, verificationDataset.filter("shortTitle =''").count());
+		Assertions.assertEquals(0, verificationDataset.filter("title =''").count());
+
+		Assertions.assertEquals(0, verificationDataset.filter("classification = ''").count());
+
+		Assertions.assertEquals("Societal challenges $ Smart, Green And Integrated Transport $ CLEANSKY2 $ IADP Fast Rotorcraft",
+				verificationDataset.filter("code = 'H2020-EU.3.4.5.3.'").select("classification").collectAsList()
+						.get(0).getString(0));
+
+
+		Assertions.assertEquals("Euratom $ Indirect actions $ European Fusion Development Agreement",
+				verificationDataset.filter("code = 'H2020-Euratom-1.9.'").select("classification").collectAsList()
+						.get(0).getString(0));
+
+
+		Assertions.assertEquals("Industrial leadership $ Leadership in enabling and industrial technologies $ Advanced manufacturing and processing $ New sustainable business models",
+				verificationDataset.filter("code = 'H2020-EU.2.1.5.4.'").select("classification").collectAsList()
+						.get(0).getString(0));
+
+		Assertions.assertEquals("Excellent science $ Future and Emerging Technologies (FET) $ FET Open",
+				verificationDataset.filter("code = 'H2020-EU.1.2.1.'").select("classification").collectAsList()
+						.get(0).getString(0));
+
+
 	}
 
 }

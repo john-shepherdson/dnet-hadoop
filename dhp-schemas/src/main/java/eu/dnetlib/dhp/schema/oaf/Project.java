@@ -58,7 +58,26 @@ public class Project extends OafEntity implements Serializable {
 
 	private Float fundedamount;
 
-	private List<Programme> programme;
+	private String topic;
+
+	private List<H2020classification> h2020classification;
+
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	public List<H2020classification> getH2020classification() {
+		return h2020classification;
+	}
+
+	public void setH2020classification(List<H2020classification> h2020classification) {
+		this.h2020classification = h2020classification;
+	}
 
 	public Field<String> getWebsiteurl() {
 		return websiteurl;
@@ -268,13 +287,13 @@ public class Project extends OafEntity implements Serializable {
 		this.fundedamount = fundedamount;
 	}
 
-	public List<Programme> getProgramme() {
-		return programme;
-	}
-
-	public void setProgramme(List<Programme> programme) {
-		this.programme = programme;
-	}
+//	public List<Programme> getProgramme() {
+//		return programme;
+//	}
+//
+//	public void setProgramme(List<Programme> programme) {
+//		this.programme = programme;
+//	}
 
 	@Override
 	public void mergeFrom(OafEntity e) {
@@ -331,7 +350,9 @@ public class Project extends OafEntity implements Serializable {
 			? p.getFundedamount()
 			: fundedamount;
 
-		programme = mergeLists(programme, p.getProgramme());
+		//programme = mergeLists(programme, p.getProgramme());
+
+		h2020classification = mergeLists(h2020classification, p.getH2020classification());
 
 		mergeOAFDataInfo(e);
 	}
