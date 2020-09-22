@@ -60,7 +60,7 @@ public class Project extends OafEntity implements Serializable {
 
 	private String topic;
 
-	private List<H2020classification> h2020classification;
+	private List<H2020Classification> h2020classification;
 
 
 	public String getTopic() {
@@ -71,11 +71,11 @@ public class Project extends OafEntity implements Serializable {
 		this.topic = topic;
 	}
 
-	public List<H2020classification> getH2020classification() {
+	public List<H2020Classification> getH2020classification() {
 		return h2020classification;
 	}
 
-	public void setH2020classification(List<H2020classification> h2020classification) {
+	public void setH2020classification(List<H2020Classification> h2020classification) {
 		this.h2020classification = h2020classification;
 	}
 

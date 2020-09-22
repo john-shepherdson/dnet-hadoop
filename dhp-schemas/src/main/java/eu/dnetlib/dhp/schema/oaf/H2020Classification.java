@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class H2020classification implements Serializable {
+public class H2020Classification implements Serializable {
     private H2020Programme h2020Programme;
     private String level1;
     private String level2;
@@ -53,16 +53,6 @@ public class H2020classification implements Serializable {
         this.classification = classification;
     }
 
-    public void setLevels() {
-        String[] tmp = classification.split(" $ ");
-        level1 = tmp[0];
-        if(tmp.length > 1){
-            level2 = tmp[1];
-        }
-        if(tmp.length > 2){
-            level3 = tmp[2];
-        }
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -71,7 +61,7 @@ public class H2020classification implements Serializable {
         if (o == null || getClass() != o.getClass())
             return false;
 
-        H2020classification h2020classification = (H2020classification)o;
+        H2020Classification h2020classification = (H2020Classification)o;
 
         return Objects.equals(level1, h2020classification.level1) &&
                 Objects.equals(level2, h2020classification.level2) &&
