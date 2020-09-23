@@ -73,7 +73,8 @@ public class SparkUpdateProjectTest {
 					Boolean.FALSE.toString(),
 					"-programmePath",
 					getClass()
-						.getResource("/eu/dnetlib/dhp/actionmanager/project/preparedProgramme_whole.json.gz")
+						.getResource(
+							"/eu/dnetlib/dhp/actionmanager/project/preparedProgramme_classification_whole.json.gz")
 						.getPath(),
 					"-projectPath",
 					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/prepared_projects.json").getPath(),
@@ -88,7 +89,9 @@ public class SparkUpdateProjectTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Project) aa.getPayload()));
 
-		Assertions.assertEquals(14, tmp.count());
+		Assertions.assertEquals(15, tmp.count());
+
+		tmp.foreach(value -> System.out.println(OBJECT_MAPPER.writeValueAsString(value)));
 
 	}
 }
