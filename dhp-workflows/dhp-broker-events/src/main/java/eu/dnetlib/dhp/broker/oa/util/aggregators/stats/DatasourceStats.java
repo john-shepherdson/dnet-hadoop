@@ -2,8 +2,6 @@
 package eu.dnetlib.dhp.broker.oa.util.aggregators.stats;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DatasourceStats implements Serializable {
 
@@ -15,7 +13,8 @@ public class DatasourceStats implements Serializable {
 	private String id;
 	private String name;
 	private String type;
-	private Map<String, Long> topics = new HashMap<>();
+	private String topic;
+	private long size = 0l;
 
 	public String getId() {
 		return id;
@@ -41,21 +40,24 @@ public class DatasourceStats implements Serializable {
 		this.type = type;
 	}
 
-	public Map<String, Long> getTopics() {
-		return topics;
+	public String getTopic() {
+		return topic;
 	}
 
-	public void setTopics(final Map<String, Long> topics) {
-		this.topics = topics;
+	public void setTopic(final String topic) {
+		this.topic = topic;
 	}
 
-	public void incrementTopic(final String topic, final long inc) {
-		if (topics.containsKey(topic)) {
-			topics.put(topic, topics.get(topic) + inc);
-		} else {
-			topics.put(topic, inc);
-		}
+	public long getSize() {
+		return size;
+	}
 
+	public void setSize(final long size) {
+		this.size = size;
+	}
+
+	public void incrementSize(final long inc) {
+		this.size = this.size + inc;
 	}
 
 }

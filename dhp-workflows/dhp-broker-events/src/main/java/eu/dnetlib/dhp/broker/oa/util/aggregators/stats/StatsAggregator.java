@@ -25,7 +25,8 @@ public class StatsAggregator extends Aggregator<Event, DatasourceStats, Datasour
 		stats.setId(e.getMap().getTargetDatasourceId());
 		stats.setName(e.getMap().getTargetDatasourceName());
 		stats.setType(e.getMap().getTargetDatasourceType());
-		stats.incrementTopic(e.getTopic(), 1l);
+		stats.setTopic(e.getTopic());
+		stats.incrementSize(1l);
 		return stats;
 	}
 
@@ -35,8 +36,9 @@ public class StatsAggregator extends Aggregator<Event, DatasourceStats, Datasour
 			stats0.setId(stats1.getId());
 			stats0.setName(stats1.getName());
 			stats0.setType(stats1.getType());
+			stats0.setTopic(stats1.getTopic());
 		}
-		stats1.getTopics().entrySet().forEach(e -> stats0.incrementTopic(e.getKey(), e.getValue()));
+		stats0.incrementSize(stats1.getSize());
 		return stats0;
 	}
 
