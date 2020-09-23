@@ -58,17 +58,16 @@ public class Project extends OafEntity implements Serializable {
 
 	private Float fundedamount;
 
-	private String topic;
+	private String h2020topiccode;
 
 	private List<H2020Classification> h2020classification;
 
-
-	public String getTopic() {
-		return topic;
+	public String getH2020topiccode() {
+		return h2020topiccode;
 	}
 
-	public void setTopic(String topic) {
-		this.topic = topic;
+	public void setH2020topiccode(String h2020topiccode) {
+		this.h2020topiccode = h2020topiccode;
 	}
 
 	public List<H2020Classification> getH2020classification() {
@@ -287,14 +286,6 @@ public class Project extends OafEntity implements Serializable {
 		this.fundedamount = fundedamount;
 	}
 
-//	public List<Programme> getProgramme() {
-//		return programme;
-//	}
-//
-//	public void setProgramme(List<Programme> programme) {
-//		this.programme = programme;
-//	}
-
 	@Override
 	public void mergeFrom(OafEntity e) {
 		super.mergeFrom(e);
@@ -350,7 +341,7 @@ public class Project extends OafEntity implements Serializable {
 			? p.getFundedamount()
 			: fundedamount;
 
-		//programme = mergeLists(programme, p.getProgramme());
+		// programme = mergeLists(programme, p.getProgramme());
 
 		h2020classification = mergeLists(h2020classification, p.getH2020classification());
 
