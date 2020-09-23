@@ -9,6 +9,15 @@ public class CSVProgramme implements Serializable {
 	private String title;
 	private String shortTitle;
 	private String language;
+	private String classification;
+
+	public String getClassification() {
+		return classification;
+	}
+
+	public void setClassification(String classification) {
+		this.classification = classification;
+	}
 
 	public String getRcn() {
 		return rcn;
