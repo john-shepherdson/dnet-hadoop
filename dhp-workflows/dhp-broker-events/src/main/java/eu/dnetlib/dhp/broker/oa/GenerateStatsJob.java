@@ -3,11 +3,16 @@ package eu.dnetlib.dhp.broker.oa;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.IOException;
 import java.util.Optional;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.TypedColumn;
 import org.slf4j.Logger;
@@ -28,8 +33,8 @@ public class GenerateStatsJob {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					IndexOnESJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+					GenerateStatsJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/stats_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -43,21 +48,50 @@ public class GenerateStatsJob {
 		final String eventsPath = parser.get("workingPath") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
-		final String statsPath = parser.get("workingPath") + "/stats";
-		log.info("stats: {}", statsPath);
+		final String dbUrl = parser.get("dbUrl");
+		log.info("dbUrl: {}", dbUrl);
+
+		final String dbUser = parser.get("dbUser");
+		log.info("dbUser: {}", dbUser);
+
+		final String dbPassword = parser.get("dbPassword");
+		log.info("dbPassword: {}", "***");
+
+		final String brokerApiBaseUrl = parser.get("brokerApiBaseUrl");
+		log.info("brokerApiBaseUrl: {}", brokerApiBaseUrl);
 
 		final TypedColumn<Event, DatasourceStats> aggr = new StatsAggregator().toColumn();
 
+		final Properties connectionProperties = new Properties();
+		connectionProperties.put("user", dbUser);
+		connectionProperties.put("password", dbPassword);
+
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
-			final Dataset<DatasourceStats> stats = ClusterUtils
+			ClusterUtils
 				.readPath(spark, eventsPath, Event.class)
-				.groupByKey(e -> e.getMap().getTargetDatasourceId(), Encoders.STRING())
+				.groupByKey(e -> e.getTopic() + "@@@" + e.getMap().getTargetDatasourceId(), Encoders.STRING())
 				.agg(aggr)
-				.map(t -> t._2, Encoders.bean(DatasourceStats.class));
+				.map(t -> t._2, Encoders.bean(DatasourceStats.class))
+				.write()
+				.jdbc(dbUrl, "oa_datasource_stats_temp", connectionProperties);
 
-			ClusterUtils.save(stats, statsPath, DatasourceStats.class, null);
+			log.info("*** updateStats");
+			updateStats(brokerApiBaseUrl);
+			log.info("*** ALL done.");
+
 		});
+	}
+
+	private static String updateStats(final String brokerApiBaseUrl) throws IOException {
+		final String url = brokerApiBaseUrl + "/api/openaireBroker/stats/update";
+		final HttpGet req = new HttpGet(url);
+
+		try (final CloseableHttpClient client = HttpClients.createDefault()) {
+			try (final CloseableHttpResponse response = client.execute(req)) {
+				return IOUtils.toString(response.getEntity().getContent());
+			}
+		}
 	}
 
 }

@@ -45,18 +45,6 @@
         	<description>the url of the broker service api</description>
         </property>
         <property>
-        	<name>brokerDbUrl</name>
-        	<description>the url of the broker database</description>
-        </property>
-        <property>
-        	<name>brokerDbUser</name>
-        	<description>the user of the broker database</description>
-        </property>
-        <property>
-        	<name>brokerDbPassword</name>
-        	<description>the password of the broker database</description>
-        </property>
-        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -111,23 +99,23 @@
         </configuration>
     </global>
 
-    <start to="stats"/>
+    <start to="index_notifications"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     
-    <action name="stats">
+    <action name="index_notifications">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>GenerateStatsJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.GenerateStatsJob</class>
+            <name>IndexNotificationsOnESJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.IndexNotificationsJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.dynamicAllocation.maxExecutors="8" 
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -135,14 +123,14 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--dbUrl</arg><arg>${brokerDbUrl}</arg>
-            <arg>--dbUser</arg><arg>${brokerDbUser}</arg>
-            <arg>--dbPassword</arg><arg>${brokerDbPassword}</arg>
+            <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
+            <arg>--esHost</arg><arg>${esIndexHost}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+    
     	
     <end name="End"/>
 

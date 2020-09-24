@@ -20,6 +20,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 
+@Deprecated
 public class IndexOnESJob {
 
 	private static final Logger log = LoggerFactory.getLogger(IndexOnESJob.class);
