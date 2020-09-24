@@ -337,13 +337,13 @@ public class MigrateDbEntitiesApplicationTest {
 
 	private <T> T getValueAs(final String name, final List<TypedField> fields) {
 		return fields
-				.stream()
-				.filter(f -> f.getField().equals(name))
-				.map(TypedField::getValue)
-				.filter(Objects::nonNull)
-				.map(o -> (T) o)
-				.findFirst()
-				.get();
+			.stream()
+			.filter(f -> f.getField().equals(name))
+			.map(TypedField::getValue)
+			.filter(Objects::nonNull)
+			.map(o -> (T) o)
+			.findFirst()
+			.get();
 	}
 }
 
