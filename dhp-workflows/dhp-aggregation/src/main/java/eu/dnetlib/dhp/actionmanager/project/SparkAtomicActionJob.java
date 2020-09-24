@@ -107,6 +107,7 @@ public class SparkAtomicActionJob {
 								ModelSupport.entityIdPrefix.get("project"),
 								"corda__h2020", csvProject.getId()));
 					p.setH2020topiccode(csvProject.getTopics());
+					p.setH2020topicdescription(csvProject.getTopicdescription());
 					H2020Programme pm = new H2020Programme();
 					H2020Classification h2020classification = new H2020Classification();
 					pm.setCode(csvProject.getProgramme());
