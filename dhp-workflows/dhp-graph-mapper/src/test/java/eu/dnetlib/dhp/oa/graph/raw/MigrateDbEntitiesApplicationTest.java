@@ -73,12 +73,16 @@ public class MigrateDbEntitiesApplicationTest {
 		final Datasource ds = (Datasource) list.get(0);
 		assertValidId(ds.getId());
 		assertValidId(ds.getCollectedfrom().get(0).getKey());
-		assertEquals(ds.getOfficialname().getValue(), getValueAsString("officialname", fields));
-		assertEquals(ds.getEnglishname().getValue(), getValueAsString("englishname", fields));
-		assertEquals(ds.getContactemail().getValue(), getValueAsString("contactemail", fields));
-		assertEquals(ds.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
-		assertEquals(ds.getNamespaceprefix().getValue(), getValueAsString("namespaceprefix", fields));
-		assertEquals(ds.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(getValueAsString("officialname", fields), ds.getOfficialname().getValue());
+		assertEquals(getValueAsString("englishname", fields), ds.getEnglishname().getValue());
+		assertEquals(getValueAsString("contactemail", fields), ds.getContactemail().getValue());
+		assertEquals(getValueAsString("websiteurl", fields), ds.getWebsiteurl().getValue());
+		assertEquals(getValueAsString("namespaceprefix", fields), ds.getNamespaceprefix().getValue());
+		assertEquals(getValueAsString("collectedfromname", fields), ds.getCollectedfrom().get(0).getValue());
+		assertEquals(getValueAsString("officialname", fields), ds.getJournal().getName());
+		assertEquals("2579-5449", ds.getJournal().getIssnPrinted());
+		assertEquals("2597-6540", ds.getJournal().getIssnOnline());
+		assertEquals(null, ds.getJournal().getIssnLinking());
 	}
 
 	@Test
@@ -92,9 +96,11 @@ public class MigrateDbEntitiesApplicationTest {
 		final Project p = (Project) list.get(0);
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertEquals(p.getAcronym().getValue(), getValueAsString("acronym", fields));
-		assertEquals(p.getTitle().getValue(), getValueAsString("title", fields));
-		assertEquals(p.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(getValueAsString("acronym", fields), p.getAcronym().getValue());
+		assertEquals(getValueAsString("title", fields), p.getTitle().getValue());
+		assertEquals(getValueAsString("collectedfromname", fields), p.getCollectedfrom().get(0).getValue());
+		assertEquals(getValueAsFloat("fundedamount", fields), p.getFundedamount());
+		assertEquals(getValueAsFloat("totalcost", fields), p.getTotalcost());
 	}
 
 	@Test
@@ -110,14 +116,14 @@ public class MigrateDbEntitiesApplicationTest {
 		final Organization o = (Organization) list.get(0);
 		assertValidId(o.getId());
 		assertValidId(o.getCollectedfrom().get(0).getKey());
-		assertEquals(o.getLegalshortname().getValue(), getValueAsString("legalshortname", fields));
-		assertEquals(o.getLegalname().getValue(), getValueAsString("legalname", fields));
-		assertEquals(o.getWebsiteurl().getValue(), getValueAsString("websiteurl", fields));
-		assertEquals(o.getCountry().getClassid(), getValueAsString("country", fields).split("@@@")[0]);
-		assertEquals(o.getCountry().getClassname(), getValueAsString("country", fields).split("@@@")[0]);
-		assertEquals(o.getCountry().getSchemeid(), getValueAsString("country", fields).split("@@@")[1]);
-		assertEquals(o.getCountry().getSchemename(), getValueAsString("country", fields).split("@@@")[1]);
-		assertEquals(o.getCollectedfrom().get(0).getValue(), getValueAsString("collectedfromname", fields));
+		assertEquals(getValueAsString("legalshortname", fields), o.getLegalshortname().getValue());
+		assertEquals(getValueAsString("legalname", fields), o.getLegalname().getValue());
+		assertEquals(getValueAsString("websiteurl", fields), o.getWebsiteurl().getValue());
+		assertEquals(getValueAsString("country", fields).split("@@@")[0], o.getCountry().getClassid());
+		assertEquals(getValueAsString("country", fields).split("@@@")[0], o.getCountry().getClassname());
+		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemeid());
+		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemename());
+		assertEquals(getValueAsString("collectedfromname", fields), o.getCollectedfrom().get(0).getValue());
 	}
 
 	@Test
@@ -322,14 +328,22 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	private String getValueAsString(final String name, final List<TypedField> fields) {
+		return getValueAs(name, fields);
+	}
+
+	private Float getValueAsFloat(final String name, final List<TypedField> fields) {
+		return new Float(getValueAs(name, fields).toString());
+	}
+
+	private <T> T getValueAs(final String name, final List<TypedField> fields) {
 		return fields
-			.stream()
-			.filter(f -> f.getField().equals(name))
-			.map(TypedField::getValue)
-			.filter(Objects::nonNull)
-			.map(o -> o.toString())
-			.findFirst()
-			.get();
+				.stream()
+				.filter(f -> f.getField().equals(name))
+				.map(TypedField::getValue)
+				.filter(Objects::nonNull)
+				.map(o -> (T) o)
+				.findFirst()
+				.get();
 	}
 }
 
