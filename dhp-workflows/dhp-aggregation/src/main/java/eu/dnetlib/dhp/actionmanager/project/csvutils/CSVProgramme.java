@@ -4,8 +4,17 @@ package eu.dnetlib.dhp.actionmanager.project.csvutils;
 import java.io.Serializable;
 
 public class CSVProgramme implements Serializable {
+	private String parentProgramme;
+	private String frameworkProgramme;
+	private String startDate;
+	private String endDate;
+	private String objective;
+	private String subjects;
+	private String legalBasis;
+	private String call;
 	private String rcn;
 	private String code;
+
 	private String title;
 	private String shortTitle;
 	private String language;
@@ -57,5 +66,69 @@ public class CSVProgramme implements Serializable {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public String getParentProgramme() {
+		return parentProgramme;
+	}
+
+	public void setParentProgramme(String parentProgramme) {
+		this.parentProgramme = parentProgramme;
+	}
+
+	public String getFrameworkProgramme() {
+		return frameworkProgramme;
+	}
+
+	public void setFrameworkProgramme(String frameworkProgramme) {
+		this.frameworkProgramme = frameworkProgramme;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getObjective() {
+		return objective;
+	}
+
+	public void setObjective(String objective) {
+		this.objective = objective;
+	}
+
+	public String getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(String subjects) {
+		this.subjects = subjects;
+	}
+
+	public String getLegalBasis() {
+		return legalBasis;
+	}
+
+	public void setLegalBasis(String legalBasis) {
+		this.legalBasis = legalBasis;
+	}
+
+	public String getCall() {
+		return call;
+	}
+
+	public void setCall(String call) {
+		this.call = call;
 	}
 }
