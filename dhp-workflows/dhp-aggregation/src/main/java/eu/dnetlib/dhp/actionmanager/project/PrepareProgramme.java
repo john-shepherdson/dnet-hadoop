@@ -120,7 +120,7 @@ public class PrepareProgramme {
 
 		JavaRDD<CSVProgramme> h2020Programmes = programme
 			.toJavaRDD()
-			.filter(p -> !p.getCode().contains("FP7"))
+			.filter(p -> p.getFrameworkProgramme().trim().equalsIgnoreCase("H2020"))
 			.mapToPair(csvProgramme -> new Tuple2<>(csvProgramme.getCode(), csvProgramme))
 			.reduceByKey((a, b) -> {
 				if (!a.getLanguage().equals("en")) {
