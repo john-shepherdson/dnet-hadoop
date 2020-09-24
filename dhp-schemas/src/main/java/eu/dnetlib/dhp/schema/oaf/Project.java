@@ -60,7 +60,17 @@ public class Project extends OafEntity implements Serializable {
 
 	private String h2020topiccode;
 
+	private String h2020topicdescription;
+
 	private List<H2020Classification> h2020classification;
+
+	public String getH2020topicdescription() {
+		return h2020topicdescription;
+	}
+
+	public void setH2020topicdescription(String h2020topicdescription) {
+		this.h2020topicdescription = h2020topicdescription;
+	}
 
 	public String getH2020topiccode() {
 		return h2020topiccode;
