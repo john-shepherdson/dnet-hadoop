@@ -26,6 +26,16 @@ public class CSVProject implements Serializable {
 	private String participantCountries;
 	private String subjects;
 
+	private String topicdescription;
+
+	public String getTopicdescription() {
+		return topicdescription;
+	}
+
+	public void setTopicdescription(String topicdescription) {
+		this.topicdescription = topicdescription;
+	}
+
 	public String getRcn() {
 		return rcn;
 	}
