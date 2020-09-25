@@ -17,6 +17,10 @@ import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 
 public class SendToZenodoHDFS implements Serializable {
 
+	private final static String NEW = "new"; // to be used for a brand new deposition in zenodo
+	private final static String VERSION = "version"; // to be used to upload a new version of a published deposition
+	private final static String UPDATE = "update"; // to upload content to an open deposition not published
+
 	private static final Log log = LogFactory.getLog(SendToZenodoHDFS.class);
 
 	public static void main(final String[] args) throws Exception, MissingConceptDoiException {
@@ -34,10 +38,12 @@ public class SendToZenodoHDFS implements Serializable {
 		final String access_token = parser.get("accessToken");
 		final String connection_url = parser.get("connectionUrl");
 		final String metadata = parser.get("metadata");
-		final Boolean newDeposition = Boolean.valueOf(parser.get("newDeposition"));
+		final String depositionType = parser.get("depositionType");
 		final String concept_rec_id = Optional
 			.ofNullable(parser.get("conceptRecordId"))
 			.orElse(null);
+
+		final String depositionId = Optional.ofNullable(parser.get("depositionId")).orElse(null);
 		final String communityMapPath = parser.get("communityMapPath");
 
 		Configuration conf = new Configuration();
@@ -51,13 +57,22 @@ public class SendToZenodoHDFS implements Serializable {
 			.listFiles(
 				new Path(hdfsPath), true);
 		ZenodoAPIClient zenodoApiClient = new ZenodoAPIClient(connection_url, access_token);
-		if (newDeposition) {
-			zenodoApiClient.newDeposition();
-		} else {
-			if (concept_rec_id == null) {
-				throw new MissingConceptDoiException("No concept record id has been provided");
-			}
-			zenodoApiClient.newVersion(concept_rec_id);
+		switch (depositionType) {
+			case NEW:
+				zenodoApiClient.newDeposition();
+				break;
+			case VERSION:
+				if (concept_rec_id == null) {
+					throw new MissingConceptDoiException("No concept record id has been provided");
+				}
+				zenodoApiClient.newVersion(concept_rec_id);
+				break;
+			case UPDATE:
+				if (depositionId == null) {
+					throw new MissingConceptDoiException("No deposition id has been provided");
+				}
+				zenodoApiClient.uploadOpenDeposition(depositionId);
+				break;
 		}
 
 		while (fileStatusListIterator.hasNext()) {
