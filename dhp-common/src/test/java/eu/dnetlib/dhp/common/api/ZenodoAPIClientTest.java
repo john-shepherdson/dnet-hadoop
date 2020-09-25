@@ -11,13 +11,37 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
+//@Disabled
 public class ZenodoAPIClientTest {
 
 	private final String URL_STRING = "https://sandbox.zenodo.org/api/deposit/depositions";
 	private final String ACCESS_TOKEN = "";
 
 	private final String CONCEPT_REC_ID = "657113";
+
+	private final String depositionId = "674915";
+
+	@Test
+	public void testUploadOldDeposition() throws IOException, MissingConceptDoiException {
+		ZenodoAPIClient client = new ZenodoAPIClient(URL_STRING,
+			ACCESS_TOKEN);
+		Assertions.assertEquals(200, client.uploadOpenDeposition(depositionId));
+
+		File file = new File(getClass()
+			.getResource("/eu/dnetlib/dhp/common/api/COVID-19.json.gz")
+			.getPath());
+
+		InputStream is = new FileInputStream(file);
+
+		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz", file.length()));
+
+		String metadata = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/common/api/metadata.json"));
+
+		Assertions.assertEquals(200, client.sendMretadata(metadata));
+
+		Assertions.assertEquals(202, client.publish());
+
+	}
 
 	@Test
 	public void testNewDeposition() throws IOException {
