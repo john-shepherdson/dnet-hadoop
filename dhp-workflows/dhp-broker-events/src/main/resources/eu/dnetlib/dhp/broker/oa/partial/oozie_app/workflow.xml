@@ -111,18 +111,18 @@
         </configuration>
     </global>
 
-    <start to="stats"/>
+    <start to="partition"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     
-    <action name="stats">
+   <action name="partition">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>GenerateStatsJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.GenerateStatsJob</class>
+            <name>PartitionEventsByDsIdJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.PartitionEventsByDsIdJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -134,11 +134,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
+            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--dbUrl</arg><arg>${brokerDbUrl}</arg>
-            <arg>--dbUser</arg><arg>${brokerDbUser}</arg>
-            <arg>--dbPassword</arg><arg>${brokerDbPassword}</arg>
-            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

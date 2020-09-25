@@ -142,12 +142,12 @@
 	{
 		"field": "totalcost",
 		"type": "double",
-		"value": null
+		"value": 157846
 	},
 	{
 		"field": "fundedamount",
 		"type": "double",
-		"value": null
+		"value": 157846
 	},
 	{
 		"field": "collectedfromid",

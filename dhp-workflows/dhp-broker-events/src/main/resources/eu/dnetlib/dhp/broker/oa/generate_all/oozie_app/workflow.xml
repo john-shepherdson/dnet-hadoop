@@ -45,6 +45,18 @@
         	<description>the url of the broker service api</description>
         </property>
         <property>
+        	<name>brokerDbUrl</name>
+        	<description>the url of the broker database</description>
+        </property>
+        <property>
+        	<name>brokerDbUser</name>
+        	<description>the user of the broker database</description>
+        </property>
+        <property>
+        	<name>brokerDbPassword</name>
+        	<description>the password of the broker database</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -509,8 +521,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--dbUrl</arg><arg>${brokerDbUrl}</arg>
+            <arg>--dbUser</arg><arg>${brokerDbUser}</arg>
+            <arg>--dbPassword</arg><arg>${brokerDbPassword}</arg>
+            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
