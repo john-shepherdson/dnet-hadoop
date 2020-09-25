@@ -4,16 +4,20 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.config.DedupConfig;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.*;
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +69,7 @@ public class SparkCollectSimRels extends AbstractSparkAction {
     }
 
     @Override
-    void run(ISLookUpService isLookUpService) {
+    void run(ISLookUpService isLookUpService) throws DocumentException, ISLookUpException, IOException {
 
         // read oozie parameters
         final String isLookUpUrl = parser.get("isLookUpUrl");
@@ -126,11 +130,16 @@ public class SparkCollectSimRels extends AbstractSparkAction {
                 Encoders.bean(Relation.class)
         ).repartition(numPartitions);
 
-        savePostgresRelation(organizationRelations, workingPath, actionSetId, "organization");
-        savePostgresRelation(resultRelations, workingPath, actionSetId, "publication");
-        savePostgresRelation(resultRelations, workingPath, actionSetId, "software");
-        savePostgresRelation(resultRelations, workingPath, actionSetId, "otherresearchproduct");
-        savePostgresRelation(resultRelations, workingPath, actionSetId, "dataset");
+        for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
+            switch(dedupConf.getWf().getSubEntityValue()){
+                case "organization":
+                    savePostgresRelation(organizationRelations, workingPath, actionSetId, "organization");
+                    break;
+                default:
+                    savePostgresRelation(resultRelations, workingPath, actionSetId, dedupConf.getWf().getSubEntityValue());
+                    break;
+            }
+        }
 
     }
 
