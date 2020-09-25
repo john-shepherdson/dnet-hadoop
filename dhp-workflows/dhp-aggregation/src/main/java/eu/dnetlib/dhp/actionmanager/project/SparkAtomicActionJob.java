@@ -147,7 +147,7 @@ public class SparkAtomicActionJob {
 	}
 
 	private static void setLevels(H2020Classification h2020Classification, String classification) {
-		String[] tmp = classification.split(" | ");
+		String[] tmp = classification.split(" \\| ");
 		h2020Classification.setLevel1(tmp[0]);
 		if (tmp.length > 1) {
 			h2020Classification.setLevel2(tmp[1]);

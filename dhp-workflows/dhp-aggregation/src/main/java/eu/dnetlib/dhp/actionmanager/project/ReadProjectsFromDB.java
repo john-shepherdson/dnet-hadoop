@@ -33,7 +33,7 @@ public class ReadProjectsFromDB implements Closeable {
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private final static String query = "SELECT code , optional1, optional2" +
+	private final static String query = "SELECT code , optional1, optional2 " +
 		"from projects where id like 'corda__h2020%' ";
 
 	public static void main(final String[] args) throws Exception {

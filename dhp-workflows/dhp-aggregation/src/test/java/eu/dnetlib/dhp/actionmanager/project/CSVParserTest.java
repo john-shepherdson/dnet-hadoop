@@ -7,10 +7,14 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.google.gson.Gson;
+
 import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVParser;
+import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme;
 
 public class CSVParserTest {
 
