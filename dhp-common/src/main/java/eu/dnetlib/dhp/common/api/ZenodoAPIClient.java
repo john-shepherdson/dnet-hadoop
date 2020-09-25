@@ -206,6 +206,33 @@ public class ZenodoAPIClient implements Serializable {
 		}
 	}
 
+	public int uploadOpenDeposition(String deposition_id) throws IOException, MissingConceptDoiException {
+
+		this.deposition_id = deposition_id;
+
+		String json = "{}";
+
+		OkHttpClient httpClient = new OkHttpClient();
+
+		Request request = new Request.Builder()
+			.url(urlString + "/" + deposition_id)
+			.addHeader("Authorization", "Bearer " + access_token)
+			// .post(RequestBody.create(MEDIA_TYPE_JSON, json))
+			.build();
+
+		try (Response response = httpClient.newCall(request).execute()) {
+
+			if (!response.isSuccessful())
+				throw new IOException("Unexpected code " + response + response.body().string());
+
+			ZenodoModel zenodoModel = new Gson().fromJson(response.body().string(), ZenodoModel.class);
+			bucket = zenodoModel.getLinks().getBucket();
+			return response.code();
+
+		}
+
+	}
+
 	private void setDepositionId(String concept_rec_id) throws IOException, MissingConceptDoiException {
 
 		ZenodoModelList zenodoModelList = new Gson().fromJson(getPrevDepositions(), ZenodoModelList.class);
