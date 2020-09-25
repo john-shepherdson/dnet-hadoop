@@ -14,6 +14,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.TypedColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +75,7 @@ public class GenerateStatsJob {
 				.agg(aggr)
 				.map(t -> t._2, Encoders.bean(DatasourceStats.class))
 				.write()
+				.mode(SaveMode.Overwrite)
 				.jdbc(dbUrl, "oa_datasource_stats_temp", connectionProperties);
 
 			log.info("*** updateStats");
