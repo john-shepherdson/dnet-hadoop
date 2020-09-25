@@ -24,9 +24,7 @@ public class Instance implements Serializable {
 
 	private String type;
 
-
 	private List<String> url;
-
 
 	private String publicationdate;// dateofacceptance;
 

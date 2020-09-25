@@ -373,7 +373,6 @@ public class ResultMapper implements Serializable {
 	private static Instance getGraphInstance(eu.dnetlib.dhp.schema.oaf.Instance i) {
 		Instance instance = new Instance();
 
-
 		setCommonValue(i, instance);
 
 		return instance;
