@@ -30,12 +30,16 @@
             <description> the metadata associated to the deposition</description>
         </property>
         <property>
-            <name>newDeposition</name>
-            <description>true if it is a brand new depositon. false for new version of an old deposition</description>
+            <name>depositionType</name>
+            <description>the type of deposition we want to perform. "new" for brand new deposition, "version" for a new version of a published deposition (in this case the concept record id must be provided), "upload" to upload content to an open deposition for which we already have the deposition id (in this case the deposition id should be provided)</description>
         </property>
         <property>
             <name>conceptRecordId</name>
             <description>for new version, the id of the record for the old deposition</description>
+        </property>
+        <property>
+            <name>depositionId</name>
+            <description>the depositionId of a deposition open that has to be added content</description>
         </property>
         <property>
             <name>organizationCommunityMap</name>
@@ -110,7 +114,7 @@
         </configuration>
     </global>
 
-    <start to="send_zenodo"/>
+    <start to="save_community_map"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -132,7 +136,7 @@
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </java>
-        <ok to="fork_dump"/>
+        <ok to="send_zenodo"/>
         <error to="Kill"/>
     </action>
 
@@ -576,7 +580,8 @@
             <arg>--metadata</arg><arg>${metadata}</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--conceptRecordId</arg><arg>${conceptRecordId}</arg>
-            <arg>--newDeposition</arg><arg>${newDeposition}</arg>
+            <arg>--depositionType</arg><arg>${depositionType}</arg>
+            <arg>--depositionId</arg><arg>${depositionId}</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>
