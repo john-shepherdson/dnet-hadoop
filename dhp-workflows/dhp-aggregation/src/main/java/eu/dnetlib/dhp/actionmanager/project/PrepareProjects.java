@@ -95,7 +95,7 @@ public class PrepareProjects {
 			if (csvProject.isPresent()) {
 
 				String[] programme = csvProject.get().getProgramme().split(";");
-//				String topic = csvProject.get().getTopics();
+				String topic = csvProject.get().getTopics();
 //				String topicdescription = Optional
 //					.ofNullable(csvProject.get().getTopics())
 //					.map(topics -> {
@@ -110,7 +110,7 @@ public class PrepareProjects {
 					.stream(programme)
 					.forEach(p -> {
 						CSVProject proj = new CSVProject();
-//						proj.setTopics(topic);
+						proj.setTopics(topic);
 //						if (topicdescription != null) {
 //							proj.setTopicdescription(topicdescription);
 //						}
