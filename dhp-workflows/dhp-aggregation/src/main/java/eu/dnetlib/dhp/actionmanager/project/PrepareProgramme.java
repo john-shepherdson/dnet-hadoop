@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.actionmanager.project;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;
@@ -68,52 +67,6 @@ public class PrepareProgramme {
 	private static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
-
-//	private static void exec(SparkSession spark, String programmePath, String outputPath) {
-//		Dataset<CSVProgramme> programme = readPath(spark, programmePath, CSVProgramme.class);
-//
-//		programme
-//			.toJavaRDD()
-//			.filter(p -> !p.getCode().contains("FP7"))
-//			.mapToPair(csvProgramme -> new Tuple2<>(csvProgramme.getCode(), csvProgramme))
-//			.reduceByKey((a, b) -> {
-//				if (StringUtils.isEmpty(a.getShortTitle())) {
-//					if (StringUtils.isEmpty(b.getShortTitle())) {
-//						if (StringUtils.isEmpty(a.getTitle())) {
-//							if (StringUtils.isNotEmpty(b.getTitle())) {
-//								a.setShortTitle(b.getTitle());
-//								a.setLanguage(b.getLanguage());
-//							}
-//						} else {// notIsEmpty a.getTitle
-//							if (StringUtils.isEmpty(b.getTitle())) {
-//								a.setShortTitle(a.getTitle());
-//							} else {
-//								if (b.getLanguage().equalsIgnoreCase("en")) {
-//									a.setShortTitle(b.getTitle());
-//									a.setLanguage(b.getLanguage());
-//								} else {
-//									a.setShortTitle(a.getTitle());
-//								}
-//							}
-//						}
-//					} else {// not isEmpty b.getShortTitle
-//						a.setShortTitle(b.getShortTitle());
-//						// a.setLanguage(b.getLanguage());
-//					}
-//				}
-//				return a;
-//
-//			})
-//			.map(p -> {
-//				CSVProgramme csvProgramme = p._2();
-//				if (StringUtils.isEmpty(csvProgramme.getShortTitle())) {
-//					csvProgramme.setShortTitle(csvProgramme.getTitle());
-//				}
-//				return OBJECT_MAPPER.writeValueAsString(csvProgramme);
-//			})
-//			.saveAsTextFile(outputPath);
-//
-//	}
 
 	private static void exec(SparkSession spark, String programmePath, String outputPath) {
 		Dataset<CSVProgramme> programme = readPath(spark, programmePath, CSVProgramme.class);
@@ -217,22 +170,7 @@ public class PrepareProgramme {
 
 				}
 				map.put(ent + ".", map.get(key) + " | " + current);
-//					String current = entry._2();
-//					String parent;
-//					String tmp_key = tmp[0] + ".";
-//					for (int i = 1; i< tmp.length -1; i++){
-//						tmp_key += tmp[i] + ".";
-//						parent = map.get(tmp_key).toLowerCase().trim();
-//						if (current.trim().length() > parent.length() && current.toLowerCase().trim().substring(0, parent.length()).equals(parent)){
-//							current = current.substring(parent.length()+1);
-//							if(current.trim().charAt(0) == '-'){
-//								current = current.trim().substring(1).trim();
-//							}
-//
-//						}
-//					}
-//
-//					map.put(ent + ".", map.get(key)  + " $ " + current);
+
 			}
 
 		}
