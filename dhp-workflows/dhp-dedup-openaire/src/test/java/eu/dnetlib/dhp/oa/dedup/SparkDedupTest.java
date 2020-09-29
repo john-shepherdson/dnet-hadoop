@@ -1,11 +1,18 @@
+
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.util.MapDocumentUtil;
+import static java.nio.file.Files.createTempDirectory;
+
+import static org.apache.spark.sql.functions.count;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.lenient;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -21,18 +28,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-
-import static java.nio.file.Files.createTempDirectory;
-import static org.apache.spark.sql.functions.count;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -48,7 +52,7 @@ public class SparkDedupTest implements Serializable {
 	private static String testOutputBasePath;
 	private static String testDedupGraphBasePath;
 	private static final String testActionSetId = "test-orchestrator";
-	private static  String testDedupAssertionsBasePath;
+	private static String testDedupAssertionsBasePath;
 
 	@BeforeAll
 	public static void cleanUp() throws IOException, URISyntaxException {
@@ -64,9 +68,9 @@ public class SparkDedupTest implements Serializable {
 			.toAbsolutePath()
 			.toString();
 		testDedupAssertionsBasePath = Paths
-            .get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/assertions").toURI())
-            .toFile()
-            .getAbsolutePath();
+			.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/assertions").toURI())
+			.toFile()
+			.getAbsolutePath();
 
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
@@ -82,7 +86,7 @@ public class SparkDedupTest implements Serializable {
 
 		jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-    }
+	}
 
 	@BeforeEach
 	public void setUp() throws IOException, ISLookUpException {
@@ -165,98 +169,98 @@ public class SparkDedupTest implements Serializable {
 
 		new SparkCreateSimRels(parser, spark).run(isLookUpService);
 
-        long orgs_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
-                .count();
+		long orgs_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
+			.count();
 
-        long pubs_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
-                .count();
+		long pubs_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
+			.count();
 
-        long sw_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/software_simrel")
-                .count();
+		long sw_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/software_simrel")
+			.count();
 
-        long ds_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/dataset_simrel")
-                .count();
+		long ds_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/dataset_simrel")
+			.count();
 
-        long orp_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
-                .count();
+		long orp_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
+			.count();
 
-		assertEquals(3432, orgs_simrel);
-		assertEquals(7152, pubs_simrel);
+		assertEquals(3082, orgs_simrel);
+		assertEquals(7036, pubs_simrel);
 		assertEquals(344, sw_simrel);
-		assertEquals(458, ds_simrel);
+		assertEquals(442, ds_simrel);
 		assertEquals(6750, orp_simrel);
 	}
 
-    @Test
-    @Order(2)
-    public void collectSimRelsTest() throws Exception {
-        ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils
-                        .toString(
-                                SparkCreateSimRels.class
-                                        .getResourceAsStream(
-                                                "/eu/dnetlib/dhp/oa/dedup/collectSimRels_parameters.json")));
-        parser
-                .parseArgument(
-                        new String[] {
-                                "-asi", testActionSetId,
-                                "-la", "lookupurl",
-                                "-w", testOutputBasePath,
-                                "-np", "50",
-                                "-purl", "jdbc:postgresql://localhost:5432/dnet_dedup",
-                                "-pusr", "postgres_url",
-                                "-ppwd", ""
-                        });
+	@Test
+	@Order(2)
+	public void collectSimRelsTest() throws Exception {
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkCollectSimRels.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/dedup/collectSimRels_parameters.json")));
+		parser
+			.parseArgument(
+				new String[] {
+					"-asi", testActionSetId,
+					"-la", "lookupurl",
+					"-w", testOutputBasePath,
+					"-np", "50",
+					"-purl", "jdbc:postgresql://localhost:5432/dnet_dedup",
+					"-pusr", "postgres_user",
+					"-ppwd", ""
+				});
 
-        new SparkCollectSimRels(
-                parser,
-                spark,
-                spark.read().load(testDedupAssertionsBasePath + "/similarity_groups"),
-                spark.read().load(testDedupAssertionsBasePath + "/groups")
-        ).run(null);
+		new SparkCollectSimRels(
+				parser,
+				spark,
+				spark.read().load(testDedupAssertionsBasePath + "/similarity_groups"),
+				spark.read().load(testDedupAssertionsBasePath + "/groups"))
+			.run(isLookUpService);
 
-        long orgs_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
-                .count();
+		long orgs_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
+			.count();
 
-        long pubs_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
-                .count();
+		long pubs_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
+			.count();
 
-        long sw_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/software_simrel")
-                .count();
+		long sw_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/software_simrel")
+			.count();
 
-        long ds_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/dataset_simrel")
-                .count();
+		long ds_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/dataset_simrel")
+			.count();
 
-        long orp_simrel = spark
-                .read()
-                .load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
-                .count();
+		long orp_simrel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
+			.count();
 
-        assertEquals(4022, orgs_simrel);
-        assertEquals(10575, pubs_simrel);
-        assertEquals(3767, sw_simrel);
-        assertEquals(3881, ds_simrel);
-        assertEquals(10173, orp_simrel);
+		assertEquals(3672, orgs_simrel);
+		assertEquals(10459, pubs_simrel);
+		assertEquals(3767, sw_simrel);
+		assertEquals(3865, ds_simrel);
+		assertEquals(10173, orp_simrel);
 
-    }
+	}
 
 	@Test
 	@Order(3)
@@ -402,8 +406,8 @@ public class SparkDedupTest implements Serializable {
 			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_mergerel")
 			.count();
 
-		assertEquals(1276, orgs_mergerel);
-		assertEquals(1442, pubs_mergerel);
+		assertEquals(1272, orgs_mergerel);
+		assertEquals(1438, pubs_mergerel);
 		assertEquals(288, sw_mergerel);
 		assertEquals(472, ds_mergerel);
 		assertEquals(718, orp_mergerel);
@@ -449,10 +453,10 @@ public class SparkDedupTest implements Serializable {
 				testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_deduprecord")
 			.count();
 
-		assertEquals(82, orgs_deduprecord);
-		assertEquals(66, pubs_deduprecord);
+		assertEquals(84, orgs_deduprecord);
+		assertEquals(65, pubs_deduprecord);
 		assertEquals(51, sw_deduprecord);
-		assertEquals(96, ds_deduprecord);
+		assertEquals(97, ds_deduprecord);
 		assertEquals(89, orp_deduprecord);
 	}
 
@@ -532,12 +536,12 @@ public class SparkDedupTest implements Serializable {
 			.distinct()
 			.count();
 
-		assertEquals(897, publications);
-		assertEquals(835, organizations);
+		assertEquals(896, publications);
+		assertEquals(837, organizations);
 		assertEquals(100, projects);
 		assertEquals(100, datasource);
 		assertEquals(200, softwares);
-		assertEquals(388, dataset);
+		assertEquals(389, dataset);
 		assertEquals(517, otherresearchproduct);
 
 		long deletedOrgs = jsc
@@ -592,7 +596,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4866, relations);
+		assertEquals(4858, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
@@ -641,11 +645,11 @@ public class SparkDedupTest implements Serializable {
 		assertEquals(expected_unique, rel.distinct().count());
 	}
 
-//	@AfterAll
-//	public static void finalCleanUp() throws IOException {
-//		FileUtils.deleteDirectory(new File(testOutputBasePath));
-//		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
-//	}
+	@AfterAll
+	public static void finalCleanUp() throws IOException {
+		FileUtils.deleteDirectory(new File(testOutputBasePath));
+		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
+	}
 
 	public boolean isDeletedByInference(String s) {
 		return s.contains("\"deletedbyinference\":true");

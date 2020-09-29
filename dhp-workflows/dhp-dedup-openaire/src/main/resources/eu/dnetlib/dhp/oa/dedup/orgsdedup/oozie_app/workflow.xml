@@ -1,4 +1,4 @@
-<workflow-app name="Duplicate Scan" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Organization Dedup" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>graphBasePath</name>
@@ -23,10 +23,6 @@
         <property>
             <name>cutConnectedComponent</name>
             <description>max number of elements in a connected component</description>
-        </property>
-        <property>
-            <name>apiUrl</name>
-            <description>the url for the APIs of the openorgs service</description>
         </property>
         <property>
             <name>dbUrl</name>
@@ -109,6 +105,16 @@
         <fs>
             <delete path="${workingPath}"/>
         </fs>
+        <ok to="copyRelations"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copyRelations">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>-pb</arg>
+            <arg>${graphBasePath}/relation</arg>
+            <arg>${workingPath}/${actionSetId}/organization_simrel</arg>
+        </distcp>
         <ok to="CreateSimRel"/>
         <error to="Kill"/>
     </action>
@@ -136,16 +142,6 @@
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
-        <ok to="copyRelations"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copyRelations">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/relation</arg>
-            <arg>${workingPath}/organization_simrel</arg>
-        </distcp>
         <ok to="CreateMergeRel"/>
         <error to="Kill"/>
     </action>
@@ -203,6 +199,7 @@
             <arg>--dbTable</arg><arg>${dbTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
             <arg>--dbPwd</arg><arg>${dbPwd}</arg>
+            <arg>--numConnections</arg><arg>20</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

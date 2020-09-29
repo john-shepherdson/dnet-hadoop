@@ -138,10 +138,10 @@ public class EntityMergerTest implements Serializable {
 	public void publicationMergerTest3() throws InstantiationException, IllegalAccessException {
 
 		Publication pub_merged = DedupRecordFactory
-				.entityMerger(dedupId, publications3.iterator(), 0, dataInfo, Publication.class);
+			.entityMerger(dedupId, publications3.iterator(), 0, dataInfo, Publication.class);
 
 		// verify id
-		assertEquals( "50|dedup_doi___::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
+		assertEquals("50|dedup_doi___::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
 
 	}
 
@@ -149,7 +149,7 @@ public class EntityMergerTest implements Serializable {
 	public void publicationMergerTest4() throws InstantiationException, IllegalStateException, IllegalAccessException {
 
 		Publication pub_merged = DedupRecordFactory
-				.entityMerger(dedupId, publications4.iterator(), 0, dataInfo, Publication.class);
+			.entityMerger(dedupId, publications4.iterator(), 0, dataInfo, Publication.class);
 
 		// verify id
 		assertEquals("50|dedup_wf_001::2d2bbbbcfb285e3fb3590237b79e2fa8", pub_merged.getId());
@@ -160,7 +160,7 @@ public class EntityMergerTest implements Serializable {
 	public void publicationMergerTest5() throws InstantiationException, IllegalStateException, IllegalAccessException {
 
 		Publication pub_merged = DedupRecordFactory
-				.entityMerger(dedupId, publications5.iterator(), 0, dataInfo, Publication.class);
+			.entityMerger(dedupId, publications5.iterator(), 0, dataInfo, Publication.class);
 
 		// verify id
 		assertEquals("50|dedup_wf_001::584b89679c3ccd1015b647ec63cc2699", pub_merged.getId());

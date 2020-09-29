@@ -100,17 +100,17 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 				.repartition(numPartitions);
 
 			// create relations by comparing only elements in the same group
-            spark.createDataset(
-                    Deduper
-				        .computeRelations(sc, blocks, dedupConf)
-			        	.map(t -> createSimRel(t._1(), t._2(), entity))
-				        .repartition(numPartitions)
-				        .rdd(),
-                    Encoders.bean(Relation.class)
-            )
-                    .write()
-                    .mode(SaveMode.Append)
-                    .parquet(outputPath);
+			spark
+				.createDataset(
+					Deduper
+						.computeRelations(sc, blocks, dedupConf)
+						.map(t -> createSimRel(t._1(), t._2(), entity))
+						.repartition(numPartitions)
+						.rdd(),
+					Encoders.bean(Relation.class))
+				.write()
+				.mode(SaveMode.Append)
+				.parquet(outputPath);
 		}
 	}
 

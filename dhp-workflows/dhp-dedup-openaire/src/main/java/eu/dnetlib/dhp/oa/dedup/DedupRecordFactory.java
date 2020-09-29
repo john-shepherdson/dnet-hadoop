@@ -1,12 +1,10 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
@@ -15,11 +13,15 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.*;
+import scala.Tuple2;
 
 public class DedupRecordFactory {
 
@@ -80,14 +82,14 @@ public class DedupRecordFactory {
 
 		final Collection<String> dates = Lists.newArrayList();
 		final List<List<Author>> authors = Lists.newArrayList();
-		final List<Identifier> bestPids = Lists.newArrayList();  //best pids list
+		final List<Identifier> bestPids = Lists.newArrayList(); // best pids list
 
 		entities
 			.forEachRemaining(
 				t -> {
 					T duplicate = t._2();
 
-					//prepare the list of pids to use for the id generation
+					// prepare the list of pids to use for the id generation
 					bestPids.addAll(IdGenerator.bestPidtoIdentifier(duplicate));
 
 					entity.mergeFrom(duplicate);
@@ -114,6 +116,5 @@ public class DedupRecordFactory {
 
 		return entity;
 	}
-
 
 }
