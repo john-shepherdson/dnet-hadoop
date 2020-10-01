@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.actionmanager.project;
 
-
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import eu.dnetlib.dhp.actionmanager.project.utils.CSVParser;
 
 public class CSVParserTest {
-
 
 	@Test
 	public void readProgrammeTest() throws Exception {

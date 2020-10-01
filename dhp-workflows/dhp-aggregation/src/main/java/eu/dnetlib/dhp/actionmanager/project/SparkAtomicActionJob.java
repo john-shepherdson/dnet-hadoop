@@ -108,7 +108,6 @@ public class SparkAtomicActionJob {
 				CSVProject csvProject = c._1();
 				Optional<CSVProgramme> ocsvProgramme = Optional.ofNullable(c._2());
 
-
 				return Optional
 					.ofNullable(c._2())
 					.map(csvProgramme -> {
@@ -172,7 +171,7 @@ public class SparkAtomicActionJob {
 		if (tmp.length > 2) {
 			h2020Classification.setLevel3(tmp[2]);
 		}
-		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length-1]);
+		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length - 1]);
 	}
 
 	public static <R> Dataset<R> readPath(

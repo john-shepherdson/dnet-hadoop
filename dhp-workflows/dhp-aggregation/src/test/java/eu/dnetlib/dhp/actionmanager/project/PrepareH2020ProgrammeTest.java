@@ -133,14 +133,14 @@ public class PrepareH2020ProgrammeTest {
 					.getString(0));
 
 		Assertions
-				.assertEquals(
-						"Industrial leadership | Leadership in enabling and industrial technologies | Biotechnology",
-						verificationDataset
-								.filter("code = 'H2020-EU.2.1.4.'")
-								.select("classification")
-								.collectAsList()
-								.get(0)
-								.getString(0));
+			.assertEquals(
+				"Industrial leadership | Leadership in enabling and industrial technologies | Biotechnology",
+				verificationDataset
+					.filter("code = 'H2020-EU.2.1.4.'")
+					.select("classification")
+					.collectAsList()
+					.get(0)
+					.getString(0));
 
 	}
 

@@ -38,6 +38,5 @@ public class EXCELParserTest {
 
 		Assertions.assertEquals(3837, pl.size());
 
-
 	}
 }
