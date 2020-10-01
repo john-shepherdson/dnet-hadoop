@@ -26,7 +26,6 @@ public class CSVProject implements Serializable {
 	private String participantCountries;
 	private String subjects;
 
-
 	public String getRcn() {
 		return rcn;
 	}

@@ -56,11 +56,11 @@ public class EXCELParser {
 
 				}
 
-				EXCELTopic et = (EXCELTopic)cc;
-				if(StringUtils.isNotBlank(et.getRcn())){
+				EXCELTopic et = (EXCELTopic) cc;
+				if (StringUtils.isNotBlank(et.getRcn())) {
 					ret.add((R) cc);
 				}
-				
+
 			}
 
 			count += 1;
