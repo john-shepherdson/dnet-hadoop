@@ -1,9 +1,12 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
+import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.clearspring.analytics.util.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.oa.graph.raw.AbstractMdRecordToOafMapper;
@@ -12,6 +15,8 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningFunctions {
+
+	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
 		if (value instanceof Datasource) {
@@ -139,6 +144,25 @@ public class CleaningFunctions {
 						author.setRank(i++);
 					}
 				}
+				for(Author a : r.getAuthor()) {
+					if (Objects.isNull(a.getPid())) {
+						a.setPid(Lists.newArrayList());
+					} else {
+						a.setPid(
+							a.getPid().stream()
+								.filter(p -> Objects.nonNull(p.getQualifier()))
+								.filter(p -> StringUtils.isNotBlank(p.getValue()))
+								.map(p -> {
+									p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
+									return p;
+								})
+								.collect(Collectors.toMap(StructuredProperty::getValue, Function.identity(), (p1, p2) -> p1, LinkedHashMap::new))
+								.values()
+								.stream()
+								.collect(Collectors.toList()));
+					}
+				}
+
 			}
 			if (value instanceof Publication) {
 
