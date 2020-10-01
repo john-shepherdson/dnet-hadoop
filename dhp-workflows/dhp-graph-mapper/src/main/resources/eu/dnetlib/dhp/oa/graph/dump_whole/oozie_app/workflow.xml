@@ -114,7 +114,7 @@
         </configuration>
     </global>
 
-    <start to="save_community_map"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -136,7 +136,7 @@
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </java>
-        <ok to="send_zenodo"/>
+        <ok to="fork_dump"/>
         <error to="Kill"/>
     </action>
 
