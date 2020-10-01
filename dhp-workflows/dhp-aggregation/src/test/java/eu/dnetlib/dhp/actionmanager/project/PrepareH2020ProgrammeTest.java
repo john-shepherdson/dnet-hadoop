@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
 
 public class PrepareH2020ProgrammeTest {
 
@@ -131,6 +131,16 @@ public class PrepareH2020ProgrammeTest {
 					.collectAsList()
 					.get(0)
 					.getString(0));
+
+		Assertions
+				.assertEquals(
+						"Industrial leadership | Leadership in enabling and industrial technologies | Biotechnology",
+						verificationDataset
+								.filter("code = 'H2020-EU.2.1.4.'")
+								.select("classification")
+								.collectAsList()
+								.get(0)
+								.getString(0));
 
 	}
 
