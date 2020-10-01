@@ -62,7 +62,7 @@ public class CleaningFunctionTest {
 		assertTrue(p_in instanceof Result);
 		assertTrue(p_in instanceof Publication);
 
-		Publication p_out = OafCleaner.apply(CleanGraphSparkJob.fixVocabularyNames(p_in), mapping);
+		Publication p_out = OafCleaner.apply(CleaningFunctions.fixVocabularyNames(p_in), mapping);
 
 		assertNotNull(p_out);
 
@@ -88,7 +88,7 @@ public class CleaningFunctionTest {
 				.map(p -> p.getQualifier())
 				.allMatch(q -> pidTerms.contains(q.getClassid())));
 
-		Publication p_defaults = CleanGraphSparkJob.fixDefaults(p_out);
+		Publication p_defaults = CleaningFunctions.fixDefaults(p_out);
 		assertEquals("CLOSED", p_defaults.getBestaccessright().getClassid());
 		assertNull(p_out.getPublisher());
 
