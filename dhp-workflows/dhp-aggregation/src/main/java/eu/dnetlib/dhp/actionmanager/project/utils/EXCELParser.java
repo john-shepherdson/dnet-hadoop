@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -50,11 +51,16 @@ public class EXCELParser {
 
 				for (int i = 0; i < headers.size(); i++) {
 					Cell cell = row.getCell(i);
+					String value = dataFormatter.formatCellValue(cell);
 					FieldUtils.writeField(cc, headers.get(i), dataFormatter.formatCellValue(cell), true);
 
 				}
 
-				ret.add((R) cc);
+				EXCELTopic et = (EXCELTopic)cc;
+				if(StringUtils.isNotBlank(et.getRcn())){
+					ret.add((R) cc);
+				}
+				
 			}
 
 			count += 1;
