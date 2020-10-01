@@ -88,7 +88,10 @@ public class MakeTar implements Serializable {
 			String p_string = p.toString();
 			if (!p_string.endsWith("_SUCCESS")) {
 				String name = p_string.substring(p_string.lastIndexOf("/") + 1);
-				TarArchiveEntry entry = new TarArchiveEntry(dir_name + "/" + name + ".json.gz");
+				if(! name.trim().equalsIgnoreCase("context")){
+					name = "communities_infrastructures.json";
+				}
+				TarArchiveEntry entry = new TarArchiveEntry(dir_name + "/" + name );
 				entry.setSize(fileStatus.getLen());
 				ar.putArchiveEntry(entry);
 
