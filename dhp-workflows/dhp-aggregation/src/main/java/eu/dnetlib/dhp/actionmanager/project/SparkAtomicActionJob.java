@@ -123,8 +123,8 @@ public class SparkAtomicActionJob {
 						H2020Classification h2020classification = new H2020Classification();
 						pm.setCode(csvProject.getProgramme());
 						h2020classification.setClassification(ocsvProgramme.get().getClassification());
-						setLevelsAndProgramme(h2020classification, ocsvProgramme.get().getClassification());
 						h2020classification.setH2020Programme(pm);
+						setLevelsAndProgramme(h2020classification, ocsvProgramme.get().getClassification());
 						pp.setH2020classification(Arrays.asList(h2020classification));
 
 						return pp;
