@@ -31,7 +31,7 @@ import java.util.List;
  * - private List<Funder> funding to store the list of funder of the project
  * - private String summary to store the summary of the project
  * - private Granted granted to store the granted amount
- * - private List<Programme> programme to store the list of programmes the project is related to
+ * - private List<H2020Classification> h2020classification to store the list of H2020 classifications the project is related to
  */
 
 public class Project implements Serializable {
@@ -59,8 +59,6 @@ public class Project implements Serializable {
 	private String summary;
 
 	private Granted granted;
-
-	// private List<Programme> programme;
 
 	private List<H2020Classification> h2020Classifications;
 
