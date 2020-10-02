@@ -10,6 +10,7 @@ import net.sf.saxon.om.Sequence;
 import net.sf.saxon.trans.XPathException;
 import net.sf.saxon.value.SequenceType;
 import net.sf.saxon.value.StringValue;
+import org.apache.commons.lang3.StringUtils;
 
 public class NormalizeDate extends AbstractExtensionFunction {
 
@@ -19,6 +20,8 @@ public class NormalizeDate extends AbstractExtensionFunction {
 
 	private static final String normalizeOutFormat = "yyyy-MM-dd'T'hh:mm:ss'Z'";
 
+	public static final String BLANK = "";
+
 	@Override
 	public String getName() {
 		return "normalizeDate";
@@ -27,10 +30,10 @@ public class NormalizeDate extends AbstractExtensionFunction {
 	@Override
 	public Sequence doCall(XPathContext context, Sequence[] arguments) throws XPathException {
 		if (arguments == null | arguments.length == 0) {
-			return new StringValue("");
+			return new StringValue(BLANK);
 		}
 		String s = arguments[0].head().getStringValue();
-		return new StringValue(_year(s));
+		return new StringValue(_normalizeDate(s));
 	}
 
 	@Override
@@ -55,8 +58,8 @@ public class NormalizeDate extends AbstractExtensionFunction {
 		return SequenceType.SINGLE_STRING;
 	}
 
-	private String _year(String s) {
-		final String date = s != null ? s.trim() : "";
+	private String _normalizeDate(String s) {
+		final String date = StringUtils.isNotBlank(s) ? s.trim() : BLANK;
 
 		for (String format : normalizeDateFormats) {
 			try {
@@ -66,6 +69,6 @@ public class NormalizeDate extends AbstractExtensionFunction {
 			} catch (ParseException e) {
 			}
 		}
-		return "";
+		return BLANK;
 	}
 }
