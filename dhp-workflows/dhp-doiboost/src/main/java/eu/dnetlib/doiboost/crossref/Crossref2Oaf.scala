@@ -93,7 +93,7 @@ case object Crossref2Oaf {
 
     result.setOriginalId(tmp.filter(id => id != null).asJava)
 
-    //Set identifier as {50|60} | doiboost____::md5(DOI)
+    //Set identifier as 50 | doiboost____::md5(DOI)
     result.setId(generateIdentifier(result, doi))
 
     // Add DataInfo
@@ -267,7 +267,7 @@ case object Crossref2Oaf {
 
       val r = new Relation
       r.setSource(sourceId)
-      r.setTarget(s"$nsPrefix::$targetId")
+      r.setTarget(s"40|$nsPrefix::$targetId")
       r.setRelType("resultProject")
       r.setRelClass("isProducedBy")
       r.setSubRelType("outcome")
