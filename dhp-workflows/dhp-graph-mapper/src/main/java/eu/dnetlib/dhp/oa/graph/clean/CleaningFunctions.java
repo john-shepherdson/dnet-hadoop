@@ -6,8 +6,9 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.clearspring.analytics.util.Lists;
 import org.apache.commons.lang3.StringUtils;
+
+import com.clearspring.analytics.util.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.AbstractMdRecordToOafMapper;
 import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
@@ -144,22 +145,29 @@ public class CleaningFunctions {
 						author.setRank(i++);
 					}
 				}
-				for(Author a : r.getAuthor()) {
+				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
 						a.setPid(Lists.newArrayList());
 					} else {
-						a.setPid(
-							a.getPid().stream()
-								.filter(p -> Objects.nonNull(p.getQualifier()))
-								.filter(p -> StringUtils.isNotBlank(p.getValue()))
-								.map(p -> {
-									p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
-									return p;
-								})
-								.collect(Collectors.toMap(StructuredProperty::getValue, Function.identity(), (p1, p2) -> p1, LinkedHashMap::new))
-								.values()
-								.stream()
-								.collect(Collectors.toList()));
+						a
+							.setPid(
+								a
+									.getPid()
+									.stream()
+									.filter(p -> Objects.nonNull(p.getQualifier()))
+									.filter(p -> StringUtils.isNotBlank(p.getValue()))
+									.map(p -> {
+										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
+										return p;
+									})
+									.collect(
+										Collectors
+											.toMap(
+												StructuredProperty::getValue, Function.identity(), (p1, p2) -> p1,
+												LinkedHashMap::new))
+									.values()
+									.stream()
+									.collect(Collectors.toList()));
 					}
 				}
 

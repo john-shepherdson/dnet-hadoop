@@ -154,24 +154,24 @@ public class OafMapperUtils {
 	}
 
 	public static Journal journal(
-			final String name,
-			final String issnPrinted,
-			final String issnOnline,
-			final String issnLinking,
-			final DataInfo dataInfo) {
+		final String name,
+		final String issnPrinted,
+		final String issnOnline,
+		final String issnLinking,
+		final DataInfo dataInfo) {
 		return journal(
-				name,
-				issnPrinted,
-				issnOnline,
-				issnLinking,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				dataInfo);
+			name,
+			issnPrinted,
+			issnOnline,
+			issnLinking,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			dataInfo);
 	}
 
 	public static Journal journal(

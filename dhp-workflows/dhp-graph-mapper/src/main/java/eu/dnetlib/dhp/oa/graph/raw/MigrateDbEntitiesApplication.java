@@ -195,11 +195,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final Datasource ds = new Datasource();
 
 			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
-			ds.setOriginalId(Arrays.asList(
-					(String[]) rs.getArray("identities").getArray())
-					.stream()
-					.filter(StringUtils::isNotBlank)
-					.collect(Collectors.toList()));
+			ds
+				.setOriginalId(
+					Arrays
+						.asList(
+							(String[]) rs.getArray("identities").getArray())
+						.stream()
+						.filter(StringUtils::isNotBlank)
+						.collect(Collectors.toList()));
 			ds
 				.setCollectedfrom(
 					listKeyValues(
@@ -244,13 +247,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds.setPidsystems(field(rs.getString("pidsystems"), info));
 			ds.setCertificates(field(rs.getString("certificates"), info));
 			ds.setPolicies(new ArrayList<>()); // The sql query returns an empty array
-			ds.setJournal(
+			ds
+				.setJournal(
 					journal(
-							rs.getString("officialname"),
-							rs.getString("issnPrinted"),
-							rs.getString("issnOnline"),
-							rs.getString("issnLinking"),
-							info)); // Journal
+						rs.getString("officialname"),
+						rs.getString("issnPrinted"),
+						rs.getString("issnOnline"),
+						rs.getString("issnLinking"),
+						info)); // Journal
 			ds.setDataInfo(info);
 			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -579,7 +583,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			return null;
 		} else {
 
-			return journal(rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"), rs.getString("issnLinking"), info);
+			return journal(
+				rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
+				rs.getString("issnLinking"), info);
 		}
 	}
 
