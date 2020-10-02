@@ -96,24 +96,12 @@ public class PrepareProjects {
 
 				String[] programme = csvProject.get().getProgramme().split(";");
 				String topic = csvProject.get().getTopics();
-//				String topicdescription = Optional
-//					.ofNullable(csvProject.get().getTopics())
-//					.map(topics -> {
-//						if (topic.equalsIgnoreCase(value._1().getTopiccode())) {
-//							return value._1().getTopicdescription();
-//						}
-//						return null;
-//					})
-//					.orElse(null);
 
 				Arrays
 					.stream(programme)
 					.forEach(p -> {
 						CSVProject proj = new CSVProject();
 						proj.setTopics(topic);
-//						if (topicdescription != null) {
-//							proj.setTopicdescription(topicdescription);
-//						}
 
 						proj.setProgramme(p);
 						proj.setId(csvProject.get().getId());
