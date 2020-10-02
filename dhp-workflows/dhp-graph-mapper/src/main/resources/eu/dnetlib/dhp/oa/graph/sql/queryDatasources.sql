@@ -84,8 +84,10 @@ SELECT
 	dc.id                                                                                                      AS collectedfromid,
 	dc.officialname                                                                                            AS collectedfromname,
 	d.typology||'@@@dnet:datasource_typologies'                                                                AS datasourcetype,
-	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
-	concat_ws(' @@@ ', d.issn, d.eissn, d.lissn)                                                               AS journal
+	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions'                                             AS provenanceaction,
+	d.issn                                                                                                     AS issnPrinted,
+	d.eissn                                                                                                    AS issnOnline,
+	d.lissn                                                                                                    AS issnLinking
 
 FROM dsm_datasources d
 

@@ -80,9 +80,9 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("namespaceprefix", fields), ds.getNamespaceprefix().getValue());
 		assertEquals(getValueAsString("collectedfromname", fields), ds.getCollectedfrom().get(0).getValue());
 		assertEquals(getValueAsString("officialname", fields), ds.getJournal().getName());
-		assertEquals("2579-5449", ds.getJournal().getIssnPrinted());
-		assertEquals("2597-6540", ds.getJournal().getIssnOnline());
-		assertEquals(null, ds.getJournal().getIssnLinking());
+		assertEquals(getValueAsString("issnPrinted", fields), ds.getJournal().getIssnPrinted());
+		assertEquals(getValueAsString("issnOnline", fields), ds.getJournal().getIssnOnline());
+		assertEquals(getValueAsString("issnLinking", fields), ds.getJournal().getIssnLinking());
 	}
 
 	@Test
