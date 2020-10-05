@@ -17,6 +17,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+/**
+ * Reads a generic excel file and maps it into classes that mirror its schema
+ */
 public class EXCELParser {
 
 	public <R> List<R> parse(InputStream file, String classForName)

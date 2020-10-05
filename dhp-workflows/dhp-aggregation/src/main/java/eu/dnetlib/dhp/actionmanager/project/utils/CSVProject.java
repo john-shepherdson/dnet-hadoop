@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.actionmanager.project.utils;
 
 import java.io.Serializable;
 
+/**
+ * the mmodel for the projects csv file
+ */
 public class CSVProject implements Serializable {
 	private String rcn;
 	private String id;

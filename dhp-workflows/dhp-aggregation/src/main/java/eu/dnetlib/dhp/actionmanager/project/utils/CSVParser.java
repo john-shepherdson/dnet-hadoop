@@ -10,6 +10,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.reflect.FieldUtils;
 
+/**
+ * Reads a generic csv and maps it into classes that mirror its schema
+ */
 public class CSVParser {
 
 	public <R> List<R> parse(String csvFile, String classForName)

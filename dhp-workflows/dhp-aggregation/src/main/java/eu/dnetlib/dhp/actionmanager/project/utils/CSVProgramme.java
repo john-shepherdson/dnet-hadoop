@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.actionmanager.project.utils;
 
 import java.io.Serializable;
 
+/**
+ * The model for the programme csv file
+ */
 public class CSVProgramme implements Serializable {
 	private String parentProgramme;
 	private String frameworkProgramme;

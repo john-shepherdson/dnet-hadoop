@@ -17,6 +17,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.actionmanager.project.httpconnector.HttpConnector;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
+/**
+ * Applies the parsing of an excel file and writes the Serialization of it in hdfs
+ */
+
 public class ReadExcel implements Closeable {
 	private static final Log log = LogFactory.getLog(ReadCSV.class);
 	private final Configuration conf;

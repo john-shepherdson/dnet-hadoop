@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.actionmanager.project.utils;
 
 import java.io.Serializable;
 
+/**
+ * the model class for the topic excel file
+ */
 public class EXCELTopic implements Serializable {
 	private String rcn;
 	private String language;
