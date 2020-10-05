@@ -4,8 +4,6 @@ package eu.dnetlib.dhp.schema.dump.oaf.graph;
 import java.io.Serializable;
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
-
 /**
  * This is the class representing the Project in the model used for the dumps of the whole graph. At the moment the dump
  * of the Projects differs from the other dumps because we do not create relations between Funders (Organization) and
@@ -33,7 +31,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
  * - private List<Funder> funding to store the list of funder of the project
  * - private String summary to store the summary of the project
  * - private Granted granted to store the granted amount
- * - private List<Programme> programme to store the list of programmes the project is related to
+ * - private List<H2020Classification> h2020classification to store the list of H2020 classifications the project is related to
  */
 
 public class Project implements Serializable {
@@ -62,7 +60,7 @@ public class Project implements Serializable {
 
 	private Granted granted;
 
-	private List<Programme> programme;
+	private List<H2020Classification> h2020Classifications;
 
 	public String getId() {
 		return id;
@@ -184,12 +182,11 @@ public class Project implements Serializable {
 		this.granted = granted;
 	}
 
-	public List<Programme> getProgramme() {
-		return programme;
+	public List<H2020Classification> getH2020Classifications() {
+		return h2020Classifications;
 	}
 
-	public void setProgramme(List<Programme> programme) {
-		this.programme = programme;
+	public void setH2020Classifications(List<H2020Classification> h2020Classifications) {
+		this.h2020Classifications = h2020Classifications;
 	}
-
 }
