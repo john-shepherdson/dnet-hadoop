@@ -25,6 +25,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 
+/**
+ * queries the OpenAIRE database to get the grant agreement of projects collected from corda__h2020. The code collected
+ * are written on hdfs using the ProjectSubset model
+ */
 public class ReadProjectsFromDB implements Closeable {
 
 	private final DbClient dbClient;
@@ -72,8 +76,6 @@ public class ReadProjectsFromDB implements Closeable {
 		try {
 			ProjectSubset p = new ProjectSubset();
 			p.setCode(rs.getString("code"));
-//			p.setTopiccode(rs.getString("optional1"));
-//			p.setTopicdescription(rs.getString("optional2"));
 			return Arrays.asList(p);
 
 		} catch (final Exception e) {

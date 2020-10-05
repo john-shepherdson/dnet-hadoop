@@ -36,6 +36,21 @@ import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
+/**
+ * Class that makes the ActionSet. To prepare the AS two joins are needed
+ *
+ *  1. join betweem the collected project subset and the programme extenden with the classification on the grant agreement.
+ *     For each entry a
+ *     eu.dnetlib.dhp.Project entity is created and the information about H2020Classification is set together with the
+ *     h2020topiccode variable
+ *  2. join between the output of the previous step and the topic information on the topic code. Each time a match is
+ *     found the h2020topicdescription variable is set.
+ *
+ * To produce one single entry for each project code a step of groupoing is needed: each project can be associated to more
+ * than one programme.
+ *
+ *
+ */
 public class SparkAtomicActionJob {
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

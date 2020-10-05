@@ -24,6 +24,10 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;
 
+/**
+ * Selects only the relevant information collected with the projects: project grant agreement, project programme code and
+ * project topic code for the projects that are also collected from OpenAIRE.
+ */
 public class PrepareProjects {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareProgramme.class);

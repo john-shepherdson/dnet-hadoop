@@ -23,6 +23,74 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;
 
+/**
+ * Among all the programmes provided in the csv file, selects those in H2020 framework that have an english title.
+ *
+ * The title is then handled to get the programme description at a certain level. The set of programme titles will then
+ * be used to associate a classification for the programme.
+ *
+ * The programme code describes an hierarchy that can be exploited to provide the classification. To determine the hierarchy
+ * the code can be split by '.'. If the length of the splitted code is less than or equal to 2 it can be directly used
+ * as the classification: H2020-EU -> Horizon 2020 Framework Programme (It will never be repeated),
+ * H2020-EU.1. -> Excellent science, H2020-EU.2. -> Industrial leadership etc.
+ *
+ * The codes are ordered and for all of them the concatenation of all the titles (from the element in position 1 of
+ * the splitted code) handled as below is used to create the classification. For example:
+ *
+ *   H2020-EU.1.1       -> Excellent science | European Research Council (ERC)
+ *   from H2020-EU.1. -> Excellence science and H2020-EU.1.1. -> European Research Council (ERC)
+ *
+ *   H2020-EU.3.1.3.1. -> Societal challenges | Health, demographic change and well-being | Treating and managing disease | Treating disease, including developing regenerative medicine
+ *   from H2020-EU.3.       -> Societal challenges,
+ *        H2020-EU.3.1.     -> Health, demographic change and well-being
+ *        H2020-EU.3.1.3    -> Treating and managing disease
+ *        H2020-EU.3.1.3.1. -> Treating disease, including developing regenerative medicine
+ *
+ * The classification up to level three, will be split in dedicated variables, while the complete classification will be stored
+ * in a variable called classification and provided as shown above.
+ *
+ * The programme title is not give in a standardized way:
+ *
+ *  - Sometimes associated to the higher level in the hierarchy we can find Priority in title other times it is not the
+ *    case. Since it is not uniform, we removed priority from the handled titles:
+ *
+ *    H2020-EU.1. -> PRIORITY 'Excellent science'
+ *    H2020-EU.2. -> PRIORITY 'Industrial leadership'
+ *    H2020-EU.3. -> PRIORITY 'Societal challenges
+ *
+ *    will become
+ *
+ *    H2020-EU.1. -> Excellent science
+ *    H2020-EU.2. -> Industrial leadership
+ *    H2020-EU.3. -> Societal challenges
+ *
+ *  - Sometimes the title of the parent is repeated in the title for the code, but it is not always the case, so, titles
+ *    associated to previous levels in the hierarchy are removed from the code title.
+ *
+ *	  H2020-EU.1.2. -> EXCELLENT SCIENCE - Future and Emerging Technologies (FET)
+ *	  H2020-EU.2.2. -> INDUSTRIAL LEADERSHIP - Access to risk finance
+ *    H2020-EU.3.4. -> SOCIETAL CHALLENGES - Smart, Green And Integrated Transport
+ *
+ *    will become
+ *
+ *    H2020-EU.1.2. -> Future and Emerging Technologies (FET)
+ *    H2020-EU.2.2. -> Access to risk finance
+ *    H2020-EU.3.4. -> Smart, Green And Integrated Transport
+ *
+ *    This holds at all levels in the hierarchy. Hence
+ *
+ *    H2020-EU.2.1.2. -> INDUSTRIAL LEADERSHIP - Leadership in enabling and industrial technologies – Nanotechnologies
+ *
+ *    will become
+ *
+ *    H2020-EU.2.1.2. -> Nanotechnologies
+ *
+ *  - Euratom is not given in the way the other programmes are: H2020-EU. but H2020-Euratom- . So we need to write
+ *    specific code for it
+ *
+ *
+ *
+ */
 public class PrepareProgramme {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareProgramme.class);
@@ -107,6 +175,17 @@ public class PrepareProgramme {
 				return csvProgramme;
 			});
 
+		prepareClassification(h2020Programmes);
+
+		h2020Programmes.map(csvProgramme -> OBJECT_MAPPER.writeValueAsString(csvProgramme))
+				.saveAsTextFile(outputPath);
+
+
+
+	}
+
+
+	private static void prepareClassification(JavaRDD<CSVProgramme> h2020Programmes) {
 		Object[] codedescription = h2020Programmes
 			.map(value -> new Tuple2<>(value.getCode(), value.getTitle()))
 			.collect()
@@ -174,16 +253,13 @@ public class PrepareProgramme {
 			}
 
 		}
-
-		h2020Programmes.map(csvProgramme -> {
+		h2020Programmes.foreach(csvProgramme -> {
 			if (!csvProgramme.getCode().endsWith(".") && !csvProgramme.getCode().contains("Euratom")
-				&& !csvProgramme.getCode().equals("H2020-EC"))
+					&& !csvProgramme.getCode().equals("H2020-EC"))
 				csvProgramme.setClassification(map.get(csvProgramme.getCode() + "."));
 			else
 				csvProgramme.setClassification(map.get(csvProgramme.getCode()));
-			return OBJECT_MAPPER.writeValueAsString(csvProgramme);
-		}).saveAsTextFile(outputPath);
-
+		});
 	}
 
 	public static <R> Dataset<R> readPath(
