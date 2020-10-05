@@ -370,7 +370,7 @@
     <action name="create_entities_fromcontext">
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.dump.graph.CreateContextEntities</main-class>
-            <arg>--hdfsPath</arg><arg>${workingDir}/collect/context</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/collect/communities_infrastructures</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </java>
