@@ -38,13 +38,11 @@ import java.io.IOException;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -197,7 +195,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final Datasource ds = new Datasource();
 
 			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
-			ds.setOriginalId(Arrays.asList((String[]) rs.getArray("identities").getArray()));
+			ds
+				.setOriginalId(
+					Arrays
+						.asList(
+							(String[]) rs.getArray("identities").getArray())
+						.stream()
+						.filter(StringUtils::isNotBlank)
+						.collect(Collectors.toList()));
 			ds
 				.setCollectedfrom(
 					listKeyValues(
@@ -243,7 +248,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds.setCertificates(field(rs.getString("certificates"), info));
 			ds.setPolicies(new ArrayList<>()); // The sql query returns an empty array
 			ds
-				.setJournal(prepareJournal(rs.getString("officialname"), rs.getString("journal"), info)); // Journal
+				.setJournal(
+					journal(
+						rs.getString("officialname"),
+						rs.getString("issnPrinted"),
+						rs.getString("issnOnline"),
+						rs.getString("issnLinking"),
+						info)); // Journal
 			ds.setDataInfo(info);
 			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -567,21 +578,15 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		return res;
 	}
 
-	private Journal prepareJournal(final String name, final String sj, final DataInfo info) {
-		if (StringUtils.isNotBlank(sj)) {
-			final String[] arr = sj.split("@@@");
-			if (arr.length == 3) {
-				final String issn = StringUtils.isNotBlank(arr[0]) ? arr[0].trim() : null;
-				final String eissn = StringUtils.isNotBlank(arr[1]) ? arr[1].trim() : null;
+	private Journal prepareJournal(final ResultSet rs, final DataInfo info) throws SQLException {
+		if (Objects.isNull(rs)) {
+			return null;
+		} else {
 
-				final String lissn = StringUtils.isNotBlank(arr[2]) ? arr[2].trim() : null;
-
-				if (issn != null || eissn != null || lissn != null) {
-					return journal(name, issn, eissn, lissn, null, null, null, null, null, null, null, info);
-				}
-			}
+			return journal(
+				rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
+				rs.getString("issnLinking"), info);
 		}
-		return null;
 	}
 
 	@Override

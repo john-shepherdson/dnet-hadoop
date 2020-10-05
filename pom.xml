@@ -328,7 +328,7 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-pace-core</artifactId>
-				<version>4.0.4</version>
+				<version>4.0.5</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
