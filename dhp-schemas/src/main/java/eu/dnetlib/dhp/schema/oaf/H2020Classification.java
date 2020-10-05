@@ -4,6 +4,24 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * To store information about the classification for the project. The classification depends on the programme. For example
+ * H2020-EU.3.4.5.3 can be classified as
+ * H2020-EU.3.       => Societal Challenges  (level1)
+ * H2020-EU.3.4.     => Transport            (level2)
+ * H2020-EU.3.4.5.   => CLEANSKY2            (level3)
+ * H2020-EU.3.4.5.3. => IADP Fast Rotorcraft (level4)
+ *
+ * We decided to explicitly represent up to three levels in the classification.
+ *
+ * H2020Classification has the following parameters:
+ * - private Programme programme to store the information about the programme related to this classification
+ * - private String level1 to store the information about the level 1 of the classification (Priority or Pillar of the EC)
+ * - private String level2 to store the information about the level2 af the classification (Objectives (?))
+ * - private String level3 to store the information about the level3 of the classification
+ * - private String classification to store the entire classification related to the programme
+ */
+
 public class H2020Classification implements Serializable {
 	private H2020Programme h2020Programme;
 	private String level1;
