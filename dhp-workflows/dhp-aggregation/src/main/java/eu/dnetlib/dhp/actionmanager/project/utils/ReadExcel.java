@@ -1,10 +1,7 @@
 
-package eu.dnetlib.dhp.actionmanager.project.csvutils;
+package eu.dnetlib.dhp.actionmanager.project.utils;
 
-import java.io.BufferedWriter;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
@@ -20,12 +17,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.actionmanager.project.httpconnector.HttpConnector;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
-public class ReadCSV implements Closeable {
+/**
+ * Applies the parsing of an excel file and writes the Serialization of it in hdfs
+ */
+
+public class ReadExcel implements Closeable {
 	private static final Log log = LogFactory.getLog(ReadCSV.class);
 	private final Configuration conf;
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private String csvFile;
+	private InputStream excelFile;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -42,18 +43,18 @@ public class ReadCSV implements Closeable {
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 		final String classForName = parser.get("classForName");
 
-		try (final ReadCSV readCSV = new ReadCSV(hdfsPath, hdfsNameNode, fileURL)) {
+		try (final ReadExcel readExcel = new ReadExcel(hdfsPath, hdfsNameNode, fileURL)) {
 
-			log.info("Getting CSV file...");
-			readCSV.execute(classForName);
+			log.info("Getting Excel file...");
+			readExcel.execute(classForName);
 
 		}
 	}
 
 	public void execute(final String classForName) throws Exception {
-		CSVParser csvParser = new CSVParser();
-		csvParser
-			.parse(csvFile, classForName)
+		EXCELParser excelParser = new EXCELParser();
+		excelParser
+			.parse(excelFile, classForName)
 			.stream()
 			.forEach(p -> write(p));
 
@@ -64,7 +65,7 @@ public class ReadCSV implements Closeable {
 		writer.close();
 	}
 
-	public ReadCSV(
+	public ReadExcel(
 		final String hdfsPath,
 		final String hdfsNameNode,
 		final String fileURL)
@@ -81,7 +82,7 @@ public class ReadCSV implements Closeable {
 		fsDataOutputStream = fileSystem.create(hdfsWritePath);
 
 		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
-		this.csvFile = httpConnector.getInputSource(fileURL);
+		this.excelFile = httpConnector.getInputSourceAsStream(fileURL);
 		;
 	}
 

@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.project.csvutils;
+package eu.dnetlib.dhp.actionmanager.project.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +10,9 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.reflect.FieldUtils;
 
+/**
+ * Reads a generic csv and maps it into classes that mirror its schema
+ */
 public class CSVParser {
 
 	public <R> List<R> parse(String csvFile, String classForName)

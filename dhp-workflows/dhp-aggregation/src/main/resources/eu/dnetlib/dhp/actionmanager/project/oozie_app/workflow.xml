@@ -11,6 +11,10 @@
         </property>
 
         <property>
+            <name>topicFileURL</name>
+            <description>the url where to get the topic file</description>
+        </property>
+        <property>
             <name>outputPath</name>
             <description>path where to store the action set</description>
         </property>
@@ -33,11 +37,11 @@
 
     <action name="get_project_file">
         <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.csvutils.ReadCSV</main-class>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${projectFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProject</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProject</arg>
         </java>
         <ok to="get_programme_file"/>
         <error to="Kill"/>
@@ -45,11 +49,23 @@
 
     <action name="get_programme_file">
         <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.csvutils.ReadCSV</main-class>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${programmeFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/programme</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme</arg>
+        </java>
+        <ok to="get_topic_file"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="get_topic_file">
+        <java>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadExcel</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--fileURL</arg><arg>${topicFileURL}</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/topic</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic</arg>
         </java>
         <ok to="read_projects"/>
         <error to="Kill"/>
@@ -136,6 +152,7 @@
             </spark-opts>
             <arg>--projectPath</arg><arg>${workingDir}/preparedProjects</arg>
             <arg>--programmePath</arg><arg>${workingDir}/preparedProgramme</arg>
+            <arg>--topicPath</arg><arg>${workingDir}/topic</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
