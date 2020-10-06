@@ -5,38 +5,19 @@ import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Factory class for OpenAIRE identifiers in the Graph
  */
 public class IdentifierFactory implements Serializable {
 
-	private static final Logger log = LoggerFactory.getLogger(IdentifierFactory.class);
-
 	public static final String ID_SEPARATOR = "::";
 	public static final String ID_PREFIX_SEPARATOR = "|";
 	public final static String ID_REGEX = "^[0-9][0-9]\\"+ID_PREFIX_SEPARATOR+".{12}"+ID_SEPARATOR+"[a-zA-Z0-9]{32}$";
 	public static final int ID_PREFIX_LEN = 12;
-
-	public static Set<String> acceptedPidTypes = new HashSet<>();
-
-	static {
-		acceptedPidTypes.add("doi");
-		acceptedPidTypes.add("doi");
-		acceptedPidTypes.add("doi");
-		acceptedPidTypes.add("doi");
-		acceptedPidTypes.add("doi");
-		acceptedPidTypes.add("doi");
-
-	}
 
 	public static <T extends OafEntity> String createIdentifier(T entity) {
 
@@ -48,14 +29,14 @@ public class IdentifierFactory implements Serializable {
 				.getPid()
 				.stream()
 				.filter(s -> Objects.nonNull(s.getQualifier()))
-				.filter(s -> acceptedPidTypes.contains(s.getQualifier().getClassid()))
-				.max(new PidComparator<T>(entity))
+				.filter(s -> PidType.isValid(s.getQualifier().getClassid()))
+				.min(new PidComparator<>(entity))
 				.map(s -> idFromPid(entity, s))
 				.map(IdentifierFactory::verifyIdSyntax)
 				.orElseGet(entity::getId);
 	}
 
-	protected static String verifyIdSyntax(String s) {
+	private static String verifyIdSyntax(String s) {
 		if(StringUtils.isBlank(s) || !s.matches(ID_REGEX)) {
 			throw new RuntimeException(String.format("malformed id: '%s'", s));
 		} else {
@@ -74,7 +55,7 @@ public class IdentifierFactory implements Serializable {
 	}
 
 	private static String normalizePidValue(String value) {
-		//TODO more aggressive cleaning? keep only alphanum and punctation?
+		//TODO more aggressive cleaning? keep only alphanum and punctuation?
 		return value.toLowerCase().replaceAll(" ", "");
 	}
 

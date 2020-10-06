@@ -27,8 +27,8 @@ public class PidComparator<T extends OafEntity> implements Comparator<Structured
 		if (right == null)
 			return -1;
 
-		String lClass = left.getQualifier().getClassid();
-		String rClass = right.getQualifier().getClassid();
+		PidType lClass = PidType.valueOf(left.getQualifier().getClassid());
+		PidType rClass = PidType.valueOf(right.getQualifier().getClassid());
 
 		if (lClass.equals(rClass))
 			return 0;
@@ -44,39 +44,69 @@ public class PidComparator<T extends OafEntity> implements Comparator<Structured
 		return lClass.compareTo(rClass);
 	}
 
-	private int compareResultPids(String lClass, String rClass) {
-		if (lClass.equals("doi"))
+	private int compareResultPids(PidType lClass, PidType rClass) {
+		if (lClass.equals(PidType.doi))
 			return -1;
-		if (rClass.equals("doi"))
+		if (rClass.equals(PidType.doi))
 			return 1;
 
-		if (lClass.equals("pmid"))
+		if (lClass.equals(PidType.pmid))
 			return -1;
-		if (rClass.equals("pmid"))
+		if (rClass.equals(PidType.pmid))
 			return 1;
 
-		if (lClass.equals("pmc"))
+		if (lClass.equals(PidType.pmc))
 			return -1;
-		if (rClass.equals("pmc"))
+		if (rClass.equals(PidType.pmc))
+			return 1;
+
+		if (lClass.equals(PidType.handle))
+			return -1;
+		if (rClass.equals(PidType.handle))
+			return 1;
+
+		if (lClass.equals(PidType.arXiv))
+			return -1;
+		if (rClass.equals(PidType.arXiv))
+			return 1;
+
+		if (lClass.equals(PidType.NCID))
+			return -1;
+		if (rClass.equals(PidType.NCID))
+			return 1;
+
+		if (lClass.equals(PidType.GBIF))
+			return -1;
+		if (rClass.equals(PidType.GBIF))
+			return 1;
+
+		if (lClass.equals(PidType.nct))
+			return -1;
+		if (rClass.equals(PidType.nct))
+			return 1;
+
+		if (lClass.equals(PidType.urn))
+			return -1;
+		if (rClass.equals(PidType.urn))
 			return 1;
 
 		return 0;
 	}
 
-	private int compareOrganizationtPids(String lClass, String rClass) {
-		if (lClass.equals("GRID"))
+	private int compareOrganizationtPids(PidType lClass, PidType rClass) {
+		if (lClass.equals(PidType.GRID))
 			return -1;
-		if (rClass.equals("GRID"))
+		if (rClass.equals(PidType.GRID))
 			return 1;
 
-		if (lClass.equals("mag_id"))
+		if (lClass.equals(PidType.mag_id))
 			return -1;
-		if (rClass.equals("mag_id"))
+		if (rClass.equals(PidType.mag_id))
 			return 1;
 
-		if (lClass.equals("urn"))
+		if (lClass.equals(PidType.urn))
 			return -1;
-		if (rClass.equals("urn"))
+		if (rClass.equals(PidType.urn))
 			return 1;
 
 		return 0;
