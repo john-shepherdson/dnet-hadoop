@@ -65,7 +65,7 @@ public class EntityMergerTest implements Serializable {
 		assertEquals(dedupId, pub_merged.getId());
 
 		assertEquals(pub_merged.getJournal(), pub_top.getJournal());
-		assertEquals(pub_merged.getBestaccessright(), pub_top.getBestaccessright());
+		assertEquals(pub_merged.getBestaccessright().getClassid(), "OPEN");
 		assertEquals(pub_merged.getResulttype(), pub_top.getResulttype());
 		assertEquals(pub_merged.getLanguage(), pub_merged.getLanguage());
 		assertEquals(pub_merged.getPublisher(), pub_top.getPublisher());
