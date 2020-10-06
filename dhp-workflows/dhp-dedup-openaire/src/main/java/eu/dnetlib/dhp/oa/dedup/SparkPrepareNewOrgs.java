@@ -2,17 +2,12 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -29,11 +24,11 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
-public class SparkPrepareOrgRels extends AbstractSparkAction {
+public class SparkPrepareNewOrgs extends AbstractSparkAction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
 
-	public SparkPrepareOrgRels(ArgumentApplicationParser parser, SparkSession spark) {
+	public SparkPrepareNewOrgs(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
 	}
 
@@ -41,16 +36,16 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkPrepareNewOrgs.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/dedup/prepareOrgRels_parameters.json")));
+							"/eu/dnetlib/dhp/oa/dedup/prepareNewOrgs_parameters.json")));
 		parser.parseArgument(args);
 
 		SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
-		new SparkPrepareOrgRels(parser, getSparkSession(conf))
+		new SparkPrepareNewOrgs(parser, getSparkSession(conf))
 			.run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
 	}
 
@@ -66,10 +61,6 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 			.map(Integer::valueOf)
 			.orElse(NUM_CONNECTIONS);
 
-		final String apiUrl = Optional
-			.ofNullable(parser.get("apiUrl"))
-			.orElse("");
-
 		final String dbUrl = parser.get("dbUrl");
 		final String dbTable = parser.get("dbTable");
 		final String dbUser = parser.get("dbUser");
@@ -80,7 +71,6 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		log.info("actionSetId:   '{}'", actionSetId);
 		log.info("workingPath:   '{}'", workingPath);
 		log.info("numPartitions: '{}'", numConnections);
-		log.info("apiUrl:        '{}'", apiUrl);
 		log.info("dbUrl:         '{}'", dbUrl);
 		log.info("dbUser:        '{}'", dbUser);
 		log.info("table:         '{}'", dbTable);
@@ -89,24 +79,21 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, "organization");
 		final String entityPath = DedupUtility.createEntityPath(graphBasePath, "organization");
 
-		Dataset<OrgSimRel> relations = createRelations(spark, mergeRelPath, entityPath);
+		Dataset<OrgSimRel> newOrgs = createNewOrgs(spark, mergeRelPath, entityPath);
 
 		final Properties connectionProperties = new Properties();
 		connectionProperties.put("user", dbUser);
 		connectionProperties.put("password", dbPwd);
 
-		relations
+		newOrgs
 			.repartition(numConnections)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.jdbc(dbUrl, dbTable, connectionProperties);
 
-		if (!apiUrl.isEmpty())
-			updateSimRels(apiUrl);
-
 	}
 
-	public static Dataset<OrgSimRel> createRelations(
+	public static Dataset<OrgSimRel> createNewOrgs(
 		final SparkSession spark,
 		final String mergeRelsPath,
 		final String entitiesPath) {
@@ -122,68 +109,37 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 				},
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Organization.class)));
 
-		Dataset<Tuple2<String, String>> relations = spark
+		Dataset<Tuple2<String, String>> mergerels = spark
 			.createDataset(
 				spark
 					.read()
 					.load(mergeRelsPath)
 					.as(Encoders.bean(Relation.class))
-					.where("relClass == 'merges'")
+					.where("relClass == 'isMergedIn'")
 					.toJavaRDD()
 					.mapToPair(r -> new Tuple2<>(r.getSource(), r.getTarget()))
-					.groupByKey()
-					.flatMap(g -> {
-						List<Tuple2<String, String>> rels = new ArrayList<>();
-						for (String id1 : g._2()) {
-							for (String id2 : g._2()) {
-								if (!id1.equals(id2))
-									if (id1.contains("openorgs____") && !id2.contains("openorgsmesh"))
-										rels.add(new Tuple2<>(id1, id2));
-							}
-						}
-						return rels.iterator();
-					})
 					.rdd(),
 				Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
-		Dataset<Tuple2<String, OrgSimRel>> relations2 = relations // <openorgs, corda>
-			.joinWith(entities, relations.col("_2").equalTo(entities.col("_1")), "inner")
+		return entities
+			.joinWith(mergerels, entities.col("_1").equalTo(mergerels.col("_1")), "left")
+			.filter((FilterFunction<Tuple2<Tuple2<String, Organization>, Tuple2<String, String>>>) t -> t._2() == null)
+			.filter(
+				(FilterFunction<Tuple2<Tuple2<String, Organization>, Tuple2<String, String>>>) t -> !t
+					._1()
+					._1()
+					.contains("openorgs"))
 			.map(
-				(MapFunction<Tuple2<Tuple2<String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> new OrgSimRel(
-					r._1()._1(),
-					r._2()._2().getOriginalId().get(0),
-					r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
-					r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
-					r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
-					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
-					r._2()._2().getCollectedfrom().get(0).getValue()),
-				Encoders.bean(OrgSimRel.class))
-			.map(
-				(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),
-				Encoders.tuple(Encoders.STRING(), Encoders.bean(OrgSimRel.class)));
-
-		return relations2
-			.joinWith(entities, relations2.col("_1").equalTo(entities.col("_1")), "inner")
-			.map(
-				(MapFunction<Tuple2<Tuple2<String, OrgSimRel>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
-					OrgSimRel orgSimRel = r._1()._2();
-					orgSimRel.setLocal_id(r._2()._2().getOriginalId().get(0));
-					return orgSimRel;
-				},
+				(MapFunction<Tuple2<Tuple2<String, Organization>, Tuple2<String, String>>, OrgSimRel>) r -> new OrgSimRel(
+					"",
+					r._1()._2().getOriginalId().get(0),
+					r._1()._2().getLegalname() != null ? r._1()._2().getLegalname().getValue() : "",
+					r._1()._2().getLegalshortname() != null ? r._1()._2().getLegalshortname().getValue() : "",
+					r._1()._2().getCountry() != null ? r._1()._2().getCountry().getClassid() : "",
+					r._1()._2().getWebsiteurl() != null ? r._1()._2().getWebsiteurl().getValue() : "",
+					r._1()._2().getCollectedfrom().get(0).getValue()),
 				Encoders.bean(OrgSimRel.class));
 
-	}
-
-	private static String updateSimRels(final String apiUrl) throws IOException {
-
-		log.info("Updating simrels on the portal");
-
-		final HttpGet req = new HttpGet(apiUrl);
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				return IOUtils.toString(response.getEntity().getContent());
-			}
-		}
 	}
 
 }

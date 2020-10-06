@@ -223,11 +223,11 @@ public class SparkDedupTest implements Serializable {
 				});
 
 		new SparkCollectSimRels(
-				parser,
-				spark,
-				spark.read().load(testDedupAssertionsBasePath + "/similarity_groups"),
-				spark.read().load(testDedupAssertionsBasePath + "/groups"))
-			.run(isLookUpService);
+			parser,
+			spark,
+			spark.read().load(testDedupAssertionsBasePath + "/similarity_groups"),
+			spark.read().load(testDedupAssertionsBasePath + "/groups"))
+				.run(isLookUpService);
 
 		long orgs_simrel = spark
 			.read()
