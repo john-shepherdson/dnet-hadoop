@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
+import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;

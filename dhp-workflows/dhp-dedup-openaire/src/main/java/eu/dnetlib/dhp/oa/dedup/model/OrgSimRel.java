@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.dedup;
+package eu.dnetlib.dhp.oa.dedup.model;
 
 import java.io.Serializable;
 

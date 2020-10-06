@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import java.util.*;
 
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;

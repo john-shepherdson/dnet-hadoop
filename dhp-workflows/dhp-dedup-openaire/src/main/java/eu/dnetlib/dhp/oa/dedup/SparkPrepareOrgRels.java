@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
