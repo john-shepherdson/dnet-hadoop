@@ -1,11 +1,8 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
@@ -18,7 +15,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
-import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -90,7 +86,7 @@ public class DedupRecordFactory {
 					T duplicate = t._2();
 
 					// prepare the list of pids to use for the id generation
-					bestPids.addAll(IdGenerator.bestPidtoIdentifier(duplicate));
+					bestPids.addAll(IdGenerator.bestPidToIdentifier(duplicate));
 
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {

@@ -4,6 +4,8 @@ package eu.dnetlib.dhp.oa.dedup;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
@@ -35,7 +37,7 @@ public class Identifier implements Serializable, Comparable<Identifier> {
 		return pid;
 	}
 
-	public void setPid(StructuredProperty pidValue) {
+	public void setPid(StructuredProperty pid) {
 		this.pid = pid;
 	}
 
@@ -91,25 +93,29 @@ public class Identifier implements Serializable, Comparable<Identifier> {
 	public int compareTo(Identifier i) {
 		// priority in comparisons: 1) pidtype, 2) collectedfrom (depending on the entity type) , 3) date 4)
 		// alphabetical order of the originalID
+
+		Set<String> lKeys = this.collectedFrom.stream().map(KeyValue::getKey).collect(Collectors.toSet());
+		Set<String> rKeys = i.getCollectedFrom().stream().map(KeyValue::getKey).collect(Collectors.toSet());
+
 		if (this.getType().compareTo(i.getType()) == 0) { // same type
 			if (entityType == EntityType.publication) {
-				if (isFromDatasourceID(this.collectedFrom, IdGenerator.CROSSREF_ID)
-					&& !isFromDatasourceID(i.collectedFrom, IdGenerator.CROSSREF_ID))
+				if (isFromDatasourceID(lKeys, IdGenerator.CROSSREF_ID)
+					&& !isFromDatasourceID(rKeys, IdGenerator.CROSSREF_ID))
 					return 1;
-				if (isFromDatasourceID(i.collectedFrom, IdGenerator.CROSSREF_ID)
-					&& !isFromDatasourceID(this.collectedFrom, IdGenerator.CROSSREF_ID))
+				if (isFromDatasourceID(rKeys, IdGenerator.CROSSREF_ID)
+					&& !isFromDatasourceID(lKeys, IdGenerator.CROSSREF_ID))
 					return -1;
 			}
 			if (entityType == EntityType.dataset) {
-				if (isFromDatasourceID(this.collectedFrom, IdGenerator.DATACITE_ID)
-					&& !isFromDatasourceID(i.collectedFrom, IdGenerator.DATACITE_ID))
+				if (isFromDatasourceID(lKeys, IdGenerator.DATACITE_ID)
+					&& !isFromDatasourceID(rKeys, IdGenerator.DATACITE_ID))
 					return 1;
-				if (isFromDatasourceID(i.collectedFrom, IdGenerator.DATACITE_ID)
-					&& !isFromDatasourceID(this.collectedFrom, IdGenerator.DATACITE_ID))
+				if (isFromDatasourceID(rKeys, IdGenerator.DATACITE_ID)
+					&& !isFromDatasourceID(lKeys, IdGenerator.DATACITE_ID))
 					return -1;
 			}
 
-			if (this.getDate().compareTo(date) == 0) {// same date
+			if (this.getDate().compareTo(i.getDate()) == 0) {// same date
 
 				if (this.originalID.compareTo(i.originalID) > 0)
 					this.useOriginal = true;
@@ -120,19 +126,14 @@ public class Identifier implements Serializable, Comparable<Identifier> {
 				return -this.originalID.compareTo(i.originalID);
 			} else
 				// the minus is because we need to take the elder date
-				return -this.getDate().compareTo(date);
+				return -this.getDate().compareTo(i.getDate());
 		} else {
 			return this.getType().compareTo(i.getType());
 		}
 
 	}
 
-	public boolean isFromDatasourceID(List<KeyValue> collectedFrom, String dsId) {
-
-		for (KeyValue cf : collectedFrom) {
-			if (cf.getKey().equals(dsId))
-				return true;
-		}
-		return false;
+	public boolean isFromDatasourceID(Set<String> collectedFrom, String dsId) {
+		return collectedFrom.contains(dsId);
 	}
 }

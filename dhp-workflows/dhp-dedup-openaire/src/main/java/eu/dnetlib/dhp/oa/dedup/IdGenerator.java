@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringUtils;
 
@@ -34,17 +35,17 @@ public class IdGenerator implements Serializable {
 
 		if (bp.get().isUseOriginal() || bp.get().getPid().getValue() == null) {
 			return bp.get().getOriginalID().split("\\|")[0] + "|dedup_wf_001::"
-				+ DedupUtility.md5(bp.get().getOriginalID());
+				+ DHPUtils.md5(bp.get().getOriginalID());
 		} else {
 			return bp.get().getOriginalID().split("\\|")[0] + "|"
 				+ createPrefix(bp.get().getPid().getQualifier().getClassid()) + "::"
-				+ DedupUtility.md5(bp.get().getPid().getValue());
+				+ DHPUtils.md5(bp.get().getPid().getValue());
 		}
 
 	}
 
 	// pick the best pid from the entity. Returns a list (length 1) to save time in the call
-	public static <T extends OafEntity> List<Identifier> bestPidtoIdentifier(T entity) {
+	public static <T extends OafEntity> List<Identifier> bestPidToIdentifier(T entity) {
 
 		if (entity.getPid() == null || entity.getPid().size() == 0)
 			return Lists

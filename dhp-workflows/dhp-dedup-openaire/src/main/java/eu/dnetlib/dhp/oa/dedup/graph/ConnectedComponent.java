@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
@@ -36,7 +37,7 @@ public class ConnectedComponent implements Serializable {
 		if (docIds.size() > 1) {
 			final String s = getMin();
 			String prefix = s.split("\\|")[0];
-			ccId = prefix + "|dedup_wf_001::" + DedupUtility.md5(s);
+			ccId = prefix + "|dedup_wf_001::" + DHPUtils.md5(s);
 			return ccId;
 		} else {
 			return docIds.iterator().next();
