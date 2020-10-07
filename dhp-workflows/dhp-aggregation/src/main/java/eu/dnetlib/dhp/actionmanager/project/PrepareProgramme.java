@@ -177,13 +177,11 @@ public class PrepareProgramme {
 
 		prepareClassification(h2020Programmes);
 
-		h2020Programmes.map(csvProgramme -> OBJECT_MAPPER.writeValueAsString(csvProgramme))
-				.saveAsTextFile(outputPath);
-
-
+		h2020Programmes
+			.map(csvProgramme -> OBJECT_MAPPER.writeValueAsString(csvProgramme))
+			.saveAsTextFile(outputPath);
 
 	}
-
 
 	private static void prepareClassification(JavaRDD<CSVProgramme> h2020Programmes) {
 		Object[] codedescription = h2020Programmes
@@ -255,7 +253,7 @@ public class PrepareProgramme {
 		}
 		h2020Programmes.foreach(csvProgramme -> {
 			if (!csvProgramme.getCode().endsWith(".") && !csvProgramme.getCode().contains("Euratom")
-					&& !csvProgramme.getCode().equals("H2020-EC"))
+				&& !csvProgramme.getCode().equals("H2020-EC"))
 				csvProgramme.setClassification(map.get(csvProgramme.getCode() + "."));
 			else
 				csvProgramme.setClassification(map.get(csvProgramme.getCode()));

@@ -10,7 +10,6 @@ import java.util.Objects;
  * - private String description to store the description of the programme
  */
 
-
 public class H2020Programme implements Serializable {
 	private String code;
 	private String description;
