@@ -10,7 +10,6 @@ public class ProjectSubset implements Serializable {
 
 	private String code;
 
-
 	public String getCode() {
 		return code;
 	}
