@@ -133,6 +133,17 @@ public class MergeGraphSparkJob {
 			.json(outputPath);
 	}
 
+	/**
+	 * Datasources involved in the merge operation doesn't obey to the infra precedence policy, but relies on a custom
+	 * behaviour that, given two datasources from beta and prod returns the one from prod with the highest
+	 * compatibility among the two.
+	 *
+	 * @param p datasource from PROD
+	 * @param b datasource from BETA
+	 * @param <P> Datasource class type from PROD
+	 * @param <B> Datasource class type from BETA
+	 * @return the datasource from PROD with the highest compatibility level.
+	 */
 	protected static <P extends Oaf, B extends Oaf> P mergeDatasource(Optional<P> p, Optional<B> b) {
 		if (p.isPresent() & !b.isPresent()) {
 			return p.get();
