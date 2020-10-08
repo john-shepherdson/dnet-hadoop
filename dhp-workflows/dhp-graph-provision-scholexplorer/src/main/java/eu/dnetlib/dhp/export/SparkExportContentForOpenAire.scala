@@ -32,10 +32,10 @@ object SparkExportContentForOpenAire {
         .master(parser.get("master")).getOrCreate()
 
 
-    val sc:SparkContext = spark.sparkContext
-
     val workingPath = parser.get("workingDirPath")
 
+    implicit  val dliPubEncoder: Encoder[DLIPublication] = Encoders.kryo(classOf[DLIPublication])
+    implicit  val dliDatEncoder: Encoder[DLIDataset] = Encoders.kryo(classOf[DLIDataset])
     implicit  val pubEncoder: Encoder[Publication] = Encoders.bean(classOf[Publication])
     implicit  val datEncoder: Encoder[OafDataset] = Encoders.bean(classOf[OafDataset])
     implicit  val relEncoder: Encoder[Relation] = Encoders.bean(classOf[Relation])
@@ -43,40 +43,41 @@ object SparkExportContentForOpenAire {
     import spark.implicits._
 
 
-    val relRDD:RDD[Relation] = sc.textFile(s"$workingPath/relation_j")
-      .map(s => new ObjectMapper().readValue(s, classOf[Relation]))
-      .filter(p => p.getDataInfo.getDeletedbyinference == false)
-    spark.createDataset(relRDD).write.mode(SaveMode.Overwrite).save(s"$workingPath/relationDS")
+    val dsRel = spark.read.load(s"$workingPath/relation_b").as[Relation]
+    dsRel.filter(r => r.getDataInfo==null || r.getDataInfo.getDeletedbyinference ==false).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/relationDS")
 
-    val datRDD:RDD[OafDataset] = sc.textFile(s"$workingPath/dataset")
-      .map(s => new ObjectMapper().readValue(s, classOf[DLIDataset]))
+
+    val dsPubs = spark.read.load(s"$workingPath/publication").as[DLIPublication]
+    dsPubs
+      .filter(p=>p.getDataInfo.getDeletedbyinference == false)
+      .map(DLIToOAF.convertDLIPublicationToOAF)
+      .filter(p=>p!= null)
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/export/publicationDS")
+
+
+    val dsDataset = spark.read.load(s"$workingPath/dataset").as[DLIDataset]
+    dsDataset
       .filter(p => p.getDataInfo.getDeletedbyinference == false)
       .map(DLIToOAF.convertDLIDatasetTOOAF).filter(p=>p!= null)
-    spark.createDataset(datRDD).write.mode(SaveMode.Overwrite).save(s"$workingPath/datasetDS")
-
-
-    val pubRDD:RDD[Publication] = sc.textFile(s"$workingPath/publication")
-      .map(s => new ObjectMapper().readValue(s, classOf[DLIPublication]))
-      .filter(p => p.getDataInfo.getDeletedbyinference == false)
-      .map(DLIToOAF.convertDLIPublicationToOAF).filter(p=>p!= null)
-    spark.createDataset(pubRDD).write.mode(SaveMode.Overwrite).save(s"$workingPath/publicationDS")
+     .write.mode(SaveMode.Overwrite).save(s"$workingPath/export/datasetDS")
 
 
 
-    val pubs:Dataset[Publication] = spark.read.load(s"$workingPath/publicationDS").as[Publication]
-    val dats :Dataset[OafDataset] = spark.read.load(s"$workingPath/datasetDS").as[OafDataset]
-    val relDS1 :Dataset[Relation] = spark.read.load(s"$workingPath/relationDS").as[Relation]
+
+    val pubs:Dataset[Publication] = spark.read.load(s"$workingPath/export/publicationDS").as[Publication]
+    val dats :Dataset[OafDataset] = spark.read.load(s"$workingPath/export/datasetDS").as[OafDataset]
+    val relDS1 :Dataset[Relation] = spark.read.load(s"$workingPath/export/relationDS").as[Relation]
 
 
     val pub_id = pubs.select("id").distinct()
     val dat_id = dats.select("id").distinct()
 
 
-    pub_id.joinWith(relDS1, pub_id("id").equalTo(relDS1("source"))).map(k => k._2).write.mode(SaveMode.Overwrite).save(s"$workingPath/relationDS_f1")
+    pub_id.joinWith(relDS1, pub_id("id").equalTo(relDS1("source"))).map(k => k._2).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/relationDS_f1")
 
-    val relDS2= spark.read.load(s"$workingPath/relationDS_f1").as[Relation]
+    val relDS2= spark.read.load(s"$workingPath/export/relationDS_f1").as[Relation]
 
-    relDS2.joinWith(dat_id, relDS2("target").equalTo(dats("id"))).map(k => k._1).write.mode(SaveMode.Overwrite).save(s"$workingPath/relationDS_filtered")
+    relDS2.joinWith(dat_id, relDS2("target").equalTo(dats("id"))).map(k => k._1).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/relationDS_filtered")
 
 
     val r_source = relDS2.select(relDS2("source")).distinct()
@@ -87,22 +88,20 @@ object SparkExportContentForOpenAire {
 
     pubs.joinWith(r_source, pubs("id").equalTo(r_source("source")), "inner").map(k => k._1)
       .withColumn("row",row_number.over(w2)).where($"row" === 1).drop("row")
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/publicationDS_filtered")
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/export/publicationDS_filtered")
 
     dats.joinWith(r_target, dats("id").equalTo(r_target("target")), "inner").map(k => k._1)
       .withColumn("row",row_number.over(w2)).where($"row" === 1).drop("row")
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/datasetAS")
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/export/datasetAS")
 
-    spark.createDataset(sc.textFile(s"$workingPath/dataset")
-      .map(s => new ObjectMapper().readValue(s, classOf[DLIDataset]))
-      .map(DLIToOAF.convertDLIDatasetToExternalReference)
-      .filter(p => p != null)).as[DLIExternalReference].write.mode(SaveMode.Overwrite).save(s"$workingPath/externalReference")
 
-    val pf = spark.read.load(s"$workingPath/publicationDS_filtered").select("id")
-    val relDS3  = spark.read.load(s"$workingPath/relationDS").as[Relation]
+    dsDataset.map(DLIToOAF.convertDLIDatasetToExternalReference).filter(p => p != null).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/externalReference")
+
+    val pf = spark.read.load(s"$workingPath/export/publicationDS_filtered").select("id")
+    val relDS3  = spark.read.load(s"$workingPath/export/relationDS").as[Relation]
     val relationTo = pf.joinWith(relDS3, pf("id").equalTo(relDS3("source")),"inner").map(t =>t._2)
 
-    val extRef =  spark.read.load(s"$workingPath/externalReference").as[DLIExternalReference]
+    val extRef =  spark.read.load(s"$workingPath/export/externalReference").as[DLIExternalReference]
 
     spark.createDataset(relationTo.joinWith(extRef, relationTo("target").equalTo(extRef("id")), "inner").map(d => {
         val r = d._1
@@ -112,11 +111,11 @@ object SparkExportContentForOpenAire {
       var dli_ext = ArrayBuffer[DLIExternalReference]()
       f._2.foreach(d => if (dli_ext.size < 100) dli_ext += d )
       (f._1, dli_ext)
-    })).write.mode(SaveMode.Overwrite).save(s"$workingPath/externalReference_grouped")
+    })).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/externalReference_grouped")
 
-    val pubf :Dataset[Publication] = spark.read.load(s"$workingPath/publicationDS_filtered").as[Publication]
+    val pubf :Dataset[Publication] = spark.read.load(s"$workingPath/export/publicationDS_filtered").as[Publication]
 
-    val groupedERf:Dataset[(String, List[DLIExternalReference])]= spark.read.load(s"$workingPath/externalReference_grouped").as[(String, List[DLIExternalReference])]
+    val groupedERf:Dataset[(String, List[DLIExternalReference])]= spark.read.load(s"$workingPath/export/externalReference_grouped").as[(String, List[DLIExternalReference])]
 
     groupedERf.joinWith(pubf,pubf("id").equalTo(groupedERf("_1"))).map(t =>
       {
@@ -128,29 +127,28 @@ object SparkExportContentForOpenAire {
         } else
           publication
       }
-    ).write.mode(SaveMode.Overwrite).save(s"$workingPath/publicationAS")
+    ).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/publicationAS")
 
 
-    spark.createDataset(sc.textFile(s"$workingPath/dataset")
-      .map(s => new ObjectMapper().readValue(s, classOf[DLIDataset]))
+    dsDataset
       .map(DLIToOAF.convertClinicalTrial)
-      .filter(p => p != null))
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/clinicalTrials")
+      .filter(p => p != null)
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/export/clinicalTrials")
 
-    val ct:Dataset[(String,String)] = spark.read.load(s"$workingPath/clinicalTrials").as[(String,String)]
+    val ct:Dataset[(String,String)] = spark.read.load(s"$workingPath/export/clinicalTrials").as[(String,String)]
 
-    val relDS= spark.read.load(s"$workingPath/relationDS_f1").as[Relation]
+    val relDS= spark.read.load(s"$workingPath/export/relationDS_f1").as[Relation]
 
     relDS.joinWith(ct, relDS("target").equalTo(ct("_1")), "inner")
       .map(k =>{
         val currentRel = k._1
         currentRel.setTarget(k._2._2)
         currentRel
-      }).write.mode(SaveMode.Overwrite).save(s"$workingPath/clinicalTrialsRels")
+      }).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/clinicalTrialsRels")
 
 
-    val clRels:Dataset[Relation] = spark.read.load(s"$workingPath/clinicalTrialsRels").as[Relation]
-    val rels:Dataset[Relation] = spark.read.load(s"$workingPath/relationDS_filtered").as[Relation]
+    val clRels:Dataset[Relation] = spark.read.load(s"$workingPath/export/clinicalTrialsRels").as[Relation]
+    val rels:Dataset[Relation] = spark.read.load(s"$workingPath/export/relationDS_filtered").as[Relation]
 
     rels.union(clRels).flatMap(r => {
       val inverseRel = new Relation
@@ -162,18 +160,18 @@ object SparkExportContentForOpenAire {
       inverseRel.setSubRelType(r.getSubRelType)
       inverseRel.setRelClass(DLIToOAF.rel_inverse(r.getRelClass))
       List(r, inverseRel)
-    }).write.mode(SaveMode.Overwrite).save(s"$workingPath/relationAS")
+    }).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/relationAS")
 
 
 
-    spark.read.load(s"$workingPath/publicationAS").as[Publication].map(DLIToOAF.fixInstance).write.mode(SaveMode.Overwrite).save(s"$workingPath/publicationAS_fixed")
-    spark.read.load(s"$workingPath/datasetAS").as[OafDataset].map(DLIToOAF.fixInstanceDataset).write.mode(SaveMode.Overwrite).save(s"$workingPath/datasetAS_fixed")
+    spark.read.load(s"$workingPath/export/publicationAS").as[Publication].map(DLIToOAF.fixInstance).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/publicationAS_fixed")
+    spark.read.load(s"$workingPath/export/datasetAS").as[OafDataset].map(DLIToOAF.fixInstanceDataset).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/datasetAS_fixed")
 
-    val fRels:Dataset[(String,String)] = spark.read.load(s"$workingPath/relationAS").as[Relation].map(DLIToOAF.toActionSet)
-    val fpubs:Dataset[(String,String)] = spark.read.load(s"$workingPath/publicationAS_fixed").as[Publication].map(DLIToOAF.toActionSet)
-    val fdats:Dataset[(String,String)] = spark.read.load(s"$workingPath/datasetAS_fixed").as[OafDataset].map(DLIToOAF.toActionSet)
+    val fRels:Dataset[(String,String)] = spark.read.load(s"$workingPath/export/relationAS").as[Relation].map(DLIToOAF.toActionSet)
+    val fpubs:Dataset[(String,String)] = spark.read.load(s"$workingPath/export/publicationAS_fixed").as[Publication].map(DLIToOAF.toActionSet)
+    val fdats:Dataset[(String,String)] = spark.read.load(s"$workingPath/export/datasetAS_fixed").as[OafDataset].map(DLIToOAF.toActionSet)
 
-    fRels.union(fpubs).union(fdats).rdd.map(s => (new Text(s._1), new Text(s._2))).saveAsHadoopFile(s"$workingPath/rawset", classOf[Text], classOf[Text], classOf[SequenceFileOutputFormat[Text,Text]], classOf[GzipCodec])
+    fRels.union(fpubs).union(fdats).rdd.map(s => (new Text(s._1), new Text(s._2))).saveAsHadoopFile(s"$workingPath/export/rawset", classOf[Text], classOf[Text], classOf[SequenceFileOutputFormat[Text,Text]], classOf[GzipCodec])
   }
 
 
