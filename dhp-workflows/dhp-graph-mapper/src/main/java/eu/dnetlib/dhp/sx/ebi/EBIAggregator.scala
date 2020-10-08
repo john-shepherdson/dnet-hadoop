@@ -1,5 +1,5 @@
 package eu.dnetlib.dhp.sx.ebi
-import eu.dnetlib.dhp.oa.dedup.AuthorMerger
+import eu.dnetlib.dhp.oa.merge.AuthorMerger
 import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIUnknown}
 import org.apache.spark.sql.{Encoder, Encoders}

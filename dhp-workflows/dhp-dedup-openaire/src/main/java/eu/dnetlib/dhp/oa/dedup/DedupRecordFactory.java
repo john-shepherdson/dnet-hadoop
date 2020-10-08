@@ -1,11 +1,12 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import java.io.Serializable;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
