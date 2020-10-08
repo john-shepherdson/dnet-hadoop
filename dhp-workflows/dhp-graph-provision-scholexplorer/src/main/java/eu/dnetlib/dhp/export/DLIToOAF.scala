@@ -272,30 +272,11 @@ object DLIToOAF {
     result
   }
 
-
-//  def convertDLIRelation(r: DLIRelation): Relation = {
-//
-//    val result = new Relation
-//    if (!relationTypeMapping.contains(r.getRelType))
-//      return null
-//
-//    if (r.getProperties == null || r.getProperties.size() == 0 || (r.getProperties.size() == 1 && r.getProperties.get(0) == null))
-//      return null
-//    val t = relationTypeMapping.get(r.getRelType)
-//
-//    result.setRelType("resultResult")
-//    result.setRelClass(t.get._1)
-//    result.setSubRelType(t.get._2)
-//    result.setCollectedfrom(r.getProperties.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).filter(p => p != null).asJava)
-//    result.setSource(generateId(r.getSource))
-//    result.setTarget(generateId(r.getTarget))
-//
-//    if (result.getSource.equals(result.getTarget))
-//      return null
-//    result.setDataInfo(generateDataInfo())
-//
-//    result
-//  }
+  def convertDLIRelation(r: Relation): Relation = {
+    r.setSource(r.getSource.replaceFirst("50|","50|scholix_____::" ).replaceFirst("60|", "60|scholix_____::"))
+    r.setTarget(r.getTarget.replaceFirst("50|","50|scholix_____::" ).replaceFirst("60|", "60|scholix_____::"))
+    r
+  }
 
 
   def convertDLIDatasetTOOAF(d: DLIDataset): Dataset = {

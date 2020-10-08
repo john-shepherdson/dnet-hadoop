@@ -44,7 +44,7 @@ object SparkExportContentForOpenAire {
 
 
     val dsRel = spark.read.load(s"$workingPath/relation_b").as[Relation]
-    dsRel.filter(r => r.getDataInfo==null || r.getDataInfo.getDeletedbyinference ==false).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/relationDS")
+    dsRel.filter(r => r.getDataInfo==null || r.getDataInfo.getDeletedbyinference ==false).map(DLIToOAF.convertDLIRelation).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/relationDS")
 
 
     val dsPubs = spark.read.load(s"$workingPath/publication").as[DLIPublication]
