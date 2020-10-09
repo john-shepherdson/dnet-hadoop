@@ -24,6 +24,7 @@ public class IdGenerator implements Serializable {
 
 	public static String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
 	public static String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
+	public static String BASE_DATE	 = "2000-01-01";
 
 	// pick the best pid from the list (consider date and pidtype)
 	public static String generate(List<Identifier> pids, String defaultID) {
@@ -45,14 +46,27 @@ public class IdGenerator implements Serializable {
 
 	}
 
+	public static <T extends OafEntity> ArrayList<Identifier> createBasePid(T entity, SimpleDateFormat sdf) {
+
+		Date date;
+		try {
+			date = sdf.parse(BASE_DATE);
+		} catch (ParseException e) {
+			date = new Date();
+		}
+		return Lists
+				.newArrayList(
+						new Identifier(new StructuredProperty(), date, PidType.original, entity.getCollectedfrom(),
+								EntityType.fromClass(entity.getClass()), entity.getId()));
+	}
+
 	// pick the best pid from the entity. Returns a list (length 1) to save time in the call
 	public static <T extends OafEntity> List<Identifier> bestPidToIdentifier(T entity) {
 
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
 		if (entity.getPid() == null || entity.getPid().size() == 0)
-			return Lists
-				.newArrayList(
-					new Identifier(new StructuredProperty(), new Date(), PidType.original, entity.getCollectedfrom(),
-						EntityType.fromClass(entity.getClass()), entity.getId()));
+			return createBasePid(entity, sdf);
 
 		Optional<StructuredProperty> bp = entity
 			.getPid()
@@ -64,14 +78,10 @@ public class IdGenerator implements Serializable {
 			.map(
 				structuredProperty -> Lists
 					.newArrayList(
-						new Identifier(structuredProperty, extractDate(entity, new SimpleDateFormat("yyyy-MM-dd")),
+						new Identifier(structuredProperty, extractDate(entity, sdf),
 							PidType.classidValueOf(structuredProperty.getQualifier().getClassid()),
 							entity.getCollectedfrom(), EntityType.fromClass(entity.getClass()), entity.getId())))
-			.orElseGet(
-				() -> Lists
-					.newArrayList(
-						new Identifier(new StructuredProperty(), new Date(), PidType.original,
-							entity.getCollectedfrom(), EntityType.fromClass(entity.getClass()), entity.getId())));
+			.orElseGet(() -> createBasePid(entity, sdf));
 
 	}
 
@@ -91,7 +101,7 @@ public class IdGenerator implements Serializable {
 	// 00-01-01
 	public static <T extends OafEntity> Date extractDate(T duplicate, SimpleDateFormat sdf) {
 
-		String date = "2000-01-01";
+		String date = BASE_DATE;
 		if (ModelSupport.isSubClass(duplicate, Result.class)) {
 			Result result = (Result) duplicate;
 			if (isWellformed(result.getDateofacceptance())) {

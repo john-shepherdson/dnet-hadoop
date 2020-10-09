@@ -118,7 +118,7 @@ public class Identifier implements Serializable, Comparable<Identifier> {
 
 			if (this.getDate().compareTo(i.getDate()) == 0) {// same date
 
-				if (this.originalID.compareTo(i.originalID) > 0)
+				if (this.originalID.compareTo(i.originalID) < 0)
 					this.useOriginal = true;
 				else
 					i.setUseOriginal(true);
