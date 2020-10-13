@@ -47,6 +47,7 @@ object DLIToOAF {
     "References" -> ("isRelatedTo", "relationship"),
     "IsRelatedTo" -> ("isRelatedTo", "relationship"),
     "IsSupplementedBy" -> ("isSupplementedBy", "supplement"),
+    "Documents"-> ("isRelatedTo", "relationship"),
     "Cites" -> ("cites", "citation"),
     "Unknown" -> ("isRelatedTo", "relationship"),
     "IsSourceOf" -> ("isRelatedTo", "relationship"),
@@ -83,7 +84,7 @@ object DLIToOAF {
 
   val rel_inverse: Map[String, String] = Map(
     "isRelatedTo" -> "isRelatedTo",
-    "IsSupplementedBy" -> "isSupplementTo",
+    "isSupplementedBy" -> "isSupplementTo",
     "cites" -> "IsCitedBy",
     "IsCitedBy" -> "cites",
     "reviews" -> "IsReviewedBy"
@@ -272,9 +273,17 @@ object DLIToOAF {
     result
   }
 
+
   def convertDLIRelation(r: Relation): Relation = {
-    r.setSource(r.getSource.replaceFirst("50|","50|scholix_____::" ).replaceFirst("60|", "60|scholix_____::"))
-    r.setTarget(r.getTarget.replaceFirst("50|","50|scholix_____::" ).replaceFirst("60|", "60|scholix_____::"))
+
+    val rt = r.getRelType
+    if (!relationTypeMapping.contains(rt))
+      return null
+    r.setRelType("resultResult")
+    r.setRelClass(relationTypeMapping(rt)._1)
+    r.setSubRelType(relationTypeMapping(rt)._2)
+    r.setSource(generateId(r.getSource))
+    r.setTarget(generateId(r.getTarget))
     r
   }
 

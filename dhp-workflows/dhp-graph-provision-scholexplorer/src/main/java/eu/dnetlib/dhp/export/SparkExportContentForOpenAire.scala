@@ -15,9 +15,11 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.codehaus.jackson.map.ObjectMapper
 
 import scala.collection.mutable.ArrayBuffer
-
+import scala.collection.JavaConverters._
 
 object SparkExportContentForOpenAire {
+
+
 
 
   def main(args: Array[String]): Unit = {
@@ -42,9 +44,11 @@ object SparkExportContentForOpenAire {
 
     import spark.implicits._
 
-
     val dsRel = spark.read.load(s"$workingPath/relation_b").as[Relation]
-    dsRel.filter(r => r.getDataInfo==null || r.getDataInfo.getDeletedbyinference ==false).map(DLIToOAF.convertDLIRelation).write.mode(SaveMode.Overwrite).save(s"$workingPath/export/relationDS")
+    dsRel.filter(r => r.getDataInfo==null || r.getDataInfo.getDeletedbyinference ==false)
+      .map(DLIToOAF.convertDLIRelation)
+      .filter(r => r!= null)
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/export/relationDS")
 
 
     val dsPubs = spark.read.load(s"$workingPath/publication").as[DLIPublication]

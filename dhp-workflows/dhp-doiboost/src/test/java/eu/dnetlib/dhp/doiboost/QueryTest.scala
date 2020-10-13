@@ -1,17 +1,13 @@
 package eu.dnetlib.dhp.doiboost
-import eu.dnetlib.dhp.schema.oaf.Project
+
+import eu.dnetlib.dhp.schema.oaf.Publication
 import org.apache.spark.SparkContext
-import org.apache.spark.sql.functions.{col, sum}
-import org.apache.hadoop.io.Text
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
-import org.codehaus.jackson.map.ObjectMapper
-import org.json4s.DefaultFormats
+import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
 import org.json4s
 import org.json4s.DefaultFormats
-import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
-import scala.::
+
 import scala.collection.JavaConverters._
 class QueryTest {
 
@@ -27,17 +23,30 @@ class QueryTest {
 
   }
 
+  def hasInstanceWithUrl(p:Publication):Boolean = {
+    val c = p.getInstance.asScala.map(i => i.getUrl!= null && !i.getUrl.isEmpty).size
+    !(!p.getInstance.isEmpty && c == p.getInstance().size)
+  }
+
+
+  def hasNullAccessRights(p:Publication):Boolean = {
+    val c = p.getInstance.asScala.map(i => i.getAccessright!= null && i.getAccessright.getClassname.nonEmpty).size
+    !p.getInstance.isEmpty && c == p.getInstance().size()
+  }
+
 
   def myQuery(spark:SparkSession, sc:SparkContext): Unit = {
-    implicit val mapEncoderPub: Encoder[Project] = Encoders.kryo[Project]
+    implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
+
+    val mapper = new ObjectMapper()
+    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
 
 
-//    val ds:Dataset[Project] = spark.createDataset(sc.sequenceFile("", classOf[Text], classOf[Text])
-//      .map(_._2.toString)
-//      .map(s => new ObjectMapper().readValue(s, classOf[Project])))
-//
-//      ds.write.saveAsTable()
+      val ds:Dataset[Publication] = spark.read.load("/tmp/p").as[Publication]
 
+
+
+    ds.filter(p =>p.getBestaccessright!= null && p.getBestaccessright.getClassname.nonEmpty).count()
 
 
   }
