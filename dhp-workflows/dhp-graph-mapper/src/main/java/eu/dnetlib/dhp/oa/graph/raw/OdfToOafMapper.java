@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -20,15 +22,6 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -313,12 +306,10 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Oaf> addOtherResultRels(
-		final Document doc,
-		final KeyValue collectedFrom,
-		final DataInfo info,
-		final long lastUpdateTimestamp) {
+			final Document doc,
+			final OafEntity entity) {
 
-		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
+		final String docId = entity.getId();
 
 		final List<Oaf> res = new ArrayList<>();
 
@@ -330,30 +321,26 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				final String otherId = createOpenaireId(50, originalId, false);
 				final String type = ((Node) o).valueOf("@relationType");
 
-				if (type.equalsIgnoreCase("IsSupplementTo")) {
+				if (type.equalsIgnoreCase(IS_SUPPLEMENT_TO)) {
 					res
 						.add(
 							getRelation(
-								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, collectedFrom, info,
-								lastUpdateTimestamp));
+								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, entity));
 					res
 						.add(
 							getRelation(
-								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, collectedFrom, info,
-								lastUpdateTimestamp));
-				} else if (type.equals("IsPartOf")) {
-
+								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, entity));
+				} else if (type.equalsIgnoreCase(IS_PART_OF)) {
 					res
 						.add(
 							getRelation(
-								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, collectedFrom, info,
-								lastUpdateTimestamp));
+								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, entity));
 					res
 						.add(
 							getRelation(
-								otherId, docId, RESULT_RESULT, PART, HAS_PARTS, collectedFrom, info,
-								lastUpdateTimestamp));
+								otherId, docId, RESULT_RESULT, PART, HAS_PARTS, entity));
 				} else {
+					// TODO catch more semantics
 				}
 			}
 		}

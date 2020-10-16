@@ -445,22 +445,26 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
 
 		try {
+			final String targetType = rs.getString(TARGET_TYPE);
 			if (rs.getString(SOURCE_TYPE).equals("context")) {
 				final Result r;
 
-				if (rs.getString(TARGET_TYPE).equals("dataset")) {
-					r = new Dataset();
-					r.setResulttype(DATASET_DEFAULT_RESULTTYPE);
-				} else if (rs.getString(TARGET_TYPE).equals("software")) {
-					r = new Software();
-					r.setResulttype(SOFTWARE_DEFAULT_RESULTTYPE);
-				} else if (rs.getString(TARGET_TYPE).equals("other")) {
-					r = new OtherResearchProduct();
-					r.setResulttype(ORP_DEFAULT_RESULTTYPE);
-				} else {
-					r = new Publication();
-					r.setResulttype(PUBLICATION_DEFAULT_RESULTTYPE);
+				switch (targetType) {
+					case "dataset":
+						r = new Dataset();
+						break;
+					case "software":
+						r = new Software();
+						break;
+					case "other":
+						r = new OtherResearchProduct();
+						break;
+					case "publication":
+					default:
+						r = new Publication();
+						break;
 				}
+
 				r.setId(createOpenaireId(50, rs.getString("target_id"), false));
 				r.setLastupdatetimestamp(lastUpdateTimestamp);
 				r.setContext(prepareContext(rs.getString("source_id"), info));
@@ -470,7 +474,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				return Arrays.asList(r);
 			} else {
 				final String sourceId = createOpenaireId(rs.getString(SOURCE_TYPE), rs.getString("source_id"), false);
-				final String targetId = createOpenaireId(rs.getString(TARGET_TYPE), rs.getString("target_id"), false);
+				final String targetId = createOpenaireId(targetType, rs.getString("target_id"), false);
 
 				final Relation r1 = new Relation();
 				final Relation r2 = new Relation();

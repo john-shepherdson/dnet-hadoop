@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -19,15 +20,6 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -256,12 +248,10 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Oaf> addOtherResultRels(
-		final Document doc,
-		final KeyValue collectedFrom,
-		final DataInfo info,
-		final long lastUpdateTimestamp) {
-		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
+			final Document doc,
+			final OafEntity entity) {
 
+		final String docId = entity.getId();
 		final List<Oaf> res = new ArrayList<>();
 
 		for (final Object o : doc.selectNodes("//*[local-name()='relatedDataset']")) {
@@ -275,13 +265,11 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						getRelation(
-							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, collectedFrom, info,
-							lastUpdateTimestamp));
+							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
 				res
 					.add(
 						getRelation(
-							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, collectedFrom, info,
-							lastUpdateTimestamp));
+							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
 			}
 		}
 		return res;
