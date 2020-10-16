@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.common.api;
 
 import java.io.*;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 
@@ -56,7 +57,8 @@ public class ZenodoAPIClient implements Serializable {
 	 */
 	public int newDeposition() throws IOException {
 		String json = "{}";
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+
 
 		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
 
@@ -94,7 +96,10 @@ public class ZenodoAPIClient implements Serializable {
 	 * @return the response code
 	 */
 	public int uploadIS(InputStream is, String file_name, long len) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder()
+				.writeTimeout(600, TimeUnit.SECONDS)
+				.readTimeout(600, TimeUnit.SECONDS)
+				.connectTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(bucket + "/" + file_name)
@@ -119,7 +124,7 @@ public class ZenodoAPIClient implements Serializable {
 	 */
 	public int sendMretadata(String metadata) throws IOException {
 
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
 		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, metadata);
 
@@ -151,7 +156,7 @@ public class ZenodoAPIClient implements Serializable {
 
 		String json = "{}";
 
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/publish")
@@ -184,7 +189,7 @@ public class ZenodoAPIClient implements Serializable {
 		setDepositionId(concept_rec_id);
 		String json = "{}";
 
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/newversion")
@@ -212,7 +217,7 @@ public class ZenodoAPIClient implements Serializable {
 
 		String json = "{}";
 
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id)
@@ -249,7 +254,7 @@ public class ZenodoAPIClient implements Serializable {
 	}
 
 	private String getPrevDepositions() throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(urlString)
@@ -270,7 +275,8 @@ public class ZenodoAPIClient implements Serializable {
 	}
 
 	private String getBucket(String url) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder()
+				.connectTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(url)
