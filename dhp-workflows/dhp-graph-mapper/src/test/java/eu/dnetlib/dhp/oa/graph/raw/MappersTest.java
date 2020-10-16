@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)

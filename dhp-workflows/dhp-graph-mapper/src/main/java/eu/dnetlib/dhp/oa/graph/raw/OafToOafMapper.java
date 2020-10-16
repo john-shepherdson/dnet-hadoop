@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -20,6 +19,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -248,8 +248,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Oaf> addOtherResultRels(
-			final Document doc,
-			final OafEntity entity) {
+		final Document doc,
+		final OafEntity entity) {
 
 		final String docId = entity.getId();
 		final List<Oaf> res = new ArrayList<>();

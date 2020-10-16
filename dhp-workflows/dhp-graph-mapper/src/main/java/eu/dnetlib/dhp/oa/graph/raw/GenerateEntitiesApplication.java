@@ -29,16 +29,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
@@ -124,7 +115,27 @@ public class GenerateEntitiesApplication {
 
 	private static Oaf merge(final Oaf o1, final Oaf o2) {
 		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
-			((OafEntity) o1).mergeFrom((OafEntity) o2);
+			if (ModelSupport.isSubClass(o1, Result.class)) {
+				if (ModelSupport.isSubClass(o1, Publication.class)) {
+					((Publication) o1).mergeFrom((Publication) o2);
+				} else if (ModelSupport.isSubClass(o1, Dataset.class)) {
+					((Dataset) o1).mergeFrom((Dataset) o2);
+				} else if (ModelSupport.isSubClass(o1, Software.class)) {
+					((Software) o1).mergeFrom((Software) o2);
+				} else if (ModelSupport.isSubClass(o1, OtherResearchProduct.class)) {
+					((OtherResearchProduct) o1).mergeFrom((OtherResearchProduct) o2);
+				} else {
+					throw new RuntimeException("invalid Result subtype:" + o1.getClass().getCanonicalName());
+				}
+			} else if (ModelSupport.isSubClass(o1, Datasource.class)) {
+				((Datasource) o1).mergeFrom((Datasource) o2);
+			} else if (ModelSupport.isSubClass(o1, Organization.class)) {
+				((Organization) o1).mergeFrom((Organization) o2);
+			} else if (ModelSupport.isSubClass(o1, Project.class)) {
+				((Project) o1).mergeFrom((Project) o2);
+			} else {
+				throw new RuntimeException("invalid OafEntity subtype:" + o1.getClass().getCanonicalName());
+			}
 		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
 			((Relation) o1).mergeFrom((Relation) o2);
 		} else {

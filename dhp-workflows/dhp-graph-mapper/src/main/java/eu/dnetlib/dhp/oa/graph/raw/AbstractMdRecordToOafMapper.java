@@ -6,18 +6,19 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.util.*;
 
-import com.google.common.collect.Lists;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
+import com.google.common.collect.Lists;
+
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public abstract class AbstractMdRecordToOafMapper {
 
@@ -152,7 +153,8 @@ public abstract class AbstractMdRecordToOafMapper {
 		return oafs;
 	}
 
-	private OafEntity createEntity(Document doc, String type, List<Instance> instances, KeyValue collectedFrom, DataInfo info, long lastUpdateTimestamp) {
+	private OafEntity createEntity(Document doc, String type, List<Instance> instances, KeyValue collectedFrom,
+		DataInfo info, long lastUpdateTimestamp) {
 		switch (type.toLowerCase()) {
 			case "publication":
 				final Publication p = new Publication();

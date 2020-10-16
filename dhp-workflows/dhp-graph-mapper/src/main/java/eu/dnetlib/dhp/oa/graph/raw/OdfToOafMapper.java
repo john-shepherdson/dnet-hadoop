@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -22,6 +20,8 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -306,8 +306,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Oaf> addOtherResultRels(
-			final Document doc,
-			final OafEntity entity) {
+		final Document doc,
+		final OafEntity entity) {
 
 		final String docId = entity.getId();
 
