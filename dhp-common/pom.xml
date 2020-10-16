@@ -98,6 +98,17 @@
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>eu.dnetlib</groupId>
+			<artifactId>dnet-pace-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>eu.dnetlib.dhp</groupId>
+			<artifactId>dhp-schemas</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 </project>

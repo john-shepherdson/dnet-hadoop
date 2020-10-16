@@ -14,6 +14,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;

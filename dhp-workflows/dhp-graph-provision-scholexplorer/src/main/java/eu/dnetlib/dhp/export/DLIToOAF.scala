@@ -47,6 +47,7 @@ object DLIToOAF {
     "References" -> ("isRelatedTo", "relationship"),
     "IsRelatedTo" -> ("isRelatedTo", "relationship"),
     "IsSupplementedBy" -> ("isSupplementedBy", "supplement"),
+    "Documents"-> ("isRelatedTo", "relationship"),
     "Cites" -> ("cites", "citation"),
     "Unknown" -> ("isRelatedTo", "relationship"),
     "IsSourceOf" -> ("isRelatedTo", "relationship"),
@@ -83,7 +84,7 @@ object DLIToOAF {
 
   val rel_inverse: Map[String, String] = Map(
     "isRelatedTo" -> "isRelatedTo",
-    "IsSupplementedBy" -> "isSupplementTo",
+    "isSupplementedBy" -> "isSupplementTo",
     "cites" -> "IsCitedBy",
     "IsCitedBy" -> "cites",
     "reviews" -> "IsReviewedBy"
@@ -273,29 +274,18 @@ object DLIToOAF {
   }
 
 
-//  def convertDLIRelation(r: DLIRelation): Relation = {
-//
-//    val result = new Relation
-//    if (!relationTypeMapping.contains(r.getRelType))
-//      return null
-//
-//    if (r.getProperties == null || r.getProperties.size() == 0 || (r.getProperties.size() == 1 && r.getProperties.get(0) == null))
-//      return null
-//    val t = relationTypeMapping.get(r.getRelType)
-//
-//    result.setRelType("resultResult")
-//    result.setRelClass(t.get._1)
-//    result.setSubRelType(t.get._2)
-//    result.setCollectedfrom(r.getProperties.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).filter(p => p != null).asJava)
-//    result.setSource(generateId(r.getSource))
-//    result.setTarget(generateId(r.getTarget))
-//
-//    if (result.getSource.equals(result.getTarget))
-//      return null
-//    result.setDataInfo(generateDataInfo())
-//
-//    result
-//  }
+  def convertDLIRelation(r: Relation): Relation = {
+
+    val rt = r.getRelType
+    if (!relationTypeMapping.contains(rt))
+      return null
+    r.setRelType("resultResult")
+    r.setRelClass(relationTypeMapping(rt)._1)
+    r.setSubRelType(relationTypeMapping(rt)._2)
+    r.setSource(generateId(r.getSource))
+    r.setTarget(generateId(r.getTarget))
+    r
+  }
 
 
   def convertDLIDatasetTOOAF(d: DLIDataset): Dataset = {
