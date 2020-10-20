@@ -1,0 +1,33 @@
+<workflow-app name="Send Dump to Zenodo" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the target path</description>
+        </property>
+    </parameters>
+
+    <start to="MakeTar"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="MakeTar">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.export.zenodo.MakeTar</main-class>
+            <arg>-t</arg><arg>${targetPath}</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-s</arg><arg>${sourcePath}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>
