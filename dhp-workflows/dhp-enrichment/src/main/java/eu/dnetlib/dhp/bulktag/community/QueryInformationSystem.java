@@ -17,7 +17,9 @@ public class QueryInformationSystem {
 		+ "  let $datasources := $x//CONFIGURATION/context/category[./@id=concat($x//CONFIGURATION/context/@id,'::contentproviders')]/concept  "
 		+ "  let $organizations := $x//CONFIGURATION/context/category[./@id=concat($x//CONFIGURATION/context/@id,'::resultorganizations')]/concept  "
 		+ "  let $communities := $x//CONFIGURATION/context/category[./@id=concat($x//CONFIGURATION/context/@id,'::zenodocommunities')]/concept  "
-		+ "  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri']  "
+		+
+		"let $zenodo := $x//param[./@name='zenodoCommunity']/text() "
+		+ "  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] and $x//context/param[./@name = 'status']/text() != 'hidden'  "
 		+ "  return  "
 		+ "  <community>  "
 		+ "  { $x//CONFIGURATION/context/@id}  "
@@ -38,8 +40,15 @@ public class QueryInformationSystem {
 		+ "  {$d/param[./@name='selcriteria']/text()}  "
 		+ "  </selcriteria>  "
 		+ "  </datasource> } "
-		+ "  </datasources>  "
-		+ "  <zenodocommunities>  "
+		+ "  </datasources>  " +
+		"  <zenodocommunities>  " +
+		"{for $zc in $zenodo " +
+		"return " +
+		"<zenodocommunity> " +
+		"<zenodoid> " +
+		"{$zc} " +
+		"</zenodoid> " +
+		"</zenodocommunity>}"
 		+ "  {for $zc in $communities  "
 		+ "  return  "
 		+ "  <zenodocommunity>  "

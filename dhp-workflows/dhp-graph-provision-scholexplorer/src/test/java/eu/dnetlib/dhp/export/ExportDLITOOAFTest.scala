@@ -4,10 +4,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import eu.dnetlib.dhp.schema.oaf.Relation
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
-import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
+
 import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
 import org.junit.jupiter.api.Test
 
@@ -20,6 +18,19 @@ class ExportDLITOOAFTest {
   @Test
   def testDate():Unit = {
     println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")))
+
+  }
+
+
+  @Test
+  def testMappingRele():Unit = {
+
+    val r:Relation = new Relation
+    r.setSource("60|fbff1d424e045eecf24151a5fe3aa738")
+    r.setTarget("50|dedup_wf_001::ec409f09e63347d4e834087fe1483877")
+
+    val r1 =DLIToOAF.convertDLIRelation(r)
+    println(r1.getSource, r1.getTarget)
 
   }
 
@@ -65,7 +76,7 @@ class ExportDLITOOAFTest {
     val json = Source.fromInputStream(getClass.getResourceAsStream("relation.json")).mkString
 
 
-    val oaf =DLIToOAF.convertDLIRelation(mapper.readValue(json, classOf[DLIRelation]))
+    val oaf =mapper.readValue(json, classOf[Relation])
 
     println(mapper.writeValueAsString(oaf))
 

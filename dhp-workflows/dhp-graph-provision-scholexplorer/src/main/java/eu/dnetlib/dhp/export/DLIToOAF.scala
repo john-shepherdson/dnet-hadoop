@@ -5,11 +5,12 @@ import java.time.format.DateTimeFormatter
 
 import eu.dnetlib.dhp.common.PacePerson
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, StructuredProperty}
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIRelation}
+import eu.dnetlib.dhp.schema.oaf.{Author,  Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.jackson.map.ObjectMapper
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils._
 
 import scala.collection.JavaConverters._
 
@@ -45,7 +46,8 @@ object DLIToOAF {
     "IsReferencedBy" -> ("isRelatedTo", "relationship"),
     "References" -> ("isRelatedTo", "relationship"),
     "IsRelatedTo" -> ("isRelatedTo", "relationship"),
-    "IsSupplementedBy" -> ("IsSupplementedBy", "supplement"),
+    "IsSupplementedBy" -> ("isSupplementedBy", "supplement"),
+    "Documents"-> ("isRelatedTo", "relationship"),
     "Cites" -> ("cites", "citation"),
     "Unknown" -> ("isRelatedTo", "relationship"),
     "IsSourceOf" -> ("isRelatedTo", "relationship"),
@@ -82,7 +84,7 @@ object DLIToOAF {
 
   val rel_inverse: Map[String, String] = Map(
     "isRelatedTo" -> "isRelatedTo",
-    "IsSupplementedBy" -> "isSupplementTo",
+    "isSupplementedBy" -> "isSupplementTo",
     "cites" -> "IsCitedBy",
     "IsCitedBy" -> "cites",
     "reviews" -> "IsReviewedBy"
@@ -97,6 +99,20 @@ object DLIToOAF {
     "DOI" -> "doi",
     "doi" -> "doi"
   )
+
+
+  def fixInstance(r:Publication) :Publication = {
+    val collectedFrom = r.getCollectedfrom.asScala.head
+    r.getInstance().asScala.foreach(i => i.setCollectedfrom(collectedFrom))
+    r
+  }
+
+
+  def fixInstanceDataset(r:Dataset) :Dataset = {
+    val collectedFrom = r.getCollectedfrom.asScala.head
+    r.getInstance().asScala.foreach(i => i.setCollectedfrom(collectedFrom))
+    r
+  }
 
 
   def toActionSet(item: Oaf): (String, String) = {
@@ -258,28 +274,17 @@ object DLIToOAF {
   }
 
 
-  def convertDLIRelation(r: DLIRelation): Relation = {
+  def convertDLIRelation(r: Relation): Relation = {
 
-    val result = new Relation
-    if (!relationTypeMapping.contains(r.getRelType))
+    val rt = r.getRelType
+    if (!relationTypeMapping.contains(rt))
       return null
-
-    if (r.getCollectedFrom == null || r.getCollectedFrom.size() == 0 || (r.getCollectedFrom.size() == 1 && r.getCollectedFrom.get(0) == null))
-      return null
-    val t = relationTypeMapping.get(r.getRelType)
-
-    result.setRelType("resultResult")
-    result.setRelClass(t.get._1)
-    result.setSubRelType(t.get._2)
-    result.setCollectedfrom(r.getCollectedFrom.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).filter(p => p != null).asJava)
-    result.setSource(generateId(r.getSource))
-    result.setTarget(generateId(r.getTarget))
-
-    if (result.getSource.equals(result.getTarget))
-      return null
-    result.setDataInfo(generateDataInfo())
-
-    result
+    r.setRelType("resultResult")
+    r.setRelClass(relationTypeMapping(rt)._1)
+    r.setSubRelType(relationTypeMapping(rt)._2)
+    r.setSource(generateId(r.getSource))
+    r.setTarget(generateId(r.getTarget))
+    r
   }
 
 
@@ -412,46 +417,6 @@ object DLIToOAF {
   }
 
 
-  def generateKeyValue(key: String, value: String): KeyValue = {
-    val kv: KeyValue = new KeyValue()
-    kv.setKey(key)
-    kv.setValue(value)
-    kv.setDataInfo(generateDataInfo("0.9"))
-    kv
-  }
 
-
-  def generateDataInfo(trust: String = "0.9", invisibile: Boolean = false): DataInfo = {
-    val di = new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust(trust)
-    di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
-    di
-  }
-
-  def createQualifier(cls: String, sch: String): Qualifier = {
-    createQualifier(cls, cls, sch, sch)
-  }
-
-
-  def createQualifier(classId: String, className: String, schemeId: String, schemeName: String): Qualifier = {
-    val q: Qualifier = new Qualifier
-    q.setClassid(classId)
-    q.setClassname(className)
-    q.setSchemeid(schemeId)
-    q.setSchemename(schemeName)
-    q
-  }
-
-
-  def asField[T](value: T): Field[T] = {
-    val tmp = new Field[T]
-    tmp.setValue(value)
-    tmp
-
-
-  }
 
 }

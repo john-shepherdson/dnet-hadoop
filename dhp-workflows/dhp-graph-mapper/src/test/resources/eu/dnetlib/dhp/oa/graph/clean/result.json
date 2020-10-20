@@ -27,6 +27,28 @@
             "schemename": "dnet:pid_types"
           },
           "value": "0000-0001-9613-6639"
+        },
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:datasetarchive",
+              "classname": "sysimport:crosswalk:datasetarchive",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "ORCID12",
+            "classname": "ORCID12",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "https://orcid.org/0000-0001-9613-6639"
         }
       ],
       "rank": 1,
@@ -59,6 +81,28 @@
             "schemename": "dnet:pid_types"
           },
           "value": "qwerty"
+        },
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:datasetarchive",
+              "classname": "sysimport:crosswalk:datasetarchive",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "ORCID",
+            "classname": "ORCID",
+            "schemeid": "",
+            "schemename": ""
+          },
+          "value": "asdasd"
         }
       ],
       "rank": 2,
@@ -69,8 +113,7 @@
       ],
       "fullname": "Barry, Peter S.",
       "name": "Peter S.",
-      "pid": [
-      ],
+      "pid": null,
       "rank": 3,
       "surname": "Barry"
     },
@@ -186,6 +229,9 @@
     }
   ],
   "bestaccessright": null,
+  "publisher": {
+    "value": null
+  },
   "collectedfrom": [
     {
       "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",

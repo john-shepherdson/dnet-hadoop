@@ -82,7 +82,8 @@
 <p>All files are in MATLAB .mat format.</p></description>
       </descriptions>
     </resource>
-    <dr:CobjCategory type="dataset">0021</dr:CobjCategory>
+    <!--<dr:CobjCategory type="dataset">0021</dr:CobjCategory>-->
+    <dr:CobjCategory>0021</dr:CobjCategory>
     <oaf:dateAccepted>2019-01-01</oaf:dateAccepted>
     <oaf:accessrights>OPEN</oaf:accessrights>
     <oaf:language>und</oaf:language>

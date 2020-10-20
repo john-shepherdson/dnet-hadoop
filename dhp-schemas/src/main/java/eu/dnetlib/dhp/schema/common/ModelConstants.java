@@ -1,14 +1,13 @@
 
 package eu.dnetlib.dhp.schema.common;
 
-import java.security.Key;
-
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class ModelConstants {
 
+	public static final String DNET_SUBJECT_TYPOLOGIES = "dnet:subject_classification_typologies";
 	public static final String DNET_RESULT_TYPOLOGIES = "dnet:result_typologies";
 	public static final String DNET_PUBLICATION_RESOURCE = "dnet:publication_resource";
 	public static final String DNET_ACCESS_MODES = "dnet:access_modes";

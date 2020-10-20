@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,7 +19,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
@@ -31,24 +32,25 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
 public class MappersTest {
+
+	@Mock
+	private ISLookUpService isLookUpService;
 
 	@Mock
 	private VocabularyGroup vocs;
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		when(vocs.getTermAsQualifier(anyString(), anyString()))
-			.thenAnswer(
-				invocation -> OafMapperUtils
-					.qualifier(
-						invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0),
-						invocation.getArgument(0)));
+		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
+		lenient()
+			.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
+			.thenReturn(synonyms());
 
-		when(vocs.termExists(anyString(), anyString())).thenReturn(true);
-
+		vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
 	}
 
 	@Test
@@ -68,9 +70,14 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(p.getId());
+
+		assertTrue(p.getOriginalId().size() == 1);
+		assertEquals("10.3897/oneeco.2.e13718", p.getOriginalId().get(0));
+
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertFalse(p.getDataInfo().getInvisible());
+		assertTrue(p.getSource().size() == 1);
 
 		assertTrue(p.getAuthor().size() > 0);
 		final Optional<Author> author = p
@@ -79,6 +86,7 @@ public class MappersTest {
 			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.findFirst();
 		assertTrue(author.isPresent());
+
 		final StructuredProperty pid = author
 			.get()
 			.getPid()
@@ -169,6 +177,8 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
+		assertTrue(d.getOriginalId().size() == 1);
+		assertEquals("oai:zenodo.org:3234526", d.getOriginalId().get(0));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
@@ -255,10 +265,96 @@ public class MappersTest {
 		assertTrue(s.getInstance().size() > 0);
 	}
 
+	// @Test
+	void testDataset_2() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset_2.xml"));
+
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+	}
+
+	@Test
+	void testClaimDedup() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_dedup.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+	}
+
+	@Test
+	void testNakala() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_nakala.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Dataset);
+
+		final Dataset d = (Dataset) list.get(0);
+
+		assertValidId(d.getId());
+		assertValidId(d.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
+		assertEquals(1, d.getAuthor().size());
+		assertEquals(1, d.getSubject().size());
+		assertEquals(1, d.getInstance().size());
+		assertEquals(1, d.getPid().size());
+		assertNotNull(d.getInstance().get(0).getUrl());
+	}
+
+	@Test
+	void testClaimFromCrossref() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		System.out.println(p.getTitle().get(0).getValue());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+	}
+
+	@Test
+	void testODFRecord() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_record.xml"));
+		List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		final Dataset p = (Dataset) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		System.out.println(p.getTitle().get(0).getValue());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+	}
+
 	private void assertValidId(final String id) {
 		assertEquals(49, id.length());
 		assertEquals('|', id.charAt(2));
 		assertEquals(':', id.charAt(15));
 		assertEquals(':', id.charAt(16));
 	}
+
+	private List<String> vocs() throws IOException {
+		return IOUtils
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+	}
+
+	private List<String> synonyms() throws IOException {
+		return IOUtils
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+	}
+
 }

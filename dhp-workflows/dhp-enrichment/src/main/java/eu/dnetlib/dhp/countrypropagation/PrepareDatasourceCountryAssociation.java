@@ -96,27 +96,6 @@ public class PrepareDatasourceCountryAssociation {
 		relation.createOrReplaceTempView("relation");
 		organization.createOrReplaceTempView("organization");
 
-//		String query = "SELECT source dataSourceId, named_struct('classid', country.classid, 'classname', country.classname) country "
-//			+ "FROM ( SELECT id "
-//			+ "       FROM datasource "
-//			+ "       WHERE (datainfo.deletedbyinference = false "
-//			+ whitelisted
-//			+ ") "
-//			+ getConstraintList("datasourcetype.classid = '", allowedtypes)
-//			+ ") d "
-//			+ "JOIN ( SELECT source, target "
-//			+ "       FROM relation "
-//			+ "       WHERE relclass = '"
-//			+ ModelConstants.IS_PROVIDED_BY
-//			+ "' "
-//			+ "       AND datainfo.deletedbyinference = false ) rel "
-//			+ "ON d.id = rel.source "
-//			+ "JOIN (SELECT id, country "
-//			+ "      FROM organization "
-//			+ "      WHERE datainfo.deletedbyinference = false "
-//			+ "      AND length(country.classid) > 0) o "
-//			+ "ON o.id = rel.target";
-
 		String query = "SELECT source dataSourceId, " +
 			"named_struct('classid', country.classid, 'classname', country.classname) country " +
 			"FROM datasource d " +
@@ -125,7 +104,7 @@ public class PrepareDatasourceCountryAssociation {
 			"JOIN organization o " +
 			"ON o.id = rel.target " +
 			"WHERE rel.datainfo.deletedbyinference = false  " +
-			"and rel.relclass = '" + ModelConstants.IS_PROVIDED_BY + "'" +
+			"and lower(rel.relclass) = '" + ModelConstants.IS_PROVIDED_BY.toLowerCase() + "'" +
 			"and o.datainfo.deletedbyinference = false  " +
 			"and length(o.country.classid) > 0 " +
 			"and (" + allowed + " or " + whitelisted + ")";

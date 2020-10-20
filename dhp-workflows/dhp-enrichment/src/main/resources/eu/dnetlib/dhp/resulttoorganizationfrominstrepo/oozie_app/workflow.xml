@@ -176,7 +176,6 @@
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
         </spark>
         <ok to="wait2"/>
@@ -206,7 +205,6 @@
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
         </spark>
         <ok to="wait2"/>
@@ -236,7 +234,6 @@
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
         </spark>
         <ok to="wait2"/>
@@ -266,7 +263,6 @@
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
         </spark>
         <ok to="wait2"/>

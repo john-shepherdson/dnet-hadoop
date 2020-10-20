@@ -31,7 +31,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
-import eu.dnetlib.dhp.schema.scholexplorer.DLIRelation;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import net.minidev.json.JSONArray;
@@ -156,9 +155,9 @@ public class SparkScholexplorerCreateRawGraphJob {
 				SparkSXGeneratePidSimlarity
 					.generateDataFrame(
 						spark, sc, inputPath.replace("/relation", ""), targetPath.replace("/relation", ""));
-				RDD<DLIRelation> rdd = union
+				RDD<Relation> rdd = union
 					.mapToPair(
-						(PairFunction<String, String, DLIRelation>) f -> {
+						(PairFunction<String, String, Relation>) f -> {
 							final String source = getJPathString(SOURCEJSONPATH, f);
 							final String target = getJPathString(TARGETJSONPATH, f);
 							final String reltype = getJPathString(RELJSONPATH, f);
@@ -175,7 +174,7 @@ public class SparkScholexplorerCreateRawGraphJob {
 												source.toLowerCase(),
 												reltype.toLowerCase(),
 												target.toLowerCase())),
-								mapper.readValue(f, DLIRelation.class));
+								mapper.readValue(f, Relation.class));
 						})
 					.reduceByKey(
 						(a, b) -> {
@@ -186,7 +185,7 @@ public class SparkScholexplorerCreateRawGraphJob {
 					.rdd();
 
 				spark
-					.createDataset(rdd, Encoders.bean(DLIRelation.class))
+					.createDataset(rdd, Encoders.bean(Relation.class))
 					.write()
 					.mode(SaveMode.Overwrite)
 					.save(targetPath);

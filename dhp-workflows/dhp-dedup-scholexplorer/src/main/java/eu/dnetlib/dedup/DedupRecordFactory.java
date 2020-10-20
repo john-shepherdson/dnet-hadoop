@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -15,6 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
+import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
@@ -30,10 +33,16 @@ public class DedupRecordFactory {
 		final DedupConfig dedupConf) {
 		long ts = System.currentTimeMillis();
 		// <id, json_entity>
-		final JavaPairRDD<String, String> inputJsonEntities = sc
-			.textFile(entitiesInputPath)
+		final JavaPairRDD<String, String> inputJsonEntities = spark
+			.read()
+			.load(entitiesInputPath)
+			.as(Encoders.kryo(Oaf.class))
+			.map(
+				(MapFunction<Oaf, String>) p -> new org.codehaus.jackson.map.ObjectMapper().writeValueAsString(p),
+				Encoders.STRING())
+			.javaRDD()
 			.mapToPair(
-				(PairFunction<String, String, String>) it -> new Tuple2<String, String>(
+				(PairFunction<String, String, String>) it -> new Tuple2<>(
 					MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), it), it));
 
 		// <source, target>: source is the dedup_id, target is the id of the mergedIn
@@ -74,9 +83,9 @@ public class DedupRecordFactory {
 		}
 	}
 
-	private static Publication publicationMerger(Tuple2<String, Iterable<String>> e, final long ts) {
+	private static DLIPublication publicationMerger(Tuple2<String, Iterable<String>> e, final long ts) {
 
-		Publication p = new Publication(); // the result of the merge, to be returned at the end
+		DLIPublication p = new DLIPublication(); // the result of the merge, to be returned at the end
 
 		p.setId(e._1());
 
@@ -91,7 +100,7 @@ public class DedupRecordFactory {
 				.forEach(
 					pub -> {
 						try {
-							Publication publication = mapper.readValue(pub, Publication.class);
+							DLIPublication publication = mapper.readValue(pub, DLIPublication.class);
 
 							p.mergeFrom(publication);
 							p.setAuthor(DedupUtility.mergeAuthor(p.getAuthor(), publication.getAuthor()));
@@ -110,9 +119,9 @@ public class DedupRecordFactory {
 		return p;
 	}
 
-	private static Dataset datasetMerger(Tuple2<String, Iterable<String>> e, final long ts) {
+	private static DLIDataset datasetMerger(Tuple2<String, Iterable<String>> e, final long ts) {
 
-		Dataset d = new Dataset(); // the result of the merge, to be returned at the end
+		DLIDataset d = new DLIDataset(); // the result of the merge, to be returned at the end
 
 		d.setId(e._1());
 

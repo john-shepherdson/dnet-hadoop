@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oai:record xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+  xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+  xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:oai="http://www.openarchives.org/OAI/2.0/">
+  <oai:header>
+    <dri:objIdentifier>opentrials__::0000bf8e63d3d7e6b88421eabafae3f6</dri:objIdentifier>
+    <dri:recordIdentifier>feabb67c-1fd1-423b-aec6-606d04ce53c6</dri:recordIdentifier>
+    <dri:dateOfCollection>2019-03-27T15:15:22.22Z</dri:dateOfCollection>
+    <oaf:datasourceprefix>opentrials__</oaf:datasourceprefix>
+    <dr:dateOfTransformation>2019-04-17T16:04:20.586Z</dr:dateOfTransformation>
+  </oai:header>
+  <oai:metadata>
+    <resource xmlns="http://datacite.org/schema/kernel-3"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+      <identifier identifierType="URL">https://clinicaltrials.gov/ct2/show/NCT02321059</identifier>
+      <alternateIdentifiers>
+        <alternateIdentifier alternateIdentifierType="URL">http://apps.who.int/trialsearch/Trial3.aspx?trialid=NCT02321059</alternateIdentifier>
+        <alternateIdentifier alternateIdentifierType="nct">NCT02321059</alternateIdentifier>
+      </alternateIdentifiers>
+      <creators>
+        <creator>
+          <creatorName>Jensen, Kristian K</creatorName>
+        </creator>
+      </creators>
+      <titles>
+        <title>Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia</title>
+      </titles>
+      <publisher>nct</publisher>
+      <geoLocations>
+        <geoLocationPlace>Denmark</geoLocationPlace>
+      </geoLocations>
+      <resourceType resourceTypeGeneral="clinicalTrial">0037</resourceType>
+      <descriptions>
+        <description descriptionType="Abstract">Patients with an incisional hernia in the midline and controls with an intact abdominal wall are examined twice with one week apart, in order to establish the test-retest reliability and internal and external validity of the Goodstrength trunk dynamometer.</description>
+      </descriptions>
+    </resource>
+    <oaf:accessrights>OPEN</oaf:accessrights>
+    <dr:CobjCategory type="dataset">0037</dr:CobjCategory>
+    <oaf:dateAccepted>2014-11-11</oaf:dateAccepted>
+    <oaf:hostedBy id="openaire____::opentrials" name="OpenTrials"/>
+    <oaf:collectedFrom id="openaire____::opentrials" name="OpenTrials"/>
+    <oaf:about>
+      <oaf:datainfo>
+        <oaf:inferred>false</oaf:inferred>
+        <oaf:deletedbyinference>false</oaf:deletedbyinference>
+        <oaf:trust>0.9</oaf:trust>
+        <oaf:inferenceprovenance/>
+        <oaf:provenanceaction
+          classid="sysimport:crosswalk:datasetarchive"
+          classname="sysimport:crosswalk:datasetarchive"
+          schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+      </oaf:datainfo>
+    </oaf:about>
+  </oai:metadata>
+  <about xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+      <originDescription altered="true" harvestDate="2019-03-27T15:15:22.22Z">
+        <baseURL>file:///var/lib/dnet/data/opentrials/opentrials.csv</baseURL>
+        <identifier/>
+        <datestamp/>
+        <metadataNamespace/>
+      </originDescription>
+    </provenance>
+    <oaf:datainfo>
+      <oaf:inferred>false</oaf:inferred>
+      <oaf:deletedbyinference>false</oaf:deletedbyinference>
+      <oaf:trust>0.9</oaf:trust>
+      <oaf:inferenceprovenance/>
+      <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+        classname="sysimport:crosswalk:datasetarchive"
+        schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+    </oaf:datainfo>
+  </about>
+</oai:record>

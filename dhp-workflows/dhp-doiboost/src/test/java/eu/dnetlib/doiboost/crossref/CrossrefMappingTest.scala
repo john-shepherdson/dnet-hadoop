@@ -19,8 +19,6 @@ class CrossrefMappingTest {
 
 
 
-
-
   @Test
   def testFunderRelationshipsMapping(): Unit = {
     val template = Source.fromInputStream(getClass.getResourceAsStream("article_funder_template.json")).mkString

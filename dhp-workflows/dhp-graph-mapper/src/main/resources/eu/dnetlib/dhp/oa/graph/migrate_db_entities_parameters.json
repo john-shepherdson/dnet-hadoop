@@ -40,5 +40,11 @@
 		"paramLongName": "dbschema",
 		"paramDescription": "the database schema according to the D-Net infrastructure (beta or production)",
 		"paramRequired": true
+	},
+	{
+		"paramName": "nsbl",
+		"paramLongName": "nsPrefixBlacklist",
+		"paramDescription": "a blacklist of nsprefixes (comma separeted)",
+		"paramRequired": false
 	}
 ]

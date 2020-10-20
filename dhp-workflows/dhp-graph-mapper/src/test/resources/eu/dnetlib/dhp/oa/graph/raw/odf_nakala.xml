@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <oai:header xmlns="http://namespace.openaire.eu/"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <dri:objIdentifier>r3f5b9831893::01a497c6c6b44289c52dcdf22b6c0fc0</dri:objIdentifier>
+        <dri:recordIdentifier>oai:nakala.fr:hdl_11280_50f302c6</dri:recordIdentifier>
+        <dri:dateOfCollection>2020-10-03T06:06:52.228Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>r3f5b9831893</oaf:datasourceprefix>
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">oai:nakala.fr:hdl_11280_50f302c6</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2020-09-19T23:56:08Z</datestamp>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">hdl_11280_96355742</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">hdl_11280_26914437</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">hdl_11280_86561837</setSpec>
+        <dr:dateOfTransformation>2020-10-19T15:39:52.151Z</dr:dateOfTransformation>
+    </oai:header>
+    <metadata>
+        <datacite:resource xmlns="http://www.openarchives.org/OAI/2.0/"
+                           xmlns:datacite="http://datacite.org/schema/kernel-4"
+                           xmlns:dc="http://purl.org/dc/elements/1.1/"
+                           xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+                           xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://datacite.org/schema/kernel-4 https://schema.datacite.org/meta/kernel-4/metadata.xsd">
+            <alternateIdentifier alternateIdentifierType="URL" xmlns="http://datacite.org/schema/kernel-4">http://nakala.fr/data/11280/50f302c6</alternateIdentifier>
+            <identifier identifierType="Handle" xmlns="http://datacite.org/schema/kernel-4">11280/50f302c6</identifier>
+            <datacite:creators>
+                <datacite:creator>
+                    <datacite:creatorName>Desbrosse, Xavier</datacite:creatorName>
+                </datacite:creator>
+            </datacite:creators>
+            <datacite:titles>
+                <datacite:title>Les rues Stalingrad en France (1945-2013)</datacite:title>
+            </datacite:titles>
+            <datacite:subjects>
+                <datacite:subject>Rues – Noms -- France</datacite:subject>
+            </datacite:subjects>
+            <datacite:descriptions>
+                <datacite:description descriptionType="Abstract">Cette carte appartient à la collection « Guerre froide vue d’en bas » élaborée dans le cadre de l’enquête 2009-2013 du réseau des correspondants départementaux de l’IHTP « La Guerre froide vue d’en bas : 1947-1967 », enquête  conduite sous la direction de  Philippe Buton Professeur d’Histoire contemporaine à l’Université de Reims, d’Olivier Büttner Ingénieur de Recherche IHTP-CNRS et de  Michel Hastings, Professeur de Science politique à l’Institut d’Etudes Politiques de Lille.</datacite:description>
+            </datacite:descriptions>
+            <datacite:publisher>IHTP-CNRS</datacite:publisher>
+            <datacite:contributors>
+                <datacite:contributor contributorType="Other">
+                    <datacite:contributorName>(CNRS), Institut d'Histoire du Temps Présent (IHTP) - Centre National de la Recherche Scientifique </datacite:contributorName>
+                </datacite:contributor>
+            </datacite:contributors>
+            <datacite:dates>
+                <datacite:date dateType="Created">2013</datacite:date>
+            </datacite:dates>
+            <datacite:resourceType resourceTypeGeneral="Image">Carte</datacite:resourceType>
+            <datacite:geoLocations>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>France</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+            </datacite:geoLocations>
+        </datacite:resource>
+        <oaf:identifier identifierType="handle">11280/50f302c6</oaf:identifier>
+        <oaf:concept id="dariah"/>
+        <dr:CobjCategory type="dataset">0025</dr:CobjCategory>
+        <oaf:dateAccepted/>
+        <oaf:accessrights>UNKNOWN</oaf:accessrights>
+        <oaf:language>und</oaf:language>
+        <oaf:hostedBy id="re3data_____::r3d100012102" name="NAKALA"/>
+        <oaf:collectedFrom id="re3data_____::r3d100012102" name="NAKALA"/>
+    </metadata>
+    <about xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2020-10-03T06:06:52.228Z">
+                <baseURL>https%3A%2F%2Fwww.nakala.fr%2Foai_oa%2F11280%2F92c4d30b</baseURL>
+                <identifier>oai:nakala.fr:hdl_11280_50f302c6</identifier>
+                <datestamp>2020-09-19T23:56:08Z</datestamp>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+                                  classname="sysimport:crosswalk:datasetarchive"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>

@@ -85,8 +85,8 @@ public class PrepareProjectResultsAssociation {
 		String resproj_relation_query = "SELECT source, target "
 			+ "       FROM relation "
 			+ "       WHERE datainfo.deletedbyinference = false "
-			+ "       AND relClass = '"
-			+ ModelConstants.IS_PRODUCED_BY
+			+ "       AND lower(relClass) = '"
+			+ ModelConstants.IS_PRODUCED_BY.toLowerCase()
 			+ "'";
 
 		Dataset<Row> resproj_relation = spark.sql(resproj_relation_query);
@@ -98,7 +98,7 @@ public class PrepareProjectResultsAssociation {
 			+ "      FROM (SELECT source, target "
 			+ "            FROM relation "
 			+ "            WHERE datainfo.deletedbyinference = false  "
-			+ getConstraintList(" relClass = '", allowedsemrel)
+			+ getConstraintList(" lower(relClass) = '", allowedsemrel)
 			+ "            ) r1"
 			+ "      JOIN resproj_relation r2 "
 			+ "      ON r1.source = r2.source "

@@ -144,8 +144,8 @@ public class PrepareResultCommunitySetStep1 {
 		String resultContextQuery = String
 			.format(
 				RESULT_CONTEXT_QUERY_TEMPLATE,
-				getConstraintList(" co.id = '", communityIdList),
-				getConstraintList(" relClass = '", allowedsemrel));
+				getConstraintList(" lower(co.id) = '", communityIdList),
+				getConstraintList(" lower(relClass) = '", allowedsemrel));
 
 		Dataset<Row> result_context = spark.sql(resultContextQuery);
 		result_context.createOrReplaceTempView("result_context");

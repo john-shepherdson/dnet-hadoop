@@ -18,19 +18,12 @@
     "paramRequired": true
   },
   {
-    "paramName": "h",
-    "paramLongName": "esHost",
-    "paramDescription": "the index host name",
+    "paramName": "c",
+    "paramLongName": "cluster",
+    "paramDescription": "the index cluster",
     "paramRequired": true
   },
 
-
-  {
-    "paramName": "t",
-    "paramLongName": "type",
-    "paramDescription": "should be scholix or summary",
-    "paramRequired": true
-  },
   {
     "paramName": "id",
     "paramLongName": "idPath",

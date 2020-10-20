@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "alternativenames": {
+      "description": "Description of alternativenames",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Description of alternativenames"
+      }
+    },
+    "country": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Description of code"
+        },
+        "label": {
+          "type": "string",
+          "description": "Description of label"
+        }
+      },
+      "description": "Description of country"
+    },
+    "id": {
+      "type": "string",
+      "description": "Description of id"
+    },
+    "legalname": {
+      "type": "string",
+      "description": "Description of legalname"
+    },
+    "legalshortname": {
+      "type": "string",
+      "description": "Description of legalshortname"
+    },
+    "pid": {
+      "description": "Description of pid",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scheme": {
+            "type": "string",
+            "description": "Description of scheme"
+          },
+          "value": {
+            "type": "string",
+            "description": "Description of value"
+          }
+        },
+        "description": "Description of pid"
+      }
+    },
+    "websiteurl": {
+      "type": "string",
+      "description": "Description of websiteurl"
+    }
+  }
+}

@@ -91,8 +91,8 @@ public class PrepareResultInstRepoAssociation {
 			+ "AND datainfo.deletedbyinference = false  ) d "
 			+ "JOIN ( SELECT source, target "
 			+ "FROM relation "
-			+ "WHERE relclass = '"
-			+ ModelConstants.IS_PROVIDED_BY
+			+ "WHERE lower(relclass) = '"
+			+ ModelConstants.IS_PROVIDED_BY.toLowerCase()
 			+ "' "
 			+ "AND datainfo.deletedbyinference = false ) rel "
 			+ "ON d.id = rel.source ";
@@ -111,8 +111,8 @@ public class PrepareResultInstRepoAssociation {
 		String query = "Select source resultId, collect_set(target) organizationSet "
 			+ "from relation "
 			+ "where datainfo.deletedbyinference = false "
-			+ "and relClass = '"
-			+ ModelConstants.HAS_AUTHOR_INSTITUTION
+			+ "and lower(relClass) = '"
+			+ ModelConstants.HAS_AUTHOR_INSTITUTION.toLowerCase()
 			+ "' "
 			+ "group by source";
 
