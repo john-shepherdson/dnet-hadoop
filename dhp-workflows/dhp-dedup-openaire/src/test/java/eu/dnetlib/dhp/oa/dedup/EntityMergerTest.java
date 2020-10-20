@@ -53,6 +53,7 @@ public class EntityMergerTest implements Serializable {
 
 	@Test
 	public void softwareMergerTest() throws InstantiationException, IllegalAccessException {
+
 		List<Tuple2<String, Software>> softwares = readSample(
 			testEntityBasePath + "/software_merge.json", Software.class);
 
@@ -131,7 +132,6 @@ public class EntityMergerTest implements Serializable {
 		assertEquals("50|dedup_doi___::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
 
 		assertEquals(pub_merged.getAuthor().size(), 27);
-
 	}
 
 	@Test
@@ -142,7 +142,6 @@ public class EntityMergerTest implements Serializable {
 
 		// verify id
 		assertEquals("50|dedup_doi___::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
-
 	}
 
 	@Test
@@ -153,7 +152,6 @@ public class EntityMergerTest implements Serializable {
 
 		// verify id
 		assertEquals("50|dedup_wf_001::2d2bbbbcfb285e3fb3590237b79e2fa8", pub_merged.getId());
-
 	}
 
 	@Test
@@ -164,7 +162,6 @@ public class EntityMergerTest implements Serializable {
 
 		// verify id
 		assertEquals("50|dedup_wf_001::584b89679c3ccd1015b647ec63cc2699", pub_merged.getId());
-
 	}
 
 	public DataInfo setDI() {
