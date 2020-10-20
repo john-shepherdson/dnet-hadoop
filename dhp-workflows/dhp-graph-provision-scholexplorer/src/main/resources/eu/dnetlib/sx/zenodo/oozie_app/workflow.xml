@@ -8,9 +8,13 @@
             <name>targetPath</name>
             <description>the target path</description>
         </property>
+        <property>
+            <name>metadata</name>
+            <description>the metadata</description>
+        </property>
     </parameters>
 
-    <start to="MakeTar"/>
+    <start to="send_zenodo"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -24,6 +28,22 @@
             <arg>-t</arg><arg>${targetPath}</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-s</arg><arg>${sourcePath}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="send_zenodo">
+        <java>
+            <main-class>eu.dnetlib.dhp.export.zenodo.SendToZenodoHDFS</main-class>
+            <arg>--hdfsPath</arg><arg>/user/dnet.scholexplorer/scholix/provision/scholix.tar/scholix-2020-10-16.tar</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--accessToken</arg><arg>b6ddrY6b77WxcDEevn9gqVE5sL5sDNjdUijt75W3o7cQo5vpFFI48dMiu8Gv</arg>
+            <arg>--connectionUrl</arg><arg>https://zenodo.org/api/deposit/depositions</arg>
+            <arg>--metadata</arg><arg>${metadata}</arg>
+            <arg>--conceptRecordId</arg><arg>1200252</arg>
+            <arg>--newDeposition</arg><arg>false</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>
