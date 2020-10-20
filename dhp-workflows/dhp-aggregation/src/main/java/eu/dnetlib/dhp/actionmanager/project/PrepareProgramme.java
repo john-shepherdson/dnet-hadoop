@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.actionmanager.project;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
@@ -175,43 +177,54 @@ public class PrepareProgramme {
 				return csvProgramme;
 			});
 
-		prepareClassification(h2020Programmes);
+		// prepareClassification(h2020Programmes);
 
-		h2020Programmes
-			.map(csvProgramme -> OBJECT_MAPPER.writeValueAsString(csvProgramme))
+		JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<CSVProgramme> rdd = jsc.parallelize(prepareClassification(h2020Programmes), 1);
+		rdd
+			.map(csvProgramme -> {
+				String tmp = OBJECT_MAPPER.writeValueAsString(csvProgramme);
+				return tmp;
+			})
 			.saveAsTextFile(outputPath);
 
 	}
 
-	private static void prepareClassification(JavaRDD<CSVProgramme> h2020Programmes) {
+	private static List<CSVProgramme> prepareClassification(JavaRDD<CSVProgramme> h2020Programmes) {
 		Object[] codedescription = h2020Programmes
-			.map(value -> new Tuple2<>(value.getCode(), value.getTitle()))
+			.map(
+				value -> new Tuple2<>(value.getCode(),
+					new Tuple2<String, String>(value.getTitle(), value.getShortTitle())))
 			.collect()
 			.toArray();
 
 		for (int i = 0; i < codedescription.length - 1; i++) {
 			for (int j = i + 1; j < codedescription.length; j++) {
-				Tuple2<String, String> t2i = (Tuple2<String, String>) codedescription[i];
-				Tuple2<String, String> t2j = (Tuple2<String, String>) codedescription[j];
+				Tuple2<String, Tuple2<String, String>> t2i = (Tuple2<String, Tuple2<String, String>>) codedescription[i];
+				Tuple2<String, Tuple2<String, String>> t2j = (Tuple2<String, Tuple2<String, String>>) codedescription[j];
 				if (t2i._1().compareTo(t2j._1()) > 0) {
-					Tuple2<String, String> temp = t2i;
+					Tuple2<String, Tuple2<String, String>> temp = t2i;
 					codedescription[i] = t2j;
 					codedescription[j] = temp;
 				}
 			}
 		}
 
-		Map<String, String> map = new HashMap<>();
+		Map<String, Tuple2<String, String>> map = new HashMap<>();
 		for (int j = 0; j < codedescription.length; j++) {
-			Tuple2<String, String> entry = (Tuple2<String, String>) codedescription[j];
+			Tuple2<String, Tuple2<String, String>> entry = (Tuple2<String, Tuple2<String, String>>) codedescription[j];
 			String ent = entry._1();
 			if (ent.contains("Euratom-")) {
 				ent = ent.replace("-Euratom-", ".Euratom.");
 			}
 			String[] tmp = ent.split("\\.");
 			if (tmp.length <= 2) {
-				map.put(entry._1(), entry._2());
-
+				if (StringUtils.isEmpty(entry._2()._2())) {
+					map.put(entry._1(), new Tuple2<String, String>(entry._2()._1(), entry._2()._1()));
+				} else {
+					map.put(entry._1(), entry._2());
+				}
 			} else {
 				if (ent.endsWith(".")) {
 					ent = ent.substring(0, ent.length() - 1);
@@ -224,14 +237,14 @@ public class PrepareProgramme {
 						key = key.substring(0, key.length() - 1);
 					}
 				}
-				String current = entry._2();
+				String current = entry._2()._1();
 				if (!ent.contains("Euratom")) {
 
 					String parent;
 					String tmp_key = tmp[0] + ".";
 					for (int i = 1; i < tmp.length - 1; i++) {
 						tmp_key += tmp[i] + ".";
-						parent = map.get(tmp_key).toLowerCase().trim();
+						parent = map.get(tmp_key)._1().toLowerCase().trim();
 						if (parent.contains("|")) {
 							parent = parent.substring(parent.lastIndexOf("|") + 1).trim();
 						}
@@ -246,18 +259,29 @@ public class PrepareProgramme {
 					}
 
 				}
-				map.put(ent + ".", map.get(key) + " | " + current);
+				String shortTitle = entry._2()._2();
+				if (StringUtils.isEmpty(shortTitle)) {
+					shortTitle = current;
+				}
+				Tuple2<String, String> newEntry = new Tuple2<>(map.get(key)._1() + " | " + current,
+					map.get(key)._2() + " | " + shortTitle);
+				map.put(ent + ".", newEntry);
 
 			}
 
 		}
-		h2020Programmes.foreach(csvProgramme -> {
-			if (!csvProgramme.getCode().endsWith(".") && !csvProgramme.getCode().contains("Euratom")
-				&& !csvProgramme.getCode().equals("H2020-EC"))
-				csvProgramme.setClassification(map.get(csvProgramme.getCode() + "."));
-			else
-				csvProgramme.setClassification(map.get(csvProgramme.getCode()));
-		});
+		return h2020Programmes.map(csvProgramme -> {
+
+			String code = csvProgramme.getCode();
+			if (!code.endsWith(".") && !code.contains("Euratom")
+				&& !code.equals("H2020-EC"))
+				code += ".";
+
+			csvProgramme.setClassification(map.get(code)._1());
+			csvProgramme.setClassification_short(map.get(code)._2());
+
+			return csvProgramme;
+		}).collect();
 	}
 
 	public static <R> Dataset<R> readPath(

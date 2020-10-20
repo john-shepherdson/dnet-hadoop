@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
@@ -138,7 +137,8 @@ public class SparkAtomicActionJob {
 						pm.setCode(csvProject.getProgramme());
 						h2020classification.setClassification(ocsvProgramme.get().getClassification());
 						h2020classification.setH2020Programme(pm);
-						setLevelsAndProgramme(h2020classification, ocsvProgramme.get().getClassification());
+						setLevelsandProgramme(h2020classification, ocsvProgramme.get().getClassification_short());
+						// setProgramme(h2020classification, ocsvProgramme.get().getClassification());
 						pp.setH2020classification(Arrays.asList(h2020classification));
 
 						return pp;
@@ -177,8 +177,8 @@ public class SparkAtomicActionJob {
 
 	}
 
-	private static void setLevelsAndProgramme(H2020Classification h2020Classification, String classification) {
-		String[] tmp = classification.split(" \\| ");
+	private static void setLevelsandProgramme(H2020Classification h2020Classification, String classification_short) {
+		String[] tmp = classification_short.split(" \\| ");
 		h2020Classification.setLevel1(tmp[0]);
 		if (tmp.length > 1) {
 			h2020Classification.setLevel2(tmp[1]);
@@ -188,6 +188,12 @@ public class SparkAtomicActionJob {
 		}
 		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length - 1]);
 	}
+
+//	private static void setProgramme(H2020Classification h2020Classification, String classification) {
+//		String[] tmp = classification.split(" \\| ");
+//
+//		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length - 1]);
+//	}
 
 	public static <R> Dataset<R> readPath(
 		SparkSession spark, String inputPath, Class<R> clazz) {

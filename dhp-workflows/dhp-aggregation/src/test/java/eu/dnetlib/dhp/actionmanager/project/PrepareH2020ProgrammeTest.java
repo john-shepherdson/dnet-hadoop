@@ -92,6 +92,8 @@ public class PrepareH2020ProgrammeTest {
 
 		Assertions.assertEquals(0, verificationDataset.filter("classification = ''").count());
 
+		// tmp.foreach(csvProgramme -> System.out.println(OBJECT_MAPPER.writeValueAsString(csvProgramme)));
+
 		Assertions
 			.assertEquals(
 				"Societal challenges | Smart, Green And Integrated Transport | CLEANSKY2 | IADP Fast Rotorcraft",
