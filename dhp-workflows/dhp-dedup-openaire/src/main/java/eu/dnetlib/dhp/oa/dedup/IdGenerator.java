@@ -6,25 +6,25 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import eu.dnetlib.dhp.oa.dedup.model.Identifier;
-import eu.dnetlib.dhp.oa.dedup.model.PidType;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.collect.Lists;
 
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
+import eu.dnetlib.dhp.oa.dedup.model.PidType;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class IdGenerator implements Serializable {
 
 	public static String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
 	public static String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
-	public static String BASE_DATE	 = "2000-01-01";
+	public static String BASE_DATE = "2000-01-01";
 
 	// pick the best pid from the list (consider date and pidtype)
 	public static String generate(List<Identifier> pids, String defaultID) {
@@ -55,9 +55,9 @@ public class IdGenerator implements Serializable {
 			date = new Date();
 		}
 		return Lists
-				.newArrayList(
-						new Identifier(new StructuredProperty(), date, PidType.original, entity.getCollectedfrom(),
-								EntityType.fromClass(entity.getClass()), entity.getId()));
+			.newArrayList(
+				new Identifier(new StructuredProperty(), date, PidType.original, entity.getCollectedfrom(),
+					EntityType.fromClass(entity.getClass()), entity.getId()));
 	}
 
 	// pick the best pid from the entity. Returns a list (length 1) to save time in the call

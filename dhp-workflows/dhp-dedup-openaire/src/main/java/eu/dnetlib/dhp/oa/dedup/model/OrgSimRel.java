@@ -12,12 +12,13 @@ public class OrgSimRel implements Serializable {
 	String oa_country;
 	String oa_url;
 	String oa_collectedfrom;
+	String group_id;
 
 	public OrgSimRel() {
 	}
 
 	public OrgSimRel(String local_id, String oa_original_id, String oa_name, String oa_acronym, String oa_country,
-		String oa_url, String oa_collectedfrom) {
+		String oa_url, String oa_collectedfrom, String group_id) {
 		this.local_id = local_id;
 		this.oa_original_id = oa_original_id;
 		this.oa_name = oa_name;
@@ -25,6 +26,7 @@ public class OrgSimRel implements Serializable {
 		this.oa_country = oa_country;
 		this.oa_url = oa_url;
 		this.oa_collectedfrom = oa_collectedfrom;
+		this.group_id = group_id;
 	}
 
 	public String getLocal_id() {
@@ -81,6 +83,14 @@ public class OrgSimRel implements Serializable {
 
 	public void setOa_collectedfrom(String oa_collectedfrom) {
 		this.oa_collectedfrom = oa_collectedfrom;
+	}
+
+	public String getGroup_id() {
+		return group_id;
+	}
+
+	public void setGroup_id(String group_id) {
+		this.group_id = group_id;
 	}
 
 	@Override

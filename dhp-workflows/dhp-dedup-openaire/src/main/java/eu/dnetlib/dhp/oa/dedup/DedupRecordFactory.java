@@ -1,8 +1,8 @@
+
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.util.*;
 
-import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;

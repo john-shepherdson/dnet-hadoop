@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Sets;
 import eu.dnetlib.dhp.oa.dedup.IdGenerator;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
@@ -95,8 +96,13 @@ public class Identifier implements Serializable, Comparable<Identifier> {
 		// priority in comparisons: 1) pidtype, 2) collectedfrom (depending on the entity type) , 3) date 4)
 		// alphabetical order of the originalID
 
-		Set<String> lKeys = this.collectedFrom.stream().map(KeyValue::getKey).collect(Collectors.toSet());
-		Set<String> rKeys = i.getCollectedFrom().stream().map(KeyValue::getKey).collect(Collectors.toSet());
+		Set<String> lKeys = Sets.newHashSet();
+		if (this.collectedFrom != null)
+			lKeys = this.collectedFrom.stream().map(KeyValue::getKey).collect(Collectors.toSet());
+
+		Set<String> rKeys = Sets.newHashSet();
+		if (i.getCollectedFrom() != null)
+			rKeys = i.getCollectedFrom().stream().map(KeyValue::getKey).collect(Collectors.toSet());
 
 		if (this.getType().compareTo(i.getType()) == 0) { // same type
 			if (entityType == EntityType.publication) {

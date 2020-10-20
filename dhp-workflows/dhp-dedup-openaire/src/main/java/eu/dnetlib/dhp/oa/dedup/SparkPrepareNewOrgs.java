@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
-import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -18,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -62,6 +66,10 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.map(Integer::valueOf)
 			.orElse(NUM_CONNECTIONS);
 
+		final String apiUrl = Optional
+			.ofNullable(parser.get("apiUrl"))
+			.orElse("");
+
 		final String dbUrl = parser.get("dbUrl");
 		final String dbTable = parser.get("dbTable");
 		final String dbUser = parser.get("dbUser");
@@ -72,6 +80,7 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		log.info("actionSetId:   '{}'", actionSetId);
 		log.info("workingPath:   '{}'", workingPath);
 		log.info("numPartitions: '{}'", numConnections);
+		log.info("apiUrl:        '{}'", apiUrl);
 		log.info("dbUrl:         '{}'", dbUrl);
 		log.info("dbUser:        '{}'", dbUser);
 		log.info("table:         '{}'", dbTable);
@@ -89,8 +98,11 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		newOrgs
 			.repartition(numConnections)
 			.write()
-			.mode(SaveMode.Overwrite)
+			.mode(SaveMode.Append)
 			.jdbc(dbUrl, dbTable, connectionProperties);
+
+		if (!apiUrl.isEmpty())
+			updateSimRels(apiUrl);
 
 	}
 
@@ -138,9 +150,21 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 					r._1()._2().getLegalshortname() != null ? r._1()._2().getLegalshortname().getValue() : "",
 					r._1()._2().getCountry() != null ? r._1()._2().getCountry().getClassid() : "",
 					r._1()._2().getWebsiteurl() != null ? r._1()._2().getWebsiteurl().getValue() : "",
-					r._1()._2().getCollectedfrom().get(0).getValue()),
+					r._1()._2().getCollectedfrom().get(0).getValue(), ""),
 				Encoders.bean(OrgSimRel.class));
 
+	}
+
+	private static String updateSimRels(final String apiUrl) throws IOException {
+
+		log.info("Updating simrels on the portal");
+
+		final HttpGet req = new HttpGet(apiUrl);
+		try (final CloseableHttpClient client = HttpClients.createDefault()) {
+			try (final CloseableHttpResponse response = client.execute(req)) {
+				return IOUtils.toString(response.getEntity().getContent());
+			}
+		}
 	}
 
 }

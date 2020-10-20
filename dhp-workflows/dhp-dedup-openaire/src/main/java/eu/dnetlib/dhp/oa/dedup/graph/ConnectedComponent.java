@@ -6,13 +6,13 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.dedup.DedupUtility;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.pace.util.PaceException;
 
 public class ConnectedComponent implements Serializable {

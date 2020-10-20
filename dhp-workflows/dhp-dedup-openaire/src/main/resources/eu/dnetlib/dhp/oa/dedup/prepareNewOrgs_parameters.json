@@ -30,6 +30,12 @@
     "paramRequired": false
   },
   {
+    "paramName": "au",
+    "paramLongName": "apiUrl",
+    "paramDescription": "the url for the APIs of the openorgs service",
+    "paramRequired": false
+  },
+  {
     "paramName": "du",
     "paramLongName": "dbUrl",
     "paramDescription": "the url of the database",
