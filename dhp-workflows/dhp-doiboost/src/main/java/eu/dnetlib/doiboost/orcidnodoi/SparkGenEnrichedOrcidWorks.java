@@ -167,6 +167,6 @@ public class SparkGenEnrichedOrcidWorks {
 				return name.getAsString();
 			}
 		}
-		return null;
+		return new String("");
 	}
 }
