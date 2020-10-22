@@ -1,0 +1,32 @@
+[
+	{
+		"paramName": "wp",
+		"paramLongName": "workingPath",
+		"paramDescription": "the working path",
+		"paramRequired": true
+	},
+	{
+		"paramName": "dburl",
+		"paramLongName": "dbUrl",
+		"paramDescription": "the broker database url",
+		"paramRequired": true
+	},
+	{
+		"paramName": "u",
+		"paramLongName": "dbUser",
+		"paramDescription": "the broker database user",
+		"paramRequired": true
+	},
+	{
+		"paramName": "p",
+		"paramLongName": "dbPassword",
+		"paramDescription": "the broker database password",
+		"paramRequired": true
+	},
+	{
+		"paramName": "broker",
+		"paramLongName": "brokerApiBaseUrl",
+		"paramDescription": "the url of the broker service api",
+		"paramRequired": true
+	}
+]

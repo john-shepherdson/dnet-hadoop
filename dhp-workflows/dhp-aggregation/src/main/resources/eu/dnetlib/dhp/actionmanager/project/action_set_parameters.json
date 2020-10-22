@@ -17,6 +17,12 @@
 "paramDescription": "the URL from where to get the programme file",
 "paramRequired": true
 },
+  {
+    "paramName": "tp",
+    "paramLongName": "topicPath",
+    "paramDescription": "the URL from where to get the topic file",
+    "paramRequired": true
+  },
 {
 "paramName": "o",
 "paramLongName": "outputPath",

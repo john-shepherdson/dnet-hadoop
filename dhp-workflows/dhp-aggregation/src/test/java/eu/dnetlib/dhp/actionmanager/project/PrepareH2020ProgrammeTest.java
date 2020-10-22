@@ -21,29 +21,29 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
 
-public class PrepareProgrammeTest {
+public class PrepareH2020ProgrammeTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private static final ClassLoader cl = eu.dnetlib.dhp.actionmanager.project.PrepareProgrammeTest.class
+	private static final ClassLoader cl = PrepareH2020ProgrammeTest.class
 		.getClassLoader();
 
 	private static SparkSession spark;
 
 	private static Path workingDir;
 	private static final Logger log = LoggerFactory
-		.getLogger(eu.dnetlib.dhp.actionmanager.project.PrepareProgrammeTest.class);
+		.getLogger(PrepareH2020ProgrammeTest.class);
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files
-			.createTempDirectory(eu.dnetlib.dhp.actionmanager.project.PrepareProgrammeTest.class.getSimpleName());
+			.createTempDirectory(PrepareH2020ProgrammeTest.class.getSimpleName());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
-		conf.setAppName(eu.dnetlib.dhp.actionmanager.project.PrepareProgrammeTest.class.getSimpleName());
+		conf.setAppName(PrepareH2020ProgrammeTest.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
@@ -54,7 +54,7 @@ public class PrepareProgrammeTest {
 
 		spark = SparkSession
 			.builder()
-			.appName(PrepareProgrammeTest.class.getSimpleName())
+			.appName(PrepareH2020ProgrammeTest.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}
@@ -88,7 +88,60 @@ public class PrepareProgrammeTest {
 
 		Dataset<CSVProgramme> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(CSVProgramme.class));
 
-		Assertions.assertEquals(0, verificationDataset.filter("shortTitle =''").count());
+		Assertions.assertEquals(0, verificationDataset.filter("title =''").count());
+
+		Assertions.assertEquals(0, verificationDataset.filter("classification = ''").count());
+
+		Assertions
+			.assertEquals(
+				"Societal challenges | Smart, Green And Integrated Transport | CLEANSKY2 | IADP Fast Rotorcraft",
+				verificationDataset
+					.filter("code = 'H2020-EU.3.4.5.3.'")
+					.select("classification")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+
+		Assertions
+			.assertEquals(
+				"Euratom | Indirect actions | European Fusion Development Agreement",
+				verificationDataset
+					.filter("code = 'H2020-Euratom-1.9.'")
+					.select("classification")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+
+		Assertions
+			.assertEquals(
+				"Industrial leadership | Leadership in enabling and industrial technologies | Advanced manufacturing and processing | New sustainable business models",
+				verificationDataset
+					.filter("code = 'H2020-EU.2.1.5.4.'")
+					.select("classification")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+
+		Assertions
+			.assertEquals(
+				"Excellent science | Future and Emerging Technologies (FET) | FET Open",
+				verificationDataset
+					.filter("code = 'H2020-EU.1.2.1.'")
+					.select("classification")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+
+		Assertions
+			.assertEquals(
+				"Industrial leadership | Leadership in enabling and industrial technologies | Biotechnology",
+				verificationDataset
+					.filter("code = 'H2020-EU.2.1.4.'")
+					.select("classification")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+
 	}
 
 }

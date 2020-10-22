@@ -3,47 +3,54 @@ package eu.dnetlib.dhp.actionmanager.project;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.SequenceFile;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
-import org.apache.spark.rdd.SequenceFileRDDFunctions;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme;
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Programme;
+import eu.dnetlib.dhp.schema.oaf.H2020Classification;
+import eu.dnetlib.dhp.schema.oaf.H2020Programme;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.utils.DHPUtils;
-import scala.Function1;
 import scala.Tuple2;
-import scala.runtime.BoxedUnit;
 
+/**
+ * Class that makes the ActionSet. To prepare the AS two joins are needed
+ *
+ *  1. join betweem the collected project subset and the programme extenden with the classification on the grant agreement.
+ *     For each entry a
+ *     eu.dnetlib.dhp.Project entity is created and the information about H2020Classification is set together with the
+ *     h2020topiccode variable
+ *  2. join between the output of the previous step and the topic information on the topic code. Each time a match is
+ *     found the h2020topicdescription variable is set.
+ *
+ * To produce one single entry for each project code a step of groupoing is needed: each project can be associated to more
+ * than one programme.
+ *
+ *
+ */
 public class SparkAtomicActionJob {
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -77,6 +84,9 @@ public class SparkAtomicActionJob {
 		final String programmePath = parser.get("programmePath");
 		log.info("programmePath {}: ", programmePath);
 
+		final String topicPath = parser.get("topicPath");
+		log.info("topic path {}: ", topicPath);
+
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
@@ -88,6 +98,7 @@ public class SparkAtomicActionJob {
 					spark,
 					projectPath,
 					programmePath,
+					topicPath,
 					outputPath);
 			});
 	}
@@ -98,31 +109,53 @@ public class SparkAtomicActionJob {
 
 	private static void getAtomicActions(SparkSession spark, String projectPatH,
 		String programmePath,
+		String topicPath,
 		String outputPath) {
 
 		Dataset<CSVProject> project = readPath(spark, projectPatH, CSVProject.class);
 		Dataset<CSVProgramme> programme = readPath(spark, programmePath, CSVProgramme.class);
+		Dataset<EXCELTopic> topic = readPath(spark, topicPath, EXCELTopic.class);
 
-		project
+		Dataset<Project> aaproject = project
 			.joinWith(programme, project.col("programme").equalTo(programme.col("code")), "left")
-			.map(c -> {
-				CSVProject csvProject = c._1();
-				Optional<CSVProgramme> csvProgramme = Optional.ofNullable(c._2());
-				if (csvProgramme.isPresent()) {
-					Project p = new Project();
-					p
-						.setId(
-							createOpenaireId(
-								ModelSupport.entityIdPrefix.get("project"),
-								"corda__h2020", csvProject.getId()));
-					Programme pm = new Programme();
-					pm.setCode(csvProject.getProgramme());
-					pm.setDescription(csvProgramme.get().getShortTitle());
-					p.setProgramme(Arrays.asList(pm));
-					return p;
-				}
+			.map((MapFunction<Tuple2<CSVProject, CSVProgramme>, Project>) c -> {
 
-				return null;
+				CSVProject csvProject = c._1();
+				Optional<CSVProgramme> ocsvProgramme = Optional.ofNullable(c._2());
+
+				return Optional
+					.ofNullable(c._2())
+					.map(csvProgramme -> {
+						Project pp = new Project();
+						pp
+							.setId(
+								createOpenaireId(
+									ModelSupport.entityIdPrefix.get("project"),
+									"corda__h2020", csvProject.getId()));
+						pp.setH2020topiccode(csvProject.getTopics());
+						H2020Programme pm = new H2020Programme();
+						H2020Classification h2020classification = new H2020Classification();
+						pm.setCode(csvProject.getProgramme());
+						h2020classification.setClassification(ocsvProgramme.get().getClassification());
+						h2020classification.setH2020Programme(pm);
+						setLevelsAndProgramme(h2020classification, ocsvProgramme.get().getClassification());
+						pp.setH2020classification(Arrays.asList(h2020classification));
+
+						return pp;
+					})
+					.orElse(null);
+
+			}, Encoders.bean(Project.class));
+
+		aaproject
+			.joinWith(topic, aaproject.col("h2020topiccode").equalTo(topic.col("code")))
+			.map((MapFunction<Tuple2<Project, EXCELTopic>, Project>) p -> {
+				Optional<EXCELTopic> op = Optional.ofNullable(p._2());
+				Project rp = p._1();
+				if (op.isPresent()) {
+					rp.setH2020topicdescription(op.get().getTitle());
+				}
+				return rp;
 			}, Encoders.bean(Project.class))
 			.filter(Objects::nonNull)
 			.groupByKey(
@@ -142,6 +175,18 @@ public class SparkAtomicActionJob {
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 
+	}
+
+	private static void setLevelsAndProgramme(H2020Classification h2020Classification, String classification) {
+		String[] tmp = classification.split(" \\| ");
+		h2020Classification.setLevel1(tmp[0]);
+		if (tmp.length > 1) {
+			h2020Classification.setLevel2(tmp[1]);
+		}
+		if (tmp.length > 2) {
+			h2020Classification.setLevel3(tmp[2]);
+		}
+		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length - 1]);
 	}
 
 	public static <R> Dataset<R> readPath(

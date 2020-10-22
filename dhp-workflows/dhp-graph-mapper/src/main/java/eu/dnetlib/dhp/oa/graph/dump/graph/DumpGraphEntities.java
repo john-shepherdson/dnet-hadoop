@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -88,7 +89,9 @@ public class DumpGraphEntities implements Serializable {
 		Class<E> inputClazz) {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
-			.map(d -> mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) d), Encoders.bean(Datasource.class))
+			.map(
+				(MapFunction<E, Datasource>) d -> mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) d),
+				Encoders.bean(Datasource.class))
 			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -100,7 +103,9 @@ public class DumpGraphEntities implements Serializable {
 		Class<E> inputClazz) {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
-			.map(p -> mapProject((eu.dnetlib.dhp.schema.oaf.Project) p), Encoders.bean(Project.class))
+			.map(
+				(MapFunction<E, Project>) p -> mapProject((eu.dnetlib.dhp.schema.oaf.Project) p),
+				Encoders.bean(Project.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -374,13 +379,17 @@ public class DumpGraphEntities implements Serializable {
 		}
 
 		project
-			.setProgramme(
+			.setH2020Classifications(
 				Optional
-					.ofNullable(p.getProgramme())
+					.ofNullable(p.getH2020classification())
 					.map(
-						programme -> programme
+						classification -> classification
 							.stream()
-							.map(pg -> Programme.newInstance(pg.getCode(), pg.getDescription()))
+							.map(
+								c -> H2020Classification
+									.newInstance(
+										c.getH2020Programme().getCode(), c.getH2020Programme().getDescription(),
+										c.getLevel1(), c.getLevel2(), c.getLevel3(), c.getClassification()))
 							.collect(Collectors.toList()))
 					.orElse(new ArrayList<>()));
 
@@ -442,7 +451,9 @@ public class DumpGraphEntities implements Serializable {
 		Class<E> inputClazz) {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
-			.map(o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o), Encoders.bean(Organization.class))
+			.map(
+				(MapFunction<E, Organization>) o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o),
+				Encoders.bean(Organization.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

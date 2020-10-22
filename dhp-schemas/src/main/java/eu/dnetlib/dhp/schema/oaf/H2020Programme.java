@@ -4,7 +4,13 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Programme implements Serializable {
+/**
+ * To store information about the ec programme for the project. It has the following parameters:
+ * - private String code to store the code of the programme
+ * - private String description to store the description of the programme
+ */
+
+public class H2020Programme implements Serializable {
 	private String code;
 	private String description;
 
@@ -31,8 +37,8 @@ public class Programme implements Serializable {
 		if (o == null || getClass() != o.getClass())
 			return false;
 
-		Programme programme = (Programme) o;
-		return Objects.equals(code, programme.code);
+		H2020Programme h2020Programme = (H2020Programme) o;
+		return Objects.equals(code, h2020Programme.code);
 	}
 
 }

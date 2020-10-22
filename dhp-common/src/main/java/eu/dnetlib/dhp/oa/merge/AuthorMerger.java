@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.dedup;
+package eu.dnetlib.dhp.oa.merge;
 
 import java.text.Normalizer;
 import java.util.*;
@@ -94,7 +94,13 @@ public class AuthorMerger {
 							if (r.getPid() == null) {
 								r.setPid(new ArrayList<>());
 							}
-							r.getPid().add(a._1());
+
+							// TERRIBLE HACK but for some reason when we create and Array with Arrays.asList,
+							// it creates of fixed size, and the add method raise UnsupportedOperationException at
+							// java.util.AbstractList.add
+							final List<StructuredProperty> tmp = new ArrayList<>(r.getPid());
+							tmp.add(a._1());
+							r.setPid(tmp);
 						}
 					}
 				});

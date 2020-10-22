@@ -32,6 +32,10 @@
         <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
     </property>
     <property>
+        <name>oozie.launcher.mapreduce.user.classpath.first</name>
+        <value>true</value>
+    </property>
+    <property>
         <name>sparkExecutorNumber</name>
         <value>4</value>
     </property>

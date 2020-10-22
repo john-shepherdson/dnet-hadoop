@@ -3,7 +3,7 @@ SELECT
 	d.id || array_agg(distinct di.pid)                                                                         AS identities,
 	d.officialname                                                                                             AS officialname,
 	d.englishname                                                                                              AS englishname,
-	d.contactemail                                                                                             AS contactemail,      
+	d.contactemail                                                                                             AS contactemail,
 	CASE
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['openaire-cris_1.1'])
     			THEN
@@ -84,8 +84,10 @@ SELECT
 	dc.id                                                                                                      AS collectedfromid,
 	dc.officialname                                                                                            AS collectedfromname,
 	d.typology||'@@@dnet:datasource_typologies'                                                                AS datasourcetype,
-	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
-	d.issn || ' @@@ ' || d.eissn || ' @@@ ' || d.lissn                                                       AS journal
+	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions'                                             AS provenanceaction,
+	d.issn                                                                                                     AS issnPrinted,
+	d.eissn                                                                                                    AS issnOnline,
+	d.lissn                                                                                                    AS issnLinking
 
 FROM dsm_datasources d
 

@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.LicenseComparator;
+
 public class Result extends OafEntity implements Serializable {
 
 	private List<Measure> measures;
@@ -245,7 +247,8 @@ public class Result extends OafEntity implements Serializable {
 
 		instance = mergeLists(instance, r.getInstance());
 
-		if (r.getBestaccessright() != null && compareTrust(this, r) < 0)
+		if (r.getBestaccessright() != null
+			&& new LicenseComparator().compare(r.getBestaccessright(), bestaccessright) < 0)
 			bestaccessright = r.getBestaccessright();
 
 		if (r.getResulttype() != null && compareTrust(this, r) < 0)

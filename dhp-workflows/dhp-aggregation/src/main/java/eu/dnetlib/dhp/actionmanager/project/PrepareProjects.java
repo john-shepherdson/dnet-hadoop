@@ -6,9 +6,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.util.*;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -20,12 +18,16 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProgramme;
-import eu.dnetlib.dhp.actionmanager.project.csvutils.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.CSVProject;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;
 
+/**
+ * Selects only the relevant information collected with the projects: project grant agreement, project programme code and
+ * project topic code for the projects that are also collected from OpenAIRE.
+ */
 public class PrepareProjects {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareProgramme.class);
@@ -97,10 +99,14 @@ public class PrepareProjects {
 			if (csvProject.isPresent()) {
 
 				String[] programme = csvProject.get().getProgramme().split(";");
+				String topic = csvProject.get().getTopics();
+
 				Arrays
 					.stream(programme)
 					.forEach(p -> {
 						CSVProject proj = new CSVProject();
+						proj.setTopics(topic);
+
 						proj.setProgramme(p);
 						proj.setId(csvProject.get().getId());
 						csvProjectList.add(proj);

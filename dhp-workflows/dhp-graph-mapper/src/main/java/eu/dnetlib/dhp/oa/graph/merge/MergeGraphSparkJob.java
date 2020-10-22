@@ -3,8 +3,9 @@ package eu.dnetlib.dhp.oa.graph.merge;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+
+import javax.xml.crypto.Data;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -14,6 +15,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,14 @@ public class MergeGraphSparkJob {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private static final String PRIORITY_DEFAULT = "BETA"; // BETA | PROD
+
+	private static final Datasource DATASOURCE = new Datasource();
+
+	static {
+		Qualifier compatibility = new Qualifier();
+		compatibility.setClassid("UNKNOWN");
+		DATASOURCE.setOpenairecompatibility(compatibility);
+	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -104,6 +114,10 @@ public class MergeGraphSparkJob {
 			.map((MapFunction<Tuple2<Tuple2<String, P>, Tuple2<String, B>>, P>) value -> {
 				Optional<P> p = Optional.ofNullable(value._1()).map(Tuple2::_2);
 				Optional<B> b = Optional.ofNullable(value._2()).map(Tuple2::_2);
+
+				if (p.orElse((P) b.orElse((B) DATASOURCE)) instanceof Datasource) {
+					return mergeDatasource(p, b);
+				}
 				switch (priority) {
 					default:
 					case "BETA":
@@ -117,6 +131,36 @@ public class MergeGraphSparkJob {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+	}
+
+	/**
+	 * Datasources involved in the merge operation doesn't obey to the infra precedence policy, but relies on a custom
+	 * behaviour that, given two datasources from beta and prod returns the one from prod with the highest
+	 * compatibility among the two.
+	 *
+	 * @param p datasource from PROD
+	 * @param b datasource from BETA
+	 * @param <P> Datasource class type from PROD
+	 * @param <B> Datasource class type from BETA
+	 * @return the datasource from PROD with the highest compatibility level.
+	 */
+	protected static <P extends Oaf, B extends Oaf> P mergeDatasource(Optional<P> p, Optional<B> b) {
+		if (p.isPresent() & !b.isPresent()) {
+			return p.get();
+		}
+		if (b.isPresent() & !p.isPresent()) {
+			return (P) b.get();
+		}
+		if (!b.isPresent() & !p.isPresent()) {
+			return null; // unlikely, at least one should be produced by the join operation
+		}
+
+		Datasource dp = (Datasource) p.get();
+		Datasource db = (Datasource) b.get();
+
+		List<Qualifier> list = Arrays.asList(dp.getOpenairecompatibility(), db.getOpenairecompatibility());
+		dp.setOpenairecompatibility(Collections.min(list, new DatasourceCompatibilityComparator()));
+		return (P) dp;
 	}
 
 	private static <P extends Oaf, B extends Oaf> P mergeWithPriorityToPROD(Optional<P> p, Optional<B> b) {
