@@ -128,10 +128,7 @@ public class ActivitiesDumpReader {
 							}
 						}
 					} catch (Exception e) {
-						Log
-							.warn(
-								"Parsing work from tar archive and xml work: " + filename + "  " + e.getMessage());
-//						Log.warn(e);
+						throw new Exception(filename, e);
 					}
 
 					if ((counter % XML_WORKS_PARSED_COUNTER_LOG_INTERVAL) == 0) {
@@ -143,7 +140,7 @@ public class ActivitiesDumpReader {
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Log.warn("Parsing work from gzip archive: " + e.getMessage());
 			Log.warn(e);
 			throw new RuntimeException(e);
