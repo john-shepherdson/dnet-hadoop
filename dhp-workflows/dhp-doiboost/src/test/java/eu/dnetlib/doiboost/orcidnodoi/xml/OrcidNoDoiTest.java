@@ -41,7 +41,7 @@ public class OrcidNoDoiTest {
 	String orcidIdA = "0000-0003-2760-1191";
 
 	@Test
-	@Ignore
+//	@Ignore
 	public void readPublicationFieldsTest()
 		throws IOException, XPathEvalException, XPathParseException, NavException, VtdException, ParseException {
 		logger.info("running loadPublicationFieldsTest ....");
@@ -95,7 +95,7 @@ public class OrcidNoDoiTest {
 	}
 
 	@Test
-	@Ignore
+//	@Ignore
 	private void authorMatchTest() throws Exception {
 		logger.info("running authorSimpleMatchTest ....");
 		String orcidWork = "activity_work_0000-0003-2760-1191-similarity.xml";
