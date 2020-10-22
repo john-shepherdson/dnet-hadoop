@@ -97,8 +97,8 @@ public class PublicationToOaf implements Serializable {
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/doiboost/orcidnodoi/mappings/typologies.json"));
 			typologiesMapping = new Gson().fromJson(tt, Map.class);
-		} catch (final Exception e) {
-			logger.error("loading typologies", e);
+		} catch (Exception e) {
+			throw new RuntimeException("loading typologies", e);
 		}
 	}
 
