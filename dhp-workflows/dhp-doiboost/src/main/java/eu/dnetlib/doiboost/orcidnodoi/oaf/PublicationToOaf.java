@@ -185,6 +185,7 @@ public class PublicationToOaf implements Serializable {
 					.map(t -> {
 						return mapStructuredProperty(t, q, null);
 					})
+						.filter(s -> s!=null)
 					.collect(Collectors.toList()));
 		// Adding identifier
 		final String id = getStringValue(rootElement, "id");
@@ -376,7 +377,7 @@ public class PublicationToOaf implements Serializable {
 						.map(r -> {
 							return mapStructuredProperty(r, q, null);
 						})
-						.collect(Collectors.toList()));
+						.filter(s -> s!=null).collect(Collectors.toList()));
 		}
 	}
 
