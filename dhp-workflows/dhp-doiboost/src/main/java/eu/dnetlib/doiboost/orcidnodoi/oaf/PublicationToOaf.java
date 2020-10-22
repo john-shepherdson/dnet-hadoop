@@ -166,7 +166,13 @@ public class PublicationToOaf implements Serializable {
 		// Adding source
 		final String source = getStringValue(rootElement, "sourceName");
 		if (StringUtils.isNotBlank(source)) {
-			publication.setSource(Arrays.asList(mapStringField(source, null)));
+			Field<String> sourceField = mapStringField(source, null);
+			if (sourceField==null) {
+				publication.setSource(null);
+			}
+			else {
+				publication.setSource(Arrays.asList(sourceField));
+			}
 		}
 
 		// Adding titles
