@@ -50,6 +50,7 @@ public class OrcidDSManager {
 
 	protected FileSystem initFileSystemObject(Configuration conf) throws IOException {
 		// Get the filesystem - HDFS
+		// if there is an exception, it will be propagate
 		FileSystem fs = null;
 		fs = FileSystem.get(URI.create(hdfsServerUri.concat(workingPath)), conf);
 		return fs;
