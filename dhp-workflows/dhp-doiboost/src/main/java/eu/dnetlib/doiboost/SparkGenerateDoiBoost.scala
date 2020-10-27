@@ -1,13 +1,15 @@
 package eu.dnetlib.doiboost
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Dataset => OafDataset, Organization}
+import eu.dnetlib.dhp.oa.merge.AuthorMerger
+import eu.dnetlib.dhp.schema.oaf.{Organization, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.doiboost.mag.ConversionUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.JavaConverters._
 
 object SparkGenerateDoiBoost {
@@ -49,6 +51,7 @@ object SparkGenerateDoiBoost {
         val otherPub = item._2._2
         if (otherPub != null) {
           crossrefPub.mergeFrom(otherPub)
+          crossrefPub.setAuthor(AuthorMerger.mergeAuthor(crossrefPub.getAuthor, otherPub.getAuthor))
         }
       }
       crossrefPub
