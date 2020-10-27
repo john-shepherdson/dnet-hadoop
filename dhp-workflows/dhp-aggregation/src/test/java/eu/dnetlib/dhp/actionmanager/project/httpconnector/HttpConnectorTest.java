@@ -13,7 +13,7 @@ public class HttpConnectorTest {
 	private static final Log log = LogFactory.getLog(HttpConnectorTest.class);
 	private static HttpConnector connector;
 
-	private static final String URL = "http://cordis.europa.eu/data/reference/cordisref-H2020programmes.csv";
+	private static final String URL = "http://cordis.europa.eu/data/reference/cordisref-H2020topics.xlsx";
 	private static final String URL_MISCONFIGURED_SERVER = "https://www.alexandria.unisg.ch/cgi/oai2?verb=Identify";
 	private static final String URL_GOODSNI_SERVER = "https://air.unimi.it/oai/openaire?verb=Identify";
 

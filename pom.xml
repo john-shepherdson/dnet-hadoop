@@ -328,7 +328,7 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-pace-core</artifactId>
-				<version>4.0.4</version>
+				<version>4.0.5</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
@@ -429,6 +429,21 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-compress</artifactId>
 				<version>${common.compress.version}</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>${common.csv.version}</version>
+			</dependency>
+
+
+			<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>${apache.poi.version}</version>
 			</dependency>
 
 			<dependency>
@@ -666,8 +681,10 @@
 		<dnet.openaire.broker.common>3.1.1</dnet.openaire.broker.common>
 		<solr.version>7.5.0</solr.version>
 		<okhttp.version>4.7.2</okhttp.version>
-		<common.compress.version>1.1</common.compress.version>
+		<common.compress.version>1.20</common.compress.version>
 		<json4s.version>3.5.3</json4s.version>
 		<jsonschemagenerator.version>4.13.0</jsonschemagenerator.version>
+		<common.csv.version>1.8</common.csv.version>
+		<apache.poi.version>4.1.2</apache.poi.version>
 	</properties>
 </project>

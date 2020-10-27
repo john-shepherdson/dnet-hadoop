@@ -1,4 +1,5 @@
 package eu.dnetlib.dhp.sx.ebi
+import eu.dnetlib.dhp.oa.merge.AuthorMerger
 import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIUnknown}
 import org.apache.spark.sql.{Encoder, Encoders}
@@ -14,6 +15,7 @@ object EBIAggregator {
 
     override def reduce(b: OafDataset, a: (String, OafDataset)): OafDataset = {
       b.mergeFrom(a._2)
+      b.setAuthor(AuthorMerger.mergeAuthor(a._2.getAuthor, b.getAuthor))
       if (b.getId == null)
         b.setId(a._2.getId)
       b
@@ -22,6 +24,7 @@ object EBIAggregator {
 
     override def merge(wx: OafDataset, wy: OafDataset): OafDataset = {
       wx.mergeFrom(wy)
+      wx.setAuthor(AuthorMerger.mergeAuthor(wy.getAuthor, wx.getAuthor))
       if(wx.getId == null && wy.getId.nonEmpty)
         wx.setId(wy.getId)
       wx
@@ -34,8 +37,6 @@ object EBIAggregator {
     override def outputEncoder: Encoder[OafDataset] =
       Encoders.kryo(classOf[OafDataset])
   }
-
-
 
   def getDLIUnknownAggregator(): Aggregator[(String, DLIUnknown), DLIUnknown, DLIUnknown] = new Aggregator[(String, DLIUnknown), DLIUnknown, DLIUnknown]{
 
@@ -69,6 +70,7 @@ object EBIAggregator {
 
     override def reduce(b: DLIDataset, a: (String, DLIDataset)): DLIDataset = {
       b.mergeFrom(a._2)
+      b.setAuthor(AuthorMerger.mergeAuthor(a._2.getAuthor, b.getAuthor))
       if (b.getId == null)
         b.setId(a._2.getId)
       b
@@ -76,6 +78,7 @@ object EBIAggregator {
 
     override def merge(wx: DLIDataset, wy: DLIDataset): DLIDataset = {
       wx.mergeFrom(wy)
+      wx.setAuthor(AuthorMerger.mergeAuthor(wy.getAuthor, wx.getAuthor))
       if(wx.getId == null && wy.getId.nonEmpty)
         wx.setId(wy.getId)
       wx
@@ -96,6 +99,8 @@ object EBIAggregator {
 
     override def reduce(b: DLIPublication, a: (String, DLIPublication)): DLIPublication = {
       b.mergeFrom(a._2)
+      b.setAuthor(AuthorMerger.mergeAuthor(a._2.getAuthor, b.getAuthor))
+
       if (b.getId == null)
         b.setId(a._2.getId)
       b
@@ -104,6 +109,7 @@ object EBIAggregator {
 
     override def merge(wx: DLIPublication, wy: DLIPublication): DLIPublication = {
       wx.mergeFrom(wy)
+      wx.setAuthor(AuthorMerger.mergeAuthor(wy.getAuthor, wx.getAuthor))
       if(wx.getId == null && wy.getId.nonEmpty)
         wx.setId(wy.getId)
       wx
@@ -124,6 +130,7 @@ object EBIAggregator {
 
     override def reduce(b: Publication, a: (String, Publication)): Publication = {
       b.mergeFrom(a._2)
+      b.setAuthor(AuthorMerger.mergeAuthor(a._2.getAuthor, b.getAuthor))
       if (b.getId == null)
         b.setId(a._2.getId)
       b
@@ -132,6 +139,7 @@ object EBIAggregator {
 
     override def merge(wx: Publication, wy: Publication): Publication = {
       wx.mergeFrom(wy)
+      wx.setAuthor(AuthorMerger.mergeAuthor(wy.getAuthor, wx.getAuthor))
       if(wx.getId == null && wy.getId.nonEmpty)
         wx.setId(wy.getId)
       wx
@@ -144,7 +152,6 @@ object EBIAggregator {
     override def outputEncoder: Encoder[Publication] =
       Encoders.kryo(classOf[Publication])
   }
-
 
   def getRelationAggregator(): Aggregator[(String, Relation), Relation, Relation] = new Aggregator[(String, Relation), Relation, Relation]{
 
@@ -166,10 +173,4 @@ object EBIAggregator {
     override def outputEncoder: Encoder[Relation] =
       Encoders.kryo(classOf[Relation])
   }
-
-
-
-
-
-
 }

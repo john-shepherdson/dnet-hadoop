@@ -89,7 +89,7 @@
             </spark-opts>
             <arg>--dbPublicationPath</arg><arg>${workingDirPath}/doiBoostPublicationFiltered</arg>
             <arg>--dbDatasetPath</arg><arg>${workingDirPath}/crossrefDataset</arg>
-            <arg>--crossRefRelation</arg><arg>/data/doiboost/input/crossref/relations</arg>
+            <arg>--crossRefRelation</arg><arg>${workingDirPath}/crossrefRelation</arg>
             <arg>--dbaffiliationRelationPath</arg><arg>${workingDirPath}/doiBoostPublicationAffiliation</arg>
             <arg>-do</arg><arg>${workingDirPath}/doiBoostOrganization</arg>
             <arg>--targetPath</arg><arg>${workingDirPath}/actionDataSet</arg>

@@ -379,13 +379,17 @@ public class DumpGraphEntities implements Serializable {
 		}
 
 		project
-			.setProgramme(
+			.setH2020Classifications(
 				Optional
-					.ofNullable(p.getProgramme())
+					.ofNullable(p.getH2020classification())
 					.map(
-						programme -> programme
+						classification -> classification
 							.stream()
-							.map(pg -> Programme.newInstance(pg.getCode(), pg.getDescription()))
+							.map(
+								c -> H2020Classification
+									.newInstance(
+										c.getH2020Programme().getCode(), c.getH2020Programme().getDescription(),
+										c.getLevel1(), c.getLevel2(), c.getLevel3(), c.getClassification()))
 							.collect(Collectors.toList()))
 					.orElse(new ArrayList<>()));
 

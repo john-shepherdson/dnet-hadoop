@@ -1,54 +1,54 @@
 package eu.dnetlib.dhp.doiboost
-import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, StructuredProperty, Dataset => OafDataset}
-import org.apache.spark.sql.functions.{col, sum}
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 
-import scala.::
+import eu.dnetlib.dhp.schema.oaf.Publication
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
+import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
+import org.json4s
+import org.json4s.DefaultFormats
+import org.json4s.jackson.JsonMethods._
+
 import scala.collection.JavaConverters._
 class QueryTest {
 
+  def extract_payload(input:String) :String = {
 
-  def extractLicense(p:Publication):Tuple2[String,String] = {
-
-      val tmp = p.getInstance().asScala.map(i => i.getLicense.getValue).distinct.mkString(",")
-      (p.getId,tmp)
-    }
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = parse(input)
 
 
+    compact(render((json \ "payload")))
 
-  def hasDOI(publication: Publication, doi:String):Boolean = {
 
-
-    val s = publication.getOriginalId.asScala.filter(i =>  i.equalsIgnoreCase(doi))
-
-    s.nonEmpty
 
   }
 
-  def hasNullHostedBy(publication: Publication):Boolean = {
-    publication.getInstance().asScala.exists(i => i.getHostedby == null || i.getHostedby.getValue == null)
+  def hasInstanceWithUrl(p:Publication):Boolean = {
+    val c = p.getInstance.asScala.map(i => i.getUrl!= null && !i.getUrl.isEmpty).size
+    !(!p.getInstance.isEmpty && c == p.getInstance().size)
   }
 
 
+  def hasNullAccessRights(p:Publication):Boolean = {
+    val c = p.getInstance.asScala.map(i => i.getAccessright!= null && i.getAccessright.getClassname.nonEmpty).size
+    !p.getInstance.isEmpty && c == p.getInstance().size()
+  }
 
-  def myQuery(spark:SparkSession): Unit = {
+
+  def myQuery(spark:SparkSession, sc:SparkContext): Unit = {
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
-    implicit val mapEncoderDat: Encoder[OafDataset] = Encoders.kryo[OafDataset]
-    implicit val mapEncoderRel: Encoder[Relation] = Encoders.kryo[Relation]
 
-    val doiboostPubs:Dataset[Publication]    = spark.read.load("/data/doiboost/process/doiBoostPublicationFiltered").as[Publication]
+    val mapper = new ObjectMapper()
+    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
 
-    val relFunder: Dataset[Relation] = spark.read.format("org.apache.spark.sql.parquet").load("/data/doiboost/process/crossrefRelation").as[Relation]
 
-    doiboostPubs.filter(p => p.getDateofacceptance != null && p.getDateofacceptance.getValue!= null && p.getDateofacceptance.getValue.length > 0 )
-
-    doiboostPubs.filter(p=>hasDOI(p, "10.1016/j.is.2020.101522")).collect()(0).getDescription.get(0).getValue
+      val ds:Dataset[Publication] = spark.read.load("/tmp/p").as[Publication]
 
 
 
-    doiboostPubs.filter(p=> hasNullHostedBy(p)).count()
+    ds.filter(p =>p.getBestaccessright!= null && p.getBestaccessright.getClassname.nonEmpty).count()
 
-    doiboostPubs.map(p=> (p.getId, p.getBestaccessright.getClassname))(Encoders.tuple(Encoders.STRING,Encoders.STRING))
+
   }
 
 }

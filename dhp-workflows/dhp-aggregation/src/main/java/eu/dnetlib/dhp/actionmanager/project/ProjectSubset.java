@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.actionmanager.project;
 
 import java.io.Serializable;
 
+/**
+ * Class to store the grande agreement (code) of the collected projects
+ */
 public class ProjectSubset implements Serializable {
 
 	private String code;
@@ -14,4 +17,5 @@ public class ProjectSubset implements Serializable {
 	public void setCode(String code) {
 		this.code = code;
 	}
+
 }

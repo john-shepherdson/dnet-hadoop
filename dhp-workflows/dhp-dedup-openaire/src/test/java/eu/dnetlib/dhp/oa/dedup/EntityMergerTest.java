@@ -14,6 +14,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
@@ -65,7 +66,7 @@ public class EntityMergerTest implements Serializable {
 		assertEquals(dedupId, pub_merged.getId());
 
 		assertEquals(pub_merged.getJournal(), pub_top.getJournal());
-		assertEquals(pub_merged.getBestaccessright(), pub_top.getBestaccessright());
+		assertEquals(pub_merged.getBestaccessright().getClassid(), "OPEN");
 		assertEquals(pub_merged.getResulttype(), pub_top.getResulttype());
 		assertEquals(pub_merged.getLanguage(), pub_merged.getLanguage());
 		assertEquals(pub_merged.getPublisher(), pub_top.getPublisher());

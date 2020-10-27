@@ -51,14 +51,12 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Brand new deposition in Zenodo. It sets the deposition_id and the bucket where to store the files to upload
-	 * 
 	 * @return response code
 	 * @throws IOException
 	 */
 	public int newDeposition() throws IOException {
 		String json = "{}";
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
-
+		OkHttpClient httpClient = new OkHttpClient();
 
 		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
 
@@ -89,17 +87,17 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Upload files in Zenodo.
-	 * 
 	 * @param is the inputStream for the file to upload
 	 * @param file_name the name of the file as it will appear on Zenodo
 	 * @param len the size of the file
 	 * @return the response code
 	 */
 	public int uploadIS(InputStream is, String file_name, long len) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient.Builder()
-				.writeTimeout(600, TimeUnit.SECONDS)
+		OkHttpClient httpClient = new OkHttpClient
+				.Builder()
+				.connectTimeout(600, TimeUnit.SECONDS)
 				.readTimeout(600, TimeUnit.SECONDS)
-				.connectTimeout(600, TimeUnit.SECONDS).build();
+				.writeTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(bucket + "/" + file_name)
@@ -117,14 +115,13 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Associates metadata information to the current deposition
-	 * 
 	 * @param metadata the metadata
 	 * @return response code
 	 * @throws IOException
 	 */
 	public int sendMretadata(String metadata) throws IOException {
 
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+		OkHttpClient httpClient = new OkHttpClient();
 
 		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, metadata);
 
@@ -148,7 +145,6 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * To publish the current deposition. It works for both new deposition or new version of an old deposition
-	 * 
 	 * @return response code
 	 * @throws IOException
 	 */
@@ -156,7 +152,7 @@ public class ZenodoAPIClient implements Serializable {
 
 		String json = "{}";
 
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/publish")
@@ -175,12 +171,11 @@ public class ZenodoAPIClient implements Serializable {
 	}
 
 	/**
-	 * To create a new version of an already published deposition. It sets the deposition_id and the bucket to be used
-	 * for the new version.
-	 * 
-	 * @param concept_rec_id the concept record id of the deposition for which to create a new version. It is the last
-	 *            part of the url for the DOI Zenodo suggests to use to cite all versions: DOI: 10.xxx/zenodo.656930
-	 *            concept_rec_id = 656930
+	 * To create a new version of an already published deposition.
+	 * It sets the deposition_id and the bucket to be used for the new version.
+	 * @param concept_rec_id the concept record id of the deposition for which to create a new version. It is
+	 *                       the last part of the url for the DOI Zenodo suggests to use to cite all versions:
+	 *                       DOI: 10.xxx/zenodo.656930 concept_rec_id = 656930
 	 * @return response code
 	 * @throws IOException
 	 * @throws MissingConceptDoiException
@@ -189,7 +184,7 @@ public class ZenodoAPIClient implements Serializable {
 		setDepositionId(concept_rec_id);
 		String json = "{}";
 
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/newversion")
@@ -211,33 +206,6 @@ public class ZenodoAPIClient implements Serializable {
 		}
 	}
 
-	public int uploadOpenDeposition(String deposition_id) throws IOException, MissingConceptDoiException {
-
-		this.deposition_id = deposition_id;
-
-		String json = "{}";
-
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
-
-		Request request = new Request.Builder()
-			.url(urlString + "/" + deposition_id)
-			.addHeader("Authorization", "Bearer " + access_token)
-			// .post(RequestBody.create(MEDIA_TYPE_JSON, json))
-			.build();
-
-		try (Response response = httpClient.newCall(request).execute()) {
-
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
-
-			ZenodoModel zenodoModel = new Gson().fromJson(response.body().string(), ZenodoModel.class);
-			bucket = zenodoModel.getLinks().getBucket();
-			return response.code();
-
-		}
-
-	}
-
 	private void setDepositionId(String concept_rec_id) throws IOException, MissingConceptDoiException {
 
 		ZenodoModelList zenodoModelList = new Gson().fromJson(getPrevDepositions(), ZenodoModelList.class);
@@ -254,7 +222,7 @@ public class ZenodoAPIClient implements Serializable {
 	}
 
 	private String getPrevDepositions() throws IOException {
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
 			.url(urlString)
@@ -275,8 +243,7 @@ public class ZenodoAPIClient implements Serializable {
 	}
 
 	private String getBucket(String url) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient.Builder()
-				.connectTimeout(600, TimeUnit.SECONDS).build();
+		OkHttpClient httpClient = new OkHttpClient();
 
 		Request request = new Request.Builder()
 			.url(url)

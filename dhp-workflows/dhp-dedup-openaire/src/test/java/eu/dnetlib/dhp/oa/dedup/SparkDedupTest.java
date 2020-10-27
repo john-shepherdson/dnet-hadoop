@@ -194,10 +194,10 @@ public class SparkDedupTest implements Serializable {
 			.textFile(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
 			.count();
 
-		assertEquals(3432, orgs_simrel);
-		assertEquals(7152, pubs_simrel);
+		assertEquals(3082, orgs_simrel);
+		assertEquals(7036, pubs_simrel);
 		assertEquals(344, sw_simrel);
-		assertEquals(458, ds_simrel);
+		assertEquals(442, ds_simrel);
 		assertEquals(6750, orp_simrel);
 	}
 
@@ -343,8 +343,8 @@ public class SparkDedupTest implements Serializable {
 			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_mergerel")
 			.count();
 
-		assertEquals(1276, orgs_mergerel);
-		assertEquals(1442, pubs_mergerel);
+		assertEquals(1272, orgs_mergerel);
+		assertEquals(1438, pubs_mergerel);
 		assertEquals(288, sw_mergerel);
 		assertEquals(472, ds_mergerel);
 		assertEquals(718, orp_mergerel);
@@ -390,10 +390,10 @@ public class SparkDedupTest implements Serializable {
 				testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_deduprecord")
 			.count();
 
-		assertEquals(82, orgs_deduprecord);
-		assertEquals(66, pubs_deduprecord);
+		assertEquals(85, orgs_deduprecord);
+		assertEquals(65, pubs_deduprecord);
 		assertEquals(51, sw_deduprecord);
-		assertEquals(96, ds_deduprecord);
+		assertEquals(97, ds_deduprecord);
 		assertEquals(89, orp_deduprecord);
 	}
 
@@ -473,12 +473,12 @@ public class SparkDedupTest implements Serializable {
 			.distinct()
 			.count();
 
-		assertEquals(897, publications);
-		assertEquals(835, organizations);
+		assertEquals(896, publications);
+		assertEquals(838, organizations);
 		assertEquals(100, projects);
 		assertEquals(100, datasource);
 		assertEquals(200, softwares);
-		assertEquals(388, dataset);
+		assertEquals(389, dataset);
 		assertEquals(517, otherresearchproduct);
 
 		long deletedOrgs = jsc
@@ -533,7 +533,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4866, relations);
+		assertEquals(4858, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark

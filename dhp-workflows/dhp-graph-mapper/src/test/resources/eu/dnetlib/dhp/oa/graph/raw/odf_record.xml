@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <oai:header xmlns="http://namespace.openaire.eu/"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <dri:objIdentifier>r3a507cdacc5::03b31980d9bb3c4609e6005c4a3baba6</dri:objIdentifier>
+        <dri:recordIdentifier>oai:lindat.mff.cuni.cz:11372/LRT-1844</dri:recordIdentifier>
+        <dri:dateOfCollection>2020-09-04T14:36:48.411Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>r3a507cdacc5</oaf:datasourceprefix>
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">oai:lindat.mff.cuni.cz:11372/LRT-1844</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2016-12-07T11:10:30Z</datestamp>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">hdl_11858_00-097C-0000-0007-710A-A</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">hdl_11858_00-097C-0000-0007-710B-8</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">openaire_data</setSpec>
+        <dr:dateOfTransformation>2020-09-04T14:39:16.458Z</dr:dateOfTransformation>
+    </oai:header>
+    <metadata>
+        <resource xmlns="http://datacite.org/schema/kernel-4"
+                  xmlns:dc="http://purl.org/dc/elements/1.1/"
+                  xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+            <identifier identifierType="Handle">11372/LRT-1844</identifier>
+            <alternateIdentifiers>
+                <alternateIdentifier alternateIdentifierType="URL">http://hdl.handle.net/11372/LRT-1844</alternateIdentifier>
+            </alternateIdentifiers>
+            <creators>
+                <creator>
+                    <creatorName>Hercig, Tomáš</creatorName>
+                </creator>
+                <creator>
+                    <creatorName>Brychcín, Tomáš</creatorName>
+                </creator>
+                <creator>
+                    <creatorName>Svoboda, Lukáš</creatorName>
+                </creator>
+                <creator>
+                    <creatorName>Konkol, Michal</creatorName>
+                </creator>
+                <creator>
+                    <creatorName>Steinberger, Josef</creatorName>
+                </creator>
+            </creators>
+            <titles>
+                <title>Restaurant Reviews CZ ABSA corpus v2</title>
+            </titles>
+            <publisher>University of West Bohemia, Department of Computer Science and Engineering</publisher>
+            <publicationYear>2016</publicationYear>
+            <contributors>
+                <contributor contributorType="Funder">
+                    <contributorName>European Commission</contributorName>
+                    <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/630786</nameIdentifier>
+                </contributor>
+            </contributors>
+            <dates>
+                <date dateType="Issued">2016</date>
+                <date dateType="Accepted">2016-12-07T11:10:30Z</date>
+                <date dateType="Available">2016-12-07T11:10:30Z</date>
+            </dates>
+            <resourceType resourceTypeGeneral="Dataset">corpus</resourceType>
+            <rightsList>
+                <rights rightsURI="info:eu-repo/semantics/openAccess"/>
+                <rights rightsURI="http://creativecommons.org/licenses/by-nc-sa/4.0/"/>
+            </rightsList>
+            <descriptions>
+                <description descriptionType="Abstract">Restaurant Reviews CZ ABSA - 2.15k reviews with their related target and category
+
+                    The work done is described in the paper: https://doi.org/10.13053/CyS-20-3-2469</description>
+            </descriptions>
+        </resource>
+        <oaf:identifier identifierType="handle">11372/LRT-1844</oaf:identifier>
+        <oaf:embargoenddate>2016-12-07</oaf:embargoenddate>
+        <dr:CobjCategory type="dataset">0021</dr:CobjCategory>
+        <oaf:dateAccepted>2016-01-01</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:license>http://creativecommons.org/licenses/by-nc-sa/4.0/</oaf:license>
+        <oaf:language>und</oaf:language>
+        <oaf:projectid>corda_______::630786</oaf:projectid>
+        <oaf:hostedBy id="re3data_____::r3d100010386" name="LINDAT/CLARIN repository"/>
+        <oaf:collectedFrom id="re3data_____::r3d100010386" name="LINDAT/CLARIN repository"/>
+    </metadata>
+    <about xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2020-09-04T14:36:48.411Z">
+                <baseURL>https%3A%2F%2Flindat.mff.cuni.cz%2Frepository%2Foai%2Fopenaire_data</baseURL>
+                <identifier>oai:lindat.mff.cuni.cz:11372/LRT-1844</identifier>
+                <datestamp>2016-12-07T11:10:30Z</datestamp>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+                                  classname="sysimport:crosswalk:datasetarchive"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>

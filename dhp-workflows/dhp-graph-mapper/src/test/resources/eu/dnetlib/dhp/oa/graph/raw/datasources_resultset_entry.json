@@ -228,8 +228,18 @@
 		"value": "sysimport:crosswalk:entityregistry@@@dnet:provenance_actions"
 	},
 	{
-		"field": "journal",
+		"field": "issnPrinted",
 		"type": "string",
-		"value": "2579-5449 @@@ 2597-6540 @@@ "
+		"value": "2579-5449"
+	},
+	{
+		"field": "issnOnline",
+		"type": "string",
+		"value": "2579-5448"
+	},
+	{
+		"field": "issnLinking",
+		"type": "string",
+		"value": "2579-5447"
 	}
 ]
