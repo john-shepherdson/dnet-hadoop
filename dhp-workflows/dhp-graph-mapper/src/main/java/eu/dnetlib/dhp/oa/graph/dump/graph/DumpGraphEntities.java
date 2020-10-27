@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.H2020Programme;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
@@ -378,20 +379,14 @@ public class DumpGraphEntities implements Serializable {
 			}
 		}
 
-		project
-			.setH2020Classifications(
-				Optional
-					.ofNullable(p.getH2020classification())
-					.map(
-						classification -> classification
-							.stream()
-							.map(
-								c -> H2020Classification
-									.newInstance(
-										c.getH2020Programme().getCode(), c.getH2020Programme().getDescription(),
-										c.getLevel1(), c.getLevel2(), c.getLevel3(), c.getClassification()))
-							.collect(Collectors.toList()))
-					.orElse(new ArrayList<>()));
+		project.setH2020programme(
+				Optional.ofNullable(p.getH2020classification())
+				.map(classification -> classification
+				.stream()
+				.map(c -> Programme.newInstance(c.getH2020Programme().getCode(), c.getH2020Programme().getDescription())).collect(Collectors.toList()))
+				.orElse(new ArrayList<>()));
+
+
 
 		Optional<List<Field<String>>> ofundTree = Optional
 			.ofNullable(p.getFundingtree());
