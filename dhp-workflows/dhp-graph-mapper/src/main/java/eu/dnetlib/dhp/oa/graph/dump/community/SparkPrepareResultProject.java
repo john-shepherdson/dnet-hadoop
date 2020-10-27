@@ -122,26 +122,31 @@ public class SparkPrepareResultProject implements Serializable {
 
 	private static Project getProject(eu.dnetlib.dhp.schema.oaf.Project op) {
 		Project p = Project
-			.newInstance(
-				op.getId(),
-				op.getCode().getValue(),
-				Optional
-					.ofNullable(op.getAcronym())
-					.map(a -> a.getValue())
-					.orElse(null),
-				Optional
-					.ofNullable(op.getTitle())
-					.map(v -> v.getValue())
-					.orElse(null),
-				Optional
-					.ofNullable(op.getFundingtree())
-					.map(
-						value -> value
-							.stream()
-							.map(ft -> getFunder(ft.getValue()))
-							.collect(Collectors.toList())
-							.get(0))
-					.orElse(null));
+				.newInstance(
+						op.getId(),
+						op.getCode().getValue(),
+						Optional
+								.ofNullable(op.getAcronym())
+								.map(a -> a.getValue())
+								.orElse(null),
+						Optional
+								.ofNullable(op.getTitle())
+								.map(v -> v.getValue())
+								.orElse(null),
+						Optional
+								.ofNullable(op.getFundingtree())
+								.map(value -> {
+									List<Funder> tmp = value
+											.stream()
+											.map(ft -> getFunder(ft.getValue()))
+											.collect(Collectors.toList());
+									if (tmp.size() > 0) {
+										return tmp.get(0);
+									} else {
+										return null;
+									}
+								})
+								.orElse(null));
 
 		Optional<DataInfo> di = Optional.ofNullable(op.getDataInfo());
 		Provenance provenance = new Provenance();
