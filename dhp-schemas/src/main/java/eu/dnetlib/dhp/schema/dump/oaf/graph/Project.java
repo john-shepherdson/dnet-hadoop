@@ -31,7 +31,7 @@ import java.util.List;
  * - private List<Funder> funding to store the list of funder of the project
  * - private String summary to store the summary of the project
  * - private Granted granted to store the granted amount
- * - private List<H2020Classification> h2020classification to store the list of H2020 classifications the project is related to
+ * - private List<Programme> h2020programme to store the list of programmes the project is related to
  */
 
 public class Project implements Serializable {
@@ -60,7 +60,7 @@ public class Project implements Serializable {
 
 	private Granted granted;
 
-	private List<H2020Classification> h2020Classifications;
+	private List<Programme> h2020programme;
 
 	public String getId() {
 		return id;
@@ -182,11 +182,11 @@ public class Project implements Serializable {
 		this.granted = granted;
 	}
 
-	public List<H2020Classification> getH2020Classifications() {
-		return h2020Classifications;
+	public List<Programme> getH2020programme() {
+		return h2020programme;
 	}
 
-	public void setH2020Classifications(List<H2020Classification> h2020Classifications) {
-		this.h2020Classifications = h2020Classifications;
+	public void setH2020programme(List<Programme> h2020programme) {
+		this.h2020programme = h2020programme;
 	}
 }
