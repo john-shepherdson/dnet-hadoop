@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-//@Disabled
+@Disabled
 public class ZenodoAPIClientTest {
 
 	private final String URL_STRING = "https://sandbox.zenodo.org/api/deposit/depositions";
