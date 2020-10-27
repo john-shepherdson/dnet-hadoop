@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.common.api;
 
 import java.io.*;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 
@@ -92,7 +93,11 @@ public class ZenodoAPIClient implements Serializable {
 	 * @return the response code
 	 */
 	public int uploadIS(InputStream is, String file_name, long len) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient
+				.Builder()
+				.connectTimeout(600, TimeUnit.SECONDS)
+				.readTimeout(600, TimeUnit.SECONDS)
+				.writeTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(bucket + "/" + file_name)
