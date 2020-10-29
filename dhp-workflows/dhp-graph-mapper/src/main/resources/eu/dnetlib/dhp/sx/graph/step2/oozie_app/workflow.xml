@@ -14,30 +14,103 @@
         </property>
     </parameters>
 
-    <start to="ExtractDLIEntities"/>
+    <start to="ExtractDLIPublication"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="ExtractDLIEntities">
+    <action name="ExtractDLIPublication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>Extract DLI Entities</name>
+            <name>Extract DLI Entities (Publication)</name>
             <class>eu.dnetlib.dhp.sx.graph.SparkSplitOafTODLIEntities</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>-e</arg><arg>publication</arg>
+        </spark>
+        <ok to="ExtractDLIDataset"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ExtractDLIDataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Extract DLI Entities (Dataset)</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkSplitOafTODLIEntities</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=5000
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>-e</arg><arg>dataset</arg>
+        </spark>
+        <ok to="ExtractDLIUnknown"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ExtractDLIUnknown">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Extract DLI Entities (Unknown)</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkSplitOafTODLIEntities</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=5000
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>-e</arg><arg>unknown</arg>
+        </spark>
+        <ok to="ExtractDLIRelation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ExtractDLIRelation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Extract DLI Entities (Relation)</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkSplitOafTODLIEntities</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=5000
+                ${sparkExtraOPT}
+            </spark-opts>
+            <arg>-mt</arg> <arg>yarn-cluster</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>-e</arg><arg>relation</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
