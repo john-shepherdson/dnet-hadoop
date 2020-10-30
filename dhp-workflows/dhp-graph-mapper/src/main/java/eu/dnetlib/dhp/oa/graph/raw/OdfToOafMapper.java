@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -22,6 +23,7 @@ import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -191,7 +193,13 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//datacite:description[@descriptionType='Abstract']", info);
+		return prepareListFields(doc, "//datacite:description[@descriptionType='Abstract']", info)
+			.stream()
+			.map(d -> {
+				d.setValue(StringUtils.left(d.getValue(), ModelHardLimits.MAX_ABSTRACT_LENGTH));
+				return d;
+			})
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -371,7 +379,11 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					doc,
 					"//datacite:alternateIdentifier[@alternateIdentifierType != 'URL' and @alternateIdentifierType != 'landingPage']",
 					"@alternateIdentifierType", DNET_PID_TYPES, info));
-		return Lists.newArrayList(res);
+
+		return res
+			.stream()
+			.map(IdentifierFactory::normalizePidValue)
+			.collect(Collectors.toList());
 	}
 
 }

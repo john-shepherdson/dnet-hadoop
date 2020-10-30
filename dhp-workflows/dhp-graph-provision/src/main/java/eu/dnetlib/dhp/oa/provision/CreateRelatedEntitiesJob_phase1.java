@@ -164,7 +164,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 
 				if (result.getTitle() != null && !result.getTitle().isEmpty()) {
 					final StructuredProperty title = result.getTitle().stream().findFirst().get();
-					title.setValue(StringUtils.left(title.getValue(), ProvisionConstants.MAX_TITLE_LENGTH));
+					title.setValue(StringUtils.left(title.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
 					re.setTitle(title);
 				}
 
@@ -178,7 +178,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 								.getInstance()
 								.stream()
 								.filter(Objects::nonNull)
-								.limit(ProvisionConstants.MAX_INSTANCES)
+								.limit(ModelHardLimits.MAX_INSTANCES)
 								.collect(Collectors.toList()));
 				}
 

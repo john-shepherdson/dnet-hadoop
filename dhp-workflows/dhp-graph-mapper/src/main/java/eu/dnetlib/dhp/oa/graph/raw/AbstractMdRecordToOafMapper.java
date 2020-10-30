@@ -561,4 +561,5 @@ public abstract class AbstractMdRecordToOafMapper {
 		}
 		return res;
 	}
+
 }

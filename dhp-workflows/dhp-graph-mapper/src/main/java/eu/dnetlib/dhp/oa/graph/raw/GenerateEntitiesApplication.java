@@ -116,17 +116,9 @@ public class GenerateEntitiesApplication {
 	private static Oaf merge(final Oaf o1, final Oaf o2) {
 		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
 			if (ModelSupport.isSubClass(o1, Result.class)) {
-				if (ModelSupport.isSubClass(o1, Publication.class)) {
-					((Publication) o1).mergeFrom((Publication) o2);
-				} else if (ModelSupport.isSubClass(o1, Dataset.class)) {
-					((Dataset) o1).mergeFrom((Dataset) o2);
-				} else if (ModelSupport.isSubClass(o1, Software.class)) {
-					((Software) o1).mergeFrom((Software) o2);
-				} else if (ModelSupport.isSubClass(o1, OtherResearchProduct.class)) {
-					((OtherResearchProduct) o1).mergeFrom((OtherResearchProduct) o2);
-				} else {
-					throw new RuntimeException("invalid Result subtype:" + o1.getClass().getCanonicalName());
-				}
+
+				// We cannot further specify the result type as different result types might share the same ID
+				((Result) o1).mergeFrom((Result) o2);
 			} else if (ModelSupport.isSubClass(o1, Datasource.class)) {
 				((Datasource) o1).mergeFrom((Datasource) o2);
 			} else if (ModelSupport.isSubClass(o1, Organization.class)) {

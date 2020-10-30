@@ -8,6 +8,7 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,7 @@ import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -85,7 +87,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:description", info);
+		return prepareListFields(doc, "//dc:description", info)
+			.stream()
+			.map(d -> {
+				d.setValue(StringUtils.left(d.getValue(), ModelHardLimits.MAX_ABSTRACT_LENGTH));
+				return d;
+			})
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -283,6 +291,10 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
 		return prepareListStructPropsWithValidQualifier(
-			doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info);
+			doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info)
+				.stream()
+				.map(IdentifierFactory::normalizePidValue)
+				.collect(Collectors.toList());
 	}
+
 }
