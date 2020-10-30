@@ -22,6 +22,15 @@ public class CSVProgramme implements Serializable {
 	private String shortTitle;
 	private String language;
 	private String classification;
+	private String classification_short;
+
+	public String getClassification_short() {
+		return classification_short;
+	}
+
+	public void setClassification_short(String classification_short) {
+		this.classification_short = classification_short;
+	}
 
 	public String getClassification() {
 		return classification;

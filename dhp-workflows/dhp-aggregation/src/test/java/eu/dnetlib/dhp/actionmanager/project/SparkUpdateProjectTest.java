@@ -78,7 +78,7 @@ public class SparkUpdateProjectTest {
 					"-programmePath",
 					getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/actionmanager/project/preparedProgramme_classification_whole.json.gz")
+							"/eu/dnetlib/dhp/actionmanager/project/preparedProgramme_whole.json.gz")
 						.getPath(),
 					"-projectPath",
 					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/prepared_projects.json").getPath(),
@@ -124,7 +124,7 @@ public class SparkUpdateProjectTest {
 					.getString(0));
 		Assertions
 			.assertEquals(
-				"Societal challenges",
+				"Societal Challenges",
 				execverification
 					.filter("id = '40|corda__h2020::2c7298913008865ba784e5c1350a0aa5'")
 					.select("classification.level1")
@@ -133,7 +133,7 @@ public class SparkUpdateProjectTest {
 					.getString(0));
 		Assertions
 			.assertEquals(
-				"Smart, Green And Integrated Transport",
+				"Transport",
 				execverification
 					.filter("id = '40|corda__h2020::2c7298913008865ba784e5c1350a0aa5'")
 					.select("classification.level2")
@@ -188,7 +188,7 @@ public class SparkUpdateProjectTest {
 					.getString(0));
 		Assertions
 			.assertEquals(
-				"Nurturing excellence by means of cross-border and cross-sector mobility",
+				"MSCA Mobility",
 				execverification
 					.filter("id = '40|corda__h2020::1a1f235fdd06ef14790baec159aa1202'")
 					.select("classification.h2020Programme.description")
@@ -197,7 +197,7 @@ public class SparkUpdateProjectTest {
 					.getString(0));
 		Assertions
 			.assertEquals(
-				"Excellent science",
+				"Excellent Science",
 				execverification
 					.filter("id = '40|corda__h2020::1a1f235fdd06ef14790baec159aa1202'")
 					.select("classification.level1")
@@ -206,7 +206,7 @@ public class SparkUpdateProjectTest {
 					.getString(0));
 		Assertions
 			.assertEquals(
-				"Marie Skłodowska-Curie Actions",
+				"Marie-Sklodowska-Curie Actions",
 				execverification
 					.filter("id = '40|corda__h2020::1a1f235fdd06ef14790baec159aa1202'")
 					.select("classification.level2")
@@ -215,7 +215,7 @@ public class SparkUpdateProjectTest {
 					.getString(0));
 		Assertions
 			.assertEquals(
-				"Nurturing excellence by means of cross-border and cross-sector mobility",
+				"MSCA Mobility",
 				execverification
 					.filter("id = '40|corda__h2020::1a1f235fdd06ef14790baec159aa1202'")
 					.select("classification.level3")
