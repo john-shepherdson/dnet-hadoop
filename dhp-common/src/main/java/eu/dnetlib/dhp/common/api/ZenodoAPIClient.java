@@ -59,8 +59,7 @@ public class ZenodoAPIClient implements Serializable {
 		String json = "{}";
 		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
-
-		//RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
+		// RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
 
 		RequestBody body = RequestBody.create(json, MEDIA_TYPE_JSON);
 
@@ -99,9 +98,10 @@ public class ZenodoAPIClient implements Serializable {
 	 */
 	public int uploadIS(InputStream is, String file_name, long len) throws IOException {
 		OkHttpClient httpClient = new OkHttpClient.Builder()
-				.writeTimeout(600, TimeUnit.SECONDS)
-				.readTimeout(600, TimeUnit.SECONDS)
-				.connectTimeout(600, TimeUnit.SECONDS).build();
+			.writeTimeout(600, TimeUnit.SECONDS)
+			.readTimeout(600, TimeUnit.SECONDS)
+			.connectTimeout(600, TimeUnit.SECONDS)
+			.build();
 
 		Request request = new Request.Builder()
 			.url(bucket + "/" + file_name)
@@ -128,7 +128,7 @@ public class ZenodoAPIClient implements Serializable {
 
 		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
-		//RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, metadata);
+		// RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, metadata);
 		RequestBody body = RequestBody.create(metadata, MEDIA_TYPE_JSON);
 
 		Request request = new Request.Builder()
@@ -166,8 +166,8 @@ public class ZenodoAPIClient implements Serializable {
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/publish")
 			.addHeader("Authorization", "Bearer " + access_token)
-			//.post(RequestBody.create(MEDIA_TYPE_JSON, json))
-				.post(body)
+			// .post(RequestBody.create(MEDIA_TYPE_JSON, json))
+			.post(body)
 			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
@@ -202,8 +202,8 @@ public class ZenodoAPIClient implements Serializable {
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/newversion")
 			.addHeader("Authorization", "Bearer " + access_token)
-			//.post(RequestBody.create(MEDIA_TYPE_JSON, json))
-				.post(body)
+			// .post(RequestBody.create(MEDIA_TYPE_JSON, json))
+			.post(body)
 			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
@@ -285,7 +285,8 @@ public class ZenodoAPIClient implements Serializable {
 
 	private String getBucket(String url) throws IOException {
 		OkHttpClient httpClient = new OkHttpClient.Builder()
-				.connectTimeout(600, TimeUnit.SECONDS).build();
+			.connectTimeout(600, TimeUnit.SECONDS)
+			.build();
 
 		Request request = new Request.Builder()
 			.url(url)
