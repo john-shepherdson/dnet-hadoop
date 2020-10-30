@@ -8,7 +8,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.oaf.H2020Programme;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
@@ -27,6 +26,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Project;
 import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.H2020Programme;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
@@ -379,14 +379,19 @@ public class DumpGraphEntities implements Serializable {
 			}
 		}
 
-		project.setH2020programme(
-				Optional.ofNullable(p.getH2020classification())
-				.map(classification -> classification
-				.stream()
-				.map(c -> Programme.newInstance(c.getH2020Programme().getCode(), c.getH2020Programme().getDescription())).collect(Collectors.toList()))
-				.orElse(new ArrayList<>()));
-
-
+		project
+			.setH2020programme(
+				Optional
+					.ofNullable(p.getH2020classification())
+					.map(
+						classification -> classification
+							.stream()
+							.map(
+								c -> Programme
+									.newInstance(
+										c.getH2020Programme().getCode(), c.getH2020Programme().getDescription()))
+							.collect(Collectors.toList()))
+					.orElse(new ArrayList<>()));
 
 		Optional<List<Field<String>>> ofundTree = Optional
 			.ofNullable(p.getFundingtree());
