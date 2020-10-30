@@ -84,7 +84,7 @@ public class MakeTar implements Serializable {
 
 		final long numberOfSplits = sourceSize / bytesPerSplit;
 
-		if (numberOfSplits <= 1) {
+		if (numberOfSplits < 2) {
 			write(fileSystem, inputPath, outputPath + ".tar", dir_name);
 		} else {
 			int partNum = 0;
