@@ -7,13 +7,17 @@ import java.io.Serializable;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
@@ -21,6 +25,7 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Node;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.RelType;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 /**
@@ -66,40 +71,54 @@ public class SparkDumpRelationJob implements Serializable {
 	}
 
 	private static void dumpRelation(SparkSession spark, String inputPath, String outputPath) {
-		Utils
-			.readPath(spark, inputPath, Relation.class)
+		Dataset<Relation> relations = Utils.readPath(spark, inputPath, Relation.class);
+		relations
 			.map((MapFunction<Relation, eu.dnetlib.dhp.schema.dump.oaf.graph.Relation>) relation -> {
-				eu.dnetlib.dhp.schema.dump.oaf.graph.Relation rel = new eu.dnetlib.dhp.schema.dump.oaf.graph.Relation();
-				rel
+				eu.dnetlib.dhp.schema.dump.oaf.graph.Relation rel_new = new eu.dnetlib.dhp.schema.dump.oaf.graph.Relation();
+				rel_new
 					.setSource(
 						Node
 							.newInstance(
 								relation.getSource(),
 								ModelSupport.idPrefixEntity.get(relation.getSource().substring(0, 2))));
 
-				rel
+				rel_new
 					.setTarget(
 						Node
 							.newInstance(
 								relation.getTarget(),
 								ModelSupport.idPrefixEntity.get(relation.getTarget().substring(0, 2))));
 
-				rel
+				rel_new
 					.setReltype(
 						RelType
 							.newInstance(
 								relation.getRelClass(),
 								relation.getSubRelType()));
 
-				Optional
-					.ofNullable(relation.getDataInfo())
-					.ifPresent(
-						datainfo -> rel
-							.setProvenance(
-								Provenance
-									.newInstance(datainfo.getProvenanceaction().getClassname(), datainfo.getTrust())));
+				Optional<DataInfo> odInfo = Optional.ofNullable(relation.getDataInfo());
+				if (odInfo.isPresent()) {
+					DataInfo dInfo = odInfo.get();
+					if (Optional.ofNullable(dInfo.getProvenanceaction()).isPresent()) {
+						if (Optional.ofNullable(dInfo.getProvenanceaction().getClassname()).isPresent()) {
+							rel_new
+								.setProvenance(
+									Provenance
+										.newInstance(
+											dInfo.getProvenanceaction().getClassname(),
+											dInfo.getTrust()));
+						}
+					}
+				}
+//						Optional
+//								.ofNullable(relation.getDataInfo())
+//								.ifPresent(
+//										datainfo -> rel_new
+//												.setProvenance(
+//														Provenance
+//																.newInstance(datainfo.getProvenanceaction().getClassname(), datainfo.getTrust())));
 
-				return rel;
+				return rel_new;
 
 			}, Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Relation.class))
 			.write()
