@@ -292,9 +292,40 @@ public class MappersTest {
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertEquals(1, d.getAuthor().size());
-		assertEquals(0, d.getSubject().size());
+		assertEquals(1, d.getSubject().size());
 		assertEquals(1, d.getInstance().size());
 		assertEquals(1, d.getPid().size());
+		assertNotNull(d.getInstance().get(0).getUrl());
+	}
+
+	@Test
+	void testClaimFromCrossref() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		System.out.println(p.getTitle().get(0).getValue());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+	}
+
+	@Test
+	void testODFRecord() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_record.xml"));
+		List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		final Dataset p = (Dataset) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		System.out.println(p.getTitle().get(0).getValue());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 	}
 
 	private void assertValidId(final String id) {

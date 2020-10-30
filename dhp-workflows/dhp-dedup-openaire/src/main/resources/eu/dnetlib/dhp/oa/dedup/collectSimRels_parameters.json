@@ -1,0 +1,44 @@
+[
+  {
+    "paramName": "la",
+    "paramLongName": "isLookUpUrl",
+    "paramDescription": "address for the LookUp",
+    "paramRequired": true
+  },
+  {
+    "paramName": "asi",
+    "paramLongName": "actionSetId",
+    "paramDescription": "action set identifier (name of the orchestrator)",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "path of the working directory",
+    "paramRequired": true
+  },
+  {
+    "paramName": "np",
+    "paramLongName": "numPartitions",
+    "paramDescription": "number of partitions for the similarity relations intermediate phases",
+    "paramRequired": false
+  },
+  {
+    "paramName": "purl",
+    "paramLongName": "postgresUrl",
+    "paramDescription": "the url of the postgres server",
+    "paramRequired": true
+  },
+  {
+    "paramName": "pusr",
+    "paramLongName": "postgresUser",
+    "paramDescription": "the owner of the postgres database",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ppwd",
+    "paramLongName": "postgresPassword",
+    "paramDescription": "the password for the postgres user",
+    "paramRequired": true
+  }
+]

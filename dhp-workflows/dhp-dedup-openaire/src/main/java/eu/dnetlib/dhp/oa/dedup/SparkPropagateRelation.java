@@ -28,8 +28,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		SOURCE, TARGET
 	}
 
-	public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark)
-		throws Exception {
+	public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
 		super(parser, spark);
 	}
 

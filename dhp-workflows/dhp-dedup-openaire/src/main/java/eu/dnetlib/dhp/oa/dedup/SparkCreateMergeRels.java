@@ -106,10 +106,8 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 			final RDD<Edge<String>> edgeRdd = spark
 				.read()
-				.textFile(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity))
-				.map(
-					(MapFunction<String, Relation>) r -> OBJECT_MAPPER.readValue(r, Relation.class),
-					Encoders.bean(Relation.class))
+				.load(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity))
+				.as(Encoders.bean(Relation.class))
 				.javaRDD()
 				.map(it -> new Edge<>(hash(it.getSource()), hash(it.getTarget()), it.getRelClass()))
 				.rdd();
