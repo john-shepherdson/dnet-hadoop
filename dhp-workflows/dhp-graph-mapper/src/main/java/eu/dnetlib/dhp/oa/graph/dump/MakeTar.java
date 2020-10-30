@@ -88,16 +88,16 @@ public class MakeTar implements Serializable {
 			write(fileSystem, inputPath, outputPath + ".tar", dir_name);
 		} else {
 			int partNum = 0;
-			long remainingBytes = sourceSize % bytesPerSplit;
 
 			RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
 				.listFiles(
 					new Path(inputPath), true);
-			while (sourceSize > 0) {
-				TarArchiveOutputStream ar = getTar(fileSystem, outputPath + "_" + partNum + ".tar");
+			boolean next = fileStatusListIterator.hasNext();
+			while (sourceSize > 0 && next) {
+				TarArchiveOutputStream ar = getTar(fileSystem, outputPath + "_" + (partNum + 1) + ".tar");
 
 				long current_size = 0;
-				while (fileStatusListIterator.hasNext() && current_size < bytesPerSplit) {
+				while (next && current_size < bytesPerSplit) {
 					LocatedFileStatus fileStatus = fileStatusListIterator.next();
 
 					Path p = fileStatus.getPath();
@@ -125,6 +125,7 @@ public class MakeTar implements Serializable {
 						ar.closeArchiveEntry();
 
 					}
+					next = fileStatusListIterator.hasNext();
 
 				}
 				sourceSize = sourceSize - current_size;
