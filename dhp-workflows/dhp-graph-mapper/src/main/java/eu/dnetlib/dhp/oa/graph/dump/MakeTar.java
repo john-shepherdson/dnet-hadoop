@@ -59,7 +59,7 @@ public class MakeTar implements Serializable {
 			String p_string = p.toString();
 			String entity = p_string.substring(p_string.lastIndexOf("/") + 1);
 
-			writeMaxSize(fileSystem, p_string, outputPath + "/" + entity, entity, 40);
+			writeMaxSize(fileSystem, p_string, outputPath + "/" + entity, entity, 10);
 		}
 
 	}
