@@ -1,13 +1,9 @@
+
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.google.common.collect.Lists;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import java.io.IOException;
+import java.util.*;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -17,11 +13,18 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 import scala.Tuple3;
-
-import java.io.IOException;
-import java.util.*;
 
 public class SparkPrepareOrgRels extends AbstractSparkAction {
 
@@ -235,14 +238,14 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 			.joinWith(entities, relations.col("_2").equalTo(entities.col("_1")), "inner")
 			.map(
 				(MapFunction<Tuple2<Tuple2<String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> new OrgSimRel(
-							r._1()._1(),
-							r._2()._2().getOriginalId().get(0),
-							r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
-							r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
-							r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
-							r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
-							r._2()._2().getCollectedfrom().get(0).getValue(),
-							"group::" + r._1()._1()),
+					r._1()._1(),
+					r._2()._2().getOriginalId().get(0),
+					r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
+					r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
+					r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
+					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
+					r._2()._2().getCollectedfrom().get(0).getValue(),
+					"group::" + r._1()._1()),
 				Encoders.bean(OrgSimRel.class))
 			.map(
 				(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),

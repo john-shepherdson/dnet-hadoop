@@ -94,7 +94,8 @@ public class IdGeneratorTest {
 	public void generateIdTest1() {
 		String id1 = IdGenerator.generate(bestIds, "50|defaultID");
 
-		System.out.println("id list 1 = " + bestIds.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
+		System.out
+			.println("id list 1 = " + bestIds.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
 
 		assertEquals("50|dedup_wf_001::9c5cfbf993d38476e0f959a301239719", id1);
 	}
@@ -104,9 +105,11 @@ public class IdGeneratorTest {
 		String id1 = IdGenerator.generate(bestIds2, "50|defaultID");
 		String id2 = IdGenerator.generate(bestIds3, "50|defaultID");
 
-		System.out.println("id list 2 = " + bestIds2.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
+		System.out
+			.println("id list 2 = " + bestIds2.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
 		System.out.println("winner 2 = " + id1);
-		System.out.println("id list 3 = " + bestIds3.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
+		System.out
+			.println("id list 3 = " + bestIds3.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
 		System.out.println("winner 3 = " + id2);
 
 		assertEquals("50|dedup_wf_001::2c56cc1914bffdb30fdff354e0099612", id1);
