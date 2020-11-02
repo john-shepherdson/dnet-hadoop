@@ -204,6 +204,9 @@ public class PiwikDownloadLogs {
 
 		logger.info("Downloading from repos with the followins piwikIds: " + piwikIdToVisit);
 
+
+		// ExecutorService executor = Executors.newFixedThreadPool(ExecuteWorkflow.numberOfDownloadThreads);
+		for (int siteId : piwikIdToVisit) {
 		// Setting the starting period
 		Calendar start = (Calendar) ExecuteWorkflow.startingLogPeriod.clone();
 		logger.info("Starting period for log download: " + sdf.format(start.getTime()));
@@ -214,9 +217,6 @@ public class PiwikDownloadLogs {
 		end.add(Calendar.DAY_OF_MONTH, -1);
 		logger.info("Ending period for log download: " + sdf.format(end.getTime()));
 
-		//ExecutorService executor = Executors.newFixedThreadPool(ExecuteWorkflow.numberOfDownloadThreads);
-		for (int siteId : piwikIdToVisit) {
-
 			logger.info("Now working on piwikId: " + siteId);
 
 			PreparedStatement st = ConnectDB.DB_HIVE_CONNECTION
@@ -224,7 +224,7 @@ public class PiwikDownloadLogs {
 					"SELECT max(timestamp) FROM " + ConnectDB.getUsageStatsDBSchema()
 						+ ".piwiklog WHERE source=?");
 			st.setInt(1, siteId);
-
+                        Date dateMax=null;
 			ResultSet rs_date = st.executeQuery();
 			while (rs_date.next()) {
 				logger.info("Found max date: " + rs_date.getString(1) + " for repository " + siteId);
@@ -232,85 +232,92 @@ public class PiwikDownloadLogs {
 				if (rs_date.getString(1) != null && !rs_date.getString(1).equals("null")
 					&& !rs_date.getString(1).equals("")) {
 					start.setTime(sdf.parse(rs_date.getString(1)));
+                                        dateMax = sdf.parse(rs_date.getString(1));
 				}
-			}
+                        }
 			rs_date.close();
 
 			for (Calendar currDay = (Calendar) start.clone(); currDay.before(end); currDay.add(Calendar.DATE, 1)) {
-				//logger.info("Date used " + currDay.toString());
-				//Runnable worker = new WorkerThread(currDay, siteId, repoLogsPath, portalLogPath, portalMatomoID);
-				//executor.execute(worker);// calling execute method of ExecutorService
-                                GetOpenAIRELogsForDate(currDay, siteId, repoLogsPath, portalLogPath, portalMatomoID);
+				// logger.info("Date used " + currDay.toString());
+				// Runnable worker = new WorkerThread(currDay, siteId, repoLogsPath, portalLogPath, portalMatomoID);
+				// executor.execute(worker);// calling execute method of ExecutorService
+                                logger.info("Date used " + currDay.getTime().toString());
+
+                               if(dateMax!=null && currDay.getTime().compareTo(dateMax)<=0)
+                                    logger.info("Date found in logs "+dateMax+ " and not downloanding Matomo logs for "+siteId);
+                                 else   
+                                    GetOpenAIRELogsForDate(currDay, siteId, repoLogsPath, portalLogPath, portalMatomoID);
+
 			}
 		}
-		//executor.shutdown();
-		//while (!executor.isTerminated()) {
-		//}
-		//System.out.println("Finished all threads");
+		// executor.shutdown();
+		// while (!executor.isTerminated()) {
+		// }
+		// System.out.println("Finished all threads");
 	}
-        
-        		public void GetOpenAIRELogsForDate(Calendar currDay, int siteId, String repoLogsPath, String portalLogPath,
-			String portalMatomoID) throws Exception {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-			Date date = currDay.getTime();
-			logger.info("Downloading logs for repoid " + siteId + " and for " + sdf.format(date));
+	public void GetOpenAIRELogsForDate(Calendar currDay, int siteId, String repoLogsPath, String portalLogPath,
+		String portalMatomoID) throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-			String period = "&period=day&date=" + sdf.format(date);
-			String outFolder = "";
-			if (siteId == Integer.parseInt(portalMatomoID)) {
-				outFolder = portalLogPath;
-			} else {
-				outFolder = repoLogsPath;
+		Date date = currDay.getTime();
+		logger.info("Downloading logs for repoid " + siteId + " and for " + sdf.format(date));
+
+		String period = "&period=day&date=" + sdf.format(date);
+		String outFolder = "";
+		if (siteId == Integer.parseInt(portalMatomoID)) {
+			outFolder = portalLogPath;
+		} else {
+			outFolder = repoLogsPath;
+		}
+
+		String baseApiUrl = getPiwikLogUrl() + APImethod + "&idSite=" + siteId + period + format
+			+ "&expanded=5&filter_limit=1000&token_auth=" + tokenAuth;
+		String content = "";
+
+		int i = 0;
+
+		JSONParser parser = new JSONParser();
+		StringBuffer totalContent = new StringBuffer();
+		FileSystem fs = FileSystem.get(new Configuration());
+
+		do {
+			int writtenBytes = 0;
+			String apiUrl = baseApiUrl;
+
+			if (i > 0) {
+				apiUrl += "&filter_offset=" + (i * 1000);
 			}
 
-			String baseApiUrl = getPiwikLogUrl() + APImethod + "&idSite=" + siteId + period + format
-				+ "&expanded=5&filter_limit=1000&token_auth=" + tokenAuth;
-			String content = "";
+			content = getJson(apiUrl);
+			if (content.length() == 0 || content.equals("[]"))
+				break;
 
-			int i = 0;
+			FSDataOutputStream fin = fs
+				.create(
+					new Path(outFolder + "/" + siteId + "_Piwiklog" + sdf.format((date)) + "_offset_" + i
+						+ ".json"),
+					true);
+			JSONArray jsonArray = (JSONArray) parser.parse(content);
+			for (Object aJsonArray : jsonArray) {
+				JSONObject jsonObjectRaw = (JSONObject) aJsonArray;
+				byte[] jsonObjectRawBytes = jsonObjectRaw.toJSONString().getBytes();
+				fin.write(jsonObjectRawBytes);
+				fin.writeChar('\n');
 
-			JSONParser parser = new JSONParser();
-			StringBuffer totalContent = new StringBuffer();
-			FileSystem fs = FileSystem.get(new Configuration());
+				writtenBytes += jsonObjectRawBytes.length + 1;
+			}
 
-			do {
-				int writtenBytes = 0;
-				String apiUrl = baseApiUrl;
+			fin.close();
+			System.out
+				.println(
+					Thread.currentThread().getName() + " (Finished writing) Wrote " + writtenBytes
+						+ " bytes. Filename: " + siteId + "_Piwiklog" + sdf.format((date)) + "_offset_" + i
+						+ ".json");
 
-				if (i > 0) {
-					apiUrl += "&filter_offset=" + (i * 1000);
-				}
+			i++;
+		} while (true);
 
-				content = getJson(apiUrl);
-				if (content.length() == 0 || content.equals("[]"))
-					break;
-
-				FSDataOutputStream fin = fs
-					.create(
-						new Path(outFolder + "/" + siteId + "_Piwiklog" + sdf.format((date)) + "_offset_" + i
-							+ ".json"),
-						true);
-				JSONArray jsonArray = (JSONArray) parser.parse(content);
-				for (Object aJsonArray : jsonArray) {
-					JSONObject jsonObjectRaw = (JSONObject) aJsonArray;
-					byte[] jsonObjectRawBytes = jsonObjectRaw.toJSONString().getBytes();
-					fin.write(jsonObjectRawBytes);
-					fin.writeChar('\n');
-
-					writtenBytes += jsonObjectRawBytes.length + 1;
-				}
-
-				fin.close();
-				System.out
-					.println(
-						Thread.currentThread().getName() + " (Finished writing) Wrote " + writtenBytes
-							+ " bytes. Filename: " + siteId + "_Piwiklog" + sdf.format((date)) + "_offset_" + i
-							+ ".json");
-
-				i++;
-			} while (true);
-
-			fs.close();
-		}
+		fs.close();
+	}
 }

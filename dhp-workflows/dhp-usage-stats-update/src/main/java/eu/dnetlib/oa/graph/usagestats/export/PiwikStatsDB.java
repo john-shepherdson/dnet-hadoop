@@ -199,14 +199,14 @@ public class PiwikStatsDB {
 			cleanOAI();
 			logger.info("Cleaning oai done");
 
-                        logger.info("Processing portal logs");
+			logger.info("Processing portal logs");
 			processPortalLog();
 			logger.info("Portal logs process done");
 
 			logger.info("Processing portal usagestats");
 			portalStats();
 			logger.info("Portal usagestats process done");
-                        
+
 			logger.info("ViewsStats processing starts");
 			viewsStats();
 			logger.info("ViewsStats processing ends");
@@ -214,8 +214,6 @@ public class PiwikStatsDB {
 			logger.info("DownloadsStats processing starts");
 			downloadsStats();
 			logger.info("DownloadsStats processing starts");
-
-
 
 			logger.info("Updating Production Tables");
 			updateProdTables();
@@ -313,7 +311,7 @@ public class PiwikStatsDB {
 			"SELECT DISTINCT p1.source, p1.id_visit, p1.action, p1.entity_id, p1.timestamp \n" +
 			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp p1, " +
 			ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp p2\n" +
-			"WHERE p1.source!='5' AND p1.source=p2.source AND p1.id_visit=p2.id_visit AND p1.entity_id=p2.entity_id \n"
+			"WHERE p1.source=p2.source AND p1.id_visit=p2.id_visit AND p1.entity_id=p2.entity_id \n"
 			+
 			"AND p1.action=p2.action AND p1.action='download' AND p1.timestamp!=p2.timestamp \n" +
 			"AND p1.timestamp<p2.timestamp AND ((unix_timestamp(p2.timestamp)-unix_timestamp(p1.timestamp))/60)<30 \n" +
@@ -329,7 +327,7 @@ public class PiwikStatsDB {
 			"SELECT DISTINCT p1.source, p1.id_visit, p1.action, p1.entity_id, p1.timestamp \n" +
 			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp p1, " +
 			ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp p2\n" +
-			"WHERE p1.source!='5' AND p1.source=p2.source AND p1.id_visit=p2.id_visit AND p1.entity_id=p2.entity_id \n"
+			"WHERE p1.source=p2.source AND p1.id_visit=p2.id_visit AND p1.entity_id=p2.entity_id \n"
 			+
 			"AND p1.action=p2.action AND p1.action='action' AND p1.timestamp!=p2.timestamp \n" +
 			"AND p1.timestamp<p2.timestamp AND (unix_timestamp(p2.timestamp)-unix_timestamp(p1.timestamp))<10 \n" +
@@ -380,22 +378,22 @@ public class PiwikStatsDB {
 			"max(views) AS count, max(openaire_referrer) AS openaire " +
 			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".result_views_monthly_tmp p, " +
 			ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro " +
-			"WHERE p.source!='5' AND p.source=d.piwik_id AND p.id=ro.oid " +
+			"WHERE p.source=d.piwik_id AND p.id=ro.oid " +
 			"GROUP BY d.id, ro.id, month " +
 			"ORDER BY d.id, ro.id, month";
 		stmt.executeUpdate(create_views_stats_tmp);
 		logger.info("Created views_stats_tmp table");
-
+/*
 		logger.info("Dropping views_stats table");
 		String drop_views_stats = "DROP TABLE IF EXISTS " +
 			ConnectDB.getUsageStatsDBSchema() +
 			".views_stats";
 		stmt.executeUpdate(drop_views_stats);
 		logger.info("Dropped views_stats table");
-
+*/
 		logger.info("Creating views_stats table");
 		String create_view_stats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".views_stats " +
-			"STORED AS PARQUET AS SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".views_stats_tmp";
+			"LIKE " + ConnectDB.getUsageStatsDBSchema() + ".views_stats_tmp STORED AS PARQUET";
 		stmt.executeUpdate(create_view_stats);
 		logger.info("Created views_stats table");
 
@@ -412,23 +410,23 @@ public class PiwikStatsDB {
 			"'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, max(views) AS count " +
 			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".result_views_monthly_tmp p, " +
 			ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro " +
-			"WHERE p.source="+ExecuteWorkflow.portalMatomoID +" AND p.source=d.piwik_id and p.id=ro.id \n" +
+			"WHERE p.source=" + ExecuteWorkflow.portalMatomoID + " AND p.source=d.piwik_id and p.id=ro.id \n" +
 			"GROUP BY d.id, ro.id, month " +
 			"ORDER BY d.id, ro.id, month";
 		stmt.executeUpdate(create_pageviews_stats_tmp);
 		logger.info("Created pageviews_stats_tmp table");
 
-		logger.info("Droping pageviews_stats table");
+/*		logger.info("Droping pageviews_stats table");
 		String drop_pageviews_stats = "DROP TABLE IF EXISTS " +
 			ConnectDB.getUsageStatsDBSchema() +
 			".pageviews_stats";
 		stmt.executeUpdate(drop_pageviews_stats);
 		logger.info("Dropped pageviews_stats table");
-
+*/
 		logger.info("Creating pageviews_stats table");
 		String create_pageviews_stats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
 			+ ".pageviews_stats " +
-			"STORED AS PARQUET AS SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats_tmp";
+			"LIKE " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats_tmp STORED AS PARQUET";
 		stmt.executeUpdate(create_pageviews_stats);
 		logger.info("Created pageviews_stats table");
 
@@ -477,19 +475,19 @@ public class PiwikStatsDB {
 			"ORDER BY d.id, ro.id, month";
 		stmt.executeUpdate(sql);
 		logger.info("Created downloads_stats_tmp table");
-
+/*
 		logger.info("Dropping downloads_stats table");
 		String drop_downloads_stats = "DROP TABLE IF EXISTS " +
 			ConnectDB.getUsageStatsDBSchema() +
 			".downloads_stats";
 		stmt.executeUpdate(drop_downloads_stats);
 		logger.info("Dropped downloads_stats table");
-
+*/
 		logger.info("Creating downloads_stats table");
-		String create_pageviews_stats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
+		String create_downloads_stats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
 			+ ".downloads_stats " +
-			"STORED AS PARQUET AS SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp";
-		stmt.executeUpdate(create_pageviews_stats);
+			"LIKE " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp STORED AS PARQUET ";
+		stmt.executeUpdate(create_downloads_stats);
 		logger.info("Created downloads_stats table");
 
 		logger.info("Dropping result_downloads_monthly_tmp view");
@@ -843,18 +841,15 @@ public class PiwikStatsDB {
 		stmt.executeUpdate(sql);
 		stmt.close();
 
-/*		logger.info("PortalStats - Step 3");
-		stmt = con.createStatement();
-		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp " +
-			"SELECT DISTINCT source, id_visit, country, action, url, entity_id, 'organization', `timestamp`, referrer_name, agent "
-			+
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".process_portal_log_tmp " +
-			"WHERE process_portal_log_tmp.entity_id IS NOT NULL AND process_portal_log_tmp.entity_id " +
-			"IN (SELECT roid.id FROM " + ConnectDB.getStatsDBSchema()
-			+ ".organization_oids roid WHERE roid.id IS NOT NULL)";
-//		stmt.executeUpdate(sql);
-		stmt.close();
-*/
+		/*
+		 * logger.info("PortalStats - Step 3"); stmt = con.createStatement(); sql = "INSERT INTO " +
+		 * ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp " +
+		 * "SELECT DISTINCT source, id_visit, country, action, url, entity_id, 'organization', `timestamp`, referrer_name, agent "
+		 * + "FROM " + ConnectDB.getUsageStatsDBSchema() + ".process_portal_log_tmp " +
+		 * "WHERE process_portal_log_tmp.entity_id IS NOT NULL AND process_portal_log_tmp.entity_id " +
+		 * "IN (SELECT roid.id FROM " + ConnectDB.getStatsDBSchema() +
+		 * ".organization_oids roid WHERE roid.id IS NOT NULL)"; // stmt.executeUpdate(sql); stmt.close();
+		 */
 		logger.info("PortalStats - Step 3");
 		stmt = con.createStatement();
 		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp " +
@@ -866,7 +861,7 @@ public class PiwikStatsDB {
 			+ ".project_oids roid WHERE roid.id IS NOT NULL)";
 		stmt.executeUpdate(sql);
 		stmt.close();
-                
+
 		con.close();
 	}
 
@@ -1172,22 +1167,16 @@ public class PiwikStatsDB {
 			"SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats_tmp";
 		stmt.executeUpdate(sql);
 
-/*		logger.info("Dropping table views_stats_tmp");
-		sql = "DROP TABLE IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".views_stats_tmp";
-		stmt.executeUpdate(sql);
-
-		logger.info("Dropping table downloads_stats_tmp");
-		sql = "DROP TABLE IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp";
-		stmt.executeUpdate(sql);
-
-		logger.info("Dropping table pageviews_stats_tmp");
-		sql = "DROP TABLE IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats_tmp";
-		stmt.executeUpdate(sql);
-
-		logger.info("Dropping table process_portal_log_tmp");
-		sql = "DROP TABLE IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".process_portal_log_tmp";
-		stmt.executeUpdate(sql);
-*/
+		/*
+		 * logger.info("Dropping table views_stats_tmp"); sql = "DROP TABLE IF EXISTS " +
+		 * ConnectDB.getUsageStatsDBSchema() + ".views_stats_tmp"; stmt.executeUpdate(sql);
+		 * logger.info("Dropping table downloads_stats_tmp"); sql = "DROP TABLE IF EXISTS " +
+		 * ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp"; stmt.executeUpdate(sql);
+		 * logger.info("Dropping table pageviews_stats_tmp"); sql = "DROP TABLE IF EXISTS " +
+		 * ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats_tmp"; stmt.executeUpdate(sql);
+		 * logger.info("Dropping table process_portal_log_tmp"); sql = "DROP TABLE IF EXISTS " +
+		 * ConnectDB.getUsageStatsDBSchema() + ".process_portal_log_tmp"; stmt.executeUpdate(sql);
+		 */
 		stmt.close();
 		ConnectDB.getHiveConnection().close();
 

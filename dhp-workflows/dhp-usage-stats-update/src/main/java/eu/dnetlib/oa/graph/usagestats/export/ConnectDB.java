@@ -78,20 +78,20 @@ public abstract class ConnectDB {
 		 */
 		ComboPooledDataSource cpds = new ComboPooledDataSource();
 		cpds.setJdbcUrl(dbHiveUrl);
-    cpds.setAcquireIncrement(1);
-    cpds.setMaxPoolSize(100);
-    cpds.setMinPoolSize(1);
-    cpds.setInitialPoolSize(1);
-    cpds.setMaxIdleTime(300);
-    cpds.setMaxConnectionAge(36000);
+		cpds.setAcquireIncrement(1);
+		cpds.setMaxPoolSize(100);
+		cpds.setMinPoolSize(1);
+		cpds.setInitialPoolSize(1);
+		cpds.setMaxIdleTime(300);
+		cpds.setMaxConnectionAge(36000);
 
-    cpds.setAcquireRetryAttempts(5);
-    cpds.setAcquireRetryDelay(2000);
-    cpds.setBreakAfterAcquireFailure(false);
+		cpds.setAcquireRetryAttempts(5);
+		cpds.setAcquireRetryDelay(2000);
+		cpds.setBreakAfterAcquireFailure(false);
 
-    cpds.setCheckoutTimeout(30000);
-    cpds.setPreferredTestQuery("SELECT 1");
-    cpds.setIdleConnectionTestPeriod(60);                
+		cpds.setCheckoutTimeout(0);
+		cpds.setPreferredTestQuery("SELECT 1");
+		cpds.setIdleConnectionTestPeriod(60);
 		return cpds.getConnection();
 
 	}
@@ -103,23 +103,23 @@ public abstract class ConnectDB {
 		 */
 		ComboPooledDataSource cpds = new ComboPooledDataSource();
 		cpds.setJdbcUrl(dbImpalaUrl);
-    cpds.setAcquireIncrement(1);
-    cpds.setMaxPoolSize(100);
-    cpds.setMinPoolSize(1);
-    cpds.setInitialPoolSize(1);
-    cpds.setMaxIdleTime(300);
-    cpds.setMaxConnectionAge(36000);
+		cpds.setAcquireIncrement(1);
+		cpds.setMaxPoolSize(100);
+		cpds.setMinPoolSize(1);
+		cpds.setInitialPoolSize(1);
+		cpds.setMaxIdleTime(300);
+		cpds.setMaxConnectionAge(36000);
 
-    cpds.setAcquireRetryAttempts(5);
-    cpds.setAcquireRetryDelay(2000);
-    cpds.setBreakAfterAcquireFailure(false);
+		cpds.setAcquireRetryAttempts(5);
+		cpds.setAcquireRetryDelay(2000);
+		cpds.setBreakAfterAcquireFailure(false);
 
-    cpds.setCheckoutTimeout(30000);
-    cpds.setPreferredTestQuery("SELECT 1");
-    cpds.setIdleConnectionTestPeriod(60);                
+		cpds.setCheckoutTimeout(0);
+		cpds.setPreferredTestQuery("SELECT 1");
+		cpds.setIdleConnectionTestPeriod(60);
 
-                return cpds.getConnection();
+		return cpds.getConnection();
 
 	}
 
-}
+}   

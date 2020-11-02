@@ -173,7 +173,7 @@ public class UsageStatsExporter {
 		sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats";
 		stmt.executeUpdate(sql);
 
-                stmt.close();
+		stmt.close();
 		ConnectDB.getHiveConnection().close();
 	}
 }
