@@ -30,7 +30,7 @@ class SparkScholexplorerAggregationTest {
 
 
     implicit val pubEncoder: Encoder[DLIPublication] = Encoders.kryo[DLIPublication]
-    val spark: SparkSession = SparkSession.builder().appName("Test").master("local[*]").getOrCreate()
+    val spark: SparkSession = SparkSession.builder().appName("Test").master("local[*]").config("spark.driver.bindAddress", "127.0.0.1").getOrCreate()
 
 
     val ds: Dataset[DLIPublication] = spark.createDataset(spark.sparkContext.parallelize(s)).as[DLIPublication]
