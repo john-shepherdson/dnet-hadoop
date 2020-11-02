@@ -38,6 +38,8 @@ class QueryTest {
   def myQuery(spark:SparkSession, sc:SparkContext): Unit = {
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
 
+
+
     val mapper = new ObjectMapper()
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
 

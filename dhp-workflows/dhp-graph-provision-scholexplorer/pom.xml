@@ -62,6 +62,10 @@
             <artifactId>dhp-schemas</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.elasticsearch</groupId>
