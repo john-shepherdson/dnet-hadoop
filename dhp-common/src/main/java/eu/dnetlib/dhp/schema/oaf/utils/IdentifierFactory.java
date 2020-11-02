@@ -23,6 +23,7 @@ public class IdentifierFactory implements Serializable {
 	public final static String ID_REGEX = "^[0-9][0-9]\\" + ID_PREFIX_SEPARATOR + ".{12}" + ID_SEPARATOR
 		+ "[a-zA-Z0-9]{32}$";
 	public static final int ID_PREFIX_LEN = 12;
+	public static final String NONE = "none";
 
 	/**
 	 * Creates an identifier from the most relevant PID (if available) in the given entity T. Returns entity.id
@@ -40,13 +41,18 @@ public class IdentifierFactory implements Serializable {
 		return entity
 			.getPid()
 			.stream()
-			.filter(s -> Objects.nonNull(s.getQualifier()))
-			.filter(s -> PidType.isValid(s.getQualifier().getClassid()))
-			.filter(s -> StringUtils.isNotBlank(StringUtils.trim(s.getValue())))
+			.filter(s -> pidFilter(s))
 			.min(new PidComparator<>(entity))
 			.map(s -> idFromPid(entity, s))
 			.map(IdentifierFactory::verifyIdSyntax)
 			.orElseGet(entity::getId);
+	}
+
+	protected static boolean pidFilter(StructuredProperty s) {
+		return Objects.nonNull(s.getQualifier()) &&
+				PidType.isValid(s.getQualifier().getClassid()) &&
+				StringUtils.isNotBlank(StringUtils.trim(s.getValue())) &&
+				!NONE.equals(StringUtils.trim(StringUtils.lowerCase(s.getValue())));
 	}
 
 	/**
