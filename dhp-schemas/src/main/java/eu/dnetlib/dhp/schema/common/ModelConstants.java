@@ -39,15 +39,15 @@ public class ModelConstants {
 	public static final String IS_SUPPLEMENT_TO = "isSupplementTo";
 	public static final String IS_SUPPLEMENTED_BY = "isSupplementedBy";
 	public static final String PART = "part";
-	public static final String IS_PART_OF = "IsPartOf";
-	public static final String HAS_PARTS = "HasParts";
+	public static final String IS_PART_OF = "isPartOf";
+	public static final String HAS_PARTS = "hasParts";
 	public static final String RELATIONSHIP = "relationship";
 	public static final String CITATION = "citation";
 	public static final String CITES = "cites";
-	public static final String IS_CITED_BY = "IsCitedBy";
+	public static final String IS_CITED_BY = "isCitedBy";
 	public static final String REVIEW = "review";
 	public static final String REVIEWS = "reviews";
-	public static final String IS_REVIEWED_BY = "IsReviewedBy";
+	public static final String IS_REVIEWED_BY = "isReviewedBy";
 
 	public static final String RESULT_PROJECT = "resultProject";
 	public static final String OUTCOME = "outcome";
