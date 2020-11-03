@@ -5,32 +5,30 @@
       "type": "object",
       "properties": {
         "scheme": {
-          "type": "string",
-          "description": "Description of scheme"
+          "type": "string"
         },
         "value": {
-          "type": "string",
-          "description": "Description of value"
+          "type": "string"
         }
-      }
+      },
+      "description": "To represent the information described by a scheme and a value in that scheme (i.e. pid)"
     }
   },
   "type": "object",
   "properties": {
     "accessrights": {
       "type": "string",
-      "description": "Description of accessrights"
+      "description": "The database access type: {open, restricted or closed}"
     },
     "certificates": {
       "type": "string",
       "description": "Description of certificates"
     },
     "citationguidelineurl": {
-      "type": "string",
-      "description": "Description of citationguidelineurl"
+      "type": "string"
     },
     "contenttypes": {
-      "description": "Description of contenttypes",
+      "description": "OpenDoar specific fileds ",
       "type": "array",
       "items": {
         "type": "string",
@@ -39,7 +37,7 @@
     },
     "databaseaccessrestriction": {
       "type": "string",
-      "description": "Description of databaseaccessrestriction"
+      "description": "One of {feeRequired, registration, other}"
     },
     "datasourcetype": {
       "allOf": [
@@ -47,114 +45,102 @@
           "$ref": "#/definitions/ControlledField"
         },
         {
-          "description": "Description of datasourcetype"
+          "description": "The type of the datasource. See https://api.openaire.eu/vocabularies/dnet:datasource_typologies"
         }
       ]
     },
     "datauploadrestriction": {
       "type": "string",
-      "description": "Description of datauploadrestriction"
+      "description": "One of {feeRequired, registration, other}"
     },
     "dateofvalidation": {
       "type": "string",
-      "description": "Description of dateofvalidation"
+      "description": "The date of last validation against the OpenAIRE guidelines for the datasource records"
     },
     "description": {
-      "type": "string",
-      "description": "Description of description"
+      "type": "string"
     },
     "englishname": {
       "type": "string",
-      "description": "Description of englishname"
+      "description": "The English name of the datasource"
     },
     "id": {
       "type": "string",
-      "description": "Description of id"
+      "description": "The OpenAIRE id of the resource"
     },
     "journal": {
       "type": "object",
       "properties": {
         "conferencedate": {
-          "type": "string",
-          "description": "Description of conferencedate"
+          "type": "string"
         },
         "conferenceplace": {
-          "type": "string",
-          "description": "Description of conferenceplace"
+          "type": "string"
         },
         "edition": {
           "type": "string",
-          "description": "Description of edition"
+          "description": "Edition of the journal or conference proceeding"
         },
         "ep": {
           "type": "string",
-          "description": "Description of ep"
+          "description": "End page"
         },
         "iss": {
-          "type": "string",
-          "description": "Description of iss"
+          "type": "string"
         },
         "issnLinking": {
-          "type": "string",
-          "description": "Description of issnLinking"
+          "type": "string"
         },
         "issnOnline": {
-          "type": "string",
-          "description": "Description of issnOnline"
+          "type": "string"
         },
         "issnPrinted": {
-          "type": "string",
-          "description": "Description of issnPrinted"
+          "type": "string"
         },
         "name": {
           "type": "string",
-          "description": "Description of name"
+          "description": "Name of the journal or conference"
         },
         "sp": {
           "type": "string",
-          "description": "Description of sp"
+          "description": "Start page"
         },
         "vol": {
-          "type": "string",
-          "description": "Description of vol"
+          "type": "string"
         }
       },
       "description": "Description of journal"
     },
     "languages": {
-      "description": "Description of languages",
+      "description": "OpenDOAR specific field",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of languages"
+        "type": "string"
       }
     },
     "logourl": {
-      "type": "string",
-      "description": "Description of logourl"
+      "type": "string"
     },
     "missionstatementurl": {
-      "type": "string",
-      "description": "Description of missionstatementurl"
+      "type": "string"
     },
     "officialname": {
       "type": "string",
-      "description": "Description of officialname"
+      "description": "The official name of the datasource"
     },
     "openairecompatibility": {
       "type": "string",
-      "description": "Description of openairecompatibility"
+      "description": "Information about the OpenAIRE compatibility of the ingested results (which guidelines they are compliant to)"
     },
     "originalId": {
-      "description": "Description of originalId",
+      "description": "Original identifiers for the datasource"
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of originalId"
+        "type": "string"
       }
     },
     "pid": {
-      "description": "Description of pid",
+      "description": "Persistent identifiers for the datasource",
       "type": "array",
       "items": {
         "allOf": [
@@ -187,24 +173,22 @@
       "description": "Description of releasestartdate"
     },
     "subjects": {
-      "description": "Description of subjects",
+      "description": "List of subjects associated to the datasource",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of subjects"
+        "type": "string"
       }
     },
     "uploadrights": {
       "type": "string",
-      "description": "Description of uploadrights"
+      "description": "One of {open, restricted or closed}"
     },
     "versioning": {
       "type": "boolean",
       "description": "Description of versioning"
     },
     "websiteurl": {
-      "type": "string",
-      "description": "Description of websiteurl"
+      "type": "string"
     }
   }
 }
