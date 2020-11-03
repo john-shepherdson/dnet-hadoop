@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Description of the research community/ research infrastructure"
+    },
+    "id": {
+      "type": "string",
+      "description": "OpenAIRE id of the research community/ research infrastructure"
+    },
+    "name": {
+      "type": "string",
+      "description": "The long name of the community"
+    },
+    "originalId": {
+      "type": "string",
+      "description": "The acronym of the community"
+    },
+    "subject": {
+      "description": "Description of subject",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Only for research communities: the list of the subjects associated to the research community"
+      }
+    },
+    "type": {
+      "type": "string",
+      "description": "The type of the record (research community/research infrastructure)"
+    },
+    "zenodo_community": {
+      "type": "string",
+      "description": "The id of the Zenodo communities associated to the research community/Research infrastructure"
+    }
+  }
+}
