@@ -4,11 +4,9 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +18,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,8 +116,7 @@ public class GenerateEntitiesApplication {
 		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
 			if (ModelSupport.isSubClass(o1, Result.class)) {
 
-				// We cannot further specify the result type as different result types might share the same ID
-				((Result) o1).mergeFrom((Result) o2);
+				return mergeResults((Result) o1, (Result) o2);
 			} else if (ModelSupport.isSubClass(o1, Datasource.class)) {
 				((Datasource) o1).mergeFrom((Datasource) o2);
 			} else if (ModelSupport.isSubClass(o1, Organization.class)) {
@@ -134,6 +132,19 @@ public class GenerateEntitiesApplication {
 			throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
 		}
 		return o1;
+	}
+
+	protected static Result mergeResults(Result o1, Result o2) {
+		Result r1 = o1;
+		Result r2 = o2;
+
+		if (new ResultTypeComparator().compare(r1, r2) < 0) {
+			r1.mergeFrom(r2);
+			return r1;
+		} else {
+			r2.mergeFrom(r1);
+			return r2;
+		}
 	}
 
 	private static List<Oaf> convertToListOaf(
