@@ -3,14 +3,15 @@ package eu.dnetlib.dhp.export
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import eu.dnetlib.dhp.provision.scholix.Scholix
+import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary
 import eu.dnetlib.dhp.schema.oaf.Relation
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
-
 import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
 import org.junit.jupiter.api.Test
 
 import scala.io.Source
-
+import scala.collection.JavaConverters._
 class ExportDLITOOAFTest {
 
   val mapper = new ObjectMapper()
@@ -22,12 +23,27 @@ class ExportDLITOOAFTest {
   }
 
 
+  def extractDatasources(s:Scholix):List[String]= {
+    s.getTarget.getCollectedFrom.asScala.map(c => c.getProvider.getName)(collection.breakOut)
+  }
+
+
+  def extractDatasources(s:ScholixSummary):List[String] = {
+
+    s.getDatasources.asScala.map(c => c.getDatasourceName)(collection.breakOut)
+
+
+  }
+
+
   @Test
   def testMappingRele():Unit = {
 
     val r:Relation = new Relation
     r.setSource("60|fbff1d424e045eecf24151a5fe3aa738")
     r.setTarget("50|dedup_wf_001::ec409f09e63347d4e834087fe1483877")
+    r.setRelType("IsReferencedBy")
+
 
     val r1 =DLIToOAF.convertDLIRelation(r)
     println(r1.getSource, r1.getTarget)

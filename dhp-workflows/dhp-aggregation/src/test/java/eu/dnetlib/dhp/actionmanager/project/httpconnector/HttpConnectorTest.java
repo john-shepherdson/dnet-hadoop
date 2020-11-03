@@ -6,8 +6,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+
+@Disabled
 public class HttpConnectorTest {
 
 	private static final Log log = LogFactory.getLog(HttpConnectorTest.class);
