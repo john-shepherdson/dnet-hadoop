@@ -53,5 +53,11 @@
 "paramLongName":"metadata",
 "paramDescription": "metadata associated to the deposition",
 "paramRequired": false
-}
+},
+  {
+    "paramName":"p",
+    "paramLongName":"publish",
+    "paramDescription": "if to publish the upload",
+    "paramRequired": false
+  }
 ]

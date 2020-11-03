@@ -42,6 +42,10 @@ public class SendToZenodoHDFS implements Serializable {
 		final String concept_rec_id = Optional
 			.ofNullable(parser.get("conceptRecordId"))
 			.orElse(null);
+		final Boolean publish = Optional
+			.ofNullable(parser.get("publish"))
+			.map(Boolean::valueOf)
+			.orElse(false);
 
 		final String depositionId = Optional.ofNullable(parser.get("depositionId")).orElse(null);
 		final String communityMapPath = parser.get("communityMapPath");
@@ -96,7 +100,8 @@ public class SendToZenodoHDFS implements Serializable {
 		}
 
 		zenodoApiClient.sendMretadata(metadata);
-		zenodoApiClient.publish();
+		if (publish)
+			zenodoApiClient.publish();
 
 	}
 
