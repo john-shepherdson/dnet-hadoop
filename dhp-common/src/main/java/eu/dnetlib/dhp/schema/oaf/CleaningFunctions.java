@@ -12,12 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import com.clearspring.analytics.util.Lists;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class CleaningFunctions {
 
-	public static final String DOI_URL_PREFIX = "^http(s?):\\/\\/(dx\\.)?doi\\.org\\/";
+	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
 	public static final String NONE = "none";
 
@@ -231,7 +229,7 @@ public class CleaningFunctions {
 
 			// TODO add cleaning for more PID types as needed
 			case "doi":
-				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX, ""));
+				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX_REGEX, ""));
 				break;
 		}
 		return pid;

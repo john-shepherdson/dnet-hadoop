@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -21,6 +22,12 @@ public class IdentifierFactory implements Serializable {
 	public static final String ID_PREFIX_SEPARATOR = "|";
 	public final static String ID_REGEX = "^[0-9][0-9]\\" + ID_PREFIX_SEPARATOR + ".{12}" + ID_SEPARATOR
 		+ "[a-zA-Z0-9]{32}$";
+
+	public final static String DOI_REGEX = "(^10\\.[0-9]{4,9}\\/[-._;()\\/:a-zA-Z0-9]+$)|" +
+		"(^10\\.1002\\/[^\\s]+$)|" +
+		"(^10\\.1021\\/[a-zA-Z0-9_][a-zA-Z0-9_][0-9]++$)|" +
+		"(^10\\.1207\\/[a-zA-Z0-9_]+\\&[0-9]+_[0-9]+$)";
+
 	public static final int ID_PREFIX_LEN = 12;
 	public static final String NONE = "none";
 
@@ -48,10 +55,21 @@ public class IdentifierFactory implements Serializable {
 	}
 
 	protected static boolean pidFilter(StructuredProperty s) {
-		return Objects.nonNull(s.getQualifier()) &&
-			PidType.isValid(s.getQualifier().getClassid()) &&
-			StringUtils.isNotBlank(StringUtils.trim(s.getValue())) &&
-			!NONE.equals(StringUtils.trim(StringUtils.lowerCase(s.getValue())));
+		if (Objects.isNull(s.getQualifier()) ||
+			StringUtils.isBlank(StringUtils.trim(s.getValue()))) {
+			return false;
+		}
+		try {
+			switch (PidType.valueOf(s.getQualifier().getClassid())) {
+				case doi:
+					final String doi = StringUtils.trim(StringUtils.lowerCase(s.getValue()));
+					return doi.matches(DOI_REGEX);
+				default:
+					return true;
+			}
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
 	}
 
 	private static String verifyIdSyntax(String s) {
