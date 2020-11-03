@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
 
+import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
@@ -15,8 +16,6 @@ import eu.dnetlib.dhp.utils.DHPUtils;
  * Factory class for OpenAIRE identifiers in the Graph
  */
 public class IdentifierFactory implements Serializable {
-
-	public static final String DOI_URL_PREFIX = "^http(s?):\\/\\/(dx\\.)?doi\\.org\\/";
 
 	public static final String ID_SEPARATOR = "::";
 	public static final String ID_PREFIX_SEPARATOR = "|";
@@ -50,29 +49,9 @@ public class IdentifierFactory implements Serializable {
 
 	protected static boolean pidFilter(StructuredProperty s) {
 		return Objects.nonNull(s.getQualifier()) &&
-				PidType.isValid(s.getQualifier().getClassid()) &&
-				StringUtils.isNotBlank(StringUtils.trim(s.getValue())) &&
-				!NONE.equals(StringUtils.trim(StringUtils.lowerCase(s.getValue())));
-	}
-
-	/**
-	 * Utility method that normalises PID values on a per-type basis.
-	 * @param pid the PID whose value will be normalised.
-	 * @return the PID containing the normalised value.
-	 */
-	public static StructuredProperty normalizePidValue(StructuredProperty pid) {
-		String value = Optional
-			.ofNullable(pid.getValue())
-			.map(String::trim)
-			.orElseThrow(() -> new IllegalArgumentException("PID value cannot be empty"));
-		switch (pid.getQualifier().getClassid()) {
-
-			// TODO add cleaning for more PID types as needed
-			case "doi":
-				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX, ""));
-				break;
-		}
-		return pid;
+			PidType.isValid(s.getQualifier().getClassid()) &&
+			StringUtils.isNotBlank(StringUtils.trim(s.getValue())) &&
+			!NONE.equals(StringUtils.trim(StringUtils.lowerCase(s.getValue())));
 	}
 
 	private static String verifyIdSyntax(String s) {
@@ -89,7 +68,7 @@ public class IdentifierFactory implements Serializable {
 			.append(ID_PREFIX_SEPARATOR)
 			.append(createPrefix(s.getQualifier().getClassid()))
 			.append(ID_SEPARATOR)
-			.append(DHPUtils.md5(normalizePidValue(s).getValue()))
+			.append(DHPUtils.md5(CleaningFunctions.normalizePidValue(s).getValue()))
 			.toString();
 	}
 

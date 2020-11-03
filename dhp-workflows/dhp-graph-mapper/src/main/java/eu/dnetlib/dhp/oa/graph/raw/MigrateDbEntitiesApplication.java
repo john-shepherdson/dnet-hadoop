@@ -1,16 +1,6 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.asString;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASOURCE_ORGANIZATION;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
@@ -19,19 +9,25 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PARTICIPANT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PROVIDED_BY;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_RELATED_TO;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PARTICIPATION;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PROJECT_ORGANIZATION;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVIDES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVISION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RELATIONSHIP;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.asString;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listKeyValues;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
 
 import java.io.Closeable;
 import java.io.IOException;

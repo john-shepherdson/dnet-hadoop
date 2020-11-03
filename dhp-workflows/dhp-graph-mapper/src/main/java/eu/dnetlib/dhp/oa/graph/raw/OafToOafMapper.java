@@ -1,14 +1,13 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -293,7 +292,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		return prepareListStructPropsWithValidQualifier(
 			doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info)
 				.stream()
-				.map(IdentifierFactory::normalizePidValue)
+				.map(CleaningFunctions::normalizePidValue)
 				.collect(Collectors.toList());
 	}
 

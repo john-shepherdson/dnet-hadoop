@@ -1,8 +1,8 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
 
 import java.util.*;
 
@@ -282,7 +282,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 
 		r.setInstance(instances);
-		r.setBestaccessright(getBestAccessRights(instances));
+		r.setBestaccessright(OafMapperUtils.createBestAccessRights(instances));
 	}
 
 	protected abstract List<StructuredProperty> prepareResultPids(Document doc, DataInfo info);
@@ -366,38 +366,6 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected abstract Field<String> prepareDatasetDevice(Document doc, DataInfo info);
 
 	protected abstract Field<String> prepareDatasetStorageDate(Document doc, DataInfo info);
-
-	public static Qualifier createBestAccessRights(final List<Instance> instanceList) {
-		return getBestAccessRights(instanceList);
-	}
-
-	protected static Qualifier getBestAccessRights(final List<Instance> instanceList) {
-		if (instanceList != null) {
-			final Optional<Qualifier> min = instanceList
-				.stream()
-				.map(i -> i.getAccessright())
-				.min(new LicenseComparator());
-
-			final Qualifier rights = min.isPresent() ? min.get() : new Qualifier();
-
-			if (StringUtils.isBlank(rights.getClassid())) {
-				rights.setClassid(UNKNOWN);
-			}
-			if (StringUtils.isBlank(rights.getClassname())
-				|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
-				rights.setClassname(NOT_AVAILABLE);
-			}
-			if (StringUtils.isBlank(rights.getSchemeid())) {
-				rights.setSchemeid(DNET_ACCESS_MODES);
-			}
-			if (StringUtils.isBlank(rights.getSchemename())) {
-				rights.setSchemename(DNET_ACCESS_MODES);
-			}
-
-			return rights;
-		}
-		return null;
-	}
 
 	private Journal prepareJournal(final Document doc, final DataInfo info) {
 		final Node n = doc.selectSingleNode("//oaf:journal");

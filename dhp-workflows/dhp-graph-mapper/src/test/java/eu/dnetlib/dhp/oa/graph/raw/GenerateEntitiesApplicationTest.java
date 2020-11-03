@@ -1,11 +1,13 @@
+
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,85 +15,85 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.lenient;
+import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
+import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
 public class GenerateEntitiesApplicationTest {
 
-    @Mock
-    private ISLookUpService isLookUpService;
+	@Mock
+	private ISLookUpService isLookUpService;
 
-    @Mock
-    private VocabularyGroup vocs;
+	@Mock
+	private VocabularyGroup vocs;
 
-    @BeforeEach
-    public void setUp() throws IOException, ISLookUpException {
+	@BeforeEach
+	public void setUp() throws IOException, ISLookUpException {
 
-        lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
-        lenient()
-                .when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
-                .thenReturn(synonyms());
+		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
+		lenient()
+			.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
+			.thenReturn(synonyms());
 
-        vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
-    }
+		vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
+	}
 
-    @Test
-    public void testMergeResult() throws IOException {
-        Result publication = getResult("oaf_record.xml", Publication.class);
-        Result dataset = getResult("odf_dataset.xml", Dataset.class);
-        Result software = getResult("odf_software.xml", Software.class);
-        Result orp = getResult("oaf_orp.xml", OtherResearchProduct.class);
+	@Test
+	public void testMergeResult() throws IOException {
+		Result publication = getResult("oaf_record.xml", Publication.class);
+		Result dataset = getResult("odf_dataset.xml", Dataset.class);
+		Result software = getResult("odf_software.xml", Software.class);
+		Result orp = getResult("oaf_orp.xml", OtherResearchProduct.class);
 
-        verifyMerge(publication, dataset, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
-        verifyMerge(dataset, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(publication, dataset, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(dataset, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
 
-        verifyMerge(publication, software, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
-        verifyMerge(software, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(publication, software, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(software, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
 
-        verifyMerge(publication, orp, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
-        verifyMerge(orp, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(publication, orp, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(orp, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
 
-        verifyMerge(dataset, software, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
-        verifyMerge(software, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		verifyMerge(dataset, software, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		verifyMerge(software, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
 
-        verifyMerge(dataset, orp, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
-        verifyMerge(orp, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		verifyMerge(dataset, orp, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		verifyMerge(orp, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
 
-        verifyMerge(software, orp, Software.class, ModelConstants.SOFTWARE_RESULTTYPE_CLASSID);
-        verifyMerge(orp, software, Software.class, ModelConstants.SOFTWARE_RESULTTYPE_CLASSID);
-    }
+		verifyMerge(software, orp, Software.class, ModelConstants.SOFTWARE_RESULTTYPE_CLASSID);
+		verifyMerge(orp, software, Software.class, ModelConstants.SOFTWARE_RESULTTYPE_CLASSID);
+	}
 
-    protected <T extends Result> void verifyMerge(Result publication, Result dataset, Class<T> clazz, String resultType) {
-        final Result merge = GenerateEntitiesApplication.mergeResults(publication, dataset);
-        assertTrue(clazz.isAssignableFrom(merge.getClass()));
-        assertEquals(resultType, merge.getResulttype().getClassid());
-    }
+	protected <T extends Result> void verifyMerge(Result publication, Result dataset, Class<T> clazz,
+		String resultType) {
+		final Result merge = GenerateEntitiesApplication.mergeResults(publication, dataset);
+		assertTrue(clazz.isAssignableFrom(merge.getClass()));
+		assertEquals(resultType, merge.getResulttype().getClassid());
+	}
 
-    protected <T extends Result> Result getResult(String xmlFileName, Class<T> clazz) throws IOException {
-        final String xml = IOUtils.toString(getClass().getResourceAsStream(xmlFileName));
-        return new OdfToOafMapper(vocs, false)
-                .processMdRecord(xml)
-                .stream()
-                .filter(s -> clazz.isAssignableFrom(s.getClass()))
-                .map(s -> (Result) s)
-                .findFirst()
-                .get();
-    }
+	protected <T extends Result> Result getResult(String xmlFileName, Class<T> clazz) throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream(xmlFileName));
+		return new OdfToOafMapper(vocs, false)
+			.processMdRecord(xml)
+			.stream()
+			.filter(s -> clazz.isAssignableFrom(s.getClass()))
+			.map(s -> (Result) s)
+			.findFirst()
+			.get();
+	}
 
+	private List<String> vocs() throws IOException {
+		return IOUtils
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+	}
 
-    private List<String> vocs() throws IOException {
-        return IOUtils
-                .readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
-    }
-
-    private List<String> synonyms() throws IOException {
-        return IOUtils
-                .readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
-    }
+	private List<String> synonyms() throws IOException {
+		return IOUtils
+			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+	}
 
 }
