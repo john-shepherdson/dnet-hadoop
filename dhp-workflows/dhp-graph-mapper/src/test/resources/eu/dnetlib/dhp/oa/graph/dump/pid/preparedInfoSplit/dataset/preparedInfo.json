@@ -1,3 +1,0 @@
-{"authorAllowedPids":[[{"key":"orcid","value":"0000-0001-9317-9350"},{"key":"mag","value":"fakeMag"}],[{"key":"orcid","value":"0000-0002-1114-4216"}]],"resultAllowedPids":[{"key":"doi","value":"10.1016/fake"},{"key":"pmid","value":"10443fake"}],"resultId":"50|_____OmicsDI::00899d9cb1163754943a3277365adc02"}
-{"authorAllowedPids":[],"resultAllowedPids":[{"key":"pdb","value":"fakepdb"}],"resultId":"50|_____OmicsDI::023fd1fcbb64f0f7df0671798a62f379"}
-{"authorAllowedPids":[],"resultAllowedPids":[{"key":"doi","value":"10.1016/j.tcs.2012.06.029"},{"key":"arXiv","value":"fake_arxiv"}],"resultId":"50|_____OmicsDI::036d65211a6ac14237c6e2d7cc223386"}
