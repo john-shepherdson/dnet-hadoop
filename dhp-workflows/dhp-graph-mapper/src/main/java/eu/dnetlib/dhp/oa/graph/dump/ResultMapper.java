@@ -156,7 +156,6 @@ public class ResultMapper implements Serializable {
 				.ifPresent(value -> value.stream().forEach(c -> contributorList.add(c.getValue())));
 			out.setContributor(contributorList);
 
-			// List<Country> countryList = new ArrayList<>();
 			Optional
 				.ofNullable(input.getCountry())
 				.ifPresent(
@@ -187,8 +186,6 @@ public class ResultMapper implements Serializable {
 									})
 								.filter(Objects::nonNull)
 								.collect(Collectors.toList())));
-
-			// out.setCountry(countryList);
 
 			final List<String> coverageList = new ArrayList<>();
 			Optional
@@ -397,12 +394,7 @@ public class ResultMapper implements Serializable {
 
 	}
 
-	private static <I extends Instance> void setCommonValue(eu.dnetlib.dhp.schema.oaf.Instance i, I instance) {// <I
-																												// extends
-																												// Instance>
-																												// I
-		// getInstance(eu.dnetlib.dhp.schema.oaf.Instance
-		// i, boolean graph) {
+	private static <I extends Instance> void setCommonValue(eu.dnetlib.dhp.schema.oaf.Instance i, I instance) {
 		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> opAr = Optional
 			.ofNullable(i.getAccessright());
 		if (opAr.isPresent()) {
@@ -427,7 +419,6 @@ public class ResultMapper implements Serializable {
 		Optional
 			.ofNullable(i.getRefereed())
 			.ifPresent(value -> instance.setRefereed(value.getClassname()));
-		// .ifPresent(value -> instance.setRefereed(value.getValue()));
 		Optional
 			.ofNullable(i.getInstancetype())
 			.ifPresent(value -> instance.setType(value.getClassname()));
@@ -437,10 +428,8 @@ public class ResultMapper implements Serializable {
 
 	private static List<Provenance> getUniqueProvenance(List<Provenance> provenance) {
 		Provenance iProv = new Provenance();
-		// iProv.setProvenance(Constants.INFERRED);
 
 		Provenance hProv = new Provenance();
-		// hProv.setProvenance(Constants.HARVESTED);
 		Provenance lProv = new Provenance();
 
 		for (Provenance p : provenance) {
