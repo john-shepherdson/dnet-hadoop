@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary;
@@ -91,11 +93,89 @@ public class Scholix implements Serializable {
 		s.setSource(ScholixResource.fromSummary(scholixSummary));
 
 		s.setIdentifier(rel.getTarget());
-		// ScholixResource mockTarget = new ScholixResource();
-		// mockTarget.setDnetIdentifier(rel.getTarget());
-		// s.setTarget(mockTarget);
-		// s.generateIdentifier();
 		return s;
+	}
+
+	private List<ScholixEntityId> mergeScholixEntityId(final List<ScholixEntityId> a, final List<ScholixEntityId> b) {
+		final List<ScholixEntityId> m = new ArrayList<>(a);
+		if (b != null)
+			b.forEach(s -> {
+				int tt = (int) m.stream().filter(t -> t.getName().equalsIgnoreCase(s.getName())).count();
+				if (tt == 0) {
+					m.add(s);
+				}
+			});
+		return m;
+	}
+
+	private List<ScholixIdentifier> mergeScholixIdnetifier(final List<ScholixIdentifier> a,
+		final List<ScholixIdentifier> b) {
+		final List<ScholixIdentifier> m = new ArrayList<>(a);
+		if (b != null)
+			b.forEach(s -> {
+				int tt = (int) m.stream().filter(t -> t.getIdentifier().equalsIgnoreCase(s.getIdentifier())).count();
+				if (tt == 0) {
+					m.add(s);
+				}
+			});
+		return m;
+	}
+
+	private List<ScholixCollectedFrom> mergeScholixCollectedFrom(final List<ScholixCollectedFrom> a,
+		final List<ScholixCollectedFrom> b) {
+		final List<ScholixCollectedFrom> m = new ArrayList<>(a);
+		if (b != null)
+			b.forEach(s -> {
+				int tt = (int) m
+					.stream()
+					.filter(t -> t.getProvider().getName().equalsIgnoreCase(s.getProvider().getName()))
+					.count();
+				if (tt == 0) {
+					m.add(s);
+				}
+			});
+		return m;
+	}
+
+	private ScholixRelationship mergeRelationships(final ScholixRelationship a, final ScholixRelationship b) {
+		ScholixRelationship result = new ScholixRelationship();
+		result.setName(StringUtils.isEmpty(a.getName()) ? b.getName() : a.getName());
+		result.setInverse(StringUtils.isEmpty(a.getInverse()) ? b.getInverse() : a.getInverse());
+		result.setSchema(StringUtils.isEmpty(a.getSchema()) ? b.getSchema() : a.getSchema());
+		return result;
+	}
+
+	private ScholixResource mergeResource(final ScholixResource a, final ScholixResource b) {
+
+		final ScholixResource result = new ScholixResource();
+		result.setCollectedFrom(mergeScholixCollectedFrom(a.getCollectedFrom(), b.getCollectedFrom()));
+		result.setCreator(mergeScholixEntityId(a.getCreator(), b.getCreator()));
+		result
+			.setDnetIdentifier(
+				StringUtils.isBlank(a.getDnetIdentifier()) ? b.getDnetIdentifier() : a.getDnetIdentifier());
+		result.setIdentifier(mergeScholixIdnetifier(a.getIdentifier(), b.getIdentifier()));
+		result.setObjectType(StringUtils.isNotBlank(a.getObjectType()) ? a.getObjectType() : b.getObjectType());
+		result
+			.setObjectSubType(
+				StringUtils.isNotBlank(a.getObjectSubType()) ? a.getObjectSubType() : b.getObjectSubType());
+		result.setPublisher(mergeScholixEntityId(a.getPublisher(), b.getPublisher()));
+		result
+			.setPublicationDate(
+				StringUtils.isNotBlank(a.getPublicationDate()) ? a.getPublicationDate() : b.getPublicationDate());
+		result.setTitle(StringUtils.isNotBlank(a.getTitle()) ? a.getTitle() : b.getTitle());
+		return result;
+
+	}
+
+	public void mergeFrom(final Scholix other) {
+		linkprovider = mergeScholixEntityId(linkprovider, other.getLinkprovider());
+		publisher = mergeScholixEntityId(publisher, other.getPublisher());
+		if (StringUtils.isEmpty(publicationDate))
+			publicationDate = other.getPublicationDate();
+		relationship = mergeRelationships(relationship, other.getRelationship());
+		source = mergeResource(source, other.getSource());
+		target = mergeResource(target, other.getTarget());
+		generateIdentifier();
 	}
 
 	public void generatelinkPublisher() {
