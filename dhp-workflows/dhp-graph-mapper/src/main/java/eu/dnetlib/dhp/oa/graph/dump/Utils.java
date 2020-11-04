@@ -4,9 +4,7 @@ package eu.dnetlib.dhp.oa.graph.dump;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -14,9 +12,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.io.SAXReader;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -24,10 +20,7 @@ import com.google.gson.Gson;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.oa.graph.dump.graph.Constants;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.Node;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.RelType;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.Relation;
-import eu.dnetlib.dhp.schema.dump.pidgraph.Entity;
+
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
