@@ -10,7 +10,7 @@
     },
     "code": {
       "type": "string",
-      "description": "The grant agreement"
+      "description": "The grant agreement number"
     },
     "enddate": {
       "type": "string"
@@ -54,7 +54,7 @@
       "properties": {
         "currency": {
           "type": "string",
-          "description": "The currency of the granted amount"
+          "description": "The currency of the granted amount (e.g. EUR)"
         },
         "fundedamount": {
           "type": "number",
@@ -62,13 +62,13 @@
         },
         "totalcost": {
           "type": "number",
-          "description": "The total cost"
+          "description": "The total cost of the project"
         }
       },
-      "description": "The funded amount for the project"
+      "description": "The money granted to the project"
     },
     "h2020programme": {
-      "description": "The h2020 programme the project is funded under",
+      "description": "The h2020 programme funding the project",
       "type": "array",
       "items": {
         "type": "object",
