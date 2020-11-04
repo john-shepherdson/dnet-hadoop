@@ -4,11 +4,11 @@
   "properties": {
     "description": {
       "type": "string",
-      "description": "Description of the research community/ research infrastructure"
+      "description": "Description of the research community/research infrastructure"
     },
     "id": {
       "type": "string",
-      "description": "OpenAIRE id of the research community/ research infrastructure"
+      "description": "OpenAIRE id of the research community/research infrastructure"
     },
     "name": {
       "type": "string",
@@ -19,20 +19,19 @@
       "description": "The acronym of the community"
     },
     "subject": {
-      "description": "Description of subject",
+      "description": "Only for research communities: the list of the subjects associated to the research community",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Only for research communities: the list of the subjects associated to the research community"
+        "type": "string"
       }
     },
     "type": {
       "type": "string",
-      "description": "The type of the record (research community/research infrastructure)"
+      "description": "One of {Research Community, Research infrastructure}"
     },
     "zenodo_community": {
       "type": "string",
-      "description": "The id of the Zenodo communities associated to the research community/Research infrastructure"
+      "description": "The URL of the Zenodo community associated to the Research community/Research infrastructure"
     }
   }
 }
