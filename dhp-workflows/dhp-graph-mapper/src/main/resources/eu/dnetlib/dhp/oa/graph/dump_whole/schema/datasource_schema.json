@@ -18,26 +18,26 @@
   "properties": {
     "accessrights": {
       "type": "string",
-      "description": "The database access type: {open, restricted or closed}"
+      "description": "Type of access to the data source, as defined by re3data.org. Possible values: {open, restricted, closed}"
     },
     "certificates": {
       "type": "string",
-      "description": "Description of certificates"
+      "description": "The certificate, seal or standard the data source complies with. As defined by re3data.org."
     },
     "citationguidelineurl": {
-      "type": "string"
+      "type": "string",
+      "description":"The URL of the data source providing information on how to cite its items. As defined by re3data.org."
     },
     "contenttypes": {
-      "description": "OpenDoar specific fileds ",
+      "description": "Types of content in the data source, as defined by OpenDOAR",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of contenttypes"
+        "type": "string"
       }
     },
     "databaseaccessrestriction": {
       "type": "string",
-      "description": "One of {feeRequired, registration, other}"
+      "description": "Access restrinctions to the data source, as defined by re3data.org. One of {feeRequired, registration, other}"
     },
     "datasourcetype": {
       "allOf": [
@@ -51,7 +51,7 @@
     },
     "datauploadrestriction": {
       "type": "string",
-      "description": "One of {feeRequired, registration, other}"
+      "description": "Upload restrictions applied by the datasource, as defined by re3data.org. One of {feeRequired, registration, other}"
     },
     "dateofvalidation": {
       "type": "string",
@@ -66,7 +66,7 @@
     },
     "id": {
       "type": "string",
-      "description": "The OpenAIRE id of the resource"
+      "description": "The OpenAIRE id of the data source"
     },
     "journal": {
       "type": "object",
@@ -78,15 +78,15 @@
           "type": "string"
         },
         "edition": {
-          "type": "string",
-          "description": "Edition of the journal or conference proceeding"
+          "type": "string"
         },
         "ep": {
           "type": "string",
           "description": "End page"
         },
         "iss": {
-          "type": "string"
+          "type": "string",
+          "description": "Issue number"
         },
         "issnLinking": {
           "type": "string"
@@ -98,21 +98,21 @@
           "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "Name of the journal or conference"
+          "type": "string"
         },
         "sp": {
           "type": "string",
           "description": "Start page"
         },
         "vol": {
-          "type": "string"
+          "type": "string",
+          "description": "Volume"
         }
       },
-      "description": "Description of journal"
+      "description": "Information about the journal, if this data source is of type Journal."
     },
     "languages": {
-      "description": "OpenDOAR specific field",
+      "description": "The languages present in the data source's content, as defined by OpenDOAR.",
       "type": "array",
       "items": {
         "type": "string"
@@ -122,7 +122,8 @@
       "type": "string"
     },
     "missionstatementurl": {
-      "type": "string"
+      "type": "string",
+      "description":"The URL of a mission statement describing the designated community of the data source. As defined by re3data.org"
     },
     "officialname": {
       "type": "string",
@@ -130,7 +131,7 @@
     },
     "openairecompatibility": {
       "type": "string",
-      "description": "Information about the OpenAIRE compatibility of the ingested results (which guidelines they are compliant to)"
+      "description": "OpenAIRE guidelines the data source comply with. See also https://guidelines.openaire.eu."
     },
     "originalId": {
       "description": "Original identifiers for the datasource"
@@ -140,37 +141,34 @@
       }
     },
     "pid": {
-      "description": "Persistent identifiers for the datasource",
+      "description": "Persistent identifiers of the datasource",
       "type": "array",
       "items": {
         "allOf": [
           {
             "$ref": "#/definitions/ControlledField"
-          },
-          {
-            "description": "Description of pid"
           }
         ]
       }
     },
     "pidsystems": {
       "type": "string",
-      "description": "Description of pidsystems"
+      "description": "The persistent identifier system that is used by the data source. As defined by re3data.org"
     },
     "policies": {
-      "description": "Description of policies",
+      "description": "Policies of the data source, as defined in OpenDOAR.",
       "type": "array",
       "items": {
-        "description": "Description of policies"
+        "type": "string"
       }
     },
     "releaseenddate": {
       "type": "string",
-      "description": "Description of releaseenddate"
+      "description": "Date when the data source went offline or stopped ingesting new research data. As defined by re3data.org"
     },
     "releasestartdate": {
       "type": "string",
-      "description": "Description of releasestartdate"
+      "description": "Releasing date of the data source, as defined by re3data.org"
     },
     "subjects": {
       "description": "List of subjects associated to the datasource",
@@ -181,11 +179,11 @@
     },
     "uploadrights": {
       "type": "string",
-      "description": "One of {open, restricted or closed}"
+      "description": "Type of data upload. As defined by re3data.org: one of {open, restricted,closed}"
     },
     "versioning": {
       "type": "boolean",
-      "description": "Description of versioning"
+      "description": "As defined by redata.org: 'yes' if the data source supports versioning, 'no' otherwise."
     },
     "websiteurl": {
       "type": "string"
