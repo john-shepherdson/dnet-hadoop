@@ -2,94 +2,85 @@
 package eu.dnetlib.dhp.oa.dedup.model;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Sets;
 
-import eu.dnetlib.dhp.oa.dedup.IdGenerator;
+import eu.dnetlib.dhp.oa.dedup.DatePicker;
 import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.PidComparator;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
-public class Identifier implements Serializable, Comparable<Identifier> {
+public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier> {
 
-	StructuredProperty pid;
-	Date date;
-	PidType type;
-	List<KeyValue> collectedFrom;
-	EntityType entityType;
-	String originalID;
+	public static String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
+	public static String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
+	public static String BASE_DATE = "2000-01-01";
 
-	boolean useOriginal = false; // to know if the top identifier won because of the alphabetical order of the original
-									// ID
+	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-	public Identifier(StructuredProperty pid, Date date, PidType type, List<KeyValue> collectedFrom,
-		EntityType entityType, String originalID) {
-		this.pid = pid;
-		this.date = date;
-		this.type = type;
-		this.collectedFrom = collectedFrom;
-		this.entityType = entityType;
-		this.originalID = originalID;
+	private T entity;
+
+	public static <T extends OafEntity> Identifier newInstance(T entity) {
+		return new Identifier(entity);
 	}
 
-	public StructuredProperty getPid() {
-		return pid;
+	public Identifier(T entity) {
+		this.entity = entity;
 	}
 
-	public void setPid(StructuredProperty pid) {
-		this.pid = pid;
+	public T getEntity() {
+		return entity;
+	}
+
+	public void setEntity(T entity) {
+		this.entity = entity;
 	}
 
 	public Date getDate() {
-		return date;
+		String date = BASE_DATE;
+		if (ModelSupport.isSubClass(getEntity(), Result.class)) {
+			Result result = (Result) getEntity();
+			if (isWellformed(result.getDateofacceptance())) {
+				date = result.getDateofacceptance().getValue();
+			}
+		}
+		try {
+			return sdf.parse(date);
+		} catch (ParseException e) {
+			return new Date();
+		}
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public PidType getType() {
-		return type;
-	}
-
-	public void setType(PidType type) {
-		this.type = type;
+	private static boolean isWellformed(Field<String> date) {
+		return date != null && StringUtils.isNotBlank(date.getValue())
+			&& date.getValue().matches(DatePicker.DATE_PATTERN) && DatePicker.inRange(date.getValue());
 	}
 
 	public List<KeyValue> getCollectedFrom() {
-		return collectedFrom;
-	}
-
-	public void setCollectedFrom(List<KeyValue> collectedFrom) {
-		this.collectedFrom = collectedFrom;
+		return entity.getCollectedfrom();
 	}
 
 	public EntityType getEntityType() {
-		return entityType;
-	}
-
-	public void setEntityType(EntityType entityType) {
-		this.entityType = entityType;
+		return EntityType.fromClass(entity.getClass());
 	}
 
 	public String getOriginalID() {
-		return originalID;
+		return entity.getId();
 	}
 
-	public void setOriginalID(String originalID) {
-		this.originalID = originalID;
-	}
-
-	public boolean isUseOriginal() {
-		return useOriginal;
-	}
-
-	public void setUseOriginal(boolean useOriginal) {
-		this.useOriginal = useOriginal;
+	private PidType getPidType() {
+		return PidType.tryValueOf(StringUtils.substringBefore(StringUtils.substringAfter(entity.getId(), "|"), "_"));
 	}
 
 	@Override
@@ -97,48 +88,48 @@ public class Identifier implements Serializable, Comparable<Identifier> {
 		// priority in comparisons: 1) pidtype, 2) collectedfrom (depending on the entity type) , 3) date 4)
 		// alphabetical order of the originalID
 
-		Set<String> lKeys = Sets.newHashSet();
-		if (this.collectedFrom != null)
-			lKeys = this.collectedFrom.stream().map(KeyValue::getKey).collect(Collectors.toSet());
+		Set<String> lKeys = Optional
+			.ofNullable(getCollectedFrom())
+			.map(c -> c.stream().map(KeyValue::getKey).collect(Collectors.toSet()))
+			.orElse(Sets.newHashSet());
 
-		Set<String> rKeys = Sets.newHashSet();
-		if (i.getCollectedFrom() != null)
-			rKeys = i.getCollectedFrom().stream().map(KeyValue::getKey).collect(Collectors.toSet());
+		final Optional<List<KeyValue>> cf = Optional.ofNullable(i.getCollectedFrom());
+		Set<String> rKeys = cf
+			.map(c -> c.stream().map(KeyValue::getKey).collect(Collectors.toSet()))
+			.orElse(Sets.newHashSet());
 
-		if (this.getType().compareTo(i.getType()) == 0) { // same type
-			if (entityType == EntityType.publication) {
-				if (isFromDatasourceID(lKeys, IdGenerator.CROSSREF_ID)
-					&& !isFromDatasourceID(rKeys, IdGenerator.CROSSREF_ID))
-					return 1;
-				if (isFromDatasourceID(rKeys, IdGenerator.CROSSREF_ID)
-					&& !isFromDatasourceID(lKeys, IdGenerator.CROSSREF_ID))
+		if (this.getPidType().compareTo(i.getPidType()) == 0) { // same type
+			if (getEntityType() == EntityType.publication) {
+				if (isFromDatasourceID(lKeys, CROSSREF_ID)
+					&& !isFromDatasourceID(rKeys, CROSSREF_ID))
 					return -1;
+				if (isFromDatasourceID(rKeys, CROSSREF_ID)
+					&& !isFromDatasourceID(lKeys, CROSSREF_ID))
+					return 1;
 			}
-			if (entityType == EntityType.dataset) {
-				if (isFromDatasourceID(lKeys, IdGenerator.DATACITE_ID)
-					&& !isFromDatasourceID(rKeys, IdGenerator.DATACITE_ID))
-					return 1;
-				if (isFromDatasourceID(rKeys, IdGenerator.DATACITE_ID)
-					&& !isFromDatasourceID(lKeys, IdGenerator.DATACITE_ID))
+			if (getEntityType() == EntityType.dataset) {
+				if (isFromDatasourceID(lKeys, DATACITE_ID)
+					&& !isFromDatasourceID(rKeys, DATACITE_ID))
 					return -1;
+				if (isFromDatasourceID(rKeys, DATACITE_ID)
+					&& !isFromDatasourceID(lKeys, DATACITE_ID))
+					return 1;
 			}
 
 			if (this.getDate().compareTo(i.getDate()) == 0) {// same date
-
-				if (this.originalID.compareTo(i.originalID) < 0)
-					this.useOriginal = true;
-				else
-					i.setUseOriginal(true);
-
 				// the minus because we need to take the alphabetically lower id
-				return -this.originalID.compareTo(i.originalID);
+				return this.getOriginalID().compareTo(i.getOriginalID());
 			} else
 				// the minus is because we need to take the elder date
-				return -this.getDate().compareTo(i.getDate());
+				return this.getDate().compareTo(i.getDate());
 		} else {
-			return this.getType().compareTo(i.getType());
+			return new PidComparator<>(getEntity()).compare(toSP(getPidType()), toSP(i.getPidType()));
 		}
 
+	}
+
+	private StructuredProperty toSP(PidType pidType) {
+		return OafMapperUtils.structuredProperty("", pidType.toString(), pidType.toString(), "", "", new DataInfo());
 	}
 
 	public boolean isFromDatasourceID(Set<String> collectedFrom, String dsId) {

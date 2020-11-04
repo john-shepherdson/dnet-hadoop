@@ -7,97 +7,57 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
-import eu.dnetlib.dhp.oa.dedup.model.PidType;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class IdGeneratorTest {
 
-	private static List<Identifier> bestIds;
-	private static List<Tuple2<String, Publication>> pubs;
+	private static ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-	private static List<Identifier> bestIds2;
-	private static List<Identifier> bestIds3;
+	private static List<Identifier<Publication>> bestIds;
+	private static List<Identifier<Publication>> bestIds2;
+	private static List<Identifier<Publication>> bestIds3;
 
 	private static String testEntityBasePath;
 
-	private static SimpleDateFormat sdf;
-	private static Date baseDate;
-
 	@BeforeAll
 	public static void setUp() throws Exception {
-
-		sdf = new SimpleDateFormat("yyyy-MM-dd");
-		baseDate = sdf.parse("2000-01-01");
-
-		bestIds = new ArrayList<>();
-		bestIds2 = Lists
-			.newArrayList(
-				new Identifier(pid("pid1", "original", "original"), baseDate, PidType.original,
-					keyValue("key", "value"), EntityType.publication, "50|originalID1"),
-				new Identifier(pid("pid2", "original", "original"), baseDate, PidType.original,
-					keyValue("key", "value"), EntityType.publication, "50|originalID2"),
-				new Identifier(pid("pid3", "original", "original"), baseDate, PidType.original,
-					keyValue("key", "value"), EntityType.publication, "50|originalID3"));
-		bestIds3 = Lists
-			.newArrayList(
-				new Identifier(pid("pid1", "original", "original"), baseDate, PidType.original,
-					keyValue("key", "value"), EntityType.publication, "50|originalID1"),
-				new Identifier(pid("pid2", "doi", "doi"), baseDate, PidType.doi, keyValue("key", "value"),
-					EntityType.publication, "50|originalID2"),
-				new Identifier(pid("pid3", "original", "original"), baseDate, PidType.original,
-					keyValue("key", "value"), EntityType.publication, "50|originalID3"));
-
 		testEntityBasePath = Paths
 			.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/json").toURI())
 			.toFile()
 			.getAbsolutePath();
 
-		pubs = readSample(testEntityBasePath + "/publication_idgeneration.json", Publication.class);
-
+		bestIds = createBestIds(testEntityBasePath + "/publication_idgeneration.json", Publication.class);
+		bestIds2 = createBestIds(testEntityBasePath + "/publication_idgeneration2.json", Publication.class);
+		bestIds3 = createBestIds(testEntityBasePath + "/publication_idgeneration3.json", Publication.class);
 	}
 
 	@Test
-	@Order(1)
-	public void bestPidToIdentifierTest() {
-
-		List<String> typesForAssertions = Lists
-			.newArrayList(PidType.pmc.toString(), PidType.doi.toString(), PidType.doi.toString());
-
-		for (Tuple2<String, Publication> pub : pubs) {
-			List<Identifier> ids = IdGenerator.bestPidToIdentifier(pub._2());
-			assertEquals(typesForAssertions.get(pubs.indexOf(pub)), ids.get(0).getPid().getQualifier().getClassid());
-			bestIds.addAll(ids);
-		}
-	}
-
-	@Test
-	@Order(2)
 	public void generateIdTest1() {
 		String id1 = IdGenerator.generate(bestIds, "50|defaultID");
 
 		System.out
-			.println("id list 1 = " + bestIds.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
+			.println("id list 1 = " + bestIds.stream().map(i -> i.getOriginalID()).collect(Collectors.toList()));
 
-		assertEquals("50|dedup_wf_001::9c5cfbf993d38476e0f959a301239719", id1);
+		assertEquals("50|doi_dedup___::0968af610a356656706657e4f234b340", id1);
 	}
 
 	@Test
@@ -106,14 +66,22 @@ public class IdGeneratorTest {
 		String id2 = IdGenerator.generate(bestIds3, "50|defaultID");
 
 		System.out
-			.println("id list 2 = " + bestIds2.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
+			.println("id list 2 = " + bestIds2.stream().map(i -> i.getOriginalID()).collect(Collectors.toList()));
 		System.out.println("winner 2 = " + id1);
 		System.out
-			.println("id list 3 = " + bestIds3.stream().map(i -> i.getPid().getValue()).collect(Collectors.toList()));
+			.println("id list 3 = " + bestIds3.stream().map(i -> i.getOriginalID()).collect(Collectors.toList()));
 		System.out.println("winner 3 = " + id2);
 
-		assertEquals("50|dedup_wf_001::2c56cc1914bffdb30fdff354e0099612", id1);
-		assertEquals("50|dedup_doi___::128ead3ed8d9ecf262704b6fcf592b8d", id2);
+		assertEquals("50|doi_dedup___::1a77a3bba737f8b669dcf330ad3b37e2", id1);
+		assertEquals("50|dedup_wf_001::0829b5191605bdbea36d6502b8c1ce1g", id2);
+	}
+
+	protected static <T extends OafEntity> List<Identifier<T>> createBestIds(String path, Class<T> clazz) {
+		final Stream<Identifier<T>> ids = readSample(path, clazz)
+			.stream()
+			.map(Tuple2::_2)
+			.map(Identifier::newInstance);
+		return ids.collect(Collectors.toList());
 	}
 
 	public static <T> List<Tuple2<String, T>> readSample(String path, Class<T> clazz) {
@@ -127,7 +95,7 @@ public class IdGeneratorTest {
 					.add(
 						new Tuple2<>(
 							MapDocumentUtil.getJPathString("$.id", line),
-							new ObjectMapper().readValue(line, clazz)));
+							OBJECT_MAPPER.readValue(line, clazz)));
 				// read next line
 				line = reader.readLine();
 			}
@@ -140,23 +108,10 @@ public class IdGeneratorTest {
 	}
 
 	public static StructuredProperty pid(String pid, String classid, String classname) {
-
-		StructuredProperty sp = new StructuredProperty();
-		sp.setValue(pid);
-		Qualifier q = new Qualifier();
-		q.setSchemeid(classid);
-		q.setSchemename(classname);
-		q.setClassname(classname);
-		q.setClassid(classid);
-		sp.setQualifier(q);
-		return sp;
+		return OafMapperUtils.structuredProperty(pid, classid, classname, "", "", new DataInfo());
 	}
 
 	public static List<KeyValue> keyValue(String key, String value) {
-
-		KeyValue kv = new KeyValue();
-		kv.setKey(key);
-		kv.setValue(value);
-		return Lists.newArrayList(kv);
+		return Lists.newArrayList(OafMapperUtils.keyValue(key, value));
 	}
 }

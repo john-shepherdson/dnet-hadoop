@@ -45,70 +45,10 @@ public class PidComparator<T extends OafEntity> implements Comparator<Structured
 	}
 
 	private int compareResultPids(PidType lClass, PidType rClass) {
-		if (lClass.equals(PidType.doi))
-			return -1;
-		if (rClass.equals(PidType.doi))
-			return 1;
-
-		if (lClass.equals(PidType.pmid))
-			return -1;
-		if (rClass.equals(PidType.pmid))
-			return 1;
-
-		if (lClass.equals(PidType.pmc))
-			return -1;
-		if (rClass.equals(PidType.pmc))
-			return 1;
-
-		if (lClass.equals(PidType.handle))
-			return -1;
-		if (rClass.equals(PidType.handle))
-			return 1;
-
-		if (lClass.equals(PidType.arXiv))
-			return -1;
-		if (rClass.equals(PidType.arXiv))
-			return 1;
-
-		if (lClass.equals(PidType.NCID))
-			return -1;
-		if (rClass.equals(PidType.NCID))
-			return 1;
-
-		if (lClass.equals(PidType.GBIF))
-			return -1;
-		if (rClass.equals(PidType.GBIF))
-			return 1;
-
-		if (lClass.equals(PidType.nct))
-			return -1;
-		if (rClass.equals(PidType.nct))
-			return 1;
-
-		if (lClass.equals(PidType.urn))
-			return -1;
-		if (rClass.equals(PidType.urn))
-			return 1;
-
-		return 0;
+		return new ResultPidComparator().compare(lClass, rClass);
 	}
 
 	private int compareOrganizationtPids(PidType lClass, PidType rClass) {
-		if (lClass.equals(PidType.GRID))
-			return -1;
-		if (rClass.equals(PidType.GRID))
-			return 1;
-
-		if (lClass.equals(PidType.mag_id))
-			return -1;
-		if (rClass.equals(PidType.mag_id))
-			return 1;
-
-		if (lClass.equals(PidType.urn))
-			return -1;
-		if (rClass.equals(PidType.urn))
-			return 1;
-
-		return 0;
+		return new OrganizationPidComparator().compare(lClass, rClass);
 	}
 }
