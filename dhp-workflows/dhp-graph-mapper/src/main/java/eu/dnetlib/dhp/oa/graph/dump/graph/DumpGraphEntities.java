@@ -26,6 +26,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Project;
 import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.H2020Programme;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
@@ -48,7 +49,7 @@ public class DumpGraphEntities implements Serializable {
 				DumpProducts d = new DumpProducts();
 				d
 					.run(
-						isSparkSessionManaged, inputPath, outputPath, communityMapPath, inputClazz, Result.class,
+						isSparkSessionManaged, inputPath, outputPath, communityMapPath, inputClazz, GraphResult.class,
 						true);
 				break;
 			case "40":
@@ -379,17 +380,16 @@ public class DumpGraphEntities implements Serializable {
 		}
 
 		project
-			.setH2020Classifications(
+			.setH2020programme(
 				Optional
 					.ofNullable(p.getH2020classification())
 					.map(
 						classification -> classification
 							.stream()
 							.map(
-								c -> H2020Classification
+								c -> Programme
 									.newInstance(
-										c.getH2020Programme().getCode(), c.getH2020Programme().getDescription(),
-										c.getLevel1(), c.getLevel2(), c.getLevel3(), c.getClassification()))
+										c.getH2020Programme().getCode(), c.getH2020Programme().getDescription()))
 							.collect(Collectors.toList()))
 					.orElse(new ArrayList<>()));
 
@@ -488,7 +488,12 @@ public class DumpGraphEntities implements Serializable {
 		Optional
 			.ofNullable(org.getCountry())
 			.ifPresent(
-				value -> organization.setCountry(Qualifier.newInstance(value.getClassid(), value.getClassname())));
+				value -> {
+					if (!value.getClassid().equals(Constants.UNKNOWN)) {
+						organization.setCountry(Qualifier.newInstance(value.getClassid(), value.getClassname()));
+					}
+
+				});
 
 		Optional
 			.ofNullable(org.getId())

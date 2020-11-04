@@ -1,9 +1,9 @@
 
 [
   {
-    "paramName":"nd",
-    "paramLongName":"newDeposition",
-    "paramDescription": "if it is a new deposition (true) or a new versione (false)",
+    "paramName":"dt",
+    "paramLongName":"depositionType",
+    "paramDescription": "the type of the deposition (new, version, update)",
     "paramRequired": true
   },
   {
@@ -16,6 +16,12 @@
     "paramName":"cmp",
     "paramLongName":"communityMapPath",
     "paramDescription": "the path to the serialization of the community map",
+    "paramRequired": false
+  },
+  {
+    "paramName":"di",
+    "paramLongName":"depositionId",
+    "paramDescription": "the id of an open deposition which has not been published",
     "paramRequired": false
   },
 {
@@ -47,5 +53,11 @@
 "paramLongName":"metadata",
 "paramDescription": "metadata associated to the deposition",
 "paramRequired": false
-}
+},
+  {
+    "paramName":"p",
+    "paramLongName":"publish",
+    "paramDescription": "if to publish the upload",
+    "paramRequired": false
+  }
 ]

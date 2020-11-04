@@ -3,23 +3,20 @@
   "type": "object",
   "properties": {
     "acronym": {
-      "type": "string",
-      "description": "Description of acronym"
+      "type": "string"
     },
     "callidentifier": {
-      "type": "string",
-      "description": "Description of callidentifier"
+      "type": "string"
     },
     "code": {
       "type": "string",
-      "description": "Description of code"
+      "description": "The grant agreement number"
     },
     "enddate": {
-      "type": "string",
-      "description": "Description of enddate"
+      "type": "string"
     },
     "funding": {
-      "description": "Description of funding",
+      "description": "Funding information for the project",
       "type": "array",
       "items": {
         "type": "object",
@@ -29,29 +26,27 @@
             "properties": {
               "description": {
                 "type": "string",
-                "description": "Description of description"
+                "description": "Description of the funding stream"
               },
               "id": {
                 "type": "string",
-                "description": "Description of id"
+                "description": "Id of the funding stream"
               }
-            },
-            "description": "Description of funding_stream"
+            }
           },
           "jurisdiction": {
             "type": "string",
-            "description": "Description of jurisdiction"
+            "description": "The jurisdiction of the funder (i.e. EU)"
           },
           "name": {
             "type": "string",
-            "description": "Description of name"
+            "description": "The name of the funder (European Commission)"
           },
           "shortName": {
             "type": "string",
-            "description": "Description of shortName"
+            "description": "The short name of the funder (EC)"
           }
-        },
-        "description": "Description of funding"
+        }
       }
     },
     "granted": {
@@ -59,76 +54,66 @@
       "properties": {
         "currency": {
           "type": "string",
-          "description": "Description of currency"
+          "description": "The currency of the granted amount (e.g. EUR)"
         },
         "fundedamount": {
           "type": "number",
-          "description": "Description of fundedamount"
+          "description": "The funded amount"
         },
         "totalcost": {
           "type": "number",
-          "description": "Description of totalcost"
+          "description": "The total cost of the project"
         }
       },
-      "description": "Description of granted"
+      "description": "The money granted to the project"
     },
-    "id": {
-      "type": "string",
-      "description": "Description of id"
-    },
-    "keywords": {
-      "type": "string",
-      "description": "Description of keywords"
-    },
-    "openaccessmandatefordataset": {
-      "type": "boolean",
-      "description": "Description of openaccessmandatefordataset"
-    },
-    "openaccessmandateforpublications": {
-      "type": "boolean",
-      "description": "Description of openaccessmandateforpublications"
-    },
-    "programme": {
-      "description": "Description of programme",
+    "h2020programme": {
+      "description": "The h2020 programme funding the project",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "code": {
             "type": "string",
-            "description": "Description of code"
+            "description": "The code of the programme"
           },
           "description": {
             "type": "string",
-            "description": "Description of description"
+            "description": "The description of the programme"
           }
-        },
-        "description": "Description of programme"
+        }
       }
     },
-    "startdate": {
+    "id": {
       "type": "string",
-      "description": "Description of startdate"
+      "description": "OpenAIRE id for the project"
+    },
+    "keywords": {
+      "type": "string"
+    },
+    "openaccessmandatefordataset": {
+      "type": "boolean"
+    },
+    "openaccessmandateforpublications": {
+      "type": "boolean"
+    },
+    "startdate": {
+      "type": "string"
     },
     "subject": {
-      "description": "Description of subject",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of subject"
+        "type": "string"
       }
     },
     "summary": {
-      "type": "string",
-      "description": "Description of summary"
+      "type": "string"
     },
     "title": {
-      "type": "string",
-      "description": "Description of title"
+      "type": "string"
     },
     "websiteurl": {
-      "type": "string",
-      "description": "Description of websiteurl"
+      "type": "string"
     }
   }
 }

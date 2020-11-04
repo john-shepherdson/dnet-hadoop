@@ -6,11 +6,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Description of id"
+          "description": "The OpenAIRE id of the entity"
         },
         "type": {
           "type": "string",
-          "description": "Description of type"
+          "description": "The type of the entity (i.e. organisation)"
         }
       }
     }
@@ -22,47 +22,38 @@
       "properties": {
         "provenance": {
           "type": "string",
-          "description": "Description of provenance"
+          "description": "The reason why OpenAIRE holds the relation "
         },
         "trust": {
           "type": "string",
-          "description": "Description of trust"
+          "description": "The trust of the relation in the range of [0,1]. Where greater the number, more the trust. Harvested relationships have typically a high trust (0.9). The trust of inferred relationship is calculated by the inference algorithm that generated them, as described in https://graph.openaire.eu/about#architecture (Enrichment --> Mining)"
         }
-      },
-      "description": "Description of provenance"
+      }
     },
     "reltype": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
-          "description": "Description of name"
+          "description": "The semantics of the relation (i.e. isAuthorInstitutionOf). "
         },
         "type": {
           "type": "string",
-          "description": "Description of type"
+          "description": "the type of the relation (i.e. affiliation)"
         }
       },
-      "description": "Description of reltype"
+      "description": "To represent the semantics of a relation between two entities"
     },
     "source": {
       "allOf": [
-        {
-          "$ref": "#/definitions/Node"
-        },
-        {
-          "description": "Description of source"
-        }
+        {"$ref": "#/definitions/Node"},
+        {"description": "The node source in the relation"}
       ]
     },
     "target": {
       "allOf": [
-        {
-          "$ref": "#/definitions/Node"
-        },
-        {
-          "description": "Description of target"
-        }
+        {"$ref": "#/definitions/Node"},
+        {"description": "The node target in the relation"}
       ]
     }
   }

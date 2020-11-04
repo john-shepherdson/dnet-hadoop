@@ -14,6 +14,10 @@
                 <description>the output path</description>
             </property>
         <property>
+            <name>resultAggregation</name>
+            <description>true if all the result type have to be dumped under result. false otherwise</description>
+        </property>
+        <property>
             <name>accessToken</name>
             <description>the access token used for the deposition in Zenodo</description>
         </property>
@@ -26,12 +30,16 @@
             <description> the metadata associated to the deposition</description>
         </property>
         <property>
-            <name>newDeposition</name>
-            <description>true if it is a brand new depositon. false for new version of an old deposition</description>
+            <name>depositionType</name>
+            <description>the type of deposition we want to perform. "new" for brand new deposition, "version" for a new version of a published deposition (in this case the concept record id must be provided), "upload" to upload content to an open deposition for which we already have the deposition id (in this case the deposition id should be provided)</description>
         </property>
         <property>
             <name>conceptRecordId</name>
             <description>for new version, the id of the record for the old deposition</description>
+        </property>
+        <property>
+            <name>depositionId</name>
+            <description>the depositionId of a deposition open that has to be added content</description>
         </property>
         <property>
             <name>organizationCommunityMap</name>
@@ -268,7 +276,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--outputPath</arg><arg>${workingDir}/collect/organization</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -295,7 +302,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--outputPath</arg><arg>${workingDir}/collect/project</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -322,7 +328,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--outputPath</arg><arg>${workingDir}/collect/datasource</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -365,7 +370,7 @@
     <action name="create_entities_fromcontext">
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.dump.graph.CreateContextEntities</main-class>
-            <arg>--hdfsPath</arg><arg>${workingDir}/collect/context</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/collect/communities_infrastructures</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </java>
@@ -405,6 +410,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/contextOrg</arg>
             <arg>--organizationCommunityMap</arg><arg>${organizationCommunityMap}</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
         </spark>
         <ok to="join_context"/>
         <error to="Kill"/>
@@ -441,7 +447,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/publication</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -468,7 +473,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/dataset</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -495,7 +499,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/orp</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -522,7 +525,6 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/software</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-<!--            <arg>&#45;&#45;isLookUpUrl</arg><arg>${isLookUpUrl}</arg>-->
         </spark>
         <ok to="join_extract_relations"/>
         <error to="Kill"/>
@@ -550,6 +552,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/collect</arg>
+            <arg>--resultAggregation</arg><arg>${resultAggregation}</arg>
         </spark>
         <ok to="make_archive"/>
         <error to="Kill"/>
@@ -577,7 +580,8 @@
             <arg>--metadata</arg><arg>${metadata}</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--conceptRecordId</arg><arg>${conceptRecordId}</arg>
-            <arg>--newDeposition</arg><arg>${newDeposition}</arg>
+            <arg>--depositionType</arg><arg>${depositionType}</arg>
+            <arg>--depositionId</arg><arg>${depositionId}</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>

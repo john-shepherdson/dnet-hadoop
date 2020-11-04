@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
@@ -89,7 +90,10 @@ public class DumpOrganizationProjectDatasourceTest {
 
 		Assertions.assertEquals(34, verificationDataset.count());
 
-		verificationDataset.foreach(o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
+		verificationDataset
+			.foreach(
+				(ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Organization>) o -> System.out
+					.println(OBJECT_MAPPER.writeValueAsString(o)));
 
 	}
 
@@ -115,7 +119,10 @@ public class DumpOrganizationProjectDatasourceTest {
 
 		Assertions.assertEquals(12, verificationDataset.count());
 
-		verificationDataset.foreach(o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
+		verificationDataset
+			.foreach(
+				(ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Project>) o -> System.out
+					.println(OBJECT_MAPPER.writeValueAsString(o)));
 
 	}
 
@@ -140,7 +147,10 @@ public class DumpOrganizationProjectDatasourceTest {
 
 		Assertions.assertEquals(5, verificationDataset.count());
 
-		verificationDataset.foreach(o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
+		verificationDataset
+			.foreach(
+				(ForeachFunction<eu.dnetlib.dhp.schema.dump.oaf.graph.Datasource>) o -> System.out
+					.println(OBJECT_MAPPER.writeValueAsString(o)));
 	}
 
 }

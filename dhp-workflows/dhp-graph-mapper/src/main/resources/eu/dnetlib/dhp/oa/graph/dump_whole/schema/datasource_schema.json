@@ -5,41 +5,39 @@
       "type": "object",
       "properties": {
         "scheme": {
-          "type": "string",
-          "description": "Description of scheme"
+          "type": "string"
         },
         "value": {
-          "type": "string",
-          "description": "Description of value"
+          "type": "string"
         }
-      }
+      },
+      "description": "To represent the information described by a scheme and a value in that scheme (i.e. pid)"
     }
   },
   "type": "object",
   "properties": {
     "accessrights": {
       "type": "string",
-      "description": "Description of accessrights"
+      "description": "Type of access to the data source, as defined by re3data.org. Possible values: {open, restricted, closed}"
     },
     "certificates": {
       "type": "string",
-      "description": "Description of certificates"
+      "description": "The certificate, seal or standard the data source complies with. As defined by re3data.org."
     },
     "citationguidelineurl": {
       "type": "string",
-      "description": "Description of citationguidelineurl"
+      "description":"The URL of the data source providing information on how to cite its items. As defined by re3data.org."
     },
     "contenttypes": {
-      "description": "Description of contenttypes",
+      "description": "Types of content in the data source, as defined by OpenDOAR",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of contenttypes"
+        "type": "string"
       }
     },
     "databaseaccessrestriction": {
       "type": "string",
-      "description": "Description of databaseaccessrestriction"
+      "description": "Access restrinctions to the data source, as defined by re3data.org. One of {feeRequired, registration, other}"
     },
     "datasourcetype": {
       "allOf": [
@@ -47,164 +45,148 @@
           "$ref": "#/definitions/ControlledField"
         },
         {
-          "description": "Description of datasourcetype"
+          "description": "The type of the datasource. See https://api.openaire.eu/vocabularies/dnet:datasource_typologies"
         }
       ]
     },
     "datauploadrestriction": {
       "type": "string",
-      "description": "Description of datauploadrestriction"
+      "description": "Upload restrictions applied by the datasource, as defined by re3data.org. One of {feeRequired, registration, other}"
     },
     "dateofvalidation": {
       "type": "string",
-      "description": "Description of dateofvalidation"
+      "description": "The date of last validation against the OpenAIRE guidelines for the datasource records"
     },
     "description": {
-      "type": "string",
-      "description": "Description of description"
+      "type": "string"
     },
     "englishname": {
       "type": "string",
-      "description": "Description of englishname"
+      "description": "The English name of the datasource"
     },
     "id": {
       "type": "string",
-      "description": "Description of id"
+      "description": "The OpenAIRE id of the data source"
     },
     "journal": {
       "type": "object",
       "properties": {
         "conferencedate": {
-          "type": "string",
-          "description": "Description of conferencedate"
+          "type": "string"
         },
         "conferenceplace": {
-          "type": "string",
-          "description": "Description of conferenceplace"
+          "type": "string"
         },
         "edition": {
-          "type": "string",
-          "description": "Description of edition"
+          "type": "string"
         },
         "ep": {
           "type": "string",
-          "description": "Description of ep"
+          "description": "End page"
         },
         "iss": {
           "type": "string",
-          "description": "Description of iss"
+          "description": "Issue number"
         },
         "issnLinking": {
-          "type": "string",
-          "description": "Description of issnLinking"
+          "type": "string"
         },
         "issnOnline": {
-          "type": "string",
-          "description": "Description of issnOnline"
+          "type": "string"
         },
         "issnPrinted": {
-          "type": "string",
-          "description": "Description of issnPrinted"
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "Description of name"
+          "type": "string"
         },
         "sp": {
           "type": "string",
-          "description": "Description of sp"
+          "description": "Start page"
         },
         "vol": {
           "type": "string",
-          "description": "Description of vol"
+          "description": "Volume"
         }
       },
-      "description": "Description of journal"
+      "description": "Information about the journal, if this data source is of type Journal."
     },
     "languages": {
-      "description": "Description of languages",
+      "description": "The languages present in the data source's content, as defined by OpenDOAR.",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of languages"
+        "type": "string"
       }
     },
     "logourl": {
-      "type": "string",
-      "description": "Description of logourl"
+      "type": "string"
     },
     "missionstatementurl": {
       "type": "string",
-      "description": "Description of missionstatementurl"
+      "description":"The URL of a mission statement describing the designated community of the data source. As defined by re3data.org"
     },
     "officialname": {
       "type": "string",
-      "description": "Description of officialname"
+      "description": "The official name of the datasource"
     },
     "openairecompatibility": {
       "type": "string",
-      "description": "Description of openairecompatibility"
+      "description": "OpenAIRE guidelines the data source comply with. See also https://guidelines.openaire.eu."
     },
     "originalId": {
-      "description": "Description of originalId",
+      "description": "Original identifiers for the datasource"
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of originalId"
+        "type": "string"
       }
     },
     "pid": {
-      "description": "Description of pid",
+      "description": "Persistent identifiers of the datasource",
       "type": "array",
       "items": {
         "allOf": [
           {
             "$ref": "#/definitions/ControlledField"
-          },
-          {
-            "description": "Description of pid"
           }
         ]
       }
     },
     "pidsystems": {
       "type": "string",
-      "description": "Description of pidsystems"
+      "description": "The persistent identifier system that is used by the data source. As defined by re3data.org"
     },
     "policies": {
-      "description": "Description of policies",
+      "description": "Policies of the data source, as defined in OpenDOAR.",
       "type": "array",
       "items": {
-        "description": "Description of policies"
+        "type": "string"
       }
     },
     "releaseenddate": {
       "type": "string",
-      "description": "Description of releaseenddate"
+      "description": "Date when the data source went offline or stopped ingesting new research data. As defined by re3data.org"
     },
     "releasestartdate": {
       "type": "string",
-      "description": "Description of releasestartdate"
+      "description": "Releasing date of the data source, as defined by re3data.org"
     },
     "subjects": {
-      "description": "Description of subjects",
+      "description": "List of subjects associated to the datasource",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of subjects"
+        "type": "string"
       }
     },
     "uploadrights": {
       "type": "string",
-      "description": "Description of uploadrights"
+      "description": "Type of data upload. As defined by re3data.org: one of {open, restricted,closed}"
     },
     "versioning": {
       "type": "boolean",
-      "description": "Description of versioning"
+      "description": "As defined by redata.org: 'yes' if the data source supports versioning, 'no' otherwise."
     },
     "websiteurl": {
-      "type": "string",
-      "description": "Description of websiteurl"
+      "type": "string"
     }
   }
 }

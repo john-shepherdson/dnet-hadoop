@@ -17,7 +17,13 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
-	}
+	},
+	{
+	"paramName": "ra",
+	"paramLongName": "resultAggregation",
+	"paramDescription": "true if all the result type should be saved under the generic result name. false to get a different dump for each result type",
+	"paramRequired": true
+}
 ]
 
 
