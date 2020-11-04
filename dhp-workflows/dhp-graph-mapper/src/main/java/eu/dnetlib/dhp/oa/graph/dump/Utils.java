@@ -81,36 +81,5 @@ public class Utils {
 		return new Gson().fromJson(sb.toString(), CommunityMap.class);
 	}
 
-	public static List<Relation> getRelationPair(String pid1, String pid2, String type1, String type2,
-		String semtype, String rel1, String rel2) {
-		List<Relation> ret = new ArrayList<>();
-		ret
-			.add(
-				Relation
-					.newInstance(
-						Node.newInstance(pid1, type1),
-						Node.newInstance(pid2, type2),
-						RelType.newInstance(rel1, semtype),
-						null));
 
-		ret
-			.add(
-				Relation
-					.newInstance(
-						Node.newInstance(pid2, type2),
-						Node.newInstance(pid1, type1),
-						RelType.newInstance(rel2, semtype),
-						null));
-
-		return ret;
-	}
-
-	public static Entity getEntity(String fund, String code) throws DocumentException {
-		{
-			final Document doc;
-			doc = new SAXReader().read(new StringReader(fund));
-			String name = ((org.dom4j.Node) (doc.selectNodes("//funder/shortname").get(0))).getText();
-			return Entity.newInstance(name + ":" + code);
-		}
-	}
 }
