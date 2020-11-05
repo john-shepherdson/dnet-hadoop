@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.graph.dump;
 import java.io.*;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.common.MakeTarArchive;
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -16,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.MakeTarArchive;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 
 public class MakeTar implements Serializable {
@@ -41,9 +41,10 @@ public class MakeTar implements Serializable {
 		final String inputPath = parser.get("sourcePath");
 		log.info("input path : {}", inputPath);
 
-		final int gBperSplit = Optional.ofNullable(parser.get("splitSize"))
-				.map(Integer::valueOf)
-				.orElse(10);
+		final int gBperSplit = Optional
+			.ofNullable(parser.get("splitSize"))
+			.map(Integer::valueOf)
+			.orElse(10);
 
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
@@ -54,7 +55,8 @@ public class MakeTar implements Serializable {
 
 	}
 
-	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit) throws IOException {
+	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit)
+		throws IOException {
 
 		RemoteIterator<LocatedFileStatus> dir_iterator = fileSystem.listLocatedStatus(new Path(inputPath));
 
@@ -69,6 +71,5 @@ public class MakeTar implements Serializable {
 		}
 
 	}
-
 
 }
