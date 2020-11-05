@@ -108,7 +108,7 @@
             <arg>-m</arg> <arg>yarn-cluster</arg>
             <arg>--workingPath</arg><arg>${workingDirPath}</arg>
         </spark>
-        <ok to="DropAndCreateIndex"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
