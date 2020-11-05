@@ -59,8 +59,6 @@ public class ZenodoAPIClient implements Serializable {
 		String json = "{}";
 		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
-		// RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
-
 		RequestBody body = RequestBody.create(json, MEDIA_TYPE_JSON);
 
 		Request request = new Request.Builder()
@@ -128,7 +126,6 @@ public class ZenodoAPIClient implements Serializable {
 
 		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
-		// RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, metadata);
 		RequestBody body = RequestBody.create(metadata, MEDIA_TYPE_JSON);
 
 		Request request = new Request.Builder()
@@ -166,7 +163,6 @@ public class ZenodoAPIClient implements Serializable {
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/publish")
 			.addHeader("Authorization", "Bearer " + access_token)
-			// .post(RequestBody.create(MEDIA_TYPE_JSON, json))
 			.post(body)
 			.build();
 
@@ -202,7 +198,6 @@ public class ZenodoAPIClient implements Serializable {
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/newversion")
 			.addHeader("Authorization", "Bearer " + access_token)
-			// .post(RequestBody.create(MEDIA_TYPE_JSON, json))
 			.post(body)
 			.build();
 
@@ -220,18 +215,26 @@ public class ZenodoAPIClient implements Serializable {
 		}
 	}
 
+	/**
+	 * To finish uploading a version or new deposition not published
+	 * It sets the deposition_id and the bucket to be used
+	 *
+	 *
+	 * @param deposition_id the deposition id of the not yet published upload
+	 *            concept_rec_id = 656930
+	 * @return response code
+	 * @throws IOException
+	 * @throws MissingConceptDoiException
+	 */
 	public int uploadOpenDeposition(String deposition_id) throws IOException, MissingConceptDoiException {
 
 		this.deposition_id = deposition_id;
-
-		String json = "{}";
 
 		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id)
 			.addHeader("Authorization", "Bearer " + access_token)
-			// .post(RequestBody.create(MEDIA_TYPE_JSON, json))
 			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {

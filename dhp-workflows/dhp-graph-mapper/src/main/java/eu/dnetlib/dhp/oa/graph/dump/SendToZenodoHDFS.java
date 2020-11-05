@@ -98,8 +98,10 @@ public class SendToZenodoHDFS implements Serializable {
 			}
 
 		}
+		if (!metadata.equals("")) {
+			zenodoApiClient.sendMretadata(metadata);
+		}
 
-		zenodoApiClient.sendMretadata(metadata);
 		if (publish)
 			zenodoApiClient.publish();
 
