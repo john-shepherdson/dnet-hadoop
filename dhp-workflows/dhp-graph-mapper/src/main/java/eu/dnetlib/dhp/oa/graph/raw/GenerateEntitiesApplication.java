@@ -134,10 +134,7 @@ public class GenerateEntitiesApplication {
 		return o1;
 	}
 
-	protected static Result mergeResults(Result o1, Result o2) {
-		Result r1 = o1;
-		Result r2 = o2;
-
+	protected static Result mergeResults(Result r1, Result r2) {
 		if (new ResultTypeComparator().compare(r1, r2) < 0) {
 			r1.mergeFrom(r2);
 			return r1;
