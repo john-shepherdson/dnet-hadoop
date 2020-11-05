@@ -1,18 +1,18 @@
 <workflow-app name="dump_whole_graph" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
-            <property>
-                <name>sourcePath</name>
-                <description>the source path</description>
-            </property>
-            <property>
-                <name>isLookUpUrl</name>
-                <description>the isLookup service endpoint</description>
-            </property>
-            <property>
-                <name>outputPath</name>
-                <description>the output path</description>
-            </property>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>isLookUpUrl</name>
+            <description>the isLookup service endpoint</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the output path</description>
+        </property>
         <property>
             <name>resultAggregation</name>
             <description>true if all the result type have to be dumped under result. false otherwise</description>
@@ -357,9 +357,7 @@
         <error to="Kill"/>
     </action>
 
-
     <join name="join_dump" to="fork_context"/>
-
 
     <fork name="fork_context">
         <path start="create_entities_fromcontext"/>
@@ -389,7 +387,6 @@
         <error to="Kill"/>
     </action>
 
-
     <action name="create_relation_fromorgs">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -417,7 +414,6 @@
     </action>
 
     <join name="join_context" to="fork_extract_relations"/>
-
 
     <fork name="fork_extract_relations">
         <path start="rels_from_pubs"/>
@@ -530,7 +526,6 @@
         <error to="Kill"/>
     </action>
 
-
     <join name="join_extract_relations" to="collect_and_save"/>
 
     <action name="collect_and_save">
@@ -568,8 +563,7 @@
         <ok to="send_zenodo"/>
         <error to="Kill"/>
     </action>
-
-
+    
     <action name="send_zenodo">
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.dump.SendToZenodoHDFS</main-class>
