@@ -1,0 +1,3 @@
+{ "id" : "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1g", "pid" : [ { "value" : "pid1", "qualifier" : { "classid" : "original" } } ], "dateofacceptance" :  { "value" :  "2000-01-01"}, "collectedfrom" : [ { "key" : "key", "value" :  "value" } ] }
+{ "id" : "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1h", "pid" : [ { "value" : "pid2", "qualifier" : { "classid" : "original" } } ], "dateofacceptance" :  { "value" :  "2000-01-01"}, "collectedfrom" : [ { "key" : "key", "value" :  "value" } ] }
+{ "id" : "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1i", "pid" : [ { "value" : "pid3", "qualifier" : { "classid" : "original" } } ], "dateofacceptance" :  { "value" :  "2000-01-01"}, "collectedfrom" : [ { "key" : "key", "value" :  "value" } ] }

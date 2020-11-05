@@ -1,10 +1,10 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,15 +19,8 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -93,7 +86,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:description", info);
+		return prepareListFields(doc, "//dc:description", info)
+			.stream()
+			.map(d -> {
+				d.setValue(StringUtils.left(d.getValue(), ModelHardLimits.MAX_ABSTRACT_LENGTH));
+				return d;
+			})
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -257,11 +256,9 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Oaf> addOtherResultRels(
 		final Document doc,
-		final KeyValue collectedFrom,
-		final DataInfo info,
-		final long lastUpdateTimestamp) {
-		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
+		final OafEntity entity) {
 
+		final String docId = entity.getId();
 		final List<Oaf> res = new ArrayList<>();
 
 		for (final Object o : doc.selectNodes("//*[local-name()='relatedDataset']")) {
@@ -275,13 +272,11 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						getRelation(
-							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, collectedFrom, info,
-							lastUpdateTimestamp));
+							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
 				res
 					.add(
 						getRelation(
-							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, collectedFrom, info,
-							lastUpdateTimestamp));
+							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
 			}
 		}
 		return res;
@@ -295,6 +290,10 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
 		return prepareListStructPropsWithValidQualifier(
-			doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info);
+			doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info)
+				.stream()
+				.map(CleaningFunctions::normalizePidValue)
+				.collect(Collectors.toList());
 	}
+
 }

@@ -1,11 +1,10 @@
 
-package eu.dnetlib.dhp.oa.graph.raw.common;
+package eu.dnetlib.dhp.schema.oaf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -13,15 +12,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
-import eu.dnetlib.dhp.schema.oaf.OriginDescription;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class OafMapperUtils {
@@ -269,5 +260,37 @@ public class OafMapperUtils {
 		final Function<? super T, ?> keyExtractor) {
 		final Map<Object, Boolean> seen = new ConcurrentHashMap<>();
 		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+	}
+
+	public static Qualifier createBestAccessRights(final List<Instance> instanceList) {
+		return getBestAccessRights(instanceList);
+	}
+
+	protected static Qualifier getBestAccessRights(final List<Instance> instanceList) {
+		if (instanceList != null) {
+			final Optional<Qualifier> min = instanceList
+				.stream()
+				.map(i -> i.getAccessright())
+				.min(new LicenseComparator());
+
+			final Qualifier rights = min.isPresent() ? min.get() : new Qualifier();
+
+			if (StringUtils.isBlank(rights.getClassid())) {
+				rights.setClassid(UNKNOWN);
+			}
+			if (StringUtils.isBlank(rights.getClassname())
+				|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
+				rights.setClassname(NOT_AVAILABLE);
+			}
+			if (StringUtils.isBlank(rights.getSchemeid())) {
+				rights.setSchemeid(DNET_ACCESS_MODES);
+			}
+			if (StringUtils.isBlank(rights.getSchemename())) {
+				rights.setSchemename(DNET_ACCESS_MODES);
+			}
+
+			return rights;
+		}
+		return null;
 	}
 }

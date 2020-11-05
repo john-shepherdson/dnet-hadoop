@@ -1,8 +1,9 @@
 
-package eu.dnetlib.dhp.oa.graph.clean;
+package eu.dnetlib.dhp.schema.oaf;
 
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -10,14 +11,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.clearspring.analytics.util.Lists;
 
-import eu.dnetlib.dhp.oa.graph.raw.AbstractMdRecordToOafMapper;
-import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningFunctions {
 
+	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
+	public static final String NONE = "none";
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
 		if (value instanceof Datasource) {
@@ -71,7 +71,7 @@ public class CleaningFunctions {
 		return value;
 	}
 
-	protected static <T extends Oaf> T fixDefaults(T value) {
+	public static <T extends Oaf> T fixDefaults(T value) {
 		if (value instanceof Datasource) {
 			// nothing to clean here
 		} else if (value instanceof Project) {
@@ -106,6 +106,20 @@ public class CleaningFunctions {
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
 							.collect(Collectors.toList()));
 			}
+			if (Objects.nonNull(r.getPid())) {
+				r
+					.setPid(
+						r
+							.getPid()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
+							.filter(sp -> NONE.equalsIgnoreCase(sp.getValue()))
+							.filter(sp -> Objects.nonNull(sp.getQualifier()))
+							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.map(CleaningFunctions::normalizePidValue)
+							.collect(Collectors.toList()));
+			}
 			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
 				r
 					.setResourcetype(
@@ -125,7 +139,7 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.isNull(r.getBestaccessright()) || StringUtils.isBlank(r.getBestaccessright().getClassid())) {
-				Qualifier bestaccessrights = AbstractMdRecordToOafMapper.createBestAccessRights(r.getInstance());
+				Qualifier bestaccessrights = OafMapperUtils.createBestAccessRights(r.getInstance());
 				if (Objects.isNull(bestaccessrights)) {
 					r
 						.setBestaccessright(
@@ -199,6 +213,26 @@ public class CleaningFunctions {
 		return OafMapperUtils
 			.qualifier(
 				classid, classname, scheme, scheme);
+	}
+
+	/**
+	 * Utility method that normalises PID values on a per-type basis.
+	 * @param pid the PID whose value will be normalised.
+	 * @return the PID containing the normalised value.
+	 */
+	public static StructuredProperty normalizePidValue(StructuredProperty pid) {
+		String value = Optional
+			.ofNullable(pid.getValue())
+			.map(String::trim)
+			.orElseThrow(() -> new IllegalArgumentException("PID value cannot be empty"));
+		switch (pid.getQualifier().getClassid()) {
+
+			// TODO add cleaning for more PID types as needed
+			case "doi":
+				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX_REGEX, ""));
+				break;
+		}
+		return pid;
 	}
 
 }

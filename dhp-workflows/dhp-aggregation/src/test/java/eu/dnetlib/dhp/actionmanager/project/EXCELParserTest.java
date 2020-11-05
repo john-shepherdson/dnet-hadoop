@@ -9,12 +9,14 @@ import java.util.List;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.actionmanager.project.httpconnector.CollectorServiceException;
 import eu.dnetlib.dhp.actionmanager.project.httpconnector.HttpConnector;
 import eu.dnetlib.dhp.actionmanager.project.utils.EXCELParser;
 
+@Disabled
 public class EXCELParserTest {
 
 	private static Path workingDir;

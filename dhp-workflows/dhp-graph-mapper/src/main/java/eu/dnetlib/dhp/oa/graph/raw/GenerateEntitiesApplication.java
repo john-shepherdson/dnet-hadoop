@@ -4,11 +4,9 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +18,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,16 +28,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
@@ -124,13 +114,37 @@ public class GenerateEntitiesApplication {
 
 	private static Oaf merge(final Oaf o1, final Oaf o2) {
 		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
-			((OafEntity) o1).mergeFrom((OafEntity) o2);
+			if (ModelSupport.isSubClass(o1, Result.class)) {
+
+				return mergeResults((Result) o1, (Result) o2);
+			} else if (ModelSupport.isSubClass(o1, Datasource.class)) {
+				((Datasource) o1).mergeFrom((Datasource) o2);
+			} else if (ModelSupport.isSubClass(o1, Organization.class)) {
+				((Organization) o1).mergeFrom((Organization) o2);
+			} else if (ModelSupport.isSubClass(o1, Project.class)) {
+				((Project) o1).mergeFrom((Project) o2);
+			} else {
+				throw new RuntimeException("invalid OafEntity subtype:" + o1.getClass().getCanonicalName());
+			}
 		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
 			((Relation) o1).mergeFrom((Relation) o2);
 		} else {
 			throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
 		}
 		return o1;
+	}
+
+	protected static Result mergeResults(Result o1, Result o2) {
+		Result r1 = o1;
+		Result r2 = o2;
+
+		if (new ResultTypeComparator().compare(r1, r2) < 0) {
+			r1.mergeFrom(r2);
+			return r1;
+		} else {
+			r2.mergeFrom(r1);
+			return r2;
+		}
 	}
 
 	private static List<Oaf> convertToListOaf(

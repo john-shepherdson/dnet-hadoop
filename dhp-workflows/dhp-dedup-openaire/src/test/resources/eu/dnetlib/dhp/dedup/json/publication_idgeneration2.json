@@ -1,0 +1,3 @@
+{ "id" : "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1g", "pid" : [ { "value" : "pid1", "qualifier" : { "classid" : "original" } } ], "dateofacceptance" :  { "value" :  "2000-01-01"}, "collectedfrom" : [ { "key" : "key", "value" :  "value" } ] }
+{ "id" : "50|doi_________::1a77a3bba737f8b669dcf330ad3b37e2", "pid" : [ { "value" : "pid2", "qualifier" : { "classid" : "doi" } } ], "dateofacceptance" :  { "value" :  "2000-01-01"}, "collectedfrom" : [ { "key" : "key", "value" :  "value" } ] }
+{ "id" : "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", "pid" : [ { "value" : "pid3", "qualifier" : { "classid" : "original" } } ], "dateofacceptance" :  { "value" :  "2000-01-01"}, "collectedfrom" : [ { "key" : "key", "value" :  "value" } ] }
