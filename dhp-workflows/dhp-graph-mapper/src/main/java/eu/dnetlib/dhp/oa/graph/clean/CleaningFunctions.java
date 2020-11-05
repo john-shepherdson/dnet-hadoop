@@ -109,20 +109,20 @@ public class CleaningFunctions {
 			}
 			if (Objects.nonNull(r.getPid())) {
 				r
-						.setPid(
-								r
-										.getPid()
-										.stream()
-										.filter(Objects::nonNull)
-										.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
-										.filter(sp -> NONE.equalsIgnoreCase(sp.getValue()))
-										.filter(sp -> Objects.nonNull(sp.getQualifier()))
-										.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
-										.map(sp -> {
-											sp.setValue(StringUtils.trim(sp.getValue()));
-											return sp;
-										})
-										.collect(Collectors.toList()));
+					.setPid(
+						r
+							.getPid()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
+							.filter(sp -> NONE.equalsIgnoreCase(sp.getValue()))
+							.filter(sp -> Objects.nonNull(sp.getQualifier()))
+							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.map(sp -> {
+								sp.setValue(StringUtils.trim(sp.getValue()));
+								return sp;
+							})
+							.collect(Collectors.toList()));
 			}
 			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
 				r

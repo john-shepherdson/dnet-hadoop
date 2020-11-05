@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
@@ -27,8 +28,8 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.RelType;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 /**
- * Create new Relations between Context Entities and Organizations whose products are associated to the context.
- * It produces relation such as: organization <-> isRelatedTo <-> context
+ * Create new Relations between Context Entities and Organizations whose products are associated to the context. It
+ * produces relation such as: organization <-> isRelatedTo <-> context
  */
 public class SparkOrganizationRelation implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkOrganizationRelation.class);
@@ -59,6 +60,9 @@ public class SparkOrganizationRelation implements Serializable {
 			.fromJson(parser.get("organizationCommunityMap"), OrganizationMap.class);
 		log.info("organization map : {}", new Gson().toJson(organizationMap));
 
+		final String communityMapPath = parser.get("communityMapPath");
+		log.info("communityMapPath: {} ", communityMapPath);
+
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
@@ -66,14 +70,17 @@ public class SparkOrganizationRelation implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				extractRelation(spark, inputPath, organizationMap, outputPath);
+				extractRelation(spark, inputPath, organizationMap, outputPath, communityMapPath);
 
 			});
 
 	}
 
 	private static void extractRelation(SparkSession spark, String inputPath, OrganizationMap organizationMap,
-		String outputPath) {
+		String outputPath, String communityMapPath) {
+
+		CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
+
 		Dataset<Relation> relationDataset = Utils.readPath(spark, inputPath, Relation.class);
 
 		relationDataset.createOrReplaceTempView("relation");
@@ -97,32 +104,43 @@ public class SparkOrganizationRelation implements Serializable {
 		}, Encoders.bean(MergedRels.class))
 			.filter(Objects::nonNull)
 			.collectAsList()
-			.forEach(getMergedRelsConsumer(organizationMap, relList));
+			.forEach(getMergedRelsConsumer(organizationMap, relList, communityMap));
 
 		organizationMap
 			.keySet()
 			.forEach(
 				oId -> organizationMap
 					.get(oId)
-					.forEach(community -> addRelations(relList, community, oId)));
+					.forEach(community -> {
+						if (communityMap.containsKey(community)) {
+							addRelations(relList, community, oId);
+						}
+					}));
 
+		// if (relList.size() > 0) {
 		spark
 			.createDataset(relList, Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Relation.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+		// }
 
 	}
 
 	@NotNull
 	private static Consumer<MergedRels> getMergedRelsConsumer(OrganizationMap organizationMap,
-		List<eu.dnetlib.dhp.schema.dump.oaf.graph.Relation> relList) {
+		List<eu.dnetlib.dhp.schema.dump.oaf.graph.Relation> relList, CommunityMap communityMap) {
 		return mergedRels -> {
 			String oId = mergedRels.getOrganizationId();
 			organizationMap
 				.get(oId)
-				.forEach(community -> addRelations(relList, community, mergedRels.getRepresentativeId()));
+				.forEach(community -> {
+					if (communityMap.containsKey(community)) {
+						addRelations(relList, community, mergedRels.getRepresentativeId());
+					}
+
+				});
 			organizationMap.remove(oId);
 		};
 	}

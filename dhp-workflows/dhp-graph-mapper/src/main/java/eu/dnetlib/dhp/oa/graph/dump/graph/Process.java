@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +17,8 @@ import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 
 /**
- * It process the ContextInfo information to produce a new Context Entity or a set of Relations between the
- * generic context entity and datasource/projects related to the context.
- *
+ * It process the ContextInfo information to produce a new Context Entity or a set of Relations between the generic
+ * context entity and datasource/projects related to the context.
  */
 public class Process implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(Process.class);
@@ -39,7 +39,9 @@ public class Process implements Serializable {
 
 			ri.setDescription(ci.getDescription());
 			ri.setName(ci.getName());
-			ri.setZenodo_community(Constants.ZENODO_COMMUNITY_PREFIX + ci.getZenodocommunity());
+			if (StringUtils.isNotEmpty(ci.getZenodocommunity())) {
+				ri.setZenodo_community(Constants.ZENODO_COMMUNITY_PREFIX + ci.getZenodocommunity());
+			}
 			return (R) ri;
 
 		} catch (final Exception e) {

@@ -17,6 +17,12 @@
 		"paramLongName":"nameNode",
 		"paramDescription": "the name node",
 		"paramRequired": true
+	},
+	{
+		"paramName":"ss",
+		"paramLongName":"splitSize",
+		"paramDescription": "the maximum size of the archive",
+		"paramRequired": false
 	}
 ]
 

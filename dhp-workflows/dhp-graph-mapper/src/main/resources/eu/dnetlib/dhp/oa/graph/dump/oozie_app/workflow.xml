@@ -1,18 +1,18 @@
 <workflow-app name="dump_community_products" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
-            <property>
-                <name>sourcePath</name>
-                <description>the source path</description>
-            </property>
-            <property>
-                <name>isLookUpUrl</name>
-                <description>the isLookup service endpoint</description>
-            </property>
-            <property>
-                <name>outputPath</name>
-                <description>the output path</description>
-            </property>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>isLookUpUrl</name>
+            <description>the isLookup service endpoint</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the output path</description>
+        </property>
         <property>
             <name>accessToken</name>
             <description>the access token used for the deposition in Zenodo</description>
@@ -320,6 +320,7 @@
         <ok to="join_extend"/>
         <error to="Kill"/>
     </action>
+
     <action name="extend_orp">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -344,6 +345,7 @@
         <ok to="join_extend"/>
         <error to="Kill"/>
     </action>
+
     <action name="extend_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -371,42 +373,41 @@
 
     <join name="join_extend" to="splitForCommunities"/>
 
-        <action name="splitForCommunities">
-            <spark xmlns="uri:oozie:spark-action:0.2">
-                <master>yarn</master>
-                <mode>cluster</mode>
-                <name>Split dumped result for community</name>
-                <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkSplitForCommunity</class>
-                <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-                <spark-opts>
-                    --executor-memory=${sparkExecutorMemory}
-                    --executor-cores=${sparkExecutorCores}
-                    --driver-memory=${sparkDriverMemory}
-                    --conf spark.extraListeners=${spark2ExtraListeners}
-                    --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                    --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                    --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                    --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-                </spark-opts>
-                <arg>--sourcePath</arg><arg>${workingDir}/ext</arg>
-                <arg>--outputPath</arg><arg>${workingDir}/split</arg>
-                <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
-            </spark>
-            <ok to="make_archive"/>
-            <error to="Kill"/>
-        </action>
+    <action name="splitForCommunities">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Split dumped result for community</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkSplitForCommunity</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/ext</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/split</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+        </spark>
+        <ok to="make_archive"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="make_archive">
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.dump.MakeTar</main-class>
             <arg>--hdfsPath</arg><arg>${outputPath}</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
-           <arg>--sourcePath</arg><arg>${workingDir}/split</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/split</arg>
         </java>
         <ok to="send_zenodo"/>
         <error to="Kill"/>
     </action>
-
 
     <action name="send_zenodo">
         <java>
@@ -423,8 +424,6 @@
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
-
 
     <end name="End"/>
 

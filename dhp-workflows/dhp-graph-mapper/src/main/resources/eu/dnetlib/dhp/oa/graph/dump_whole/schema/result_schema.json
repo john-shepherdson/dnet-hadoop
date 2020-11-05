@@ -1,207 +1,152 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "AccessRight": {
-      "type": "object",
-      "properties": {
-        "code": {
-          "type": "string",
-          "description": "Description of code"
-        },
-        "label": {
-          "type": "string",
-          "description": "Description of label"
-        },
-        "scheme": {
-          "type": "string",
-          "description": "Description of scheme"
-        }
-      }
-    },
     "ControlledField": {
       "type": "object",
       "properties": {
         "scheme": {
-          "type": "string",
-          "description": "Description of scheme"
+          "type": "string"
         },
         "value": {
-          "type": "string",
-          "description": "Description of value"
+          "type": "string"
         }
-      }
-    },
-    "KeyValue": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Description of key"
-        },
-        "value": {
-          "type": "string",
-          "description": "Description of value"
-        }
-      }
+      },
+      "description": "To represent the information described by a scheme and a value in that scheme (i.e. pid)"
     },
     "Provenance": {
       "type": "object",
       "properties": {
         "provenance": {
           "type": "string",
-          "description": "Description of provenance"
+          "description": "The process that produced/provided the information"
         },
         "trust": {
-          "type": "string",
-          "description": "Description of trust"
+          "type": "string"
         }
-      }
+      },
+      "description": "Indicates the process that produced (or provided) the information, and the trust associated to the information"
     }
   },
   "type": "object",
   "properties": {
     "author": {
-      "description": "Description of author",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
-          "affiliation": {
-            "description": "Description of affiliation",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "description": "Description of affiliation"
-            }
-          },
           "fullname": {
-            "type": "string",
-            "description": "Description of fullname"
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "description": "Description of name"
+            "type": "string"
           },
           "pid": {
             "type": "object",
             "properties": {
               "id": {
                 "allOf": [
-                  {
-                    "$ref": "#/definitions/ControlledField"
-                  },
-                  {
-                    "description": "Description of id"
-                  }
+                  {"$ref": "#/definitions/ControlledField"},
+                  {"description": "The author's id and scheme. OpenAIRE currently supports 'ORCID'"}
                 ]
               },
               "provenance": {
                 "allOf": [
-                  {
-                    "$ref": "#/definitions/Provenance"
-                  },
-                  {
-                    "description": "Description of provenance"
-                  }
+                  {"$ref": "#/definitions/Provenance"},
+                  {"description": "Provenance of author's pid"}
                 ]
               }
-            },
-            "description": "Description of pid"
+            }
           },
           "rank": {
-            "type": "integer",
-            "description": "Description of rank"
+            "type": "integer"
           },
           "surname": {
-            "type": "string",
-            "description": "Description of surname"
+            "type": "string"
           }
-        },
-        "description": "Description of author"
+        }
       }
     },
     "bestaccessright": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/AccessRight"
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "COAR access mode code: http://vocabularies.coar-repositories.org/documentation/access_rights/"
         },
-        {
-          "description": "Description of bestaccessright"
+        "label": {
+          "type": "string",
+          "description": "Label for the access mode"
+        },
+        "scheme": {
+          "type": "string",
+          "description": "Scheme of reference for access right code. Always set to COAR access rights vocabulary: http://vocabularies.coar-repositories.org/documentation/access_rights/"
         }
-      ]
+      },
+      "description": "The openest access right associated to the manifestations of this research results"
     },
     "codeRepositoryUrl": {
       "type": "string",
-      "description": "Description of codeRepositoryUrl"
+      "description": "Only for results with type 'software': the URL to the repository with the source code"
     },
     "contactgroup": {
-      "description": "Description of contactgroup",
+      "description": "Only for results with type 'software': Information on the group responsible for providing further information regarding the resource",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of contactgroup"
+        "type": "string"
       }
     },
     "contactperson": {
-      "description": "Description of contactperson",
+      "description": "Only for results with type 'software': Information on the person responsible for providing further information regarding the resource",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of contactperson"
+        "type": "string"
       }
     },
     "container": {
       "type": "object",
       "properties": {
         "conferencedate": {
-          "type": "string",
-          "description": "Description of conferencedate"
+          "type": "string"
         },
         "conferenceplace": {
-          "type": "string",
-          "description": "Description of conferenceplace"
+          "type": "string"
         },
         "edition": {
           "type": "string",
-          "description": "Description of edition"
+          "description": "Edition of the journal or conference proceeding"
         },
         "ep": {
           "type": "string",
-          "description": "Description of ep"
+          "description": "End page"
         },
         "iss": {
           "type": "string",
-          "description": "Description of iss"
+          "description": "Journal issue"
         },
         "issnLinking": {
-          "type": "string",
-          "description": "Description of issnLinking"
+          "type": "string"
         },
         "issnOnline": {
-          "type": "string",
-          "description": "Description of issnOnline"
+          "type": "string"
         },
         "issnPrinted": {
-          "type": "string",
-          "description": "Description of issnPrinted"
+          "type": "string"
         },
         "name": {
           "type": "string",
-          "description": "Description of name"
+          "description": "Name of the journal or conference"
         },
         "sp": {
           "type": "string",
-          "description": "Description of sp"
+          "description": "start page"
         },
         "vol": {
-          "type": "string",
-          "description": "Description of vol"
+          "type": "string"
         }
       },
-      "description": "Description of container"
+      "description": "Container has information about the conference or journal where the result has been presented or published"
     },
     "contributor": {
-      "description": "Description of contributor",
       "type": "array",
       "items": {
         "type": "string",
@@ -209,312 +154,177 @@
       }
     },
     "country": {
-      "description": "Description of country",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "code": {
             "type": "string",
-            "description": "Description of code"
+            "description": "ISO 3166-1 alpha-2 country code"
           },
           "label": {
-            "type": "string",
-            "description": "Description of label"
+            "type": "string"
           },
           "provenance": {
             "allOf": [
-              {
-                "$ref": "#/definitions/Provenance"
-              },
-              {
-                "description": "Description of provenance"
-              }
+              {"$ref": "#/definitions/Provenance"},
+              {"description": "Why this result is associated to the country."}
             ]
           }
-        },
-        "description": "Description of country"
+        }
       }
     },
     "coverage": {
-      "description": "Description of coverage",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of coverage"
+        "type": "string"
       }
     },
     "dateofcollection": {
       "type": "string",
-      "description": "Description of dateofcollection"
+      "description": "When OpenAIRE collected the record the last time"
     },
     "description": {
-      "description": "Description of description",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of description"
+        "type": "string"
       }
     },
     "documentationUrl": {
-      "description": "Description of documentationUrl",
+      "description": "Only for results with type 'software': URL to the software documentation",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of documentationUrl"
+        "type": "string"
       }
     },
     "embargoenddate": {
       "type": "string",
-      "description": "Description of embargoenddate"
-    },
-    "externalReference": {
-      "description": "Description of externalReference",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Description of name"
-          },
-          "provenance": {
-            "allOf": [
-              {
-                "$ref": "#/definitions/Provenance"
-              },
-              {
-                "description": "Description of provenance"
-              }
-            ]
-          },
-          "typology": {
-            "type": "string",
-            "description": "Description of typology"
-          },
-          "value": {
-            "type": "string",
-            "description": "Description of value"
-          }
-        },
-        "description": "Description of externalReference"
-      }
+      "description": "Date when the embargo ends and this result turns Open Access"
     },
     "format": {
-      "description": "Description of format",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of format"
+        "type": "string"
       }
     },
     "geolocation": {
-      "description": "Description of geolocation",
+      "description": "Geolocation information",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "box": {
-            "type": "string",
-            "description": "Description of box"
+            "type": "string"
           },
           "place": {
-            "type": "string",
-            "description": "Description of place"
+            "type": "string"
           },
           "point": {
-            "type": "string",
-            "description": "Description of point"
+            "type": "string"
           }
-        },
-        "description": "Description of geolocation"
+        }
       }
     },
     "id": {
       "type": "string",
-      "description": "Description of id"
-    },
-    "instance": {
-      "description": "Description of instance",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "accessright": {
-            "allOf": [
-              {
-                "$ref": "#/definitions/AccessRight"
-              },
-              {
-                "description": "Description of accessright"
-              }
-            ]
-          },
-          "collectedfrom": {
-            "allOf": [
-              {
-                "$ref": "#/definitions/KeyValue"
-              },
-              {
-                "description": "Description of collectedfrom"
-              }
-            ]
-          },
-          "hostedby": {
-            "allOf": [
-              {
-                "$ref": "#/definitions/KeyValue"
-              },
-              {
-                "description": "Description of hostedby"
-              }
-            ]
-          },
-          "license": {
-            "type": "string",
-            "description": "Description of license"
-          },
-          "publicationdate": {
-            "type": "string",
-            "description": "Description of publicationdate"
-          },
-          "refereed": {
-            "type": "string",
-            "description": "Description of refereed"
-          },
-          "type": {
-            "type": "string",
-            "description": "Description of type"
-          },
-          "url": {
-            "description": "Description of url",
-            "type": "array",
-            "items": {
-              "type": "string",
-              "description": "Description of url"
-            }
-          }
-        },
-        "description": "Description of instance"
-      }
+      "description": "OpenAIRE Identifier"
     },
     "language": {
       "type": "object",
       "properties": {
         "code": {
           "type": "string",
-          "description": "Description of code"
+          "description": "alpha-3/ISO 639-2 code of the language"
         },
         "label": {
           "type": "string",
-          "description": "Description of label"
+          "description": "English label"
         }
-      },
-      "description": "Description of language"
+      }
     },
     "lastupdatetimestamp": {
       "type": "integer",
-      "description": "Description of lastupdatetimestamp"
+      "description": "Timestamp of last update of the record in OpenAIRE"
     },
     "maintitle": {
-      "type": "string",
-      "description": "Description of maintitle"
+      "type": "string"
     },
     "originalId": {
-      "description": "Description of originalId",
+      "description": "Identifiers of the record at the original sources",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of originalId"
+        "type": "string"
       }
     },
     "pid": {
-      "description": "Description of pid",
+      "description": "Persistent identifiers of the result",
       "type": "array",
       "items": {
         "allOf": [
-          {
-            "$ref": "#/definitions/ControlledField"
-          },
-          {
-            "description": "Description of pid"
-          }
+          {"$ref": "#/definitions/ControlledField"},
+          {"description": "scheme: list of available schemes are at https://api.openaire.eu/vocabularies/dnet:pid_types, value: the PID of the result "}
         ]
       }
     },
     "programmingLanguage": {
       "type": "string",
-      "description": "Description of programmingLanguage"
+      "description": "Only for results with type 'software': the programming language"
     },
     "publicationdate": {
-      "type": "string",
-      "description": "Description of publicationdate"
+      "type": "string"
     },
     "publisher": {
-      "type": "string",
-      "description": "Description of publisher"
+      "type": "string"
     },
     "size": {
       "type": "string",
-      "description": "Description of size"
+      "description": "Only for results with type 'dataset': the declared size of the dataset"
     },
     "source": {
-      "description": "Description of source",
+      "description": "See definition of Dublin Core field dc:source",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of source"
+        "type": "string"
       }
     },
     "subjects": {
-      "description": "Description of subjects",
+      "description": "Keywords associated to the result",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "provenance": {
             "allOf": [
-              {
-                "$ref": "#/definitions/Provenance"
-              },
-              {
-                "description": "Description of provenance"
-              }
+              {"$ref": "#/definitions/Provenance"},
+              {"description": "Why this subject is associated to the result"}
             ]
           },
           "subject": {
             "allOf": [
-              {
-                "$ref": "#/definitions/ControlledField"
-              },
-              {
-                "description": "Description of subject"
-              }
+              {"$ref": "#/definitions/ControlledField"},
+              {"description": "OpenAIRE subject classification scheme (https://api.openaire.eu/vocabularies/dnet:subject_classification_typologies) and value. When the scheme is 'keyword', it means that the subject is free-text (i.e. not a term from a controlled vocabulary)."},
             ]
           }
-        },
-        "description": "Description of subjects"
+        }
       }
     },
     "subtitle": {
-      "type": "string",
-      "description": "Description of subtitle"
+      "type": "string"
     },
     "tool": {
-      "description": "Description of tool",
+      "description": "Only for results with type 'other': tool useful for the interpretation and/or re-used of the research product",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of tool"
+        "type": "string"
       }
     },
     "type": {
       "type": "string",
-      "description": "Description of type"
+      "description": "Type of the result: one of 'publication', 'dataset', 'software', 'other' (see also https://api.openaire.eu/vocabularies/dnet:result_typologies)"
     },
     "version": {
       "type": "string",
-      "description": "Description of version"
+      "description": "Version of the result"
     }
   }
 }

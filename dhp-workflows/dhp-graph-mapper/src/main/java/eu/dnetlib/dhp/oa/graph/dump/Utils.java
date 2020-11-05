@@ -70,4 +70,5 @@ public class Utils {
 
 		return new Gson().fromJson(sb.toString(), CommunityMap.class);
 	}
+
 }

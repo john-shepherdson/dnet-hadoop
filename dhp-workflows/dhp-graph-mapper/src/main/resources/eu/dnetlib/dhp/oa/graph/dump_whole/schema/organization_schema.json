@@ -3,11 +3,10 @@
   "type": "object",
   "properties": {
     "alternativenames": {
-      "description": "Description of alternativenames",
+      "description": "Alternative names that identify the organisation",
       "type": "array",
       "items": {
-        "type": "string",
-        "description": "Description of alternativenames"
+        "type": "string"
       }
     },
     "country": {
@@ -15,48 +14,44 @@
       "properties": {
         "code": {
           "type": "string",
-          "description": "Description of code"
+          "description": "The organisation country code"
         },
         "label": {
           "type": "string",
-          "description": "Description of label"
+          "description": "The organisation country label"
         }
       },
-      "description": "Description of country"
+      "description": "The country of the organisation"
     },
     "id": {
       "type": "string",
-      "description": "Description of id"
+      "description": "The OpenAIRE id for the organisation"
     },
     "legalname": {
-      "type": "string",
-      "description": "Description of legalname"
+      "type": "string"
     },
     "legalshortname": {
-      "type": "string",
-      "description": "Description of legalshortname"
+      "type": "string"
     },
     "pid": {
-      "description": "Description of pid",
+      "description": "Persistent identifiers for the organisation i.e. isni 0000000090326370",
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "scheme": {
             "type": "string",
-            "description": "Description of scheme"
+            "description": "The scheme of the identifier (i.e. isni)"
           },
           "value": {
             "type": "string",
-            "description": "Description of value"
+            "description": "the value in the schema (i.e. 0000000090326370)"
           }
-        },
-        "description": "Description of pid"
+        }
       }
     },
     "websiteurl": {
-      "type": "string",
-      "description": "Description of websiteurl"
+      "type": "string"
     }
   }
 }
