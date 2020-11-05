@@ -1,13 +1,9 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import java.io.StringReader;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -16,8 +12,6 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 

@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import java.io.Serializable;
 import java.util.*;
@@ -9,9 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.dump.QueryInformationSystem;
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 /**

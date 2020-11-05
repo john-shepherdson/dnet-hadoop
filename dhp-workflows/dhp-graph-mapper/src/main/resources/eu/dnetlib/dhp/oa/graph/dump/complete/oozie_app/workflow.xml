@@ -156,7 +156,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table publication </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkDumpEntitiesJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkDumpEntitiesJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -182,7 +182,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table dataset </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkDumpEntitiesJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkDumpEntitiesJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -208,7 +208,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table ORP </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkDumpEntitiesJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkDumpEntitiesJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -234,7 +234,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table software </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkDumpEntitiesJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkDumpEntitiesJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -260,7 +260,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table organization </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkDumpEntitiesJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkDumpEntitiesJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -286,7 +286,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table project </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkDumpEntitiesJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkDumpEntitiesJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -312,7 +312,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table datasource </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkDumpEntitiesJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkDumpEntitiesJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -338,7 +338,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table relation </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkDumpRelationJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkDumpRelationJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -367,7 +367,7 @@
 
     <action name="create_entities_fromcontext">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.dump.graph.CreateContextEntities</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.complete.CreateContextEntities</main-class>
             <arg>--hdfsPath</arg><arg>${workingDir}/collect/communities_infrastructures</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
@@ -378,7 +378,7 @@
 
     <action name="create_relation_fromcontext">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.dump.graph.CreateContextRelation</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.complete.CreateContextRelation</main-class>
             <arg>--hdfsPath</arg><arg>${workingDir}/relation/context</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
@@ -392,7 +392,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table relation </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkOrganizationRelation</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkOrganizationRelation</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -427,7 +427,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Extract Relations from publication </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkExtractRelationFromEntities</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkExtractRelationFromEntities</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -453,7 +453,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table dataset </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkExtractRelationFromEntities</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkExtractRelationFromEntities</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -479,7 +479,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table ORP </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkExtractRelationFromEntities</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkExtractRelationFromEntities</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -505,7 +505,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump table software </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkExtractRelationFromEntities</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkExtractRelationFromEntities</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -533,7 +533,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Collect Results and Relations and put them in the right path </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.graph.SparkCollectAndSave</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkCollectAndSave</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

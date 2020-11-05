@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import static org.mockito.Mockito.lenient;
 
@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Assertions;

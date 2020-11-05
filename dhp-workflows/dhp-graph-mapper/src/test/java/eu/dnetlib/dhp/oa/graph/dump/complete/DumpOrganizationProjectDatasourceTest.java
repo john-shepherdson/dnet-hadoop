@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -72,7 +72,7 @@ public class DumpOrganizationProjectDatasourceTest {
 	public void dumpOrganizationTest() throws Exception {
 
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/graph/organization")
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/complete/organization")
 			.getPath();
 
 		DumpGraphEntities dg = new DumpGraphEntities();
@@ -101,7 +101,7 @@ public class DumpOrganizationProjectDatasourceTest {
 	public void dumpProjectTest() {
 
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/graph/project")
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/complete/project")
 			.getPath();
 
 		DumpGraphEntities dg = new DumpGraphEntities();
@@ -129,7 +129,7 @@ public class DumpOrganizationProjectDatasourceTest {
 	@Test
 	public void dumpDatasourceTest() {
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/graph/datasource")
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/complete/datasource")
 			.getPath();
 
 		DumpGraphEntities dg = new DumpGraphEntities();

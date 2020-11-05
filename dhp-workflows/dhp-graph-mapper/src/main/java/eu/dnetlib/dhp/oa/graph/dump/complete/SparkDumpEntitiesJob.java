@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -22,7 +22,7 @@ public class SparkDumpEntitiesJob implements Serializable {
 			.toString(
 				SparkDumpEntitiesJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_parameters.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

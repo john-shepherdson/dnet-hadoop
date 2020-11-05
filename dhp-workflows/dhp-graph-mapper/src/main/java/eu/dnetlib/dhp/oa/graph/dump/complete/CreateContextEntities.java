@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class CreateContextEntities implements Serializable {
 			.toString(
 				CreateContextEntities.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_entity_parameter.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_entity_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

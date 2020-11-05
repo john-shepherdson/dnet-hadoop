@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Assertions;

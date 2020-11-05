@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -31,7 +31,7 @@ public class SparkCollectAndSave implements Serializable {
 			.toString(
 				SparkCollectAndSave.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump_whole/input_collect_and_save.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_collect_and_save.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

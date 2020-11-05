@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -26,7 +26,6 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Project;
 import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.H2020Programme;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 

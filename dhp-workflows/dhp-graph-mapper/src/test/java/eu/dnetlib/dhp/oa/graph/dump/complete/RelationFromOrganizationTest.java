@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.dump.graph;
+package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,13 +7,10 @@ import java.nio.file.Path;
 import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.neethi.Assertion;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -24,9 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Relation;
-import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class RelationFromOrganizationTest {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -77,7 +72,7 @@ public class RelationFromOrganizationTest {
 	public void test1() throws Exception {
 
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/graph/relation")
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation")
 			.getPath();
 
 		final String communityMapPath = getClass()
