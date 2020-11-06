@@ -73,7 +73,7 @@ public class ActivitiesDumpReader {
 					SequenceFile.Writer.valueClass(Text.class))) {
 				while ((entry = tais.getNextTarEntry()) != null) {
 					String filename = entry.getName();
-
+					StringBuffer buffer = new StringBuffer();
 					try {
 						if (entry.isDirectory() || !filename.contains("works")) {
 
@@ -83,7 +83,7 @@ public class ActivitiesDumpReader {
 							BufferedReader br = new BufferedReader(new InputStreamReader(tais)); // Read directly from
 																									// tarInput
 							String line;
-							StringBuffer buffer = new StringBuffer();
+							buffer = new StringBuffer();
 							while ((line = br.readLine()) != null) {
 								buffer.append(line);
 							}

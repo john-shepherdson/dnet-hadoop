@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.Normalizer;
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class AuthorMatcher {
 		int matchCounter = 0;
 		List<Integer> matchCounters = Arrays.asList(matchCounter);
 		Contributor contributor = null;
-		contributors.forEach(c -> {
+		contributors.stream().filter(c -> !StringUtils.isBlank(c.getCreditName())).forEach(c -> {
 			if (simpleMatch(c.getCreditName(), author.getName()) ||
 				simpleMatch(c.getCreditName(), author.getSurname()) ||
 				simpleMatch(c.getCreditName(), author.getOtherName())) {
@@ -54,6 +55,7 @@ public class AuthorMatcher {
 			Optional<Contributor> optCon = contributors
 				.stream()
 				.filter(c -> c.isSimpleMatch())
+				.filter(c -> !StringUtils.isBlank(c.getCreditName()))
 				.map(c -> {
 					c.setScore(bestMatch(author.getName(), author.getSurname(), c.getCreditName()));
 					return c;

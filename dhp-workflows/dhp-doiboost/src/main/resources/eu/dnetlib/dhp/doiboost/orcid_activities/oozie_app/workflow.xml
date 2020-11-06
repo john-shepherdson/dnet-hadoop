@@ -1,4 +1,4 @@
-<workflow-app name="Import Orcid Activities" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Gen Orcid Works-no-doi From Activities" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>workingPath</name>
@@ -6,70 +6,70 @@
         </property>
         <property>
             <name>shell_cmd_0</name>
-            <value>wget -O /tmp/ORCID_2019_activites_0.tar.gz https://orcid.figshare.com/ndownloader/files/18017660 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_0.tar.gz /data/orcid_activities/ORCID_2019_activites_0.tar.gz ; rm -f /tmp/ORCID_2019_activites_0.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_0.tar.gz https://orcid.figshare.com/ndownloader/files/25002232 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_0.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_0.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_0.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 0</description>
         </property>
         <property>
             <name>shell_cmd_1</name>
-            <value>wget -O /tmp/ORCID_2019_activites_1.tar.gz https://orcid.figshare.com/ndownloader/files/18017675 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_1.tar.gz /data/orcid_activities/ORCID_2019_activites_1.tar.gz ; rm -f /tmp/ORCID_2019_activites_1.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_1.tar.gz https://orcid.figshare.com/ndownloader/files/25002088 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_1.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_1.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_1.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 1</description>
         </property>
         <property>
             <name>shell_cmd_2</name>
-            <value>wget -O /tmp/ORCID_2019_activites_2.tar.gz https://orcid.figshare.com/ndownloader/files/18017717 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_2.tar.gz /data/orcid_activities/ORCID_2019_activites_2.tar.gz ; rm -f /tmp/ORCID_2019_activites_2.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_2.tar.gz https://orcid.figshare.com/ndownloader/files/25000596 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_2.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_2.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_2.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 2</description>
         </property>
         <property>
             <name>shell_cmd_3</name>
-            <value>wget -O /tmp/ORCID_2019_activites_3.tar.gz https://orcid.figshare.com/ndownloader/files/18017765 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_3.tar.gz /data/orcid_activities/ORCID_2019_activites_3.tar.gz ; rm -f /tmp/ORCID_2019_activites_3.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_3.tar.gz https://orcid.figshare.com/ndownloader/files/25015150 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_3.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_3.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_3.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 3</description>
-        </property> 
+        </property>
         <property>
             <name>shell_cmd_4</name>
-            <value>wget -O /tmp/ORCID_2019_activites_4.tar.gz https://orcid.figshare.com/ndownloader/files/18017831 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_4.tar.gz /data/orcid_activities/ORCID_2019_activites_4.tar.gz ; rm -f /tmp/ORCID_2019_activites_4.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_4.tar.gz https://orcid.figshare.com/ndownloader/files/25033643 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_4.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_4.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_4.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 4</description>
-        </property> 
+        </property>
         <property>
             <name>shell_cmd_5</name>
-            <value>wget -O /tmp/ORCID_2019_activites_5.tar.gz https://orcid.figshare.com/ndownloader/files/18017987 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_5.tar.gz /data/orcid_activities/ORCID_2019_activites_5.tar.gz ; rm -f /tmp/ORCID_2019_activites_5.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_5.tar.gz https://orcid.figshare.com/ndownloader/files/25005483 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_5.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_5.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_5.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 5</description>
-        </property>  
+        </property>
         <property>
             <name>shell_cmd_6</name>
-            <value>wget -O /tmp/ORCID_2019_activites_6.tar.gz https://orcid.figshare.com/ndownloader/files/18018053 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_6.tar.gz /data/orcid_activities/ORCID_2019_activites_6.tar.gz ; rm -f /tmp/ORCID_2019_activites_6.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_6.tar.gz https://orcid.figshare.com/ndownloader/files/25005425 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_6.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_6.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_6.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 6</description>
         </property>
         <property>
             <name>shell_cmd_7</name>
-            <value>wget -O /tmp/ORCID_2019_activites_7.tar.gz https://orcid.figshare.com/ndownloader/files/18018023 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_7.tar.gz /data/orcid_activities/ORCID_2019_activites_7.tar.gz ; rm -f /tmp/ORCID_2019_activites_7.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_7.tar.gz https://orcid.figshare.com/ndownloader/files/25012016 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_7.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_7.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_7.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 7</description>
         </property>
         <property>
             <name>shell_cmd_8</name>
-            <value>wget -O /tmp/ORCID_2019_activites_8.tar.gz https://orcid.figshare.com/ndownloader/files/18018248 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_8.tar.gz /data/orcid_activities/ORCID_2019_activites_8.tar.gz ; rm -f /tmp/ORCID_2019_activites_8.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_8.tar.gz https://orcid.figshare.com/ndownloader/files/25012079 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_8.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_8.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_8.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 8</description>
         </property>
         <property>
             <name>shell_cmd_9</name>
-            <value>wget -O /tmp/ORCID_2019_activites_9.tar.gz https://orcid.figshare.com/ndownloader/files/18018029 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_9.tar.gz /data/orcid_activities/ORCID_2019_activites_9.tar.gz ; rm -f /tmp/ORCID_2019_activites_9.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_9.tar.gz https://orcid.figshare.com/ndownloader/files/25010727 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_9.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_9.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_9.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file 9</description>
-        </property> 
+        </property>
         <property>
             <name>shell_cmd_X</name>
-            <value>wget -O /tmp/ORCID_2019_activites_X.tar.gz https://orcid.figshare.com/ndownloader/files/18018182 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_activites_X.tar.gz /data/orcid_activities/ORCID_2019_activites_X.tar.gz ; rm -f /tmp/ORCID_2019_activites_X.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_activites_X.tar.gz https://orcid.figshare.com/ndownloader/files/25011025 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_activites_X.tar.gz /data/orcid_activities_2020/ORCID_2020_10_activites_X.tar.gz ; rm -f /tmp/ORCID_2020_10_activites_X.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid activity file X</description>
-        </property>  
+        </property>
     </parameters>
 
     <start to="ResetWorkingPath"/>
@@ -82,11 +82,11 @@
         <fs>
             <delete path='${workingPath}/no_doi_works/*'/>
         </fs>
-        <ok to="fork_gen_orcid_author_work"/>
+        <ok to="fork_check_download_files"/>
         <error to="Kill"/>
     </action>
     
-    <fork name = "fork_gen_orcid_author_work">
+    <fork name = "fork_check_download_files">
       <path start = "check_exist_on_hdfs_activities_0"/>
       <path start = "check_exist_on_hdfs_activities_1"/>
       <path start = "check_exist_on_hdfs_activities_2"/>
@@ -102,8 +102,8 @@
    	
     <decision name="check_exist_on_hdfs_activities_0">
          <switch>
-            <case to="GenOrcidAuthorWork_0">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_0.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_0.tar.gz'))}
             </case>
             <default to="Download_0" />
          </switch>
@@ -118,7 +118,7 @@
 	    <argument>${shell_cmd_0}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_0"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -129,7 +129,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_0.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_0.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_0.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -139,8 +139,8 @@
     
     <decision name="check_exist_on_hdfs_activities_1">
          <switch>
-            <case to="GenOrcidAuthorWork_1">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_1.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_1.tar.gz'))}
             </case>
             <default to="Download_1" />
          </switch>
@@ -155,7 +155,7 @@
 	    <argument>${shell_cmd_1}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_1"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -166,7 +166,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_1.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_1.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_1.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -176,8 +176,8 @@
     
     <decision name="check_exist_on_hdfs_activities_2">
          <switch>
-            <case to="GenOrcidAuthorWork_2">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_2.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_2.tar.gz'))}
             </case>
             <default to="Download_2" />
          </switch>
@@ -192,7 +192,7 @@
 	    <argument>${shell_cmd_2}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_2"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -203,7 +203,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_2.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_2.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_2.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -213,8 +213,8 @@
     
     <decision name="check_exist_on_hdfs_activities_3">
          <switch>
-            <case to="GenOrcidAuthorWork_3">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_3.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_3.tar.gz'))}
             </case>
             <default to="Download_3" />
          </switch>
@@ -229,7 +229,7 @@
 	    <argument>${shell_cmd_3}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_3"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -240,7 +240,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_3.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_3.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_3.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -250,8 +250,8 @@
     
     <decision name="check_exist_on_hdfs_activities_4">
          <switch>
-            <case to="GenOrcidAuthorWork_4">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_4.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_4.tar.gz'))}
             </case>
             <default to="Download_4" />
          </switch>
@@ -266,7 +266,7 @@
 	    <argument>${shell_cmd_4}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_4"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -277,7 +277,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_4.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_4.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_4.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -287,8 +287,8 @@
     
     <decision name="check_exist_on_hdfs_activities_5">
          <switch>
-            <case to="GenOrcidAuthorWork_5">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_5.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_5.tar.gz'))}
             </case>
             <default to="Download_5" />
          </switch>
@@ -303,7 +303,7 @@
 	    <argument>${shell_cmd_5}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_5"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -314,7 +314,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_5.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_5.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_5.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -324,8 +324,8 @@
     
     <decision name="check_exist_on_hdfs_activities_6">
          <switch>
-            <case to="GenOrcidAuthorWork_6">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_6.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_6.tar.gz'))}
             </case>
             <default to="Download_6" />
          </switch>
@@ -340,7 +340,7 @@
 	    <argument>${shell_cmd_6}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_6"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -351,7 +351,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_6.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_6.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_6.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -362,8 +362,8 @@
     
     <decision name="check_exist_on_hdfs_activities_7">
          <switch>
-            <case to="GenOrcidAuthorWork_7">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_7.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_7.tar.gz'))}
             </case>
             <default to="Download_7" />
          </switch>
@@ -378,7 +378,7 @@
 	    <argument>${shell_cmd_7}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_7"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -389,7 +389,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_7.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_7.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_7.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -399,8 +399,8 @@
     
     <decision name="check_exist_on_hdfs_activities_8">
          <switch>
-            <case to="GenOrcidAuthorWork_8">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_8.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_8.tar.gz'))}
             </case>
             <default to="Download_8" />
          </switch>
@@ -415,7 +415,7 @@
 	    <argument>${shell_cmd_8}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_8"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -426,7 +426,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_8.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_8.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_8.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -436,8 +436,8 @@
     
     <decision name="check_exist_on_hdfs_activities_9">
          <switch>
-            <case to="GenOrcidAuthorWork_9">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_9.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_9.tar.gz'))}
             </case>
             <default to="Download_9" />
          </switch>
@@ -452,7 +452,7 @@
 	    <argument>${shell_cmd_9}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_9"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -463,7 +463,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_9.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_9.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_9.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -473,8 +473,8 @@
     
     <decision name="check_exist_on_hdfs_activities_X">
          <switch>
-            <case to="GenOrcidAuthorWork_X">
-              ${fs:exists(concat(workingPath,'/ORCID_2019_activites_X.tar.gz'))}
+            <case to="wait_download_phase_node">
+              ${fs:exists(concat(workingPath,'/ORCID_2020_10_activites_X.tar.gz'))}
             </case>
             <default to="Download_X" />
          </switch>
@@ -489,7 +489,7 @@
 	    <argument>${shell_cmd_X}</argument>
 		<capture-output/>
 		</shell>
-	<ok to="GenOrcidAuthorWork_X"/>
+	<ok to="wait_download_phase_node"/>
 	<error to="Kill"/>
 	</action>
 	
@@ -500,7 +500,7 @@
             <main-class>eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_activites_X.tar.gz</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_activites_X.tar.gz</arg>
             <arg>-ow</arg><arg>no_doi_works/works_X.seq</arg>
             <arg>-oew</arg><arg>no_doi_enriched_works/</arg>
         </java>
@@ -508,7 +508,35 @@
         <error to="Kill"/>
     </action>
 
+    <join name = "wait_download_phase_node" to = "fork_gen_orcid_author_work"/>
+
+    <fork name = "fork_gen_orcid_author_work">
+        <path start = "GenOrcidAuthorWork_0"/>
+        <path start = "GenOrcidAuthorWork_1"/>
+        <path start = "GenOrcidAuthorWork_2"/>
+        <path start = "GenOrcidAuthorWork_3"/>
+        <path start = "GenOrcidAuthorWork_4"/>
+        <path start = "GenOrcidAuthorWork_5"/>
+        <path start = "GenOrcidAuthorWork_6"/>
+        <path start = "GenOrcidAuthorWork_7"/>
+        <path start = "GenOrcidAuthorWork_8"/>
+        <path start = "GenOrcidAuthorWork_9"/>
+        <path start = "GenOrcidAuthorWork_X"/>
+    </fork>
+
     <join name = "join_node" to = "End"/>
-    
+
+<!--    <join name = "join_node" to = "fork_gen_orcid_author_work_2"/>-->
+
+<!--    <fork name = "fork_gen_orcid_author_work_2">-->
+<!--        <path start = "GenOrcidAuthorWork_6"/>-->
+<!--        <path start = "GenOrcidAuthorWork_7"/>-->
+<!--        <path start = "GenOrcidAuthorWork_8"/>-->
+<!--        <path start = "GenOrcidAuthorWork_9"/>-->
+<!--        <path start = "GenOrcidAuthorWork_X"/>-->
+<!--    </fork>-->
+
+<!--    <join name = "join_node_2" to = "End"/>-->
+
    <end name="End"/>
 </workflow-app>

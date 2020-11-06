@@ -59,7 +59,7 @@
     
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${workingPath}/no_doi_enriched_works/output'/>
+            <delete path='${workingPath}/no_doi_dataset'/>
         </fs>
         <ok to="GenOrcidNoDoiDataset"/>
         <error to="Kill"/>
@@ -85,7 +85,7 @@
             <arg>-n</arg><arg>${nameNode}</arg>
             <arg>-f</arg><arg>-</arg>
             <arg>-ow</arg><arg>no_doi_works/</arg>
-            <arg>-oew</arg><arg>no_doi_enriched_works/output</arg>
+            <arg>-oew</arg><arg>no_doi_dataset</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

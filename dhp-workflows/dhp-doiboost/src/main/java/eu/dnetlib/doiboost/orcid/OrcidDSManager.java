@@ -62,7 +62,7 @@ public class OrcidDSManager {
 				.toString(
 					OrcidDSManager.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/doiboost/create_orcid_authors_data.json")));
+							"/eu/dnetlib/dhp/doiboost/gen_orcid_authors_from_summaries.json")));
 		parser.parseArgument(args);
 
 		hdfsServerUri = parser.get("hdfsServerUri");

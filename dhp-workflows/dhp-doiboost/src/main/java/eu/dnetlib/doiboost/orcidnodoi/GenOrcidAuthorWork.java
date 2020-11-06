@@ -42,7 +42,7 @@ public class GenOrcidAuthorWork extends OrcidDSManager {
 				.toString(
 					GenOrcidAuthorWork.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/doiboost/gen_enriched_orcid_works_parameters.json")));
+							"/eu/dnetlib/dhp/doiboost/gen_orcid_works-no-doi_from_activities.json")));
 		parser.parseArgument(args);
 
 		hdfsServerUri = parser.get("hdfsServerUri");

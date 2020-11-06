@@ -67,7 +67,7 @@ public class SparkGenEnrichedOrcidWorks {
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 				JavaPairRDD<Text, Text> summariesRDD = sc
-					.sequenceFile(workingPath + "summaries/output/authors.seq", Text.class, Text.class);
+					.sequenceFile(workingPath + "authors/authors.seq", Text.class, Text.class);
 				Dataset<AuthorData> summariesDataset = spark
 					.createDataset(
 						summariesRDD.map(seq -> loadAuthorFromJson(seq._1(), seq._2())).rdd(),
@@ -96,8 +96,8 @@ public class SparkGenEnrichedOrcidWorks {
 						Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
 					.filter(Objects::nonNull)
 					.toJavaRDD();
-				enrichedWorksRDD.saveAsTextFile(workingPath + outputEnrichedWorksPath);
-				logger.info("Works enriched data saved");
+//				enrichedWorksRDD.saveAsTextFile(workingPath + outputEnrichedWorksPath);
+				logger.info("Enriched works RDD ready.");
 
 				final LongAccumulator parsedPublications = spark.sparkContext().longAccumulator("parsedPublications");
 				final LongAccumulator enrichedPublications = spark
@@ -132,7 +132,7 @@ public class SparkGenEnrichedOrcidWorks {
 					.write()
 					.format("parquet")
 					.mode(SaveMode.Overwrite)
-					.save(workingPath + "no_doi_dataset/output");
+					.save(workingPath + outputEnrichedWorksPath);
 
 				logger.info("parsedPublications: " + parsedPublications.value().toString());
 				logger.info("enrichedPublications: " + enrichedPublications.value().toString());

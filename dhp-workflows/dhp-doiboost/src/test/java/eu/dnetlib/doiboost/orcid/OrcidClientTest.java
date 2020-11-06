@@ -38,8 +38,8 @@ public class OrcidClientTest {
 
 	@Test
 	public void downloadTest() throws Exception {
-		String record = testDownloadRecord("0000-0002-2536-4498");
-		File f = new File("/tmp/downloaded_0000-0002-2536-4498.xml");
+		String record = testDownloadRecord("0000-0001-6163-2042");
+		File f = new File("/tmp/downloaded_0000-0001-6163-2042.xml");
 		OutputStream outStream = new FileOutputStream(f);
 		IOUtils.write(record.getBytes(), outStream);
 		System.out.println("saved to tmp");

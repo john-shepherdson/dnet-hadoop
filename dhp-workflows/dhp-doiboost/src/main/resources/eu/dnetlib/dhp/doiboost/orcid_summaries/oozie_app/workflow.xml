@@ -1,4 +1,4 @@
-<workflow-app name="Import Orcid Summaries" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Gen Orcid Authors From Summaries" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>workingPath</name>
@@ -6,7 +6,7 @@
         </property>
         <property>
             <name>shell_cmd_0</name>
-            <value>wget -O /tmp/ORCID_2019_summaries.tar.gz https://orcid.figshare.com/ndownloader/files/18017633 ; hdfs dfs -copyFromLocal /tmp/ORCID_2019_summaries.tar.gz /data/orcid_activities/ORCID_2019_summaries.tar.gz ; rm -f /tmp/ORCID_2019_summaries.tar.gz
+            <value>wget -O /tmp/ORCID_2020_10_summaries.tar.gz https://orcid.figshare.com/ndownloader/files/25032905 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_summaries.tar.gz /data/orcid_activities_2020/ORCID_2020_10_summaries.tar.gz ; rm -f /tmp/ORCID_2020_10_summaries.tar.gz
             </value>
             <description>the shell command that downloads and puts to hdfs orcid summaries</description>
         </property>
@@ -21,8 +21,8 @@
     
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${workingPath}/summaries/output'/>
-            <mkdir path='${workingPath}/summaries/output'/>
+            <delete path='${workingPath}/authors'/>
+            <mkdir path='${workingPath}/authors'/>
         </fs>
         <ok to="check_exist_on_hdfs_summaries"/>
         <error to="Kill"/>
@@ -31,7 +31,7 @@
     <decision name="check_exist_on_hdfs_summaries">
         <switch>
             <case to="ImportOrcidSummaries">
-                ${fs:exists(concat(workingPath,'/ORCID_2019_summaries.tar.gz'))}
+                ${fs:exists(concat(workingPath,'/ORCID_2020_10_summaries.tar.gz'))}
             </case>
             <default to="DownloadSummaries" />
         </switch>
@@ -57,8 +57,8 @@
             <main-class>eu.dnetlib.doiboost.orcid.OrcidDSManager</main-class>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>ORCID_2019_summaries.tar.gz</arg>
-            <arg>-o</arg><arg>summaries/output/</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_summaries.tar.gz</arg>
+            <arg>-o</arg><arg>authors/</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>

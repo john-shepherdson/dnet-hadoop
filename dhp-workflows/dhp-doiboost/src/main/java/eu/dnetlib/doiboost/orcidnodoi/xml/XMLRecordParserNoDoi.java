@@ -183,39 +183,34 @@ public class XMLRecordParserNoDoi {
 	private static List<Contributor> getContributors(VTDGen vg, VTDNav vn, AutoPilot ap)
 		throws XPathParseException, NavException, XPathEvalException {
 		List<Contributor> contributors = new ArrayList<Contributor>();
-		int nameIndex = 0;
-		ap.selectXPath("//work:contributor/work:credit-name");
+		ap.selectXPath("//work:contributors/work:contributor");
 		while (ap.evalXPath() != -1) {
 			Contributor contributor = new Contributor();
-			int t = vn.getText();
-			if (t >= 0) {
-				contributor.setCreditName(vn.toNormalizedString(t));
-				contributors.add(nameIndex, contributor);
-				nameIndex++;
+			if (vn.toElement(VTDNav.FIRST_CHILD, "work:credit-name")) {
+				int val = vn.getText();
+				if (val != -1) {
+					contributor.setCreditName(vn.toNormalizedString(val));
+				}
+				vn.toElement(VTDNav.PARENT);
 			}
-		}
-		if (contributors.size() == 0) {
-			return contributors;
-		}
-
-		int sequenceIndex = 0;
-		ap.selectXPath("//work:contributor/work:contributor-attributes/work:contributor-sequence");
-		while (ap.evalXPath() != -1) {
-			int t = vn.getText();
-			if (t >= 0) {
-				contributors.get(sequenceIndex).setSequence(vn.toNormalizedString(t));
-				sequenceIndex++;
+			if (vn.toElement(VTDNav.FIRST_CHILD, "work:contributor-attributes")) {
+				if (vn.toElement(VTDNav.FIRST_CHILD, "work:contributor-sequence")) {
+					int val = vn.getText();
+					if (val != -1) {
+						contributor.setSequence(vn.toNormalizedString(val));
+					}
+					vn.toElement(VTDNav.PARENT);
+				}
+				if (vn.toElement(VTDNav.FIRST_CHILD, "work:contributor-role")) {
+					int val = vn.getText();
+					if (val != -1) {
+						contributor.setRole(vn.toNormalizedString(val));
+					}
+					vn.toElement(VTDNav.PARENT);
+				}
+				vn.toElement(VTDNav.PARENT);
 			}
-		}
-
-		int roleIndex = 0;
-		ap.selectXPath("//work:contributor/work:contributor-attributes/work:contributor-role");
-		while (ap.evalXPath() != -1) {
-			int t = vn.getText();
-			if (t >= 0) {
-				contributors.get(roleIndex).setRole(vn.toNormalizedString(t));
-				roleIndex++;
-			}
+			contributors.add(contributor);
 		}
 		return contributors;
 	}

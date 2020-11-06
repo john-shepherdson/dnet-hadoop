@@ -458,6 +458,18 @@
 				<version>${jsonschemagenerator.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-text</artifactId>
+				<version>${common.text.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${org.apache.httpcomponents.version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
