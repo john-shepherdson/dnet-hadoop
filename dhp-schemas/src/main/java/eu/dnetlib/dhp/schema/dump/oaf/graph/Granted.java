@@ -5,10 +5,9 @@ import java.io.Serializable;
 import java.util.Optional;
 
 /**
- * To describe the funded amount. It has the following parameters:
- * - private String currency to store the currency of the fund
- * - private float totalcost to store the total cost of the project
- * - private float fundedamount to store the funded amount by the funder
+ * To describe the funded amount. It has the following parameters: - private String currency to store the currency of
+ * the fund - private float totalcost to store the total cost of the project - private float fundedamount to store the
+ * funded amount by the funder
  */
 public class Granted implements Serializable {
 	private String currency;
