@@ -112,59 +112,5 @@
         <error to="Kill"/>
     </action>
 
-
-    <action name="DropAndCreateIndex">
-        <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <main-class>eu.dnetlib.dhp.provision.DropAndCreateESIndex</main-class>
-            <arg>-i</arg><arg>${index}</arg>
-            <arg>-c</arg><arg>${esCluster}</arg>
-        </java>
-        <ok to="indexSummary"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="indexSummary">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>index summary</name>
-            <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
-            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory}  --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="8" </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingDirPath}/summary_json</arg>
-            <arg>--index</arg><arg>${index}_object</arg>
-            <arg>--idPath</arg><arg>id</arg>
-            <arg>--cluster</arg><arg>${esCluster}</arg>
-        </spark>
-        <ok to="indexScholix"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="indexScholix">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>index scholix</name>
-            <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
-            <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory}  --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="8" </spark-opts>
-            <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingDirPath}/scholix_json</arg>
-            <arg>--index</arg><arg>${index}_scholix</arg>
-            <arg>--idPath</arg><arg>identifier</arg>
-            <arg>--cluster</arg><arg>${esCluster}</arg>
-        </spark>
-        <ok to="End"/>
-        <error to="Kill"/>
-    </action>
-
     <end name="End"/>
 </workflow-app>

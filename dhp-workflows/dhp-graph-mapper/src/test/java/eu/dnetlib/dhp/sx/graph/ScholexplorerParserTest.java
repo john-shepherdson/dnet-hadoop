@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.sx.graph.parser.DatasetScholexplorerParser;
+import eu.dnetlib.dhp.sx.graph.parser.PublicationScholexplorerParser;
 import eu.dnetlib.scholexplorer.relation.RelationMapper;
 
 public class ScholexplorerParserTest {
@@ -21,6 +22,28 @@ public class ScholexplorerParserTest {
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("dmf.xml"));
 
 		DatasetScholexplorerParser p = new DatasetScholexplorerParser();
+		List<Oaf> oaves = p.parseObject(xml, RelationMapper.load());
+
+		ObjectMapper m = new ObjectMapper();
+		m.enable(SerializationFeature.INDENT_OUTPUT);
+
+		oaves
+			.forEach(
+				oaf -> {
+					try {
+						System.out.println(m.writeValueAsString(oaf));
+						System.out.println("----------------------------");
+					} catch (JsonProcessingException e) {
+
+					}
+				});
+	}
+
+	@Test
+	public void testPublicationParser() throws Exception {
+		String xml = IOUtils.toString(this.getClass().getResourceAsStream("pmf.xml"));
+
+		PublicationScholexplorerParser p = new PublicationScholexplorerParser();
 		List<Oaf> oaves = p.parseObject(xml, RelationMapper.load());
 
 		ObjectMapper m = new ObjectMapper();

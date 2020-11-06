@@ -97,12 +97,17 @@ public class Scholix implements Serializable {
 	}
 
 	private List<ScholixEntityId> mergeScholixEntityId(final List<ScholixEntityId> a, final List<ScholixEntityId> b) {
-		final List<ScholixEntityId> m = new ArrayList<>(a);
+		final List<ScholixEntityId> m = a != null ? new ArrayList<>(a) : new ArrayList<>();
 		if (b != null)
 			b.forEach(s -> {
-				int tt = (int) m.stream().filter(t -> t.getName().equalsIgnoreCase(s.getName())).count();
-				if (tt == 0) {
-					m.add(s);
+				if (s != null) {
+					int tt = (int) m
+						.stream()
+						.filter(t -> t != null && t.getName() != null && t.getName().equalsIgnoreCase(s.getName()))
+						.count();
+					if (tt == 0) {
+						m.add(s);
+					}
 				}
 			});
 		return m;
@@ -110,7 +115,7 @@ public class Scholix implements Serializable {
 
 	private List<ScholixIdentifier> mergeScholixIdnetifier(final List<ScholixIdentifier> a,
 		final List<ScholixIdentifier> b) {
-		final List<ScholixIdentifier> m = new ArrayList<>(a);
+		final List<ScholixIdentifier> m = a != null ? new ArrayList<>(a) : new ArrayList<>();
 		if (b != null)
 			b.forEach(s -> {
 				int tt = (int) m.stream().filter(t -> t.getIdentifier().equalsIgnoreCase(s.getIdentifier())).count();
@@ -123,7 +128,7 @@ public class Scholix implements Serializable {
 
 	private List<ScholixCollectedFrom> mergeScholixCollectedFrom(final List<ScholixCollectedFrom> a,
 		final List<ScholixCollectedFrom> b) {
-		final List<ScholixCollectedFrom> m = new ArrayList<>(a);
+		final List<ScholixCollectedFrom> m = a != null ? new ArrayList<>(a) : new ArrayList<>();
 		if (b != null)
 			b.forEach(s -> {
 				int tt = (int) m
@@ -139,14 +144,15 @@ public class Scholix implements Serializable {
 
 	private ScholixRelationship mergeRelationships(final ScholixRelationship a, final ScholixRelationship b) {
 		ScholixRelationship result = new ScholixRelationship();
-		result.setName(StringUtils.isEmpty(a.getName()) ? b.getName() : a.getName());
-		result.setInverse(StringUtils.isEmpty(a.getInverse()) ? b.getInverse() : a.getInverse());
-		result.setSchema(StringUtils.isEmpty(a.getSchema()) ? b.getSchema() : a.getSchema());
+		result.setName(a == null || StringUtils.isEmpty(a.getName()) ? b.getName() : a.getName());
+		result.setInverse(a == null || StringUtils.isEmpty(a.getInverse()) ? b.getInverse() : a.getInverse());
+		result.setSchema(a == null || StringUtils.isEmpty(a.getSchema()) ? b.getSchema() : a.getSchema());
 		return result;
 	}
 
 	private ScholixResource mergeResource(final ScholixResource a, final ScholixResource b) {
-
+		if (a == null)
+			return b;
 		final ScholixResource result = new ScholixResource();
 		result.setCollectedFrom(mergeScholixCollectedFrom(a.getCollectedFrom(), b.getCollectedFrom()));
 		result.setCreator(mergeScholixEntityId(a.getCreator(), b.getCreator()));

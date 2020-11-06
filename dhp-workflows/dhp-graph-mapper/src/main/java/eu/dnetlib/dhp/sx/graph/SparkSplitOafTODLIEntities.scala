@@ -1,12 +1,15 @@
 package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation}
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIUnknown}
 import eu.dnetlib.dhp.sx.ebi.EBIAggregator
 import org.apache.commons.io.IOUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.LoggerFactory
+import org.apache.spark.sql.functions.col
+
 
 object SparkSplitOafTODLIEntities {
 
@@ -83,13 +86,41 @@ object SparkSplitOafTODLIEntities {
   }
 
 
+  def extract_ids(o:Oaf) :(String, String) = {
+
+    o match {
+      case p: DLIPublication =>
+        val prefix = StringUtils.substringBefore(p.getId, "|")
+        val original = StringUtils.substringAfter(p.getOriginalObjIdentifier, "::")
+        (p.getId, s"$prefix|$original")
+      case p: DLIDataset =>
+        val prefix = StringUtils.substringBefore(p.getId, "|")
+        val original = StringUtils.substringAfter(p.getOriginalObjIdentifier, "::")
+        (p.getId, s"$prefix|$original")
+      case _ =>null
+    }
+  }
+
   def extract_relations(spark:SparkSession, workingPath:String) :Unit = {
 
     implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo[Oaf]
     implicit val relEncoder: Encoder[Relation] = Encoders.kryo[Relation]
+    import spark.implicits._
 
     val OAFDataset:Dataset[Oaf] = spark.read.load(s"$workingPath/input/OAFDataset").as[Oaf]
     val ebi_relation:Dataset[Relation] = spark.read.load(s"$workingPath/ebi/baseline_relation_ebi").as[Relation].repartition(2000)
+
+
+    OAFDataset
+      .filter(o => o.isInstanceOf[Result])
+      .map(extract_ids)(Encoders.tuple(Encoders.STRING, Encoders.STRING))
+      .filter(r => r != null)
+      .where("_1 != _2")
+      .select(col("_1").alias("newId"), col("_2").alias("oldId"))
+      .distinct()
+      .map(f => IdReplace(f.getString(0), f.getString(1)))
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/graph/id_replace")
+
 
     OAFDataset
       .filter(s => s != null && s.isInstanceOf[Relation])
@@ -100,7 +131,41 @@ object SparkSplitOafTODLIEntities {
       .agg(EBIAggregator.getRelationAggregator().toColumn)
       .map(p => p._2)
       .repartition(4000)
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/graph/relation")
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/graph/relation_unfixed")
+
+
+    val relations = spark.read.load(s"$workingPath/graph/relation_unfixed").as[Relation]
+    val ids = spark.read.load(s"$workingPath/graph/id_replace").as[IdReplace]
+
+    relations
+      .map(r => (r.getSource, r))(Encoders.tuple(Encoders.STRING, relEncoder))
+      .joinWith(ids, col("_1").equalTo(ids("oldId")), "left")
+      .map(i =>{
+        val r = i._1._2
+        if (i._2 != null)
+          {
+            val id = i._2.newId
+            r.setSource(id)
+          }
+        r
+      }).write.mode(SaveMode.Overwrite).save(s"$workingPath/graph/rel_f_source")
+
+    val rel_source:Dataset[Relation] = spark.read.load(s"$workingPath/graph/rel_f_source").as[Relation]
+
+    rel_source
+      .map(r => (r.getTarget, r))(Encoders.tuple(Encoders.STRING, relEncoder))
+      .joinWith(ids, col("_1").equalTo(ids("oldId")), "left")
+      .map(i =>{
+        val r:Relation = i._1._2
+        if (i._2 != null)
+        {
+          val id = i._2.newId
+          r.setTarget(id)
+        }
+        r
+      }).write.mode(SaveMode.Overwrite).save(s"$workingPath/graph/relation")
+
+
 
   }
 
