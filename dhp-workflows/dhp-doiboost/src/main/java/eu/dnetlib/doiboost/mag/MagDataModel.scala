@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.mag
 
 
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.json4s
@@ -190,8 +191,11 @@ case object ConversionUtil {
     pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
-    //Set identifier as 50|doiboost____::md5(DOI)
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //will be replaced using IdentifierFactory
     pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
+    pub.setId(IdentifierFactory.createIdentifier(pub))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
     val originalTitles = createSP(paper.OriginalTitle, "alternative title", "dnet:dataCite_title")

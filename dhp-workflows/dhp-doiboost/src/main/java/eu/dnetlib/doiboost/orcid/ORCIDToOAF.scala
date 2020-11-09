@@ -1,5 +1,6 @@
 package eu.dnetlib.doiboost.orcid
 
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Author, Publication}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil.{ORCID, PID_TYPES, createSP, generateDataInfo, generateIdentifier}
@@ -48,7 +49,14 @@ object ORCIDToOAF {
     val pub:Publication = new Publication
     pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
+
+    //IMPORTANT
+    //The old method pub.setId(IdentifierFactory.createIdentifier(pub))
+    //will be replaced using IdentifierFactory
     pub.setId(generateIdentifier(pub, doi.toLowerCase))
+    pub.setId(IdentifierFactory.createIdentifier(pub))
+
+
     try{
       pub.setAuthor(input.authors.map(a=> {
         generateAuthor(a.name, a.surname, a.creditName, a.oid)

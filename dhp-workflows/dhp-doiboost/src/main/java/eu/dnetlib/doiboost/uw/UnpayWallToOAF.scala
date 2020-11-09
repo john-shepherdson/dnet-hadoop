@@ -1,5 +1,6 @@
 package eu.dnetlib.doiboost.uw
 
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Instance, Publication}
 import org.json4s
 import org.json4s.DefaultFormats
@@ -33,7 +34,13 @@ object UnpayWallToOAF {
 
     val oaLocation:OALocation = (json \ "best_oa_location").extractOrElse[OALocation](null)
     pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+
+    //IMPORTANT
+    //The old method pub.setId(IdentifierFactory.createIdentifier(pub))
+    //will be replaced using IdentifierFactory
     pub.setId(generateIdentifier(pub, doi.toLowerCase))
+    pub.setId(IdentifierFactory.createIdentifier(pub))
+
 
     pub.setCollectedfrom(List(createUnpayWallCollectedFrom()).asJava)
     pub.setDataInfo(generateDataInfo())

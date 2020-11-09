@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.schema.oaf._
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.lang.StringUtils
@@ -96,7 +97,12 @@ case object Crossref2Oaf {
     result.setOriginalId(tmp.filter(id => id != null).asJava)
 
     //Set identifier as 50 | doiboost____::md5(DOI)
+
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //will be replaced using IdentifierFactory
     result.setId(generateIdentifier(result, doi))
+    result.setId(IdentifierFactory.createIdentifier(result))
 
     // Add DataInfo
     result.setDataInfo(generateDataInfo())
