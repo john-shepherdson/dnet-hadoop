@@ -18,6 +18,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class CleaningFunctions {
 
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
+	public static final String NONE = "none";
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
 		if (value instanceof Datasource) {
@@ -104,6 +105,23 @@ public class CleaningFunctions {
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.collect(Collectors.toList()));
+			}
+			if (Objects.nonNull(r.getPid())) {
+				r
+					.setPid(
+						r
+							.getPid()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
+							.filter(sp -> NONE.equalsIgnoreCase(sp.getValue()))
+							.filter(sp -> Objects.nonNull(sp.getQualifier()))
+							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.map(sp -> {
+								sp.setValue(StringUtils.trim(sp.getValue()));
+								return sp;
+							})
 							.collect(Collectors.toList()));
 			}
 			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {

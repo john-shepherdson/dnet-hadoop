@@ -17,7 +17,7 @@ import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.oa.graph.dump.graph.Constants;
+import eu.dnetlib.dhp.oa.graph.dump.complete.Constants;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -70,4 +70,5 @@ public class Utils {
 
 		return new Gson().fromJson(sb.toString(), CommunityMap.class);
 	}
+
 }

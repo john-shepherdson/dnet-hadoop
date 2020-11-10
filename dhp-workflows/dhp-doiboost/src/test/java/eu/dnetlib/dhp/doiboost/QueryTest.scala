@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.doiboost
 
-import eu.dnetlib.dhp.schema.oaf.Publication
+import eu.dnetlib.dhp.schema.oaf.{Publication, Relation}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
@@ -23,6 +23,13 @@ class QueryTest {
 
   }
 
+
+  def has_ands(r:Relation) :Boolean = {
+
+    r.getCollectedfrom!= null && r.getCollectedfrom.asScala.count(k => k.getValue.contains("Australian")) > 0
+
+  }
+
   def hasInstanceWithUrl(p:Publication):Boolean = {
     val c = p.getInstance.asScala.map(i => i.getUrl!= null && !i.getUrl.isEmpty).size
     !(!p.getInstance.isEmpty && c == p.getInstance().size)
@@ -37,6 +44,8 @@ class QueryTest {
 
   def myQuery(spark:SparkSession, sc:SparkContext): Unit = {
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
+
+
 
     val mapper = new ObjectMapper()
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)

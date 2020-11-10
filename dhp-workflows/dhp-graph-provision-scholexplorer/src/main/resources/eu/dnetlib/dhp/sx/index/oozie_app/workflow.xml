@@ -1,8 +1,16 @@
-<workflow-app name="Index graph to ElasticSearch" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Materialize and Index graph to ElasticSearch" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>workingDirPath</name>
             <description>the source path</description>
+        </property>
+        <property>
+            <name>index</name>
+            <description>the index name</description>
+        </property>
+        <property>
+            <name>esCluster</name>
+            <description>the Index cluster</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -12,22 +20,27 @@
             <name>sparkExecutorMemory</name>
             <description>memory for individual executor</description>
         </property>
-        <property>
-            <name>index</name>
-            <description>index name</description>
-        </property>
-
-        <property>
-            <name>indexHost</name>
-            <description>index host name</description>
-        </property>
     </parameters>
 
-    <start to="indexSummary"/>
+    <start to="DropAndCreateIndex"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+
+    <action name="DropAndCreateIndex">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.provision.DropAndCreateESIndex</main-class>
+            <arg>-i</arg><arg>${index}</arg>
+            <arg>-c</arg><arg>${esCluster}</arg>
+        </java>
+        <ok to="indexSummary"/>
+        <error to="Kill"/>
+    </action>
+
 
     <action name="indexSummary">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -35,16 +48,15 @@
             <name-node>${nameNode}</name-node>
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>index Summary</name>
+            <name>index summary</name>
             <class>eu.dnetlib.dhp.provision.SparkIndexCollectionOnES</class>
             <jar>dhp-graph-provision-scholexplorer-${projectVersion}.jar</jar>
-            <spark-opts>--executor-memory ${sparkExecutorMemory} --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="32" </spark-opts>
+            <spark-opts>--executor-memory ${sparkExecutorMemory}  --driver-memory=${sparkDriverMemory} ${sparkExtraOPT} --conf spark.dynamicAllocation.maxExecutors="8" </spark-opts>
             <arg>-mt</arg> <arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingDirPath}/summary</arg>
+            <arg>--sourcePath</arg><arg>${workingDirPath}/summary_json</arg>
             <arg>--index</arg><arg>${index}_object</arg>
-            <arg>--esHost</arg><arg>${indexHost}</arg>
             <arg>--idPath</arg><arg>id</arg>
-            <arg>--type</arg><arg>summary</arg>
+            <arg>--cluster</arg><arg>${esCluster}</arg>
         </spark>
         <ok to="indexScholix"/>
         <error to="Kill"/>
@@ -63,9 +75,8 @@
             <arg>-mt</arg> <arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${workingDirPath}/scholix_json</arg>
             <arg>--index</arg><arg>${index}_scholix</arg>
-            <arg>--esHost</arg><arg>${indexHost}</arg>
             <arg>--idPath</arg><arg>identifier</arg>
-            <arg>--type</arg><arg>scholix</arg>
+            <arg>--cluster</arg><arg>${esCluster}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

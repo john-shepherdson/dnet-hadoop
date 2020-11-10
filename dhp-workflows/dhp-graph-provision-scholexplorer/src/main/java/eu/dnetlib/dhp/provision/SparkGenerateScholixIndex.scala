@@ -6,9 +6,34 @@ import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary
 import eu.dnetlib.dhp.schema.oaf.Relation
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
+import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 
 object SparkGenerateScholixIndex {
+
+
+
+  def getScholixAggregator(): Aggregator[(String, Scholix), Scholix, Scholix] = new Aggregator[(String, Scholix), Scholix, Scholix]{
+
+    override def zero: Scholix = new Scholix()
+
+    override def reduce(b: Scholix, a: (String, Scholix)): Scholix = {
+      b.mergeFrom(a._2)
+      b
+    }
+
+    override def merge(wx: Scholix, wy: Scholix): Scholix = {
+      wx.mergeFrom(wy)
+      wx
+    }
+    override def finish(reduction: Scholix): Scholix = reduction
+
+    override def bufferEncoder: Encoder[Scholix] =
+      Encoders.kryo(classOf[Scholix])
+
+    override def outputEncoder: Encoder[Scholix] =
+      Encoders.kryo(classOf[Scholix])
+  }
 
 
   def main(args: Array[String]): Unit = {
@@ -40,7 +65,7 @@ object SparkGenerateScholixIndex {
 
         (relation.getTarget, Scholix.generateScholixWithSource(summary,relation))
 
-      }).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/scholix_source")
+      }).repartition(6000).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/scholix_source")
 
     val sTarget:Dataset[(String,Scholix)] = spark.read.load(s"$workingDirPath/scholix_source").as[(String, Scholix)]
 
@@ -53,9 +78,16 @@ object SparkGenerateScholixIndex {
       scholix.generateIdentifier()
       scholix.generatelinkPublisher()
       scholix
-    }).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/scholix")
+    }).repartition(6000).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/scholix_r")
 
 
+    val finalScholix:Dataset[Scholix] = spark.read.load(s"$workingDirPath/scholix_r").as[Scholix]
+
+    finalScholix.map(d => (d.getIdentifier, d))(Encoders.tuple(Encoders.STRING, scholixEncoder))
+      .groupByKey(_._1)(Encoders.STRING)
+      .agg(getScholixAggregator().toColumn)
+      .map(p => p._2)
+      .write.mode(SaveMode.Overwrite).save(s"$workingDirPath/scholix")
 
   }
 

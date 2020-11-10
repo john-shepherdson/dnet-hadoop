@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.dump;
 
 import java.io.*;
+import java.util.Optional;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.MakeTarArchive;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 
 public class MakeTar implements Serializable {
@@ -39,16 +41,22 @@ public class MakeTar implements Serializable {
 		final String inputPath = parser.get("sourcePath");
 		log.info("input path : {}", inputPath);
 
+		final int gBperSplit = Optional
+			.ofNullable(parser.get("splitSize"))
+			.map(Integer::valueOf)
+			.orElse(10);
+
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
 
-		makeTArArchive(fileSystem, inputPath, outputPath);
+		makeTArArchive(fileSystem, inputPath, outputPath, gBperSplit);
 
 	}
 
-	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath) throws IOException {
+	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit)
+		throws IOException {
 
 		RemoteIterator<LocatedFileStatus> dir_iterator = fileSystem.listLocatedStatus(new Path(inputPath));
 
@@ -59,56 +67,9 @@ public class MakeTar implements Serializable {
 			String p_string = p.toString();
 			String entity = p_string.substring(p_string.lastIndexOf("/") + 1);
 
-			write(fileSystem, p_string, outputPath + "/" + entity + ".tar", entity);
+			MakeTarArchive.tarMaxSize(fileSystem, p_string, outputPath + "/" + entity, entity, gBperSplit);
 		}
 
-	}
-
-	private static void write(FileSystem fileSystem, String inputPath, String outputPath, String dir_name)
-		throws IOException {
-
-		Path hdfsWritePath = new Path(outputPath);
-		FSDataOutputStream fsDataOutputStream = null;
-		if (fileSystem.exists(hdfsWritePath)) {
-			fileSystem.delete(hdfsWritePath, true);
-
-		}
-		fsDataOutputStream = fileSystem.create(hdfsWritePath);
-
-		TarArchiveOutputStream ar = new TarArchiveOutputStream(fsDataOutputStream.getWrappedStream());
-
-		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
-			.listFiles(
-				new Path(inputPath), true);
-
-		while (fileStatusListIterator.hasNext()) {
-			LocatedFileStatus fileStatus = fileStatusListIterator.next();
-
-			Path p = fileStatus.getPath();
-			String p_string = p.toString();
-			if (!p_string.endsWith("_SUCCESS")) {
-				String name = p_string.substring(p_string.lastIndexOf("/") + 1);
-				TarArchiveEntry entry = new TarArchiveEntry(dir_name + "/" + name + ".json.gz");
-				entry.setSize(fileStatus.getLen());
-				ar.putArchiveEntry(entry);
-
-				InputStream is = fileSystem.open(fileStatus.getPath());
-
-				BufferedInputStream bis = new BufferedInputStream(is);
-
-				int count;
-				byte data[] = new byte[1024];
-				while ((count = bis.read(data, 0, data.length)) != -1) {
-					ar.write(data, 0, count);
-				}
-				bis.close();
-				ar.closeArchiveEntry();
-
-			}
-
-		}
-
-		ar.close();
 	}
 
 }

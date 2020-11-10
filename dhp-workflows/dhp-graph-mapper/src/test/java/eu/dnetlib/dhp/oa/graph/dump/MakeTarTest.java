@@ -54,7 +54,7 @@ public class MakeTarTest {
 
 		String inputPath = workingDir + "/zenodo/";
 
-		MakeTar.makeTArArchive(fs, inputPath, "/tmp/out");
+		MakeTar.makeTArArchive(fs, inputPath, "/tmp/out", 0);
 
 	}
 }
