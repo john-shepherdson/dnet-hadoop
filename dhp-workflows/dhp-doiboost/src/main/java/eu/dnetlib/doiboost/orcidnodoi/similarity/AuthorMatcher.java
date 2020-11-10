@@ -33,7 +33,7 @@ import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 public class AuthorMatcher {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthorMatcher.class);
-	private static final Double threshold = 0.8;
+	public static final Double threshold = 0.8;
 
 	public static void match(AuthorData author, List<Contributor> contributors)
 		throws IOException, XPathEvalException, XPathParseException, NavException, VtdException, ParseException {
@@ -41,16 +41,35 @@ public class AuthorMatcher {
 		int matchCounter = 0;
 		List<Integer> matchCounters = Arrays.asList(matchCounter);
 		Contributor contributor = null;
-		contributors.stream().filter(c -> !StringUtils.isBlank(c.getCreditName())).forEach(c -> {
-			if (simpleMatch(c.getCreditName(), author.getName()) ||
-				simpleMatch(c.getCreditName(), author.getSurname()) ||
-				simpleMatch(c.getCreditName(), author.getOtherName())) {
-				matchCounters.set(0, matchCounters.get(0) + 1);
-				c.setSimpleMatch(true);
-			}
-		});
+		contributors
+			.stream()
+			.filter(c -> !StringUtils.isBlank(c.getCreditName()))
+			.forEach(c -> {
+				if (simpleMatch(c.getCreditName(), author.getName()) ||
+					simpleMatch(c.getCreditName(), author.getSurname()) ||
+					simpleMatch(c.getCreditName(), author.getOtherName())) {
+					matchCounters.set(0, matchCounters.get(0) + 1);
+					c.setSimpleMatch(true);
+				}
+			});
 		if (matchCounters.get(0) == 1) {
 			updateAuthorsSimpleMatch(contributors, author);
+		} else if (matchCounters.get(0) == 0) {
+			Optional<Contributor> optCon = contributors
+				.stream()
+				.filter(c -> !StringUtils.isBlank(c.getCreditName()))
+				.map(c -> {
+					c.setScore(bestMatch(author.getName(), author.getSurname(), c.getCreditName()));
+					return c;
+				})
+				.filter(c -> c.getScore() >= threshold)
+				.max(Comparator.comparing(c -> c.getScore()));
+			Contributor bestMatchContributor = null;
+			if (optCon.isPresent()) {
+				bestMatchContributor = optCon.get();
+				bestMatchContributor.setBestMatch(true);
+				updateAuthorsSimilarityMatch(contributors, author);
+			}
 		} else if (matchCounters.get(0) > 1) {
 			Optional<Contributor> optCon = contributors
 				.stream()
@@ -68,19 +87,18 @@ public class AuthorMatcher {
 				bestMatchContributor.setBestMatch(true);
 				updateAuthorsSimilarityMatch(contributors, author);
 			}
-
 		}
 
 	}
 
-	private static boolean simpleMatch(String name, String searchValue) {
+	public static boolean simpleMatch(String name, String searchValue) {
 		if (searchValue == null) {
 			return false;
 		}
 		return normalize(name).contains(normalize(searchValue));
 	}
 
-	private static Double bestMatch(String authorSurname, String authorName, String contributor) {
+	public static Double bestMatch(String authorSurname, String authorName, String contributor) {
 		String[] contributorSplitted = contributor.split(" ");
 		if (contributorSplitted.length == 0) {
 			return 0.0;
@@ -106,7 +124,7 @@ public class AuthorMatcher {
 		return sm2;
 	}
 
-	private static Double similarity(String nameA, String surnameA, String nameB, String surnameB) {
+	public static Double similarity(String nameA, String surnameA, String nameB, String surnameB) {
 		Double score = similarityJaroWinkler(nameA, surnameA, nameB, surnameB);
 		return score;
 	}
@@ -115,7 +133,7 @@ public class AuthorMatcher {
 		return new JaroWinklerSimilarity().apply(normalize(parse(nameA, surnameA)), normalize(parse(nameB, surnameB)));
 	}
 
-	private static String normalize(final String s) {
+	public static String normalize(final String s) {
 		if (s == null) {
 			return new String("");
 		}
@@ -140,7 +158,7 @@ public class AuthorMatcher {
 		return surname + " " + name;
 	}
 
-	private static void updateAuthorsSimpleMatch(List<Contributor> contributors, AuthorData author) {
+	public static void updateAuthorsSimpleMatch(List<Contributor> contributors, AuthorData author) {
 		contributors.forEach(c -> {
 			if (c.isSimpleMatch()) {
 				c.setName(author.getName());
@@ -151,7 +169,7 @@ public class AuthorMatcher {
 		updateRanks(contributors);
 	}
 
-	private static void updateAuthorsSimilarityMatch(List<Contributor> contributors, AuthorData author) {
+	public static void updateAuthorsSimilarityMatch(List<Contributor> contributors, AuthorData author) {
 		contributors
 			.stream()
 			.filter(c -> c.isBestMatch())

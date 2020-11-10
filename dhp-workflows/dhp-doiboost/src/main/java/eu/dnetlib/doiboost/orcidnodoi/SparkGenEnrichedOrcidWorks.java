@@ -96,7 +96,7 @@ public class SparkGenEnrichedOrcidWorks {
 						Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
 					.filter(Objects::nonNull)
 					.toJavaRDD();
-//				enrichedWorksRDD.saveAsTextFile(workingPath + outputEnrichedWorksPath);
+				enrichedWorksRDD.saveAsTextFile(workingPath + "enrichedWorksText/");
 				logger.info("Enriched works RDD ready.");
 
 				final LongAccumulator parsedPublications = spark.sparkContext().longAccumulator("parsedPublications");
