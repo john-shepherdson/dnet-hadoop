@@ -38,7 +38,11 @@ import java.io.IOException;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -174,7 +178,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		execute(sqlFile, producer, oaf -> true);
 	}
 
-	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer,
+	public void execute(final String sqlFile,
+		final Function<ResultSet, List<Oaf>> producer,
 		final Predicate<Oaf> predicate)
 		throws Exception {
 		final String sql = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/sql/" + sqlFile));
@@ -198,8 +203,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds
 				.setOriginalId(
 					Arrays
-						.asList(
-							(String[]) rs.getArray("identities").getArray())
+						.asList((String[]) rs.getArray("identities").getArray())
 						.stream()
 						.filter(StringUtils::isNotBlank)
 						.collect(Collectors.toList()));
@@ -250,11 +254,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds
 				.setJournal(
 					journal(
-						rs.getString("officialname"),
-						rs.getString("issnPrinted"),
-						rs.getString("issnOnline"),
-						rs.getString("issnLinking"),
-						info)); // Journal
+						rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
+						rs.getString("issnLinking"), info)); // Journal
 			ds.setDataInfo(info);
 			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -332,7 +333,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					listKeyValues(
 						createOpenaireId(10, rs.getString("collectedfromid"), true),
 						rs.getString("collectedfromname")));
-			o.setPid(new ArrayList<>());
+			o.setPid(prepareListOfStructProps(rs.getArray("pid"), info));
 			o.setDateofcollection(asString(rs.getDate("dateofcollection")));
 			o.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
 			o.setExtraInfo(new ArrayList<>()); // Values not present in the DB
