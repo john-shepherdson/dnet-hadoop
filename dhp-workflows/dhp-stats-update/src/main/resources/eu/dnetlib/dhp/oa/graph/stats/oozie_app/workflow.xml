@@ -46,7 +46,7 @@
         </configuration>
     </global>
 
-    <start to="Step1"/>
+    <start to="Step18"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -270,7 +270,7 @@
             <exec>impala-shell.sh</exec>
             <argument>${stats_db_name}</argument>
             <argument>step18.sql</argument>
-            <argument>/user/${wf:user()}/oa/graph/stats/oozie_app/scripts/step18.sql</argument>
+            <argument>${wf:appPath()}/scripts/step18.sql</argument>
             <file>impala-shell.sh</file>
         </shell>
         <ok to="Step19"/>
@@ -284,7 +284,7 @@
             <exec>impala-shell.sh</exec>
             <argument>${stats_db_shadow_name}</argument>
             <argument>step19.sql</argument>
-            <argument>/user/${wf:user()}/oa/graph/stats/oozie_app/scripts/step19.sql</argument>
+            <argument>${wf:appPath()}/scripts/step19.sql</argument>
             <file>impala-shell.sh</file>
         </shell>
         <ok to="End"/>
