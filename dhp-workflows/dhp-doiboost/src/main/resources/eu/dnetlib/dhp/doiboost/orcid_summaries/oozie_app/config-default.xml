@@ -21,6 +21,6 @@
     </property>
     <property>
         <name>oozie.launcher.mapreduce.map.java.opts</name>
-        <value>-Xmx16g</value>
+        <value>-Xmx8g</value>
     </property>
 </configuration>

@@ -3,7 +3,7 @@ package eu.dnetlib.doiboost.orcidnodoi.model;
 
 import java.io.Serializable;
 
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorData;
 
 /**
  * This class models the data related to a contributor, that are retrieved from an orcid publication

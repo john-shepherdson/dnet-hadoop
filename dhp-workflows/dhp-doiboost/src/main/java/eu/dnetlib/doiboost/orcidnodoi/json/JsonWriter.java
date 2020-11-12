@@ -1,9 +1,12 @@
 
 package eu.dnetlib.doiboost.orcidnodoi.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 
 /**
@@ -12,15 +15,11 @@ import eu.dnetlib.doiboost.orcid.model.WorkData;
 
 public class JsonWriter {
 
-	public static String create(AuthorData authorData) {
-		JsonObject author = new JsonObject();
-		author.addProperty("oid", authorData.getOid());
-		author.addProperty("name", authorData.getName());
-		author.addProperty("surname", authorData.getSurname());
-		if (authorData.getCreditName() != null) {
-			author.addProperty("creditname", authorData.getCreditName());
-		}
-		return author.toString();
+	public static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.setSerializationInclusion(JsonInclude.Include.NON_NULL);;
+
+	public static String create(AuthorData authorData) throws JsonProcessingException {
+		return OBJECT_MAPPER.writeValueAsString(authorData);
 	}
 
 	public static String create(WorkData workData) {

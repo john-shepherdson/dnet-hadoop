@@ -5,34 +5,24 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.text.Normalizer;
 import java.util.*;
-
-import javax.validation.constraints.AssertTrue;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.similarity.JaccardSimilarity;
-import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.junit.jupiter.api.Test;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ximpleware.NavException;
 import com.ximpleware.ParseException;
 import com.ximpleware.XPathEvalException;
 import com.ximpleware.XPathParseException;
 
 import eu.dnetlib.dhp.parser.utility.VtdException;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcidnodoi.model.Contributor;
 import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class OrcidNoDoiTest {
 

@@ -1,18 +1,12 @@
 
 package eu.dnetlib.doiboost.orcidnodoi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.action.AtomicAction;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.doiboost.orcid.json.JsonHelper;
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
-import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
-import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
@@ -26,13 +20,21 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.doiboost.orcid.json.JsonHelper;
+import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
+import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 import scala.Tuple2;
-
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 /**
  * This spark job generates one parquet file, containing orcid publications dataset

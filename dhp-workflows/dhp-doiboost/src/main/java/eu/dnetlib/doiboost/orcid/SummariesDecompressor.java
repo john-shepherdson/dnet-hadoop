@@ -19,7 +19,7 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.mortbay.log.Log;
 
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
 import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 
@@ -56,6 +56,7 @@ public class SummariesDecompressor {
 		int nameFound = 0;
 		int surnameFound = 0;
 		int creditNameFound = 0;
+		int otherNamesFound = 0;
 		int errorFromOrcidFound = 0;
 		int xmlParserErrorFound = 0;
 		try (TarArchiveInputStream tais = new TarArchiveInputStream(gzipInputStream)) {
@@ -117,6 +118,9 @@ public class SummariesDecompressor {
 								if (authorData.getCreditName() != null) {
 									creditNameFound += 1;
 								}
+								if (authorData.getOtherNames() != null && authorData.getOtherNames().size() > 1) {
+									otherNamesFound += authorData.getOtherNames().size();
+								}
 
 							} else {
 								Log.warn("Data not retrievable [" + entry.getName() + "] " + buffer.toString());
@@ -152,6 +156,7 @@ public class SummariesDecompressor {
 		Log.info("Name found: " + nameFound);
 		Log.info("Surname found: " + surnameFound);
 		Log.info("Credit name found: " + creditNameFound);
+		Log.info("Other names found: " + otherNamesFound);
 		Log.info("Error from Orcid found: " + errorFromOrcidFound);
 		Log.info("Error parsing xml record found: " + xmlParserErrorFound);
 	}

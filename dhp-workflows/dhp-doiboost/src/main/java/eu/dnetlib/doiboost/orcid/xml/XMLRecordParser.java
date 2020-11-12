@@ -14,7 +14,7 @@ import com.ximpleware.VTDNav;
 
 import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 
 public class XMLRecordParser {
@@ -81,6 +81,12 @@ public class XMLRecordParser {
 		if (!creditNames.isEmpty()) {
 			authorData.setCreditName(creditNames.get(0));
 		}
+
+		final List<String> otherNames = VtdUtilityParser.getTextValue(ap, vn, "//other-name:content");
+		if (!otherNames.isEmpty()) {
+			authorData.setOtherNames(otherNames);
+		}
+
 		return authorData;
 	}
 

@@ -1,7 +1,10 @@
 
-package eu.dnetlib.doiboost.orcid.model;
+package eu.dnetlib.dhp.schema.orcid;
 
 import java.io.Serializable;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 /**
  * This class models the data that are retrieved from orcid publication
@@ -13,8 +16,8 @@ public class AuthorData implements Serializable {
 	private String name;
 	private String surname;
 	private String creditName;
-	private String otherName;
 	private String errorCode;
+	private List<String> otherNames;
 
 	public String getErrorCode() {
 		return errorCode;
@@ -56,11 +59,14 @@ public class AuthorData implements Serializable {
 		this.oid = oid;
 	}
 
-	public String getOtherName() {
-		return otherName;
+	public List<String> getOtherNames() {
+		return otherNames;
 	}
 
-	public void setOtherName(String otherName) {
-		this.otherName = otherName;
+	public void setOtherNames(List<String> otherNames) {
+		if (this.otherNames == null) {
+			this.otherNames = Lists.newArrayList();
+		}
+		this.otherNames = otherNames;
 	}
 }

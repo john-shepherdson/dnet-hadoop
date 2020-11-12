@@ -18,7 +18,7 @@ import com.ximpleware.XPathEvalException;
 import com.ximpleware.XPathParseException;
 
 import eu.dnetlib.dhp.parser.utility.VtdException;
-import eu.dnetlib.doiboost.orcid.model.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcidnodoi.model.Contributor;
 import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 
@@ -47,7 +47,7 @@ public class AuthorMatcher {
 			.forEach(c -> {
 				if (simpleMatch(c.getCreditName(), author.getName()) ||
 					simpleMatch(c.getCreditName(), author.getSurname()) ||
-					simpleMatch(c.getCreditName(), author.getOtherName())) {
+					simpleMatchOnOtherNames(c.getCreditName(), author.getOtherNames())) {
 					matchCounters.set(0, matchCounters.get(0) + 1);
 					c.setSimpleMatch(true);
 				}
@@ -89,6 +89,13 @@ public class AuthorMatcher {
 			}
 		}
 
+	}
+
+	public static boolean simpleMatchOnOtherNames(String name, List<String> otherNames) {
+		if (otherNames == null || (otherNames != null && otherNames.isEmpty())) {
+			return false;
+		}
+		return otherNames.stream().filter(o -> simpleMatch(name, o)).count() > 0;
 	}
 
 	public static boolean simpleMatch(String name, String searchValue) {
