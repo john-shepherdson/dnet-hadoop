@@ -105,7 +105,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 		TypedColumn<JoinedEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
 
 		entities
-			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left_outer")
+			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left")
 			.map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, RelatedEntityWrapper>>, JoinedEntity>) value -> {
 				JoinedEntity je = new JoinedEntity(value._1()._2());
 				Optional
@@ -114,7 +114,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.ifPresent(r -> je.getLinks().add(r));
 				return je;
 			}, Encoders.kryo(JoinedEntity.class))
-			.filter(filterEmptyEntityFn())
 			.groupByKey(
 				(MapFunction<JoinedEntity, String>) value -> value.getEntity().getId(),
 				Encoders.STRING())
@@ -122,7 +121,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.map(
 				(MapFunction<Tuple2<String, JoinedEntity>, JoinedEntity>) value -> value._2(),
 				Encoders.kryo(JoinedEntity.class))
-			.filter(filterEmptyEntityFn())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);

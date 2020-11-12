@@ -46,7 +46,7 @@
         </configuration>
     </global>
 
-    <start to="Step1"/>
+    <start to="Step18"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -237,6 +237,17 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
+        <ok to="Step16_6"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step16_6">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+            <script>scripts/step16_6.sql</script>
+            <param>stats_db_name=${stats_db_name}</param>
+            <param>openaire_db_name=${openaire_db_name}</param>
+        </hive2>
         <ok to="Step17"/>
         <error to="Kill"/>
     </action>
@@ -259,12 +270,26 @@
             <exec>impala-shell.sh</exec>
             <argument>${stats_db_name}</argument>
             <argument>step18.sql</argument>
-            <argument>/user/${wf:user()}/oa/graph/stats/oozie_app/scripts/step18.sql</argument>
+            <argument>${wf:appPath()}/scripts/step18.sql</argument>
+            <file>impala-shell.sh</file>
+        </shell>
+        <ok to="Step19"/>
+        <error to="Kill"/>
+    </action>
+        
+    <action name="Step19">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>impala-shell.sh</exec>
+            <argument>${stats_db_shadow_name}</argument>
+            <argument>step19.sql</argument>
+            <argument>${wf:appPath()}/scripts/step19.sql</argument>
             <file>impala-shell.sh</file>
         </shell>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-        
+
     <end name="End"/>
 </workflow-app>
