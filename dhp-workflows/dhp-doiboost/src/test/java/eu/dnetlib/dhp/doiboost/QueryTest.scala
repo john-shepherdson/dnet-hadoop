@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.doiboost
 
-import eu.dnetlib.dhp.schema.oaf.Publication
+import eu.dnetlib.dhp.schema.oaf.{Publication, Relation}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
@@ -20,6 +20,13 @@ class QueryTest {
     compact(render((json \ "payload")))
 
 
+
+  }
+
+
+  def has_ands(r:Relation) :Boolean = {
+
+    r.getCollectedfrom!= null && r.getCollectedfrom.asScala.count(k => k.getValue.contains("Australian")) > 0
 
   }
 

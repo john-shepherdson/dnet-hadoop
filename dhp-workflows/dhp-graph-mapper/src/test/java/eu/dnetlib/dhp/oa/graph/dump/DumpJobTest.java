@@ -8,9 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.*;
@@ -23,12 +25,13 @@ import com.google.gson.Gson;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Software;
 
-@Disabled
+//@Disabled
 public class DumpJobTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -165,6 +168,10 @@ public class DumpJobTest {
 
 		Assertions.assertEquals(90, verificationDataset.count());
 
+//		verificationDataset
+//			.filter("id = '50|DansKnawCris::1a960e20087cb46b93588e4e184e8a58'")
+//			.foreach((ForeachFunction<CommunityResult>) rec -> System.out.println(OBJECT_MAPPER.writeValueAsString(rec)));
+
 		Assertions
 			.assertTrue(
 				verificationDataset.filter("bestAccessright.code = 'c_abf2'").count() == verificationDataset
@@ -213,20 +220,21 @@ public class DumpJobTest {
 			.run(
 				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
-				Result.class, true);
+				GraphResult.class, true);
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.Result> tmp = sc
+		JavaRDD<eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult> tmp = sc
 			.textFile(workingDir.toString() + "/result")
-			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.Result.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult.class));
 
-		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.Result> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.Result.class));
+		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult.class));
 
 		Assertions.assertEquals(5, verificationDataset.count());
 
-		verificationDataset.show(false);
+		verificationDataset
+			.foreach((ForeachFunction<GraphResult>) res -> System.out.println(OBJECT_MAPPER.writeValueAsString(res)));
 	}
 
 	@Test

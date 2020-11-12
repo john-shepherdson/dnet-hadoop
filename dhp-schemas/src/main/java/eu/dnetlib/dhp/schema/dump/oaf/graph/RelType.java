@@ -4,12 +4,11 @@ package eu.dnetlib.dhp.schema.dump.oaf.graph;
 import java.io.Serializable;
 
 /**
- * To represent the semantics of the generic relation between two entities. It has the following parameters:
- * - private String name to store the semantics of the relation (i.e. isAuthorInstitutionOf). It corresponds to the
- *   relclass parameter in the relation represented in the internal model
- *   represented in the internal model
- * - private String type to store the type of the relation (i.e. affiliation). It corresponds to the subreltype parameter
- *   of the relation represented in theinternal model
+ * To represent the semantics of the generic relation between two entities. It has the following parameters: - private
+ * String name to store the semantics of the relation (i.e. isAuthorInstitutionOf). It corresponds to the relclass
+ * parameter in the relation represented in the internal model represented in the internal model - private String type
+ * to store the type of the relation (i.e. affiliation). It corresponds to the subreltype parameter of the relation
+ * represented in theinternal model
  */
 public class RelType implements Serializable {
 	private String name; // relclass

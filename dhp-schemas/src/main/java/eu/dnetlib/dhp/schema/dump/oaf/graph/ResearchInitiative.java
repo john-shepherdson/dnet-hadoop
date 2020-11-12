@@ -5,13 +5,17 @@ import java.io.Serializable;
 
 /**
  * To represent entity of type RC/RI. It has the following parameters, which are mostly derived by the profile
- * - private String id to store the openaire id for the entity. Is has as code 00 and will be created as
- *   00|context_____::md5(originalId)
- * 	private String originalId to store the id of the context as provided in the profile (i.e. mes)
- * 	private String name to store the name of the context (got from the label attribute in the context definition)
- * 	private String type to store the type of the context (i.e.: research initiative or research community)
- * 	private String description to store the description of the context as given in the profile
- * 	private String zenodo_community to store the zenodo community associated to the context (main zenodo community)
+ * - private
+ * String id to store the openaire id for the entity. Is has as code 00 and will be created as
+ * 00|context_____::md5(originalId) private
+ * String originalId to store the id of the context as provided in the profile
+ * (i.e. mes)
+ * - private String name to store the name of the context (got from the label attribute in the context
+ * definition)
+ * - private String type to store the type of the context (i.e.: research initiative or research community)
+ * - private String description to store the description of the context as given in the profile
+ * -private String
+ * zenodo_community to store the zenodo community associated to the context (main zenodo community)
  */
 public class ResearchInitiative implements Serializable {
 	private String id; // openaireId

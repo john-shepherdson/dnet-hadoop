@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oai:record xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+            xmlns="http://namespace.openaire.eu/">
+    <oai:header xmlns="">
+        <dri:objIdentifier xmlns:dri="http://www.driver-repository.eu/namespace/dri">r3d100010464::57793c5aa995172db237d9da17353f8b</dri:objIdentifier>
+        <dri:recordIdentifier xmlns:dri="http://www.driver-repository.eu/namespace/dri">10.1111/j.1365-2486.2005.00995.x::doi</dri:recordIdentifier>
+        <dri:dateOfCollection xmlns:dri="http://www.driver-repository.eu/namespace/dri">2020-11-02T16:14:07.831Z</dri:dateOfCollection>
+        <dri:repositoryId xmlns:dri="http://www.driver-repository.eu/namespace/dri">ands_UmVwb3NpdG9yeVNlcnZpY2VSZXNvdXJjZXMvUmVwb3NpdG9yeVNlcnZpY2VSZXNvdXJjZVR5cGU=</dri:repositoryId>
+        <dri:datasourceprefix xmlns:dri="http://www.driver-repository.eu/namespace/dri">r3d100010464</dri:datasourceprefix>
+    </oai:header>
+    <metadata xmlns="">
+        <oaf:pid xmlns:oaf="http://namespace.dnet.eu/oaf" type="doi">10.1111/j.1365-2486.2005.00995.x</oaf:pid>
+        <dc:identifier xmlns:dc="http://purl.org/dc/elements/1.1/">10.1111/j.1365-2486.2005.00995.x</dc:identifier>
+        <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">Potential decoupling of trends in distribution area and population size of species with climate change.</dc:title>
+        <dc:type xmlns:dc="http://purl.org/dc/elements/1.1/">publication</dc:type>
+    </metadata>
+    <oaf:about xmlns:oaf="http://namespace.dnet.eu/oaf" xmlns="">
+        <oaf:datainfo>
+            <oaf:collectedFrom completionStatus="complete" id="dli_________::r3d100010464"
+                               name="Australian National Data Service"/>
+            <oaf:completionStatus>complete</oaf:completionStatus>
+            <oaf:provisionMode>collected</oaf:provisionMode>
+        </oaf:datainfo>
+    </oaf:about>
+</oai:record>

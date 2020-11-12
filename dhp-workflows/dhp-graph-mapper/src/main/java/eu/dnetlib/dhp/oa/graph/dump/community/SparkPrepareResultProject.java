@@ -135,12 +135,17 @@ public class SparkPrepareResultProject implements Serializable {
 					.orElse(null),
 				Optional
 					.ofNullable(op.getFundingtree())
-					.map(
-						value -> value
+					.map(value -> {
+						List<Funder> tmp = value
 							.stream()
 							.map(ft -> getFunder(ft.getValue()))
-							.collect(Collectors.toList())
-							.get(0))
+							.collect(Collectors.toList());
+						if (tmp.size() > 0) {
+							return tmp.get(0);
+						} else {
+							return null;
+						}
+					})
 					.orElse(null));
 
 		Optional<DataInfo> di = Optional.ofNullable(op.getDataInfo());
