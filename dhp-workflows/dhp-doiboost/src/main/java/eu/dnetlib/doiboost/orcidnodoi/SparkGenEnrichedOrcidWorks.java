@@ -128,6 +128,8 @@ public class SparkGenEnrichedOrcidWorks {
 						})
 					.filter(p -> p != null);
 
+				sc.hadoopConfiguration().set("mapreduce.output.fileoutputformat.compress", "true");
+
 				oafPublicationRDD
 					.mapToPair(
 						p -> new Tuple2<>(p.getClass().toString(),
