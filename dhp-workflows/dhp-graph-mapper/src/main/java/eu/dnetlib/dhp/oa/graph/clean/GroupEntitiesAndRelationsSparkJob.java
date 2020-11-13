@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.groupbyid;
+package eu.dnetlib.dhp.oa.graph.clean;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.utils.DHPUtils.toSeq;
