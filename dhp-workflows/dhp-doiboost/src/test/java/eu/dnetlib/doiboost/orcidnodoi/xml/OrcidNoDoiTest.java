@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.ximpleware.NavException;
 import com.ximpleware.ParseException;
 import com.ximpleware.XPathEvalException;
@@ -218,7 +219,7 @@ public class OrcidNoDoiTest {
 			.forEach(c -> {
 				if (am.simpleMatch(c.getCreditName(), author.getName()) ||
 					am.simpleMatch(c.getCreditName(), author.getSurname()) ||
-					am.simpleMatch(c.getCreditName(), author.getOtherName())) {
+					am.simpleMatchOnOtherNames(c.getCreditName(), author.getOtherNames())) {
 					matchCounters.set(0, matchCounters.get(0) + 1);
 					c.setSimpleMatch(true);
 				}
@@ -250,7 +251,7 @@ public class OrcidNoDoiTest {
 			.forEach(c -> {
 				if (am.simpleMatch(c.getCreditName(), authorX.getName()) ||
 					am.simpleMatch(c.getCreditName(), authorX.getSurname()) ||
-					am.simpleMatch(c.getCreditName(), authorX.getOtherName())) {
+					am.simpleMatchOnOtherNames(c.getCreditName(), author.getOtherNames())) {
 					int currentCounter = matchCounters2.get(0);
 					currentCounter += 1;
 					matchCounters2.set(0, currentCounter);
@@ -320,5 +321,28 @@ public class OrcidNoDoiTest {
 		assertTrue(c.get(0).getSurname().equals(surname));
 		assertTrue(c.get(0).getCreditName().equals("Khair Abde Daye"));
 		assertTrue(c.get(0).getOid().equals(orcidIdA));
+	}
+
+	@Test
+	public void otherNamesMatchTest()
+		throws VtdException, ParseException, IOException, XPathEvalException, NavException, XPathParseException {
+
+		AuthorData author = new AuthorData();
+		author.setName("Joe");
+		author.setSurname("Dodge");
+		author.setOid("0000-1111-2222-3333");
+		String otherName1 = new String("Joe Dr. Dodge");
+		String otherName2 = new String("XY");
+		List<String> others = Lists.newArrayList();
+		others.add(otherName1);
+		others.add(otherName2);
+		author.setOtherNames(others);
+		Contributor contributor = new Contributor();
+		contributor.setCreditName("XY");
+		List<Contributor> contributors = Arrays.asList(contributor);
+		AuthorMatcher.match(author, contributors);
+		assertTrue(contributors.get(0).getName().equals("Joe"));
+		assertTrue(contributors.get(0).getSurname().equals("Dodge"));
+		assertTrue(contributors.get(0).getOid().equals("0000-1111-2222-3333"));
 	}
 }
