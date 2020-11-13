@@ -2,12 +2,11 @@
 package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.utils.DHPUtils.toSeq;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
@@ -28,13 +27,11 @@ import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.*;
+import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
-import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
-import scala.collection.JavaConverters;
-import scala.collection.Seq;
 
 /**
  * XmlConverterJob converts the JoinedEntities as XML records
@@ -42,8 +39,6 @@ import scala.collection.Seq;
 public class XmlConverterJob {
 
 	private static final Logger log = LoggerFactory.getLogger(XmlConverterJob.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static final String schemaLocation = "https://www.openaire.eu/schema/1.0/oaf-1.0.xsd";
 
@@ -127,10 +122,6 @@ public class XmlConverterJob {
 
 	private static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-	}
-
-	private static Seq<String> toSeq(List<String> list) {
-		return JavaConverters.asScalaIteratorConverter(list.iterator()).asScala().toSeq();
 	}
 
 	private static Map<String, LongAccumulator> prepareAccumulators(SparkContext sc) {

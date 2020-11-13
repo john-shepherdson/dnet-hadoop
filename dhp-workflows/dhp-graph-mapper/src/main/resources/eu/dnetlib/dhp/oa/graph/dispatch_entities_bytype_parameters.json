@@ -6,15 +6,21 @@
 		"paramRequired": false
 	},
 	{
-		"paramName": "s",
-		"paramLongName": "sourcePath",
-		"paramDescription": "the source path",
+		"paramName": "ep",
+		"paramLongName": "entitiesPath",
+		"paramDescription": "the entities path",
 		"paramRequired": true
 	},
 	{
 		"paramName": "g",
-		"paramLongName": "graphRawPath",
-		"paramDescription": "the path of the graph Raw in hdfs",
+		"paramLongName": "outputPath",
+		"paramDescription": "the output path to store the dispatched entities",
+		"paramRequired": true
+	},
+	{
+		"paramName": "class",
+		"paramLongName": "graphTableClassName",
+		"paramDescription": "class name modelling the graph table",
 		"paramRequired": true
 	}
 ]

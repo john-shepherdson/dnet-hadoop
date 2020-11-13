@@ -2,11 +2,11 @@
 
     <parameters>
         <property>
-            <name>betaInputGgraphPath</name>
+            <name>betaInputGraphPath</name>
             <description>the beta graph root path</description>
         </property>
         <property>
-            <name>prodInputGgraphPath</name>
+            <name>prodInputGraphPath</name>
             <description>the production graph root path</description>
         </property>
         <property>

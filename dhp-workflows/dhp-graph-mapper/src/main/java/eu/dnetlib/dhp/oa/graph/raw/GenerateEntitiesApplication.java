@@ -4,9 +4,11 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +20,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,7 @@ public class GenerateEntitiesApplication {
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
-			removeOutputDir(spark, targetPath);
+			HdfsSupport.remove(targetPath, spark.sparkContext().hadoopConfiguration());
 			generateEntities(spark, vocs, sourcePaths, targetPath);
 		});
 	}
@@ -82,7 +83,7 @@ public class GenerateEntitiesApplication {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		final List<String> existingSourcePaths = Arrays
 			.stream(sourcePaths.split(","))
-			.filter(p -> exists(sc, p))
+			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
 			.collect(Collectors.toList());
 
 		log.info("Generate entities from files:");
@@ -160,17 +161,4 @@ public class GenerateEntitiesApplication {
 		}
 	}
 
-	private static boolean exists(final JavaSparkContext context, final String pathToFile) {
-		try {
-			final FileSystem hdfs = FileSystem.get(context.hadoopConfiguration());
-			final Path path = new Path(pathToFile);
-			return hdfs.exists(path);
-		} catch (final IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static void removeOutputDir(final SparkSession spark, final String path) {
-		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-	}
 }

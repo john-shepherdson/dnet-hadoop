@@ -1,4 +1,4 @@
-<workflow-app name="fuse graph entities by id" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="group graph entities and relations" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
         <property>
@@ -46,18 +46,18 @@
         </property>
     </parameters>
 
-	<start to="fuse_graph"/>
+	<start to="group_entities"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="fuse_graph">
+    <action name="group_entities">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Fuse graph entities by ID</name>
-            <class>eu.dnetlib.dhp.oa.graph.fuse.FuseGraphResultsSparkJob</class>
+            <name>group graph entities and relations</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.GroupEntitiesAndRelationsSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -70,18 +70,29 @@
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
             <arg>--graphInputPath</arg><arg>${graphInputPath}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/entities</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/grouped_entities</arg>
         </spark>
-        <ok to="wait_merge"/>
+        <ok to="fork_dispatch_entities"/>
         <error to="Kill"/>
     </action>
 
-    <action name="merge_dataset">
+    <fork name="fork_dispatch_entities">
+        <path start="dispatch_publication"/>
+        <path start="dispatch_dataset"/>
+        <path start="dispatch_software"/>
+        <path start="dispatch_otherresearchproduct"/>
+        <path start="dispatch_datasource"/>
+        <path start="dispatch_organization"/>
+        <path start="dispatch_project"/>
+        <path start="dispatch_relation"/>
+    </fork>
+
+    <action name="dispatch_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Merge datasets</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
+            <name>Dispatch publications</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.DispatchEntitiesSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -93,22 +104,45 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/dataset</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/dataset</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
+            <arg>--entitiesPath</arg><arg>${workingDir}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="dispatch_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch datasets</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.DispatchEntitiesSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--entitiesPath</arg><arg>${workingDir}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
-        <ok to="wait_merge"/>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="merge_otherresearchproduct">
+    <action name="dispatch_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Merge otherresearchproducts</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
+            <name>Dispatch softwares</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.DispatchEntitiesSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -120,49 +154,20 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/otherresearchproduct</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--priority</arg><arg>${priority}</arg>
-        </spark>
-        <ok to="wait_merge"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="merge_software">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Merge softwares</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/software</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/software</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
+            <arg>--entitiesPath</arg><arg>${workingDir}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
-        <ok to="wait_merge"/>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="merge_datasource">
+    <action name="dispatch_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Merge datasources</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
+            <name>Dispatch otherresearchproducts</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.DispatchEntitiesSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -174,22 +179,45 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/datasource</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/datasource</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
+            <arg>--entitiesPath</arg><arg>${workingDir}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="dispatch_datasource">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch datasources</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.DispatchEntitiesSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--entitiesPath</arg><arg>${workingDir}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
-            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
-        <ok to="wait_merge"/>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="merge_organization">
+    <action name="dispatch_organization">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Merge organizations</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
+            <name>Dispatch organizations</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.DispatchEntitiesSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -201,22 +229,20 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/organization</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/organization</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
+            <arg>--entitiesPath</arg><arg>${workingDir}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
-            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
-        <ok to="wait_merge"/>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="merge_project">
+    <action name="dispatch_project">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Merge projects</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
+            <name>Dispatch project</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.DispatchEntitiesSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -228,22 +254,20 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/project</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/project</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
+            <arg>--entitiesPath</arg><arg>${workingDir}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
-            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
-        <ok to="wait_merge"/>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="merge_relation">
+    <action name="dispatch_relation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Merge relations</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
+            <name>Dispatch relations</name>
+            <class>eu.dnetlib.dhp.oa.graph.groupbyid.DispatchEntitiesSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -255,17 +279,15 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/relation</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/relation</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>
+            <arg>--entitiesPath</arg><arg>${workingDir}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
-            <arg>--priority</arg><arg>${priority}</arg>
         </spark>
-        <ok to="wait_merge"/>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait_merge" to="End"/>
+    <join name="wait_dispatch" to="End"/>
 
     <end name="End"/>
 </workflow-app>

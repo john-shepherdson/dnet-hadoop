@@ -3,13 +3,9 @@ package eu.dnetlib.dhp.oa.graph.clean;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.BufferedInputStream;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -23,11 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.graph.raw.AbstractMdRecordToOafMapper;
-import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 

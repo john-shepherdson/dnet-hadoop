@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.clearspring.analytics.util.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.AbstractMdRecordToOafMapper;
-import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 

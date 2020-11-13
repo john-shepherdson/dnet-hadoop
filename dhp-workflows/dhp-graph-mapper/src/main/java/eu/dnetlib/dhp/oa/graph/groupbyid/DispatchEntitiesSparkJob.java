@@ -1,11 +1,10 @@
 
-package eu.dnetlib.dhp.oa.graph.fuse;
+package eu.dnetlib.dhp.oa.graph.groupbyid;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -17,13 +16,21 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import scala.Tuple2;
 
 public class DispatchEntitiesSparkJob {
 
 	private static final Logger log = LoggerFactory.getLogger(DispatchEntitiesSparkJob.class);
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -40,48 +47,51 @@ public class DispatchEntitiesSparkJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String sourcePath = parser.get("sourcePath");
-		final String targetPath = parser.get("graphRawPath");
+		final String entitiesPath = parser.get("entitiesPath");
+		log.info("entitiesPath: {}", entitiesPath);
+
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath: {}", outputPath);
+
+		String graphTableClassName = parser.get("graphTableClassName");
+		log.info("graphTableClassName: {}", graphTableClassName);
+
+		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
 		SparkConf conf = new SparkConf();
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, targetPath);
-				ModelSupport.oafTypes
-					.values()
-					.forEach(clazz -> processEntity(spark, clazz, sourcePath, targetPath));
+				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
+				dispatchOaf(spark, entityClazz, entitiesPath, outputPath);
 			});
 	}
 
-	private static <T extends Oaf> void processEntity(
+	private static <T extends Oaf> void dispatchOaf(
 		final SparkSession spark,
 		final Class<T> clazz,
 		final String sourcePath,
 		final String targetPath) {
-		final String type = clazz.getSimpleName().toLowerCase();
 
-		log.info("Processing entities ({}) in file: {}", type, sourcePath);
+		log.info("Processing entities ({}) in file: {}", clazz.getName(), sourcePath);
 
 		spark
 			.read()
 			.textFile(sourcePath)
-			.filter((FilterFunction<String>) value -> isEntityType(value, type))
-			.map(
-				(MapFunction<String, String>) l -> StringUtils.substringAfter(l, "|"),
-				Encoders.STRING())
+			.filter((FilterFunction<String>) s -> isEntityType(s, clazz))
+			.map((MapFunction<String, String>) s -> StringUtils.substringAfter(s, "|"), Encoders.STRING())
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
-			.text(targetPath + "/" + type);
+			.text(targetPath);
 	}
 
-	private static boolean isEntityType(final String line, final String type) {
-		return StringUtils.substringBefore(line, "|").equalsIgnoreCase(type);
+	private static <T extends Oaf> boolean isEntityType(final String s, final Class<T> clazz) {
+		return StringUtils.substringBefore(s, "|").equals(clazz.getName());
 	}
 
-	private static void removeOutputDir(SparkSession spark, String path) {
-		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-	}
 }
