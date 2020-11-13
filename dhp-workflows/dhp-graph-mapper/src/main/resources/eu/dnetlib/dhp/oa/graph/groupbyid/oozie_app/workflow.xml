@@ -1,21 +1,13 @@
-<workflow-app name="merge graphs" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="fuse graph entities by id" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
         <property>
-            <name>betaInputGgraphPath</name>
-            <description>the beta graph root path</description>
+            <name>graphInputPath</name>
+            <description>the graph root input path</description>
         </property>
         <property>
-            <name>prodInputGgraphPath</name>
-            <description>the production graph root path</description>
-        </property>
-        <property>
-            <name>graphOutputPath</name>
-            <description>the output merged graph root path</description>
-        </property>
-        <property>
-            <name>priority</name>
-            <description>decides from which infrastructure the content must win in case of ID clash</description>
+            <name>outputPath</name>
+            <description>the graph root output path</description>
         </property>
 
         <property>
@@ -54,29 +46,18 @@
         </property>
     </parameters>
 
-	<start to="fork_merge_graph"/>
+	<start to="fuse_graph"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <fork name="fork_merge_graph">
-        <path start="merge_publication"/>
-        <path start="merge_dataset"/>
-        <path start="merge_otherresearchproduct"/>
-        <path start="merge_software"/>
-        <path start="merge_datasource"/>
-        <path start="merge_organization"/>
-        <path start="merge_project"/>
-        <path start="merge_relation"/>
-    </fork>
-
-    <action name="merge_publication">
+    <action name="fuse_graph">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Merge publications</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
+            <name>Fuse graph entities by ID</name>
+            <class>eu.dnetlib.dhp.oa.graph.fuse.FuseGraphResultsSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -88,11 +69,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/publication</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/publication</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--priority</arg><arg>${priority}</arg>
+            <arg>--graphInputPath</arg><arg>${graphInputPath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/entities</arg>
         </spark>
         <ok to="wait_merge"/>
         <error to="Kill"/>
