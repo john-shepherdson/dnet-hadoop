@@ -1,4 +1,4 @@
-package eu.dnetlib.oa.graph.usagestats.export;
+package eu.dnetlib.oa.graph.usagerawdata.export;
 
 import java.io.*;
 import java.net.Authenticator;
@@ -193,8 +193,10 @@ public class PiwikDownloadLogs {
         // Getting all the piwikids in a list for logging reasons & limitting the list
         // to the max number of piwikids
         List<Integer> piwikIdToVisit = new ArrayList<Integer>();
-		while (rs.next())
-			piwikIdToVisit.add(rs.getInt(1));
+		//while (rs.next())
+			//piwikIdToVisit.add(rs.getInt(1));
+                        piwikIdToVisit.add(13);
+                        
         logger.info("Found the following piwikIds for download: " + piwikIdToVisit);
 
         if (ExecuteWorkflow.numberOfPiwikIdsToDownload > 0

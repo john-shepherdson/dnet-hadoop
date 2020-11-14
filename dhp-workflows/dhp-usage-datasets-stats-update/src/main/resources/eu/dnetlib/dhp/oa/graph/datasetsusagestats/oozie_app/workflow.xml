@@ -1,0 +1,70 @@
+<workflow-app name="Usage Graph Stats" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>hiveMetastoreUris</name>
+            <description>Hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hiveJdbcUrl</name>
+            <description>Hive server jdbc url</description>
+        </property>
+        <property>
+            <name>impalaJdbcUrl</name>
+            <description>Impala server jdbc url</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>${hiveMetastoreUris}</value>
+            </property>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="Step1"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name='Step1'>
+        <java>
+            <main-class>eu.dnetlib.oa.graph.datasetsusagestats.export.ExecuteWorkflow</main-class>
+            <arg>--dataciteBaseURL</arg>
+            <arg>${dataciteBaseURL}</arg>
+            <arg>--dataciteReportPath</arg>
+            <arg>${dataciteReportPath}</arg>
+            <arg>--dbHiveUrl</arg>
+            <arg>${hiveJdbcUrl}</arg>
+            <arg>--dbImpalaUrl</arg>
+            <arg>${impalaJdbcUrl}</arg>
+            <arg>--datasetUsageStatsDBSchema</arg>
+            <arg>${datasetUsageStatsDBSchema}</arg>
+            <arg>--statsDBSchema</arg>
+            <arg>${statsDBSchema}</arg>
+            <arg>--recreateDbAndTables</arg>
+            <arg>${recreateDbAndTables}</arg>
+            <arg>--datasetsEmptyDirs</arg>
+            <arg>${datasetsEmptyDirs}</arg>
+            <arg>--finalTablesVisibleToImpala</arg>
+            <arg>${finalTablesVisibleToImpala}</arg>
+            <capture-output/>
+        </java>
+        <ok to="End" />
+        <error to="Kill" />
+    </action>
+    
+    <end name="End"/>
+</workflow-app>

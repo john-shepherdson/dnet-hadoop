@@ -1,0 +1,231 @@
+[
+  {
+    "paramName": "mat",
+    "paramLongName": "matomoAuthToken",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "mbu",
+    "paramLongName": "matomoBaseURL",
+    "paramDescription": "URL of the isLookUp Service",
+    "paramRequired": true
+  },
+  {
+    "paramName": "rlp",
+    "paramLongName": "repoLogPath",
+    "paramDescription": "nameNode of the source cluster",
+    "paramRequired": true
+  },
+  {
+    "paramName": "plp",
+    "paramLongName": "portalLogPath",
+    "paramDescription": "namoNode of the target cluster",
+    "paramRequired": true
+  },
+  {
+    "paramName": "pmi",
+    "paramLongName": "portalMatomoID",
+    "paramDescription": "namoNode of the target cluster",
+    "paramRequired": true
+  },
+  {
+    "paramName": "iukbuw",
+    "paramLongName": "irusUKBaseURL",
+    "paramDescription": "working directory",
+    "paramRequired": true
+  },
+  {
+    "paramName": "iukrp",
+    "paramLongName": "irusUKReportPath",
+    "paramDescription": "maximum number of map tasks used in the distcp process",
+    "paramRequired": true
+  },
+  {
+    "paramName": "srpa",
+    "paramLongName": "sarcsReportPathArray",
+    "paramDescription": "memory for distcp action copying actionsets from remote cluster",
+    "paramRequired": true
+  },
+  {
+    "paramName": "srpna",
+    "paramLongName": "sarcsReportPathNonArray",
+    "paramDescription": "timeout for distcp copying actions from remote cluster",
+    "paramRequired": true
+  },
+  {
+    "paramName": "llp",
+    "paramLongName": "lareferenciaLogPath",
+    "paramDescription": "activate tranform-only mode. Only apply transformation step",
+    "paramRequired": true
+  },
+  {
+    "paramName": "lbu",
+    "paramLongName": "lareferenciaBaseURL",
+    "paramDescription": "activate tranform-only mode. Only apply transformation step",
+    "paramRequired": true
+  },
+  {
+    "paramName": "lat",
+    "paramLongName": "lareferenciaAuthToken",
+    "paramDescription": "activate tranform-only mode. Only apply transformation step",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dbhu",
+    "paramLongName": "dbHiveUrl",
+    "paramDescription": "activate tranform-only mode. Only apply transformation step",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dbiu",
+    "paramLongName": "dbImpalaUrl",
+    "paramDescription": "activate tranform-only mode. Only apply transformation step",
+    "paramRequired": true
+  },
+  {
+    "paramName": "usdbs",
+    "paramLongName": "usageStatsDBSchema",
+    "paramDescription": "activate tranform-only mode. Only apply transformation step",
+    "paramRequired": true
+  },
+  {
+    "paramName": "sdbs",
+    "paramLongName": "statsDBSchema",
+    "paramDescription": "activate tranform-only mode. Only apply transformation step",
+    "paramRequired": true
+  },
+  {
+    "paramName": "rdbt",
+    "paramLongName": "recreateDbAndTables",
+    "paramDescription": "Re-create database and initial tables?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "pwed",
+    "paramLongName": "piwikEmptyDirs",
+    "paramDescription": "Empty piwik directories?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ppwl",
+    "paramLongName": "processPiwikLogs",
+    "paramDescription": "Process the piwiklogs (create & fill in the needed tables and process the data) based on the downloaded data",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dpwl",
+    "paramLongName": "downloadPiwikLogs",
+    "paramDescription": "download piwik logs?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "slp",
+    "paramLongName": "startingLogPeriod",
+    "paramDescription": "Starting log period",
+    "paramRequired": true
+  },
+  {
+    "paramName": "elp",
+    "paramLongName": "endingLogPeriod",
+    "paramDescription": "Ending log period",
+    "paramRequired": true
+  },
+  {
+    "paramName": "npidd",
+    "paramLongName": "numberOfPiwikIdsToDownload",
+    "paramDescription": "Limit the number of the downloaded piwikids to the first numberOfPiwikIdsToDownload",
+    "paramRequired": true
+  },
+  {
+    "paramName": "nsidd",
+    "paramLongName": "numberOfSiteIdsToDownload",
+    "paramDescription": "Limit the number of the downloaded siteids (La Referencia logs) to the first numberOfSiteIdsToDownload",
+    "paramRequired": true
+  },
+  {
+    "paramName": "lerd",
+    "paramLongName": "laReferenciaEmptyDirs",
+    "paramDescription": "Empty LaReferencia directories?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "plrl",
+    "paramLongName": "processLaReferenciaLogs",
+    "paramDescription": "Process the La Referencia logs (create & fill in the needed tables and process the data) based on the downloaded data",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dlrl",
+    "paramLongName": "downloadLaReferenciaLogs",
+    "paramDescription": "download La Referencia logs?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "icted",
+    "paramLongName": "irusCreateTablesEmptyDirs",
+    "paramDescription": "Irus section: Create tables and empty JSON directories?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "idr",
+    "paramLongName": "irusDownloadReports",
+    "paramDescription": "Irus section: Download reports?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ipr",
+    "paramLongName": "irusProcessStats",
+    "paramDescription": "Irus section: Process stats?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "inod",
+    "paramLongName": "irusNumberOfOpendoarsToDownload",
+    "paramDescription": "Limit the number of the downloaded Opendoars (Irus) to the first irusNumberOfOpendoarsToDownload",
+    "paramRequired": true
+  },
+  {
+    "paramName": "icted",
+    "paramLongName": "sarcCreateTablesEmptyDirs",
+    "paramDescription": "Sarc section: Create tables and empty JSON directories?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "idr",
+    "paramLongName": "sarcDownloadReports",
+    "paramDescription": "Sarc section: Download reports?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ipr",
+    "paramLongName": "sarcProcessStats",
+    "paramDescription": "Sarc section: Process stats?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "inod",
+    "paramLongName": "sarcNumberOfIssnToDownload",
+    "paramDescription": "Limit the number of the downloaded ISSN (Sarc) to the first sarcNumberOfIssnToDownload",
+    "paramRequired": true
+  },
+  
+  {
+    "paramName": "fs",
+    "paramLongName": "finalizeStats",
+    "paramDescription": "Create the usage_stats table?",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ftvi",
+    "paramLongName": "finalTablesVisibleToImpala",
+    "paramDescription": "Make the usage_stats, views_stats and downloads_stats tables visible to Impala",
+    "paramRequired": true
+  },
+  {
+    "paramName": "nodt",
+    "paramLongName": "numberOfDownloadThreads",
+    "paramDescription": "Number of download threads",
+    "paramRequired": true
+  }
+]

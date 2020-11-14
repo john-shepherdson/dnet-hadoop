@@ -1,4 +1,4 @@
-package eu.dnetlib.oa.graph.usagestats.export;
+package eu.dnetlib.oa.graph.usagerawdata.export;
 
 import java.io.*;
 // import java.io.BufferedReader;

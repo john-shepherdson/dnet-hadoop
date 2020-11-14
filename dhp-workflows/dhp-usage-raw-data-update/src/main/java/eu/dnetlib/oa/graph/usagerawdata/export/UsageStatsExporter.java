@@ -1,5 +1,5 @@
 
-package eu.dnetlib.oa.graph.usagestats.export;
+package eu.dnetlib.oa.graph.usagerawdata.export;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -77,7 +77,7 @@ public class UsageStatsExporter {
 					ExecuteWorkflow.portalLogPath, ExecuteWorkflow.portalMatomoID);
 		}
 		logger.info("Downloaded piwik logs");
-
+/*
 		// Create DB tables, insert/update statistics
 		String cRobotsUrl = "https://raw.githubusercontent.com/atmire/COUNTER-Robots/master/COUNTER_Robots_list.json";
 		piwikstatsdb.setCounterRobotsURL(cRobotsUrl);
@@ -86,7 +86,7 @@ public class UsageStatsExporter {
 			logger.info("Processing logs");
 			piwikstatsdb.processLogs();
 		}
-
+*/
 		logger.info("Creating LaReferencia tables");
 		LaReferenciaDownloadLogs lrf = new LaReferenciaDownloadLogs(ExecuteWorkflow.lareferenciaBaseURL,
 			ExecuteWorkflow.lareferenciaAuthToken);
@@ -101,14 +101,15 @@ public class UsageStatsExporter {
 			lrf.GetLaReferenciaRepos(ExecuteWorkflow.lareferenciaLogPath);
 			logger.info("Downloaded LaReferencia logs");
 		}
-		LaReferenciaStats lastats = new LaReferenciaStats(ExecuteWorkflow.lareferenciaLogPath);
+/*
+                LaReferenciaStats lastats = new LaReferenciaStats(ExecuteWorkflow.lareferenciaLogPath);
 
 		if (ExecuteWorkflow.processLaReferenciaLogs) {
 			logger.info("Processing LaReferencia logs");
 			lastats.processLogs();
 			logger.info("LaReferencia logs done");
 		}
-
+*/
 		IrusStats irusstats = new IrusStats(ExecuteWorkflow.irusUKBaseURL);
 		if (ExecuteWorkflow.irusCreateTablesEmptyDirs) {
 			logger.info("Creating Irus Stats tables");
@@ -123,11 +124,12 @@ public class UsageStatsExporter {
 		if (ExecuteWorkflow.irusDownloadReports) {
 			irusstats.getIrusRRReport(ExecuteWorkflow.irusUKReportPath);
 		}
-		if (ExecuteWorkflow.irusProcessStats) {
+/*
+                if (ExecuteWorkflow.irusProcessStats) {
 			irusstats.processIrusStats();
 			logger.info("Irus done");
 		}
-
+*/
 		SarcStats sarcStats = new SarcStats();
 		if (ExecuteWorkflow.sarcCreateTablesEmptyDirs) {
 			sarcStats.reCreateLogDirs();
@@ -135,24 +137,29 @@ public class UsageStatsExporter {
 		if (ExecuteWorkflow.sarcDownloadReports) {
 			sarcStats.getAndProcessSarc(ExecuteWorkflow.sarcsReportPathArray, ExecuteWorkflow.sarcsReportPathNonArray);
 		}
-		if (ExecuteWorkflow.sarcProcessStats) {
+/*
+                if (ExecuteWorkflow.sarcProcessStats) {
 			sarcStats.processSarc(ExecuteWorkflow.sarcsReportPathArray, ExecuteWorkflow.sarcsReportPathNonArray);
 			sarcStats.finalizeSarcStats();
 		}
 		logger.info("Sarc done");
+*/
 
+/*
 		// finalize usagestats
 		if (ExecuteWorkflow.finalizeStats) {
 			piwikstatsdb.finalizeStats();
 			logger.info("Finalized stats");
 		}
+*/
 
+/*
 		// Make the tables available to Impala
 		if (ExecuteWorkflow.finalTablesVisibleToImpala) {
 			logger.info("Making tables visible to Impala");
 			invalidateMetadata();
 		}
-
+*/
 		logger.info("End");
 	}
 
