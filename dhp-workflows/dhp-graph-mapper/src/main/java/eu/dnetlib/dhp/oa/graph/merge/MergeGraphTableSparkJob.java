@@ -33,9 +33,9 @@ import scala.Tuple2;
  * are picked preferring those from the BETA aggregator rather then from PROD. The identity of a relationship is defined
  * by eu.dnetlib.dhp.schema.common.ModelSupport#idFn()
  */
-public class MergeGraphSparkJob {
+public class MergeGraphTableSparkJob {
 
-	private static final Logger log = LoggerFactory.getLogger(CleanGraphSparkJob.class);
+	private static final Logger log = LoggerFactory.getLogger(MergeGraphTableSparkJob.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 

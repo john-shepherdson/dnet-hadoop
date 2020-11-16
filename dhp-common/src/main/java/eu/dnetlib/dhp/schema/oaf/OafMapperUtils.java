@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.raw.common;
+package eu.dnetlib.dhp.schema.oaf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,18 +13,42 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
-import eu.dnetlib.dhp.schema.oaf.OriginDescription;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class OafMapperUtils {
+
+	public static Oaf merge(final Oaf o1, final Oaf o2) {
+		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
+			if (ModelSupport.isSubClass(o1, Result.class)) {
+
+				return mergeResults((Result) o1, (Result) o2);
+			} else if (ModelSupport.isSubClass(o1, Datasource.class)) {
+				((Datasource) o1).mergeFrom((Datasource) o2);
+			} else if (ModelSupport.isSubClass(o1, Organization.class)) {
+				((Organization) o1).mergeFrom((Organization) o2);
+			} else if (ModelSupport.isSubClass(o1, Project.class)) {
+				((Project) o1).mergeFrom((Project) o2);
+			} else {
+				throw new RuntimeException("invalid OafEntity subtype:" + o1.getClass().getCanonicalName());
+			}
+		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
+			((Relation) o1).mergeFrom((Relation) o2);
+		} else {
+			throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
+		}
+		return o1;
+	}
+
+	public static Result mergeResults(Result r1, Result r2) {
+		if (new ResultTypeComparator().compare(r1, r2) < 0) {
+			r1.mergeFrom(r2);
+			return r1;
+		} else {
+			r2.mergeFrom(r1);
+			return r2;
+		}
+	}
 
 	public static KeyValue keyValue(final String k, final String v) {
 		final KeyValue kv = new KeyValue();

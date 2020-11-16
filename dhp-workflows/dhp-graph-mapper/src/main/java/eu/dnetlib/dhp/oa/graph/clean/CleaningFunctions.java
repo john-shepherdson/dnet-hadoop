@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.clearspring.analytics.util.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.AbstractMdRecordToOafMapper;
-import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
@@ -115,7 +114,7 @@ public class CleaningFunctions {
 							.stream()
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
-							.filter(sp -> NONE.equalsIgnoreCase(sp.getValue()))
+							.filter(sp -> !NONE.equalsIgnoreCase(sp.getValue().trim()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
 							.map(sp -> {

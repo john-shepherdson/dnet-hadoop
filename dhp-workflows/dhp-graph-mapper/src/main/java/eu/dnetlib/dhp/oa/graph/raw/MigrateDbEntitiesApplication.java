@@ -1,15 +1,6 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.asString;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASOURCE_ORGANIZATION;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
@@ -32,6 +23,7 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -527,9 +519,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final Boolean deletedbyinference = rs.getBoolean("deletedbyinference");
 		final String inferenceprovenance = rs.getString("inferenceprovenance");
 		final Boolean inferred = rs.getBoolean("inferred");
-		final String trust = rs.getString("trust");
+
+		final double trust = rs.getDouble("trust");
+
 		return dataInfo(
-			deletedbyinference, inferenceprovenance, inferred, false, ENTITYREGISTRY_PROVENANCE_ACTION, trust);
+			deletedbyinference, inferenceprovenance, inferred, false, ENTITYREGISTRY_PROVENANCE_ACTION,
+			String.format("%.3f", trust));
 	}
 
 	private Qualifier prepareQualifierSplitting(final String s) {

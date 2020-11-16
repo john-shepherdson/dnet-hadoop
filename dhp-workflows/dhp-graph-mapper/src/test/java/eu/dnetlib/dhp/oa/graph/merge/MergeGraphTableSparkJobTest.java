@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 
-public class MergeGraphSparkJobTest {
+public class MergeGraphTableSparkJobTest {
 
 	private ObjectMapper mapper;
 
@@ -28,7 +28,7 @@ public class MergeGraphSparkJobTest {
 	public void testMergeDatasources() throws IOException {
 		assertEquals(
 			"openaire-cris_1.1",
-			MergeGraphSparkJob
+			MergeGraphTableSparkJob
 				.mergeDatasource(
 					d("datasource_cris.json"),
 					d("datasource_UNKNOWN.json"))
@@ -36,7 +36,7 @@ public class MergeGraphSparkJobTest {
 				.getClassid());
 		assertEquals(
 			"openaire-cris_1.1",
-			MergeGraphSparkJob
+			MergeGraphTableSparkJob
 				.mergeDatasource(
 					d("datasource_UNKNOWN.json"),
 					d("datasource_cris.json"))
@@ -44,7 +44,7 @@ public class MergeGraphSparkJobTest {
 				.getClassid());
 		assertEquals(
 			"driver-openaire2.0",
-			MergeGraphSparkJob
+			MergeGraphTableSparkJob
 				.mergeDatasource(
 					d("datasource_native.json"),
 					d("datasource_driver-openaire2.0.json"))
@@ -52,7 +52,7 @@ public class MergeGraphSparkJobTest {
 				.getClassid());
 		assertEquals(
 			"driver-openaire2.0",
-			MergeGraphSparkJob
+			MergeGraphTableSparkJob
 				.mergeDatasource(
 					d("datasource_driver-openaire2.0.json"),
 					d("datasource_native.json"))
@@ -60,7 +60,7 @@ public class MergeGraphSparkJobTest {
 				.getClassid());
 		assertEquals(
 			"openaire4.0",
-			MergeGraphSparkJob
+			MergeGraphTableSparkJob
 				.mergeDatasource(
 					d("datasource_notCompatible.json"),
 					d("datasource_openaire4.0.json"))
@@ -68,7 +68,7 @@ public class MergeGraphSparkJobTest {
 				.getClassid());
 		assertEquals(
 			"notCompatible",
-			MergeGraphSparkJob
+			MergeGraphTableSparkJob
 				.mergeDatasource(
 					d("datasource_notCompatible.json"),
 					d("datasource_UNKNOWN.json"))
