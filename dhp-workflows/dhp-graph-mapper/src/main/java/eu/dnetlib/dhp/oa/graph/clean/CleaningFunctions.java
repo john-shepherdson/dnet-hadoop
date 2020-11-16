@@ -114,7 +114,7 @@ public class CleaningFunctions {
 							.stream()
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
-							.filter(sp -> NONE.equalsIgnoreCase(sp.getValue()))
+							.filter(sp -> !NONE.equalsIgnoreCase(sp.getValue().trim()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
 							.map(sp -> {
