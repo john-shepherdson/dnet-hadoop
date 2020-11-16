@@ -108,7 +108,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--inputPath</arg><arg>${graphInputPath}/publication</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
@@ -134,7 +134,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--inputPath</arg><arg>${graphInputPath}/dataset</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
@@ -160,7 +160,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--inputPath</arg><arg>${graphInputPath}/otherresearchproduct</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
@@ -186,7 +186,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--inputPath</arg><arg>${graphInputPath}/software</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
@@ -212,7 +212,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--inputPath</arg><arg>${graphInputPath}/datasource</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
@@ -238,7 +238,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--inputPath</arg><arg>${graphInputPath}/organization</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
@@ -264,7 +264,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--inputPath</arg><arg>${graphInputPath}/project</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
@@ -290,7 +290,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--inputPath</arg><arg>${graphInputPath}/relation</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
