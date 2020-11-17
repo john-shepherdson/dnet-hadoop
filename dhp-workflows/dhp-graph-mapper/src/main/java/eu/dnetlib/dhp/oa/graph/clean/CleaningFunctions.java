@@ -1,8 +1,10 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,7 +19,13 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class CleaningFunctions {
 
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
-	public static final String NONE = "none";
+
+	public static final Set<String> PID_BLACKLIST = new HashSet<>();
+
+	static {
+		PID_BLACKLIST.add("none");
+		PID_BLACKLIST.add("na");
+	}
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
 		if (value instanceof Datasource) {
@@ -114,7 +122,7 @@ public class CleaningFunctions {
 							.stream()
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
-							.filter(sp -> !NONE.equalsIgnoreCase(sp.getValue().trim()))
+							.filter(sp -> !PID_BLACKLIST.contains(sp.getValue().trim().toLowerCase()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
 							.map(sp -> {
