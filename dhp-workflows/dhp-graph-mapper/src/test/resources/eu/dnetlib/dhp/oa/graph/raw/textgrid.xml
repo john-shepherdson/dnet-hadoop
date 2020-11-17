@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <oai:header xmlns="http://namespace.openaire.eu/"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <dri:objIdentifier>r3f52792889d::000051aa1f61d77d2c0b340091f8024e</dri:objIdentifier>
+        <dri:recordIdentifier>textgrid:q9cv.0</dri:recordIdentifier>
+        <dri:dateOfCollection>2020-11-17T09:34:11.128+01:00</dri:dateOfCollection>
+        <oaf:datasourceprefix>r3f52792889d</oaf:datasourceprefix>
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">textgrid:q9cv.0</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2012-01-21T13:35:20Z</datestamp>
+        <dr:dateOfTransformation>2020-11-17T09:46:21.551+01:00</dr:dateOfTransformation>
+    </oai:header>
+    <metadata>
+        <datacite:resource xmlns="http://www.openarchives.org/OAI/2.0/"
+                           xmlns:datacite="http://datacite.org/schema/kernel-3"
+                           xmlns:dc="http://purl.org/dc/elements/1.1/"
+                           xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+            <datacite:identifier identifierType="Handle">hdl:11858/00-1734-0000-0003-7664-F</datacite:identifier>
+            <datacite:creators>
+                <datacite:creator>
+                    <datacite:creatorName>Hoffmann von Fallersleben, August Heinrich</datacite:creatorName>
+                    <datacite:nameIdentifier nameIdentifierScheme="pnd" schemeURI="https://de.dariah.eu/pnd-service">118552589</datacite:nameIdentifier>
+                </datacite:creator>
+            </datacite:creators>
+            <datacite:titles>
+                <datacite:title titleType="Other">Mailied</datacite:title>
+                <datacite:title titleType="Other">August Heinrich Hoffmann von Fallersleben: Unpolitische Lieder von Hoffmann von Fallersleben, 1. + 2. Theil, 1. Theil, Hamburg: Hoffmann und Campe, 1841.</datacite:title>
+            </datacite:titles>
+            <datacite:publisher>TextGrid</datacite:publisher>
+            <datacite:publicationYear>2012</datacite:publicationYear>
+            <datacite:contributors>
+                <datacite:contributor contributorType="DataManager">
+                    <datacite:contributorName>tvitt@textgrid.de</datacite:contributorName>
+                </datacite:contributor>
+                <datacite:contributor contributorType="Other">
+                    <datacite:contributorName>Digitale Bibliothek</datacite:contributorName>
+                    <datacite:nameIdentifier nameIdentifierScheme="textgrid">TGPR-372fe6dc-57f2-6cd4-01b5-2c4bbefcfd3c</datacite:nameIdentifier>
+                </datacite:contributor>
+            </datacite:contributors>
+            <datacite:dates>
+                <datacite:date dateType="Created">2012-01-21T13:35:20Z</datacite:date>
+                <datacite:date dateType="Issued">2012-01-21T13:35:20Z</datacite:date>
+                <datacite:date dateType="Updated">2012-01-21T13:35:20Z</datacite:date>
+            </datacite:dates>
+            <datacite:resourceType resourceTypeGeneral="Dataset"/>
+            <alternateIdentifiers>
+                <datacite:alternateIdentifier alternateIdentifierType="URI">textgrid:q9cv.0</datacite:alternateIdentifier>
+                <alternateIdentifier alternateIdentifierType="URL">http://hdl.handle.net/hdl:11858/00-1734-0000-0003-7664-F</alternateIdentifier>
+            </alternateIdentifiers>
+            <datacite:relatedIdentifiers>
+                <datacite:relatedIdentifier relatedIdentifierType="Handle" relationType="IsPartOf">hdl:11858/00-1734-0000-0003-7666-B</datacite:relatedIdentifier>
+            </datacite:relatedIdentifiers>
+            <datacite:sizes>
+                <datacite:size>527 Bytes</datacite:size>
+            </datacite:sizes>
+            <datacite:formats>
+                <datacite:format>text/tg.edition+tg.aggregation+xml</datacite:format>
+            </datacite:formats>
+            <datacite:version>0</datacite:version>
+            <datacite:rightsList>
+                <datacite:rights rightsURI="http://creativecommons.org/licenses/by/3.0/de/legalcode"> Der annotierte Datenbestand der Digitalen Bibliothek inklusive
+                    Metadaten sowie davon einzeln zugängliche Teile sind eine Abwandlung
+                    des Datenbestandes von www.editura.de durch TextGrid und werden
+                    unter der Lizenz Creative Commons Namensnennung 3.0 Deutschland
+                    Lizenz (by-Nennung TextGrid) veröffentlicht. Die Lizenz bezieht sich
+                    nicht auf die der Annotation zu Grunde liegenden allgemeinfreien
+                    Texte (Siehe auch Punkt 2 der Lizenzbestimmungen).</datacite:rights>
+                <datacite:rights rightsURI="info:eu-repo/semantics/openAccess"/>
+            </datacite:rightsList>
+            <datacite:descriptions>
+                <datacite:description descriptionType="Abstract"/>
+            </datacite:descriptions>
+            <datacite:geoLocations>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace
+                            xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Hamburg</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+            </datacite:geoLocations>
+        </datacite:resource>
+        <oaf:identifier identifierType="handle">hdl:11858/00-1734-0000-0003-7664-F</oaf:identifier>
+        <dr:CobjCategory type="dataset">0021</dr:CobjCategory>
+        <oaf:refereed>0002</oaf:refereed>
+        <oaf:dateAccepted>2012-01-01</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:license>http://creativecommons.org/licenses/by/3.0/de/legalcode</oaf:license>
+        <oaf:language>und</oaf:language>
+        <oaf:hostedBy id="re3data_____::r3d100011365" name="TextGrid Repository"/>
+        <oaf:collectedFrom id="re3data_____::r3d100011365" name="TextGrid Repository"/>
+    </metadata>
+    <about xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2020-11-17T09:34:11.128+01:00">
+                <baseURL>https%3A%2F%2Fdev.textgridlab.org%2F1.0%2Ftgoaipmh%2Foai</baseURL>
+                <identifier>textgrid:q9cv.0</identifier>
+                <datestamp>2012-01-21T13:35:20Z</datestamp>
+                <metadataNamespace>http://schema.datacite.org/oai/oai-1.0/</metadataNamespace>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk"
+                                  classname="sysimport:crosswalk"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>
