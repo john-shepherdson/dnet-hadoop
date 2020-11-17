@@ -285,7 +285,7 @@ public class SarcStats {
         stmtHive = ConnectDB.getHiveConnection().createStatement();
         ConnectDB.getHiveConnection().setAutoCommit(false);
         stmtImpala = ConnectDB.getImpalaConnection().createStatement();
-
+/*
         logger.info("Creating downloads_stats table_tmp");
         String createDownloadsStats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
                 + ".downloads_stats_tmp "
@@ -366,7 +366,7 @@ public class SarcStats {
                 + "`count`	int)";
         stmtHive.executeUpdate(createSushilog);
         logger.info("Created sushilog table");
-
+*/
         // Insert into sushilog
         logger.info("Inserting into sushilog");
         String insertSushiLog = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema()

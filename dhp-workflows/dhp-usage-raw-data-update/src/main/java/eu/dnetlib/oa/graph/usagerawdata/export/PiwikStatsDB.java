@@ -60,7 +60,7 @@ public class PiwikStatsDB {
 		this.createTables();
 		// The piwiklog table is not needed since it is built
 		// on top of JSON files
-		this.createTmpTables();
+		////////////this.createTmpTables();
 	}
 
 	public ArrayList getRobotsList() {
@@ -141,7 +141,7 @@ public class PiwikStatsDB {
 		}
 	}
 
-	private void createTmpTables() throws Exception {
+/*****	public void createTmpTables() throws Exception {
 		try {
 			Statement stmt = ConnectDB.getHiveConnection().createStatement();
 			String sqlCreateTmpTablePiwikLog = "CREATE TABLE IF NOT EXISTS "
@@ -181,7 +181,7 @@ public class PiwikStatsDB {
 			// System.exit(0);
 		}
 	}
-
+******/
 	public void processLogs() throws Exception {
 		try {
 			ReadCounterRobotsList counterRobots = new ReadCounterRobotsList(this.getCounterRobotsURL());
@@ -203,9 +203,10 @@ public class PiwikStatsDB {
 			processPortalLog();
 			logger.info("Portal logs process done");
 
-			logger.info("Processing portal usagestats");
+                        logger.info("Processing portal usagestats");
 			portalStats();
 			logger.info("Portal usagestats process done");
+/*****
 
 			logger.info("ViewsStats processing starts");
 			viewsStats();
@@ -214,10 +215,11 @@ public class PiwikStatsDB {
 			logger.info("DownloadsStats processing starts");
 			downloadsStats();
 			logger.info("DownloadsStats processing starts");
-
+*****/
 			logger.info("Updating Production Tables");
 			updateProdTables();
 			logger.info("Updated Production Tables");
+
 
 		} catch (Exception e) {
 			logger.error("Failed to process logs: " + e);
@@ -336,369 +338,6 @@ public class PiwikStatsDB {
 		stmt.executeUpdate(sql);
 		logger.info("Cleaned action double clicks");
 		stmt.close();
-	}
-
-	public void viewsStats() throws Exception {
-		Statement stmt = ConnectDB.getHiveConnection().createStatement();
-		ConnectDB.getHiveConnection().setAutoCommit(false);
-
-		logger.info("Dropping result_views_monthly_tmp table");
-		String drop_result_views_monthly_tmp = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".result_views_monthly_tmp";
-		stmt.executeUpdate(drop_result_views_monthly_tmp);
-		logger.info("Dropped result_views_monthly_tmp table");
-
-		logger.info("Creating result_views_monthly_tmp table");
-		String create_result_views_monthly_tmp = "CREATE OR REPLACE VIEW " + ConnectDB.getUsageStatsDBSchema()
-			+ ".result_views_monthly_tmp " +
-			"AS SELECT entity_id AS id, " +
-			"COUNT(entity_id) as views, SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) " +
-			"AS openaire_referrer, " +
-			"CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month, source " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema()
-			+ ".piwiklogtmp where action='action' and (source_item_type='oaItem' or " +
-			"source_item_type='repItem') " +
-			"GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), " +
-			"source ORDER BY source, entity_id";
-		stmt.executeUpdate(create_result_views_monthly_tmp);
-		logger.info("Created result_views_monthly_tmp table");
-
-		logger.info("Dropping views_stats_tmp table");
-		String drop_views_stats_tmp = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".views_stats_tmp";
-		stmt.executeUpdate(drop_views_stats_tmp);
-		logger.info("Dropped views_stats_tmp table");
-
-		logger.info("Creating views_stats_tmp table");
-		String create_views_stats_tmp = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
-			+ ".views_stats_tmp " +
-			"AS SELECT 'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, " +
-			"max(views) AS count, max(openaire_referrer) AS openaire " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".result_views_monthly_tmp p, " +
-			ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro " +
-			"WHERE p.source=d.piwik_id AND p.id=ro.oid " +
-			"GROUP BY d.id, ro.id, month " +
-			"ORDER BY d.id, ro.id, month";
-		stmt.executeUpdate(create_views_stats_tmp);
-		logger.info("Created views_stats_tmp table");
-/*
-		logger.info("Dropping views_stats table");
-		String drop_views_stats = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".views_stats";
-		stmt.executeUpdate(drop_views_stats);
-		logger.info("Dropped views_stats table");
-*/
-		logger.info("Creating views_stats table");
-		String create_view_stats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".views_stats " +
-			"LIKE " + ConnectDB.getUsageStatsDBSchema() + ".views_stats_tmp STORED AS PARQUET";
-		stmt.executeUpdate(create_view_stats);
-		logger.info("Created views_stats table");
-
-		logger.info("Dropping pageviews_stats_tmp table");
-		String drop_pageviews_stats_tmp = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".pageviews_stats_tmp";
-		stmt.executeUpdate(drop_pageviews_stats_tmp);
-		logger.info("Dropped pageviews_stats_tmp table");
-
-		logger.info("Creating pageviews_stats_tmp table");
-		String create_pageviews_stats_tmp = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
-			+ ".pageviews_stats_tmp AS SELECT " +
-			"'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, max(views) AS count " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".result_views_monthly_tmp p, " +
-			ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro " +
-			"WHERE p.source=" + ExecuteWorkflow.portalMatomoID + " AND p.source=d.piwik_id and p.id=ro.id \n" +
-			"GROUP BY d.id, ro.id, month " +
-			"ORDER BY d.id, ro.id, month";
-		stmt.executeUpdate(create_pageviews_stats_tmp);
-		logger.info("Created pageviews_stats_tmp table");
-
-/*		logger.info("Droping pageviews_stats table");
-		String drop_pageviews_stats = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".pageviews_stats";
-		stmt.executeUpdate(drop_pageviews_stats);
-		logger.info("Dropped pageviews_stats table");
-*/
-		logger.info("Creating pageviews_stats table");
-		String create_pageviews_stats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
-			+ ".pageviews_stats " +
-			"LIKE " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats_tmp STORED AS PARQUET";
-		stmt.executeUpdate(create_pageviews_stats);
-		logger.info("Created pageviews_stats table");
-
-		stmt.close();
-		ConnectDB.getHiveConnection().close();
-	}
-
-	private void downloadsStats() throws Exception {
-		Statement stmt = ConnectDB.getHiveConnection().createStatement();
-		ConnectDB.getHiveConnection().setAutoCommit(false);
-
-		logger.info("Dropping result_downloads_monthly_tmp view");
-		String drop_result_downloads_monthly_tmp = "DROP VIEW IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".result_downloads_monthly_tmp";
-		stmt.executeUpdate(drop_result_downloads_monthly_tmp);
-		logger.info("Dropped result_downloads_monthly_tmp view");
-
-		logger.info("Creating result_downloads_monthly_tmp view");
-		String sql = "CREATE OR REPLACE VIEW " + ConnectDB.getUsageStatsDBSchema() + ".result_downloads_monthly_tmp " +
-			"AS SELECT entity_id AS id, COUNT(entity_id) as downloads, " +
-			"SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer, " +
-			"CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month, source " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp where action='download' " +
-			"AND (source_item_type='oaItem' OR source_item_type='repItem') " +
-			"GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) , source " +
-			"ORDER BY source, entity_id, month";
-		stmt.executeUpdate(sql);
-		logger.info("Created result_downloads_monthly_tmp view");
-
-		logger.info("Dropping downloads_stats_tmp table");
-		String drop_views_stats = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".downloads_stats_tmp";
-		stmt.executeUpdate(drop_views_stats);
-		logger.info("Dropped downloads_stats_tmp table");
-
-		logger.info("Creating downloads_stats_tmp table");
-		sql = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp AS " +
-			"SELECT 'OpenAIRE' as source, d.id as repository_id, ro.id as result_id, month as date, " +
-			"max(downloads) AS count, max(openaire_referrer) AS openaire " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".result_downloads_monthly_tmp p, " +
-			ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro " +
-			"WHERE p.source=d.piwik_id and p.id=ro.oid " +
-			"GROUP BY d.id, ro.id, month " +
-			"ORDER BY d.id, ro.id, month";
-		stmt.executeUpdate(sql);
-		logger.info("Created downloads_stats_tmp table");
-/*
-		logger.info("Dropping downloads_stats table");
-		String drop_downloads_stats = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".downloads_stats";
-		stmt.executeUpdate(drop_downloads_stats);
-		logger.info("Dropped downloads_stats table");
-*/
-		logger.info("Creating downloads_stats table");
-		String create_downloads_stats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
-			+ ".downloads_stats " +
-			"LIKE " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp STORED AS PARQUET ";
-		stmt.executeUpdate(create_downloads_stats);
-		logger.info("Created downloads_stats table");
-
-		logger.info("Dropping result_downloads_monthly_tmp view");
-		sql = "DROP VIEW IF EXISTS result_downloads_monthly_tmp";
-		logger.info("Dropped result_downloads_monthly_tmp view");
-		stmt.executeUpdate(sql);
-
-		stmt.close();
-		ConnectDB.getHiveConnection().close();
-	}
-
-	public void finalizeStats() throws Exception {
-		stmt = ConnectDB.getHiveConnection().createStatement();
-		ConnectDB.getHiveConnection().setAutoCommit(false);
-
-		logger.info("Dropping full_dates table");
-		String dropFullDates = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".full_dates";
-		stmt.executeUpdate(dropFullDates);
-		logger.info("Dropped full_dates table");
-
-		Calendar startCalendar = Calendar.getInstance();
-		startCalendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse("2016-01-01"));
-		Calendar endCalendar = Calendar.getInstance();
-		int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
-		int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
-
-		logger.info("Creating full_dates table");
-		String sql = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".full_dates AS " +
-			"SELECT from_unixtime(unix_timestamp(cast(add_months(from_date,i) AS DATE)), 'yyyy/MM') AS txn_date " +
-			"FROM (SELECT DATE '2016-01-01' AS from_date) p " +
-			"LATERAL VIEW " +
-			"posexplode(split(space(" + diffMonth + "),' ')) pe AS i,x";
-		stmt.executeUpdate(sql);
-		logger.info("Created full_dates table");
-
-		logger.info("Creating downloads_stats table");
-		String createDownloadsStats = "CREATE TABLE IF NOT EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".downloads_stats " +
-			"(`source` string, " +
-			"`repository_id` string, " +
-			"`result_id` string, " +
-			"`date` string, " +
-			"`count` bigint, " +
-			"`openaire` bigint)";
-		stmt.executeUpdate(createDownloadsStats);
-		logger.info("Created downloads_stats table");
-
-		logger.info("Creating views_stats table");
-		String createViewsStats = "CREATE TABLE IF NOT EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".views_stats " +
-			"(`source` string, " +
-			"`repository_id` string, " +
-			"`result_id` string, " +
-			"`date` string, " +
-			"`count` bigint, " +
-			"`openaire` bigint)";
-		stmt.executeUpdate(createViewsStats);
-		logger.info("Created views_stats table");
-
-                logger.info("Inserting data to usage_stats");
-		sql = "INSERT INTO "+ConnectDB.getUsageStatsDBSchema() + ".usage_stats " +
-                        "SELECT coalesce(ds.source, vs.source) as source, " +
-			"coalesce(ds.repository_id, vs.repository_id) as repository_id, " +
-			"coalesce(ds.result_id, vs.result_id) as result_id, coalesce(ds.date, vs.date) as date, " +
-			"coalesce(ds.count, 0) as downloads, coalesce(vs.count, 0) as views, " +
-			"coalesce(ds.openaire, 0) as openaire_downloads, " +
-			"coalesce(vs.openaire, 0) as openaire_views " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp AS ds FULL OUTER JOIN " +
-			ConnectDB.getUsageStatsDBSchema() + ".views_stats_tmp AS vs ON ds.source=vs.source " +
-			"AND ds.repository_id=vs.repository_id AND ds.result_id=vs.result_id AND ds.date=vs.date";
-                stmt.executeUpdate(sql);
-                logger.info("Inserted data to usage_stats");
-
-
-		stmt.close();
-		ConnectDB.getHiveConnection().close();
-	}
-
-	// Create repository Views statistics
-	private void repositoryViewsStats() throws Exception {
-		stmt = ConnectDB.getHiveConnection().createStatement();
-		ConnectDB.getHiveConnection().setAutoCommit(false);
-
-//        String sql = "SELECT entity_id AS id , COUNT(entity_id) AS number_of_views, timestamp::date AS date, source INTO repo_view_stats FROM piwiklog WHERE source!='5' AND action=\'action\' AND source_item_type=\'repItem\' GROUP BY entity_id, date, source ORDER BY entity_id, date ASC, COUNT(entity_id) DESC;";
-		String sql = "CREATE TABLE IF NOT EXISTS repo_view_stats AS SELECT entity_id AS id , COUNT(entity_id) AS number_of_views, timestamp::date AS date, source FROM piwiklog WHERE source!='5' AND action=\'action\' AND source_item_type=\'repItem\' GROUP BY entity_id, date, source ORDER BY entity_id, date ASC, COUNT(entity_id) DESC;";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_view_stats_id ON repo_view_stats USING btree (id)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_view_stats_date ON repo_view_stats USING btree(date)";
-		stmt.executeUpdate(sql);
-
-//        sql = "SELECT roid.id, sum(number_of_views), extract('year' from date) ||'/'|| LPAD(CAST(extract('month' from date) AS VARCHAR), 2, '0') AS month, source INTO repo_view_stats_monthly_clean FROM repo_view_stats rvs, result_oids roid where rvs.id=roid.orid group by roid.id, month, source;";
-		sql = "CREATE TABLE IF NOT EXISTS repo_view_stats_monthly_clean AS SELECT roid.id, sum(number_of_views), extract('year' from date) ||'/'|| LPAD(CAST(extract('month' from date) AS VARCHAR), 2, '0') AS month, source FROM repo_view_stats rvs, result_oids roid where rvs.id=roid.orid group by roid.id, month, source;";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_view_stats_monthly_clean_id ON repo_view_stats_monthly_clean USING btree (id)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_view_stats_monthly_clean_month ON repo_view_stats_monthly_clean USING btree(month)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_view_stats_monthly_clean_source ON repo_view_stats_monthly_clean USING btree(source)";
-		stmt.executeUpdate(sql);
-
-		Calendar startCalendar = Calendar.getInstance();
-		startCalendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse("2016-01-01"));
-		Calendar endCalendar = Calendar.getInstance();
-		int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
-		int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
-
-		// sql="CREATE OR REPLACE view repo_view_stats_monthly AS select d.id, d.new_date AS month, case when rdm.sum is
-		// null then 0 else rdm.sum end, d.source from (select distinct rdsm.id, to_char(date_trunc('month',
-		// ('2016-01-01'::date + interval '1 month'*offs)), 'YYYY/MM') AS new_date, rdsm.source from generate_series(0,
-		// " + diffMonth +", 1) AS offs, repo_view_stats_monthly_clean rdsm) d LEFT JOIN (select id, month, sum, source
-		// from repo_view_stats_monthly_clean) rdm ON d.new_date=rdm.month and d.id=rdm.id and d.source=rdm.source order
-		// by d.id, d.new_date";
-//        sql = "select d.id, d.new_date AS month, case when rdm.sum is null then 0 else rdm.sum end, d.source INTO repo_view_stats_monthly from (select distinct rdsm.id, to_char(date_trunc('month', ('2016-01-01'::date + interval '1 month'*offs)), 'YYYY/MM') AS new_date, rdsm.source from generate_series(0, " + diffMonth + ", 1) AS offs, repo_view_stats_monthly_clean rdsm) d LEFT JOIN (select id, month, sum, source from repo_view_stats_monthly_clean) rdm ON d.new_date=rdm.month and d.id=rdm.id and d.source=rdm.source order by d.id, d.new_date";
-		sql = "CREATE TABLE IF NOT EXISTS repo_view_stats_monthly AS select d.id, d.new_date AS month, case when rdm.sum is null then 0 else rdm.sum end, d.source from (select distinct rdsm.id, to_char(date_trunc('month', ('2016-01-01'::date + interval '1 month'*offs)), 'YYYY/MM') AS new_date, rdsm.source from generate_series(0, "
-			+ diffMonth
-			+ ", 1) AS offs, repo_view_stats_monthly_clean rdsm) d LEFT JOIN (select id, month, sum, source from repo_view_stats_monthly_clean) rdm ON d.new_date=rdm.month and d.id=rdm.id and d.source=rdm.source order by d.id, d.new_date";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_view_stats_monthly_id ON repo_view_stats_monthly USING btree (id)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_view_stats_monthly_month ON repo_view_stats_monthly USING btree(month)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_view_stats_monthly_source ON repo_view_stats_monthly USING btree(source)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE OR REPLACE view repo_view_stats_monthly_sushi AS SELECT id, sum(number_of_views), extract('year' from date) ||'-'|| LPAD(CAST(extract('month' from date) AS VARCHAR), 2, '0') ||'-01' AS month, source FROM repo_view_stats group by id, month, source;";
-		stmt.executeUpdate(sql);
-
-		stmt.close();
-		ConnectDB.getHiveConnection().commit();
-		ConnectDB.getHiveConnection().close();
-	}
-
-	// Create repository downloads statistics
-	private void repositoryDownloadsStats() throws Exception {
-		stmt = ConnectDB.getHiveConnection().createStatement();
-		ConnectDB.getHiveConnection().setAutoCommit(false);
-
-//        String sql = "SELECT entity_id AS id, COUNT(entity_id) AS number_of_downloads, timestamp::date AS date, source INTO repo_download_stats FROM piwiklog WHERE source!='5' AND action=\'download\' AND source_item_type=\'repItem\' GROUP BY entity_id, date, source ORDER BY entity_id, date ASC, COUNT(entity_id) DESC;";
-		String sql = "CREATE TABLE IF NOT EXISTS repo_download_stats AS SELECT entity_id AS id, COUNT(entity_id) AS number_of_downloads, timestamp::date AS date, source FROM piwiklog WHERE source!='5' AND action=\'download\' AND source_item_type=\'repItem\' GROUP BY entity_id, date, source ORDER BY entity_id, date ASC, COUNT(entity_id) DESC;";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_download_stats_id ON repo_download_stats USING btree (id)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_download_stats_date ON repo_download_stats USING btree(date)";
-		stmt.executeUpdate(sql);
-
-//        sql = "SELECT roid.id, sum(number_of_downloads), extract('year' from date) ||'/'|| LPAD(CAST(extract('month' from date) AS VARCHAR), 2, '0') AS month, source INTO repo_download_stats_monthly_clean FROM repo_download_stats rvs, result_oids roid WHERE rvs.id=roid.orid GROUP BY roid.id, month, source;";
-		sql = "CREATE TABLE IF NOT EXISTS repo_download_stats_monthly_clean AS SELECT roid.id, sum(number_of_downloads), extract('year' from date) ||'/'|| LPAD(CAST(extract('month' from date) AS VARCHAR), 2, '0') AS month, source FROM repo_download_stats rvs, result_oids roid WHERE rvs.id=roid.orid GROUP BY roid.id, month, source;";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_download_stats_monthly_clean_id ON repo_download_stats_monthly_clean USING btree (id)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_download_stats_monthly_clean_month ON repo_download_stats_monthly_clean USING btree(month)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_download_stats_monthly_clean_source ON repo_download_stats_monthly_clean USING btree(source)";
-		stmt.executeUpdate(sql);
-
-		Calendar startCalendar = Calendar.getInstance();
-		startCalendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse("2016-01-01"));
-		Calendar endCalendar = Calendar.getInstance();
-		int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
-		int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
-
-		// sql="CREATE OR REPLACE view repo_download_stats_monthly AS select d.id, d.new_date AS month, case when
-		// rdm.sum is null then 0 else rdm.sum end, d.source from (select distinct rdsm.id, to_char(date_trunc('month',
-		// ('2016-01-01'::date + interval '1 month'*offs)), 'YYYY/MM') AS new_date, rdsm.source from generate_series(0,
-		// " + diffMonth +", 1) AS offs, repo_download_stats_monthly_clean rdsm) d LEFT JOIN (select id, month, sum,
-		// source from repo_download_stats_monthly_clean) rdm ON d.new_date=rdm.month and d.id=rdm.id and
-		// d.source=rdm.source order by d.id, d.new_date";
-		// sql = "select d.id, d.new_date AS month, case when rdm.sum is null then 0 else rdm.sum end, d.source INTO
-		// repo_download_stats_monthly from (select distinct rdsm.id, to_char(date_trunc('month', ('2016-01-01'::date +
-		// interval '1 month'*offs)), 'YYYY/MM') AS new_date, rdsm.source from generate_series(0, " + diffMonth + ", 1)
-		// AS offs, repo_download_stats_monthly_clean rdsm) d LEFT JOIN (select id, month, sum, source from
-		// repo_download_stats_monthly_clean) rdm ON d.new_date=rdm.month and d.id=rdm.id and d.source=rdm.source order
-		// by d.id, d.new_date";
-		sql = "CREATE TABLE IF NOT EXISTS repo_download_stats_monthly AS select d.id, d.new_date AS month, case when rdm.sum is null then 0 else rdm.sum end, d.source from (select distinct rdsm.id, to_char(date_trunc('month', ('2016-01-01'::date + interval '1 month'*offs)), 'YYYY/MM') AS new_date, rdsm.source from generate_series(0, "
-			+ diffMonth
-			+ ", 1) AS offs, repo_download_stats_monthly_clean rdsm) d LEFT JOIN (select id, month, sum, source from repo_download_stats_monthly_clean) rdm ON d.new_date=rdm.month and d.id=rdm.id and d.source=rdm.source order by d.id, d.new_date";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_download_stats_monthly_id ON repo_download_stats_monthly USING btree (id)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_download_stats_monthly_month ON repo_download_stats_monthly USING btree(month)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE INDEX repo_download_stats_monthly_source ON repo_download_stats_monthly USING btree(source)";
-		stmt.executeUpdate(sql);
-
-		sql = "CREATE OR REPLACE view repo_download_stats_monthly_sushi AS SELECT id, sum(number_of_downloads), extract('year' from date) ||'-'|| LPAD(CAST(extract('month' from date) AS VARCHAR), 2, '0') ||'-01' AS month, source FROM repo_download_stats group by id, month, source;";
-		stmt.executeUpdate(sql);
-
-		stmt.close();
-		ConnectDB.getHiveConnection().commit();
-		ConnectDB.getHiveConnection().close();
 	}
 
 	public void processPortalLog() throws Exception {
@@ -1154,47 +793,17 @@ public class PiwikStatsDB {
 		String sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".piwiklog " +
 			"SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp";
 		stmt.executeUpdate(sql);
-
-		logger.info("Inserting data to views_stats");
-		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".views_stats " +
-			"SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".views_stats_tmp";
-		stmt.executeUpdate(sql);
-
-		logger.info("Inserting data to downloads_stats");
-		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats " +
-			"SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp";
-		stmt.executeUpdate(sql);
-
-		logger.info("Inserting data to pageviews_stats");
-		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats " +
-			"SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats_tmp";
-		stmt.executeUpdate(sql);
-
-		logger.info("Creating usage_stats table");
-                String createUsageStats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".usage_stats " +
-			"AS SELECT coalesce(ds.source, vs.source) as source, " +
-			"coalesce(ds.repository_id, vs.repository_id) as repository_id, " +
-			"coalesce(ds.result_id, vs.result_id) as result_id, coalesce(ds.date, vs.date) as date, " +
-			"coalesce(ds.count, 0) as downloads, coalesce(vs.count, 0) as views, " +
-			"coalesce(ds.openaire, 0) as openaire_downloads, " +
-			"coalesce(vs.openaire, 0) as openaire_views " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats AS ds FULL OUTER JOIN " +
-			ConnectDB.getUsageStatsDBSchema() + ".views_stats AS vs ON ds.source=vs.source " +
-			"AND ds.repository_id=vs.repository_id AND ds.result_id=vs.result_id AND ds.date=vs.date";
-		stmt.executeUpdate(createUsageStats);
-                logger.info("Created usage_stats table");
                 
-               
-                /*
-		 * logger.info("Dropping table views_stats_tmp"); sql = "DROP TABLE IF EXISTS " +
-		 * ConnectDB.getUsageStatsDBSchema() + ".views_stats_tmp"; stmt.executeUpdate(sql);
-		 * logger.info("Dropping table downloads_stats_tmp"); sql = "DROP TABLE IF EXISTS " +
-		 * ConnectDB.getUsageStatsDBSchema() + ".downloads_stats_tmp"; stmt.executeUpdate(sql);
-		 * logger.info("Dropping table pageviews_stats_tmp"); sql = "DROP TABLE IF EXISTS " +
-		 * ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats_tmp"; stmt.executeUpdate(sql);
-		 * logger.info("Dropping table process_portal_log_tmp"); sql = "DROP TABLE IF EXISTS " +
-		 * ConnectDB.getUsageStatsDBSchema() + ".process_portal_log_tmp"; stmt.executeUpdate(sql);
-		 */
+		logger.info("Dropping piwiklogtmp");
+		sql = "DROP TABLE " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp";
+		stmt.executeUpdate(sql);
+                logger.info("Dropped piwiklogtmp");
+                
+		logger.info("Dropping process_portal_log_tmp");
+		sql = "DROP TABLE " + ConnectDB.getUsageStatsDBSchema() + ".process_portal_log_tmp";
+		stmt.executeUpdate(sql);
+                logger.info("Dropped process_portal_log_tmp");
+
 		stmt.close();
 		ConnectDB.getHiveConnection().close();
 

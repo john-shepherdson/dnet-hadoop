@@ -196,6 +196,7 @@ public class PiwikDownloadLogs {
 		//while (rs.next())
 			//piwikIdToVisit.add(rs.getInt(1));
                         piwikIdToVisit.add(13);
+                        piwikIdToVisit.add(109);
                         
         logger.info("Found the following piwikIds for download: " + piwikIdToVisit);
 

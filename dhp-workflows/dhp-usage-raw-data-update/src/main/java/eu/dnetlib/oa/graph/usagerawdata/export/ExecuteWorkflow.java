@@ -112,13 +112,13 @@ public class ExecuteWorkflow {
 			downloadPiwikLogs = true;
 		else
 			downloadPiwikLogs = false;
-/*
+
 		if (parser.get("processPiwikLogs").toLowerCase().equals("true"))
 			processPiwikLogs = true;
 		else
 			processPiwikLogs = false;
-*/
-		String startingLogPeriodStr = parser.get("startingLogPeriod");
+
+                String startingLogPeriodStr = parser.get("startingLogPeriod");
 		Date startingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(startingLogPeriodStr);
 		startingLogPeriod = startingLogPeriodStr(startingLogPeriodDate);
 
@@ -138,12 +138,12 @@ public class ExecuteWorkflow {
 			downloadLaReferenciaLogs = true;
 		else
 			downloadLaReferenciaLogs = false;
-/*
+
 		if (parser.get("processLaReferenciaLogs").toLowerCase().equals("true"))
 			processLaReferenciaLogs = true;
 		else
 			processLaReferenciaLogs = false;
-*/
+
 		if (parser.get("irusCreateTablesEmptyDirs").toLowerCase().equals("true"))
 			irusCreateTablesEmptyDirs = true;
 		else
@@ -153,13 +153,13 @@ public class ExecuteWorkflow {
 			irusDownloadReports = true;
 		else
 			irusDownloadReports = false;
-/*
+
                 if (parser.get("irusProcessStats").toLowerCase().equals("true"))
 			irusProcessStats = true;
 		else
 			irusProcessStats = false;
 		irusNumberOfOpendoarsToDownload = Integer.parseInt(parser.get("irusNumberOfOpendoarsToDownload"));
-*/
+
 		if (parser.get("sarcCreateTablesEmptyDirs").toLowerCase().equals("true"))
 			sarcCreateTablesEmptyDirs = true;
 		else
@@ -169,13 +169,13 @@ public class ExecuteWorkflow {
 			sarcDownloadReports = true;
 		else
 			sarcDownloadReports = false;
-/*
+
                 if (parser.get("sarcProcessStats").toLowerCase().equals("true"))
 			sarcProcessStats = true;
 		else
 			sarcProcessStats = false;
 		sarcNumberOfIssnToDownload = Integer.parseInt(parser.get("sarcNumberOfIssnToDownload"));
-*/
+
 /*
 		if (parser.get("finalizeStats").toLowerCase().equals("true"))
 			finalizeStats = true;
@@ -184,8 +184,8 @@ public class ExecuteWorkflow {
 		if (parser.get("finalTablesVisibleToImpala").toLowerCase().equals("true"))
 			finalTablesVisibleToImpala = true;
 		else
-*/			finalTablesVisibleToImpala = false;
-
+			finalTablesVisibleToImpala = false;
+*/
 		numberOfDownloadThreads = Integer.parseInt(parser.get("numberOfDownloadThreads"));
 
 		UsageStatsExporter usagestatsExport = new UsageStatsExporter();

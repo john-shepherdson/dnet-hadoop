@@ -116,13 +116,16 @@ public class LaReferenciaStats {
 			removeDoubleClicks();
 			logger.info("LaReferencia removed double clicks");
 
+/********                        
 			logger.info("LaReferencia creating viewsStats");
 			viewsStats();
 			logger.info("LaReferencia created viewsStats");
 			logger.info("LaReferencia creating downloadsStats");
 			downloadsStats();
 			logger.info("LaReferencia created downloadsStats");
-			logger.info("LaReferencia updating Production Tables");
+
+************/
+                        logger.info("LaReferencia updating Production Tables");
 			updateProdTables();
 			logger.info("LaReferencia updated Production Tables");
 
@@ -343,7 +346,7 @@ public class LaReferenciaStats {
 		String sql = "insert into " + ConnectDB.getUsageStatsDBSchema() + ".lareferencialog " +
 			"select * from " + ConnectDB.getUsageStatsDBSchema() + ".lareferencialogtmp";
 		stmt.executeUpdate(sql);
-
+/*****
 		logger.info("Updating views_stats");
 		sql = "insert into " + ConnectDB.getUsageStatsDBSchema() + ".views_stats " +
 			"select * from " + ConnectDB.getUsageStatsDBSchema() + ".la_views_stats_tmp";
@@ -372,6 +375,11 @@ public class LaReferenciaStats {
                 logger.info("Inserted data to usage_stats from lareferencia");
 //		sql = "insert into public.downloads_stats select * from la_downloads_stats_tmp;";
 //		stmt.executeUpdate(sql);
+****/
+		logger.info("Dropping lareferencialogtmp");
+		sql = "DROP TABLE " + ConnectDB.getUsageStatsDBSchema() + ".lareferencialogtmp";
+                logger.info("Dropped lareferencialogtmp");
+                stmt.executeUpdate(sql);
 
 		stmt.close();
 		ConnectDB.getHiveConnection().close();

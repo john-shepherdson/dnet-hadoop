@@ -174,7 +174,7 @@ public class IrusStats {
                 + "WHERE `ItemIdent`.`Type`= 'OAI'";
         stmt.executeUpdate(insertSushilogtmp);
         logger.info("Inserted to irus_sushilogtmp table");
-        
+/*        
         logger.info("Creating downloads_stats table");
         String createDownloadsStats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
                 + ".downloads_stats "
@@ -209,7 +209,7 @@ public class IrusStats {
                 + "`count`	int)";
         stmt.executeUpdate(createSushilog);
         logger.info("Created sushilog table");
-
+*/
         logger.info("Inserting to sushilog table");
         String insertToShushilog = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".sushilog SELECT * FROM "
                 + ConnectDB.getUsageStatsDBSchema()
