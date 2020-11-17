@@ -1,0 +1,64 @@
+<workflow-app name="Orcid Updates Download" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>workingPath</name>
+            <description>the working dir base path</description>
+        </property>
+        <property>
+            <name>token</name>
+            <description>access token</description>
+        </property>
+        <property>
+            <name>shell_cmd</name>
+            <value>wget -O /tmp/last_modified.csv.tar http://74804fb637bd8e2fba5b-e0a029c2f87486cddec3b416996a6057.r3.cf1.rackcdn.com/last_modified.csv.tar ; hdfs dfs -copyFromLocal /tmp/last_modified.csv.tar /data/orcid_activities_2020/last_modified.csv.tar ; rm -f /tmp/last_modified.csv.tar
+            </value>
+            <description>the shell command that downloads the lambda file from orcid containing last orcid update informations</description>
+        </property>
+    </parameters>
+    
+    <start to="ResetWorkingPath"/>
+    
+    
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    
+    <action name="ResetWorkingPath">
+        <fs>
+            <delete path='${workingPath}/downloads'/>
+            <mkdir path='${workingPath}/downloads'/>
+        </fs>
+        <ok to="DownloadLambdaFile"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="DownloadLambdaFile">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>bash</exec>
+            <argument>-c</argument>
+            <argument>${shell_cmd}</argument>
+            <capture-output/>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+	<action name="DownloadOrcidData">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcid.OrcidDownloader</main-class>
+            <arg>-d</arg><arg>${workingPathOrcid}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>last_modified.csv</arg>
+            <arg>-o</arg><arg>download/</arg>
+            <arg>-t</arg><arg>${token}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    
+   <end name="End"/>
+</workflow-app>

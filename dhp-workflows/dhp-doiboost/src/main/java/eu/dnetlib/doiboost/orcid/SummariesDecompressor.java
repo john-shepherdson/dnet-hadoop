@@ -17,6 +17,7 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.mortbay.log.Log;
 
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
@@ -159,5 +160,68 @@ public class SummariesDecompressor {
 		Log.info("Other names found: " + otherNamesFound);
 		Log.info("Error from Orcid found: " + errorFromOrcidFound);
 		Log.info("Error parsing xml record found: " + xmlParserErrorFound);
+	}
+
+	public static void extractXML(Configuration conf, String inputUri, Path outputPath)
+		throws Exception {
+		String uri = inputUri;
+		FileSystem fs = FileSystem.get(URI.create(uri), conf);
+		Path inputPath = new Path(uri);
+		CompressionCodecFactory factory = new CompressionCodecFactory(conf);
+		CompressionCodec codec = factory.getCodec(inputPath);
+		if (codec == null) {
+			System.err.println("No codec found for " + uri);
+			System.exit(1);
+		}
+		CompressionCodecFactory.removeSuffix(uri, codec.getDefaultExtension());
+		InputStream gzipInputStream = null;
+		try {
+			gzipInputStream = codec.createInputStream(fs.open(inputPath));
+			int counter = 0;
+			try (TarArchiveInputStream tais = new TarArchiveInputStream(gzipInputStream)) {
+				TarArchiveEntry entry = null;
+				CompressionCodec Codec = new GzipCodec();
+				org.apache.hadoop.io.SequenceFile.Writer.Option optCom = SequenceFile.Writer
+					.compression(SequenceFile.CompressionType.RECORD, Codec);
+				try (SequenceFile.Writer writer = SequenceFile
+					.createWriter(
+						conf,
+						SequenceFile.Writer.file(outputPath),
+						SequenceFile.Writer.keyClass(Text.class),
+						SequenceFile.Writer.valueClass(Text.class), optCom)) {
+					while ((entry = tais.getNextTarEntry()) != null) {
+						String filename = entry.getName();
+						if (entry.isDirectory()) {
+							Log.debug("Directory entry name: " + entry.getName());
+						} else {
+							Log.debug("XML record entry name: " + entry.getName());
+							counter++;
+							BufferedReader br = new BufferedReader(new InputStreamReader(tais));
+							String line;
+							StringBuffer buffer = new StringBuffer();
+							while ((line = br.readLine()) != null) {
+								buffer.append(line);
+							}
+							String xml = buffer.toString();
+							final Text key = new Text(
+								XMLRecordParser
+									.retrieveOrcidIdFromSummary(
+										xml.getBytes(), filename.split("/")[2].substring(0, 19)));
+							final Text value = new Text(xml);
+							writer.append(key, value);
+						}
+						if ((counter % 100000) == 0) {
+							Log.info("Current xml records extracted: " + counter);
+						}
+					}
+				}
+			}
+			Log.info("Summaries extract completed");
+			Log.info("Total XML records parsed: " + counter);
+
+		} finally {
+			Log.debug("Closing gzip stream");
+			IOUtils.closeStream(gzipInputStream);
+		}
 	}
 }

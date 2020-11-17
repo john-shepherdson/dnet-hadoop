@@ -4,6 +4,8 @@ package eu.dnetlib.doiboost.orcid.xml;
 import java.util.Arrays;
 import java.util.List;
 
+import org.mortbay.log.Log;
+
 import com.ximpleware.AutoPilot;
 import com.ximpleware.EOFException;
 import com.ximpleware.EncodingException;
@@ -125,5 +127,34 @@ public class XMLRecordParser {
 			workData.setDoiFound(true);
 		}
 		return workData;
+	}
+
+	public static String retrieveOrcidIdFromSummary(byte[] bytes, String defaultValue)
+		throws VtdException, ParseException {
+		return retrieveOrcidId(bytes, defaultValue, NS_RECORD, NS_RECORD_URL, "//record:record", "path").substring(1);
+	}
+
+	public static String retrieveOrcidIdFromActivity(byte[] bytes, String defaultValue)
+		throws VtdException, ParseException {
+		return retrieveOrcidId(bytes, defaultValue, NS_WORK, NS_WORK_URL, "//work:work", "put-code");
+	}
+
+	private static String retrieveOrcidId(byte[] bytes, String defaultValue, String ns, String nsUrl, String xpath,
+		String idAttributeName)
+		throws VtdException, ParseException {
+		final VTDGen vg = new VTDGen();
+		vg.setDoc(bytes);
+		vg.parse(true);
+		final VTDNav vn = vg.getNav();
+		final AutoPilot ap = new AutoPilot(vn);
+		ap.declareXPathNameSpace(ns, nsUrl);
+		List<VtdUtilityParser.Node> recordNodes = VtdUtilityParser
+			.getTextValuesWithAttributes(
+				ap, vn, xpath, Arrays.asList(idAttributeName));
+		if (!recordNodes.isEmpty()) {
+			return (recordNodes.get(0).getAttributes().get(idAttributeName));
+		}
+		Log.info("id not found - default: " + defaultValue);
+		return defaultValue;
 	}
 }
