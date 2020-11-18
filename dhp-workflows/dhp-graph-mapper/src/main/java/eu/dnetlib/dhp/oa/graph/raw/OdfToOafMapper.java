@@ -348,7 +348,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 							getRelation(
 								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, collectedFrom, info,
 								lastUpdateTimestamp));
-				} else if (type.equals("IsPartOf")) {
+				} else if (type.equalsIgnoreCase("IsPartOf")) {
 
 					res
 						.add(
