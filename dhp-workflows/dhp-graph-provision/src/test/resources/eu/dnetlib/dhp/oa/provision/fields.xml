@@ -105,7 +105,7 @@
         <FIELD indexable="true" name="relorganizationname" result="false" stat="false" xpath="distinct-values(//*[local-name()='entity']/*//rel[./to/@type='organization']/legalname)"/>
         <FIELD indexable="true" name="relorganizationshortname" result="false" stat="false" xpath="distinct-values(//*[local-name()='entity']/*//rel[./to/@type='organization']/legalshortname)"/>
         <FIELD indexable="true" name="relresultid" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/to[@type='result'])"/>
-        <FIELD indexable="true" name="relresulttype" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/resulttype/@classid)"/>
+        <FIELD indexable="true" name="relresulttype" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/to/@type)"/>
         <FIELD indexable="true" name="relclass" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/to/@class)"/>
         <FIELD indexable="true" name="relfundinglevel0_id" result="false" stat="false" tokenizable="false" xpath="//*[local-name()='entity']//rel/funding/funding_level_0"/>
         <FIELD indexable="true" name="relfundinglevel0_name" result="false" stat="false" tokenizable="false" xpath="//*[local-name()='entity']//rel/funding/funding_level_0/@name/string()"/>
@@ -123,7 +123,8 @@
         <FIELD indexable="true" name="relfundername" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']//rel/funding/funder/@name)"/>
         <FIELD indexable="true" name="relfunderjurisdiction" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']//rel/funding/funder/@jurisdiction)"/><!-- Collected from of the related entity. Available for result-result relationships -->
         <FIELD indexable="true" name="relcollectedfromid" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/collectedfrom/@id)"/>
-        <FIELD indexable="true" name="relcollectedfromname" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/collectedfrom/@name)"/><!-- COMMON FIELDS -->
+        <FIELD indexable="true" name="relcollectedfromname" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*//rel/collectedfrom/@name)"/>
+        <FIELD indexable="true" name="semrelid" result="false" stat="false" tokenizable="false" value="concat(./to/text(), '||', ./to/@class/string())" xpath="//*[local-name()='entity']//rel"/><!-- COMMON FIELDS -->
         <FIELD indexable="true" multivalued="false" name="dateofcollection" result="false" stat="false" type="pdate" value="//header/*[local-name()='dateOfCollection']"/>
         <FIELD indexable="true" name="collectedfrom" result="false" stat="false" tokenizable="false" value="distinct-values(concat(./@id, '||', ./@name))" xpath="//*[local-name()='entity']/*/*[local-name()='collectedfrom'] | //*[local-name()='entity']/*//*[local-name() = 'instance']/*[local-name()='collectedfrom']"/>
         <FIELD indexable="true" name="collectedfromdatasourceid" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*/*[local-name()='collectedfrom']/@id | //*[local-name()='entity']/*//*[local-name() = 'instance']/*[local-name()='collectedfrom']/@id)"/>
