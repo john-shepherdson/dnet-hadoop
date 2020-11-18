@@ -54,13 +54,14 @@ public abstract class SolrTest {
 		miniCluster.uploadConfigSet(configDir.toPath(), CONFIG_NAME);
 
 		// override settings in the solrconfig include
-		// System.setProperty("solr.tests.maxBufferedDocs", "100000");
-		// System.setProperty("solr.tests.maxIndexingThreads", "-1");
-		// System.setProperty("solr.tests.ramBufferSizeMB", "100");
+		System.setProperty("solr.tests.maxBufferedDocs", "100000");
+		System.setProperty("solr.tests.maxIndexingThreads", "-1");
+		System.setProperty("solr.tests.ramBufferSizeMB", "100");
 
 		// use non-test classes so RandomizedRunner isn't necessary
-		// System.setProperty("solr.tests.mergeScheduler", "org.apache.lucene.index.ConcurrentMergeScheduler");
-		// System.setProperty("solr.directoryFactory", "solr.RAMDirectoryFactory");
+		System.setProperty("solr.tests.mergeScheduler", "org.apache.lucene.index.ConcurrentMergeScheduler");
+		System.setProperty("solr.directoryFactory", "solr.RAMDirectoryFactory");
+		System.setProperty("solr.lock.type", "single");
 
 		log.info(new ConfigSetAdminRequest.List().process(miniCluster.getSolrClient()).toString());
 		log

@@ -1,8 +1,31 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import com.lucidworks.spark.util.SolrSupport;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
+import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
+import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.io.Text;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -10,29 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.Text;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.SparkSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.lucidworks.spark.util.SolrSupport;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
-import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class XmlIndexingJob {
 
@@ -47,6 +48,8 @@ public class XmlIndexingJob {
 	private String format;
 
 	private int batchSize;
+
+	private String outputPath;
 
 	private SparkSession spark;
 
@@ -72,12 +75,17 @@ public class XmlIndexingJob {
 		final String format = parser.get("format");
 		log.info("format: {}", format);
 
+		final String outputPath = Optional.ofNullable(parser.get("outputPath"))
+				.orElse(null);
+		log.info("outputPath: {}", outputPath);
+
 		final Integer batchSize = parser.getObjectMap().containsKey("batchSize")
 			? Integer.valueOf(parser.get("batchSize"))
 			: DEFAULT_BATCH_SIZE;
 		log.info("batchSize: {}", batchSize);
 
 		final SparkConf conf = new SparkConf();
+		conf.registerKryoClasses(new Class[] { SerializableSolrInputDocument.class });
 
 		runWithSparkSession(
 			conf,
@@ -86,15 +94,16 @@ public class XmlIndexingJob {
 				final String isLookupUrl = parser.get("isLookupUrl");
 				log.info("isLookupUrl: {}", isLookupUrl);
 				final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-				new XmlIndexingJob(spark, inputPath, format, batchSize).run(isLookup);
+				new XmlIndexingJob(spark, inputPath, format, batchSize, outputPath).run(isLookup);
 			});
 	}
 
-	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize) {
+	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize, String outputPath) {
 		this.spark = spark;
 		this.inputPath = inputPath;
 		this.format = format;
 		this.batchSize = batchSize;
+		this.outputPath = outputPath;
 	}
 
 	public void run(ISLookupClient isLookup) throws ISLookUpException, TransformerException {
@@ -116,15 +125,23 @@ public class XmlIndexingJob {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		RDD<SolrInputDocument> docs = sc
-			.sequenceFile(inputPath, Text.class, Text.class)
-			.map(t -> t._2().toString())
-			.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-			.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s))
-			.rdd();
+		JavaRDD<SolrInputDocument> docs = sc
+				.sequenceFile(inputPath, Text.class, Text.class)
+				.map(t -> t._2().toString())
+				.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
+				.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s));
 
-		final String collection = ProvisionConstants.getCollectionName(format);
-		SolrSupport.indexDocs(zkHost, collection, batchSize, docs);
+		if (StringUtils.isNotBlank(outputPath)) {
+			spark.createDataset(
+					docs.map(s -> new SerializableSolrInputDocument(s)).rdd(),
+					Encoders.kryo(SerializableSolrInputDocument.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.parquet(outputPath);
+		} else {
+			final String collection = ProvisionConstants.getCollectionName(format);
+			SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+		}
 	}
 
 	protected static String toIndexRecord(Transformer tr, final String record) {

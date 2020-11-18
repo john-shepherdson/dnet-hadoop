@@ -6,6 +6,9 @@ import org.apache.solr.common.SolrInputField;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Wrapper class needed to make the SolrInputDocument compatible with the Kryo serialization mechanism.
+ */
 public class SerializableSolrInputDocument extends SolrInputDocument {
 
     public SerializableSolrInputDocument() {
