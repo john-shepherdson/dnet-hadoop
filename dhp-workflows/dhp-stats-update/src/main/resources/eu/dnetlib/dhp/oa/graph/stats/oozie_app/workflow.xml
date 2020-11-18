@@ -46,7 +46,7 @@
         </configuration>
     </global>
 
-    <start to="Step18"/>
+    <start to="Step1"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
