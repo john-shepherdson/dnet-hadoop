@@ -16,30 +16,39 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lucidworks.spark.util.SolrSupport;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpDocumentNotFoundException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
-public class XmlIndexingJob extends SolrApplication {
+public class XmlIndexingJob {
 
 	private static final Logger log = LoggerFactory.getLogger(XmlIndexingJob.class);
 
 	private static final Integer DEFAULT_BATCH_SIZE = 1000;
+
+	protected static final String DATE_FORMAT = "yyyy-MM-dd'T'hh:mm:ss'Z'";
+
+	private String inputPath;
+
+	private String format;
+
+	private int batchSize;
+
+	private SparkSession spark;
 
 	public static void main(String[] args) throws Exception {
 
@@ -60,9 +69,6 @@ public class XmlIndexingJob extends SolrApplication {
 		final String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
-		final String isLookupUrl = parser.get("isLookupUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
-
 		final String format = parser.get("format");
 		log.info("format: {}", format);
 
@@ -71,16 +77,36 @@ public class XmlIndexingJob extends SolrApplication {
 			: DEFAULT_BATCH_SIZE;
 		log.info("batchSize: {}", batchSize);
 
-		final ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
-		final String fields = getLayoutSource(isLookup, format);
+		final SparkConf conf = new SparkConf();
+
+		runWithSparkSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				final String isLookupUrl = parser.get("isLookupUrl");
+				log.info("isLookupUrl: {}", isLookupUrl);
+				final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
+				new XmlIndexingJob(spark, inputPath, format, batchSize).run(isLookup);
+			});
+	}
+
+	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize) {
+		this.spark = spark;
+		this.inputPath = inputPath;
+		this.format = format;
+		this.batchSize = batchSize;
+	}
+
+	public void run(ISLookupClient isLookup) throws ISLookUpException, TransformerException {
+		final String fields = isLookup.getLayoutSource(format);
 		log.info("fields: {}", fields);
 
-		final String xslt = getLayoutTransformer(isLookup);
+		final String xslt = isLookup.getLayoutTransformer();
 
-		final String dsId = getDsId(format, isLookup);
+		final String dsId = isLookup.getDsId(format);
 		log.info("dsId: {}", dsId);
 
-		final String zkHost = getZkHost(isLookup);
+		final String zkHost = isLookup.getZkHost();
 		log.info("zkHost: {}", zkHost);
 
 		final String version = getRecordDatestamp();
@@ -88,24 +114,17 @@ public class XmlIndexingJob extends SolrApplication {
 		final String indexRecordXslt = getLayoutTransformer(format, fields, xslt);
 		log.info("indexRecordTransformer {}", indexRecordXslt);
 
-		final SparkConf conf = new SparkConf();
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		runWithSparkSession(
-			conf,
-			isSparkSessionManaged,
-			spark -> {
-				final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		RDD<SolrInputDocument> docs = sc
+			.sequenceFile(inputPath, Text.class, Text.class)
+			.map(t -> t._2().toString())
+			.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
+			.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s))
+			.rdd();
 
-				RDD<SolrInputDocument> docs = sc
-					.sequenceFile(inputPath, Text.class, Text.class)
-					.map(t -> t._2().toString())
-					.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-					.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s))
-					.rdd();
-
-				final String collection = format + SEPARATOR + LAYOUT + SEPARATOR + INTERPRETATION;
-				SolrSupport.indexDocs(zkHost, collection, batchSize, docs);
-			});
+		final String collection = ProvisionConstants.getCollectionName(format);
+		SolrSupport.indexDocs(zkHost, collection, batchSize, docs);
 	}
 
 	protected static String toIndexRecord(Transformer tr, final String record) {
@@ -149,58 +168,6 @@ public class XmlIndexingJob extends SolrApplication {
 	 */
 	public static String getRecordDatestamp() {
 		return new SimpleDateFormat(DATE_FORMAT).format(new Date());
-	}
-
-	/**
-	 * Method retrieves from the information system the list of fields associated to the given MDFormat name
-	 *
-	 * @param isLookup the ISLookup service stub
-	 * @param format the Metadata format name
-	 * @return the string representation of the list of fields to be indexed
-	 * @throws ISLookUpDocumentNotFoundException
-	 * @throws ISLookUpException
-	 */
-	private static String getLayoutSource(final ISLookUpService isLookup, final String format)
-		throws ISLookUpDocumentNotFoundException, ISLookUpException {
-		return doLookup(
-			isLookup,
-			String
-				.format(
-					"collection('')//RESOURCE_PROFILE[.//RESOURCE_TYPE/@value = 'MDFormatDSResourceType' and .//NAME='%s']//LAYOUT[@name='%s']",
-					format, LAYOUT));
-	}
-
-	/**
-	 * Method retrieves from the information system the openaireLayoutToRecordStylesheet
-	 *
-	 * @param isLookup the ISLookup service stub
-	 * @return the string representation of the XSLT contained in the transformation rule profile
-	 * @throws ISLookUpDocumentNotFoundException
-	 * @throws ISLookUpException
-	 */
-	private static String getLayoutTransformer(ISLookUpService isLookup) throws ISLookUpException {
-		return doLookup(
-			isLookup,
-			"collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType')"
-				+ "//RESOURCE_PROFILE[./BODY/CONFIGURATION/SCRIPT/TITLE/text() = 'openaireLayoutToRecordStylesheet']//CODE/node()");
-	}
-
-	/**
-	 * Method retrieves from the information system the IndexDS profile ID associated to the given MDFormat name
-	 *
-	 * @param format
-	 * @param isLookup
-	 * @return the IndexDS identifier
-	 * @throws ISLookUpException
-	 */
-	private static String getDsId(String format, ISLookUpService isLookup) throws ISLookUpException {
-		return doLookup(
-			isLookup,
-			String
-				.format(
-					"collection('/db/DRIVER/IndexDSResources/IndexDSResourceType')"
-						+ "//RESOURCE_PROFILE[./BODY/CONFIGURATION/METADATA_FORMAT/text() = '%s']//RESOURCE_IDENTIFIER/@value/string()",
-					format));
 	}
 
 }
