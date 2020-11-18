@@ -34,7 +34,7 @@ import scala.Tuple2;
 
 /**
  * Preparation of the Project information to be added to the dumped results. For each result associated to at least one
- * Project, a serialization of an instance af ResultProject closs is done. ResultProject contains the resultId, and the
+ * Project, a serialization of an instance af ResultProject class is done. ResultProject contains the resultId, and the
  * list of Projects (as in eu.dnetlib.dhp.schema.dump.oaf.community.Project) it is associated to
  */
 public class SparkPrepareResultProject implements Serializable {
