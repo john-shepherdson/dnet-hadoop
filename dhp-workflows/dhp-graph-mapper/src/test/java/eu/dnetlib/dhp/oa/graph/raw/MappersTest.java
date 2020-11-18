@@ -78,6 +78,8 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertFalse(p.getDataInfo().getInvisible());
 		assertTrue(p.getSource().size() == 1);
+		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
+		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
 		assertTrue(p.getAuthor().size() > 0);
 		final Optional<Author> author = p
@@ -329,7 +331,7 @@ public class MappersTest {
 	@Test
 	void testODFRecord() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_record.xml"));
-		List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");

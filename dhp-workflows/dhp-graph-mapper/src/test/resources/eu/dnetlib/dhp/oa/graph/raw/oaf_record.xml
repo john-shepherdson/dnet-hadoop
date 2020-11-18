@@ -7,13 +7,12 @@
   <header xmlns="http://namespace.openaire.eu/">
     <dri:objIdentifier>pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2</dri:objIdentifier>
     <dri:recordIdentifier>10.3897/oneeco.2.e13718</dri:recordIdentifier>
-    <dri:dateOfCollection/>
     <dri:mdFormat/>
     <dri:mdFormatInterpretation/>
     <dri:repositoryId/>
     <dr:objectIdentifier/>
-    <dr:dateOfCollection>2020-03-23T00:20:51.392Z</dr:dateOfCollection>
-    <dr:dateOfTransformation>2020-03-23T00:26:59.078Z</dr:dateOfTransformation>
+    <dri:dateOfCollection>2020-03-23T00:20:51.392Z</dri:dateOfCollection>
+    <dri:dateOfTransformation>2020-03-23T00:26:59.078Z</dri:dateOfTransformation>
     <oaf:datasourceprefix>pensoft_____</oaf:datasourceprefix>
   </header>
   <metadata xmlns="http://namespace.openaire.eu/">
