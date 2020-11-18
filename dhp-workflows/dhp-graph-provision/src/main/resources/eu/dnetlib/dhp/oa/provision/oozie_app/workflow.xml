@@ -638,6 +638,7 @@
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="commit_solr_collection"/>
         <error to="Kill"/>
