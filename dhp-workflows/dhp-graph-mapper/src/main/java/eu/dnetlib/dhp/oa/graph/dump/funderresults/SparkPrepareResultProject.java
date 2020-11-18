@@ -38,7 +38,7 @@ public class SparkPrepareResultProject implements Serializable {
 			.toString(
 				SparkPrepareResultProject.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump/project_prep_parameters.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump/funder_result_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
