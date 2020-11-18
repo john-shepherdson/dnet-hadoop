@@ -137,7 +137,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Dump funder results </name>
-            <class>eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkPrepareResultProject</class>
+            <class>eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkDumpFunderResults</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

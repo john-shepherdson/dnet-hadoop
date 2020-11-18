@@ -9,7 +9,6 @@ import java.util.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -21,7 +20,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.schema.dump.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -30,13 +28,13 @@ import scala.Tuple2;
  * Project, a serialization of an instance af ResultProject closs is done. ResultProject contains the resultId, and the
  * list of Projects (as in eu.dnetlib.dhp.schema.dump.oaf.community.Project) it is associated to
  */
-public class SparkPrepareResultProject implements Serializable {
-	private static final Logger log = LoggerFactory.getLogger(SparkPrepareResultProject.class);
+public class SparkDumpFunderResults implements Serializable {
+	private static final Logger log = LoggerFactory.getLogger(SparkDumpFunderResults.class);
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
-				SparkPrepareResultProject.class
+				SparkDumpFunderResults.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/oa/graph/dump/funder_result_parameters.json"));
 
@@ -65,12 +63,12 @@ public class SparkPrepareResultProject implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				prepareResultProjectList(spark, inputPath, outputPath, communityMapPath);
+				writeResultProjectList(spark, inputPath, outputPath, communityMapPath);
 			});
 	}
 
-	private static void prepareResultProjectList(SparkSession spark, String inputPath, String outputPath,
-		String communityMapPath) {
+	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath,
+											   String communityMapPath) {
 
 		CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
 
@@ -85,36 +83,17 @@ public class SparkPrepareResultProject implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/software", eu.dnetlib.dhp.schema.oaf.Result.class));
 
 		result
-			.joinWith(relation, result.col("id").equalTo(relation.col("target")))
-			.groupByKey(
-				(MapFunction<Tuple2<eu.dnetlib.dhp.schema.oaf.Result, Relation>, String>) value -> value
-					._2()
-					.getSource()
-					.substring(3, 15),
-				Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Tuple2<eu.dnetlib.dhp.schema.oaf.Result, Relation>, Tuple2<String, FunderResults>>) (
-					s, it) -> {
-					Tuple2<eu.dnetlib.dhp.schema.oaf.Result, Relation> first = it.next();
-					FunderResults fr = new FunderResults();
-					List<Result> resultList = new ArrayList<>();
-					resultList.add(ResultMapper.map(first._1(), communityMap, true));
-					it.forEachRemaining(c -> {
-						resultList.add(ResultMapper.map(c._1(), communityMap, true));
+			.joinWith(relation, result.col("id").equalTo(relation.col("target")), "inner")
+				.map((MapFunction<Tuple2<eu.dnetlib.dhp.schema.oaf.Result, Relation>, FunderResults>) value ->{
+					FunderResults res = (FunderResults) ResultMapper.map(value._1(), communityMap, false);
+					res.setFunder_id(value._2().getSource().substring(3,15));
+					return res;
+				}, Encoders.bean(FunderResults.class))
+				.write()
+				.partitionBy("funder_id")
+				.mode(SaveMode.Overwrite)
+				.json(outputPath);
 
-					});
-					fr.setResults(resultList);
-					return new Tuple2<>(s, fr);
-				}, Encoders.tuple(Encoders.STRING(), Encoders.bean(FunderResults.class)))
-			.foreach(t -> {
-				String funder = t._1();
-				spark
-					.createDataFrame(t._2.getResults(), Result.class)
-					.write()
-					.mode(SaveMode.Overwrite)
-					.option("compression", "gzip")
-					.json(outputPath + "/" + funder);
-			});
 	}
 
 }
