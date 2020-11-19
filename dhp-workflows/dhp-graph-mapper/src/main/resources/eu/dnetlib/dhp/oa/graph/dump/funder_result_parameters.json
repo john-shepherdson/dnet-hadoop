@@ -22,5 +22,10 @@
 		"paramLongName": "communityMapPath",
 		"paramDescription": "the community map path",
 		"paramRequired": true
-	}
+	},{
+	"paramName": "rp",
+	"paramLongName": "relationPath",
+	"paramDescription": "the relationPath",
+	"paramRequired": true
+}
 ]
