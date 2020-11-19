@@ -1,9 +1,7 @@
 
-package eu.dnetlib.dhp.schema.oaf;
+package eu.dnetlib.dhp.oa.graph.clean;
 
-import java.util.LinkedHashMap;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -12,12 +10,19 @@ import org.apache.commons.lang3.StringUtils;
 import com.clearspring.analytics.util.Lists;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningFunctions {
 
 	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
-	public static final String NONE = "none";
+
+	public static final Set<String> PID_BLACKLIST = new HashSet<>();
+
+	static {
+		PID_BLACKLIST.add("none");
+		PID_BLACKLIST.add("na");
+	}
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
 		if (value instanceof Datasource) {
@@ -71,7 +76,7 @@ public class CleaningFunctions {
 		return value;
 	}
 
-	public static <T extends Oaf> T fixDefaults(T value) {
+	protected static <T extends Oaf> T fixDefaults(T value) {
 		if (value instanceof Datasource) {
 			// nothing to clean here
 		} else if (value instanceof Project) {
@@ -114,7 +119,7 @@ public class CleaningFunctions {
 							.stream()
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
-							.filter(sp -> NONE.equalsIgnoreCase(sp.getValue()))
+							.filter(sp -> !PID_BLACKLIST.contains(sp.getValue().trim().toLowerCase()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
 							.map(CleaningFunctions::normalizePidValue)

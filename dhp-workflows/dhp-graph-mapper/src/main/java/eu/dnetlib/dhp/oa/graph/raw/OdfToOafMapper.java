@@ -2,15 +2,9 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,9 +12,9 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 
 import eu.dnetlib.dhp.common.PacePerson;
+import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctions;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 

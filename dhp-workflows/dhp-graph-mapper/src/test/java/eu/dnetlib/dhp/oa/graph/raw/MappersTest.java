@@ -72,6 +72,8 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertFalse(p.getDataInfo().getInvisible());
 		assertTrue(p.getSource().size() == 1);
+		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
+		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
 		assertTrue(p.getAuthor().size() > 0);
 		final Optional<Author> author = p
@@ -317,7 +319,7 @@ public class MappersTest {
 	@Test
 	void testODFRecord() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_record.xml"));
-		List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
@@ -326,6 +328,22 @@ public class MappersTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+	}
+
+	@Test
+	void testTextGrid() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("textgrid.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Dataset p = (Dataset) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		System.out.println(p.getTitle().get(0).getValue());
 	}
 
 	private void assertValidId(final String id) {

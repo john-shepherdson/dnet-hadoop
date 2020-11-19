@@ -3,12 +3,10 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
-import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
+import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
