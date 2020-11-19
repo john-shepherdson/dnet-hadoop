@@ -901,28 +901,6 @@ public class XmlRecordFactory implements Serializable {
 				if (p.getEcsc39() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("ecsc39", p.getEcsc39().getValue()));
 				}
-				if (p.getContactfullname() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils
-								.asXmlElement(
-									"contactfullname", p.getContactfullname().getValue()));
-				}
-				if (p.getContactfax() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactfax", p.getContactfax().getValue()));
-				}
-				if (p.getContactphone() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactphone", p.getContactphone().getValue()));
-				}
-				if (p.getContactemail() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactemail", p.getContactemail().getValue()));
-				}
 				if (p.getSummary() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("summary", p.getSummary().getValue()));
 				}
