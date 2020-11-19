@@ -42,6 +42,7 @@
             <value>*:*</value>
             <description>query used in the deleted by query operation</description>
         </property>
+
         <property>
             <name>sparkDriverMemoryForJoining</name>
             <description>memory for driver process</description>
@@ -638,7 +639,8 @@
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
-            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--outputFormat</arg><arg>${outputFormat}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
         </spark>
         <ok to="commit_solr_collection"/>
         <error to="Kill"/>

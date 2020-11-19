@@ -1,14 +1,21 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import com.lucidworks.spark.util.SolrSupport;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
-import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
-import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Optional;
+
+import javax.swing.text.html.Option;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
@@ -22,22 +29,23 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Optional;
+import com.lucidworks.spark.util.SolrSupport;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
+import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
+import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 public class XmlIndexingJob {
 
 	private static final Logger log = LoggerFactory.getLogger(XmlIndexingJob.class);
+
+	public enum OutputFormat {
+		SOLR, HDFS
+	}
 
 	private static final Integer DEFAULT_BATCH_SIZE = 1000;
 
@@ -48,6 +56,8 @@ public class XmlIndexingJob {
 	private String format;
 
 	private int batchSize;
+
+	private OutputFormat outputFormat;
 
 	private String outputPath;
 
@@ -75,17 +85,28 @@ public class XmlIndexingJob {
 		final String format = parser.get("format");
 		log.info("format: {}", format);
 
-		final String outputPath = Optional.ofNullable(parser.get("outputPath"))
-				.orElse(null);
+		final String outputPath = Optional
+			.ofNullable(parser.get("outputPath"))
+			.map(StringUtils::trim)
+			.orElse(null);
 		log.info("outputPath: {}", outputPath);
 
-		final Integer batchSize = parser.getObjectMap().containsKey("batchSize")
-			? Integer.valueOf(parser.get("batchSize"))
-			: DEFAULT_BATCH_SIZE;
+		final Integer batchSize = Optional
+			.ofNullable(parser.get("batchSize"))
+			.map(Integer::valueOf)
+			.orElse(DEFAULT_BATCH_SIZE);
 		log.info("batchSize: {}", batchSize);
 
+		final OutputFormat outputFormat = Optional
+			.ofNullable(parser.get("outputFormat"))
+			.map(OutputFormat::valueOf)
+			.orElse(OutputFormat.SOLR);
+		log.info("outputFormat: {}", outputFormat);
+
 		final SparkConf conf = new SparkConf();
-		conf.registerKryoClasses(new Class[] { SerializableSolrInputDocument.class });
+		conf.registerKryoClasses(new Class[] {
+			SerializableSolrInputDocument.class
+		});
 
 		runWithSparkSession(
 			conf,
@@ -94,15 +115,18 @@ public class XmlIndexingJob {
 				final String isLookupUrl = parser.get("isLookupUrl");
 				log.info("isLookupUrl: {}", isLookupUrl);
 				final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-				new XmlIndexingJob(spark, inputPath, format, batchSize, outputPath).run(isLookup);
+				new XmlIndexingJob(spark, inputPath, format, batchSize, outputFormat, outputPath).run(isLookup);
 			});
 	}
 
-	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize, String outputPath) {
+	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize,
+		OutputFormat outputFormat,
+		String outputPath) {
 		this.spark = spark;
 		this.inputPath = inputPath;
 		this.format = format;
 		this.batchSize = batchSize;
+		this.outputFormat = outputFormat;
 		this.outputPath = outputPath;
 	}
 
@@ -126,21 +150,27 @@ public class XmlIndexingJob {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<SolrInputDocument> docs = sc
-				.sequenceFile(inputPath, Text.class, Text.class)
-				.map(t -> t._2().toString())
-				.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-				.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s));
+			.sequenceFile(inputPath, Text.class, Text.class)
+			.map(t -> t._2().toString())
+			.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
+			.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s));
 
-		if (StringUtils.isNotBlank(outputPath)) {
-			spark.createDataset(
-					docs.map(s -> new SerializableSolrInputDocument(s)).rdd(),
-					Encoders.kryo(SerializableSolrInputDocument.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.parquet(outputPath);
-		} else {
-			final String collection = ProvisionConstants.getCollectionName(format);
-			SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+		switch (outputFormat) {
+			case SOLR:
+				final String collection = ProvisionConstants.getCollectionName(format);
+				SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+				break;
+			case HDFS:
+				spark
+					.createDataset(
+						docs.map(s -> new SerializableSolrInputDocument(s)).rdd(),
+						Encoders.kryo(SerializableSolrInputDocument.class))
+					.write()
+					.mode(SaveMode.Overwrite)
+					.parquet(outputPath);
+				break;
+			default:
+				throw new IllegalArgumentException("invalid outputFormat: " + outputFormat);
 		}
 	}
 
