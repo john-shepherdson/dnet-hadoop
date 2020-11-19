@@ -3,9 +3,9 @@ package eu.dnetlib.dhp.oa.graph.dump.funderresults;
 
 import java.io.Serializable;
 
-import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 
-public class FunderResults extends Result implements Serializable {
+public class FunderResults extends CommunityResult implements Serializable {
 	private String funder_id;
 
 	public String getFunder_id() {

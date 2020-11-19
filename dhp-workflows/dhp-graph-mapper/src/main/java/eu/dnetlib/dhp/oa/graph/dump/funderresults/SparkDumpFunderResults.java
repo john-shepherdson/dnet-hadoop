@@ -17,9 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.api.zenodo.Community;
 import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -53,8 +55,8 @@ public class SparkDumpFunderResults implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String communityMapPath = parser.get("communityMapPath");
-		log.info("communityMapPath: {}", communityMapPath);
+		final String relationPath = parser.get("relationPath");
+		log.info("relationPath: {}", relationPath);
 
 		SparkConf conf = new SparkConf();
 
@@ -63,36 +65,33 @@ public class SparkDumpFunderResults implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				writeResultProjectList(spark, inputPath, outputPath, communityMapPath);
+				writeResultProjectList(spark, inputPath, outputPath);
 			});
 	}
 
-	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath,
-											   String communityMapPath) {
-
-		CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
+	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath) {
 
 		Dataset<Relation> relation = Utils
 			.readPath(spark, inputPath + "/relation", Relation.class)
 			.filter("dataInfo.deletedbyinference = false and relClass = 'produces'");
 
-		Dataset<eu.dnetlib.dhp.schema.oaf.Result> result = Utils
-			.readPath(spark, inputPath + "/publication", eu.dnetlib.dhp.schema.oaf.Result.class)
-			.union(Utils.readPath(spark, inputPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Result.class))
-			.union(Utils.readPath(spark, inputPath + "/otherresearchproduct", eu.dnetlib.dhp.schema.oaf.Result.class))
-			.union(Utils.readPath(spark, inputPath + "/software", eu.dnetlib.dhp.schema.oaf.Result.class));
+		Dataset<CommunityResult> result = Utils
+			.readPath(spark, inputPath + "/publication", CommunityResult.class)
+			.union(Utils.readPath(spark, inputPath + "/dataset", CommunityResult.class))
+			.union(Utils.readPath(spark, inputPath + "/otherresearchproduct", CommunityResult.class))
+			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		result
 			.joinWith(relation, result.col("id").equalTo(relation.col("target")), "inner")
-				.map((MapFunction<Tuple2<eu.dnetlib.dhp.schema.oaf.Result, Relation>, FunderResults>) value ->{
-					FunderResults res = (FunderResults) ResultMapper.map(value._1(), communityMap, false);
-					res.setFunder_id(value._2().getSource().substring(3,15));
-					return res;
-				}, Encoders.bean(FunderResults.class))
-				.write()
-				.partitionBy("funder_id")
-				.mode(SaveMode.Overwrite)
-				.json(outputPath);
+			.map((MapFunction<Tuple2<CommunityResult, Relation>, FunderResults>) value -> {
+				FunderResults res = (FunderResults) value._1();
+				res.setFunder_id(value._2().getSource().substring(3, 15));
+				return res;
+			}, Encoders.bean(FunderResults.class))
+			.write()
+			.partitionBy("funder_id")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath);
 
 	}
 

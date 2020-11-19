@@ -127,10 +127,367 @@
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </java>
-        <ok to="dump_funder_results"/>
+        <ok to="fork_result_linked_to_projects"/>
         <error to="Kill"/>
     </action>
 
+    <fork name="fork_result_linked_to_projects">
+        <path start="select_publication_linked_to_projects"/>
+        <path start="select_dataset_linked_to_projects"/>
+        <path start="select_orp_linked_to_project"/>
+        <path start="select_software_linked_to_projects"/>
+    </fork>
+
+    <action name="select_publication_linked_to_projects">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dump funder results </name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkResultLinkedToProject</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/result/publication</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
+        </spark>
+        <ok to="join_link"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="select_dataset_linked_to_projects">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dump funder results </name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkResultLinkedToProject</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/result/dataset</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
+        </spark>
+        <ok to="join_link"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="select_orp_linked_to_project">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dump funder results </name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkResultLinkedToProject</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/result/otherresearchproduct</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
+        </spark>
+        <ok to="join_link"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="select_software_linked_to_projects">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dump funder results </name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkResultLinkedToProject</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/result/software</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
+        </spark>
+        <ok to="join_link"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="join_link" to="fork_dump"/>
+
+    <fork name="fork_dump">
+        <path start="dump_publication"/>
+        <path start="dump_dataset"/>
+        <path start="dump_orp"/>
+        <path start="dump_software"/>
+    </fork>
+
+    <action name="dump_publication">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dump table publication for community related products</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkDumpCommunityProducts</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/result/publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/dump/publication</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+        </spark>
+        <ok to="join_dump"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="dump_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dump table dataset for community related products</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkDumpCommunityProducts</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/result/dataset</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/dump/dataset</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+        </spark>
+        <ok to="join_dump"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="dump_orp">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dump table ORP for community related products</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkDumpCommunityProducts</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/result/otherresearchproduct</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/dump/otherresearchproduct</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+        </spark>
+        <ok to="join_dump"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="dump_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dump table software for community related products</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkDumpCommunityProducts</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/result/software</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/dump/software</arg>
+            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+        </spark>
+        <ok to="join_dump"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="join_dump" to="prepareResultProject"/>
+
+    <action name="prepareResultProject">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Prepare association result subset of project info</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkPrepareResultProject</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="fork_extendWithProject"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="fork_extendWithProject">
+        <path start="extend_publication"/>
+        <path start="extend_dataset"/>
+        <path start="extend_orp"/>
+        <path start="extend_software"/>
+    </fork>
+
+    <action name="extend_publication">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Extend dumped publications with information about project</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/dump/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/publication</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="join_extend"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="extend_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Extend dumped dataset with information about project</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/dump/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/dataset</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="join_extend"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="extend_orp">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Extend dumped ORP with information about project</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/dump/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/orp</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="join_extend"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="extend_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Extend dumped software with information about project</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/dump/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/software</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="join_extend"/>
+        <error to="Kill"/>
+    </action>
+    <join name="join_extend" to="dump_funder_results"/>
 
     <action name="dump_funder_results">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -149,9 +506,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/result</arg>
-            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/ext</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
