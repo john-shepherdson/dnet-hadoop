@@ -8,7 +8,10 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -18,6 +21,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import scala.Tuple2;
 
 public class SparkResultLinkedToProject implements Serializable {
 
@@ -74,6 +78,7 @@ public class SparkResultLinkedToProject implements Serializable {
 			.joinWith(
 				results, relations.col("target").equalTo(results.col("id")),
 				"inner")
+			.map((MapFunction<Tuple2<Relation, R>, R>) t2 -> t2._2(), Encoders.bean(inputClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

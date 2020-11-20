@@ -1,11 +1,4 @@
 [
-
-	{
-		"paramName":"cmp",
-		"paramLongName":"communityMapPath",
-		"paramDescription": "the path to the serialization of the community map",
-		"paramRequired": true
-	},
 	{
 		"paramName":"s",
 		"paramLongName":"sourcePath",

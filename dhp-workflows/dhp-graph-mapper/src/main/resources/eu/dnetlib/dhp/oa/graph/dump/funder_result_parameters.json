@@ -17,12 +17,7 @@
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
 	},
-	{
-		"paramName": "cmp",
-		"paramLongName": "communityMapPath",
-		"paramDescription": "the community map path",
-		"paramRequired": true
-	},{
+{
 	"paramName": "rp",
 	"paramLongName": "relationPath",
 	"paramDescription": "the relationPath",
