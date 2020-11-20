@@ -65,14 +65,14 @@ public class SparkDumpFunderResults implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				writeResultProjectList(spark, inputPath, outputPath);
+				writeResultProjectList(spark, inputPath, outputPath, relationPath);
 			});
 	}
 
-	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath) {
+	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath, String relationPath) {
 
 		Dataset<Relation> relation = Utils
-			.readPath(spark, inputPath + "/relation", Relation.class)
+			.readPath(spark, relationPath + "/relation", Relation.class)
 			.filter("dataInfo.deletedbyinference = false and relClass = 'produces'");
 
 		Dataset<CommunityResult> result = Utils
