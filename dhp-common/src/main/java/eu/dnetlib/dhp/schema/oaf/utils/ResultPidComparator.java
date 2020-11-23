@@ -1,55 +1,61 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+
 import java.util.Comparator;
 
-public class ResultPidComparator implements Comparator<PidType> {
+public class ResultPidComparator implements Comparator<StructuredProperty> {
 
 	@Override
-	public int compare(PidType pLeft, PidType pRight) {
-		if (pLeft.equals(PidType.doi))
+	public int compare(StructuredProperty left, StructuredProperty right) {
+
+		PidType lClass = PidType.valueOf(left.getQualifier().getClassid());
+		PidType rClass = PidType.valueOf(right.getQualifier().getClassid());
+
+		if (lClass.equals(PidType.doi))
 			return -1;
-		if (pRight.equals(PidType.doi))
+		if (rClass.equals(PidType.doi))
 			return 1;
 
-		if (pLeft.equals(PidType.pmid))
+		if (lClass.equals(PidType.pmid))
 			return -1;
-		if (pRight.equals(PidType.pmid))
+		if (rClass.equals(PidType.pmid))
 			return 1;
 
-		if (pLeft.equals(PidType.pmc))
+		if (lClass.equals(PidType.pmc))
 			return -1;
-		if (pRight.equals(PidType.pmc))
+		if (rClass.equals(PidType.pmc))
 			return 1;
 
-		if (pLeft.equals(PidType.handle))
+		if (lClass.equals(PidType.handle))
 			return -1;
-		if (pRight.equals(PidType.handle))
+		if (rClass.equals(PidType.handle))
 			return 1;
 
-		if (pLeft.equals(PidType.arXiv))
+		if (lClass.equals(PidType.arXiv))
 			return -1;
-		if (pRight.equals(PidType.arXiv))
+		if (rClass.equals(PidType.arXiv))
 			return 1;
 
-		if (pLeft.equals(PidType.NCID))
+		if (lClass.equals(PidType.NCID))
 			return -1;
-		if (pRight.equals(PidType.NCID))
+		if (rClass.equals(PidType.NCID))
 			return 1;
 
-		if (pLeft.equals(PidType.GBIF))
+		if (lClass.equals(PidType.GBIF))
 			return -1;
-		if (pRight.equals(PidType.GBIF))
+		if (rClass.equals(PidType.GBIF))
 			return 1;
 
-		if (pLeft.equals(PidType.nct))
+		if (lClass.equals(PidType.nct))
 			return -1;
-		if (pRight.equals(PidType.nct))
+		if (rClass.equals(PidType.nct))
 			return 1;
 
-		if (pLeft.equals(PidType.urn))
+		if (lClass.equals(PidType.urn))
 			return -1;
-		if (pRight.equals(PidType.urn))
+		if (rClass.equals(PidType.urn))
 			return 1;
 
 		return 0;

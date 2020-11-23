@@ -27,28 +27,22 @@ public class PidComparator<T extends OafEntity> implements Comparator<Structured
 		if (right == null)
 			return -1;
 
-		PidType lClass = PidType.valueOf(left.getQualifier().getClassid());
-		PidType rClass = PidType.valueOf(right.getQualifier().getClassid());
-
-		if (lClass.equals(rClass))
-			return 0;
-
 		if (ModelSupport.isSubClass(entity, Result.class)) {
-			return compareResultPids(lClass, rClass);
+			return compareResultPids(left, right);
 		}
 		if (ModelSupport.isSubClass(entity, Organization.class)) {
-			return compareOrganizationtPids(lClass, rClass);
+			return compareOrganizationtPids(left, right);
 		}
 
 		// Else (but unlikely), lexicographical ordering will do.
-		return lClass.compareTo(rClass);
+		return left.getQualifier().getClassid().compareTo(right.getQualifier().getClassid());
 	}
 
-	private int compareResultPids(PidType lClass, PidType rClass) {
-		return new ResultPidComparator().compare(lClass, rClass);
+	private int compareResultPids(StructuredProperty left, StructuredProperty right) {
+		return new ResultPidComparator().compare(left, right);
 	}
 
-	private int compareOrganizationtPids(PidType lClass, PidType rClass) {
-		return new OrganizationPidComparator().compare(lClass, rClass);
+	private int compareOrganizationtPids(StructuredProperty left, StructuredProperty right) {
+		return new OrganizationPidComparator().compare(left, right);
 	}
 }
