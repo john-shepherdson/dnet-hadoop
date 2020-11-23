@@ -42,21 +42,32 @@ class QueryTest {
   }
 
 
+
+  def extractId(input:String):String = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = parse(input)
+    (json \ "id").extractOrElse[String](null)
+
+
+  }
+
+
   def myQuery(spark:SparkSession, sc:SparkContext): Unit = {
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
-
-
-
     val mapper = new ObjectMapper()
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
 
+    val ds:Dataset[Publication] = spark.read.load("/tmp/p").as[Publication]
 
-      val ds:Dataset[Publication] = spark.read.load("/tmp/p").as[Publication]
 
+    val sc = spark.sparkContext
 
 
     ds.filter(p =>p.getBestaccessright!= null && p.getBestaccessright.getClassname.nonEmpty).count()
+    val typologies =List("dataset","datasource","organization","otherresearchproduct","project","publication","software")
+    val basePath ="/tt"
 
+    typologies.map(tp => sc.textFile(s"$basePath/dataset").map(s =>extractId(tp) ).distinct.count()).sum()
 
   }
 
