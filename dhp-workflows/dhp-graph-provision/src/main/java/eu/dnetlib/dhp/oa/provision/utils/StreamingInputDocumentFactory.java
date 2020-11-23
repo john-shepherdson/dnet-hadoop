@@ -46,11 +46,6 @@ public class StreamingInputDocumentFactory {
 
 	private static final String INDEX_RECORD_ID = INDEX_FIELD_PREFIX + "indexrecordidentifier";
 
-	private static final String outFormat = "yyyy-MM-dd'T'hh:mm:ss'Z'";
-
-	private static final List<String> dateFormats = Arrays
-		.asList("yyyy-MM-dd'T'hh:mm:ss", "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy", "yyyy");
-
 	private static final String DEFAULTDNETRESULT = "dnetResult";
 
 	private static final String TARGETFIELDS = "targetFields";
@@ -125,13 +120,12 @@ public class StreamingInputDocumentFactory {
 			}
 
 			if (!indexDocument.containsKey(INDEX_RECORD_ID)) {
-				indexDocument.clear();
-				System.err.println("missing indexrecord id:\n" + inputDocument);
+				throw new IllegalStateException("cannot extract record ID from: " + inputDocument);
 			}
 
 			return indexDocument;
 		} catch (XMLStreamException e) {
-			return new SolrInputDocument();
+			throw new IllegalStateException(e);
 		}
 	}
 

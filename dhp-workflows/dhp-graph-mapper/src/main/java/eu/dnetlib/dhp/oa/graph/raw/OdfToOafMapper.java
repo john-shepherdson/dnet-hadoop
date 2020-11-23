@@ -162,14 +162,20 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//datacite:date")) {
 			final String dateType = ((Node) o).valueOf("@dateType");
 			if (StringUtils.isBlank(dateType)
-				&& !dateType.equalsIgnoreCase("Accepted")
-				&& !dateType.equalsIgnoreCase("Issued")
-				&& !dateType.equalsIgnoreCase("Updated")
-				&& !dateType.equalsIgnoreCase("Available")) {
+				|| (!dateType.equalsIgnoreCase("Accepted")
+					&& !dateType.equalsIgnoreCase("Issued")
+					&& !dateType.equalsIgnoreCase("Updated")
+					&& !dateType.equalsIgnoreCase("Available"))) {
 				res
 					.add(
 						structuredProperty(
 							((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATA_CITE_DATE, DNET_DATA_CITE_DATE,
+							info));
+			} else {
+				res
+					.add(
+						structuredProperty(
+							((Node) o).getText(), dateType, dateType, DNET_DATA_CITE_DATE, DNET_DATA_CITE_DATE,
 							info));
 			}
 		}
@@ -341,7 +347,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 							getRelation(
 								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, collectedFrom, info,
 								lastUpdateTimestamp));
-				} else if (type.equals("IsPartOf")) {
+				} else if (type.equalsIgnoreCase("IsPartOf")) {
 
 					res
 						.add(
