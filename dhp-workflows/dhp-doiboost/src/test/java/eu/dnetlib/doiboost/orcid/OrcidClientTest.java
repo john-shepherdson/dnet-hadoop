@@ -5,17 +5,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.spark.sql.catalyst.expressions.objects.AssertNotNull;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -37,12 +44,49 @@ public class OrcidClientTest {
 //	'https://api.orcid.org/v3.0/0000-0001-7291-3210/record'
 
 	@Test
-	public void downloadTest() throws Exception {
-		String record = testDownloadRecord("0000-0001-6163-2042");
-		File f = new File("/tmp/downloaded_0000-0001-6163-2042.xml");
+	private void multipleDownloadTest() throws Exception {
+		int toDownload = 1;
+		long start = System.currentTimeMillis();
+		OrcidDownloader downloader = new OrcidDownloader();
+		TarArchiveInputStream input = new TarArchiveInputStream(
+			new GzipCompressorInputStream(new FileInputStream("/tmp/last_modified.csv.tar")));
+		TarArchiveEntry entry = input.getNextTarEntry();
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+		int rowNum = 0;
+		int entryNum = 0;
+		int modified = 0;
+		while (entry != null) {
+			br = new BufferedReader(new InputStreamReader(input)); // Read directly from tarInput
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] values = line.toString().split(",");
+				List<String> recordInfo = Arrays.asList(values);
+				String orcidId = recordInfo.get(0);
+				if (downloader.isModified(orcidId, recordInfo.get(3))) {
+					downloadTest(orcidId);
+					modified++;
+				}
+				rowNum++;
+				if (modified > toDownload) {
+					break;
+				}
+			}
+			entryNum++;
+			entry = input.getNextTarEntry();
+		}
+		long end = System.currentTimeMillis();
+		logToFile("start test: " + new Date(start).toString());
+		logToFile("end test: " + new Date(end).toString());
+	}
+
+	@Test
+	private void downloadTest(String orcid) throws Exception {
+		String record = testDownloadRecord(orcid);
+		String filename = "/tmp/downloaded_".concat(orcid).concat(".xml");
+		File f = new File(filename);
 		OutputStream outStream = new FileOutputStream(f);
 		IOUtils.write(record.getBytes(), outStream);
-		System.out.println("saved to tmp");
 	}
 
 	private String testDownloadRecord(String orcidId) throws Exception {
@@ -50,7 +94,9 @@ public class OrcidClientTest {
 			HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/record");
 			httpGet.addHeader("Accept", "application/vnd.orcid+xml");
 			httpGet.addHeader("Authorization", "Bearer 78fdb232-7105-4086-8570-e153f4198e3d");
+			logToFile("start connection: " + new Date(System.currentTimeMillis()).toString());
 			CloseableHttpResponse response = client.execute(httpGet);
+			logToFile("end connection: " + new Date(System.currentTimeMillis()).toString());
 			if (response.getStatusLine().getStatusCode() != 200) {
 				System.out
 					.println("Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
@@ -62,7 +108,7 @@ public class OrcidClientTest {
 		return new String("");
 	}
 
-//	@Test
+	// @Test
 	private void testLambdaFileParser() throws Exception {
 		try (BufferedReader br = new BufferedReader(
 			new InputStreamReader(this.getClass().getResourceAsStream("last_modified.csv")))) {
@@ -108,7 +154,7 @@ public class OrcidClientTest {
 		}
 	}
 
-//	@Test
+	// @Test
 	private void getRecordDatestamp() throws ParseException {
 		Date toRetrieveDateDt = new SimpleDateFormat(DATE_FORMAT).parse(toRetrieveDate);
 		Date toNotRetrieveDateDt = new SimpleDateFormat(DATE_FORMAT).parse(toNotRetrieveDate);
@@ -126,7 +172,7 @@ public class OrcidClientTest {
 		System.out.println(valueDt.toString());
 	}
 
-//	@Test
+	// @Test
 	@Ignore
 	private void testModifiedDate() throws ParseException {
 		testDate(toRetrieveDate);
@@ -134,14 +180,81 @@ public class OrcidClientTest {
 		testDate(shortDate);
 	}
 
-//	@Test
-	@Ignore
-	private void testReadBase64CompressedRecord() throws Exception {
+	@Test
+	public void testReadBase64CompressedRecord() throws Exception {
 		final String base64CompressedRecord = IOUtils
-			.toString(getClass().getResourceAsStream("0000-0001-6645-509X.compressed.base64"));
+			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));
 		final String recordFromSeqFile = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
-		System.out.println(recordFromSeqFile);
-		final String downloadedRecord = testDownloadRecord("0000-0001-6645-509X");
+		logToFile("\n\ndownloaded \n\n" + recordFromSeqFile);
+		final String downloadedRecord = testDownloadRecord("0000-0003-3028-6161");
 		assertTrue(recordFromSeqFile.equals(downloadedRecord));
+	}
+
+	@Test
+	private void lambdaFileReaderTest() throws Exception {
+		TarArchiveInputStream input = new TarArchiveInputStream(
+			new GzipCompressorInputStream(new FileInputStream("/develop/last_modified.csv.tar")));
+		TarArchiveEntry entry = input.getNextTarEntry();
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+		int rowNum = 0;
+		int entryNum = 0;
+		while (entry != null) {
+			br = new BufferedReader(new InputStreamReader(input)); // Read directly from tarInput
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] values = line.toString().split(",");
+				List<String> recordInfo = Arrays.asList(values);
+				assertTrue(recordInfo.size() == 4);
+
+				rowNum++;
+				if (rowNum == 1) {
+					assertTrue(recordInfo.get(3).equals("last_modified"));
+				} else if (rowNum == 2) {
+					assertTrue(recordInfo.get(0).equals("0000-0002-0499-7333"));
+				}
+			}
+			entryNum++;
+			assertTrue(entryNum == 1);
+			entry = input.getNextTarEntry();
+		}
+	}
+
+	@Test
+	private void lambdaFileCounterTest() throws Exception {
+		final String lastUpdate = "2020-09-29 00:00:00";
+		OrcidDownloader downloader = new OrcidDownloader();
+		TarArchiveInputStream input = new TarArchiveInputStream(
+			new GzipCompressorInputStream(new FileInputStream("/tmp/last_modified.csv.tar")));
+		TarArchiveEntry entry = input.getNextTarEntry();
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+		int rowNum = 0;
+		int entryNum = 0;
+		int modified = 0;
+		while (entry != null) {
+			br = new BufferedReader(new InputStreamReader(input)); // Read directly from tarInput
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] values = line.toString().split(",");
+				List<String> recordInfo = Arrays.asList(values);
+				String orcidId = recordInfo.get(0);
+				if (downloader.isModified(orcidId, recordInfo.get(3))) {
+					modified++;
+				}
+				rowNum++;
+			}
+			entryNum++;
+			entry = input.getNextTarEntry();
+		}
+		logToFile("rowNum: " + rowNum);
+		logToFile("modified: " + modified);
+	}
+
+	private void logToFile(String log)
+		throws IOException {
+		log = log.concat("\n");
+		Path path = Paths.get("/tmp/orcid_log.txt");
+		Files.write(path, log.getBytes(), StandardOpenOption.APPEND);
 	}
 }
