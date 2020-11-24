@@ -100,7 +100,13 @@ public class SparkDownloadOrcidAuthors {
 						HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/record");
 						httpGet.addHeader("Accept", "application/vnd.orcid+xml");
 						httpGet.addHeader("Authorization", String.format("Bearer %s", token));
+						long startReq = System.currentTimeMillis();
 						CloseableHttpResponse response = client.execute(httpGet);
+						long endReq = System.currentTimeMillis();
+						long reqTime = endReq - startReq;
+						if (reqTime < 1000) {
+							Thread.sleep(1000 - reqTime);
+						}
 						int statusCode = response.getStatusLine().getStatusCode();
 						downloaded.setStatusCode(statusCode);
 						if (statusCode != 200) {
@@ -111,15 +117,16 @@ public class SparkDownloadOrcidAuthors {
 									errorHTTP409Acc.add(1);
 								case 503:
 									errorHTTP503Acc.add(1);
+									throw new RuntimeException("Orcid request rate limit reached (HTTP 503)");
 								case 525:
 									errorHTTP525Acc.add(1);
 								default:
 									errorHTTPGenericAcc.add(1);
+									logger
+										.info(
+											"Downloading " + orcidId + " status code: "
+												+ response.getStatusLine().getStatusCode());
 							}
-							logger
-								.info(
-									"Downloading " + orcidId + " status code: "
-										+ response.getStatusLine().getStatusCode());
 							return downloaded.toTuple2();
 						}
 						downloadedRecordsAcc.add(1);
@@ -142,7 +149,7 @@ public class SparkDownloadOrcidAuthors {
 				logger.info("Authors modified count: " + authorsModifiedRDD.count());
 				logger.info("Start downloading ...");
 				authorsModifiedRDD
-					.repartition(20)
+					.repartition(10)
 					.map(downloadRecordFunction)
 					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
 					.saveAsNewAPIHadoopFile(

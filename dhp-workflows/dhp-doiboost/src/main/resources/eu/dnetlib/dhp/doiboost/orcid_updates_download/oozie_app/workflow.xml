@@ -15,10 +15,6 @@
             <description>the shell command that downloads the lambda file from orcid containing last orcid update informations</description>
         </property>
         <property>
-            <name>sparkExecutorNumber</name>
-            <value>20</value>
-        </property>
-        <property>
             <name>sparkDriverMemory</name>
             <value>7G</value>
             <description>memory for driver process</description>
@@ -35,7 +31,7 @@
         </property>
         <property>
             <name>spark2MaxExecutors</name>
-            <value>20</value>
+            <value>10</value>
         </property>
         <property>
             <name>oozieActionShareLibForSpark2</name>

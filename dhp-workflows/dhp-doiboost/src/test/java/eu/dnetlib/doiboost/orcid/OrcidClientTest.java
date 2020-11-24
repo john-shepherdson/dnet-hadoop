@@ -10,6 +10,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.sql.catalyst.expressions.objects.AssertNotNull;
 import org.junit.jupiter.api.Test;
+import org.mortbay.log.Log;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import jdk.nashorn.internal.ir.annotations.Ignore;
@@ -45,7 +49,7 @@ public class OrcidClientTest {
 
 	@Test
 	private void multipleDownloadTest() throws Exception {
-		int toDownload = 1;
+		int toDownload = 10;
 		long start = System.currentTimeMillis();
 		OrcidDownloader downloader = new OrcidDownloader();
 		TarArchiveInputStream input = new TarArchiveInputStream(
@@ -64,7 +68,7 @@ public class OrcidClientTest {
 				List<String> recordInfo = Arrays.asList(values);
 				String orcidId = recordInfo.get(0);
 				if (downloader.isModified(orcidId, recordInfo.get(3))) {
-					downloadTest(orcidId);
+					slowedDownDownload(orcidId);
 					modified++;
 				}
 				rowNum++;
@@ -181,7 +185,7 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	public void testReadBase64CompressedRecord() throws Exception {
+	private void testReadBase64CompressedRecord() throws Exception {
 		final String base64CompressedRecord = IOUtils
 			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));
 		final String recordFromSeqFile = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
@@ -256,5 +260,42 @@ public class OrcidClientTest {
 		log = log.concat("\n");
 		Path path = Paths.get("/tmp/orcid_log.txt");
 		Files.write(path, log.getBytes(), StandardOpenOption.APPEND);
+	}
+
+	@Test
+	private void slowedDownDownloadTest() throws Exception {
+		String orcid = "0000-0001-5496-1243";
+		String record = slowedDownDownload(orcid);
+		String filename = "/tmp/downloaded_".concat(orcid).concat(".xml");
+		File f = new File(filename);
+		OutputStream outStream = new FileOutputStream(f);
+		IOUtils.write(record.getBytes(), outStream);
+	}
+
+	private String slowedDownDownload(String orcidId) throws Exception {
+		try (CloseableHttpClient client = HttpClients.createDefault()) {
+			HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/record");
+			httpGet.addHeader("Accept", "application/vnd.orcid+xml");
+			httpGet.addHeader("Authorization", "Bearer 78fdb232-7105-4086-8570-e153f4198e3d");
+			long start = System.currentTimeMillis();
+			CloseableHttpResponse response = client.execute(httpGet);
+			long endReq = System.currentTimeMillis();
+			long reqSessionDuration = endReq - start;
+			logToFile("req time (millisec): " + reqSessionDuration);
+			if (reqSessionDuration < 1000) {
+				logToFile("wait ....");
+				Thread.sleep(1000 - reqSessionDuration);
+			}
+			long end = System.currentTimeMillis();
+			long total = end - start;
+			logToFile("total time (millisec): " + total);
+			if (response.getStatusLine().getStatusCode() != 200) {
+				logToFile("Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
+			}
+			return IOUtils.toString(response.getEntity().getContent());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return new String("");
 	}
 }
