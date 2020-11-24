@@ -1,9 +1,9 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-
 import java.util.Comparator;
+
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class OrganizationPidComparator implements Comparator<StructuredProperty> {
 
@@ -12,7 +12,7 @@ public class OrganizationPidComparator implements Comparator<StructuredProperty>
 
 		PidType lClass = PidType.valueOf(left.getQualifier().getClassid());
 		PidType rClass = PidType.valueOf(right.getQualifier().getClassid());
-		
+
 		if (lClass.equals(PidType.GRID))
 			return -1;
 		if (rClass.equals(PidType.GRID))

@@ -48,27 +48,32 @@ public class IdentifierFactory implements Serializable {
 		}
 
 		Map<String, List<StructuredProperty>> pids = entity
-				.getPid()
-				.stream()
-				.filter(s -> pidFilter(s))
-				.collect(
-						Collectors.groupingBy(p -> p.getQualifier().getClassid(),
-								Collectors.mapping(p -> p, Collectors.toList()))
-				);
+			.getPid()
+			.stream()
+			.filter(s -> pidFilter(s))
+			.collect(
+				Collectors
+					.groupingBy(
+						p -> p.getQualifier().getClassid(),
+						Collectors.mapping(p -> p, Collectors.toList())));
 
 		return pids
-				.values()
-				.stream()
-				.flatMap(s -> s.stream())
-				.min(new PidComparator<>(entity))
-				.map(min -> Optional.ofNullable(pids.get(min.getQualifier().getClassid()))
-						.map(p -> p.stream()
-								.sorted(new PidValueComparator())
-								.findFirst()
-								.map(s -> idFromPid(entity, s))
-								.orElseGet(entity::getId))
-						.orElseGet(entity::getId))
-				.orElseGet(entity::getId);
+			.values()
+			.stream()
+			.flatMap(s -> s.stream())
+			.min(new PidComparator<>(entity))
+			.map(
+				min -> Optional
+					.ofNullable(pids.get(min.getQualifier().getClassid()))
+					.map(
+						p -> p
+							.stream()
+							.sorted(new PidValueComparator())
+							.findFirst()
+							.map(s -> idFromPid(entity, s))
+							.orElseGet(entity::getId))
+					.orElseGet(entity::getId))
+			.orElseGet(entity::getId);
 	}
 
 	protected static boolean pidFilter(StructuredProperty s) {

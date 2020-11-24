@@ -1,9 +1,9 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-
 import java.util.Comparator;
+
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class ResultPidComparator implements Comparator<StructuredProperty> {
 
