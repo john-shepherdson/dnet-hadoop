@@ -182,7 +182,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/dataset</arg>
             <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
         </spark>
@@ -208,7 +208,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/otherresearchproduct</arg>
             <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
         </spark>
@@ -234,7 +234,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/software</arg>
             <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
         </spark>
@@ -269,9 +269,11 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/result/publication</arg>
+<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/publication</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/publication</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+            <arg>--dumpType</arg><arg>funder</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -295,9 +297,11 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/result/dataset</arg>
+<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/dataset</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/dataset</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+            <arg>--dumpType</arg><arg>funder</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -321,9 +325,11 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/result/otherresearchproduct</arg>
+<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/otherresearchproduct</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+            <arg>--dumpType</arg><arg>funder</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -347,9 +353,11 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/result/software</arg>
+<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/software</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/software</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
+            <arg>--dumpType</arg><arg>funder</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>
@@ -508,7 +516,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/ext</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
-            <arg>--relationPath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
