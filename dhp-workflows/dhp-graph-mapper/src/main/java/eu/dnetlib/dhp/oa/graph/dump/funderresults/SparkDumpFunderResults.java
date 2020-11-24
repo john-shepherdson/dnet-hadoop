@@ -9,10 +9,7 @@ import java.util.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +19,7 @@ import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -69,11 +67,12 @@ public class SparkDumpFunderResults implements Serializable {
 			});
 	}
 
-	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath, String relationPath) {
+	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath,
+		String relationPath) {
 
 		Dataset<Relation> relation = Utils
 			.readPath(spark, relationPath + "/relation", Relation.class)
-			.filter("dataInfo.deletedbyinference = false and relClass = 'produces'");
+			.filter("dataInfo.deletedbyinference = false and relClass = 'isProducedBy'");
 
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
@@ -81,18 +80,40 @@ public class SparkDumpFunderResults implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/otherresearchproduct", CommunityResult.class))
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
-		result
-			.joinWith(relation, result.col("id").equalTo(relation.col("target")), "inner")
-			.map((MapFunction<Tuple2<CommunityResult, Relation>, FunderResults>) value -> {
-				FunderResults res = (FunderResults) value._1();
-				res.setFunder_id(value._2().getSource().substring(3, 15));
-				return res;
-			}, Encoders.bean(FunderResults.class))
-			.write()
-			.partitionBy("funder_id")
-			.mode(SaveMode.Overwrite)
-			.json(outputPath);
+		List<String> funderList = relation
+			.select("target")
+			.map((MapFunction<Row, String>) value -> value.getString(0).substring(0, 15), Encoders.STRING())
+			.distinct()
+			.collectAsList();
 
+//		Dataset<CommunityResult> results = result
+//			.joinWith(relation, result.col("id").equalTo(relation.col("target")), "inner")
+//			.map((MapFunction<Tuple2<CommunityResult, Relation>, CommunityResult>) value -> {
+//				return value._1();
+//			}, Encoders.bean(CommunityResult.class));
+
+		funderList.forEach(funder -> writeFunderResult(funder, result, outputPath));
+
+	}
+
+	private static void writeFunderResult(String funder, Dataset<CommunityResult> results, String outputPath) {
+
+		results.map((MapFunction<CommunityResult, CommunityResult>) r -> {
+			if (!Optional.ofNullable(r.getProjects()).isPresent()) {
+				return null;
+			}
+			for (Project p : r.getProjects()) {
+				if (p.getId().startsWith(funder)) {
+					return r;
+				}
+			}
+			return null;
+		}, Encoders.bean(CommunityResult.class))
+			.filter(Objects::nonNull)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath + "/" + funder);
 	}
 
 }

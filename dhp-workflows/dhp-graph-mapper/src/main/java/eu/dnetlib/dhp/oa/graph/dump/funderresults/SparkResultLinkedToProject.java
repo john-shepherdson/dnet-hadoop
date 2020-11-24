@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -70,15 +71,25 @@ public class SparkResultLinkedToProject implements Serializable {
 	private static <R extends Result> void writeResultsLikedToProjects(SparkSession spark, Class<R> inputClazz,
 		String inputPath, String outputPath, String relationPath) {
 
-		Dataset<R> results = Utils.readPath(spark, inputPath, inputClazz);
+		Dataset<R> results = Utils
+			.readPath(spark, inputPath, inputClazz)
+			.filter("dataInfo.deletedbyinference = false and datainfo.invisible = false");
 		Dataset<Relation> relations = Utils
 			.readPath(spark, relationPath, Relation.class)
-			.filter("dataInfo.deletedbyinference = false and relClass = 'produces'");
+			.filter("dataInfo.deletedbyinference = false and lower(relClass) = 'isproducedby'");
+
 		relations
 			.joinWith(
-				results, relations.col("target").equalTo(results.col("id")),
+				results, relations.col("source").equalTo(results.col("id")),
 				"inner")
-			.map((MapFunction<Tuple2<Relation, R>, R>) t2 -> t2._2(), Encoders.bean(inputClazz))
+			.groupByKey(
+				(MapFunction<Tuple2<Relation, R>, String>) value -> value
+					._2()
+					.getId(),
+				Encoders.STRING())
+			.mapGroups((MapGroupsFunction<String, Tuple2<Relation, R>, R>) (k, it) -> {
+				return it.next()._2();
+			}, Encoders.bean(inputClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
