@@ -265,18 +265,20 @@ case object Crossref2Oaf {
     }
 
 
-    def generateRelation(sourceId:String, targetId:String, nsPrefix:String) :Relation = {
+    def generateRelation(sourceId:String, targetId:String, relClass:String) :Relation = {
 
       val r = new Relation
       r.setSource(sourceId)
-      r.setTarget(s"40|$nsPrefix::$targetId")
+      r.setTarget(targetId)
       r.setRelType("resultProject")
-      r.setRelClass("isProducedBy")
+      r.setRelClass(relClass)
       r.setSubRelType("outcome")
       r.setCollectedfrom(List(cf).asJava)
       r.setDataInfo(di)
       r.setLastupdatetimestamp(ts)
       r
+
+
     }
 
 
@@ -284,11 +286,17 @@ case object Crossref2Oaf {
       if (funder.award.isDefined && funder.award.get.nonEmpty)
         funder.award.get.map(extractField).filter(a => a!= null &&  a.nonEmpty).foreach(
           award => {
-            val targetId = DHPUtils.md5(award)
-            queue += generateRelation(sourceId, targetId, nsPrefix)
+            val targetId = getProjectId(nsPrefix, DHPUtils.md5(award))
+            queue += generateRelation(sourceId, targetId , "isProducedBy")
+            queue += generateRelation(targetId , sourceId,  "produces")
           }
         )
     }
+
+    def getProjectId (nsPrefix:String, targetId:String):String = {
+      "40|$nsPrefix::$targetId"
+    }
+
 
     if (funders != null)
     funders.foreach(funder => {
@@ -310,22 +318,33 @@ case object Crossref2Oaf {
           case "10.13039/501100002341" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a)
           case "10.13039/501100001602" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a.replace("SFI", ""))
           case "10.13039/501100000923" =>   generateSimpleRelationFromAward(funder, "arc_________", a => a)
-          case "10.13039/501100000038"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "nserc_______" )
-          case "10.13039/501100000155"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "sshrc_______" )
-          case "10.13039/501100000024"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "cihr________" )
+          case "10.13039/501100000038"=>    val targetId = getProjectId("nserc_______" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId, targetId, "isProducedBy" )
+                                            queue += generateRelation(targetId, sourceId, "produces" )
+          case "10.13039/501100000155"=>    val targetId = getProjectId("sshrc_______" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId,targetId, "isProducedBy" )
+                                            queue += generateRelation(targetId,sourceId, "produces" )
+          case "10.13039/501100000024"=>    val targetId = getProjectId("cihr________" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId,targetId, "isProducedBy" )
+                                            queue += generateRelation(targetId,sourceId, "produces" )
           case "10.13039/501100002848" =>   generateSimpleRelationFromAward(funder, "conicytf____", a => a)
           case "10.13039/501100003448" =>   generateSimpleRelationFromAward(funder, "gsrt________", extractECAward)
           case "10.13039/501100010198" =>   generateSimpleRelationFromAward(funder, "sgov________", a=>a)
           case "10.13039/501100004564" =>   generateSimpleRelationFromAward(funder, "mestd_______", extractECAward)
           case "10.13039/501100003407" =>   generateSimpleRelationFromAward(funder, "miur________", a=>a)
-                                            queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "miur________" )
+                                            val targetId = getProjectId("miur________" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId,targetId, "isProducedBy" )
+                                            queue += generateRelation(targetId,sourceId, "produces" )
           case "10.13039/501100006588" |
                 "10.13039/501100004488" =>  generateSimpleRelationFromAward(funder, "irb_hr______", a=>a.replaceAll("Project No.", "").replaceAll("HRZZ-","") )
           case "10.13039/501100006769"=>    generateSimpleRelationFromAward(funder, "rsf_________", a=>a)
           case "10.13039/501100001711"=>    generateSimpleRelationFromAward(funder, "snsf________", snsfRule)
           case "10.13039/501100004410"=>    generateSimpleRelationFromAward(funder, "tubitakf____", a =>a)
           case "10.10.13039/100004440"=>    generateSimpleRelationFromAward(funder, "wt__________", a =>a)
-          case "10.13039/100004440"=>       queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "wt__________" )
+          case "10.13039/100004440"=>       val targetId = getProjectId("wt__________" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId,targetId, "isProducedBy" )
+                                            queue += generateRelation(targetId,sourceId, "produces" )
+
           case _ =>                         logger.debug("no match for "+funder.DOI.get )
 
 
@@ -341,7 +360,9 @@ case object Crossref2Oaf {
           case "The French National Research Agency (ANR)" |
                "The French National Research Agency" => generateSimpleRelationFromAward(funder, "anr_________", a => a)
           case "CONICYT, Programa de Formación de Capital Humano Avanzado" => generateSimpleRelationFromAward(funder, "conicytf____", extractECAward)
-          case "Wellcome Trust Masters Fellowship" => queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "wt__________" )
+          case "Wellcome Trust Masters Fellowship" =>  val targetId = getProjectId("wt__________", "1e5e62235d094afd01cd56e65112fc63")
+                                                        queue +=  generateRelation(sourceId, targetId, "isProducedBy" )
+                                                        queue +=  generateRelation(targetId, sourceId, "produces" )
           case _ =>                         logger.debug("no match for "+funder.name )
 
         }
