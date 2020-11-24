@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import scala.Tuple2;
 
 public class SparkUpdateProjectInfo implements Serializable {
 
@@ -73,7 +75,7 @@ public class SparkUpdateProjectInfo implements Serializable {
 			.joinWith(
 				resultProject, result.col("id").equalTo(resultProject.col("resultId")),
 				"left")
-			.map(value -> {
+			.map((MapFunction<Tuple2<CommunityResult, ResultProject>, CommunityResult>) value -> {
 				CommunityResult r = value._1();
 				Optional.ofNullable(value._2()).ifPresent(rp -> {
 					r.setProjects(rp.getProjectsList());
