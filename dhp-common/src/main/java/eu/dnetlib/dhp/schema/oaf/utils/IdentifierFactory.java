@@ -7,11 +7,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 
-import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;

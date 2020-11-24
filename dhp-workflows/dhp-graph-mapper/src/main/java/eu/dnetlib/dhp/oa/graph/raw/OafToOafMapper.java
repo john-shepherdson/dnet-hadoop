@@ -16,9 +16,9 @@ import org.dom4j.Node;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
-import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctions;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 

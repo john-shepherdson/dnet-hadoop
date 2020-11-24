@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.clean;
+package eu.dnetlib.dhp.schema.oaf;
 
 import java.util.*;
 import java.util.function.Function;
@@ -10,12 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import com.clearspring.analytics.util.Lists;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningFunctions {
 
 	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
+	public static final String NEWLINES = "(?:\\n|\\r)";
 
 	public static final Set<String> PID_BLACKLIST = new HashSet<>();
 
@@ -76,7 +76,7 @@ public class CleaningFunctions {
 		return value;
 	}
 
-	protected static <T extends Oaf> T fixDefaults(T value) {
+	public static <T extends Oaf> T cleanup(T value) {
 		if (value instanceof Datasource) {
 			// nothing to clean here
 		} else if (value instanceof Project) {
@@ -109,6 +109,29 @@ public class CleaningFunctions {
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.map(CleaningFunctions::removeNewLines)
+							.collect(Collectors.toList()));
+			}
+			if (Objects.nonNull(r.getTitle())) {
+				r
+					.setTitle(
+						r
+							.getTitle()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+							.map(CleaningFunctions::removeNewLines)
+							.collect(Collectors.toList()));
+			}
+			if (Objects.nonNull(r.getDescription())) {
+				r
+					.setDescription(
+						r
+							.getDescription()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+							.map(CleaningFunctions::removeNewLines)
 							.collect(Collectors.toList()));
 			}
 			if (Objects.nonNull(r.getPid())) {
@@ -203,6 +226,16 @@ public class CleaningFunctions {
 		}
 
 		return value;
+	}
+
+	protected static StructuredProperty removeNewLines(StructuredProperty s) {
+		s.setValue(s.getValue().replaceAll(NEWLINES, " "));
+		return s;
+	}
+
+	protected static Field<String> removeNewLines(Field<String> s) {
+		s.setValue(s.getValue().replaceAll(NEWLINES, " "));
+		return s;
 	}
 
 	// HELPERS

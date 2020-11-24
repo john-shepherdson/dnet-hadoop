@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.clean;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.schema.oaf.CleaningFunctions.*;
 
 import java.util.Optional;
 
@@ -26,7 +27,6 @@ import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import static eu.dnetlib.dhp.oa.graph.clean.CleaningFunctions.*;
 
 public class CleanGraphSparkJob {
 
@@ -89,7 +89,7 @@ public class CleanGraphSparkJob {
 		readTableFromPath(spark, inputPath, clazz)
 			.map((MapFunction<T, T>) value -> fixVocabularyNames(value), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
-			.map((MapFunction<T, T>) value -> fixDefaults(value), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) value -> cleanup(value), Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

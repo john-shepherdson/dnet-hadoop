@@ -12,7 +12,6 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 
 import eu.dnetlib.dhp.common.PacePerson;
-import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctions;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
 

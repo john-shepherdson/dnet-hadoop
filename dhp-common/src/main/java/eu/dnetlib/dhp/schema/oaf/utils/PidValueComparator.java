@@ -4,12 +4,7 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 import java.util.Comparator;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctions;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class PidValueComparator implements Comparator<StructuredProperty> {
 

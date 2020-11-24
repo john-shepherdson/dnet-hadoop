@@ -19,10 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -89,7 +86,7 @@ public class CleaningFunctionTest {
 				.map(p -> p.getQualifier())
 				.allMatch(q -> pidTerms.contains(q.getClassid())));
 
-		Publication p_defaults = CleaningFunctions.fixDefaults(p_out);
+		Publication p_defaults = CleaningFunctions.cleanup(p_out);
 		assertEquals("CLOSED", p_defaults.getBestaccessright().getClassid());
 		assertNull(p_out.getPublisher());
 
