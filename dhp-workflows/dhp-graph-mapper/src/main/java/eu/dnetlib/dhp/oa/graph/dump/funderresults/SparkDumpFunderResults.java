@@ -77,7 +77,7 @@ public class SparkDumpFunderResults implements Serializable {
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
 			.union(Utils.readPath(spark, inputPath + "/dataset", CommunityResult.class))
-			.union(Utils.readPath(spark, inputPath + "/otherresearchproduct", CommunityResult.class))
+			.union(Utils.readPath(spark, inputPath + "/orp", CommunityResult.class))
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		List<String> funderList = relation
