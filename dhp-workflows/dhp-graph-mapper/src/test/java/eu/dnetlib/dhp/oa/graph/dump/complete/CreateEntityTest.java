@@ -3,13 +3,25 @@ package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import static org.mockito.Mockito.lenient;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,11 +72,20 @@ public class CreateEntityTest {
 
 	private QueryInformationSystem queryInformationSystem;
 
+	private static String workingDir;
+
 	@BeforeEach
 	public void setUp() throws ISLookUpException {
 		lenient().when(isLookUpService.quickSearchProfile(XQUERY_ENTITY)).thenReturn(communityMap);
 		queryInformationSystem = new QueryInformationSystem();
 		queryInformationSystem.setIsLookUp(isLookUpService);
+	}
+
+	@BeforeAll
+	public static void beforeAll() throws IOException {
+		workingDir = Files
+			.createTempDirectory(eu.dnetlib.dhp.oa.graph.dump.complete.CreateEntityTest.class.getSimpleName())
+			.toString();
 	}
 
 	@Test
@@ -122,5 +143,31 @@ public class CreateEntityTest {
 		});
 
 		riList.forEach(c -> System.out.println(new Gson().toJson(c)));
+	}
+
+	@Test
+	public void test2() throws IOException, ISLookUpException {
+		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
+
+		Path hdfsWritePath = new Path(workingDir + "/prova");
+		FSDataOutputStream fsDataOutputStream = null;
+		if (fs.exists(hdfsWritePath)) {
+			fsDataOutputStream = fs.append(hdfsWritePath);
+		} else {
+			fsDataOutputStream = fs.create(hdfsWritePath);
+		}
+		CompressionCodecFactory factory = new CompressionCodecFactory(fs.getConf());
+		CompressionCodec codec = factory.getCodecByClassName("org.apache.hadoop.io.compress.GzipCodec");
+
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(codec.createOutputStream(fsDataOutputStream),
+			StandardCharsets.UTF_8));
+
+		List<ContextInfo> cInfoList = new ArrayList<>();
+		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
+		queryInformationSystem.getContextInformation(consumer);
+
+		List<ResearchInitiative> riList = new ArrayList<>();
+		cInfoList.forEach(cInfo -> riList.add(Process.getEntity(cInfo)));
+
 	}
 }
