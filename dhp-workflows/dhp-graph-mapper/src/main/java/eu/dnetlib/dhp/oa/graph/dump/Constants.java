@@ -26,7 +26,6 @@ public class Constants {
 
 	public static String ORCID = "orcid";
 
-	public static String RESULT_PROJECT_IS_PRODUCED_BY = "isProducedBy";
 
 	static {
 		accessRightsCoarMap.put("OPEN", "c_abf2");

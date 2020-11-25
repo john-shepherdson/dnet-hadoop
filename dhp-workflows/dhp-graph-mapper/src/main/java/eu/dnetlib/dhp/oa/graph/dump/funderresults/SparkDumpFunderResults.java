@@ -6,7 +6,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.io.Serializable;
 import java.util.*;
 
-import eu.dnetlib.dhp.oa.graph.dump.Constants;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.api.zenodo.Community;
+import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
@@ -72,7 +73,9 @@ public class SparkDumpFunderResults implements Serializable {
 
 		Dataset<Relation> relation = Utils
 			.readPath(spark, relationPath + "/relation", Relation.class)
-			.filter("dataInfo.deletedbyinference = false and lower(relClass) = '" + Constants.RESULT_PROJECT_IS_PRODUCED_BY.toLowerCase()+ "'");
+			.filter(
+				"dataInfo.deletedbyinference = false and lower(relClass) = '"
+					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
 
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
@@ -86,18 +89,17 @@ public class SparkDumpFunderResults implements Serializable {
 			.distinct()
 			.collectAsList();
 
-
 		funderList.forEach(funder -> {
 			String fundernsp = funder.substring(3);
 			String funderdump;
-			if (fundernsp.startsWith("corda")){
+			if (fundernsp.startsWith("corda")) {
 				funderdump = "EC_";
-				if(fundernsp.endsWith("h2020")){
+				if (fundernsp.endsWith("h2020")) {
 					funderdump += "H2020";
-				}else{
+				} else {
 					funderdump += "FP7";
 				}
-			}else{
+			} else {
 				funderdump = fundernsp.substring(0, fundernsp.indexOf("_")).toUpperCase();
 			}
 			writeFunderResult(funder, result, outputPath + "/" + funderdump);
