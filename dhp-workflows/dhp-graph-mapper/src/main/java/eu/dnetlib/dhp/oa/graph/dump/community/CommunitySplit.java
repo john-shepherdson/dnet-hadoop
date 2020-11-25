@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -54,7 +55,7 @@ public class CommunitySplit implements Serializable {
 
 	private static void printResult(String c, Dataset<CommunityResult> result, String outputPath) {
 		Dataset<CommunityResult> community_products = result
-			.filter(r -> containsCommunity(r, c));
+			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, c));
 
 		try {
 			community_products.first();
