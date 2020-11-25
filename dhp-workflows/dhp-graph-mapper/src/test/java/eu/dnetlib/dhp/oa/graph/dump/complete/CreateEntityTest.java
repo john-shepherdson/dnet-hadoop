@@ -164,14 +164,9 @@ public class CreateEntityTest {
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.getContextInformation(consumer);
 
-		cInfoList.forEach(cInfo -> {
-			try {
-				writer.write(new Gson().toJson(Process.getEntity(cInfo)));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-
+		for(ContextInfo cInfo: cInfoList){
+			writer.write(new Gson().toJson(Process.getEntity(cInfo)));
+		}
 		writer.close();
 
 	}
