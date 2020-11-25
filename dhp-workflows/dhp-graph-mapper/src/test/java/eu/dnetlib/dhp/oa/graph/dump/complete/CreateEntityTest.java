@@ -20,10 +20,7 @@ import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -146,6 +143,7 @@ public class CreateEntityTest {
 	}
 
 	@Test
+	@Disabled
 	public void test2() throws IOException, ISLookUpException {
 		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
 
@@ -166,8 +164,16 @@ public class CreateEntityTest {
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.getContextInformation(consumer);
 
-		List<ResearchInitiative> riList = new ArrayList<>();
-		cInfoList.forEach(cInfo -> riList.add(Process.getEntity(cInfo)));
+		//List<ResearchInitiative> riList = new ArrayList<>();
+		cInfoList.forEach(cInfo -> {
+			try {
+				writer.write(new Gson().toJson(Process.getEntity(cInfo)));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+
+		writer.close();
 
 	}
 }
