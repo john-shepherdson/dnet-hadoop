@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static org.apache.spark.sql.functions.col;
 
+import java.util.Objects;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -28,7 +30,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		SOURCE, TARGET
 	}
 
-	public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark) throws Exception {
+	public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
 	}
 
@@ -55,13 +57,13 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 		final String graphBasePath = parser.get("graphBasePath");
 		final String workingPath = parser.get("workingPath");
-		final String dedupGraphPath = parser.get("dedupGraphPath");
+		final String graphOutputPath = parser.get("graphOutputPath");
 
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("workingPath: '{}'", workingPath);
-		log.info("dedupGraphPath: '{}'", dedupGraphPath);
+		log.info("graphOutputPath: '{}'", graphOutputPath);
 
-		final String outputRelationPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
+		final String outputRelationPath = DedupUtility.createEntityPath(graphOutputPath, "relation");
 		removeOutputDir(spark, outputRelationPath);
 
 		Dataset<Relation> mergeRels = spark
@@ -101,7 +103,8 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 				newRels
 					.union(updated)
 					.union(mergeRels)
-					.map((MapFunction<Relation, Relation>) r -> r, Encoders.kryo(Relation.class))),
+					.map((MapFunction<Relation, Relation>) r -> r, Encoders.kryo(Relation.class)))
+						.filter((FilterFunction<Relation>) r -> !Objects.equals(r.getSource(), r.getTarget())),
 			outputRelationPath, SaveMode.Overwrite);
 	}
 

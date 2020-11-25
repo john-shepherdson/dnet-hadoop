@@ -19,24 +19,24 @@ public class OafMapperUtils {
 
 	public static Oaf merge(final Oaf o1, final Oaf o2) {
 		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
-			if (ModelSupport.isSubClass(o1, Result.class)) {
-
-				return mergeResults((Result) o1, (Result) o2);
-			} else if (ModelSupport.isSubClass(o1, Datasource.class)) {
-				((Datasource) o1).mergeFrom((Datasource) o2);
-			} else if (ModelSupport.isSubClass(o1, Organization.class)) {
-				((Organization) o1).mergeFrom((Organization) o2);
-			} else if (ModelSupport.isSubClass(o1, Project.class)) {
-				((Project) o1).mergeFrom((Project) o2);
-			} else {
-				throw new RuntimeException("invalid OafEntity subtype:" + o1.getClass().getCanonicalName());
-			}
+			return mergeEntities((OafEntity) o1, (OafEntity) o2);
 		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
 			((Relation) o1).mergeFrom((Relation) o2);
-		} else {
-			throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
 		}
-		return o1;
+		throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
+	}
+
+	public static OafEntity mergeEntities(OafEntity e1, OafEntity e2) {
+		if (ModelSupport.isSubClass(e1, Result.class)) {
+			return mergeResults((Result) e1, (Result) e2);
+		} else if (ModelSupport.isSubClass(e1, Datasource.class)) {
+			((Datasource) e1).mergeFrom((Datasource) e2);
+		} else if (ModelSupport.isSubClass(e1, Organization.class)) {
+			((Organization) e1).mergeFrom((Organization) e2);
+		} else if (ModelSupport.isSubClass(e1, Project.class)) {
+			((Project) e1).mergeFrom((Project) e2);
+		}
+		throw new RuntimeException("invalid OafEntity subtype:" + e1.getClass().getCanonicalName());
 	}
 
 	public static Result mergeResults(Result r1, Result r2) {
