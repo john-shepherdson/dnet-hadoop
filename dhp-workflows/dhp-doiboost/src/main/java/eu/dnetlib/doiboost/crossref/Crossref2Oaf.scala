@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
 
-case class CrossrefDT(doi: String, json:String) {}
+case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
 case class mappingAffiliation(name: String) {}
 
