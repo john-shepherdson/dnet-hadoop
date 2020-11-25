@@ -17,26 +17,30 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class OafMapperUtils {
 
-	public static Oaf merge(final Oaf o1, final Oaf o2) {
-		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
-			return mergeEntities((OafEntity) o1, (OafEntity) o2);
-		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
-			((Relation) o1).mergeFrom((Relation) o2);
+	public static Oaf merge(final Oaf left, final Oaf right) {
+		if (ModelSupport.isSubClass(left, OafEntity.class)) {
+			return mergeEntities((OafEntity) left, (OafEntity) right);
+		} else if (ModelSupport.isSubClass(left, Relation.class)) {
+			((Relation) left).mergeFrom((Relation) right);
+		} else {
+			throw new RuntimeException("invalid Oaf type:" + left.getClass().getCanonicalName());
 		}
-		throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
+		return left;
 	}
 
-	public static OafEntity mergeEntities(OafEntity e1, OafEntity e2) {
-		if (ModelSupport.isSubClass(e1, Result.class)) {
-			return mergeResults((Result) e1, (Result) e2);
-		} else if (ModelSupport.isSubClass(e1, Datasource.class)) {
-			((Datasource) e1).mergeFrom((Datasource) e2);
-		} else if (ModelSupport.isSubClass(e1, Organization.class)) {
-			((Organization) e1).mergeFrom((Organization) e2);
-		} else if (ModelSupport.isSubClass(e1, Project.class)) {
-			((Project) e1).mergeFrom((Project) e2);
+	public static OafEntity mergeEntities(OafEntity left, OafEntity right) {
+		if (ModelSupport.isSubClass(left, Result.class)) {
+			return mergeResults((Result) left, (Result) right);
+		} else if (ModelSupport.isSubClass(left, Datasource.class)) {
+			((Datasource) left).mergeFrom((Datasource) right);
+		} else if (ModelSupport.isSubClass(left, Organization.class)) {
+			((Organization) left).mergeFrom((Organization) right);
+		} else if (ModelSupport.isSubClass(left, Project.class)) {
+			((Project) left).mergeFrom((Project) right);
+		} else {
+			throw new RuntimeException("invalid OafEntity subtype:" + left.getClass().getCanonicalName());
 		}
-		throw new RuntimeException("invalid OafEntity subtype:" + e1.getClass().getCanonicalName());
+		return left;
 	}
 
 	public static Result mergeResults(Result r1, Result r2) {
