@@ -29,12 +29,13 @@
 		"paramLongName":"resultTableName",
 		"paramDescription": "the name of the result table we are currently working on",
 		"paramRequired": true
-	},{
-	"paramName":"dt",
-	"paramLongName":"dumpType",
-	"paramDescription": "the type of the dump (complete for the whole graph, community for the products related to communities, funder for the results with at least a link to project",
-	"paramRequired": false
-}
+	},
+	{
+		"paramName":"dt",
+		"paramLongName":"dumpType",
+		"paramDescription": "the type of the dump (complete for the whole graph, community for the products related to communities, funder for the results with at least a link to project",
+		"paramRequired": false
+	}
 ]
 
 
