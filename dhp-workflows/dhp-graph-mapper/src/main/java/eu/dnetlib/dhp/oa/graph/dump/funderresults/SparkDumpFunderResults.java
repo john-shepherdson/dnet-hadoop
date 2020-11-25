@@ -25,9 +25,8 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
 /**
- * Preparation of the Project information to be added to the dumped results. For each result associated to at least one
- * Project, a serialization of an instance af ResultProject closs is done. ResultProject contains the resultId, and the
- * list of Projects (as in eu.dnetlib.dhp.schema.dump.oaf.community.Project) it is associated to
+ * Splits the dumped results by funder and stores them in a folder named as the funder nsp (for all the funders, but the EC
+ * for the EC it specifies also the fundingStream (FP7 or H2020)
  */
 public class SparkDumpFunderResults implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkDumpFunderResults.class);

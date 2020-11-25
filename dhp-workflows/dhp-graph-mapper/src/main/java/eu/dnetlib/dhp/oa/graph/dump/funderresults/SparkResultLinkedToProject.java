@@ -24,6 +24,11 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
 
+/**
+ * Selects the results linked to projects. Only for these results the dump will be performed.
+ * The code to perform the dump and to expend the dumped results with the informaiton related to projects
+ * is the one used for the dump of the community products
+ */
 public class SparkResultLinkedToProject implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkResultLinkedToProject.class);
