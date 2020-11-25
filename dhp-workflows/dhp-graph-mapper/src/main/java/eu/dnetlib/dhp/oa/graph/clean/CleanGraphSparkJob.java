@@ -103,15 +103,9 @@ public class CleanGraphSparkJob {
 		return spark
 			.read()
 			.textFile(inputEntityPath)
-			.filter((FilterFunction<String>) s -> isEntityType(s, clazz))
-			.map((MapFunction<String, String>) s -> StringUtils.substringAfter(s, "|"), Encoders.STRING())
 			.map(
 				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, clazz),
 				Encoders.bean(clazz));
-	}
-
-	private static <T extends Oaf> boolean isEntityType(final String s, final Class<T> clazz) {
-		return StringUtils.substringBefore(s, "|").equals(clazz.getName());
 	}
 
 }
