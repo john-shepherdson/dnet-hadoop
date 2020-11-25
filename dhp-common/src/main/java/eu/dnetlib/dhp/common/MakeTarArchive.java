@@ -90,9 +90,6 @@ public class MakeTarArchive implements Serializable {
 		String p_string = p.toString();
 		if (!p_string.endsWith("_SUCCESS")) {
 			String name = p_string.substring(p_string.lastIndexOf("/") + 1);
-//			if (name.trim().equalsIgnoreCase("communities_infrastructures")) {
-//				name = "communities_infrastructures.json";
-//			}
 			TarArchiveEntry entry = new TarArchiveEntry(dir_name + "/" + name);
 			entry.setSize(fileStatus.getLen());
 			current_size += fileStatus.getLen();
