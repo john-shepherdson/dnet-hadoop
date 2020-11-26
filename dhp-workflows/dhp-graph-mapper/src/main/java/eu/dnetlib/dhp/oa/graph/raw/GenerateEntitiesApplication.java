@@ -103,9 +103,6 @@ public class GenerateEntitiesApplication {
 		}
 
 		inputRdd
-			.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
-			.reduceByKey((o1, o2) -> OafMapperUtils.merge(o1, o2))
-			.map(Tuple2::_2)
 			.map(
 				oaf -> oaf.getClass().getSimpleName().toLowerCase()
 					+ "|"
