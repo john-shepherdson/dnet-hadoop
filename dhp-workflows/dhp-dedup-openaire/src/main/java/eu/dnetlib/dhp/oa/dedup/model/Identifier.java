@@ -4,10 +4,7 @@ package eu.dnetlib.dhp.oa.dedup.model;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,13 +20,15 @@ import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier> {
 
+	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
 	public static String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
 	public static String BASE_DATE = "2000-01-01";
 
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
 	private T entity;
+
+	// cached date value
+	private Date date = null;
 
 	public static <T extends OafEntity> Identifier newInstance(T entity) {
 		return new Identifier(entity);
@@ -48,17 +47,23 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 	}
 
 	public Date getDate() {
-		String date = BASE_DATE;
-		if (ModelSupport.isSubClass(getEntity(), Result.class)) {
-			Result result = (Result) getEntity();
-			if (isWellformed(result.getDateofacceptance())) {
-				date = result.getDateofacceptance().getValue();
+		if (Objects.nonNull(date)) {
+			return date;
+		} else {
+			String sDate = BASE_DATE;
+			if (ModelSupport.isSubClass(getEntity(), Result.class)) {
+				Result result = (Result) getEntity();
+				if (isWellformed(result.getDateofacceptance())) {
+					sDate = result.getDateofacceptance().getValue();
+				}
 			}
-		}
-		try {
-			return sdf.parse(date);
-		} catch (ParseException e) {
-			return new Date();
+			try {
+				this.date = new SimpleDateFormat(DATE_FORMAT).parse(sDate);
+				return date;
+			} catch (Throwable e) {
+				throw new RuntimeException(
+					String.format("cannot parse date: '%s' from record: '%s'", sDate, entity.getId()));
+			}
 		}
 	}
 
@@ -117,10 +122,10 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 			}
 
 			if (this.getDate().compareTo(i.getDate()) == 0) {// same date
-				// the minus because we need to take the alphabetically lower id
+				// we need to take the alphabetically lower id
 				return this.getOriginalID().compareTo(i.getOriginalID());
 			} else
-				// the minus is because we need to take the elder date
+				// we need to take the elder date
 				return this.getDate().compareTo(i.getDate());
 		} else {
 			return new PidComparator<>(getEntity()).compare(toSP(getPidType()), toSP(i.getPidType()));
