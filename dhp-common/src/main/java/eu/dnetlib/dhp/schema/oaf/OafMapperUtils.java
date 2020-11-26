@@ -43,13 +43,13 @@ public class OafMapperUtils {
 		return left;
 	}
 
-	public static Result mergeResults(Result r1, Result r2) {
-		if (new ResultTypeComparator().compare(r1, r2) < 0) {
-			r1.mergeFrom(r2);
-			return r1;
+	public static Result mergeResults(Result left, Result right) {
+		if (new ResultTypeComparator().compare(left, right) < 0) {
+			left.mergeFrom(right);
+			return left;
 		} else {
-			r2.mergeFrom(r1);
-			return r2;
+			right.mergeFrom(left);
+			return right;
 		}
 	}
 
