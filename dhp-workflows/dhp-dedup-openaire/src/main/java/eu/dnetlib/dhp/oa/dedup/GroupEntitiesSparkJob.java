@@ -90,7 +90,7 @@ public class GroupEntitiesSparkJob {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		spark
 			.read()
-			.textFile(toSeq(listPaths(inputPath, sc)))
+			.textFile(toSeq(listEntityPaths(inputPath, sc)))
 			.map((MapFunction<String, OafEntity>) s -> parseOaf(s), Encoders.kryo(OafEntity.class))
 			.filter((FilterFunction<OafEntity>) e -> StringUtils.isNotBlank(ModelSupport.idFn().apply(e)))
 			.groupByKey((MapFunction<OafEntity, String>) oaf -> ModelSupport.idFn().apply(oaf), Encoders.STRING())
@@ -191,11 +191,11 @@ public class GroupEntitiesSparkJob {
 		}
 	}
 
-	private static List<String> listPaths(String inputPath, JavaSparkContext sc) {
+	private static List<String> listEntityPaths(String inputPath, JavaSparkContext sc) {
 		return HdfsSupport
 			.listFiles(inputPath, sc.hadoopConfiguration())
 			.stream()
-			.filter(f -> !f.equals("relation"))
+			.filter(f -> !f.toLowerCase().contains("relation"))
 			.collect(Collectors.toList());
 	}
 
