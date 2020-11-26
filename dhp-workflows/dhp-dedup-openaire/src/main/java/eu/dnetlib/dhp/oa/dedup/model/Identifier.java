@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Sets;
@@ -21,9 +22,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier> {
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
-	public static String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
-	public static String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
-	public static String BASE_DATE = "2000-01-01";
+	public static final String BASE_DATE = "2000-01-01";
 
 	private T entity;
 
@@ -105,19 +104,19 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 
 		if (this.getPidType().compareTo(i.getPidType()) == 0) { // same type
 			if (getEntityType() == EntityType.publication) {
-				if (isFromDatasourceID(lKeys, CROSSREF_ID)
-					&& !isFromDatasourceID(rKeys, CROSSREF_ID))
+				if (isFromDatasourceID(lKeys, ModelConstants.CROSSREF_ID)
+					&& !isFromDatasourceID(rKeys, ModelConstants.CROSSREF_ID))
 					return -1;
-				if (isFromDatasourceID(rKeys, CROSSREF_ID)
-					&& !isFromDatasourceID(lKeys, CROSSREF_ID))
+				if (isFromDatasourceID(rKeys, ModelConstants.CROSSREF_ID)
+					&& !isFromDatasourceID(lKeys, ModelConstants.CROSSREF_ID))
 					return 1;
 			}
 			if (getEntityType() == EntityType.dataset) {
-				if (isFromDatasourceID(lKeys, DATACITE_ID)
-					&& !isFromDatasourceID(rKeys, DATACITE_ID))
+				if (isFromDatasourceID(lKeys, ModelConstants.CROSSREF_ID)
+					&& !isFromDatasourceID(rKeys, ModelConstants.CROSSREF_ID))
 					return -1;
-				if (isFromDatasourceID(rKeys, DATACITE_ID)
-					&& !isFromDatasourceID(lKeys, DATACITE_ID))
+				if (isFromDatasourceID(rKeys, ModelConstants.CROSSREF_ID)
+					&& !isFromDatasourceID(lKeys, ModelConstants.CROSSREF_ID))
 					return 1;
 			}
 

@@ -7,6 +7,9 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class ModelConstants {
 
+	public static String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
+	public static String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
+
 	public static final String DNET_SUBJECT_TYPOLOGIES = "dnet:subject_classification_typologies";
 	public static final String DNET_RESULT_TYPOLOGIES = "dnet:result_typologies";
 	public static final String DNET_PUBLICATION_RESOURCE = "dnet:publication_resource";
