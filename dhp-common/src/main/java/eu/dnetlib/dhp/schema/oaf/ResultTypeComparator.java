@@ -2,8 +2,14 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.google.common.collect.Sets;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.CROSSREF_ID;
 
 public class ResultTypeComparator implements Comparator<Result> {
 
@@ -16,6 +22,16 @@ public class ResultTypeComparator implements Comparator<Result> {
 			return 1;
 		if (right == null)
 			return -1;
+
+		HashSet<String> lCf = getCollectedFromIds(left);
+		HashSet<String> rCf = getCollectedFromIds(right);
+
+		if (lCf.contains(CROSSREF_ID) && !rCf.contains(CROSSREF_ID)) {
+			return -1;
+		}
+		if (!lCf.contains(CROSSREF_ID) && rCf.contains(CROSSREF_ID)) {
+			return 1;
+		}
 
 		String lClass = left.getResulttype().getClassid();
 		String rClass = right.getResulttype().getClassid();
@@ -45,5 +61,13 @@ public class ResultTypeComparator implements Comparator<Result> {
 
 		// Else (but unlikely), lexicographical ordering will do.
 		return lClass.compareTo(rClass);
+	}
+
+	protected HashSet<String> getCollectedFromIds(Result left) {
+		return Optional.ofNullable(left.getCollectedfrom())
+				.map(cf -> cf.stream()
+						.map(c -> c.getKey())
+						.collect(Collectors.toCollection(HashSet::new)))
+				.orElse(new HashSet<>());
 	}
 }
