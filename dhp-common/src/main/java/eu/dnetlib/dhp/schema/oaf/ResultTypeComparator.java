@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.schema.oaf;
 
+import static eu.dnetlib.dhp.schema.common.ModelConstants.CROSSREF_ID;
+
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Optional;
@@ -8,8 +10,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Sets;
+
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.CROSSREF_ID;
 
 public class ResultTypeComparator implements Comparator<Result> {
 
@@ -64,10 +66,13 @@ public class ResultTypeComparator implements Comparator<Result> {
 	}
 
 	protected HashSet<String> getCollectedFromIds(Result left) {
-		return Optional.ofNullable(left.getCollectedfrom())
-				.map(cf -> cf.stream()
-						.map(c -> c.getKey())
-						.collect(Collectors.toCollection(HashSet::new)))
-				.orElse(new HashSet<>());
+		return Optional
+			.ofNullable(left.getCollectedfrom())
+			.map(
+				cf -> cf
+					.stream()
+					.map(c -> c.getKey())
+					.collect(Collectors.toCollection(HashSet::new)))
+			.orElse(new HashSet<>());
 	}
 }
