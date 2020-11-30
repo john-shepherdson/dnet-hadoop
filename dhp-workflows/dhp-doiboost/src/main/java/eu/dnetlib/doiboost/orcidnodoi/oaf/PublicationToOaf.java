@@ -144,7 +144,7 @@ public class PublicationToOaf implements Serializable {
 
 		publication.setLastupdatetimestamp(new Date().getTime());
 
-		publication.setDateofcollection("2019-10-22");
+		publication.setDateofcollection("2020-10-14");
 		publication.setDateoftransformation(DumpToActionsUtility.now_ISO8601());
 
 		// Adding external ids
@@ -526,6 +526,18 @@ public class PublicationToOaf implements Serializable {
 		q.setSchemeid(ModelConstants.DNET_PID_TYPES);
 		q.setSchemename(ModelConstants.DNET_PID_TYPES);
 		sp.setQualifier(q);
+		final DataInfo dataInfo = new DataInfo();
+		dataInfo.setDeletedbyinference(false);
+		dataInfo.setInferred(false);
+		dataInfo.setTrust("0.9");
+		dataInfo
+				.setProvenanceaction(
+						mapQualifier(
+								"sysimport:crosswalk:entityregistry",
+								"Harvested",
+								"dnet:provenanceActions",
+								"dnet:provenanceActions"));
+		sp.setDataInfo(dataInfo);
 		return sp;
 	}
 }
