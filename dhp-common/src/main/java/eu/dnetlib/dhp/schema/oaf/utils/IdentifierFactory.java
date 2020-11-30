@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
@@ -31,17 +31,16 @@ public class IdentifierFactory implements Serializable {
 		"(^10\\.1207\\/[a-zA-Z0-9_]+\\&[0-9]+_[0-9]+$)";
 
 	public static final int ID_PREFIX_LEN = 12;
-	public static final String NONE = "none";
 
 	/**
 	 * Creates an identifier from the most relevant PID (if available) in the given entity T. Returns entity.id
 	 * when no PID is available
 	 * @param entity the entity providing PIDs and a default ID.
 	 * @param <T> the specific entity type. Currently Organization and Result subclasses are supported.
+	 * @param md5 indicates whether should hash the PID value or not.
 	 * @return an identifier from the most relevant PID, entity.id otherwise
 	 */
-	public static <T extends OafEntity> String createIdentifier(T entity) {
-
+	public static <T extends OafEntity> String createIdentifier(T entity, boolean md5) {
 		if (Objects.isNull(entity.getPid()) || entity.getPid().isEmpty()) {
 			return entity.getId();
 		}
@@ -69,15 +68,27 @@ public class IdentifierFactory implements Serializable {
 							.stream()
 							.sorted(new PidValueComparator())
 							.findFirst()
-							.map(s -> idFromPid(entity, s))
+							.map(s -> idFromPid(entity, s, md5))
 							.orElseGet(entity::getId))
 					.orElseGet(entity::getId))
 			.orElseGet(entity::getId);
 	}
 
+	/**
+	 * @see {@link IdentifierFactory#createIdentifier(OafEntity, boolean)}
+	 */
+	public static <T extends OafEntity> String createIdentifier(T entity) {
+
+		return createIdentifier(entity, true);
+	}
+
 	protected static boolean pidFilter(StructuredProperty s) {
 		if (Objects.isNull(s.getQualifier()) ||
-			StringUtils.isBlank(StringUtils.trim(s.getValue()))) {
+			StringUtils.isBlank(s.getValue()) ||
+			StringUtils.isBlank(s.getValue().replaceAll("(?:\\n|\\r|\\t|\\s)", ""))) {
+			return false;
+		}
+		if (CleaningFunctions.PID_BLACKLIST.contains(StringUtils.trim(s.getValue().toLowerCase()))) {
 			return false;
 		}
 		try {
@@ -93,21 +104,14 @@ public class IdentifierFactory implements Serializable {
 		}
 	}
 
-	private static String verifyIdSyntax(String s) {
-		if (StringUtils.isBlank(s) || !s.matches(ID_REGEX)) {
-			throw new RuntimeException(String.format("malformed id: '%s'", s));
-		} else {
-			return s;
-		}
-	}
-
-	private static <T extends OafEntity> String idFromPid(T entity, StructuredProperty s) {
+	private static <T extends OafEntity> String idFromPid(T entity, StructuredProperty s, boolean md5) {
+		final String value = CleaningFunctions.normalizePidValue(s).getValue();
 		return new StringBuilder()
 			.append(StringUtils.substringBefore(entity.getId(), ID_PREFIX_SEPARATOR))
 			.append(ID_PREFIX_SEPARATOR)
 			.append(createPrefix(s.getQualifier().getClassid()))
 			.append(ID_SEPARATOR)
-			.append(DHPUtils.md5(CleaningFunctions.normalizePidValue(s).getValue()))
+			.append(md5 ? DHPUtils.md5(value) : value)
 			.toString();
 	}
 

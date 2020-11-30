@@ -64,13 +64,19 @@ public class GenerateEntitiesApplication {
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
+		final boolean shouldHashId = Optional
+			.ofNullable(parser.get("shouldHashId"))
+			.map(Boolean::valueOf)
+			.orElse(true);
+		log.info("shouldHashId: {}", shouldHashId);
+
 		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
 		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			HdfsSupport.remove(targetPath, spark.sparkContext().hadoopConfiguration());
-			generateEntities(spark, vocs, sourcePaths, targetPath);
+			generateEntities(spark, vocs, sourcePaths, targetPath, shouldHashId);
 		});
 	}
 
@@ -78,7 +84,8 @@ public class GenerateEntitiesApplication {
 		final SparkSession spark,
 		final VocabularyGroup vocs,
 		final String sourcePaths,
-		final String targetPath) {
+		final String targetPath,
+		final boolean shouldHashId) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		final List<String> existingSourcePaths = Arrays
@@ -97,7 +104,7 @@ public class GenerateEntitiesApplication {
 					sc
 						.sequenceFile(sp, Text.class, Text.class)
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
-						.map(k -> convertToListOaf(k._1(), k._2(), vocs))
+						.map(k -> convertToListOaf(k._1(), k._2(), shouldHashId, vocs))
 						.filter(Objects::nonNull)
 						.flatMap(list -> list.iterator()));
 		}
@@ -113,20 +120,21 @@ public class GenerateEntitiesApplication {
 	private static List<Oaf> convertToListOaf(
 		final String id,
 		final String s,
+		final boolean shouldHashId,
 		final VocabularyGroup vocs) {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
 			case "oaf-store-cleaned":
 			case "oaf-store-claim":
-				return new OafToOafMapper(vocs, false).processMdRecord(s);
+				return new OafToOafMapper(vocs, false, shouldHashId).processMdRecord(s);
 			case "odf-store-cleaned":
 			case "odf-store-claim":
-				return new OdfToOafMapper(vocs, false).processMdRecord(s);
+				return new OdfToOafMapper(vocs, false, shouldHashId).processMdRecord(s);
 			case "oaf-store-intersection":
-				return new OafToOafMapper(vocs, true).processMdRecord(s);
+				return new OafToOafMapper(vocs, true, shouldHashId).processMdRecord(s);
 			case "odf-store-intersection":
-				return new OdfToOafMapper(vocs, true).processMdRecord(s);
+				return new OdfToOafMapper(vocs, true, shouldHashId).processMdRecord(s);
 			case "datasource":
 				return Arrays.asList(convertFromJson(s, Datasource.class));
 			case "organization":

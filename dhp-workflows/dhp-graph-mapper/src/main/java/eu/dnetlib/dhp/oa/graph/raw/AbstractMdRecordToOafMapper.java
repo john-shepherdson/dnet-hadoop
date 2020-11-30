@@ -26,6 +26,8 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	private final boolean invisible;
 
+	private final boolean shouldHashId;
+
 	protected static final String DATACITE_SCHEMA_KERNEL_4 = "http://datacite.org/schema/kernel-4";
 	protected static final String DATACITE_SCHEMA_KERNEL_4_SLASH = "http://datacite.org/schema/kernel-4/";
 	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
@@ -50,9 +52,11 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
 		"main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
 
-	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
+	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible,
+		final boolean shouldHashId) {
 		this.vocs = vocs;
 		this.invisible = invisible;
+		this.shouldHashId = shouldHashId;
 	}
 
 	public List<Oaf> processMdRecord(final String xml) {
@@ -137,7 +141,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		final long lastUpdateTimestamp) {
 
 		final OafEntity entity = createEntity(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
-		final String id = IdentifierFactory.createIdentifier(entity);
+		final String id = IdentifierFactory.createIdentifier(entity, shouldHashId);
 		if (!id.equals(entity.getId())) {
 			entity.getOriginalId().add(entity.getId());
 			entity.setId(id);

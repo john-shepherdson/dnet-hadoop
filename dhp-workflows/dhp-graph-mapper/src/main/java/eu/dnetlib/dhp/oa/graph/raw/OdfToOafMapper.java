@@ -19,8 +19,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
 
-	public OdfToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
-		super(vocs, invisible);
+	public OdfToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId) {
+		super(vocs, invisible, shouldHashId);
 	}
 
 	@Override

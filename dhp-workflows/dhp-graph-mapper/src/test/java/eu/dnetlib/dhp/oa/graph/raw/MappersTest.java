@@ -52,7 +52,7 @@ public class MappersTest {
 
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
 
-		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Publication);
@@ -131,7 +131,7 @@ public class MappersTest {
 
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
 
-		final List<Oaf> list = new OafToOafMapper(vocs, true).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
 
 		assertTrue(list.size() > 0);
 		assertTrue(list.get(0) instanceof Publication);
@@ -146,7 +146,7 @@ public class MappersTest {
 	void testDataset() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Dataset);
@@ -240,7 +240,7 @@ public class MappersTest {
 	void testSoftware() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_software.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof Software);
@@ -259,7 +259,7 @@ public class MappersTest {
 	void testDataset_2() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset_2.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -269,7 +269,7 @@ public class MappersTest {
 	@Test
 	void testClaimDedup() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_dedup.xml"));
-		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -279,7 +279,7 @@ public class MappersTest {
 	@Test
 	void testNakala() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_nakala.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -303,7 +303,7 @@ public class MappersTest {
 	@Test
 	void testClaimFromCrossref() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
-		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -319,7 +319,7 @@ public class MappersTest {
 	@Test
 	void testODFRecord() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_record.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
@@ -333,7 +333,7 @@ public class MappersTest {
 	@Test
 	void testTextGrid() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("textgrid.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));

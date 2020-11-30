@@ -22,8 +22,8 @@ import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
-	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
-		super(vocs, invisible);
+	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId) {
+		super(vocs, invisible, shouldHashId);
 	}
 
 	@Override
