@@ -91,16 +91,14 @@ public class IdentifierFactory implements Serializable {
 		if (CleaningFunctions.PID_BLACKLIST.contains(StringUtils.trim(s.getValue().toLowerCase()))) {
 			return false;
 		}
-		try {
-			switch (PidType.valueOf(s.getQualifier().getClassid())) {
-				case doi:
-					final String doi = StringUtils.trim(StringUtils.lowerCase(s.getValue()));
-					return doi.matches(DOI_REGEX);
-				default:
-					return true;
-			}
-		} catch (IllegalArgumentException e) {
-			return false;
+		switch (PidType.tryValueOf(s.getQualifier().getClassid())) {
+			case doi:
+				final String doi = StringUtils.trim(StringUtils.lowerCase(s.getValue()));
+				return doi.matches(DOI_REGEX);
+			case original:
+				return false;
+			default:
+				return true;
 		}
 	}
 

@@ -10,8 +10,8 @@ public class OrganizationPidComparator implements Comparator<StructuredProperty>
 	@Override
 	public int compare(StructuredProperty left, StructuredProperty right) {
 
-		PidType lClass = PidType.valueOf(left.getQualifier().getClassid());
-		PidType rClass = PidType.valueOf(right.getQualifier().getClassid());
+		PidType lClass = PidType.tryValueOf(left.getQualifier().getClassid());
+		PidType rClass = PidType.tryValueOf(right.getQualifier().getClassid());
 
 		if (lClass.equals(PidType.GRID))
 			return -1;

@@ -6,7 +6,7 @@ import org.apache.commons.lang3.EnumUtils;
 public enum PidType {
 
 	// Result
-	doi, pmid, pmc, handle, arXiv, NCID, GBIF, nct, pdb,
+	doi, pmid, pmc, handle, arXiv, nct, pdb,
 
 	// Organization
 	GRID, mag_id, urn,
