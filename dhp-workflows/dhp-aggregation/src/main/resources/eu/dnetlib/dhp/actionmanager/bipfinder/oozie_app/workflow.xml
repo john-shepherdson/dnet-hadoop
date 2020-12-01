@@ -82,7 +82,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
             <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
         </spark>
         <ok to="join_aa"/>
