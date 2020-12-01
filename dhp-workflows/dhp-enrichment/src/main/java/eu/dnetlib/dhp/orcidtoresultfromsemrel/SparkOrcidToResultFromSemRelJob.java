@@ -176,7 +176,7 @@ public class SparkOrcidToResultFromSemRelJob {
 		if (toaddpid) {
 			StructuredProperty p = new StructuredProperty();
 			p.setValue(autoritative_author.getOrcid());
-			p.setQualifier(getQualifier(PROPAGATION_AUTHOR_PID, PROPAGATION_AUTHOR_PID));
+			p.setQualifier(getQualifier(PROPAGATION_AUTHOR_PID_CLASSID, PROPAGATION_AUTHOR_PID_CLASSNAME));
 			p
 				.setDataInfo(
 					getDataInfo(
@@ -201,7 +201,8 @@ public class SparkOrcidToResultFromSemRelJob {
 			return false;
 		}
 		for (StructuredProperty pid : pids.get()) {
-			if (PROPAGATION_AUTHOR_PID.equals(pid.getQualifier().getClassid())) {
+			if (PROPAGATION_AUTHOR_PID_CLASSID.equals(pid.getQualifier().getClassid().toLowerCase()) ||
+            ORCID.equals(pid.getQualifier().getClassid().toLowerCase())) {
 				return true;
 			}
 		}
