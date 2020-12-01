@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Class that maps the model of the bipFinder! input data.
+ * Only needed for deserialization purposes
+ */
+
 public class BipDeserialize extends HashMap<String, List<Score>> implements Serializable {
 
 	public BipDeserialize() {

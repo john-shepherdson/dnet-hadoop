@@ -10,11 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +21,10 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
+/**
+ * Just collects all the atomic actions produced for the different results and saves them in
+ * outputpath for the ActionSet
+ */
 public class CollectAndSave implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectAndSave.class);

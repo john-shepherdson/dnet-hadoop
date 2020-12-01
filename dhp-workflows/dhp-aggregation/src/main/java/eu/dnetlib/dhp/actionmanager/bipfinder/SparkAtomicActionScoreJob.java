@@ -8,20 +8,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.hdfs.qjournal.protocol.QJournalProtocolProtos;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +31,9 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import scala.Tuple2;
 
+/**
+ * created the Atomic Action for each tipe of results
+ */
 public class SparkAtomicActionScoreJob implements Serializable {
 
 	private static String DOI = "doi";

@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.actionmanager.bipfinder;
 
 import java.io.Serializable;
 
+/**
+ * Subset of the information of the generic results that are needed to create the atomic action
+ */
 public class PreparedResult implements Serializable {
 	private String id; // openaire id
 	private String value; // doi
