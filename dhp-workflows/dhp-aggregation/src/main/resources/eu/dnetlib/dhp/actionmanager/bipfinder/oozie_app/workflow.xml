@@ -1,22 +1,17 @@
-<workflow-app name="H2020Programme" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="BipFinderScore" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>projectFileURL</name>
-            <description>the url where to get the projects file</description>
+            <name>inputPath</name>
+            <description>the input path of the resources to be extended</description>
         </property>
 
         <property>
-            <name>programmeFileURL</name>
-            <description>the url where to get the programme file</description>
-        </property>
-
-        <property>
-            <name>topicFileURL</name>
-            <description>the url where to get the topic file</description>
+            <name>bipScorePath</name>
+            <description>the path where to find the bipFinder scores</description>
         </property>
         <property>
             <name>outputPath</name>
-            <description>path where to store the action set</description>
+            <description>the path where to store the actionset</description>
         </property>
     </parameters>
 
@@ -31,128 +26,141 @@
             <delete path='${workingDir}'/>
             <mkdir path='${workingDir}'/>
         </fs>
-        <ok to="get_project_file"/>
+        <ok to="atomicactions"/>
         <error to="Kill"/>
     </action>
 
-    <action name="get_project_file">
-        <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileURL</arg><arg>${projectFileURL}</arg>
-            <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProject</arg>
-        </java>
-        <ok to="get_programme_file"/>
-        <error to="Kill"/>
-    </action>
+    <fork name="atomicactions">
+        <path start="atomicactions_publication"/>
+        <path start="atomicactions_dataset"/>
+        <path start="atomicactions_orp"/>
+        <path start="atomicactions_software"/>
+    </fork>
 
-    <action name="get_programme_file">
-        <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileURL</arg><arg>${programmeFileURL}</arg>
-            <arg>--hdfsPath</arg><arg>${workingDir}/programme</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme</arg>
-        </java>
-        <ok to="get_topic_file"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="get_topic_file">
-        <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadExcel</main-class>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileURL</arg><arg>${topicFileURL}</arg>
-            <arg>--hdfsPath</arg><arg>${workingDir}/topic</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic</arg>
-        </java>
-        <ok to="read_projects"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="read_projects">
-        <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.ReadProjectsFromDB</main-class>
-            <arg>--hdfsPath</arg><arg>${workingDir}/dbProjects</arg>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
-            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
-            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
-        </java>
-        <ok to="prepare_programme"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="prepare_programme">
+    <action name="atomicactions_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareProgramme</name>
-            <class>eu.dnetlib.dhp.actionmanager.project.PrepareProgramme</class>
+            <name>Produces the atomic action with the bip finder scores for publications</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--programmePath</arg><arg>${workingDir}/programme</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedProgramme</arg>
+            <arg>--inputPath</arg><arg>${inputPath}/publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
+            <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
         </spark>
-        <ok to="prepare_project"/>
+        <ok to="join_aa"/>
         <error to="Kill"/>
     </action>
 
-    <action name="prepare_project">
+    <action name="atomicactions_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareProjects</name>
-            <class>eu.dnetlib.dhp.actionmanager.project.PrepareProjects</class>
+            <name>Produces the atomic action with the bip finder scores for datasets</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--projectPath</arg><arg>${workingDir}/projects</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedProjects</arg>
-            <arg>--dbProjectPath</arg><arg>${workingDir}/dbProjects</arg>
+            <arg>--inputPath</arg><arg>${inputPath}/dataset</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
         </spark>
-        <ok to="create_updates"/>
+        <ok to="join_aa"/>
         <error to="Kill"/>
     </action>
 
-    <action name="create_updates">
+    <action name="atomicactions_orp">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ProjectProgrammeAS</name>
-            <class>eu.dnetlib.dhp.actionmanager.project.SparkAtomicActionJob</class>
+            <name>Produces the atomic action with the bip finder scores for orp</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--projectPath</arg><arg>${workingDir}/preparedProjects</arg>
-            <arg>--programmePath</arg><arg>${workingDir}/preparedProgramme</arg>
-            <arg>--topicPath</arg><arg>${workingDir}/topic</arg>
+            <arg>--inputPath</arg><arg>${inputPath}/otherresearchproduct</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
+        </spark>
+        <ok to="join_aa"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="atomicactions_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the atomic action with the bip finder scores for software</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${inputPath}/software</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/software</arg>
+            <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
+        </spark>
+        <ok to="join_aa"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="join_aa" to="collectandsave"/>
+
+    <action name="collectandsave">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>saves all the aa produced for the several types of results in the as output path</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.CollectAndSave</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingDir}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
