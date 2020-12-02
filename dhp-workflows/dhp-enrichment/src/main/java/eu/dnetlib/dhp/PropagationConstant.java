@@ -44,9 +44,7 @@ public class PropagationConstant {
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID = "authorpid:result";
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME = "Propagation of authors pid to result through semantic relations";
 
-	public static final String PROPAGATION_AUTHOR_PID_CLASSID = "orcid_pending";
-	public static final String ORCID = "orcid";
-	public static final String PROPAGATION_AUTHOR_PID_CLASSNAME = "Open Researcher and Contributor ID";
+
 
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.util.List;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -176,7 +177,7 @@ public class SparkOrcidToResultFromSemRelJob {
 		if (toaddpid) {
 			StructuredProperty p = new StructuredProperty();
 			p.setValue(autoritative_author.getOrcid());
-			p.setQualifier(getQualifier(PROPAGATION_AUTHOR_PID_CLASSID, PROPAGATION_AUTHOR_PID_CLASSNAME));
+			p.setQualifier(getQualifier(ModelConstants.ORCID_PENDING, ModelConstants.ORCID_CLASSNAME));
 			p
 				.setDataInfo(
 					getDataInfo(
@@ -201,8 +202,8 @@ public class SparkOrcidToResultFromSemRelJob {
 			return false;
 		}
 		for (StructuredProperty pid : pids.get()) {
-			if (PROPAGATION_AUTHOR_PID_CLASSID.equals(pid.getQualifier().getClassid().toLowerCase()) ||
-            ORCID.equals(pid.getQualifier().getClassid().toLowerCase())) {
+			if (ModelConstants.ORCID_PENDING.equals(pid.getQualifier().getClassid().toLowerCase()) ||
+            ModelConstants.ORCID.equals(pid.getQualifier().getClassid().toLowerCase())) {
 				return true;
 			}
 		}
