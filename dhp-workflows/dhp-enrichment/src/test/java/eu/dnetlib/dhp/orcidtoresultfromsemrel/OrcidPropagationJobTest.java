@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.cloudera.org.codehaus.jackson.map.jsontype.impl.ClassNameIdResolver;
+import eu.dnetlib.dhp.PropagationConstant;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -166,7 +168,8 @@ public class OrcidPropagationJobTest {
 				propagatedAuthors
 					.filter(
 						"id = '50|dedup_wf_001::95b033c0c3961f6a1cdcd41a99a9632e' "
-							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = 'ORCID'")
+							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = '" +
+								PropagationConstant.PROPAGATION_AUTHOR_PID_CLASSID +"'")
 					.count());
 
 		Assertions.assertEquals(1, propagatedAuthors.filter("pid = '0000-0002-8825-3517'").count());

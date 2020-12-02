@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -102,7 +103,8 @@ public class PrepareResultOrcidAssociationStep1 {
 			+ "               FROM result "
 			+ "               LATERAL VIEW EXPLODE (author) a AS MyT "
 			+ "               LATERAL VIEW EXPLODE (MyT.pid) p AS MyP "
-			+ "               WHERE lower(MyP.qualifier.classid) = 'orcid') tmp "
+			+ "               WHERE lower(MyP.qualifier.classid) = '" + ModelConstants.ORCID + "' or "
+		    +"                       lower(MyP.qalifier.classid) = '" + ModelConstants.ORCID_PENDING + "') tmp "
 			+ "               GROUP BY id) r_t "
 			+ " JOIN ("
 			+ "        SELECT source, target "
