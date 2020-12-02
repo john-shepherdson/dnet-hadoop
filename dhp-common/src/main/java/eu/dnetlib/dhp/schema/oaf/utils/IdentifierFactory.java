@@ -1,13 +1,12 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
@@ -48,7 +47,8 @@ public class IdentifierFactory implements Serializable {
 		Map<String, List<StructuredProperty>> pids = entity
 			.getPid()
 			.stream()
-			.filter(s -> pidFilter(s))
+			.map(CleaningFunctions::normalizePidValue)
+			.filter(IdentifierFactory::pidFilter)
 			.collect(
 				Collectors
 					.groupingBy(
@@ -83,17 +83,21 @@ public class IdentifierFactory implements Serializable {
 	}
 
 	protected static boolean pidFilter(StructuredProperty s) {
+		final String pidValue = s.getValue();
 		if (Objects.isNull(s.getQualifier()) ||
-			StringUtils.isBlank(s.getValue()) ||
-			StringUtils.isBlank(s.getValue().replaceAll("(?:\\n|\\r|\\t|\\s)", ""))) {
+			StringUtils.isBlank(pidValue) ||
+			StringUtils.isBlank(pidValue.replaceAll("(?:\\n|\\r|\\t|\\s)", ""))) {
 			return false;
 		}
-		if (CleaningFunctions.PID_BLACKLIST.contains(StringUtils.trim(s.getValue().toLowerCase()))) {
+		if (CleaningFunctions.PID_BLACKLIST.contains(pidValue)) {
+			return false;
+		}
+		if (PidBlacklistProvider.getBlacklist(s.getQualifier().getClassid()).contains(pidValue)) {
 			return false;
 		}
 		switch (PidType.tryValueOf(s.getQualifier().getClassid())) {
 			case doi:
-				final String doi = StringUtils.trim(StringUtils.lowerCase(s.getValue()));
+				final String doi = StringUtils.trim(StringUtils.lowerCase(pidValue));
 				return doi.matches(DOI_REGEX);
 			case original:
 				return false;
@@ -103,13 +107,12 @@ public class IdentifierFactory implements Serializable {
 	}
 
 	private static <T extends OafEntity> String idFromPid(T entity, StructuredProperty s, boolean md5) {
-		final String value = CleaningFunctions.normalizePidValue(s).getValue();
 		return new StringBuilder()
 			.append(StringUtils.substringBefore(entity.getId(), ID_PREFIX_SEPARATOR))
 			.append(ID_PREFIX_SEPARATOR)
 			.append(createPrefix(s.getQualifier().getClassid()))
 			.append(ID_SEPARATOR)
-			.append(md5 ? DHPUtils.md5(value) : value)
+			.append(md5 ? DHPUtils.md5(s.getValue()) : s.getValue())
 			.toString();
 	}
 
