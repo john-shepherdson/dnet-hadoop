@@ -294,7 +294,7 @@ case object Crossref2Oaf {
     }
 
     def getProjectId (nsPrefix:String, targetId:String):String = {
-      "40|$nsPrefix::$targetId"
+      s"40|$nsPrefix::$targetId"
     }
 
 
