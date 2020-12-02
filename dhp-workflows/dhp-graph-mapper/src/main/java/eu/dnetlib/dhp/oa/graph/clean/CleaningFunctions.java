@@ -191,11 +191,13 @@ public class CleaningFunctions {
 				}
 
 				final Set<String> collectedFrom = Optional
-						.ofNullable(r.getCollectedfrom())
-						.map(c -> c.stream()
-								.map(KeyValue::getKey)
-								.collect(Collectors.toCollection(HashSet::new)))
-						.orElse(new HashSet<>());
+					.ofNullable(r.getCollectedfrom())
+					.map(
+						c -> c
+							.stream()
+							.map(KeyValue::getKey)
+							.collect(Collectors.toCollection(HashSet::new)))
+					.orElse(new HashSet<>());
 
 				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
@@ -211,12 +213,13 @@ public class CleaningFunctions {
 									.map(p -> {
 										// hack to distinguish orcid from orcid_pending
 										String pidProvenance = Optional
-												.ofNullable(p.getDataInfo())
-												.map(d -> Optional
-														.ofNullable(d.getProvenanceaction())
-														.map(Qualifier::getClassid)
-														.orElse(""))
-												.orElse("");
+											.ofNullable(p.getDataInfo())
+											.map(
+												d -> Optional
+													.ofNullable(d.getProvenanceaction())
+													.map(Qualifier::getClassid)
+													.orElse(""))
+											.orElse("");
 										if (pidProvenance.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
 											p.getQualifier().setClassid(ModelConstants.ORCID);
 										} else {
@@ -229,8 +232,8 @@ public class CleaningFunctions {
 										Collectors
 											.toMap(
 												p -> p.getQualifier().getClassid() + p.getValue(),
-													Function.identity(),
-													(p1, p2) -> p1,
+												Function.identity(),
+												(p1, p2) -> p1,
 												LinkedHashMap::new))
 									.values()
 									.stream()
