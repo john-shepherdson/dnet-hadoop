@@ -358,6 +358,23 @@ public class MappersTest {
 		System.out.println(p.getTitle().get(0).getValue());
 	}
 
+	@Test
+	void testBologna() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf-bologna.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		System.out.println(p.getTitle().get(0).getValue());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		System.out.println(p.getTitle().get(0).getValue());
+	}
+
 	private void assertValidId(final String id) {
 		assertEquals(49, id.length());
 		assertEquals('|', id.charAt(2));
