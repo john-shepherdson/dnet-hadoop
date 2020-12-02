@@ -31,6 +31,7 @@ public class PublicationToOaf implements Serializable {
 	static Logger logger = LoggerFactory.getLogger(PublicationToOaf.class);
 
 	public static final String ORCID = "ORCID";
+	public static final String ORCID_PID_TYPE_CLASSNAME = "Open Researcher and Contributor ID";
 	public final static String orcidPREFIX = "orcid_______";
 	public static final String OPENAIRE_PREFIX = "openaire____";
 	public static final String SEPARATOR = "::";
@@ -79,10 +80,10 @@ public class PublicationToOaf implements Serializable {
 
 		{
 			put("ark".toLowerCase(), new Pair<>("ark", "ark"));
-			put("arxiv".toLowerCase(), new Pair<>("arxiv", "arXiv"));
-			put("pmc".toLowerCase(), new Pair<>("pmc", "pmc"));
-			put("pmid".toLowerCase(), new Pair<>("pmid", "pmid"));
-			put("source-work-id".toLowerCase(), new Pair<>("orcidworkid", "orcidworkid"));
+			put("arxiv".toLowerCase(), new Pair<>("arXiv", "arXiv"));
+			put("pmc".toLowerCase(), new Pair<>("pmc", "PubMed Central ID"));
+			put("pmid".toLowerCase(), new Pair<>("pmid", "PubMed ID"));
+			put("source-work-id".toLowerCase(), new Pair<>("orcidworkid", "orcid workid"));
 			put("urn".toLowerCase(), new Pair<>("urn", "urn"));
 		}
 	};
@@ -152,8 +153,8 @@ public class PublicationToOaf implements Serializable {
 			.keySet()
 			.stream()
 			.forEach(jsonExtId -> {
-				final String classid = externalIds.get(jsonExtId.toLowerCase()).getValue();
-				final String classname = externalIds.get(jsonExtId.toLowerCase()).getKey();
+				final String classid = externalIds.get(jsonExtId.toLowerCase()).getKey();
+				final String classname = externalIds.get(jsonExtId.toLowerCase()).getValue();
 				final String extId = getStringValue(rootElement, jsonExtId);
 				if (StringUtils.isNotBlank(extId)) {
 					publication
@@ -522,21 +523,21 @@ public class PublicationToOaf implements Serializable {
 		sp.setValue(orcidId);
 		final Qualifier q = new Qualifier();
 		q.setClassid(ORCID.toLowerCase());
-		q.setClassname(ORCID.toLowerCase());
+		q.setClassname(ORCID_PID_TYPE_CLASSNAME);
 		q.setSchemeid(ModelConstants.DNET_PID_TYPES);
 		q.setSchemename(ModelConstants.DNET_PID_TYPES);
 		sp.setQualifier(q);
 		final DataInfo dataInfo = new DataInfo();
 		dataInfo.setDeletedbyinference(false);
 		dataInfo.setInferred(false);
-		dataInfo.setTrust("0.9");
+		dataInfo.setTrust("0.91");
 		dataInfo
-				.setProvenanceaction(
-						mapQualifier(
-								"sysimport:crosswalk:entityregistry",
-								"Harvested",
-								"dnet:provenanceActions",
-								"dnet:provenanceActions"));
+			.setProvenanceaction(
+				mapQualifier(
+					"sysimport:crosswalk:entityregistry",
+					"Harvested",
+					"dnet:provenanceActions",
+					"dnet:provenanceActions"));
 		sp.setDataInfo(dataInfo);
 		return sp;
 	}

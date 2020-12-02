@@ -13,13 +13,13 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalUnit;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.mortbay.log.Log;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class OrcidClientTest {
@@ -42,6 +43,9 @@ public class OrcidClientTest {
 	String toNotRetrieveDate = "2019-09-29 23:59:59.000000";
 	String lastUpdate = "2019-09-30 00:00:00";
 	String shortDate = "2020-05-06 16:06:11";
+	final String REQUEST_TYPE_RECORD = "record";
+	final String REQUEST_TYPE_WORK = "work/47652866";
+	final String REQUEST_TYPE_WORKS = "works";
 
 //	curl -i -H "Accept: application/vnd.orcid+xml"
 //	-H 'Authorization: Bearer 78fdb232-7105-4086-8570-e153f4198e3d'
@@ -86,25 +90,25 @@ public class OrcidClientTest {
 
 	@Test
 	private void downloadTest(String orcid) throws Exception {
-		String record = testDownloadRecord(orcid);
-		String filename = "/tmp/downloaded_".concat(orcid).concat(".xml");
+		String record = testDownloadRecord(orcid, REQUEST_TYPE_RECORD);
+		String filename = "/tmp/downloaded_record_".concat(orcid).concat(".xml");
 		File f = new File(filename);
 		OutputStream outStream = new FileOutputStream(f);
 		IOUtils.write(record.getBytes(), outStream);
 	}
 
-	private String testDownloadRecord(String orcidId) throws Exception {
+	private String testDownloadRecord(String orcidId, String dataType) throws Exception {
 		try (CloseableHttpClient client = HttpClients.createDefault()) {
-			HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/record");
+			HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/" + dataType);
 			httpGet.addHeader("Accept", "application/vnd.orcid+xml");
 			httpGet.addHeader("Authorization", "Bearer 78fdb232-7105-4086-8570-e153f4198e3d");
-			logToFile("start connection: " + new Date(System.currentTimeMillis()).toString());
+			long start = System.currentTimeMillis();
 			CloseableHttpResponse response = client.execute(httpGet);
-			logToFile("end connection: " + new Date(System.currentTimeMillis()).toString());
+			long end = System.currentTimeMillis();
 			if (response.getStatusLine().getStatusCode() != 200) {
-				System.out
-					.println("Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
+				logToFile("Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
 			}
+			logToFile(orcidId + " " + dataType + " " + (end - start) / 1000 + " seconds");
 			return IOUtils.toString(response.getEntity().getContent());
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -129,7 +133,7 @@ public class OrcidClientTest {
 				}
 				String[] values = line.split(",");
 				List<String> recordInfo = Arrays.asList(values);
-				testDownloadRecord(recordInfo.get(0));
+				testDownloadRecord(recordInfo.get(0), REQUEST_TYPE_RECORD);
 				long endReq = System.currentTimeMillis();
 				nReqTmp++;
 				if (nReqTmp == REQ_LIMIT) {
@@ -190,7 +194,7 @@ public class OrcidClientTest {
 			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));
 		final String recordFromSeqFile = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
 		logToFile("\n\ndownloaded \n\n" + recordFromSeqFile);
-		final String downloadedRecord = testDownloadRecord("0000-0003-3028-6161");
+		final String downloadedRecord = testDownloadRecord("0000-0003-3028-6161", REQUEST_TYPE_RECORD);
 		assertTrue(recordFromSeqFile.equals(downloadedRecord));
 	}
 
@@ -255,7 +259,7 @@ public class OrcidClientTest {
 		logToFile("modified: " + modified);
 	}
 
-	private void logToFile(String log)
+	public static void logToFile(String log)
 		throws IOException {
 		log = log.concat("\n");
 		Path path = Paths.get("/tmp/orcid_log.txt");
@@ -297,5 +301,73 @@ public class OrcidClientTest {
 			e.printStackTrace();
 		}
 		return new String("");
+	}
+
+	@Test
+	private void downloadWorkTest() throws Exception {
+		String orcid = "0000-0003-0015-1952";
+		String record = testDownloadRecord(orcid, REQUEST_TYPE_WORK);
+		String filename = "/tmp/downloaded_work_".concat(orcid).concat(".xml");
+		File f = new File(filename);
+		OutputStream outStream = new FileOutputStream(f);
+		IOUtils.write(record.getBytes(), outStream);
+	}
+
+	@Test
+	private void downloadRecordTest() throws Exception {
+		String orcid = "0000-0001-5004-5918";
+		String record = testDownloadRecord(orcid, REQUEST_TYPE_RECORD);
+		String filename = "/tmp/downloaded_record_".concat(orcid).concat(".xml");
+		File f = new File(filename);
+		OutputStream outStream = new FileOutputStream(f);
+		IOUtils.write(record.getBytes(), outStream);
+	}
+
+	@Test
+	private void downloadWorksTest() throws Exception {
+		String orcid = "0000-0001-5004-5918";
+		String record = testDownloadRecord(orcid, REQUEST_TYPE_WORKS);
+		String filename = "/tmp/downloaded_works_".concat(orcid).concat(".xml");
+		File f = new File(filename);
+		OutputStream outStream = new FileOutputStream(f);
+		IOUtils.write(record.getBytes(), outStream);
+	}
+
+	@Test
+	private void downloadSingleWorkTest() throws Exception {
+		String orcid = "0000-0001-5004-5918";
+		String record = testDownloadRecord(orcid, REQUEST_TYPE_WORK);
+		String filename = "/tmp/downloaded_work_47652866_".concat(orcid).concat(".xml");
+		File f = new File(filename);
+		OutputStream outStream = new FileOutputStream(f);
+		IOUtils.write(record.getBytes(), outStream);
+	}
+
+	@Test
+	public void cleanAuthorListTest() throws Exception {
+		AuthorData a1 = new AuthorData();
+		a1.setOid("1");
+		a1.setName("n1");
+		a1.setSurname("s1");
+		a1.setCreditName("c1");
+		AuthorData a2 = new AuthorData();
+		a2.setOid("1");
+		a2.setName("n1");
+		a2.setSurname("s1");
+		a2.setCreditName("c1");
+		AuthorData a3 = new AuthorData();
+		a3.setOid("3");
+		a3.setName("n3");
+		a3.setSurname("s3");
+		a3.setCreditName("c3");
+		List<AuthorData> list = Lists.newArrayList();
+		list.add(a1);
+		list.add(a2);
+		list.add(a3);
+
+		Set<String> namesAlreadySeen = new HashSet<>();
+		assertTrue(list.size() == 3);
+		list.removeIf(a -> !namesAlreadySeen.add(a.getOid()));
+		assertTrue(list.size() == 2);
 	}
 }

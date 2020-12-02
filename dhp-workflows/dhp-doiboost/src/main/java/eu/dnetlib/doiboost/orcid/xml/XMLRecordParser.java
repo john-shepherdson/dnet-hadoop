@@ -1,23 +1,17 @@
 
 package eu.dnetlib.doiboost.orcid.xml;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import org.mortbay.log.Log;
 
-import com.ximpleware.AutoPilot;
-import com.ximpleware.EOFException;
-import com.ximpleware.EncodingException;
-import com.ximpleware.EntityException;
-import com.ximpleware.ParseException;
-import com.ximpleware.VTDGen;
-import com.ximpleware.VTDNav;
+import com.ximpleware.*;
 
 import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
+import eu.dnetlib.doiboost.orcidnodoi.model.Contributor;
 
 public class XMLRecordParser {
 
@@ -32,7 +26,8 @@ public class XMLRecordParser {
 	private static final String NS_RECORD_URL = "http://www.orcid.org/ns/record";
 	private static final String NS_RECORD = "record";
 	private static final String NS_ERROR_URL = "http://www.orcid.org/ns/error";
-
+	private static final String NS_ACTIVITIES = "activities";
+	private static final String NS_ACTIVITIES_URL = "http://www.orcid.org/ns/activities";
 	private static final String NS_WORK = "work";
 	private static final String NS_WORK_URL = "http://www.orcid.org/ns/work";
 
@@ -139,6 +134,12 @@ public class XMLRecordParser {
 		return retrieveOrcidId(bytes, defaultValue, NS_WORK, NS_WORK_URL, "//work:work", "put-code");
 	}
 
+	public static String retrieveWorkIdFromSummary(byte[] bytes, String defaultValue)
+		throws VtdException, ParseException {
+		return retrieveOrcidId(
+			bytes, defaultValue, NS_ACTIVITIES, NS_ACTIVITIES_URL, "//work:work-summary", "put-code");
+	}
+
 	private static String retrieveOrcidId(byte[] bytes, String defaultValue, String ns, String nsUrl, String xpath,
 		String idAttributeName)
 		throws VtdException, ParseException {
@@ -148,6 +149,7 @@ public class XMLRecordParser {
 		final VTDNav vn = vg.getNav();
 		final AutoPilot ap = new AutoPilot(vn);
 		ap.declareXPathNameSpace(ns, nsUrl);
+		ap.declareXPathNameSpace(NS_WORK, NS_WORK_URL);
 		List<VtdUtilityParser.Node> recordNodes = VtdUtilityParser
 			.getTextValuesWithAttributes(
 				ap, vn, xpath, Arrays.asList(idAttributeName));
@@ -156,5 +158,43 @@ public class XMLRecordParser {
 		}
 		Log.info("id not found - default: " + defaultValue);
 		return defaultValue;
+	}
+
+	public static Map<String, String> retrieveWorkIdLastModifiedDate(byte[] bytes)
+		throws ParseException, XPathParseException, NavException, XPathEvalException {
+		final VTDGen vg = new VTDGen();
+		vg.setDoc(bytes);
+		vg.parse(true);
+		final VTDNav vn = vg.getNav();
+		final AutoPilot ap = new AutoPilot(vn);
+		ap.declareXPathNameSpace(NS_COMMON, NS_COMMON_URL);
+		ap.declareXPathNameSpace(NS_PERSON, NS_PERSON_URL);
+		ap.declareXPathNameSpace(NS_DETAILS, NS_DETAILS_URL);
+		ap.declareXPathNameSpace(NS_OTHER, NS_OTHER_URL);
+		ap.declareXPathNameSpace(NS_RECORD, NS_RECORD_URL);
+		ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
+		ap.declareXPathNameSpace(NS_WORK, NS_WORK_URL);
+		ap.declareXPathNameSpace(NS_ACTIVITIES, NS_ACTIVITIES_URL);
+		Map<String, String> workIdLastModifiedDate = new HashMap<>();
+		ap.selectXPath("//work:work-summary");
+
+		while (ap.evalXPath() != -1) {
+			String workId = "";
+			String lastModifiedDate = "";
+			int attr = vn.getAttrVal("put-code");
+			if (attr > -1) {
+				workId = vn.toNormalizedString(attr);
+				workIdLastModifiedDate.put(workId, "");
+			}
+			if (vn.toElement(VTDNav.FIRST_CHILD, "common:last-modified-date")) {
+				int val = vn.getText();
+				if (val != -1) {
+					lastModifiedDate = vn.toNormalizedString(val);
+					workIdLastModifiedDate.put(workId, lastModifiedDate);
+				}
+				vn.toElement(VTDNav.PARENT);
+			}
+		}
+		return workIdLastModifiedDate;
 	}
 }

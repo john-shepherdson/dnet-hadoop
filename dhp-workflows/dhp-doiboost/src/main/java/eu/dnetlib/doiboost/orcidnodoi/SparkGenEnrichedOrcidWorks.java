@@ -37,7 +37,7 @@ import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 import scala.Tuple2;
 
 /**
- * This spark job generates one parquet file, containing orcid publications dataset
+ * This spark job generates orcid publications no doi dataset
  */
 
 public class SparkGenEnrichedOrcidWorks {

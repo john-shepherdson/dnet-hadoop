@@ -4,10 +4,13 @@ package eu.dnetlib.doiboost.orcid.xml;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.doiboost.orcid.OrcidClientTest;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 
@@ -59,7 +62,7 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testOrcidOtherNamesXMLParser() throws Exception {
+	private void testOrcidOtherNamesXMLParser() throws Exception {
 
 		String xml = IOUtils
 			.toString(
@@ -73,5 +76,18 @@ public class XMLRecordParserTest {
 		assertTrue(authorData.getOtherNames().get(0).equals("Andrew C. Porteus"));
 		String jsonData = JsonWriter.create(authorData);
 		assertNotNull(jsonData);
+	}
+
+	@Test
+	public void testWorkIdLastModifiedDateXMLParser() throws Exception {
+
+		String xml = IOUtils
+			.toString(
+				this.getClass().getResourceAsStream("record_8888-8888-8888-8880.xml"));
+//		Map<String, String> workIdLastModifiedDate = XMLRecordParser.retrieveWorkIdLastModifiedDate(xml.getBytes());
+//		String LastModifiedDate = workIdLastModifiedDate.get(0);
+//		OrcidClientTest.logToFile(LastModifiedDate + " -- " + workIdLastModifiedDate.get(LastModifiedDate));
+		String result = XMLRecordParser.retrieveWorkIdFromSummary(xml.getBytes(), "empty");
+		OrcidClientTest.logToFile(result);
 	}
 }
