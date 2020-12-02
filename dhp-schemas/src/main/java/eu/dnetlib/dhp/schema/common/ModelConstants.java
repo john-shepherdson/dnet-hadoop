@@ -7,6 +7,10 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class ModelConstants {
 
+	public static final String ORCID = "orcid";
+	public static final String ORCID_PENDING = "orcid_pending";
+	public static final String ORCID_CLASSNAME = "Open Researcher and Contributor ID";
+
 	public static final String DNET_SUBJECT_TYPOLOGIES = "dnet:subject_classification_typologies";
 	public static final String DNET_RESULT_TYPOLOGIES = "dnet:result_typologies";
 	public static final String DNET_PUBLICATION_RESOURCE = "dnet:publication_resource";

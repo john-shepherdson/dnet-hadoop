@@ -19,8 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cloudera.org.codehaus.jackson.map.jsontype.impl.ClassNameIdResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.PropagationConstant;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 
 public class OrcidPropagationJobTest {
@@ -166,7 +169,8 @@ public class OrcidPropagationJobTest {
 				propagatedAuthors
 					.filter(
 						"id = '50|dedup_wf_001::95b033c0c3961f6a1cdcd41a99a9632e' "
-							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = 'ORCID'")
+							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = '" +
+							ModelConstants.ORCID_PENDING + "'")
 					.count());
 
 		Assertions.assertEquals(1, propagatedAuthors.filter("pid = '0000-0002-8825-3517'").count());
