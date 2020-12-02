@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<record xmlns:dr="http://www.driver-repository.eu/namespace/dr"
-        xmlns:oaf="http://namespace.openaire.eu/oaf"
-        xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<record xmlns:datacite="http://datacite.org/schema/kernel-3"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:oai="http://www.openarchives.org/OAI/2.0/">
     <oai:header xmlns="http://namespace.openaire.eu/"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
-                xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+                xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+                xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <dri:objIdentifier>r3f52792889d::000051aa1f61d77d2c0b340091f8024e</dri:objIdentifier>
         <dri:recordIdentifier>textgrid:q9cv.0</dri:recordIdentifier>
         <dri:dateOfCollection>2020-11-17T09:34:11.128+01:00</dri:dateOfCollection>
         <oaf:datasourceprefix>r3f52792889d</oaf:datasourceprefix>
         <identifier xmlns="http://www.openarchives.org/OAI/2.0/">textgrid:q9cv.0</identifier>
         <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2012-01-21T13:35:20Z</datestamp>
-        <dr:dateOfTransformation>2020-11-17T09:46:21.551+01:00</dr:dateOfTransformation>
+        <dr:dateOfTransformation>2020-11-17T19:08:56.703+01:00</dr:dateOfTransformation>
     </oai:header>
     <metadata>
         <datacite:resource xmlns="http://www.openarchives.org/OAI/2.0/"
-                           xmlns:datacite="http://datacite.org/schema/kernel-3"
                            xmlns:dc="http://purl.org/dc/elements/1.1/"
-                           xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+                           xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+                           xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <datacite:identifier identifierType="Handle">hdl:11858/00-1734-0000-0003-7664-F</datacite:identifier>
             <datacite:creators>
                 <datacite:creator>
@@ -46,8 +47,8 @@
                 <datacite:date dateType="Updated">2012-01-21T13:35:20Z</datacite:date>
             </datacite:dates>
             <datacite:resourceType resourceTypeGeneral="Dataset"/>
-            <alternateIdentifiers>
-                <datacite:alternateIdentifier alternateIdentifierType="URI">textgrid:q9cv.0</datacite:alternateIdentifier>
+            <alternateIdentifiers xmlns="http://datacite.org/schema/kernel-3">
+                <datacite:alternateIdentifier alternateIdentifierType="URI" xmlns="http://www.openarchives.org/OAI/2.0/">textgrid:q9cv.0</datacite:alternateIdentifier>
                 <alternateIdentifier alternateIdentifierType="URL">http://hdl.handle.net/hdl:11858/00-1734-0000-0003-7664-F</alternateIdentifier>
             </alternateIdentifiers>
             <datacite:relatedIdentifiers>
@@ -83,7 +84,7 @@
         <oaf:identifier identifierType="handle">hdl:11858/00-1734-0000-0003-7664-F</oaf:identifier>
         <dr:CobjCategory type="dataset">0021</dr:CobjCategory>
         <oaf:refereed>0002</oaf:refereed>
-        <oaf:dateAccepted>2012-01-01</oaf:dateAccepted>
+        <oaf:dateAccepted>2012-01-21</oaf:dateAccepted>
         <oaf:accessrights>OPEN</oaf:accessrights>
         <oaf:license>http://creativecommons.org/licenses/by/3.0/de/legalcode</oaf:license>
         <oaf:language>und</oaf:language>
@@ -91,7 +92,8 @@
         <oaf:collectedFrom id="re3data_____::r3d100011365" name="TextGrid Repository"/>
     </metadata>
     <about xmlns:dc="http://purl.org/dc/elements/1.1/"
-           xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+           xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+           xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
             <originDescription altered="true" harvestDate="2020-11-17T09:34:11.128+01:00">
                 <baseURL>https%3A%2F%2Fdev.textgridlab.org%2F1.0%2Ftgoaipmh%2Foai</baseURL>
