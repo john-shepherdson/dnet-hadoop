@@ -1,5 +1,5 @@
 
-package eu.dnetlib.doiboost.orcid;
+package eu.dnetlib.doiboost.orcidnodoi;
 
 import java.io.IOException;
 
@@ -10,42 +10,48 @@ import org.apache.hadoop.fs.Path;
 import org.mortbay.log.Log;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.doiboost.orcid.OrcidDSManager;
 
-public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
+/**
+ * This job generates one sequence file, the key is an orcid identifier and the
+ * value is an orcid publication in json format
+ */
+
+public class GenOrcidAuthorWork extends OrcidDSManager {
 
 	private String activitiesFileNameTarGz;
-	private String outputAuthorsDOIsPath;
+	private String outputWorksPath;
 
 	public static void main(String[] args) throws IOException, Exception {
-		OrcidAuthorsDOIsDataGen orcidAuthorsDOIsDataGen = new OrcidAuthorsDOIsDataGen();
-		orcidAuthorsDOIsDataGen.loadArgs(args);
-		orcidAuthorsDOIsDataGen.generateAuthorsDOIsData();
+		GenOrcidAuthorWork genOrcidAuthorWork = new GenOrcidAuthorWork();
+		genOrcidAuthorWork.loadArgs(args);
+		genOrcidAuthorWork.generateAuthorsDOIsData();
 	}
 
 	public void generateAuthorsDOIsData() throws Exception {
 		Configuration conf = initConfigurationObject();
 		FileSystem fs = initFileSystemObject(conf);
 		String tarGzUri = hdfsServerUri.concat(workingPath).concat(activitiesFileNameTarGz);
-		Path outputPath = new Path(hdfsServerUri.concat(workingPath).concat(outputAuthorsDOIsPath));
-		ActivitiesDecompressor.parseGzActivities(conf, tarGzUri, outputPath);
+		Path outputPath = new Path(hdfsServerUri.concat(workingPath).concat(outputWorksPath));
+		ActivitiesDumpReader.parseGzActivities(conf, tarGzUri, outputPath);
 	}
 
 	private void loadArgs(String[] args) throws IOException, Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					OrcidAuthorsDOIsDataGen.class
+					GenOrcidAuthorWork.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/doiboost/create_orcid_authors_dois_data.json")));
+							"/eu/dnetlib/dhp/doiboost/gen_orcid_works-no-doi_from_activities.json")));
 		parser.parseArgument(args);
 
 		hdfsServerUri = parser.get("hdfsServerUri");
 		Log.info("HDFS URI: " + hdfsServerUri);
 		workingPath = parser.get("workingPath");
-		Log.info("Default Path: " + workingPath);
+		Log.info("Working Path: " + workingPath);
 		activitiesFileNameTarGz = parser.get("activitiesFileNameTarGz");
 		Log.info("Activities File Name: " + activitiesFileNameTarGz);
-		outputAuthorsDOIsPath = parser.get("outputAuthorsDOIsPath");
-		Log.info("Output Authors DOIs Data: " + outputAuthorsDOIsPath);
+		outputWorksPath = parser.get("outputWorksPath");
+		Log.info("Output Author Work Data: " + outputWorksPath);
 	}
 }

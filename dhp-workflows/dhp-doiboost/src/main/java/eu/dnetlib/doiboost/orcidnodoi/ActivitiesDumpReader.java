@@ -1,5 +1,5 @@
 
-package eu.dnetlib.doiboost.orcid;
+package eu.dnetlib.doiboost.orcidnodoi;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,14 +17,18 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.mortbay.log.Log;
 
-import eu.dnetlib.doiboost.orcid.model.WorkData;
-import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
-import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
+import eu.dnetlib.doiboost.orcid.json.JsonHelper;
+import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
 
-public class ActivitiesDecompressor {
+/**
+ * This class write on hdfs one sequence file, the key is an orcid identifier and the
+ * value is an orcid publication in json format
+ */
+
+public class ActivitiesDumpReader {
 
 	private static final int MAX_XML_WORKS_PARSED = -1;
 	private static final int XML_WORKS_PARSED_COUNTER_LOG_INTERVAL = 100000;
@@ -55,7 +59,7 @@ public class ActivitiesDecompressor {
 	private static void parseTarActivities(
 		FileSystem fs, Configuration conf, InputStream gzipInputStream, Path outputPath) {
 		int counter = 0;
-		int doiFound = 0;
+		int noDoiFound = 0;
 		int errorFromOrcidFound = 0;
 		int xmlParserErrorFound = 0;
 		try (TarArchiveInputStream tais = new TarArchiveInputStream(gzipInputStream)) {
@@ -69,7 +73,7 @@ public class ActivitiesDecompressor {
 					SequenceFile.Writer.valueClass(Text.class))) {
 				while ((entry = tais.getNextTarEntry()) != null) {
 					String filename = entry.getName();
-
+					StringBuffer buffer = new StringBuffer();
 					try {
 						if (entry.isDirectory() || !filename.contains("works")) {
 
@@ -79,27 +83,33 @@ public class ActivitiesDecompressor {
 							BufferedReader br = new BufferedReader(new InputStreamReader(tais)); // Read directly from
 																									// tarInput
 							String line;
-							StringBuffer buffer = new StringBuffer();
+							buffer = new StringBuffer();
 							while ((line = br.readLine()) != null) {
 								buffer.append(line);
 							}
-							WorkData workData = XMLRecordParser.VTDParseWorkData(buffer.toString().getBytes());
-							if (workData != null) {
-								if (workData.getErrorCode() != null) {
+							WorkDataNoDoi workDataNoDoi = XMLRecordParserNoDoi
+								.VTDParseWorkData(buffer.toString().getBytes());
+							if (workDataNoDoi != null) {
+								if (workDataNoDoi.getErrorCode() != null) {
 									errorFromOrcidFound += 1;
 									Log
 										.debug(
 											"error from Orcid with code "
-												+ workData.getErrorCode()
+												+ workDataNoDoi.getErrorCode()
 												+ " for entry "
 												+ entry.getName());
 									continue;
 								}
-								if (workData.isDoiFound()) {
-									String jsonData = JsonWriter.create(workData);
-									Log.debug("oid: " + workData.getOid() + " data: " + jsonData);
+								boolean isDoiFound = workDataNoDoi
+									.getExtIds()
+									.stream()
+									.filter(e -> e.getType() != null)
+									.anyMatch(e -> e.getType().equals("doi"));
+								if (!isDoiFound) {
+									String jsonData = JsonHelper.createOidWork(workDataNoDoi);
+									Log.debug("oid: " + workDataNoDoi.getOid() + " data: " + jsonData);
 
-									final Text key = new Text(workData.getOid());
+									final Text key = new Text(workDataNoDoi.getOid());
 									final Text value = new Text(jsonData);
 
 									try {
@@ -109,7 +119,7 @@ public class ActivitiesDecompressor {
 										Log.debug(e);
 										throw new RuntimeException(e);
 									}
-									doiFound += 1;
+									noDoiFound += 1;
 								}
 
 							} else {
@@ -118,10 +128,7 @@ public class ActivitiesDecompressor {
 							}
 						}
 					} catch (Exception e) {
-						Log
-							.warn(
-								"Parsing work from tar archive and xml work: " + filename + "  " + e.getMessage());
-						Log.warn(e);
+						throw new Exception(filename, e);
 					}
 
 					if ((counter % XML_WORKS_PARSED_COUNTER_LOG_INTERVAL) == 0) {
@@ -133,75 +140,15 @@ public class ActivitiesDecompressor {
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Log.warn("Parsing work from gzip archive: " + e.getMessage());
 			Log.warn(e);
 			throw new RuntimeException(e);
 		}
 		Log.info("Activities parse completed");
 		Log.info("Total XML works parsed: " + counter);
-		Log.info("Total doi found: " + doiFound);
+		Log.info("Total no doi work found: " + noDoiFound);
 		Log.info("Error from Orcid found: " + errorFromOrcidFound);
 		Log.info("Error parsing xml work found: " + xmlParserErrorFound);
 	}
-
-	public static void extractXML(Configuration conf, String inputUri, Path outputPath)
-		throws Exception {
-		String uri = inputUri;
-		FileSystem fs = FileSystem.get(URI.create(uri), conf);
-		Path inputPath = new Path(uri);
-		CompressionCodecFactory factory = new CompressionCodecFactory(conf);
-		CompressionCodec codec = factory.getCodec(inputPath);
-		if (codec == null) {
-			System.err.println("No codec found for " + uri);
-			System.exit(1);
-		}
-		CompressionCodecFactory.removeSuffix(uri, codec.getDefaultExtension());
-		InputStream gzipInputStream = null;
-		try {
-			gzipInputStream = codec.createInputStream(fs.open(inputPath));
-			int counter = 0;
-			try (TarArchiveInputStream tais = new TarArchiveInputStream(gzipInputStream)) {
-				TarArchiveEntry entry = null;
-				try (SequenceFile.Writer writer = SequenceFile
-					.createWriter(
-						conf,
-						SequenceFile.Writer.file(outputPath),
-						SequenceFile.Writer.keyClass(Text.class),
-						SequenceFile.Writer.valueClass(Text.class),
-						SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new GzipCodec()))) {
-					while ((entry = tais.getNextTarEntry()) != null) {
-						String filename = entry.getName();
-						if (entry.isDirectory() || !filename.contains("works")) {
-						} else {
-							counter++;
-							BufferedReader br = new BufferedReader(new InputStreamReader(tais));
-							String line;
-							StringBuffer buffer = new StringBuffer();
-							while ((line = br.readLine()) != null) {
-								buffer.append(line);
-							}
-							String xml = buffer.toString();
-							String[] filenameParts = filename.split("/");
-							final Text key = new Text(
-								XMLRecordParser
-									.retrieveOrcidIdFromActivity(
-										xml.getBytes(), filenameParts[filenameParts.length - 1]));
-							final Text value = new Text(xml);
-							writer.append(key, value);
-							if ((counter % 100000) == 0) {
-								Log.info("Current xml works extracted: " + counter);
-							}
-						}
-					}
-				}
-			}
-			Log.info("Activities extraction completed");
-			Log.info("Total XML works parsed: " + counter);
-		} finally {
-			Log.debug("Closing gzip stream");
-			IOUtils.closeStream(gzipInputStream);
-		}
-	}
-
 }

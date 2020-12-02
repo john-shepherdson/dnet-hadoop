@@ -3,8 +3,6 @@ package eu.dnetlib.doiboost.orcid.model;
 
 import java.io.Serializable;
 
-import org.apache.hadoop.io.Text;
-
 import com.google.gson.JsonObject;
 
 import scala.Tuple2;
@@ -12,7 +10,7 @@ import scala.Tuple2;
 public class DownloadedRecordData implements Serializable {
 
 	private String orcidId;
-	private String modifiedDate;
+	private String lastModifiedDate;
 	private String statusCode;
 	private String compressedData;
 	private String errorMessage;
@@ -20,7 +18,7 @@ public class DownloadedRecordData implements Serializable {
 	public Tuple2<String, String> toTuple2() {
 		JsonObject data = new JsonObject();
 		data.addProperty("statusCode", getStatusCode());
-		data.addProperty("modifiedDate", getModifiedDate());
+		data.addProperty("lastModifiedDate", getLastModifiedDate());
 		if (getCompressedData() != null) {
 			data.addProperty("compressedData", getCompressedData());
 		}
@@ -66,11 +64,11 @@ public class DownloadedRecordData implements Serializable {
 		this.compressedData = compressedData;
 	}
 
-	public String getModifiedDate() {
-		return modifiedDate;
+	public String getLastModifiedDate() {
+		return lastModifiedDate;
 	}
 
-	public void setModifiedDate(String modifiedDate) {
-		this.modifiedDate = modifiedDate;
+	public void setLastModifiedDate(String lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
 	}
 }
