@@ -49,6 +49,28 @@
             "schemename": "dnet:pid_types"
           },
           "value": "https://orcid.org/0000-0001-9613-6639"
+        },
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:entityregistry",
+              "classname": "sysimport:crosswalk:entityregistry",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "orcid",
+            "classname": "ORCID12",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-6639"
         }
       ],
       "rank": 1,

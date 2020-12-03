@@ -26,8 +26,8 @@
             <description> the metadata associated to the deposition</description>
         </property>
         <property>
-            <name>newDeposition</name>
-            <description>true if it is a brand new depositon. false for new version of an old deposition</description>
+            <name>depositionType</name>
+            <description>one among {new, update, version}</description>
         </property>
         <property>
             <name>conceptRecordId</name>
@@ -419,6 +419,7 @@
             <arg>--metadata</arg><arg>${metadata}</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--conceptRecordId</arg><arg>${conceptRecordId}</arg>
+            <arg>--depositionId</arg><arg>${depositionId}</arg>
             <arg>--depositionType</arg><arg>${depositionType}</arg>
         </java>
         <ok to="End"/>
