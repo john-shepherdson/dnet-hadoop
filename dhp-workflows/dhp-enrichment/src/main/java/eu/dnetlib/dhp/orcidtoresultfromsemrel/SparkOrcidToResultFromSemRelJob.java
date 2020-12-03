@@ -7,7 +7,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.util.List;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -24,6 +23,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.PacePerson;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
@@ -203,7 +203,7 @@ public class SparkOrcidToResultFromSemRelJob {
 		}
 		for (StructuredProperty pid : pids.get()) {
 			if (ModelConstants.ORCID_PENDING.equals(pid.getQualifier().getClassid().toLowerCase()) ||
-            ModelConstants.ORCID.equals(pid.getQualifier().getClassid().toLowerCase())) {
+				ModelConstants.ORCID.equals(pid.getQualifier().getClassid().toLowerCase())) {
 				return true;
 			}
 		}

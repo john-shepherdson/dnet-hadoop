@@ -531,12 +531,12 @@ public class PublicationToOaf implements Serializable {
 		dataInfo.setInferred(false);
 		dataInfo.setTrust("0.9");
 		dataInfo
-				.setProvenanceaction(
-						mapQualifier(
-								"sysimport:crosswalk:entityregistry",
-								"Harvested",
-								"dnet:provenanceActions",
-								"dnet:provenanceActions"));
+			.setProvenanceaction(
+				mapQualifier(
+					"sysimport:crosswalk:entityregistry",
+					"Harvested",
+					"dnet:provenanceActions",
+					"dnet:provenanceActions"));
 		sp.setDataInfo(dataInfo);
 		return sp;
 	}

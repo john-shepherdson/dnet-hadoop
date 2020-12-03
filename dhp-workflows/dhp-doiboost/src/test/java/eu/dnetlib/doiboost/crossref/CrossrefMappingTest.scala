@@ -158,7 +158,7 @@ class CrossrefMappingTest {
 
 
     rels.foreach(s => logger.info(s.getTarget))
-    assertEquals(rels.size, 3 )
+    assertEquals(rels.size, 6 )
 
 
   }

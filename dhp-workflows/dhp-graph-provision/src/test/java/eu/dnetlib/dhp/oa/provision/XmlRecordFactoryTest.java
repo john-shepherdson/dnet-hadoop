@@ -7,11 +7,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -20,13 +15,18 @@ import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
-import org.mockito.Mock;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 //TODO to enable it we need to update the joined_entity.json test file
 //@Disabled
@@ -44,26 +44,22 @@ public class XmlRecordFactoryTest {
 		assertNotNull(je);
 
 		Document doc = buildXml(je);
-		////TODO specific test assertion on doc
+		//// TODO specific test assertion on doc
 	}
-
-
 
 	@Test
 	void testBologna() throws IOException, DocumentException {
 		final String json = IOUtils.toString(getClass().getResourceAsStream("oaf-bologna.json"));
-		Publication oaf =  new ObjectMapper().readValue(json, Publication.class);
+		Publication oaf = new ObjectMapper().readValue(json, Publication.class);
 		assertNotNull(oaf);
 		JoinedEntity je = new JoinedEntity();
 		je.setEntity(oaf);
 		assertNotNull(je);
 
 		Document doc = buildXml(je);
-		//TODO specific test assertion on doc
+		// TODO specific test assertion on doc
 
 		System.out.println(doc.asXML());
-
-
 
 	}
 
@@ -71,7 +67,7 @@ public class XmlRecordFactoryTest {
 		ContextMapper contextMapper = new ContextMapper();
 
 		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
-				otherDsTypeId);
+			otherDsTypeId);
 
 		String xml = xmlRecordFactory.build(je);
 
