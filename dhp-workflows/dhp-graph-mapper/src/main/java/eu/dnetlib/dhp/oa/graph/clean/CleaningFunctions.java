@@ -17,7 +17,7 @@ public class CleaningFunctions {
 
 	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
-	public static final String NEWLINES = "(?:\\n|\\r)";
+	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 
 	public static final Set<String> PID_BLACKLIST = new HashSet<>();
 
@@ -111,7 +111,7 @@ public class CleaningFunctions {
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
-							.map(CleaningFunctions::removeNewLines)
+							.map(CleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}
 			if (Objects.nonNull(r.getTitle())) {
@@ -122,7 +122,7 @@ public class CleaningFunctions {
 							.stream()
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
-							.map(CleaningFunctions::removeNewLines)
+							.map(CleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}
 			if (Objects.nonNull(r.getDescription())) {
@@ -133,7 +133,7 @@ public class CleaningFunctions {
 							.stream()
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
-							.map(CleaningFunctions::removeNewLines)
+							.map(CleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}
 			if (Objects.nonNull(r.getPid())) {
@@ -189,6 +189,16 @@ public class CleaningFunctions {
 						author.setRank(i++);
 					}
 				}
+
+				final Set<String> collectedFrom = Optional
+					.ofNullable(r.getCollectedfrom())
+					.map(
+						c -> c
+							.stream()
+							.map(KeyValue::getKey)
+							.collect(Collectors.toCollection(HashSet::new)))
+					.orElse(new HashSet<>());
+
 				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
 						a.setPid(Lists.newArrayList());
@@ -201,13 +211,29 @@ public class CleaningFunctions {
 									.filter(p -> Objects.nonNull(p.getQualifier()))
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {
+										// hack to distinguish orcid from orcid_pending
+										String pidProvenance = Optional
+											.ofNullable(p.getDataInfo())
+											.map(
+												d -> Optional
+													.ofNullable(d.getProvenanceaction())
+													.map(Qualifier::getClassid)
+													.orElse(""))
+											.orElse("");
+										if (pidProvenance.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+											p.getQualifier().setClassid(ModelConstants.ORCID);
+										} else {
+											p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+										}
 										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
 										return p;
 									})
 									.collect(
 										Collectors
 											.toMap(
-												StructuredProperty::getValue, Function.identity(), (p1, p2) -> p1,
+												p -> p.getQualifier().getClassid() + p.getValue(),
+												Function.identity(),
+												(p1, p2) -> p1,
 												LinkedHashMap::new))
 									.values()
 									.stream()
@@ -230,13 +256,13 @@ public class CleaningFunctions {
 		return value;
 	}
 
-	protected static StructuredProperty removeNewLines(StructuredProperty s) {
-		s.setValue(s.getValue().replaceAll(NEWLINES, " "));
+	protected static StructuredProperty cleanValue(StructuredProperty s) {
+		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
 		return s;
 	}
 
-	protected static Field<String> removeNewLines(Field<String> s) {
-		s.setValue(s.getValue().replaceAll(NEWLINES, " "));
+	protected static Field<String> cleanValue(Field<String> s) {
+		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
 		return s;
 	}
 

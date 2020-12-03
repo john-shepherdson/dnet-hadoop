@@ -25,8 +25,8 @@ public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
 	public void generateAuthorsDOIsData() throws Exception {
 		Configuration conf = initConfigurationObject();
 		FileSystem fs = initFileSystemObject(conf);
-		String tarGzUri = hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(activitiesFileNameTarGz);
-		Path outputPath = new Path(hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(outputAuthorsDOIsPath));
+		String tarGzUri = hdfsServerUri.concat(workingPath).concat(activitiesFileNameTarGz);
+		Path outputPath = new Path(hdfsServerUri.concat(workingPath).concat(outputAuthorsDOIsPath));
 		ActivitiesDecompressor.parseGzActivities(conf, tarGzUri, outputPath);
 	}
 
@@ -41,8 +41,8 @@ public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
 
 		hdfsServerUri = parser.get("hdfsServerUri");
 		Log.info("HDFS URI: " + hdfsServerUri);
-		hdfsOrcidDefaultPath = parser.get("hdfsOrcidDefaultPath");
-		Log.info("Default Path: " + hdfsOrcidDefaultPath);
+		workingPath = parser.get("workingPath");
+		Log.info("Default Path: " + workingPath);
 		activitiesFileNameTarGz = parser.get("activitiesFileNameTarGz");
 		Log.info("Activities File Name: " + activitiesFileNameTarGz);
 		outputAuthorsDOIsPath = parser.get("outputAuthorsDOIsPath");
