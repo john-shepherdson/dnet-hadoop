@@ -344,7 +344,7 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	public void cleanAuthorListTest() throws Exception {
+	private void cleanAuthorListTest() throws Exception {
 		AuthorData a1 = new AuthorData();
 		a1.setOid("1");
 		a1.setName("n1");
@@ -369,5 +369,15 @@ public class OrcidClientTest {
 		assertTrue(list.size() == 3);
 		list.removeIf(a -> !namesAlreadySeen.add(a.getOid()));
 		assertTrue(list.size() == 2);
+	}
+
+	@Test
+	public void testReadDownloadedWork() throws Exception {
+		final String base64CompressedRecord = IOUtils
+			.toString(getClass().getResourceAsStream("0000-0002-6664-7451_work.compressed.base64"));
+		final String work = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
+		logToFile("\n\ndownloaded \n\n" + work);
+//		final String downloadedRecord = testDownloadRecord("0000-0003-3028-6161", REQUEST_TYPE_RECORD);
+//		assertTrue(recordFromSeqFile.equals(downloadedRecord));
 	}
 }

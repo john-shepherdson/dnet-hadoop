@@ -4,12 +4,14 @@ package eu.dnetlib.doiboost.orcid;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -17,32 +19,31 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.util.LongAccumulator;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.ximpleware.NavException;
-import com.ximpleware.ParseException;
-import com.ximpleware.XPathEvalException;
-import com.ximpleware.XPathParseException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.doiboost.orcid.model.DownloadedRecordData;
-import eu.dnetlib.doiboost.orcid.model.WorkData;
 import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
 import scala.Tuple2;
 
 public class SparkDownloadOrcidWorks {
 
 	static Logger logger = LoggerFactory.getLogger(SparkDownloadOrcidWorks.class);
-	static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	static final String lastUpdate = "2020-09-29 00:00:00";
+	public static final String LAMBDA_FILE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final DateTimeFormatter LAMBDA_FILE_DATE_FORMATTER = DateTimeFormatter
+		.ofPattern(LAMBDA_FILE_DATE_FORMAT);
+	public static final String ORCID_XML_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	public static final DateTimeFormatter ORCID_XML_DATETIMEFORMATTER = DateTimeFormatter
+		.ofPattern(ORCID_XML_DATETIME_FORMAT);
+	public static final String lastUpdateValue = "2020-09-29 00:00:00";
 
 	public static void main(String[] args) throws IOException, Exception {
 
@@ -60,12 +61,8 @@ public class SparkDownloadOrcidWorks {
 		logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 		final String workingPath = parser.get("workingPath");
 		logger.info("workingPath: ", workingPath);
-//        final String outputPath = parser.get("outputPath");
-		final String outputPath = "downloads/updated_works";
-		logger.info("outputPath: ", outputPath);
+		final String outputPath = parser.get("outputPath");
 		final String token = parser.get("token");
-//        final String lambdaFileName = parser.get("lambdaFileName");
-//        logger.info("lambdaFileName: ", lambdaFileName);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -73,9 +70,23 @@ public class SparkDownloadOrcidWorks {
 			isSparkSessionManaged,
 			spark -> {
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
-				LongAccumulator parsedRecordsAcc = spark.sparkContext().longAccumulator("parsed_records");
-				LongAccumulator modifiedRecordsAcc = spark.sparkContext().longAccumulator("to_download_records");
+				LongAccumulator updatedAuthorsAcc = spark.sparkContext().longAccumulator("updated_authors");
+				LongAccumulator parsedAuthorsAcc = spark.sparkContext().longAccumulator("parsed_authors");
+				LongAccumulator parsedWorksAcc = spark.sparkContext().longAccumulator("parsed_works");
+				LongAccumulator modifiedWorksAcc = spark.sparkContext().longAccumulator("modified_works");
+				LongAccumulator maxModifiedWorksLimitAcc = spark
+					.sparkContext()
+					.longAccumulator("max_modified_works_limit");
+				LongAccumulator errorCodeFoundAcc = spark.sparkContext().longAccumulator("error_code_found");
+				LongAccumulator errorLoadingJsonFoundAcc = spark
+					.sparkContext()
+					.longAccumulator("error_loading_json_found");
+				LongAccumulator errorLoadingXMLFoundAcc = spark
+					.sparkContext()
+					.longAccumulator("error_loading_xml_found");
+				LongAccumulator errorParsingXMLFoundAcc = spark
+					.sparkContext()
+					.longAccumulator("error_parsing_xml_found");
 				LongAccumulator downloadedRecordsAcc = spark.sparkContext().longAccumulator("downloaded_records");
 				LongAccumulator errorHTTP403Acc = spark.sparkContext().longAccumulator("error_HTTP_403");
 				LongAccumulator errorHTTP409Acc = spark.sparkContext().longAccumulator("error_HTTP_409");
@@ -83,38 +94,60 @@ public class SparkDownloadOrcidWorks {
 				LongAccumulator errorHTTP525Acc = spark.sparkContext().longAccumulator("error_HTTP_525");
 				LongAccumulator errorHTTPGenericAcc = spark.sparkContext().longAccumulator("error_HTTP_Generic");
 
-				logger.info("Retrieving updated authors");
 				JavaPairRDD<Text, Text> updatedAuthorsRDD = sc
 					.sequenceFile(workingPath + "downloads/updated_authors/*", Text.class, Text.class);
-				logger.info("Updated authors retrieved: " + updatedAuthorsRDD.count());
+				updatedAuthorsAcc.setValue(updatedAuthorsRDD.count());
 
-				Function<Tuple2<Text, Text>, Iterator<String>> retrieveWorkUrlFunction = data -> {
+				FlatMapFunction<Tuple2<Text, Text>, String> retrieveWorkUrlFunction = data -> {
 					String orcidId = data._1().toString();
 					String jsonData = data._2().toString();
-					List<String> orcidIdWorkId = Lists.newArrayList();
-					Map<String, String> workIdLastModifiedDate = retrieveWorkIdLastModifiedDate(jsonData);
+					List<String> workIds = new ArrayList<>();
+					Map<String, String> workIdLastModifiedDate = new HashMap<>();
+					JsonElement jElement = new JsonParser().parse(jsonData);
+					String statusCode = getJsonValue(jElement, "statusCode");
+					if (statusCode.equals("200")) {
+						String compressedData = getJsonValue(jElement, "compressedData");
+						if (StringUtils.isEmpty(compressedData)) {
+							errorLoadingJsonFoundAcc.add(1);
+						} else {
+							String authorSummary = ArgumentApplicationParser.decompressValue(compressedData);
+							if (StringUtils.isEmpty(authorSummary)) {
+								errorLoadingXMLFoundAcc.add(1);
+							} else {
+								try {
+									workIdLastModifiedDate = XMLRecordParser
+										.retrieveWorkIdLastModifiedDate(authorSummary.getBytes());
+								} catch (Exception e) {
+									logger.error("parsing " + orcidId + " [" + jsonData + "]", e);
+									errorParsingXMLFoundAcc.add(1);
+								}
+							}
+						}
+					} else {
+						errorCodeFoundAcc.add(1);
+					}
+					parsedAuthorsAcc.add(1);
 					workIdLastModifiedDate.forEach((k, v) -> {
+						parsedWorksAcc.add(1);
 						if (isModified(orcidId, v)) {
-							orcidIdWorkId.add(orcidId.concat("/work/").concat(k));
+							modifiedWorksAcc.add(1);
+							workIds.add(orcidId.concat("/work/").concat(k));
 						}
 					});
-					Iterator<String> iterator = orcidIdWorkId.iterator();
-					return iterator;
+					if (workIdLastModifiedDate.size() > 50) {
+						maxModifiedWorksLimitAcc.add(1);
+					}
+					return workIds.iterator();
 				};
 
-				List<Iterator<String>> toDownloadWorksRDD = updatedAuthorsRDD
-					.map(retrieveWorkUrlFunction)
-					.take(1000);
-				sc.parallelize(toDownloadWorksRDD).saveAsTextFile(workingPath.concat("downloads/updated_works_test/"));
-
-				Function<Tuple2<Text, Text>, Tuple2<String, String>> downloadRecordFunction = data -> {
-					String orcidId = data._1().toString();
-					String lastModifiedDate = data._2().toString();
+				Function<String, Tuple2<String, String>> downloadWorkFunction = data -> {
+					String relativeWorkUrl = data;
+					String orcidId = relativeWorkUrl.split("/")[0];
 					final DownloadedRecordData downloaded = new DownloadedRecordData();
 					downloaded.setOrcidId(orcidId);
-					downloaded.setLastModifiedDate(lastModifiedDate);
+					downloaded.setLastModifiedDate(lastUpdateValue);
 					try (CloseableHttpClient client = HttpClients.createDefault()) {
-						HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/work");
+						HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + relativeWorkUrl);
 						httpGet.addHeader("Accept", "application/vnd.orcid+xml");
 						httpGet.addHeader("Authorization", String.format("Bearer %s", token));
 						long startReq = System.currentTimeMillis();
@@ -153,62 +186,55 @@ public class SparkDownloadOrcidWorks {
 									.compressArgument(IOUtils.toString(response.getEntity().getContent())));
 					} catch (Throwable e) {
 						logger.info("Downloading " + orcidId, e.getMessage());
+						if (downloaded.getStatusCode() == 503) {
+							throw new RuntimeException("Orcid request rate limit reached (HTTP 503)");
+						}
 						downloaded.setErrorMessage(e.getMessage());
 						return downloaded.toTuple2();
 					}
 					return downloaded.toTuple2();
 				};
 
-//                    sc.hadoopConfiguration().set("mapreduce.output.fileoutputformat.compress", "true");
+//				sc.hadoopConfiguration().set("mapreduce.output.fileoutputformat.compress", "true");
 
-//                    logger.info("Start downloading ...");
-//                    updatedAuthorsRDD
-//                            .map(downloadRecordFunction)
-//                            .mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
-//                            .saveAsNewAPIHadoopFile(
-//                                    workingPath.concat(outputPath),
-//                                    Text.class,
-//                                    Text.class,
-//                                    SequenceFileOutputFormat.class,
-//                                    sc.hadoopConfiguration());
-//                    logger.info("parsedRecordsAcc: " + parsedRecordsAcc.value().toString());
-//                    logger.info("modifiedRecordsAcc: " + modifiedRecordsAcc.value().toString());
-//                    logger.info("downloadedRecordsAcc: " + downloadedRecordsAcc.value().toString());
-//                    logger.info("errorHTTP403Acc: " + errorHTTP403Acc.value().toString());
-//                    logger.info("errorHTTP409Acc: " + errorHTTP409Acc.value().toString());
-//                    logger.info("errorHTTP503Acc: " + errorHTTP503Acc.value().toString());
-//                    logger.info("errorHTTP525Acc: " + errorHTTP525Acc.value().toString());
-//                    logger.info("errorHTTPGenericAcc: " + errorHTTPGenericAcc.value().toString());
+				updatedAuthorsRDD
+					.flatMap(retrieveWorkUrlFunction)
+					.repartition(100)
+					.map(downloadWorkFunction)
+					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
+					.saveAsTextFile(workingPath.concat(outputPath), GzipCodec.class);
+//						.saveAsNewAPIHadoopFile(
+//						workingPath.concat(outputPath),
+//						Text.class,
+//						Text.class,
+//						SequenceFileOutputFormat.class,
+//						sc.hadoopConfiguration());
+				logger.info("updatedAuthorsAcc: " + updatedAuthorsAcc.value().toString());
+				logger.info("parsedAuthorsAcc: " + parsedAuthorsAcc.value().toString());
+				logger.info("parsedWorksAcc: " + parsedWorksAcc.value().toString());
+				logger.info("modifiedWorksAcc: " + modifiedWorksAcc.value().toString());
+				logger.info("maxModifiedWorksLimitAcc: " + maxModifiedWorksLimitAcc.value().toString());
+				logger.info("errorCodeFoundAcc: " + errorCodeFoundAcc.value().toString());
+				logger.info("errorLoadingJsonFoundAcc: " + errorLoadingJsonFoundAcc.value().toString());
+				logger.info("errorLoadingXMLFoundAcc: " + errorLoadingXMLFoundAcc.value().toString());
+				logger.info("errorParsingXMLFoundAcc: " + errorParsingXMLFoundAcc.value().toString());
+				logger.info("downloadedRecordsAcc: " + downloadedRecordsAcc.value().toString());
+				logger.info("errorHTTP403Acc: " + errorHTTP403Acc.value().toString());
+				logger.info("errorHTTP409Acc: " + errorHTTP409Acc.value().toString());
+				logger.info("errorHTTP503Acc: " + errorHTTP503Acc.value().toString());
+				logger.info("errorHTTP525Acc: " + errorHTTP525Acc.value().toString());
+				logger.info("errorHTTPGenericAcc: " + errorHTTPGenericAcc.value().toString());
 			});
 
 	}
 
-	private static boolean isModified(String orcidId, String modifiedDate) {
-		Date modifiedDateDt = null;
-		Date lastUpdateDt = null;
-		try {
-			if (modifiedDate.length() != 19) {
-				modifiedDate = modifiedDate.substring(0, 19);
-			}
-			modifiedDateDt = new SimpleDateFormat(DATE_FORMAT).parse(modifiedDate);
-			lastUpdateDt = new SimpleDateFormat(DATE_FORMAT).parse(lastUpdate);
-		} catch (Exception e) {
-			logger.info("[" + orcidId + "] Parsing date: ", e.getMessage());
-			return true;
-		}
-		return modifiedDateDt.after(lastUpdateDt);
-	}
-
-	private static Map<String, String> retrieveWorkIdLastModifiedDate(String json)
-		throws XPathEvalException, NavException, XPathParseException, ParseException {
-		JsonElement jElement = new JsonParser().parse(json);
-		String statusCode = getJsonValue(jElement, "statusCode");
-		if (statusCode.equals("200")) {
-			String compressedData = getJsonValue(jElement, "compressedData");
-			String authorSummary = ArgumentApplicationParser.decompressValue(compressedData);
-			return XMLRecordParser.retrieveWorkIdLastModifiedDate(authorSummary.getBytes());
-		}
-		return new HashMap<>();
+	public static boolean isModified(String orcidId, String modifiedDateValue) {
+		LocalDate modifiedDate = null;
+		LocalDate lastUpdate = null;
+		modifiedDate = LocalDate.parse(modifiedDateValue, SparkDownloadOrcidWorks.ORCID_XML_DATETIMEFORMATTER);
+		lastUpdate = LocalDate
+			.parse(SparkDownloadOrcidWorks.lastUpdateValue, SparkDownloadOrcidWorks.LAMBDA_FILE_DATE_FORMATTER);
+		return modifiedDate.isAfter(lastUpdate);
 	}
 
 	private static String getJsonValue(JsonElement jElement, String property) {

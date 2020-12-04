@@ -1,6 +1,7 @@
 
 package eu.dnetlib.doiboost.orcid.xml;
 
+import java.io.IOException;
 import java.util.*;
 
 import org.mortbay.log.Log;
@@ -161,30 +162,22 @@ public class XMLRecordParser {
 	}
 
 	public static Map<String, String> retrieveWorkIdLastModifiedDate(byte[] bytes)
-		throws ParseException, XPathParseException, NavException, XPathEvalException {
+		throws ParseException, XPathParseException, NavException, XPathEvalException, IOException {
 		final VTDGen vg = new VTDGen();
 		vg.setDoc(bytes);
 		vg.parse(true);
 		final VTDNav vn = vg.getNav();
 		final AutoPilot ap = new AutoPilot(vn);
-		ap.declareXPathNameSpace(NS_COMMON, NS_COMMON_URL);
-		ap.declareXPathNameSpace(NS_PERSON, NS_PERSON_URL);
-		ap.declareXPathNameSpace(NS_DETAILS, NS_DETAILS_URL);
-		ap.declareXPathNameSpace(NS_OTHER, NS_OTHER_URL);
-		ap.declareXPathNameSpace(NS_RECORD, NS_RECORD_URL);
-		ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
 		ap.declareXPathNameSpace(NS_WORK, NS_WORK_URL);
-		ap.declareXPathNameSpace(NS_ACTIVITIES, NS_ACTIVITIES_URL);
+		ap.declareXPathNameSpace(NS_COMMON, NS_COMMON_URL);
 		Map<String, String> workIdLastModifiedDate = new HashMap<>();
 		ap.selectXPath("//work:work-summary");
-
+		String workId = "";
 		while (ap.evalXPath() != -1) {
-			String workId = "";
 			String lastModifiedDate = "";
 			int attr = vn.getAttrVal("put-code");
 			if (attr > -1) {
 				workId = vn.toNormalizedString(attr);
-				workIdLastModifiedDate.put(workId, "");
 			}
 			if (vn.toElement(VTDNav.FIRST_CHILD, "common:last-modified-date")) {
 				int val = vn.getText();

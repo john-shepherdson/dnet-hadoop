@@ -4,17 +4,27 @@ package eu.dnetlib.doiboost.orcid.xml;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
+import com.ximpleware.*;
+
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcid.OrcidClientTest;
+import eu.dnetlib.doiboost.orcid.SparkDownloadOrcidWorks;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 
 public class XMLRecordParserTest {
+	private static final String NS_WORK = "work";
+	private static final String NS_WORK_URL = "http://www.orcid.org/ns/work";
+	private static final String NS_COMMON_URL = "http://www.orcid.org/ns/common";
+	private static final String NS_COMMON = "common";
 
 	@Test
 	private void testOrcidAuthorDataXMLParser() throws Exception {
@@ -67,9 +77,6 @@ public class XMLRecordParserTest {
 		String xml = IOUtils
 			.toString(
 				this.getClass().getResourceAsStream("summary_0000-0001-5109-1000_othername.xml"));
-
-		XMLRecordParser p = new XMLRecordParser();
-
 		AuthorData authorData = XMLRecordParser.VTDParseAuthorData(xml.getBytes());
 		assertNotNull(authorData);
 		assertNotNull(authorData.getOtherNames());
@@ -80,14 +87,18 @@ public class XMLRecordParserTest {
 
 	@Test
 	public void testWorkIdLastModifiedDateXMLParser() throws Exception {
-
 		String xml = IOUtils
 			.toString(
-				this.getClass().getResourceAsStream("record_8888-8888-8888-8880.xml"));
-//		Map<String, String> workIdLastModifiedDate = XMLRecordParser.retrieveWorkIdLastModifiedDate(xml.getBytes());
-//		String LastModifiedDate = workIdLastModifiedDate.get(0);
-//		OrcidClientTest.logToFile(LastModifiedDate + " -- " + workIdLastModifiedDate.get(LastModifiedDate));
-		String result = XMLRecordParser.retrieveWorkIdFromSummary(xml.getBytes(), "empty");
-		OrcidClientTest.logToFile(result);
+				this.getClass().getResourceAsStream("record_0000-0001-5004-5918.xml"));
+		Map<String, String> workIdLastModifiedDate = XMLRecordParser.retrieveWorkIdLastModifiedDate(xml.getBytes());
+		workIdLastModifiedDate.forEach((k, v) -> {
+			try {
+				OrcidClientTest
+					.logToFile(
+						k + " " + v + " isModified after " + SparkDownloadOrcidWorks.lastUpdateValue + ": "
+							+ SparkDownloadOrcidWorks.isModified("0000-0001-5004-5918", v));
+			} catch (IOException e) {
+			}
+		});
 	}
 }
