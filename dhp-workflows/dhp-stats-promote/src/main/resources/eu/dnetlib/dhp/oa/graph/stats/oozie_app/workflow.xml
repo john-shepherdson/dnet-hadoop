@@ -9,6 +9,10 @@
             <description>the name of the production schema</description>
         </property>
         <property>
+            <name>stats_tool_api_url</name>
+            <description>The url of the API of the stats tool. Is used to trigger the cache promote.</description>
+        </property>
+        <property>
             <name>hive_metastore_uris</name>
             <description>hive server metastore URIs</description>
         </property>
