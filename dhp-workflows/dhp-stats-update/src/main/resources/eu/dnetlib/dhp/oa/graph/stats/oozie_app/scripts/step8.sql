@@ -47,7 +47,7 @@ DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids;
 CREATE TABLE ${stats_db_name}.datasource_oids AS SELECT substr(d.id, 4) AS id, oids.ids AS oid FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids;
 
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations;
-CREATE TABLE ${stats_db_name}.datasource_organizations AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization FROM ${openaire_db_name}.relation r WHERE r.reltype='datasourceOrganization';
+CREATE TABLE ${stats_db_name}.datasource_organizations AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization FROM ${openaire_db_name}.relation r WHERE r.reltype='datasourceOrganization' and r.datainfo.deletedbyinference=false;
 
 -- datasource sources:
 -- where the datasource info have been collected from.
