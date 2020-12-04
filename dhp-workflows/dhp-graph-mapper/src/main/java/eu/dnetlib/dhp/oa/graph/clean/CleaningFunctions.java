@@ -190,15 +190,6 @@ public class CleaningFunctions {
 					}
 				}
 
-				final Set<String> collectedFrom = Optional
-					.ofNullable(r.getCollectedfrom())
-					.map(
-						c -> c
-							.stream()
-							.map(KeyValue::getKey)
-							.collect(Collectors.toCollection(HashSet::new)))
-					.orElse(new HashSet<>());
-
 				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
 						a.setPid(Lists.newArrayList());
