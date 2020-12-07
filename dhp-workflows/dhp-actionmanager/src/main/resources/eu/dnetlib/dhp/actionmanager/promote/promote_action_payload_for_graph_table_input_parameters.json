@@ -40,5 +40,11 @@
     "paramLongName": "mergeAndGetStrategy",
     "paramDescription": "strategy for merging graph table objects with action payload instances, MERGE_FROM_AND_GET or SELECT_NEWER_AND_GET",
     "paramRequired": true
+  },
+  {
+    "paramName": "sgid",
+    "paramLongName": "shouldGroupById",
+    "paramDescription": "indicates whether the promotion operation should group objects in the graph by id or not",
+    "paramRequired": true
   }
 ]
