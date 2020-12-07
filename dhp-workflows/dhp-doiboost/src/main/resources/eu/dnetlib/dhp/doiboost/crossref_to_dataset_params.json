@@ -1,6 +1,5 @@
 [
-  {"paramName":"s",   "paramLongName":"sourcePath", "paramDescription": "the path of the sequencial file to read",  "paramRequired": true},
-  {"paramName":"t",   "paramLongName":"targetPath", "paramDescription": "the working dir path",                      "paramRequired": true},
+  {"paramName":"w",   "paramLongName":"workingPath", "paramDescription": "the working dir path",                      "paramRequired": true},
   {"paramName":"m",   "paramLongName":"master",     "paramDescription": "the master name",                          "paramRequired": true}
 
 ]

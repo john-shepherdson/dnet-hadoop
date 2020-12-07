@@ -16,88 +16,86 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
-<!--        <property>-->
-<!--            <name>timestamp</name>-->
-<!--            <description>Timestamp for incremental Harvesting</description>-->
-<!--        </property>-->
+        <property>
+            <name>timestamp</name>
+            <description>Timestamp for incremental Harvesting</description>
+        </property>
 
     </parameters>
 
-    <start to="ExtractCrossrefToOAF"/>
+    <start to="ImportCrossRef"/>
 
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-<!--    <action name="ResetWorkingPath">-->
-<!--        <fs>-->
-<!--            <delete path='${workingPath}/input/crossref/index_dump'/>-->
-<!--&lt;!&ndash;            <mkdir path='${workingPath}/input/crossref'/>&ndash;&gt;-->
-<!--        </fs>-->
-<!--        <ok to="ImportCrossRef"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
+    <action name="ImportCrossRef">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.crossref.CrossrefImporter</main-class>
+            <arg>-t</arg><arg>${workingPath}/input/crossref/index_update</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-ts</arg><arg>${timestamp}</arg>
+        </java>
+        <ok to="GenerateDataset"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="GenerateDataset">
+            <spark xmlns="uri:oozie:spark-action:0.2">
+                <master>yarn-cluster</master>
+                <mode>cluster</mode>
+                <name>ExtractCrossrefToOAF</name>
+                <class>eu.dnetlib.doiboost.crossref.CrossrefDataset</class>
+                <jar>dhp-doiboost-${projectVersion}.jar</jar>
+                <spark-opts>
+                    --executor-memory=${sparkExecutorMemory}
+                    --executor-cores=${sparkExecutorCores}
+                    --driver-memory=${sparkDriverMemory}
+                    --conf spark.sql.shuffle.partitions=3840
+                    ${sparkExtraOPT}
+                </spark-opts>
+                <arg>--workingPath</arg><arg>/data/doiboost/input/crossref</arg>
+                <arg>--master</arg><arg>yarn-cluster</arg>
+            </spark>
+            <ok to="RenameDataset"/>
+            <error to="Kill"/>
+    </action>
+
+    <action name="RenameDataset">
+        <fs>
+            <delete path='${workingPath}/input/crossref/crossref_ds'/>
+            <move source="${workingPath}/input/crossref/crossref_ds_updated"
+                  target="${workingPath}/input/crossref/crossref_ds"/>
+        </fs>
+        <ok to="ConvertCrossrefToOAF"/>
+        <error to="Kill"/>
+    </action>
 
 
-
-<!--    <action name="ImportCrossRef">-->
-<!--        <java>-->
-<!--            <job-tracker>${jobTracker}</job-tracker>-->
-<!--            <name-node>${nameNode}</name-node>-->
-<!--            <main-class>eu.dnetlib.doiboost.crossref.CrossrefImporter</main-class>-->
-<!--            <arg>-t</arg><arg>${workingPath}/input/crossref/index_dump_1</arg>-->
-<!--            <arg>-n</arg><arg>${nameNode}</arg>-->
-<!--            <arg>-ts</arg><arg>${timestamp}</arg>-->
-<!--        </java>-->
-<!--        <ok to="End"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
-
-
-    <action name="ExtractCrossrefToOAF">
+    <action name="ConvertCrossrefToOAF">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>ExtractCrossrefToOAF</name>
+            <name>ConvertCrossrefToOAF</name>
             <class>eu.dnetlib.doiboost.crossref.SparkMapDumpIntoOAF</class>
             <jar>dhp-doiboost-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=3840
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingPath}/input/crossref/crossref_ds</arg>
-            <arg>--targetPath</arg><arg>${workingPath}/input/crossref</arg>
+            <arg>--targetPath</arg><arg>${workingPath}/process/</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
-
-
-<!--    <action name="GenerateDataset">-->
-<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
-<!--            <master>yarn-cluster</master>-->
-<!--            <mode>cluster</mode>-->
-<!--            <name>ExtractCrossrefToOAF</name>-->
-<!--            <class>eu.dnetlib.doiboost.crossref.CrossrefDataset</class>-->
-<!--            <jar>dhp-doiboost-${projectVersion}.jar</jar>-->
-<!--            <spark-opts>-->
-<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
-<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
-<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
-<!--                ${sparkExtraOPT}-->
-<!--            </spark-opts>-->
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>/data/doiboost/crossref/cr_dataset</arg>-->
-<!--            <arg>&#45;&#45;targetPath</arg><arg>/data/doiboost/crossref/crossrefDataset</arg>-->
-<!--            <arg>&#45;&#45;master</arg><arg>yarn-cluster</arg>-->
-<!--        </spark>-->
-<!--        <ok to="End"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
 
     <end name="End"/>
 </workflow-app>
