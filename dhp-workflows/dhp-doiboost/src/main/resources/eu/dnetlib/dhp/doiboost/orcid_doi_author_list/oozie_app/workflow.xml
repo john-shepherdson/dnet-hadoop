@@ -14,7 +14,7 @@
     </property>
     <property>
         <name>spark2MaxExecutors</name>
-        <value>40</value>
+        <value>20</value>
     </property>
     <property>
         <name>oozieActionShareLibForSpark2</name>

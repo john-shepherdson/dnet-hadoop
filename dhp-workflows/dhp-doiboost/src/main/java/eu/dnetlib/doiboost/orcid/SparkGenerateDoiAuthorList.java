@@ -3,37 +3,32 @@ package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.minlog.Log;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.ximpleware.ParseException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.OrcidDOI;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
 import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
@@ -154,11 +149,13 @@ public class SparkGenerateDoiAuthorList {
 						authorList.removeIf(a -> !oidsAlreadySeen.add(a.getOid()));
 						return new Tuple2<>(s._1(), authorList);
 					})
-					.mapToPair(
-						s -> {
-							return new Tuple2<>(s._1(), JsonWriter.create(s._2()));
-						})
-					.saveAsTextFile(workingPath + outputDoiAuthorListPath);
+					.map(s -> {
+						OrcidDOI orcidDOI = new OrcidDOI();
+						orcidDOI.setDoi(s._1());
+						orcidDOI.setAuthors(s._2());
+						return JsonWriter.create(orcidDOI);
+					})
+					.saveAsTextFile(workingPath + outputDoiAuthorListPath, GzipCodec.class);
 			});
 
 	}
