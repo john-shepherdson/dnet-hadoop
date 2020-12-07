@@ -4,8 +4,13 @@ package eu.dnetlib.dhp.broker.oa;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -29,15 +34,14 @@ import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 public class PartitionEventsByDsIdJob {
 
 	private static final Logger log = LoggerFactory.getLogger(PartitionEventsByDsIdJob.class);
-	private static final String OPENDOAR_NSPREFIX = "opendoar____::";
+	private static final String OPENDOAR_NSPREFIX = "10|opendoar____::";
 
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					PartitionEventsByDsIdJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+				.toString(PartitionEventsByDsIdJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/od_partitions_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -54,13 +58,25 @@ public class PartitionEventsByDsIdJob {
 		final String partitionPath = parser.get("workingPath") + "/eventsByOpendoarId";
 		log.info("partitionPath: {}", partitionPath);
 
+		final String opendoarIds = parser.get("opendoarIds");
+		log.info("opendoarIds: {}", opendoarIds);
+
+		final Set<String> validOpendoarIds = new HashSet<>();
+		if (!opendoarIds.trim().equals("-")) {
+			validOpendoarIds.addAll(Arrays.stream(opendoarIds.split(","))
+				.map(String::trim)
+				.filter(StringUtils::isNotBlank)
+				.map(s -> OPENDOAR_NSPREFIX + DigestUtils.md5Hex(s))
+				.collect(Collectors.toSet()));
+		}
+
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
 			ClusterUtils
 				.readPath(spark, eventsPath, Event.class)
 				.filter(e -> StringUtils.isNotBlank(e.getMap().getTargetDatasourceId()))
-				.filter(e -> e.getMap().getTargetDatasourceId().contains(OPENDOAR_NSPREFIX))
-				.limit(10000)
+				.filter(e -> e.getMap().getTargetDatasourceId().startsWith(OPENDOAR_NSPREFIX))
+				.filter(e -> validOpendoarIds.contains(e.getMap().getTargetDatasourceId()))
 				.map(e -> messageFromNotification(e), Encoders.bean(ShortEventMessageWithGroupId.class))
 				.coalesce(1)
 				.write()
