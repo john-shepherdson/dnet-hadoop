@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ximpleware.*;
 
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
@@ -25,9 +26,10 @@ public class XMLRecordParserTest {
 	private static final String NS_WORK_URL = "http://www.orcid.org/ns/work";
 	private static final String NS_COMMON_URL = "http://www.orcid.org/ns/common";
 	private static final String NS_COMMON = "common";
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	@Test
-	private void testOrcidAuthorDataXMLParser() throws Exception {
+	public void testOrcidAuthorDataXMLParser() throws Exception {
 
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("summary_0000-0001-6828-479X.xml"));
 
@@ -39,6 +41,7 @@ public class XMLRecordParserTest {
 		System.out.println("name: " + authorData.getName());
 		assertNotNull(authorData.getSurname());
 		System.out.println("surname: " + authorData.getSurname());
+		OrcidClientTest.logToFile(OBJECT_MAPPER.writeValueAsString(authorData));
 	}
 
 	@Test
@@ -86,7 +89,7 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testWorkIdLastModifiedDateXMLParser() throws Exception {
+	private void testWorkIdLastModifiedDateXMLParser() throws Exception {
 		String xml = IOUtils
 			.toString(
 				this.getClass().getResourceAsStream("record_0000-0001-5004-5918.xml"));

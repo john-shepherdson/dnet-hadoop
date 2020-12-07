@@ -4,6 +4,7 @@ package eu.dnetlib.doiboost.orcid.xml;
 import java.io.IOException;
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mortbay.log.Log;
 
 import com.ximpleware.*;
@@ -31,6 +32,8 @@ public class XMLRecordParser {
 	private static final String NS_ACTIVITIES_URL = "http://www.orcid.org/ns/activities";
 	private static final String NS_WORK = "work";
 	private static final String NS_WORK_URL = "http://www.orcid.org/ns/work";
+	private static final String NS_HISTORY = "history";
+	private static final String NS_HISTORY_URL = "http://www.orcid.org/ns/history";
 
 	private static final String NS_ERROR = "error";
 
@@ -47,6 +50,7 @@ public class XMLRecordParser {
 		ap.declareXPathNameSpace(NS_OTHER, NS_OTHER_URL);
 		ap.declareXPathNameSpace(NS_RECORD, NS_RECORD_URL);
 		ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
+		ap.declareXPathNameSpace(NS_HISTORY, NS_HISTORY_URL);
 
 		AuthorData authorData = new AuthorData();
 		final List<String> errors = VtdUtilityParser.getTextValue(ap, vn, "//error:response-code");
@@ -85,6 +89,46 @@ public class XMLRecordParser {
 			authorData.setOtherNames(otherNames);
 		}
 
+//		final String creationMethod = VtdUtilityParser.getSingleValue(ap, vn, "//history:creation-method");
+//		if (StringUtils.isNoneBlank(creationMethod)) {
+//			authorData.setCreationMethod(creationMethod);
+//		}
+//
+//		final String completionDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:completion-date");
+//		if (StringUtils.isNoneBlank(completionDate)) {
+//			authorData.setCompletionDate(completionDate);
+//		}
+//
+//		final String submissionDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:submission-date");
+//		if (StringUtils.isNoneBlank(submissionDate)) {
+//			authorData.setSubmissionDate(submissionDate);
+//		}
+//
+//		final String claimed = VtdUtilityParser.getSingleValue(ap, vn, "//history:claimed");
+//		if (StringUtils.isNoneBlank(claimed)) {
+//			authorData.setClaimed(Boolean.parseBoolean(claimed));
+//		}
+//
+//		final String verifiedEmail = VtdUtilityParser.getSingleValue(ap, vn, "//history:verified-email");
+//		if (StringUtils.isNoneBlank(verifiedEmail)) {
+//			authorData.setVerifiedEmail(Boolean.parseBoolean(verifiedEmail));
+//		}
+//
+//		final String verifiedPrimaryEmail = VtdUtilityParser.getSingleValue(ap, vn, "//history:verified-primary-email");
+//		if (StringUtils.isNoneBlank(verifiedPrimaryEmail)) {
+//			authorData.setVerifiedPrimaryEmail(Boolean.parseBoolean(verifiedPrimaryEmail));
+//		}
+//
+//		final String deactivationDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:deactivation-date");
+//		if (StringUtils.isNoneBlank(deactivationDate)) {
+//			authorData.setDeactivationDate(deactivationDate);
+//		}
+//
+//		final String lastModifiedDate = VtdUtilityParser
+//			.getSingleValue(ap, vn, "//history:history/common:last-modified-date");
+//		if (StringUtils.isNoneBlank(lastModifiedDate)) {
+//			authorData.setLastModifiedDate(lastModifiedDate);
+//		}
 		return authorData;
 	}
 
