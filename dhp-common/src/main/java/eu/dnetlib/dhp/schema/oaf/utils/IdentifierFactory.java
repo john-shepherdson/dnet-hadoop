@@ -1,18 +1,18 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Factory class for OpenAIRE identifiers in the Graph
@@ -21,8 +21,6 @@ public class IdentifierFactory implements Serializable {
 
 	public static final String ID_SEPARATOR = "::";
 	public static final String ID_PREFIX_SEPARATOR = "|";
-	public final static String ID_REGEX = "^[0-9][0-9]\\" + ID_PREFIX_SEPARATOR + ".{12}" + ID_SEPARATOR
-		+ "[a-zA-Z0-9]{32}$";
 
 	public final static String DOI_REGEX = "(^10\\.[0-9]{4,9}\\/[-._;()\\/:a-zA-Z0-9]+$)|" +
 		"(^10\\.1002\\/[^\\s]+$)|" +

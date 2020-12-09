@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class CleaningFunctions {
 
-	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
+	public static final String DOI_PREFIX_REGEX = "^.*10\\.";
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 
@@ -146,6 +146,7 @@ public class CleaningFunctions {
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
 							.map(CleaningFunctions::normalizePidValue)
+							.filter(CleaningFunctions::filterPid)
 							.collect(Collectors.toList()));
 			}
 			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
@@ -254,6 +255,29 @@ public class CleaningFunctions {
 	}
 
 	/**
+	 * Utility method that filter PID values on a per-type basis.
+	 * @param pid the PID whose value will be checked.
+	 * @return true the PID containing the normalised value.
+	 */
+	private static boolean filterPid(StructuredProperty pid) {
+		String value = Optional
+				.ofNullable(pid.getValue())
+				.map(s -> StringUtils.replaceAll(s, "\\s", ""))
+				.orElse("");
+		if (StringUtils.isBlank(value)) {
+			return false;
+		}
+		switch (pid.getQualifier().getClassid()) {
+
+			// TODO add cleaning for more PID types as needed
+			case "doi":
+				return value.startsWith("10.");
+			default:
+				return true;
+		}
+	}
+
+	/**
 	 * Utility method that normalises PID values on a per-type basis.
 	 * @param pid the PID whose value will be normalised.
 	 * @return the PID containing the normalised value.
@@ -267,7 +291,7 @@ public class CleaningFunctions {
 
 			// TODO add cleaning for more PID types as needed
 			case "doi":
-				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX_REGEX, ""));
+				pid.setValue(value.toLowerCase().replaceAll(DOI_PREFIX_REGEX, "10."));
 				break;
 		}
 		return pid;
