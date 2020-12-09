@@ -130,19 +130,7 @@ public class Relation extends Oaf {
 			Objects.equals(getSubRelType(), r.getSubRelType()), "subRelType(s) must be equal");
 		checkArgument(Objects.equals(getRelClass(), r.getRelClass()), "relClass(es) must be equal");
 
-		setCollectedfrom(
-			Stream
-				.concat(
-					Optional
-						.ofNullable(getCollectedfrom())
-						.map(Collection::stream)
-						.orElse(Stream.empty()),
-					Optional
-						.ofNullable(r.getCollectedfrom())
-						.map(Collection::stream)
-						.orElse(Stream.empty()))
-				.distinct() // relies on KeyValue.equals
-				.collect(Collectors.toList()));
+		super.mergeFrom(r);
 	}
 
 	@Override
