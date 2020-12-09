@@ -75,6 +75,8 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final Qualifier MAG_PID_TYPE = qualifier(
 		"MAGIdentifier", "Microsoft Academic Graph Identifier", DNET_PID_TYPES, DNET_PID_TYPES);
 
+	protected static final String DEFAULT_TRUST_FOR_VALIDATED_RELS = "0.999";
+
 	protected static final Map<String, String> nsContext = new HashMap<>();
 
 	static {
@@ -279,6 +281,16 @@ public abstract class AbstractMdRecordToOafMapper {
 			source, target, relType, subRelType, relClass, collectedFrom, info, lastUpdateTimestamp);
 		r.setValidated(StringUtils.isNotBlank(validationDate));
 		r.setValidationDate(StringUtils.isNotBlank(validationDate) ? validationDate : null);
+
+		if (StringUtils.isNotBlank(validationDate)) {
+			r.setValidated(true);
+			r.setValidationDate(validationDate);
+			r.getDataInfo().setTrust(DEFAULT_TRUST_FOR_VALIDATED_RELS);
+		} else {
+			r.setValidated(false);
+			r.setValidationDate(null);
+		}
+
 		return r;
 	}
 
