@@ -18,6 +18,8 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.slf4j.Logger;
@@ -73,15 +75,18 @@ public class PartitionEventsByDsIdJob {
 						.map(s -> OPENDOAR_NSPREFIX + DigestUtils.md5Hex(s))
 						.collect(Collectors.toSet()));
 		}
+		log.info("validOpendoarIds: {}", validOpendoarIds);
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
 			ClusterUtils
 				.readPath(spark, eventsPath, Event.class)
-				.filter(e -> StringUtils.isNotBlank(e.getMap().getTargetDatasourceId()))
-				.filter(e -> e.getMap().getTargetDatasourceId().startsWith(OPENDOAR_NSPREFIX))
-				.filter(e -> validOpendoarIds.contains(e.getMap().getTargetDatasourceId()))
-				.map(e -> messageFromNotification(e), Encoders.bean(ShortEventMessageWithGroupId.class))
+				.filter((FilterFunction<Event>) e -> StringUtils.isNotBlank(e.getMap().getTargetDatasourceId()))
+				.filter((FilterFunction<Event>) e -> e.getMap().getTargetDatasourceId().startsWith(OPENDOAR_NSPREFIX))
+				.filter((FilterFunction<Event>) e -> validOpendoarIds.contains(e.getMap().getTargetDatasourceId()))
+				.map(
+					(MapFunction<Event, ShortEventMessageWithGroupId>) e -> messageFromNotification(e),
+					Encoders.bean(ShortEventMessageWithGroupId.class))
 				.coalesce(1)
 				.write()
 				.partitionBy("group")
