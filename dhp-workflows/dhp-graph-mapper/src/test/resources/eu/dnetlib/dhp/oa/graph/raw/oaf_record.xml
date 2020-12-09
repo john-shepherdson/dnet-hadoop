@@ -51,7 +51,7 @@
     <!--<dr:CobjCategory type="publication">0001</dr:CobjCategory>-->
     <dr:CobjCategory>0001</dr:CobjCategory>
     <oaf:dateAccepted>2017-01-01</oaf:dateAccepted>
-    <oaf:projectid>corda_______::226852</oaf:projectid>
+    <oaf:projectid validationDate="2020-01-01">corda_______::226852</oaf:projectid>
     <oaf:accessrights>OPEN</oaf:accessrights>
     <oaf:hostedBy id="openaire____::issn226852" name="One Ecosystem"/>
     <oaf:collectedFrom
