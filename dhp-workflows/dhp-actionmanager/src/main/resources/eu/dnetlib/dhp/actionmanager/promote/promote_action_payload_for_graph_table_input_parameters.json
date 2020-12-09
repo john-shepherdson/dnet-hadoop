@@ -45,6 +45,6 @@
     "paramName": "sgid",
     "paramLongName": "shouldGroupById",
     "paramDescription": "indicates whether the promotion operation should group objects in the graph by id or not",
-    "paramRequired": true
+    "paramRequired": false
   }
 ]
