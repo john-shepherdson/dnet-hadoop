@@ -40,8 +40,9 @@ public class PartitionEventsByDsIdJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(PartitionEventsByDsIdJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/od_partitions_params.json")));
+				.toString(
+					PartitionEventsByDsIdJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/od_partitions_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -63,11 +64,14 @@ public class PartitionEventsByDsIdJob {
 
 		final Set<String> validOpendoarIds = new HashSet<>();
 		if (!opendoarIds.trim().equals("-")) {
-			validOpendoarIds.addAll(Arrays.stream(opendoarIds.split(","))
-				.map(String::trim)
-				.filter(StringUtils::isNotBlank)
-				.map(s -> OPENDOAR_NSPREFIX + DigestUtils.md5Hex(s))
-				.collect(Collectors.toSet()));
+			validOpendoarIds
+				.addAll(
+					Arrays
+						.stream(opendoarIds.split(","))
+						.map(String::trim)
+						.filter(StringUtils::isNotBlank)
+						.map(s -> OPENDOAR_NSPREFIX + DigestUtils.md5Hex(s))
+						.collect(Collectors.toSet()));
 		}
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
