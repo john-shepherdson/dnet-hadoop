@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -272,11 +273,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.filter(Objects::nonNull)
 			.map(Qualifier::getClassid)
 			.filter(StringUtils::isNotBlank)
-			.anyMatch(c -> "orcid".equals(c.toLowerCase()));
-	}
-
-	private static FilterFunction<JoinedEntity> filterEmptyEntityFn() {
-		return (FilterFunction<JoinedEntity>) v -> Objects.nonNull(v.getEntity());
+			.anyMatch(c -> c.toLowerCase().contains(ModelConstants.ORCID));
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {
