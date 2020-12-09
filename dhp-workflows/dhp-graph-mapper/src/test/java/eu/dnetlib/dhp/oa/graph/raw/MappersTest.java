@@ -141,7 +141,10 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
 		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
-
+		assertTrue(r1.getValidated());
+		assertTrue(r2.getValidated());
+		assertEquals(r1.getValidationDate(), "2020-01-01");
+		assertEquals(r2.getValidationDate(), "2020-01-01");
 		// System.out.println(new ObjectMapper().writeValueAsString(p));
 		// System.out.println(new ObjectMapper().writeValueAsString(r1));
 		// System.out.println(new ObjectMapper().writeValueAsString(r2));
@@ -246,6 +249,10 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
 		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+		assertTrue(r1.getValidated());
+		assertTrue(r2.getValidated());
+		assertEquals(r1.getValidationDate(), "2020-01-01");
+		assertEquals(r2.getValidationDate(), "2020-01-01");
 	}
 
 	@Test

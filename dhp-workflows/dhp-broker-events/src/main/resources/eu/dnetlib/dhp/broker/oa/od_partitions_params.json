@@ -1,0 +1,14 @@
+[
+	{
+		"paramName": "o",
+		"paramLongName": "workingPath",
+		"paramDescription": "the path where the temporary data will be stored",
+		"paramRequired": true
+	},
+	{
+		"paramName": "list",
+		"paramLongName": "opendoarIds",
+		"paramDescription": "the opendoar IDs whitelist (comma separated)",
+		"paramRequired": true
+	}
+]

@@ -189,6 +189,7 @@ public class CleaningFunctions {
 						author.setRank(i++);
 					}
 				}
+
 				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
 						a.setPid(Lists.newArrayList());
@@ -201,13 +202,29 @@ public class CleaningFunctions {
 									.filter(p -> Objects.nonNull(p.getQualifier()))
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {
+										// hack to distinguish orcid from orcid_pending
+										String pidProvenance = Optional
+											.ofNullable(p.getDataInfo())
+											.map(
+												d -> Optional
+													.ofNullable(d.getProvenanceaction())
+													.map(Qualifier::getClassid)
+													.orElse(""))
+											.orElse("");
+										if (pidProvenance.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+											p.getQualifier().setClassid(ModelConstants.ORCID);
+										} else {
+											p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+										}
 										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
 										return p;
 									})
 									.collect(
 										Collectors
 											.toMap(
-												StructuredProperty::getValue, Function.identity(), (p1, p2) -> p1,
+												p -> p.getQualifier().getClassid() + p.getValue(),
+												Function.identity(),
+												(p1, p2) -> p1,
 												LinkedHashMap::new))
 									.values()
 									.stream()

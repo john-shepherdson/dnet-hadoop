@@ -18,6 +18,10 @@
             <description>the name of the shadow schema</description>
         </property>
         <property>
+            <name>stats_tool_api_url</name>
+            <description>The url of the API of the stats tool. Is used to trigger the cache update.</description>
+        </property>
+        <property>
             <name>hive_metastore_uris</name>
             <description>hive server metastore URIs</description>
         </property>
@@ -255,7 +259,7 @@
     <action name="Step17">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
-            <script>scripts/step17.sql</script>
+            <script>scripts/updateProductionViews.sql</script>
 			<param>stats_db_name=${stats_db_name}</param>
 			<param>stats_db_shadow_name=${stats_db_shadow_name}</param>
         </hive2>
@@ -283,9 +287,21 @@
             <name-node>${nameNode}</name-node>
             <exec>impala-shell.sh</exec>
             <argument>${stats_db_shadow_name}</argument>
-            <argument>step19.sql</argument>
-            <argument>${wf:appPath()}/scripts/step19.sql</argument>
+            <argument>computeProductionStats.sql</argument>
+            <argument>${wf:appPath()}/scripts/computeProductionStats.sql</argument>
             <file>impala-shell.sh</file>
+        </shell>
+        <ok to="Step20"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step20">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateCache.sh</exec>
+            <argument>${stats_tool_api_url}</argument>
+            <file>updateCache.sh</file>
         </shell>
         <ok to="End"/>
         <error to="Kill"/>

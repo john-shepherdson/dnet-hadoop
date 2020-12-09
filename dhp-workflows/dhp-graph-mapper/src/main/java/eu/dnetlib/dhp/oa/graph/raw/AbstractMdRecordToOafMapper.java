@@ -75,6 +75,8 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final Qualifier MAG_PID_TYPE = qualifier(
 		"MAGIdentifier", "Microsoft Academic Graph Identifier", DNET_PID_TYPES, DNET_PID_TYPES);
 
+	protected static final String DEFAULT_TRUST_FOR_VALIDATED_RELS = "0.999";
+
 	protected static final Map<String, String> nsContext = new HashMap<>();
 
 	static {
@@ -244,23 +246,52 @@ public abstract class AbstractMdRecordToOafMapper {
 
 			final String originalId = ((Node) o).getText();
 
+			final String validationdDate = ((Node) o).valueOf("@validationDate");
+
 			if (StringUtils.isNotBlank(originalId)) {
 				final String projectId = createOpenaireId(40, originalId, true);
 
 				res
 					.add(
-						getRelation(
+						getRelationWithValidationDate(
 							docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, collectedFrom, info,
-							lastUpdateTimestamp));
+							lastUpdateTimestamp, validationdDate));
 				res
 					.add(
-						getRelation(
+						getRelationWithValidationDate(
 							projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, collectedFrom, info,
-							lastUpdateTimestamp));
+							lastUpdateTimestamp, validationdDate));
 			}
 		}
 
 		return res;
+	}
+
+	protected Relation getRelationWithValidationDate(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final KeyValue collectedFrom,
+		final DataInfo info,
+		final long lastUpdateTimestamp,
+		final String validationDate) {
+
+		final Relation r = getRelation(
+			source, target, relType, subRelType, relClass, collectedFrom, info, lastUpdateTimestamp);
+		r.setValidated(StringUtils.isNotBlank(validationDate));
+		r.setValidationDate(StringUtils.isNotBlank(validationDate) ? validationDate : null);
+
+		if (StringUtils.isNotBlank(validationDate)) {
+			r.setValidated(true);
+			r.setValidationDate(validationDate);
+			r.getDataInfo().setTrust(DEFAULT_TRUST_FOR_VALIDATED_RELS);
+		} else {
+			r.setValidated(false);
+			r.setValidationDate(null);
+		}
+
+		return r;
 	}
 
 	protected Relation getRelation(final String source,
