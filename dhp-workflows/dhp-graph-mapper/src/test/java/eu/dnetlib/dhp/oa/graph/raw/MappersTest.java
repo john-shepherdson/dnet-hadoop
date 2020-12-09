@@ -371,7 +371,8 @@ public class MappersTest {
 		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
 		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
 		assertValidId(p.getInstance().get(0).getHostedby().getKey());
-		assertEquals("http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+		assertEquals(
+			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
 		assertEquals(1, p.getInstance().get(0).getUrl().size());
 //		System.out.println(p.getInstance().get(0).getUrl().get(0));
 //		System.out.println(p.getInstance().get(0).getHostedby().getValue());

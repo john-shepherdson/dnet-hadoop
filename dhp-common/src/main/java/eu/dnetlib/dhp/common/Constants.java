@@ -1,9 +1,9 @@
 
 package eu.dnetlib.dhp.common;
 
-import com.google.common.collect.Maps;
-
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 public class Constants {
 
