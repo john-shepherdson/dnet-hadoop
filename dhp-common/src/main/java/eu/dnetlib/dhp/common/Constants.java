@@ -1,30 +1,16 @@
 
-package eu.dnetlib.dhp.oa.graph.dump;
-
-import java.util.Map;
+package eu.dnetlib.dhp.common;
 
 import com.google.common.collect.Maps;
+
+import java.util.Map;
 
 public class Constants {
 
 	public static final Map<String, String> accessRightsCoarMap = Maps.newHashMap();
 	public static final Map<String, String> coarCodeLabelMap = Maps.newHashMap();
 
-	public static final String INFERRED = "Inferred by OpenAIRE";
-
-	public static final String HARVESTED = "Harvested";
-	public static final String DEFAULT_TRUST = "0.9";
-	public static final String USER_CLAIM = "Linked by user";;
-
 	public static String COAR_ACCESS_RIGHT_SCHEMA = "http://vocabularies.coar-repositories.org/documentation/access_rights/";
-
-	public static String ZENODO_COMMUNITY_PREFIX = "https://zenodo.org/communities/";
-
-	public static String RESEARCH_COMMUNITY = "Research Community";
-
-	public static String RESEARCH_INFRASTRUCTURE = "Research Infrastructure/Initiative";
-
-	public static String ORCID = "orcid";
 
 	static {
 		accessRightsCoarMap.put("OPEN", "c_abf2");
@@ -41,17 +27,4 @@ public class Constants {
 		coarCodeLabelMap.put("c_f1cf", "EMBARGO");
 	}
 
-	public enum DUMPTYPE {
-		COMPLETE("complete"), COMMUNITY("community"), FUNDER("funder");
-
-		private String type;
-
-		DUMPTYPE(String type) {
-			this.type = type;
-		}
-
-		public String getType() {
-			return type;
-		}
-	}
 }

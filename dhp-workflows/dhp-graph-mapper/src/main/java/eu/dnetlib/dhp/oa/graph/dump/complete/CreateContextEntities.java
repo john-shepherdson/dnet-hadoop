@@ -1,21 +1,24 @@
 
 package eu.dnetlib.dhp.oa.graph.dump.complete;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.apache.commons.crypto.utils.IoUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
+import org.apache.hadoop.io.compress.CompressionOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
@@ -76,8 +79,11 @@ public class CreateContextEntities implements Serializable {
 		} else {
 			fsDataOutputStream = fileSystem.create(hdfsWritePath);
 		}
+		CompressionCodecFactory factory = new CompressionCodecFactory(conf);
+		CompressionCodec codec = factory.getCodecByClassName("org.apache.hadoop.io.compress.GzipCodec");
 
-		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
+		this.writer = new BufferedWriter(new OutputStreamWriter(codec.createOutputStream(fsDataOutputStream),
+			StandardCharsets.UTF_8));
 
 	}
 
