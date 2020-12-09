@@ -1,18 +1,19 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import eu.dnetlib.dhp.utils.DHPUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 /**
  * Factory class for OpenAIRE identifiers in the Graph

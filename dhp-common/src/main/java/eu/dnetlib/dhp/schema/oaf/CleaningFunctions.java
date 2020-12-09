@@ -261,9 +261,9 @@ public class CleaningFunctions {
 	 */
 	private static boolean filterPid(StructuredProperty pid) {
 		String value = Optional
-				.ofNullable(pid.getValue())
-				.map(s -> StringUtils.replaceAll(s, "\\s", ""))
-				.orElse("");
+			.ofNullable(pid.getValue())
+			.map(s -> StringUtils.replaceAll(s, "\\s", ""))
+			.orElse("");
 		if (StringUtils.isBlank(value)) {
 			return false;
 		}
