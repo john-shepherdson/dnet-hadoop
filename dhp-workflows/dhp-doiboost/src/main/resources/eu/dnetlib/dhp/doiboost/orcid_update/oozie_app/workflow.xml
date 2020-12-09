@@ -2,7 +2,7 @@
     <parameters>
         <property>
             <name>spark2MaxExecutors</name>
-            <value>5</value>
+            <value>40</value>
         </property>
         <property>
             <name>sparkDriverMemory</name>

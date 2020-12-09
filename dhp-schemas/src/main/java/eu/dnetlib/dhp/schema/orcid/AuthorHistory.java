@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.schema.orcid;
 
 import java.io.Serializable;
 
-public class Summary implements Serializable {
+public class AuthorHistory implements Serializable {
 	private String creationMethod;
 	private String completionDate;
 	private String submissionDate;

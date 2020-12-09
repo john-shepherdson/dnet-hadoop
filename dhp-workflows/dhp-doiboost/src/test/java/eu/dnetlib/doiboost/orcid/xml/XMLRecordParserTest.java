@@ -5,21 +5,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ximpleware.*;
 
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorSummary;
+import eu.dnetlib.dhp.schema.orcid.Work;
+import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcid.OrcidClientTest;
 import eu.dnetlib.doiboost.orcid.SparkDownloadOrcidWorks;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
+import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
 
 public class XMLRecordParserTest {
 	private static final String NS_WORK = "work";
@@ -29,7 +31,7 @@ public class XMLRecordParserTest {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	@Test
-	public void testOrcidAuthorDataXMLParser() throws Exception {
+	private void testOrcidAuthorDataXMLParser() throws Exception {
 
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("summary_0000-0001-6828-479X.xml"));
 
@@ -103,5 +105,27 @@ public class XMLRecordParserTest {
 			} catch (IOException e) {
 			}
 		});
+	}
+
+	@Test
+	public void testAuthorSummaryXMLParser() throws Exception {
+		String xml = IOUtils
+			.toString(
+				this.getClass().getResourceAsStream("record_0000-0001-5004-5918.xml"));
+		AuthorSummary authorSummary = XMLRecordParser.VTDParseAuthorSummary(xml.getBytes());
+		authorSummary.setBase64CompressData(ArgumentApplicationParser.compressArgument(xml));
+		OrcidClientTest.logToFile(JsonWriter.create(authorSummary));
+	}
+
+	@Test
+	public void testWorkDataXMLParser() throws Exception {
+		String xml = IOUtils
+			.toString(
+				this.getClass().getResourceAsStream("activity_work_0000-0003-2760-1191.xml"));
+		WorkDetail workDetail = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
+		Work work = new Work();
+		work.setWorkDetail(workDetail);
+		work.setBase64CompressData(ArgumentApplicationParser.compressArgument(xml));
+		OrcidClientTest.logToFile(JsonWriter.create(work));
 	}
 }

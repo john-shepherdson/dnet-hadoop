@@ -12,8 +12,9 @@ import com.ximpleware.*;
 import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorHistory;
+import eu.dnetlib.dhp.schema.orcid.AuthorSummary;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
-import eu.dnetlib.doiboost.orcidnodoi.model.Contributor;
 
 public class XMLRecordParser {
 
@@ -233,5 +234,115 @@ public class XMLRecordParser {
 			}
 		}
 		return workIdLastModifiedDate;
+	}
+
+	public static AuthorSummary VTDParseAuthorSummary(byte[] bytes)
+		throws VtdException, ParseException {
+		final VTDGen vg = new VTDGen();
+		vg.setDoc(bytes);
+		vg.parse(true);
+		final VTDNav vn = vg.getNav();
+		final AutoPilot ap = new AutoPilot(vn);
+		ap.declareXPathNameSpace(NS_COMMON, NS_COMMON_URL);
+		ap.declareXPathNameSpace(NS_PERSON, NS_PERSON_URL);
+		ap.declareXPathNameSpace(NS_DETAILS, NS_DETAILS_URL);
+		ap.declareXPathNameSpace(NS_OTHER, NS_OTHER_URL);
+		ap.declareXPathNameSpace(NS_RECORD, NS_RECORD_URL);
+		ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
+		ap.declareXPathNameSpace(NS_HISTORY, NS_HISTORY_URL);
+
+		AuthorData authorData = retrieveAuthorData(ap, vn, bytes);
+		AuthorHistory authorHistory = retrieveAuthorHistory(ap, vn, bytes);
+		AuthorSummary authorSummary = new AuthorSummary();
+		authorSummary.setAuthorData(authorData);
+		authorSummary.setAuthorHistory(authorHistory);
+		return authorSummary;
+	}
+
+	private static AuthorData retrieveAuthorData(AutoPilot ap, VTDNav vn, byte[] bytes)
+		throws VtdException {
+		AuthorData authorData = new AuthorData();
+		final List<String> errors = VtdUtilityParser.getTextValue(ap, vn, "//error:response-code");
+		if (!errors.isEmpty()) {
+			authorData.setErrorCode(errors.get(0));
+			return authorData;
+		}
+
+		List<VtdUtilityParser.Node> recordNodes = VtdUtilityParser
+			.getTextValuesWithAttributes(
+				ap, vn, "//record:record", Arrays.asList("path"));
+		if (!recordNodes.isEmpty()) {
+			final String oid = (recordNodes.get(0).getAttributes().get("path")).substring(1);
+			authorData.setOid(oid);
+		} else {
+			return null;
+		}
+
+		final List<String> names = VtdUtilityParser.getTextValue(ap, vn, "//personal-details:given-names");
+		if (!names.isEmpty()) {
+			authorData.setName(names.get(0));
+		}
+
+		final List<String> surnames = VtdUtilityParser.getTextValue(ap, vn, "//personal-details:family-name");
+		if (!surnames.isEmpty()) {
+			authorData.setSurname(surnames.get(0));
+		}
+
+		final List<String> creditNames = VtdUtilityParser.getTextValue(ap, vn, "//personal-details:credit-name");
+		if (!creditNames.isEmpty()) {
+			authorData.setCreditName(creditNames.get(0));
+		}
+
+		final List<String> otherNames = VtdUtilityParser.getTextValue(ap, vn, "//other-name:content");
+		if (!otherNames.isEmpty()) {
+			authorData.setOtherNames(otherNames);
+		}
+		return authorData;
+	}
+
+	private static AuthorHistory retrieveAuthorHistory(AutoPilot ap, VTDNav vn, byte[] bytes)
+		throws VtdException {
+		AuthorHistory authorHistory = new AuthorHistory();
+		final String creationMethod = VtdUtilityParser.getSingleValue(ap, vn, "//history:creation-method");
+		if (StringUtils.isNoneBlank(creationMethod)) {
+			authorHistory.setCreationMethod(creationMethod);
+		}
+
+		final String completionDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:completion-date");
+		if (StringUtils.isNoneBlank(completionDate)) {
+			authorHistory.setCompletionDate(completionDate);
+		}
+
+		final String submissionDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:submission-date");
+		if (StringUtils.isNoneBlank(submissionDate)) {
+			authorHistory.setSubmissionDate(submissionDate);
+		}
+
+		final String claimed = VtdUtilityParser.getSingleValue(ap, vn, "//history:claimed");
+		if (StringUtils.isNoneBlank(claimed)) {
+			authorHistory.setClaimed(Boolean.parseBoolean(claimed));
+		}
+
+		final String verifiedEmail = VtdUtilityParser.getSingleValue(ap, vn, "//history:verified-email");
+		if (StringUtils.isNoneBlank(verifiedEmail)) {
+			authorHistory.setVerifiedEmail(Boolean.parseBoolean(verifiedEmail));
+		}
+
+		final String verifiedPrimaryEmail = VtdUtilityParser.getSingleValue(ap, vn, "//history:verified-primary-email");
+		if (StringUtils.isNoneBlank(verifiedPrimaryEmail)) {
+			authorHistory.setVerifiedPrimaryEmail(Boolean.parseBoolean(verifiedPrimaryEmail));
+		}
+
+		final String deactivationDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:deactivation-date");
+		if (StringUtils.isNoneBlank(deactivationDate)) {
+			authorHistory.setDeactivationDate(deactivationDate);
+		}
+
+		final String lastModifiedDate = VtdUtilityParser
+			.getSingleValue(ap, vn, "//history:history/common:last-modified-date");
+		if (StringUtils.isNoneBlank(lastModifiedDate)) {
+			authorHistory.setLastModifiedDate(lastModifiedDate);
+		}
+		return authorHistory;
 	}
 }

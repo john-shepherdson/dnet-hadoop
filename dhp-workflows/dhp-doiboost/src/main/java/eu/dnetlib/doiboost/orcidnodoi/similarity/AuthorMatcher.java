@@ -19,8 +19,8 @@ import com.ximpleware.XPathParseException;
 
 import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
-import eu.dnetlib.doiboost.orcidnodoi.model.Contributor;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.dhp.schema.orcid.Contributor;
+import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 
 /**
  * This class is used for searching from a list of publication contributors a
@@ -209,7 +209,7 @@ public class AuthorMatcher {
 		}
 	}
 
-	private static String toJson(WorkDataNoDoi work) {
+	private static String toJson(WorkDetail work) {
 		GsonBuilder builder = new GsonBuilder();
 		Gson gson = builder.create();
 		return gson.toJson(work);

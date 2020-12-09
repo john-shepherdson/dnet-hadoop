@@ -30,8 +30,8 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcid.json.JsonHelper;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 import scala.Tuple2;
@@ -81,10 +81,10 @@ public class SparkGenEnrichedOrcidWorks {
 
 				JavaPairRDD<Text, Text> activitiesRDD = sc
 					.sequenceFile(workingPath + outputWorksPath + "*.seq", Text.class, Text.class);
-				Dataset<WorkDataNoDoi> activitiesDataset = spark
+				Dataset<WorkDetail> activitiesDataset = spark
 					.createDataset(
 						activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(),
-						Encoders.bean(WorkDataNoDoi.class));
+						Encoders.bean(WorkDetail.class));
 				logger.info("Works data loaded: " + activitiesDataset.count());
 
 				JavaRDD<Tuple2<String, String>> enrichedWorksRDD = activitiesDataset
@@ -92,8 +92,8 @@ public class SparkGenEnrichedOrcidWorks {
 						summariesDataset,
 						activitiesDataset.col("oid").equalTo(summariesDataset.col("oid")), "inner")
 					.map(
-						(MapFunction<Tuple2<WorkDataNoDoi, AuthorData>, Tuple2<String, String>>) value -> {
-							WorkDataNoDoi w = value._1;
+						(MapFunction<Tuple2<WorkDetail, AuthorData>, Tuple2<String, String>>) value -> {
+							WorkDetail w = value._1;
 							AuthorData a = value._2;
 							AuthorMatcher.match(a, w.getContributors());
 							return new Tuple2<>(a.getOid(), JsonHelper.createOidWork(w));
@@ -161,9 +161,9 @@ public class SparkGenEnrichedOrcidWorks {
 		return authorData;
 	}
 
-	private static WorkDataNoDoi loadWorkFromJson(Text orcidId, Text json) {
+	private static WorkDetail loadWorkFromJson(Text orcidId, Text json) {
 
-		WorkDataNoDoi workData = new Gson().fromJson(json.toString(), WorkDataNoDoi.class);
+		WorkDetail workData = new Gson().fromJson(json.toString(), WorkDetail.class);
 		return workData;
 	}
 

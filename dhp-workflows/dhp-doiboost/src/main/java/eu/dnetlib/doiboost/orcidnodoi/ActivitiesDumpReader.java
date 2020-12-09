@@ -19,8 +19,8 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.mortbay.log.Log;
 
+import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcid.json.JsonHelper;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
 import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
 
 /**
@@ -87,29 +87,29 @@ public class ActivitiesDumpReader {
 							while ((line = br.readLine()) != null) {
 								buffer.append(line);
 							}
-							WorkDataNoDoi workDataNoDoi = XMLRecordParserNoDoi
+							WorkDetail workDetail = XMLRecordParserNoDoi
 								.VTDParseWorkData(buffer.toString().getBytes());
-							if (workDataNoDoi != null) {
-								if (workDataNoDoi.getErrorCode() != null) {
+							if (workDetail != null) {
+								if (workDetail.getErrorCode() != null) {
 									errorFromOrcidFound += 1;
 									Log
 										.debug(
 											"error from Orcid with code "
-												+ workDataNoDoi.getErrorCode()
+												+ workDetail.getErrorCode()
 												+ " for entry "
 												+ entry.getName());
 									continue;
 								}
-								boolean isDoiFound = workDataNoDoi
+								boolean isDoiFound = workDetail
 									.getExtIds()
 									.stream()
 									.filter(e -> e.getType() != null)
 									.anyMatch(e -> e.getType().equals("doi"));
 								if (!isDoiFound) {
-									String jsonData = JsonHelper.createOidWork(workDataNoDoi);
-									Log.debug("oid: " + workDataNoDoi.getOid() + " data: " + jsonData);
+									String jsonData = JsonHelper.createOidWork(workDetail);
+									Log.debug("oid: " + workDetail.getOid() + " data: " + jsonData);
 
-									final Text key = new Text(workDataNoDoi.getOid());
+									final Text key = new Text(workDetail.getOid());
 									final Text value = new Text(jsonData);
 
 									try {

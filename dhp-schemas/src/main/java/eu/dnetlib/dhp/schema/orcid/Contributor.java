@@ -1,5 +1,5 @@
 
-package eu.dnetlib.doiboost.orcidnodoi.model;
+package eu.dnetlib.dhp.schema.orcid;
 
 import java.io.Serializable;
 
@@ -12,9 +12,9 @@ import eu.dnetlib.dhp.schema.orcid.AuthorData;
 public class Contributor extends AuthorData implements Serializable {
 	private String sequence;
 	private String role;
-	private transient boolean simpleMatch = false;
-	private transient Double score = 0.0;
-	private transient boolean bestMatch = false;
+	private transient boolean simpleMatch;
+	private transient Double score;
+	private transient boolean bestMatch;
 
 	public String getSequence() {
 		return sequence;

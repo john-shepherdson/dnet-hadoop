@@ -1,5 +1,5 @@
 
-package eu.dnetlib.doiboost.orcidnodoi.model;
+package eu.dnetlib.dhp.schema.orcid;
 
 /**
  * This class models the data related to external id, that are retrieved from an orcid publication
