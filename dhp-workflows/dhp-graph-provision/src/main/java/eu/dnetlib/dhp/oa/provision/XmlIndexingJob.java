@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
+import javax.swing.text.html.Option;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
@@ -42,6 +43,10 @@ public class XmlIndexingJob {
 
 	private static final Logger log = LoggerFactory.getLogger(XmlIndexingJob.class);
 
+	public enum OutputFormat {
+		SOLR, HDFS
+	}
+
 	private static final Integer DEFAULT_BATCH_SIZE = 1000;
 
 	protected static final String DATE_FORMAT = "yyyy-MM-dd'T'hh:mm:ss'Z'";
@@ -51,6 +56,8 @@ public class XmlIndexingJob {
 	private String format;
 
 	private int batchSize;
+
+	private OutputFormat outputFormat;
 
 	private String outputPath;
 
@@ -80,13 +87,21 @@ public class XmlIndexingJob {
 
 		final String outputPath = Optional
 			.ofNullable(parser.get("outputPath"))
+			.map(StringUtils::trim)
 			.orElse(null);
 		log.info("outputPath: {}", outputPath);
 
-		final Integer batchSize = parser.getObjectMap().containsKey("batchSize")
-			? Integer.valueOf(parser.get("batchSize"))
-			: DEFAULT_BATCH_SIZE;
+		final Integer batchSize = Optional
+			.ofNullable(parser.get("batchSize"))
+			.map(Integer::valueOf)
+			.orElse(DEFAULT_BATCH_SIZE);
 		log.info("batchSize: {}", batchSize);
+
+		final OutputFormat outputFormat = Optional
+			.ofNullable(parser.get("outputFormat"))
+			.map(OutputFormat::valueOf)
+			.orElse(OutputFormat.SOLR);
+		log.info("outputFormat: {}", outputFormat);
 
 		final SparkConf conf = new SparkConf();
 		conf.registerKryoClasses(new Class[] {
@@ -100,15 +115,18 @@ public class XmlIndexingJob {
 				final String isLookupUrl = parser.get("isLookupUrl");
 				log.info("isLookupUrl: {}", isLookupUrl);
 				final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-				new XmlIndexingJob(spark, inputPath, format, batchSize, outputPath).run(isLookup);
+				new XmlIndexingJob(spark, inputPath, format, batchSize, outputFormat, outputPath).run(isLookup);
 			});
 	}
 
-	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize, String outputPath) {
+	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize,
+		OutputFormat outputFormat,
+		String outputPath) {
 		this.spark = spark;
 		this.inputPath = inputPath;
 		this.format = format;
 		this.batchSize = batchSize;
+		this.outputFormat = outputFormat;
 		this.outputPath = outputPath;
 	}
 
@@ -137,17 +155,22 @@ public class XmlIndexingJob {
 			.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
 			.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s));
 
-		if (StringUtils.isNotBlank(outputPath)) {
-			spark
-				.createDataset(
-					docs.map(s -> new SerializableSolrInputDocument(s)).rdd(),
-					Encoders.kryo(SerializableSolrInputDocument.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.parquet(outputPath);
-		} else {
-			final String collection = ProvisionConstants.getCollectionName(format);
-			SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+		switch (outputFormat) {
+			case SOLR:
+				final String collection = ProvisionConstants.getCollectionName(format);
+				SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+				break;
+			case HDFS:
+				spark
+					.createDataset(
+						docs.map(s -> new SerializableSolrInputDocument(s)).rdd(),
+						Encoders.kryo(SerializableSolrInputDocument.class))
+					.write()
+					.mode(SaveMode.Overwrite)
+					.parquet(outputPath);
+				break;
+			default:
+				throw new IllegalArgumentException("invalid outputFormat: " + outputFormat);
 		}
 	}
 

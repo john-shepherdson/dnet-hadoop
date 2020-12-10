@@ -144,7 +144,6 @@ public class SparkAtomicActionScoreJob implements Serializable {
 
 	}
 
-
 	private static List<Measure> getMeasure(BipScore value) {
 		return value
 			.getScoreList()

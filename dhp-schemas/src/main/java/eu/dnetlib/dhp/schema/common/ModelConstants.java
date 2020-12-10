@@ -7,6 +7,10 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class ModelConstants {
 
+	public static final String ORCID = "orcid";
+	public static final String ORCID_PENDING = "orcid_pending";
+	public static final String ORCID_CLASSNAME = "Open Researcher and Contributor ID";
+
 	public static String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
 	public static String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
 
