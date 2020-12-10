@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.schema.dump.oaf.Result;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -155,7 +153,7 @@ public class DumpJobTest {
 			.run(
 				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
-				CommunityResult.class, false);
+				CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -220,7 +218,7 @@ public class DumpJobTest {
 			.run(
 				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
-				GraphResult.class, true);
+				GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -253,7 +251,7 @@ public class DumpJobTest {
 			.run(
 				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Dataset.class,
-				CommunityResult.class, false);
+				CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -285,7 +283,7 @@ public class DumpJobTest {
 			.run(
 				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-				CommunityResult.class, false);
+				CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -321,7 +319,7 @@ public class DumpJobTest {
 			.run(
 				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Software.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Software.class,
-				CommunityResult.class, false);
+				CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -357,7 +355,7 @@ public class DumpJobTest {
 			.run(
 				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, OtherResearchProduct.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, OtherResearchProduct.class,
-				CommunityResult.class, false);
+				CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -392,7 +390,7 @@ public class DumpJobTest {
 			.run(
 				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-				CommunityResult.class, false);
+				CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 

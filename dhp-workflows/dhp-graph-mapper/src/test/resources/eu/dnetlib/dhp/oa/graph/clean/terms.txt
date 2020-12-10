@@ -1031,6 +1031,7 @@ dnet:pid_types @=@ dnet:pid_types @=@ jprn @=@ JPRN Identifier
 dnet:pid_types @=@ dnet:pid_types @=@ mag_id @=@ Microsoft Academic Graph Identifier
 dnet:pid_types @=@ dnet:pid_types @=@ oai @=@ Open Archives Initiative
 dnet:pid_types @=@ dnet:pid_types @=@ orcid @=@ Open Researcher and Contributor ID
+dnet:pid_types @=@ dnet:pid_types @=@ orcid_pending @=@ Open Researcher and Contributor ID
 dnet:pid_types @=@ dnet:pid_types @=@ PANGAEA @=@ PANGAEA
 dnet:pid_types @=@ dnet:pid_types @=@ epo_nr_epodoc @=@ Patent application number in EPODOC format
 dnet:pid_types @=@ dnet:pid_types @=@ UNKNOWN @=@ UNKNOWN

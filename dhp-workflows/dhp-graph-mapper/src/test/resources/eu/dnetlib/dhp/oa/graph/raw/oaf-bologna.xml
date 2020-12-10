@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <header xmlns="http://namespace.openaire.eu/">
+        <dri:objIdentifier>od_________3::4f7038e665fdd3800297735f087a530c</dri:objIdentifier>
+        <dri:recordIdentifier>oai:amsacta.unibo.it:6382</dri:recordIdentifier>
+        <dri:dateOfCollection/>
+        <dri:mdFormat/>
+        <dri:mdFormatInterpretation/>
+        <dri:repositoryId/>
+        <dr:objectIdentifier/>
+        <dr:dateOfCollection>2020-05-21T05:26:15.93Z</dr:dateOfCollection>
+        <dr:dateOfTransformation>2020-08-01T11:06:26.977Z</dr:dateOfTransformation>
+        <oaf:datasourceprefix>od_________3</oaf:datasourceprefix>
+    </header>
+    <metadata xmlns="http://namespace.openaire.eu/">
+        <dc:title>CONSOLE Project - Deliverable 5.1 - "Guidelines for Community of Practice (CoP)
+            management at local level"</dc:title>
+        <dc:creator>Blanco-Velázquez, Francisco José</dc:creator>
+        <dc:creator>Runge, Tania</dc:creator>
+        <dc:creator>Anaya-Romero, María</dc:creator>
+        <dc:date>2020-05-11</dc:date>
+        <dc:description>The Community of Practice (CoP) is foreseen to play a key role in boosting
+            innovation in the effective and long-lasting delivery of agri-environmental-climate
+            public goods (AECPGs). The CONSOLE CoP will be organized around practitioners
+            experienced in the provision of AECPGs and those interested in it and will be nourished
+            throughout the project lifetime. In line with the definition of Wenger1 the CoP is
+            defined as a group of people (the community) who share a common interest and who learn
+            how to perform better through regular interaction and exchange of experiences. The idea
+            is to set up a pan-European CoP with national and/or local (regional) sub-groups managed
+            by the CONSOLE partners with the aim of developing improved and novel contract solutions
+            in collaboration with its members. This document sets out: (a) the purpose and
+            objectives of the CoP in CONSOLE, (b) the setting up and management of the CoP at
+            European, national and local level, (c) the process for motivating individuals to
+            participate. The CONSOLE CoP is intended to facilitate knowledge exchange and mutual
+            learning, mainly through virtual contacts. Participation in the CoP is based on sharing
+            and reciprocity principle. A core objective of these guidelines is to ensure a sound
+            management and facilitation of the CoP by all CONSOLE partners in view of optimizing the
+            input from CoP members in the project activities. Members within a national or local
+            CONSOLE CoP are: 1) CONSOLE partners; 2) practitioners, mainly farmers and foresters,
+            who test and implement practically the contractual models, and 3) experts, that may have
+            punctual interventions in the CoP. A vibrant CoP with active involvement of its members
+            is crucial for the assessment and testing of improved and novel voluntary measures for
+            the delivery of AECPGs. For each of the CONSOLE countries one national contact person is
+            nominated to take over the role as national focal point for the CoP activities in his
+            country and to serve as facilitator of the CoP. These facilitators are responsible to
+            ensure participation along the various project tasks foreseen within several WPs and to
+            overcome potential language barriers. The national contact person may be supported by
+            other CONSOLE partners from his country for local activities. At local level the CoP
+            benefits from existing contacts of CONSOLE partners to practitioners, including the
+            experts interviewed for the case studies analysis within WP2. The forming/development of
+            a CoP requires promoting exchanges taking on board the interests and needs of the actors
+            involved and to animate them to share their expertise. Collaborative learning within the
+            CoP supported by dedicated training activities will be crucial to ensure the intended
+            major transition towards smarter AECPGs-related practices in Europe. These guidelines
+            focus on the identification of the various tasks where CoP participation is foreseen at
+            local (regional) level and to provide support for the identification of potential
+            members. In the deliverable D5.2 “Guidelines for testing the solutions catalogue by CoP
+            and partners” further details about the involvement of the CoP will be
+            provided.</dc:description>
+        <dc:format>application/pdf</dc:format>
+        <dc:identifier>http://amsacta.unibo.it/6382/</dc:identifier>
+        <dc:language>eng</dc:language>
+        <dc:relation>info:eu-repo/grantAgreement/EC/H2020/817949/EU/CONtract SOLutions for Effective
+            and lasting delivery of agri-environmental-climate public goods by EU agriculture and
+            forestry/CONSOLE</dc:relation>
+        <dc:relation>info:eu-repo/semantics/altIdentifier/doi/10.6092/unibo/amsacta/6382</dc:relation>
+        <dc:relation>info:eu-repo/semantics/reference/url/https://console-project.eu/</dc:relation>
+        <dc:source>Blanco-Velázquez, Francisco José ; Runge, Tania ; Anaya-Romero, María (2020)
+            CONSOLE Project - Deliverable 5.1 - "Guidelines for Community of Practice (CoP)
+            management at local level". p. 21. DOI 10.6092/unibo/amsacta/6382
+            &lt;http://doi.org/10.6092/unibo/amsacta/6382&gt;.</dc:source>
+        <dc:subject classid="keyword" classname="keyword" schemeid="dnet:result_subject"
+                    schemename="dnet:result_subject">AGR/01 Economia ed estimo rurale</dc:subject>
+        <dc:subject classid="keyword" classname="keyword" schemeid="dnet:result_subject"
+                    schemename="dnet:result_subject">SECS-S/01 Statistica</dc:subject>
+        <dc:type>info:eu-repo/semantics/book</dc:type>
+        <dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+        <dr:CobjCategory type="publication">0002</dr:CobjCategory>
+        <oaf:dateAccepted>2020-05-11</oaf:dateAccepted>
+        <oaf:projectid>corda__h2020::817949</oaf:projectid>
+        <oaf:embargoenddate/>
+        <oaf:collectedDatasourceid>opendoar____::3</oaf:collectedDatasourceid>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:hostedBy name="AMS Acta" id="opendoar____::3"/>
+        <oaf:collectedFrom name="AMS Acta" id="opendoar____::3"/>
+        <oaf:identifier identifierType="doi">10.6092/unibo/amsacta/6382</oaf:identifier>
+        <oaf:journal issn="" eissn="" vol="" iss="" sp="" ep=""/>
+    </metadata>
+    <about>
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance"
+                    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription harvestDate="2020-05-21T05:26:15.93Z" altered="true">
+                <baseURL>http%3A%2F%2Famsacta.unibo.it%2Fcgi%2Fopenaire3</baseURL>
+                <identifier>oai:amsacta.unibo.it:6382</identifier>
+                <datestamp>2020-05-13T09:27:00Z</datestamp>
+                <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction schemename="dnet:provenanceActions"
+                                  schemeid="dnet:provenanceActions" classname="sysimport:crosswalk:repository"
+                                  classid="sysimport:crosswalk:repository"/>
+        </oaf:datainfo>
+    </about>
+</record>
