@@ -39,8 +39,9 @@ public class IndexEventSubsetJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(IndexEventSubsetJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_event_subset.json")));
+				.toString(
+					IndexEventSubsetJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_event_subset.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();

@@ -29,8 +29,9 @@ public class IndexOnESJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(IndexOnESJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_es.json")));
+				.toString(
+					IndexOnESJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_es.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
