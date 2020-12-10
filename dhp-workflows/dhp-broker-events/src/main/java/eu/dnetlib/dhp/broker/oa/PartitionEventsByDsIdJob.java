@@ -42,9 +42,8 @@ public class PartitionEventsByDsIdJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					PartitionEventsByDsIdJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/od_partitions_params.json")));
+				.toString(PartitionEventsByDsIdJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/od_partitions_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -67,13 +66,12 @@ public class PartitionEventsByDsIdJob {
 		final Set<String> validOpendoarIds = new HashSet<>();
 		if (!opendoarIds.trim().equals("-")) {
 			validOpendoarIds
-				.addAll(
-					Arrays
-						.stream(opendoarIds.split(","))
-						.map(String::trim)
-						.filter(StringUtils::isNotBlank)
-						.map(s -> OPENDOAR_NSPREFIX + DigestUtils.md5Hex(s))
-						.collect(Collectors.toSet()));
+				.addAll(Arrays
+					.stream(opendoarIds.split(","))
+					.map(String::trim)
+					.filter(StringUtils::isNotBlank)
+					.map(s -> OPENDOAR_NSPREFIX + DigestUtils.md5Hex(s))
+					.collect(Collectors.toSet()));
 		}
 		log.info("validOpendoarIds: {}", validOpendoarIds);
 
@@ -84,13 +82,12 @@ public class PartitionEventsByDsIdJob {
 				.filter((FilterFunction<Event>) e -> StringUtils.isNotBlank(e.getMap().getTargetDatasourceId()))
 				.filter((FilterFunction<Event>) e -> e.getMap().getTargetDatasourceId().startsWith(OPENDOAR_NSPREFIX))
 				.filter((FilterFunction<Event>) e -> validOpendoarIds.contains(e.getMap().getTargetDatasourceId()))
-				.map(
-					(MapFunction<Event, ShortEventMessageWithGroupId>) e -> messageFromNotification(e),
-					Encoders.bean(ShortEventMessageWithGroupId.class))
+				.map((MapFunction<Event, ShortEventMessageWithGroupId>) e -> messageFromNotification(e), Encoders.bean(ShortEventMessageWithGroupId.class))
 				.coalesce(1)
 				.write()
 				.partitionBy("group")
 				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
 				.json(partitionPath);
 
 		});
