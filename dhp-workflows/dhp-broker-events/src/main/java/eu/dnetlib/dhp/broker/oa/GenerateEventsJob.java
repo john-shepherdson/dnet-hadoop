@@ -33,8 +33,9 @@ public class GenerateEventsJob {
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(GenerateEventsJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_events.json")));
+				.toString(
+					GenerateEventsJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_events.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -72,8 +73,10 @@ public class GenerateEventsJob {
 				.readPath(spark, workingDir + "/duplicates", ResultGroup.class);
 
 			final Dataset<Event> dataset = groups
-				.map(g -> EventFinder
-					.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, accumulators), Encoders
+				.map(
+					g -> EventFinder
+						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, accumulators),
+					Encoders
 						.bean(EventGroup.class))
 				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
 

@@ -33,8 +33,9 @@ public class GenerateStatsJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(GenerateStatsJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/stats_params.json")));
+				.toString(
+					GenerateStatsJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/stats_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
