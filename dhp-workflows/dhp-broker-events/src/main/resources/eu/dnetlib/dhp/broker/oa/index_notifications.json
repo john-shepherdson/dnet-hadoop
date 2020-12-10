@@ -1,8 +1,8 @@
 [
 	{
 		"paramName": "o",
-		"paramLongName": "workingPath",
-		"paramDescription": "the workinh path",
+		"paramLongName": "outputDir",
+		"paramDescription": "the dir that contains the events folder",
 		"paramRequired": true
 	},
 	{

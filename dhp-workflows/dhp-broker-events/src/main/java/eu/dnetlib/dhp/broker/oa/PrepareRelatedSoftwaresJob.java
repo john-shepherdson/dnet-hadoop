@@ -44,10 +44,10 @@ public class PrepareRelatedSoftwaresJob {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String relsPath = workingPath + "/relatedSoftwares";
+		final String relsPath = workingDir + "/relatedSoftwares";
 		log.info("relsPath: {}", relsPath);
 
 		final SparkConf conf = new SparkConf();

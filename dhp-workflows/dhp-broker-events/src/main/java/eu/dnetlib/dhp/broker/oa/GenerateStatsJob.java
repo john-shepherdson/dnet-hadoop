@@ -33,9 +33,8 @@ public class GenerateStatsJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					GenerateStatsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/stats_params.json")));
+				.toString(GenerateStatsJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/stats_params.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -46,7 +45,7 @@ public class GenerateStatsJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
 		final String dbUrl = parser.get("dbUrl");

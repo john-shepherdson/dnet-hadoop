@@ -29,14 +29,13 @@ public class IndexOnESJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					IndexOnESJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_es.json")));
+				.toString(IndexOnESJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_es.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
 		final String index = parser.get("index");

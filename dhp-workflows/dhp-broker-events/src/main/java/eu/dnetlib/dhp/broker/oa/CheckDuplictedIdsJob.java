@@ -31,15 +31,15 @@ public class CheckDuplictedIdsJob {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(CheckDuplictedIdsJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/check_duplicates.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
-		final String countPath = parser.get("workingPath") + "/counts";
+		final String countPath = parser.get("outputDir") + "/counts";
 		log.info("countPath: {}", countPath);
 
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();

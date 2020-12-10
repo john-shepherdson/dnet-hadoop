@@ -1,7 +1,13 @@
 [
 	{
+		"paramName": "wp",
+		"paramLongName": "workingDir",
+		"paramDescription": "the path where the temporary data are stored",
+		"paramRequired": true
+	},
+	{
 		"paramName": "o",
-		"paramLongName": "workingPath",
+		"paramLongName": "outputDir",
 		"paramDescription": "the path where the generated events will be stored",
 		"paramRequired": true
 	},
