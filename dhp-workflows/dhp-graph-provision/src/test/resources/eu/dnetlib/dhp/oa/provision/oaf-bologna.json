@@ -1,0 +1,379 @@
+
+  {
+    "collectedfrom": [
+      {
+        "key": "10|opendoar____::eccbc87e4b5ce2fe28308fd9f2a7baf3",
+        "value": "AMS Acta",
+        "dataInfo": null
+      }
+    ],
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:repository",
+        "classname": "sysimport:crosswalk:repository",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    },
+    "lastupdatetimestamp": 1606898557407,
+    "id": "50|od_________3::4f7038e665fdd3800297735f087a530c",
+    "originalId": [
+      "oai:amsacta.unibo.it:6382"
+    ],
+    "pid": [
+      {
+        "value": "10.6092/unibo/amsacta/6382",
+        "qualifier": {
+          "classid": "doi",
+          "classname": "doi",
+          "schemeid": "dnet:pid_types",
+          "schemename": "dnet:pid_types"
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": "",
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "dateofcollection": "",
+    "dateoftransformation": "2020-08-01T11:06:26.977Z",
+    "extraInfo": [],
+    "oaiprovenance": {
+      "originDescription": {
+        "harvestDate": "2020-05-21T05:26:15.93Z",
+        "altered": true,
+        "baseURL": "http%3A%2F%2Famsacta.unibo.it%2Fcgi%2Fopenaire3",
+        "identifier": "oai:amsacta.unibo.it:6382",
+        "datestamp": "2020-05-13T09:27:00Z",
+        "metadataNamespace": "http://www.openarchives.org/OAI/2.0/oai_dc/"
+      }
+    },
+    "measures": null,
+    "author": [
+      {
+        "fullname": "Blanco-Velázquez, Francisco José",
+        "name": "Francisco José",
+        "surname": "Blanco-Velázquez",
+        "rank": 1,
+        "pid": [],
+        "affiliation": null
+      },
+      {
+        "fullname": "Runge, Tania",
+        "name": "Tania",
+        "surname": "Runge",
+        "rank": 2,
+        "pid": [],
+        "affiliation": null
+      },
+      {
+        "fullname": "Anaya-Romero, María",
+        "name": "María",
+        "surname": "Anaya-Romero",
+        "rank": 3,
+        "pid": [],
+        "affiliation": null
+      }
+    ],
+    "resulttype": {
+      "classid": "publication",
+      "classname": "publication",
+      "schemeid": "dnet:result_typologies",
+      "schemename": "dnet:result_typologies"
+    },
+    "language": {
+      "classid": "eng",
+      "classname": "English",
+      "schemeid": "dnet:languages",
+      "schemename": "dnet:languages"
+    },
+    "country": [],
+    "subject": [
+      {
+        "value": "AGR/01 Economia ed estimo rurale",
+        "qualifier": {
+          "classid": "keyword",
+          "classname": "keyword",
+          "schemeid": "dnet:result_subject",
+          "schemename": "dnet:result_subject"
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": "",
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "SECS-S/01 Statistica",
+        "qualifier": {
+          "classid": "keyword",
+          "classname": "keyword",
+          "schemeid": "dnet:result_subject",
+          "schemename": "dnet:result_subject"
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": "",
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "title": [
+      {
+        "value": "CONSOLE Project - Deliverable 5.1 - \"Guidelines for Community of Practice (CoP)\n            management at local level\"",
+        "qualifier": {
+          "classid": "main title",
+          "classname": "main title",
+          "schemeid": "dnet:dataCite_title",
+          "schemename": "dnet:dataCite_title"
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": "",
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "relevantdate": [],
+    "description": [
+      {
+        "value": "The Community of Practice (CoP) is foreseen to play a key role in boosting\n            innovation in the effective and long-lasting delivery of agri-environmental-climate\n            public goods (AECPGs). The CONSOLE CoP will be organized around practitioners\n            experienced in the provision of AECPGs and those interested in it and will be nourished\n            throughout the project lifetime. In line with the definition of Wenger1 the CoP is\n            defined as a group of people (the community) who share a common interest and who learn\n            how to perform better through regular interaction and exchange of experiences. The idea\n            is to set up a pan-European CoP with national and/or local (regional) sub-groups managed\n            by the CONSOLE partners with the aim of developing improved and novel contract solutions\n            in collaboration with its members. This document sets out: (a) the purpose and\n            objectives of the CoP in CONSOLE, (b) the setting up and management of the CoP at\n            European, national and local level, (c) the process for motivating individuals to\n            participate. The CONSOLE CoP is intended to facilitate knowledge exchange and mutual\n            learning, mainly through virtual contacts. Participation in the CoP is based on sharing\n            and reciprocity principle. A core objective of these guidelines is to ensure a sound\n            management and facilitation of the CoP by all CONSOLE partners in view of optimizing the\n            input from CoP members in the project activities. Members within a national or local\n            CONSOLE CoP are: 1) CONSOLE partners; 2) practitioners, mainly farmers and foresters,\n            who test and implement practically the contractual models, and 3) experts, that may have\n            punctual interventions in the CoP. A vibrant CoP with active involvement of its members\n            is crucial for the assessment and testing of improved and novel voluntary measures for\n            the delivery of AECPGs. For each of the CONSOLE countries one national contact person is\n            nominated to take over the role as national focal point for the CoP activities in his\n            country and to serve as facilitator of the CoP. These facilitators are responsible to\n            ensure participation along the various project tasks foreseen within several WPs and to\n            overcome potential language barriers. The national contact person may be supported by\n            other CONSOLE partners from his country for local activities. At local level the CoP\n            benefits from existing contacts of CONSOLE partners to practitioners, including the\n            experts interviewed for the case studies analysis within WP2. The forming/development of\n            a CoP requires promoting exchanges taking on board the interests and needs of the actors\n            involved and to animate them to share their expertise. Collaborative learning within the\n            CoP supported by dedicated training activities will be crucial to ensure the intended\n            major transition towards smarter AECPGs-related practices in Europe. These guidelines\n            focus on the identification of the various tasks where CoP participation is foreseen at\n            local (regional) level and to provide support for the identification of potential\n            members. In the deliverable D5.2 “Guidelines for testing the solutions catalogue by CoP\n            and partners” further details about the involvement of the CoP will be\n            provided.",
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": "",
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "dateofacceptance": {
+      "value": "2020-05-11",
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": "",
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "sysimport:crosswalk:repository",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    "publisher": null,
+    "embargoenddate": null,
+    "source": [
+      {
+        "value": "Blanco-Velázquez, Francisco José ; Runge, Tania ; Anaya-Romero, María (2020)\n            CONSOLE Project - Deliverable 5.1 - \"Guidelines for Community of Practice (CoP)\n            management at local level\". p. 21. DOI 10.6092/unibo/amsacta/6382\n            <http://doi.org/10.6092/unibo/amsacta/6382>.",
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": "",
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "fulltext": [],
+    "format": [
+      {
+        "value": "application/pdf",
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": "",
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "contributor": [],
+    "resourcetype": null,
+    "coverage": [],
+    "bestaccessright": {
+      "classid": "OPEN",
+      "classname": "Open Access",
+      "schemeid": "dnet:access_modes",
+      "schemename": "dnet:access_modes"
+    },
+    "context": [],
+    "externalReference": [],
+    "instance": [
+      {
+        "license": null,
+        "accessright": {
+          "classid": "OPEN",
+          "classname": "Open Access",
+          "schemeid": "dnet:access_modes",
+          "schemename": "dnet:access_modes"
+        },
+        "instancetype": {
+          "classid": "0002",
+          "classname": "Book",
+          "schemeid": "dnet:publication_resource",
+          "schemename": "dnet:publication_resource"
+        },
+        "hostedby": {
+          "key": "10|opendoar____::eccbc87e4b5ce2fe28308fd9f2a7baf3",
+          "value": "AMS Acta",
+          "dataInfo": null
+        },
+        "url": [
+          "http://amsacta.unibo.it/6382/"
+        ],
+        "distributionlocation": "",
+        "collectedfrom": {
+          "key": "10|opendoar____::eccbc87e4b5ce2fe28308fd9f2a7baf3",
+          "value": "AMS Acta",
+          "dataInfo": null
+        },
+        "dateofacceptance": {
+          "value": "2020-05-11",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": false,
+            "deletedbyinference": false,
+            "trust": "0.9",
+            "inferenceprovenance": "",
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:repository",
+              "classname": "sysimport:crosswalk:repository",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        "processingchargeamount": null,
+        "processingchargecurrency": null,
+        "refereed": {
+          "classid": "UNKNOWN",
+          "classname": "Unknown",
+          "schemeid": "dnet:review_levels",
+          "schemename": "dnet:review_levels"
+        }
+      }
+    ],
+    "journal": null
+  },
+  {
+    "collectedfrom": [
+      {
+        "key": "10|opendoar____::eccbc87e4b5ce2fe28308fd9f2a7baf3",
+        "value": "AMS Acta",
+        "dataInfo": null
+      }
+    ],
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:repository",
+        "classname": "sysimport:crosswalk:repository",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    },
+    "lastupdatetimestamp": 1606898557407,
+    "relType": "resultProject",
+    "subRelType": "outcome",
+    "relClass": "isProducedBy",
+    "source": "50|od_________3::4f7038e665fdd3800297735f087a530c",
+    "target": "40|corda__h2020::79a0e16c122c9a18eb60e4a5e64b620d",
+    "validated": null,
+    "validationDate": null,
+    "properties": []
+  },
+  {
+    "collectedfrom": [
+      {
+        "key": "10|opendoar____::eccbc87e4b5ce2fe28308fd9f2a7baf3",
+        "value": "AMS Acta",
+        "dataInfo": null
+      }
+    ],
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:repository",
+        "classname": "sysimport:crosswalk:repository",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    },
+    "lastupdatetimestamp": 1606898557407,
+    "relType": "resultProject",
+    "subRelType": "outcome",
+    "relClass": "produces",
+    "source": "40|corda__h2020::79a0e16c122c9a18eb60e4a5e64b620d",
+    "target": "50|od_________3::4f7038e665fdd3800297735f087a530c",
+    "validated": null,
+    "validationDate": null,
+    "properties": []
+  }
+

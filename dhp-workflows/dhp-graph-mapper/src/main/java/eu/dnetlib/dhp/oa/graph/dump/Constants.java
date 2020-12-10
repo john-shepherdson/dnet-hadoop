@@ -40,4 +40,18 @@ public class Constants {
 		coarCodeLabelMap.put("c_14cb", "CLOSED");
 		coarCodeLabelMap.put("c_f1cf", "EMBARGO");
 	}
+
+	public enum DUMPTYPE {
+		COMPLETE("complete"), COMMUNITY("community"), FUNDER("funder");
+
+		private String type;
+
+		DUMPTYPE(String type) {
+			this.type = type;
+		}
+
+		public String getType() {
+			return type;
+		}
+	}
 }

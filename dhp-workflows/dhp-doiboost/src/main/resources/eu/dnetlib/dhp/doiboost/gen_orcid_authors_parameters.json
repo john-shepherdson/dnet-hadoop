@@ -1,4 +1,0 @@
-[{"paramName":"w",   "paramLongName":"workingPath",	"paramDescription": "the working path",	"paramRequired": true},
- {"paramName":"t",   "paramLongName":"token",	"paramDescription": "token to grant access",	"paramRequired": true},
- {"paramName":"o",   "paramLongName":"outputAuthorsPath",	"paramDescription": "the relative folder of the sequencial file to write the authors data",	"paramRequired": true}
-]

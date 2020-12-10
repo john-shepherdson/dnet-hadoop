@@ -9,6 +9,10 @@
             <description>the working dir base path</description>
         </property>
         <property>
+            <name>workingPath</name>
+            <description>the working dir base path</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -31,10 +35,10 @@
 
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${targetPath}'/>
-            <mkdir path='${targetPath}'/>
+            <delete path='${workingPath}'/>
+            <mkdir path='${workingPath}'/>
         </fs>
-        <ok to="PreprocessMag"/>
+        <ok to="ConvertMagToDataset"/>
         <error to="Kill"/>
     </action>
 
@@ -52,10 +56,10 @@
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--targetPath</arg><arg>${workingPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="PreprocessMag"/>
         <error to="Kill"/>
     </action>
 
@@ -65,7 +69,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>Convert Mag to Dataset</name>
+            <name>Convert Mag to OAF Dataset</name>
             <class>eu.dnetlib.doiboost.mag.SparkPreProcessMAG</class>
             <jar>dhp-doiboost-${projectVersion}.jar</jar>
             <spark-opts>
@@ -75,7 +79,8 @@
                 --conf spark.sql.shuffle.partitions=3840
                 ${sparkExtraOPT}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${workingPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/process</arg>
             <arg>--targetPath</arg><arg>${targetPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>

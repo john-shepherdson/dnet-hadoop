@@ -98,7 +98,8 @@ public class XmlIndexingJobTest extends SolrTest {
 			.sequenceFile(inputPath, Text.class, Text.class)
 			.count();
 
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, null).run(isLookupClient);
+		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.SOLR, null)
+			.run(isLookupClient);
 
 		Assertions.assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
 
@@ -128,7 +129,8 @@ public class XmlIndexingJobTest extends SolrTest {
 		Assertions.assertEquals(nRecord, xmlIdUnique, "IDs should be unique among input records");
 
 		final String outputPath = workingDir.resolve("outputPath").toAbsolutePath().toString();
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, outputPath).run(isLookupClient);
+		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.HDFS, outputPath)
+			.run(isLookupClient);
 
 		final Dataset<SerializableSolrInputDocument> solrDocs = spark
 			.read()

@@ -78,13 +78,9 @@ public abstract class OafEntity extends Oaf implements Serializable {
 	}
 
 	public void mergeFrom(OafEntity e) {
-
-		if (e == null)
-			return;
+		super.mergeFrom(e);
 
 		originalId = mergeLists(originalId, e.getOriginalId());
-
-		collectedfrom = mergeLists(collectedfrom, e.getCollectedfrom());
 
 		pid = mergeLists(pid, e.getPid());
 

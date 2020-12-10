@@ -4,12 +4,15 @@ package eu.dnetlib.dhp.oa.graph.dump.community;
 import java.io.Serializable;
 import java.util.*;
 
+import javax.swing.text.html.Option;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
@@ -48,6 +51,11 @@ public class SparkDumpCommunityProducts implements Serializable {
 
 		String communityMapPath = parser.get("communityMapPath");
 
+		final String dumpType = Optional
+			.ofNullable(parser.get("dumpType"))
+			.map(String::valueOf)
+			.orElse("community");
+
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		DumpProducts dump = new DumpProducts();
@@ -55,7 +63,7 @@ public class SparkDumpCommunityProducts implements Serializable {
 		dump
 			.run(
 				isSparkSessionManaged, inputPath, outputPath, communityMapPath, inputClazz, CommunityResult.class,
-				false);
+				dumpType);
 
 	}
 
