@@ -30,9 +30,8 @@ public class CheckDuplictedIdsJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					CheckDuplictedIdsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+				.toString(CheckDuplictedIdsJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
@@ -59,8 +58,8 @@ public class CheckDuplictedIdsJob {
 			.map(o -> ClusterUtils.incrementAccumulator(o, total), Encoders.tuple(Encoders.STRING(), Encoders.LONG()))
 			.write()
 			.mode(SaveMode.Overwrite)
-			.json(countPath);
-		;
+			.option("compression", "gzip")
+			.json(countPath);;
 
 	}
 

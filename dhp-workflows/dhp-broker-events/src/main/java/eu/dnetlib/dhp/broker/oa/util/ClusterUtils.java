@@ -67,6 +67,7 @@ public class ClusterUtils {
 			.map(o -> ClusterUtils.incrementAccumulator(o, acc), Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
 			.json(path);
 	}
 
