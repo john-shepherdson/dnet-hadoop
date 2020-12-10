@@ -49,7 +49,7 @@ public class DumpGraphEntities implements Serializable {
 				d
 					.run(
 						isSparkSessionManaged, inputPath, outputPath, communityMapPath, inputClazz, GraphResult.class,
-						true);
+						eu.dnetlib.dhp.oa.graph.dump.Constants.DUMPTYPE.COMPLETE.getType());
 				break;
 			case "40":
 				runWithSparkSession(

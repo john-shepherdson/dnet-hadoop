@@ -1,0 +1,68 @@
+<workflow-app name="Gen Orcid Authors From Summaries" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>workingPath</name>
+            <description>the working dir base path</description>
+        </property>
+        <property>
+            <name>shell_cmd_0</name>
+            <value>wget -O /tmp/ORCID_2020_10_summaries.tar.gz https://orcid.figshare.com/ndownloader/files/25032905 ; hdfs dfs -copyFromLocal /tmp/ORCID_2020_10_summaries.tar.gz /data/orcid_activities_2020/ORCID_2020_10_summaries.tar.gz ; rm -f /tmp/ORCID_2020_10_summaries.tar.gz
+            </value>
+            <description>the shell command that downloads and puts to hdfs orcid summaries</description>
+        </property>
+    </parameters>
+    
+    <start to="ResetWorkingPath"/>
+    
+    
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    
+    <action name="ResetWorkingPath">
+        <fs>
+            <delete path='${workingPath}/authors'/>
+            <mkdir path='${workingPath}/authors'/>
+        </fs>
+        <ok to="check_exist_on_hdfs_summaries"/>
+        <error to="Kill"/>
+    </action>
+
+    <decision name="check_exist_on_hdfs_summaries">
+        <switch>
+            <case to="ImportOrcidSummaries">
+                ${fs:exists(concat(workingPath,'/ORCID_2020_10_summaries.tar.gz'))}
+            </case>
+            <default to="DownloadSummaries" />
+        </switch>
+    </decision>
+
+    <action name="DownloadSummaries">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>bash</exec>
+            <argument>-c</argument>
+            <argument>${shell_cmd_0}</argument>
+            <capture-output/>
+        </shell>
+        <ok to="ImportOrcidSummaries"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="ImportOrcidSummaries">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.orcid.OrcidDSManager</main-class>
+            <arg>-w</arg><arg>${workingPath}/</arg>
+            <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-f</arg><arg>ORCID_2020_10_summaries.tar.gz</arg>
+            <arg>-o</arg><arg>authors/</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>
