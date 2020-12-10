@@ -54,10 +54,10 @@ public class PartitionEventsByDsIdJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
-		final String partitionPath = parser.get("workingPath") + "/eventsByOpendoarId";
+		final String partitionPath = parser.get("outputDir") + "/eventsByOpendoarId";
 		log.info("partitionPath: {}", partitionPath);
 
 		final String opendoarIds = parser.get("opendoarIds");

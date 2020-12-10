@@ -6,8 +6,8 @@
             <description>the path where the graph is stored</description>
         </property>
         <property>
-            <name>workingPath</name>
-            <description>the path where the the generated data will be stored</description>
+            <name>outputDir</name>
+            <description>the path where the the generated data are stored</description>
         </property>
 		<property>
             <name>datasourceIdWhitelist</name>
@@ -122,7 +122,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>

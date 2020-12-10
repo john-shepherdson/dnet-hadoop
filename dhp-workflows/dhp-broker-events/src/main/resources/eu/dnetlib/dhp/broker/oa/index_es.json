@@ -1,8 +1,8 @@
 [
 	{
 		"paramName": "o",
-		"paramLongName": "workingPath",
-		"paramDescription": "the workinh path",
+		"paramLongName": "outputDir",
+		"paramDescription": "the data path",
 		"paramRequired": true
 	},
 	{

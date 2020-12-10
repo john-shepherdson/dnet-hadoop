@@ -6,7 +6,7 @@
             <description>the path where the graph is stored</description>
         </property>
         <property>
-            <name>workingPath</name>
+            <name>outputDir</name>
             <description>the path where the the generated data will be stored</description>
         </property>
 		<property>
@@ -119,7 +119,7 @@
     
     <action name="ensure_working_path">
         <fs>
-            <mkdir path='${workingPath}'/>
+            <mkdir path='${workingDir}'/>
         </fs>
         <ok to="start_entities_and_rels"/>
         <error to="Kill"/>
@@ -152,7 +152,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
         <error to="Kill"/>
@@ -176,7 +176,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
         <error to="Kill"/>
@@ -201,7 +201,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
         <error to="Kill"/>
@@ -225,7 +225,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
         <error to="Kill"/>
@@ -249,7 +249,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
         <error to="Kill"/>
@@ -273,7 +273,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="wait_entities_and_rels"/>
         <error to="Kill"/>
@@ -299,7 +299,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step1"/>
         <error to="Kill"/>
@@ -323,7 +323,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step2"/>
         <error to="Kill"/>
@@ -347,7 +347,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step3"/>
         <error to="Kill"/>
@@ -371,7 +371,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="join_entities_step4"/>
         <error to="Kill"/>
@@ -395,7 +395,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="prepare_groups"/>
         <error to="Kill"/>
@@ -419,7 +419,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="generate_events"/>
         <error to="Kill"/>
@@ -442,7 +442,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
 			<arg>--datasourceIdWhitelist</arg><arg>${datasourceIdWhitelist}</arg>
 			<arg>--datasourceTypeWhitelist</arg><arg>${datasourceTypeWhitelist}</arg>
 			<arg>--datasourceIdBlacklist</arg><arg>${datasourceIdBlacklist}</arg>
@@ -468,7 +469,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
             <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
@@ -495,7 +496,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
@@ -521,7 +522,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--dbUrl</arg><arg>${brokerDbUrl}</arg>
             <arg>--dbUser</arg><arg>${brokerDbUser}</arg>
             <arg>--dbPassword</arg><arg>${brokerDbPassword}</arg>

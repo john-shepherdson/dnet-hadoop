@@ -33,9 +33,8 @@ public class GenerateEventsJob {
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					GenerateEventsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_events.json")));
+				.toString(GenerateEventsJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_events.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -44,10 +43,10 @@ public class GenerateEventsJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String eventsPath = workingPath + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
 		final Set<String> dsIdWhitelist = ClusterUtils.parseParamAsList(parser, "datasourceIdWhitelist");
@@ -70,13 +69,11 @@ public class GenerateEventsJob {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_events");
 
 			final Dataset<ResultGroup> groups = ClusterUtils
-				.readPath(spark, workingPath + "/duplicates", ResultGroup.class);
+				.readPath(spark, workingDir + "/duplicates", ResultGroup.class);
 
 			final Dataset<Event> dataset = groups
-				.map(
-					g -> EventFinder
-						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, accumulators),
-					Encoders
+				.map(g -> EventFinder
+					.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, accumulators), Encoders
 						.bean(EventGroup.class))
 				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
 

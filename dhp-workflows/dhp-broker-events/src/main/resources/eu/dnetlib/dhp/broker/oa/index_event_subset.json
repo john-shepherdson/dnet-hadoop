@@ -1,8 +1,8 @@
 [
 	{
 		"paramName": "o",
-		"paramLongName": "workingPath",
-		"paramDescription": "the workinh path",
+		"paramLongName": "outputDir",
+		"paramDescription": "the path where the generated data are stored",
 		"paramRequired": true
 	},
 	{
