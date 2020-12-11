@@ -19,9 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.oaf.Publication;
 
-//TODO to enable it we need to update the joined_entity.json test file
-@Disabled
 public class XmlRecordFactoryTest {
 
 	private static final String otherDsTypeId = "scholarcomminfra,infospace,pubsrepository::mock,entityregistry,entityregistry::projects,entityregistry::repositories,websource";
@@ -29,18 +28,15 @@ public class XmlRecordFactoryTest {
 	@Test
 	public void testXMLRecordFactory() throws IOException, DocumentException {
 
-		String json = IOUtils.toString(getClass().getResourceAsStream("joined_entity.json"));
-
-		assertNotNull(json);
-		JoinedEntity je = new ObjectMapper().readValue(json, JoinedEntity.class);
-		assertNotNull(je);
-
 		ContextMapper contextMapper = new ContextMapper();
 
 		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
 			otherDsTypeId);
 
-		String xml = xmlRecordFactory.build(je);
+		Publication p = new ObjectMapper()
+			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
+
+		String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
 
 		assertNotNull(xml);
 
@@ -48,6 +44,10 @@ public class XmlRecordFactoryTest {
 
 		assertNotNull(doc);
 
+		// System.out.println(doc.asXML());
+
+		Assertions.assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid"));
+		Assertions.assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
 		// TODO add assertions based of values extracted from the XML record
 	}
 }
