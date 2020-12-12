@@ -18,14 +18,13 @@ public class ExecuteWorkflow {
 
 	static String dataciteBaseURL;
 	static String dataciteReportPath;
-        static String dbHiveUrl;
-        static String dbImpalaUrl;
-        static String datasetUsageStatsDBSchema;
-        static String statsDBSchema;
-        static boolean recreateDbAndTables;
-        static boolean datasetsEmptyDirs;
-        static boolean finalTablesVisibleToImpala;
-
+	static String dbHiveUrl;
+	static String dbImpalaUrl;
+	static String datasetUsageStatsDBSchema;
+	static String statsDBSchema;
+	static boolean recreateDbAndTables;
+	static boolean datasetsEmptyDirs;
+	static boolean finalTablesVisibleToImpala;
 
 	public static void main(String args[]) throws Exception {
 
@@ -58,11 +57,11 @@ public class ExecuteWorkflow {
 		else
 			datasetsEmptyDirs = false;
 
-		if (parser.get("finalTablesVisibleToImpala").toLowerCase().equals("true"))
-			finalTablesVisibleToImpala = true;
-		else
-			finalTablesVisibleToImpala = false;
-
+//		if (parser.get("finalTablesVisibleToImpala").toLowerCase().equals("true"))
+//			finalTablesVisibleToImpala = true;
+//		else
+//			finalTablesVisibleToImpala = false;
+//
 		UsageStatsExporter usagestatsExport = new UsageStatsExporter();
 		usagestatsExport.export();
 	}

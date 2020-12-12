@@ -42,42 +42,24 @@
     <action name='Step1'>
         <java>
           	<main-class>eu.dnetlib.oa.graph.usagestatsbuild.export.ExecuteWorkflow</main-class>
-          	<arg>--matomoAuthToken</arg><arg>${matomoAuthToken}</arg>
-            <arg>--matomoBaseURL</arg><arg>${matomoBaseURL}</arg>
             <arg>--repoLogPath</arg><arg>${repoLogPath}</arg>
             <arg>--portalLogPath</arg><arg>${portalLogPath}</arg>
             <arg>--portalMatomoID</arg><arg>${portalMatomoID}</arg>
-            <arg>--irusUKBaseURL</arg><arg>${irusUKBaseURL}</arg>
             <arg>--irusUKReportPath</arg><arg>${irusUKReportPath}</arg>
             <arg>--sarcsReportPathArray</arg><arg>${sarcsReportPathArray}</arg>
             <arg>--sarcsReportPathNonArray</arg><arg>${sarcsReportPathNonArray}</arg>
             <arg>--lareferenciaLogPath</arg><arg>${lareferenciaLogPath}</arg>
-            <arg>--lareferenciaBaseURL</arg><arg>${lareferenciaBaseURL}</arg>
-            <arg>--lareferenciaAuthToken</arg><arg>${lareferenciaAuthToken}</arg>
             <arg>--dbHiveUrl</arg><arg>${hiveJdbcUrl}</arg>
             <arg>--dbImpalaUrl</arg><arg>${impalaJdbcUrl}</arg>
             <arg>--usageRawDataDBSchema</arg><arg>${usageRawDataDBSchema}</arg>
             <arg>--usageStatsDBSchema</arg><arg>${usageStatsDBSchema}</arg>
+            <arg>--usagestatsPermanentDBSchema</arg><arg>${usagestatsPermanentDBSchema}</arg>
             <arg>--statsDBSchema</arg><arg>${statsDBSchema}</arg>
             <arg>--recreateDbAndTables</arg><arg>${recreateDbAndTables}</arg>
-            <arg>--piwikEmptyDirs</arg><arg>${piwikEmptyDirs}</arg>
-            <arg>--downloadPiwikLogs</arg><arg>${downloadPiwikLogs}</arg>
             <arg>--processPiwikLogs</arg><arg>${processPiwikLogs}</arg>
-            <arg>--startingLogPeriod</arg><arg>${startingLogPeriod}</arg>
-            <arg>--endingLogPeriod</arg><arg>${endingLogPeriod}</arg>
-            <arg>--numberOfPiwikIdsToDownload</arg><arg>${numberOfPiwikIdsToDownload}</arg>
-            <arg>--numberOfSiteIdsToDownload</arg><arg>${numberOfSiteIdsToDownload}</arg>
-            <arg>--laReferenciaEmptyDirs</arg><arg>${laReferenciaEmptyDirs}</arg>
-            <arg>--downloadLaReferenciaLogs</arg><arg>${downloadLaReferenciaLogs}</arg>
             <arg>--processLaReferenciaLogs</arg><arg>${processLaReferenciaLogs}</arg>
-            <arg>--irusCreateTablesEmptyDirs</arg><arg>${irusCreateTablesEmptyDirs}</arg>
-            <arg>--irusDownloadReports</arg><arg>${irusDownloadReports}</arg>
             <arg>--irusProcessStats</arg><arg>${irusProcessStats}</arg>
-            <arg>--irusNumberOfOpendoarsToDownload</arg><arg>${irusNumberOfOpendoarsToDownload}</arg>
-            <arg>--sarcCreateTablesEmptyDirs</arg><arg>${sarcCreateTablesEmptyDirs}</arg>
-            <arg>--sarcDownloadReports</arg><arg>${sarcDownloadReports}</arg>
             <arg>--sarcProcessStats</arg><arg>${sarcProcessStats}</arg>
-            <arg>--sarcNumberOfIssnToDownload</arg><arg>${sarcNumberOfIssnToDownload}</arg>
             <arg>--finalizeStats</arg><arg>${finalizeStats}</arg>
             <arg>--finalTablesVisibleToImpala</arg><arg>${finalTablesVisibleToImpala}</arg>
             <arg>--numberOfDownloadThreads</arg><arg>${numberOfDownloadThreads}</arg>

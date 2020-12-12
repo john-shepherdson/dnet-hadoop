@@ -41,8 +41,6 @@ public class LaReferenciaStats {
 	public LaReferenciaStats() throws Exception {
 	}
 
-
-
 	public void processLogs() throws Exception {
 		try {
 			logger.info("LaReferencia creating viewsStats");
@@ -62,7 +60,6 @@ public class LaReferenciaStats {
 		}
 	}
 
-	
 	public void viewsStats() throws Exception {
 
 		Statement stmt = ConnectDB.getHiveConnection().createStatement();
@@ -101,7 +98,7 @@ public class LaReferenciaStats {
 		logger.info("Created la_views_stats_tmp table");
 
 		stmt.close();
-		ConnectDB.getHiveConnection().close();
+		// ConnectDB.getHiveConnection().close();
 	}
 
 	private void downloadsStats() throws Exception {
@@ -142,8 +139,7 @@ public class LaReferenciaStats {
 		logger.info("Created la_downloads_stats_tmp table");
 
 		stmt.close();
-		//ConnectDB.getHiveConnection().close();
+		// ConnectDB.getHiveConnection().close();
 	}
-
 
 }

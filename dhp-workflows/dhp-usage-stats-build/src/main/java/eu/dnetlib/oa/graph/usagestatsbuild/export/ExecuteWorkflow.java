@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package eu.dnetlib.oa.graph.usagestatsbuild.export;
 
 import java.text.SimpleDateFormat;
@@ -11,162 +12,142 @@ import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**
  * @author D. Pierrakos, S. Zoupanos
  */
 public class ExecuteWorkflow {
 
-    static String matomoAuthToken;
-    static String matomoBaseURL;
-    static String repoLogPath;
-    static String portalLogPath;
-    static String portalMatomoID;
-    static String irusUKBaseURL;
-    static String irusUKReportPath;
-    static String sarcsReportPathArray;
-    static String sarcsReportPathNonArray;
-    static String lareferenciaLogPath;
-    static String lareferenciaBaseURL;
-    static String lareferenciaAuthToken;
-    static String dbHiveUrl;
-    static String dbImpalaUrl;
-    static String usageRawDataDBSchema;
-    static String usageStatsDBSchema;
-    static String statsDBSchema;
-    static boolean recreateDbAndTables;
+//    static String matomoAuthToken;
+	static String matomoBaseURL;
+	static String repoLogPath;
+	static String portalLogPath;
+	static String portalMatomoID;
+//    static String irusUKBaseURL;
+	static String irusUKReportPath;
+	static String sarcsReportPathArray;
+	static String sarcsReportPathNonArray;
+	static String lareferenciaLogPath;
+//    static String lareferenciaBaseURL;
+//    static String lareferenciaAuthToken;
+	static String dbHiveUrl;
+	static String dbImpalaUrl;
+	static String usageRawDataDBSchema;
+	static String usageStatsDBSchema;
+	static String usagestatsPermanentDBSchema;
+	static String statsDBSchema;
+	static boolean recreateDbAndTables;
 
-    static boolean piwikEmptyDirs;
-    static boolean downloadPiwikLogs;
-    static boolean processPiwikLogs;
+	static boolean processPiwikLogs;
+	static boolean processLaReferenciaLogs;
 
-    static Calendar startingLogPeriod;
-    static Calendar endingLogPeriod;
-    static int numberOfPiwikIdsToDownload;
-    static int numberOfSiteIdsToDownload;
+	static boolean irusProcessStats;
 
-    static boolean laReferenciaEmptyDirs;
-    static boolean downloadLaReferenciaLogs;
-    static boolean processLaReferenciaLogs;
+	static boolean sarcProcessStats;
 
-    static boolean irusCreateTablesEmptyDirs;
-    static boolean irusDownloadReports;
-    static boolean irusProcessStats;
-    static int irusNumberOfOpendoarsToDownload;
+	static boolean finalizeStats;
+	static boolean finalTablesVisibleToImpala;
 
-    static boolean sarcCreateTablesEmptyDirs;
-    static boolean sarcDownloadReports;
-    static boolean sarcProcessStats;
-    static int sarcNumberOfIssnToDownload;
+	static int numberOfDownloadThreads;
 
-    static boolean finalizeStats;
-    static boolean finalTablesVisibleToImpala;
+	private static final Logger logger = LoggerFactory.getLogger(PiwikStatsDB.class);
 
-    static int numberOfDownloadThreads;
+	public static void main(String args[]) throws Exception {
 
-    private static final Logger logger = LoggerFactory.getLogger(PiwikStatsDB.class);
+		// Sending the logs to the console
+		BasicConfigurator.configure();
 
-    public static void main(String args[]) throws Exception {
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					UsageStatsExporter.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/graph/usagestatsbuild/export/usagestatsbuild_parameters.json")));
+		parser.parseArgument(args);
 
-        // Sending the logs to the console
-        BasicConfigurator.configure();
+		// Setting up the initial parameters
+//        matomoAuthToken = parser.get("matomoAuthToken");
+//        matomoBaseURL = parser.get("matomoBaseURL");
+		repoLogPath = parser.get("repoLogPath");
+		portalLogPath = parser.get("portalLogPath");
+		portalMatomoID = parser.get("portalMatomoID");
+//        irusUKBaseURL = parser.get("irusUKBaseURL");
+		irusUKReportPath = parser.get("irusUKReportPath");
+		sarcsReportPathArray = parser.get("sarcsReportPathArray");
+		sarcsReportPathNonArray = parser.get("sarcsReportPathNonArray");
+		lareferenciaLogPath = parser.get("lareferenciaLogPath");
+//        lareferenciaBaseURL = parser.get("lareferenciaBaseURL");
+//        lareferenciaAuthToken = parser.get("lareferenciaAuthToken");
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                IOUtils
-                        .toString(
-                                UsageStatsExporter.class
-                                        .getResourceAsStream(
-                                                "/eu/dnetlib/dhp/oa/graph/usagestatsbuild/export/usagestatsbuild_parameters.json")));
-        parser.parseArgument(args);
+		dbHiveUrl = parser.get("dbHiveUrl");
+		dbImpalaUrl = parser.get("dbImpalaUrl");
+		usageRawDataDBSchema = parser.get("usageRawDataDBSchema");
+		usageStatsDBSchema = parser.get("usageStatsDBSchema");
+		usagestatsPermanentDBSchema = parser.get("usagestatsPermanentDBSchema");
+		statsDBSchema = parser.get("statsDBSchema");
 
-        // Setting up the initial parameters
-        matomoAuthToken = parser.get("matomoAuthToken");
-        matomoBaseURL = parser.get("matomoBaseURL");
-        repoLogPath = parser.get("repoLogPath");
-        portalLogPath = parser.get("portalLogPath");
-        portalMatomoID = parser.get("portalMatomoID");
-        irusUKBaseURL = parser.get("irusUKBaseURL");
-        irusUKReportPath = parser.get("irusUKReportPath");
-        sarcsReportPathArray = parser.get("sarcsReportPathArray");
-        sarcsReportPathNonArray = parser.get("sarcsReportPathNonArray");
-        lareferenciaLogPath = parser.get("lareferenciaLogPath");
-        lareferenciaBaseURL = parser.get("lareferenciaBaseURL");
-        lareferenciaAuthToken = parser.get("lareferenciaAuthToken");
+		if (parser.get("processPiwikLogs").toLowerCase().equals("true")) {
+			processPiwikLogs = true;
+		} else {
+			processPiwikLogs = false;
+		}
 
-        dbHiveUrl = parser.get("dbHiveUrl");
-        dbImpalaUrl = parser.get("dbImpalaUrl");
-        usageRawDataDBSchema = parser.get("usageRawDataDBSchema");
-        usageStatsDBSchema = parser.get("usageStatsDBSchema");
-        statsDBSchema = parser.get("statsDBSchema");
+//		String startingLogPeriodStr = parser.get("startingLogPeriod");
+//		Date startingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(startingLogPeriodStr);
+//        startingLogPeriod = startingLogPeriodStr(startingLogPeriodDate);
+//
+//        String endingLogPeriodStr = parser.get("endingLogPeriod");
+//        Date endingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(endingLogPeriodStr);
+//        endingLogPeriod = startingLogPeriodStr(endingLogPeriodDate);
 
-        if (parser.get("processPiwikLogs").toLowerCase().equals("true")) {
-            processPiwikLogs = true;
-        } else {
-            processPiwikLogs = false;
-        }
+		if (parser.get("recreateDbAndTables").toLowerCase().equals("true")) {
+			recreateDbAndTables = true;
+		} else {
+			recreateDbAndTables = false;
+		}
 
-        String startingLogPeriodStr = parser.get("startingLogPeriod");
-        Date startingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(startingLogPeriodStr);
-        startingLogPeriod = startingLogPeriodStr(startingLogPeriodDate);
+		if (parser.get("processLaReferenciaLogs").toLowerCase().equals("true")) {
+			processLaReferenciaLogs = true;
+		} else {
+			processLaReferenciaLogs = false;
+		}
 
-        String endingLogPeriodStr = parser.get("endingLogPeriod");
-        Date endingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(endingLogPeriodStr);
-        endingLogPeriod = startingLogPeriodStr(endingLogPeriodDate);
+		if (parser.get("irusProcessStats").toLowerCase().equals("true")) {
+			irusProcessStats = true;
+		} else {
+			irusProcessStats = false;
+		}
 
-        numberOfPiwikIdsToDownload = Integer.parseInt(parser.get("numberOfPiwikIdsToDownload"));
-        numberOfSiteIdsToDownload = Integer.parseInt(parser.get("numberOfSiteIdsToDownload"));
+		if (parser.get("sarcProcessStats").toLowerCase().equals("true")) {
+			sarcProcessStats = true;
+		} else {
+			sarcProcessStats = false;
+		}
 
-        if (parser.get("recreateDbAndTables").toLowerCase().equals("true")) {
-            recreateDbAndTables = true;
-        } else {
-            recreateDbAndTables = false;
-        }
+		if (parser.get("finalizeStats").toLowerCase().equals("true")) {
+			finalizeStats = true;
+		} else {
+			finalizeStats = false;
+		}
+		if (parser.get("finalTablesVisibleToImpala").toLowerCase().equals("true")) {
+			finalTablesVisibleToImpala = true;
+		} else {
+			numberOfDownloadThreads = Integer.parseInt(parser.get("numberOfDownloadThreads"));
+		}
 
-        if (parser.get("processLaReferenciaLogs").toLowerCase().equals("true")) {
-            processLaReferenciaLogs = true;
-        } else {
-            processLaReferenciaLogs = false;
-        }
+		UsageStatsExporter usagestatsExport = new UsageStatsExporter();
+		usagestatsExport.export();
+	}
 
-        if (parser.get("irusProcessStats").toLowerCase().equals("true")) {
-            irusProcessStats = true;
-        } else {
-            irusProcessStats = false;
-        }
+	private static Calendar startingLogPeriodStr(Date date) {
 
-        irusNumberOfOpendoarsToDownload = Integer.parseInt(parser.get("irusNumberOfOpendoarsToDownload"));
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		return calendar;
 
-        if (parser.get("sarcProcessStats").toLowerCase().equals("true")) {
-            sarcProcessStats = true;
-        } else {
-            sarcProcessStats = false;
-        }
-        sarcNumberOfIssnToDownload = Integer.parseInt(parser.get("sarcNumberOfIssnToDownload"));
-
-        if (parser.get("finalizeStats").toLowerCase().equals("true")) {
-            finalizeStats = true;
-        } else {
-            finalizeStats = false;
-        }
-        if (parser.get("finalTablesVisibleToImpala").toLowerCase().equals("true")) {
-            finalTablesVisibleToImpala = true;
-        } else {
-            numberOfDownloadThreads = Integer.parseInt(parser.get("numberOfDownloadThreads"));
-        }
-
-        UsageStatsExporter usagestatsExport = new UsageStatsExporter();
-        usagestatsExport.export();
-    }
-
-    private static Calendar startingLogPeriodStr(Date date) {
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar;
-
-    }
+	}
 }

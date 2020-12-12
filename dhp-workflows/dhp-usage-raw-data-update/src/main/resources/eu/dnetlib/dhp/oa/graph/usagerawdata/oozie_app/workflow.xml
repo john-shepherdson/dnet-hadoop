@@ -63,7 +63,6 @@
             <arg>--downloadPiwikLogs</arg><arg>${downloadPiwikLogs}</arg>
             <arg>--processPiwikLogs</arg><arg>${processPiwikLogs}</arg>
             <arg>--startingLogPeriod</arg><arg>${startingLogPeriod}</arg>
-            <arg>--endingLogPeriod</arg><arg>${endingLogPeriod}</arg>
             <arg>--numberOfPiwikIdsToDownload</arg><arg>${numberOfPiwikIdsToDownload}</arg>
             <arg>--numberOfSiteIdsToDownload</arg><arg>${numberOfSiteIdsToDownload}</arg>
             <arg>--laReferenciaEmptyDirs</arg><arg>${laReferenciaEmptyDirs}</arg>
@@ -78,7 +77,6 @@
             <arg>--sarcProcessStats</arg><arg>${sarcProcessStats}</arg>
             <arg>--sarcNumberOfIssnToDownload</arg><arg>${sarcNumberOfIssnToDownload}</arg>
             <arg>--finalizeStats</arg><arg>${finalizeStats}</arg>
-            <arg>--finalTablesVisibleToImpala</arg><arg>${finalTablesVisibleToImpala}</arg>
             <arg>--numberOfDownloadThreads</arg><arg>${numberOfDownloadThreads}</arg>
             <capture-output/>
         </java>

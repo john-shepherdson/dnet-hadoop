@@ -61,15 +61,6 @@ public class LaReferenciaStats {
 				"stored as orc tblproperties('transactional'='true')";
 			stmt.executeUpdate(sqlCreateTableLareferenciaLog);
 			logger.info("Created LaReferencia tables");
-//            String sqlcreateRuleLaReferenciaLog = "CREATE OR REPLACE RULE ignore_duplicate_inserts AS "
-//                    + " ON INSERT TO lareferencialog "
-//                    + " WHERE (EXISTS ( SELECT lareferencialog.matomoid, lareferencialog.source, lareferencialog.id_visit,"
-//                    + "lareferencialog.action, lareferencialog.\"timestamp\", lareferencialog.entity_id "
-//                    + "FROM lareferencialog "
-//                    + "WHERE lareferencialog.matomoid=new.matomoid AND lareferencialog.source = new.source AND lareferencialog.id_visit = new.id_visit AND lareferencialog.action = new.action AND lareferencialog.entity_id = new.entity_id AND lareferencialog.\"timestamp\" = new.\"timestamp\")) DO INSTEAD NOTHING;";
-//            String sqlCreateRuleIndexLaReferenciaLog = "create index if not exists lareferencialog_rule on lareferencialog(matomoid, source, id_visit, action, entity_id, \"timestamp\");";
-//            stmt.executeUpdate(sqlcreateRuleLaReferenciaLog);
-//            stmt.executeUpdate(sqlCreateRuleIndexLaReferenciaLog);
 
 			stmt.close();
 			ConnectDB.getHiveConnection().close();
@@ -82,30 +73,6 @@ public class LaReferenciaStats {
 		}
 	}
 
-//	private void createTmpTables() throws Exception {
-//
-//		try {
-//			Statement stmt = ConnectDB.getConnection().createStatement();
-//			String sqlCreateTmpTableLaReferenciaLog = "CREATE TABLE IF NOT EXISTS lareferencialogtmp(matomoid INTEGER, source TEXT, id_visit TEXT, country TEXT, action TEXT, url TEXT, entity_id TEXT, source_item_type TEXT, timestamp TEXT, referrer_name TEXT, agent TEXT, PRIMARY KEY(source, id_visit, action, timestamp, entity_id));";
-//			String sqlcreateTmpRuleLaReferenciaLog = "CREATE OR REPLACE RULE ignore_duplicate_inserts AS "
-//				+ " ON INSERT TO lareferencialogtmp "
-//				+ " WHERE (EXISTS ( SELECT lareferencialogtmp.matomoid, lareferencialogtmp.source, lareferencialogtmp.id_visit,"
-//				+ "lareferencialogtmp.action, lareferencialogtmp.\"timestamp\", lareferencialogtmp.entity_id "
-//				+ "FROM lareferencialogtmp "
-//				+ "WHERE lareferencialogtmp.matomoid=new.matomoid AND lareferencialogtmp.source = new.source AND lareferencialogtmp.id_visit = new.id_visit AND lareferencialogtmp.action = new.action AND lareferencialogtmp.entity_id = new.entity_id AND lareferencialogtmp.\"timestamp\" = new.\"timestamp\")) DO INSTEAD NOTHING;";
-//			stmt.executeUpdate(sqlCreateTmpTableLaReferenciaLog);
-//			stmt.executeUpdate(sqlcreateTmpRuleLaReferenciaLog);
-//
-//			stmt.close();
-//			log.info("Lareferencia Tmp Tables Created");
-//
-//		} catch (Exception e) {
-//			log.error("Failed to create tmptables: " + e);
-//			throw new Exception("Failed to create tmp tables: " + e.toString(), e);
-//			// System.exit(0);
-//		}
-//	}
-
 	public void processLogs() throws Exception {
 		try {
 			logger.info("Processing LaReferencia repository logs");
@@ -116,16 +83,7 @@ public class LaReferenciaStats {
 			removeDoubleClicks();
 			logger.info("LaReferencia removed double clicks");
 
-/********                        
-			logger.info("LaReferencia creating viewsStats");
-			viewsStats();
-			logger.info("LaReferencia created viewsStats");
-			logger.info("LaReferencia creating downloadsStats");
-			downloadsStats();
-			logger.info("LaReferencia created downloadsStats");
-
-************/
-                        logger.info("LaReferencia updating Production Tables");
+			logger.info("LaReferencia updating Production Tables");
 			updateProdTables();
 			logger.info("LaReferencia updated Production Tables");
 
@@ -255,88 +213,6 @@ public class LaReferenciaStats {
 		// conn.close();
 	}
 
-	public void viewsStats() throws Exception {
-
-		Statement stmt = ConnectDB.getHiveConnection().createStatement();
-		ConnectDB.getHiveConnection().setAutoCommit(false);
-
-		logger.info("Creating la_result_views_monthly_tmp view");
-		String sql = "CREATE OR REPLACE VIEW " + ConnectDB.getUsageStatsDBSchema() + ".la_result_views_monthly_tmp AS "
-			+
-			"SELECT entity_id AS id, COUNT(entity_id) as views, SUM(CASE WHEN referrer_name LIKE '%openaire%' " +
-			"THEN 1 ELSE 0 END) AS openaire_referrer, " +
-			"CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month, source " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".lareferencialogtmp where action='action' and " +
-			"(source_item_type='oaItem' or source_item_type='repItem') " +
-			"GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), " +
-			"source ORDER BY source, entity_id";
-		stmt.executeUpdate(sql);
-		logger.info("Created la_result_views_monthly_tmp view");
-
-		logger.info("Dropping la_views_stats_tmp table");
-		sql = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".la_views_stats_tmp";
-		stmt.executeUpdate(sql);
-		logger.info("Dropped la_views_stats_tmp table");
-
-		logger.info("Creating la_views_stats_tmp table");
-		sql = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".la_views_stats_tmp " +
-			"AS SELECT 'LaReferencia' as source, d.id as repository_id, ro.id as result_id, month as date, " +
-			"max(views) AS count, max(openaire_referrer) AS openaire " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".la_result_views_monthly_tmp p, " +
-			ConnectDB.getStatsDBSchema() + ".datasource_oids d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro " +
-			"WHERE p.source=d.oid AND p.id=ro.oid " +
-			"GROUP BY d.id, ro.id, month " +
-			"ORDER BY d.id, ro.id, month";
-		stmt.executeUpdate(sql);
-		logger.info("Created la_views_stats_tmp table");
-
-		stmt.close();
-		ConnectDB.getHiveConnection().close();
-	}
-
-	private void downloadsStats() throws Exception {
-
-		Statement stmt = ConnectDB.getHiveConnection().createStatement();
-		ConnectDB.getHiveConnection().setAutoCommit(false);
-
-		logger.info("Creating la_result_downloads_monthly_tmp view");
-		String sql = "CREATE OR REPLACE VIEW " + ConnectDB.getUsageStatsDBSchema()
-			+ ".la_result_downloads_monthly_tmp AS " +
-			"SELECT entity_id AS id, COUNT(entity_id) as downloads, SUM(CASE WHEN referrer_name LIKE '%openaire%' " +
-			"THEN 1 ELSE 0 END) AS openaire_referrer, " +
-			"CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month, source " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".lareferencialogtmp where action='download' and " +
-			"(source_item_type='oaItem' or source_item_type='repItem') " +
-			"GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), " +
-			"source ORDER BY source, entity_id";
-		stmt.executeUpdate(sql);
-		logger.info("Created la_result_downloads_monthly_tmp view");
-
-		logger.info("Dropping la_downloads_stats_tmp table");
-		sql = "DROP TABLE IF EXISTS " +
-			ConnectDB.getUsageStatsDBSchema() +
-			".la_downloads_stats_tmp";
-		stmt.executeUpdate(sql);
-		logger.info("Dropped la_downloads_stats_tmp table");
-
-		logger.info("Creating la_downloads_stats_tmp table");
-		sql = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".la_downloads_stats_tmp " +
-			"AS SELECT 'LaReferencia' as source, d.id as repository_id, ro.id as result_id, month as date, " +
-			"max(downloads) AS count, max(openaire_referrer) AS openaire " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".la_result_downloads_monthly_tmp p, " +
-			ConnectDB.getStatsDBSchema() + ".datasource_oids d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro " +
-			"WHERE p.source=d.oid AND p.id=ro.oid " +
-			"GROUP BY d.id, ro.id, month " +
-			"ORDER BY d.id, ro.id, month";
-		stmt.executeUpdate(sql);
-		logger.info("Created la_downloads_stats_tmp table");
-
-		stmt.close();
-		ConnectDB.getHiveConnection().close();
-	}
-
 	private void updateProdTables() throws SQLException, Exception {
 
 		Statement stmt = ConnectDB.getHiveConnection().createStatement();
@@ -346,40 +222,11 @@ public class LaReferenciaStats {
 		String sql = "insert into " + ConnectDB.getUsageStatsDBSchema() + ".lareferencialog " +
 			"select * from " + ConnectDB.getUsageStatsDBSchema() + ".lareferencialogtmp";
 		stmt.executeUpdate(sql);
-/*****
-		logger.info("Updating views_stats");
-		sql = "insert into " + ConnectDB.getUsageStatsDBSchema() + ".views_stats " +
-			"select * from " + ConnectDB.getUsageStatsDBSchema() + ".la_views_stats_tmp";
-		stmt.executeUpdate(sql);
 
-//		sql = "insert into public.views_stats select * from la_views_stats_tmp;";
-//		stmt.executeUpdate(sql);
-
-		logger.info("Updating downloads_stats");
-		sql = "insert into " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats " +
-			"select * from " + ConnectDB.getUsageStatsDBSchema() + ".la_downloads_stats_tmp";
-		stmt.executeUpdate(sql);
-
-                logger.info("Inserting data to usage_stats from lareferencia");
-		sql = "INSERT INTO "+ConnectDB.getUsageStatsDBSchema() + ".usage_stats " +
-                        "SELECT coalesce(ds.source, vs.source) as source, " +
-			"coalesce(ds.repository_id, vs.repository_id) as repository_id, " +
-			"coalesce(ds.result_id, vs.result_id) as result_id, coalesce(ds.date, vs.date) as date, " +
-			"coalesce(ds.count, 0) as downloads, coalesce(vs.count, 0) as views, " +
-			"coalesce(ds.openaire, 0) as openaire_downloads, " +
-			"coalesce(vs.openaire, 0) as openaire_views " +
-			"FROM " + ConnectDB.getUsageStatsDBSchema() + ".la_downloads_stats_tmp AS ds FULL OUTER JOIN " +
-			ConnectDB.getUsageStatsDBSchema() + ".la_views_stats_tmp AS vs ON ds.source=vs.source " +
-			"AND ds.repository_id=vs.repository_id AND ds.result_id=vs.result_id AND ds.date=vs.date";
-                stmt.executeUpdate(sql);
-                logger.info("Inserted data to usage_stats from lareferencia");
-//		sql = "insert into public.downloads_stats select * from la_downloads_stats_tmp;";
-//		stmt.executeUpdate(sql);
-****/
 		logger.info("Dropping lareferencialogtmp");
 		sql = "DROP TABLE " + ConnectDB.getUsageStatsDBSchema() + ".lareferencialogtmp";
-                logger.info("Dropped lareferencialogtmp");
-                stmt.executeUpdate(sql);
+		logger.info("Dropped lareferencialogtmp");
+		stmt.executeUpdate(sql);
 
 		stmt.close();
 		ConnectDB.getHiveConnection().close();

@@ -126,12 +126,6 @@
     "paramRequired": true
   },
   {
-    "paramName": "elp",
-    "paramLongName": "endingLogPeriod",
-    "paramDescription": "Ending log period",
-    "paramRequired": true
-  },
-  {
     "paramName": "npidd",
     "paramLongName": "numberOfPiwikIdsToDownload",
     "paramDescription": "Limit the number of the downloaded piwikids to the first numberOfPiwikIdsToDownload",
@@ -214,12 +208,6 @@
     "paramName": "fs",
     "paramLongName": "finalizeStats",
     "paramDescription": "Create the usage_stats table?",
-    "paramRequired": true
-  },
-  {
-    "paramName": "ftvi",
-    "paramLongName": "finalTablesVisibleToImpala",
-    "paramDescription": "Make the usage_stats, views_stats and downloads_stats tables visible to Impala",
     "paramRequired": true
   },
   {

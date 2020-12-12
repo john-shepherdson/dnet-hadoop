@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Main class for downloading and processing Usage statistics
- * 
+ *
  * @author D. Pierrakos, S. Zoupanos
  */
 public class UsageStatsExporter {
@@ -51,19 +51,13 @@ public class UsageStatsExporter {
 		logger.info("Initialising DB properties");
 		ConnectDB.init();
 
-//		runImpalaQuery();
-
 		PiwikStatsDB piwikstatsdb = new PiwikStatsDB(ExecuteWorkflow.repoLogPath, ExecuteWorkflow.portalLogPath);
 
 		logger.info("Re-creating database and tables");
-		if (ExecuteWorkflow.recreateDbAndTables){
+		if (ExecuteWorkflow.recreateDbAndTables) {
 			piwikstatsdb.recreateDBAndTables();
-                        logger.info("DB-Tables-TmpTables are created ");
-                }
-//                else {
-//                    piwikstatsdb.createTmpTables();
-//                    logger.info("TmpTables are created ");
-//                }
+			logger.info("DB-Tables-TmpTables are created ");
+		}
 
 		logger.info("Initializing the download logs module");
 		PiwikDownloadLogs piwd = new PiwikDownloadLogs(ExecuteWorkflow.matomoBaseURL, ExecuteWorkflow.matomoAuthToken);
@@ -106,16 +100,14 @@ public class UsageStatsExporter {
 			lrf.GetLaReferenciaRepos(ExecuteWorkflow.lareferenciaLogPath);
 			logger.info("Downloaded LaReferencia logs");
 		}
-                
 
-                LaReferenciaStats lastats = new LaReferenciaStats(ExecuteWorkflow.lareferenciaLogPath);
+		LaReferenciaStats lastats = new LaReferenciaStats(ExecuteWorkflow.lareferenciaLogPath);
 
 		if (ExecuteWorkflow.processLaReferenciaLogs) {
 			logger.info("Processing LaReferencia logs");
 			lastats.processLogs();
 			logger.info("LaReferencia logs done");
 		}
-
 
 		IrusStats irusstats = new IrusStats(ExecuteWorkflow.irusUKBaseURL);
 		if (ExecuteWorkflow.irusCreateTablesEmptyDirs) {
@@ -132,13 +124,10 @@ public class UsageStatsExporter {
 			irusstats.getIrusRRReport(ExecuteWorkflow.irusUKReportPath);
 		}
 
-
-                if (ExecuteWorkflow.irusProcessStats) {
+		if (ExecuteWorkflow.irusProcessStats) {
 			irusstats.processIrusStats();
 			logger.info("Irus done");
 		}
-
-
 
 		SarcStats sarcStats = new SarcStats();
 		if (ExecuteWorkflow.sarcCreateTablesEmptyDirs) {
@@ -148,51 +137,70 @@ public class UsageStatsExporter {
 			sarcStats.getAndProcessSarc(ExecuteWorkflow.sarcsReportPathArray, ExecuteWorkflow.sarcsReportPathNonArray);
 		}
 
-
-                if (ExecuteWorkflow.sarcProcessStats) {
+		if (ExecuteWorkflow.sarcProcessStats) {
 			sarcStats.processSarc(ExecuteWorkflow.sarcsReportPathArray, ExecuteWorkflow.sarcsReportPathNonArray);
-			sarcStats.finalizeSarcStats();
+			sarcStats.updateSarcLogs();
 		}
 		logger.info("Sarc done");
-
-
-/*
 		// finalize usagestats
+
+		logger.info("Dropping tmp tables");
 		if (ExecuteWorkflow.finalizeStats) {
 			piwikstatsdb.finalizeStats();
-			logger.info("Finalized stats");
+			logger.info("Dropped tmp tables");
 		}
-*/
 
-/*
-		// Make the tables available to Impala
-		if (ExecuteWorkflow.finalTablesVisibleToImpala) {
-			logger.info("Making tables visible to Impala");
-			invalidateMetadata();
-		}
-*/
-
-		logger.info("End");
+		logger.info("Raw Data Download End");
 	}
 
-	private void invalidateMetadata() throws SQLException {
-		Statement stmt = null;
+	public void createdDBWithTablesOnly() throws Exception {
+		logger.info("Initialising DB properties");
+		ConnectDB.init();
 
-		stmt = ConnectDB.getImpalaConnection().createStatement();
+		PiwikStatsDB piwikstatsdb = new PiwikStatsDB(ExecuteWorkflow.repoLogPath, ExecuteWorkflow.portalLogPath);
+		piwikstatsdb.recreateDBAndTables();
 
-		String sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats";
+		piwikstatsdb.createPedocsOldUsageData();
+		Statement stmt = ConnectDB.getHiveConnection().createStatement();
+
+		logger.info("Creating LaReferencia tables");
+		String sqlCreateTableLareferenciaLog = "CREATE TABLE IF NOT EXISTS "
+			+ ConnectDB.getUsageStatsDBSchema() + ".lareferencialog(matomoid INT, "
+			+ "source STRING, id_visit STRING, country STRING, action STRING, url STRING, entity_id STRING, "
+			+ "source_item_type STRING, timestamp STRING, referrer_name STRING, agent STRING) "
+			+ "clustered by (source, id_visit, action, timestamp, entity_id) into 100 buckets "
+			+ "stored as orc tblproperties('transactional'='true')";
+		stmt.executeUpdate(sqlCreateTableLareferenciaLog);
+		logger.info("Created LaReferencia tables");
+
+		logger.info("Creating sushilog");
+
+		String sqlCreateTableSushiLog = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
+			+ ".sushilog(source STRING, "
+			+ "repository STRING, rid STRING, date STRING, metric_type STRING, count INT)  clustered by (source, "
+			+ "repository, rid, date, metric_type) into 100 buckets stored as orc tblproperties('transactional'='true')";
+		stmt.executeUpdate(sqlCreateTableSushiLog);
+		logger.info("Created sushilog");
+
+		logger.info("Updating piwiklog");
+		String sql = "insert into " + ConnectDB.getUsageStatsDBSchema()
+			+ ".piwiklog select * from openaire_prod_usage_raw.piwiklog";
 		stmt.executeUpdate(sql);
 
-		sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".views_stats";
+		logger.info("Updating lareferencialog");
+		sql = "insert into " + ConnectDB.getUsageStatsDBSchema()
+			+ ".lareferencialog select * from openaire_prod_usage_raw.lareferencialog";
 		stmt.executeUpdate(sql);
 
-		sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".usage_stats";
+		logger.info("Updating sushilog");
+		sql = "insert into " + ConnectDB.getUsageStatsDBSchema()
+			+ ".sushilog select * from openaire_prod_usage_raw.sushilog";
 		stmt.executeUpdate(sql);
 
-		sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats";
-		stmt.executeUpdate(sql);
-
-                stmt.close();
+		stmt.close();
 		ConnectDB.getHiveConnection().close();
+		logger.info("Sushi Tables Created");
+
 	}
+
 }

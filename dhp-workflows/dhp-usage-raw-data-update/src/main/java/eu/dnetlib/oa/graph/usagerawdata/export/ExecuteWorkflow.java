@@ -62,7 +62,6 @@ public class ExecuteWorkflow {
 	static int sarcNumberOfIssnToDownload;
 
 	static boolean finalizeStats;
-	static boolean finalTablesVisibleToImpala;
 
 	static int numberOfDownloadThreads;
 
@@ -98,98 +97,108 @@ public class ExecuteWorkflow {
 		usageStatsDBSchema = parser.get("usageStatsDBSchema");
 		statsDBSchema = parser.get("statsDBSchema");
 
-		if (parser.get("recreateDbAndTables").toLowerCase().equals("true"))
+		if (parser.get("recreateDbAndTables").toLowerCase().equals("true")) {
 			recreateDbAndTables = true;
-		else
+		} else {
 			recreateDbAndTables = false;
+		}
 
-		if (parser.get("piwikEmptyDirs").toLowerCase().equals("true"))
+		if (parser.get("piwikEmptyDirs").toLowerCase().equals("true")) {
 			piwikEmptyDirs = true;
-		else
+		} else {
 			piwikEmptyDirs = false;
+		}
 
-		if (parser.get("downloadPiwikLogs").toLowerCase().equals("true"))
+		if (parser.get("downloadPiwikLogs").toLowerCase().equals("true")) {
 			downloadPiwikLogs = true;
-		else
+		} else {
 			downloadPiwikLogs = false;
+		}
 
-		if (parser.get("processPiwikLogs").toLowerCase().equals("true"))
+		if (parser.get("processPiwikLogs").toLowerCase().equals("true")) {
 			processPiwikLogs = true;
-		else
+		} else {
 			processPiwikLogs = false;
+		}
 
-                String startingLogPeriodStr = parser.get("startingLogPeriod");
+		String startingLogPeriodStr = parser.get("startingLogPeriod");
 		Date startingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(startingLogPeriodStr);
 		startingLogPeriod = startingLogPeriodStr(startingLogPeriodDate);
 
-		String endingLogPeriodStr = parser.get("endingLogPeriod");
-		Date endingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(endingLogPeriodStr);
-		endingLogPeriod = startingLogPeriodStr(endingLogPeriodDate);
+//		String endingLogPeriodStr = parser.get("endingLogPeriod");
+//		Date endingLogPeriodDate = new SimpleDateFormat("MM/yyyy").parse(endingLogPeriodStr);
+//		endingLogPeriod = startingLogPeriodStr(endingLogPeriodDate);
 
 		numberOfPiwikIdsToDownload = Integer.parseInt(parser.get("numberOfPiwikIdsToDownload"));
 		numberOfSiteIdsToDownload = Integer.parseInt(parser.get("numberOfSiteIdsToDownload"));
 
-		if (parser.get("laReferenciaEmptyDirs").toLowerCase().equals("true"))
+		if (parser.get("laReferenciaEmptyDirs").toLowerCase().equals("true")) {
 			laReferenciaEmptyDirs = true;
-		else
+		} else {
 			laReferenciaEmptyDirs = false;
+		}
 
-		if (parser.get("downloadLaReferenciaLogs").toLowerCase().equals("true"))
+		if (parser.get("downloadLaReferenciaLogs").toLowerCase().equals("true")) {
 			downloadLaReferenciaLogs = true;
-		else
+		} else {
 			downloadLaReferenciaLogs = false;
+		}
 
-		if (parser.get("processLaReferenciaLogs").toLowerCase().equals("true"))
+		if (parser.get("processLaReferenciaLogs").toLowerCase().equals("true")) {
 			processLaReferenciaLogs = true;
-		else
+		} else {
 			processLaReferenciaLogs = false;
+		}
 
-		if (parser.get("irusCreateTablesEmptyDirs").toLowerCase().equals("true"))
+		if (parser.get("irusCreateTablesEmptyDirs").toLowerCase().equals("true")) {
 			irusCreateTablesEmptyDirs = true;
-		else
+		} else {
 			irusCreateTablesEmptyDirs = false;
+		}
 
-                if (parser.get("irusDownloadReports").toLowerCase().equals("true"))
+		if (parser.get("irusDownloadReports").toLowerCase().equals("true")) {
 			irusDownloadReports = true;
-		else
+		} else {
 			irusDownloadReports = false;
+		}
 
-                if (parser.get("irusProcessStats").toLowerCase().equals("true"))
+		if (parser.get("irusProcessStats").toLowerCase().equals("true")) {
 			irusProcessStats = true;
-		else
+		} else {
 			irusProcessStats = false;
+		}
 		irusNumberOfOpendoarsToDownload = Integer.parseInt(parser.get("irusNumberOfOpendoarsToDownload"));
 
-		if (parser.get("sarcCreateTablesEmptyDirs").toLowerCase().equals("true"))
+		if (parser.get("sarcCreateTablesEmptyDirs").toLowerCase().equals("true")) {
 			sarcCreateTablesEmptyDirs = true;
-		else
+		} else {
 			sarcCreateTablesEmptyDirs = false;
+		}
 
-                if (parser.get("sarcDownloadReports").toLowerCase().equals("true"))
+		if (parser.get("sarcDownloadReports").toLowerCase().equals("true")) {
 			sarcDownloadReports = true;
-		else
+		} else {
 			sarcDownloadReports = false;
+		}
 
-                if (parser.get("sarcProcessStats").toLowerCase().equals("true"))
+		if (parser.get("sarcProcessStats").toLowerCase().equals("true")) {
 			sarcProcessStats = true;
-		else
+		} else {
 			sarcProcessStats = false;
+		}
 		sarcNumberOfIssnToDownload = Integer.parseInt(parser.get("sarcNumberOfIssnToDownload"));
 
-/*
-		if (parser.get("finalizeStats").toLowerCase().equals("true"))
+		if (parser.get("finalizeStats").toLowerCase().equals("true")) {
 			finalizeStats = true;
-		else
+		} else {
 			finalizeStats = false;
-		if (parser.get("finalTablesVisibleToImpala").toLowerCase().equals("true"))
-			finalTablesVisibleToImpala = true;
-		else
-			finalTablesVisibleToImpala = false;
-*/
+		}
+
 		numberOfDownloadThreads = Integer.parseInt(parser.get("numberOfDownloadThreads"));
 
 		UsageStatsExporter usagestatsExport = new UsageStatsExporter();
 		usagestatsExport.export();
+		// usagestatsExport.createdDBWithTablesOnly();
 	}
 
 	private static Calendar startingLogPeriodStr(Date date) {

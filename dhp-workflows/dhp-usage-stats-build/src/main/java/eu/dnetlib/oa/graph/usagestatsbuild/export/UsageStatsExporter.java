@@ -1,3 +1,4 @@
+
 package eu.dnetlib.oa.graph.usagestatsbuild.export;
 
 import java.io.IOException;
@@ -17,90 +18,110 @@ import org.slf4j.LoggerFactory;
  */
 public class UsageStatsExporter {
 
-    public UsageStatsExporter() {
+	public UsageStatsExporter() {
 
-    }
+	}
 
-    private static final Logger logger = LoggerFactory.getLogger(UsageStatsExporter.class);
+	private static final Logger logger = LoggerFactory.getLogger(UsageStatsExporter.class);
 
-    public void export() throws Exception {
+	public void export() throws Exception {
 
-        logger.info("Initialising DB properties");
-        ConnectDB.init();
+		logger.info("Initialising DB properties");
+		ConnectDB.init();
 
 //		runImpalaQuery();
-        PiwikStatsDB piwikstatsdb = new PiwikStatsDB();
+		PiwikStatsDB piwikstatsdb = new PiwikStatsDB();
 
-        logger.info("Re-creating database and tables");
-        if (ExecuteWorkflow.recreateDbAndTables) {
-            piwikstatsdb.recreateDBAndTables();
-            logger.info("DB-Tables are created ");
-        }
+		logger.info("Re-creating database and tables");
+		if (ExecuteWorkflow.recreateDbAndTables) {
+			piwikstatsdb.recreateDBAndTables();
+			logger.info("DB-Tables are created ");
+		}
 //                else {
 //                    piwikstatsdb.createTmpTables();
 //                    logger.info("TmpTables are created ");
 //                }
-        if (ExecuteWorkflow.processPiwikLogs) {
-            logger.info("Processing logs");
-            piwikstatsdb.processLogs();
-        }
+		if (ExecuteWorkflow.processPiwikLogs) {
+			logger.info("Processing Piwik logs");
+			piwikstatsdb.processLogs();
+			logger.info("Piwik logs Done");
+			logger.info("Processing Pedocs Old Stats");
+			piwikstatsdb.uploadOldPedocs();
+			logger.info("Processing Pedocs Old Stats Done");
+			logger.info("Processing TUDELFT Stats");
+			piwikstatsdb.uploadTUDELFTStats();
+			logger.info("Processing TUDELFT Stats Done");
 
-        LaReferenciaStats lastats = new LaReferenciaStats();
+		}
 
-        if (ExecuteWorkflow.processLaReferenciaLogs) {
-            logger.info("Processing LaReferencia logs");
-            lastats.processLogs();
-            logger.info("LaReferencia logs done");
-        }
-        
-        IrusStats irusstats = new IrusStats();
-        
-        if (ExecuteWorkflow.irusProcessStats) {
-            logger.info("Processing IRUS");
-            irusstats.processIrusStats();
-            logger.info("Irus done");
-        }
+		LaReferenciaStats lastats = new LaReferenciaStats();
 
-        SarcStats sarcStats = new SarcStats();
+		if (ExecuteWorkflow.processLaReferenciaLogs) {
+			logger.info("Processing LaReferencia logs");
+			lastats.processLogs();
+			logger.info("LaReferencia logs done");
+		}
 
-        if (ExecuteWorkflow.sarcProcessStats) {
-            sarcStats.processSarc();
-        }
-        logger.info("Sarc done");
+		IrusStats irusstats = new IrusStats();
 
-        // finalize usagestats
-        if (ExecuteWorkflow.finalizeStats) {
-            piwikstatsdb.finalizeStats();
-            logger.info("Finalized stats");
-        }
+		if (ExecuteWorkflow.irusProcessStats) {
+			logger.info("Processing IRUS");
+			irusstats.processIrusStats();
+			logger.info("Irus done");
+		}
 
-        // Make the tables available to Impala
-        if (ExecuteWorkflow.finalTablesVisibleToImpala) {
-            logger.info("Making tables visible to Impala");
-            invalidateMetadata();
-        }
+		SarcStats sarcStats = new SarcStats();
 
-        logger.info("End");
-    }
+		if (ExecuteWorkflow.sarcProcessStats) {
+			sarcStats.processSarc();
+		}
+		logger.info("Sarc done");
 
-    private void invalidateMetadata() throws SQLException {
-        Statement stmt = null;
+		// finalize usagestats
+		if (ExecuteWorkflow.finalizeStats) {
+			piwikstatsdb.finalizeStats();
+			logger.info("Finalized stats");
+		}
 
-        stmt = ConnectDB.getImpalaConnection().createStatement();
+		// Make the tables available to Impala
+		if (ExecuteWorkflow.finalTablesVisibleToImpala) {
+			logger.info("Making tables visible to Impala");
+			invalidateMetadata();
+		}
 
-        String sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats";
-        stmt.executeUpdate(sql);
+		logger.info("End");
+	}
 
-        sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".views_stats";
-        stmt.executeUpdate(sql);
+	private void invalidateMetadata() throws SQLException {
+		Statement stmt = null;
 
-        sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".usage_stats";
-        stmt.executeUpdate(sql);
+		stmt = ConnectDB.getImpalaConnection().createStatement();
 
-        sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats";
-        stmt.executeUpdate(sql);
+		String sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats";
+		stmt.executeUpdate(sql);
 
-        stmt.close();
-        ConnectDB.getHiveConnection().close();
-    }
+		sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".views_stats";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".usage_stats";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getUsageStatsDBSchema() + ".pageviews_stats";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getUsagestatsPermanentDBSchema() + ".downloads_stats";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getUsagestatsPermanentDBSchema() + ".views_stats";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getUsagestatsPermanentDBSchema() + ".usage_stats";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getUsagestatsPermanentDBSchema() + ".pageviews_stats";
+		stmt.executeUpdate(sql);
+
+		stmt.close();
+		ConnectDB.getHiveConnection().close();
+	}
 }

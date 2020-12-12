@@ -1,3 +1,4 @@
+
 package eu.dnetlib.oa.graph.usagestatsbuild.export;
 
 import java.io.*;
@@ -27,45 +28,42 @@ import org.slf4j.LoggerFactory;
  */
 public class IrusStats {
 
-    private String irusUKURL;
+	private String irusUKURL;
 
-    private static final Logger logger = LoggerFactory.getLogger(IrusStats.class);
+	private static final Logger logger = LoggerFactory.getLogger(IrusStats.class);
 
-    public IrusStats() throws Exception {
-    }
+	public IrusStats() throws Exception {
+	}
 
-      
-    public void processIrusStats() throws Exception {
-        Statement stmt = ConnectDB.getHiveConnection().createStatement();
-        ConnectDB.getHiveConnection().setAutoCommit(false);
+	public void processIrusStats() throws Exception {
+		Statement stmt = ConnectDB.getHiveConnection().createStatement();
+		ConnectDB.getHiveConnection().setAutoCommit(false);
 
+		logger.info("Creating irus_downloads_stats_tmp table");
+		String createDownloadsStats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
+			+ ".irus_downloads_stats_tmp "
+			+ "(`source` string, "
+			+ "`repository_id` string, "
+			+ "`result_id` string, "
+			+ "`date`	string, "
+			+ "`count` bigint,	"
+			+ "`openaire`	bigint)";
+		stmt.executeUpdate(createDownloadsStats);
+		logger.info("Created irus_downloads_stats_tmp table");
 
-        logger.info("Creating irus_downloads_stats_tmp table");
-        String createDownloadsStats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
-                + ".irus_downloads_stats_tmp "
-                + "(`source` string, "
-                + "`repository_id` string, "
-                + "`result_id` string, "
-                + "`date`	string, "
-                + "`count` bigint,	"
-                + "`openaire`	bigint)";
-        stmt.executeUpdate(createDownloadsStats);
-        logger.info("Created irus_downloads_stats_tmp table");
+		logger.info("Inserting into irus_downloads_stats_tmp");
+		String insertDStats = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".irus_downloads_stats_tmp "
+			+ "SELECT s.source, d.id AS repository_id, "
+			+ "ro.id as result_id, CONCAT(YEAR(date), '/', LPAD(MONTH(date), 2, '0')) as date, s.count, '0' "
+			+ "FROM " + ConnectDB.getUsageRawDataDBSchema() + ".sushilog s, "
+			+ ConnectDB.getStatsDBSchema() + ".datasource_oids d, "
+			+ ConnectDB.getStatsDBSchema() + ".result_oids ro "
+			+ "WHERE s.repository=d.oid AND s.rid=ro.oid AND metric_type='ft_total' AND s.source='IRUS-UK'";
+		stmt.executeUpdate(insertDStats);
+		logger.info("Inserted into irus_downloads_stats_tmp");
 
-        logger.info("Inserting into irus_downloads_stats_tmp");
-        String insertDStats = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".irus_downloads_stats_tmp "
-                + "SELECT s.source, d.id AS repository_id, "
-                + "ro.id as result_id, CONCAT(YEAR(date), '/', LPAD(MONTH(date), 2, '0')) as date, s.count, '0' "
-                + "FROM " + ConnectDB.getUsageRawDataDBSchema() + ".sushilog s, "
-                + ConnectDB.getStatsDBSchema() + ".datasource_oids d, "
-                + ConnectDB.getStatsDBSchema() + ".result_oids ro "
-                + "WHERE s.repository=d.oid AND s.rid=ro.oid AND metric_type='ft_total' AND s.source='IRUS-UK'";
-        stmt.executeUpdate(insertDStats);
-        logger.info("Inserted into irus_downloads_stats_tmp");
+		stmt.close();
+		// ConnectDB.getHiveConnection().close();
+	}
 
-        stmt.close();
-        //ConnectDB.getHiveConnection().close();
-    }
-
- 
 }
