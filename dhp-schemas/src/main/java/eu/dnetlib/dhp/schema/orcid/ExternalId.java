@@ -1,11 +1,13 @@
 
 package eu.dnetlib.dhp.schema.orcid;
 
+import java.io.Serializable;
+
 /**
  * This class models the data related to external id, that are retrieved from an orcid publication
  */
 
-public class ExternalId {
+public class ExternalId implements Serializable {
 	private String type;
 	private String value;
 	private String relationShip;

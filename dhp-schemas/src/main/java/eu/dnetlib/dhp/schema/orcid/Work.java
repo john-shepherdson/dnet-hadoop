@@ -1,7 +1,9 @@
 
 package eu.dnetlib.dhp.schema.orcid;
 
-public class Work extends OrcidData {
+import java.io.Serializable;
+
+public class Work extends OrcidData implements Serializable {
 	WorkDetail workDetail;
 
 	public WorkDetail getWorkDetail() {

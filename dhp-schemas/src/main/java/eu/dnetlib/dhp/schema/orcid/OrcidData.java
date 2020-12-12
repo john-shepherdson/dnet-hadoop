@@ -1,7 +1,9 @@
 
 package eu.dnetlib.dhp.schema.orcid;
 
-public class OrcidData {
+import java.io.Serializable;
+
+public class OrcidData implements Serializable {
 	protected String base64CompressData;
 	protected String statusCode;
 	protected String downloadDate;

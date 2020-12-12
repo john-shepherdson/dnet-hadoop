@@ -1,7 +1,9 @@
 
 package eu.dnetlib.dhp.schema.orcid;
 
-public class AuthorSummary extends OrcidData {
+import java.io.Serializable;
+
+public class AuthorSummary extends OrcidData implements Serializable {
 	AuthorData authorData;
 	AuthorHistory authorHistory;
 

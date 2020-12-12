@@ -66,7 +66,7 @@
         </configuration>
     </global>
 
-    <start to="DownloadOrcidWorks"/>
+    <start to="ResetWorkingPath"/>
     
     
     <kill name="Kill">
@@ -93,21 +93,6 @@
             <capture-output/>
         </shell>
         <ok to="DownloadUpdatedXMLAuthors"/>
-        <error to="Kill"/>
-    </action>
-
-	<action name="DownloadUpdatedXMLAuthors">
-        <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <main-class>eu.dnetlib.doiboost.orcid.OrcidDownloader</main-class>
-            <arg>-w</arg><arg>${workingPath}/</arg>
-            <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>last_modified.csv.tar</arg>
-            <arg>-o</arg><arg>downloads/</arg>
-            <arg>-t</arg><arg>${token}</arg>
-        </java>
-        <ok to="End"/>
         <error to="Kill"/>
     </action>
 

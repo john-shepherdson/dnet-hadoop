@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -26,14 +25,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.orcid.AuthorSummary;
 import eu.dnetlib.dhp.schema.orcid.Work;
 import eu.dnetlib.dhp.schema.orcid.WorkDetail;
-import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
 import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
-import scala.Tuple2;
 
-public class SparkUpdateOrcidDatasets {
+public class SparkUpdateOrcidWorks {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -62,25 +58,6 @@ public class SparkUpdateOrcidDatasets {
 			spark -> {
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-				LongAccumulator oldAuthorsFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("old_authors_found");
-				LongAccumulator updatedAuthorsFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("updated_authors_found");
-				LongAccumulator newAuthorsFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("new_authors_found");
-				LongAccumulator errorCodeAuthorsFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("error_code_authors_found");
-				LongAccumulator errorLoadingAuthorsJsonFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("error_loading_authors_json_found");
-				LongAccumulator errorParsingAuthorsXMLFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("error_parsing_authors_xml_found");
-
 				LongAccumulator oldWorksFoundAcc = spark
 					.sparkContext()
 					.longAccumulator("old_works_found");
@@ -99,119 +76,6 @@ public class SparkUpdateOrcidDatasets {
 				LongAccumulator errorParsingWorksXMLFoundAcc = spark
 					.sparkContext()
 					.longAccumulator("error_parsing_works_xml_found");
-
-//				JavaPairRDD<Text, Text> xmlSummariesRDD = sc
-//					.sequenceFile(workingPath.concat("xml/authors/xml_authors.seq"), Text.class, Text.class);
-//				xmlSummariesRDD
-//					.map(seq -> {
-//						AuthorSummary authorSummary = XMLRecordParser
-//							.VTDParseAuthorSummary(seq._2().toString().getBytes());
-//						authorSummary
-//							.setBase64CompressData(ArgumentApplicationParser.compressArgument(seq._2().toString()));
-//						return authorSummary;
-//					})
-//					.filter(authorSummary -> authorSummary != null)
-//					.map(authorSummary -> JsonWriter.create(authorSummary))
-//					.saveAsTextFile(workingPath.concat("orcid_dataset/authors"), GzipCodec.class);
-//
-//				JavaPairRDD<Text, Text> xmlWorksRDD = sc
-//					.sequenceFile(workingPath.concat("xml/works/*"), Text.class, Text.class);
-//
-//				xmlWorksRDD
-//					.map(seq -> {
-//						WorkDetail workDetail = XMLRecordParserNoDoi.VTDParseWorkData(seq._2().toString().getBytes());
-//						Work work = new Work();
-//						work.setWorkDetail(workDetail);
-//						work.setBase64CompressData(ArgumentApplicationParser.compressArgument(seq._2().toString()));
-//						return work;
-//					})
-//					.filter(work -> work != null)
-//					.map(work -> JsonWriter.create(work))
-//					.saveAsTextFile(workingPath.concat("orcid_dataset/works"), GzipCodec.class);
-
-//				Function<Tuple2<Text, Text>, AuthorSummary> retrieveAuthorSummaryFunction = data -> {
-//					AuthorSummary authorSummary = new AuthorSummary();
-//					String orcidId = data._1().toString();
-//					String jsonData = data._2().toString();
-//					JsonElement jElement = new JsonParser().parse(jsonData);
-//					String statusCode = getJsonValue(jElement, "statusCode");
-//					String downloadDate = getJsonValue(jElement, "lastModifiedDate");
-//					if (statusCode.equals("200")) {
-//						String compressedData = getJsonValue(jElement, "compressedData");
-//						if (StringUtils.isEmpty(compressedData)) {
-//							errorLoadingAuthorsJsonFoundAcc.add(1);
-//						} else {
-//							String xmlAuthor = ArgumentApplicationParser.decompressValue(compressedData);
-//							try {
-//								authorSummary = XMLRecordParser
-//									.VTDParseAuthorSummary(xmlAuthor.getBytes());
-//								authorSummary.setStatusCode(statusCode);
-//								authorSummary.setDownloadDate("2020-11-18 00:00:05.644768");
-//								authorSummary.setBase64CompressData(compressedData);
-//								return authorSummary;
-//							} catch (Exception e) {
-//								logger.error("parsing xml " + orcidId + " [" + jsonData + "]", e);
-//								errorParsingAuthorsXMLFoundAcc.add(1);
-//							}
-//						}
-//					} else {
-//						authorSummary.setStatusCode(statusCode);
-//						authorSummary.setDownloadDate("2020-11-18 00:00:05.644768");
-//						errorCodeAuthorsFoundAcc.add(1);
-//					}
-//					return authorSummary;
-//				};
-//
-//				Dataset<AuthorSummary> downloadedAuthorSummaryDS = spark
-//					.createDataset(
-//						sc
-//							.sequenceFile(workingPath + "downloads/updated_authors/*", Text.class, Text.class)
-//							.map(retrieveAuthorSummaryFunction)
-//							.rdd(),
-//						Encoders.bean(AuthorSummary.class));
-//				Dataset<AuthorSummary> currentAuthorSummaryDS = spark
-//					.createDataset(
-//						sc
-//							.textFile(workingPath.concat("orcid_dataset/authors/*"))
-//							.map(item -> OBJECT_MAPPER.readValue(item, AuthorSummary.class))
-//							.rdd(),
-//						Encoders.bean(AuthorSummary.class));
-//				currentAuthorSummaryDS
-//					.joinWith(
-//						downloadedAuthorSummaryDS,
-//						currentAuthorSummaryDS
-//							.col("authorData.oid")
-//							.equalTo(downloadedAuthorSummaryDS.col("authorData.oid")),
-//						"full_outer")
-//					.map(value -> {
-//						Optional<AuthorSummary> opCurrent = Optional.ofNullable(value._1());
-//						Optional<AuthorSummary> opDownloaded = Optional.ofNullable(value._2());
-//						if (!opCurrent.isPresent()) {
-//							newAuthorsFoundAcc.add(1);
-//							return opDownloaded.get();
-//						}
-//						if (!opDownloaded.isPresent()) {
-//							oldAuthorsFoundAcc.add(1);
-//							return opCurrent.get();
-//						}
-//						if (opCurrent.isPresent() && opDownloaded.isPresent()) {
-//							updatedAuthorsFoundAcc.add(1);
-//							return opDownloaded.get();
-//						}
-//						return null;
-//					},
-//						Encoders.bean(AuthorSummary.class))
-//					.filter(Objects::nonNull)
-//					.toJavaRDD()
-//					.map(authorSummary -> OBJECT_MAPPER.writeValueAsString(authorSummary))
-//					.saveAsTextFile(workingPath.concat("orcid_dataset/new_authors"), GzipCodec.class);
-//
-//				logger.info("oldAuthorsFoundAcc: " + oldAuthorsFoundAcc.value().toString());
-//				logger.info("newAuthorsFoundAcc: " + newAuthorsFoundAcc.value().toString());
-//				logger.info("updatedAuthorsFoundAcc: " + updatedAuthorsFoundAcc.value().toString());
-//				logger.info("errorCodeFoundAcc: " + errorCodeAuthorsFoundAcc.value().toString());
-//				logger.info("errorLoadingJsonFoundAcc: " + errorLoadingAuthorsJsonFoundAcc.value().toString());
-//				logger.info("errorParsingXMLFoundAcc: " + errorParsingAuthorsXMLFoundAcc.value().toString());
 
 				Function<String, Work> retrieveWorkFunction = jsonData -> {
 					Work work = new Work();
