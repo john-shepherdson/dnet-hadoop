@@ -76,6 +76,7 @@ public class EventFinder {
 		final Set<String> dsIdWhitelist,
 		final Set<String> dsIdBlacklist,
 		final Set<String> dsTypeWhitelist,
+		final Set<String> topicWhitelist,
 		final Map<String, LongAccumulator> accumulators) {
 
 		final List<UpdateInfo<?>> list = new ArrayList<>();
@@ -84,7 +85,13 @@ public class EventFinder {
 			for (final OaBrokerRelatedDatasource targetDs : target.getDatasources()) {
 				if (verifyTarget(targetDs, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist)) {
 					for (final UpdateMatcher<?> matcher : matchers) {
-						list.addAll(matcher.searchUpdatesForRecord(target, targetDs, results.getData(), accumulators));
+						for (final UpdateInfo<?> info : matcher
+							.searchUpdatesForRecord(target, targetDs, results.getData(), accumulators)) {
+							if (topicWhitelist == null || topicWhitelist.isEmpty()
+								|| topicWhitelist.contains(info.getTopic().getPath())) {
+								list.add(info);
+							}
+						}
 					}
 				}
 			}

@@ -25,6 +25,11 @@
             <description>a black list (comma separeted, - for empty list) of datasource ids</description>
         </property>
         <property>
+            <name>topicWhitelist</name>
+            <value>*</value>
+            <description>a white list (comma separeted, * for all) of topics</description>
+        </property>
+        <property>
             <name>esEventIndexName</name>
             <description>the elasticsearch index name for events</description>
         </property>
@@ -447,6 +452,7 @@
 			<arg>--datasourceIdWhitelist</arg><arg>${datasourceIdWhitelist}</arg>
 			<arg>--datasourceTypeWhitelist</arg><arg>${datasourceTypeWhitelist}</arg>
 			<arg>--datasourceIdBlacklist</arg><arg>${datasourceIdBlacklist}</arg>
+			<arg>--topicWhitelist</arg><arg>${topicWhitelist}</arg>
         </spark>
         <ok to="index_event_subset"/>
         <error to="Kill"/>
