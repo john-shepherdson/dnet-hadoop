@@ -254,6 +254,18 @@ public class XmlRecordFactory implements Serializable {
 														p -> p,
 														(p1, p2) -> p1))
 											.values()
+											.stream()
+											.collect(
+												Collectors
+													.groupingBy(
+														p -> p.getValue(),
+														Collectors
+															.mapping(
+																p -> p,
+																Collectors.minBy(new AuthorPidTypeComparator()))))
+											.values()
+											.stream()
+											.map(op -> op.get())
 											.forEach(
 												sp -> {
 													String pidType = getAuthorPidType(sp.getQualifier().getClassid());

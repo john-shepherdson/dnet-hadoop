@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
@@ -25,6 +26,9 @@ public class XmlRecordFactoryTest {
 
 	private static final String otherDsTypeId = "scholarcomminfra,infospace,pubsrepository::mock,entityregistry,entityregistry::projects,entityregistry::repositories,websource";
 
+	private static ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
 	@Test
 	public void testXMLRecordFactory() throws IOException, DocumentException {
 
@@ -33,7 +37,7 @@ public class XmlRecordFactoryTest {
 		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
 			otherDsTypeId);
 
-		Publication p = new ObjectMapper()
+		Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
 
 		String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
@@ -44,10 +48,14 @@ public class XmlRecordFactoryTest {
 
 		assertNotNull(doc);
 
-		// System.out.println(doc.asXML());
+		System.out.println(doc.asXML());
 
-		Assertions.assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid"));
+		Assertions.assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
 		Assertions.assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
+
+		Assertions.assertEquals("0000-0001-9613-9956", doc.valueOf("//creator[@rank = '2']/@orcid"));
+		Assertions.assertEquals("", doc.valueOf("//creator[@rank = '2']/@orcid_pending"));
+
 		// TODO add assertions based of values extracted from the XML record
 	}
 }

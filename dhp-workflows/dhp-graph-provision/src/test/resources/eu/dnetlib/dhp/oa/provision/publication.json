@@ -6,41 +6,15 @@
       "name": "Jaehyun",
       "pid": [
         {
-          "dataInfo": {
-            "deletedbyinference": false,
-            "inferenceprovenance": "",
-            "inferred": false,
-            "invisible": false,
-            "provenanceaction": {
-              "classid": "",
-              "classname": "",
-              "schemeid": "",
-              "schemename": ""
-            },
-            "trust": ""
-          },
           "qualifier": {
             "classid": "orcid",
             "classname": "Open Researcher and Contributor ID",
             "schemeid": "dnet:pid_types",
             "schemename": "dnet:pid_types"
           },
-          "value": "0000-0001-9613-6639"
+          "value": "0000-0001-9613-6638"
         },
         {
-          "dataInfo": {
-            "deletedbyinference": false,
-            "inferenceprovenance": "",
-            "inferred": false,
-            "invisible": false,
-            "provenanceaction": {
-              "classid": "",
-              "classname": "",
-              "schemeid": "",
-              "schemename": ""
-            },
-            "trust": ""
-          },
           "qualifier": {
             "classid": "orcid_pending",
             "classname": "Open Researcher and Contributor ID",
@@ -57,7 +31,26 @@
       "affiliation": [],
       "fullname": "Berrada, Salim",
       "name": "Salim",
-      "pid": [],
+      "pid": [
+        {
+          "qualifier": {
+            "classid": "orcid",
+            "classname": "Open Researcher and Contributor ID",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-9956"
+        },
+        {
+          "qualifier": {
+            "classid": "orcid_pending",
+            "classname": "Open Researcher and Contributor ID",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-9956"
+        }
+      ],
       "rank": 2,
       "surname": "Berrada"
     },
