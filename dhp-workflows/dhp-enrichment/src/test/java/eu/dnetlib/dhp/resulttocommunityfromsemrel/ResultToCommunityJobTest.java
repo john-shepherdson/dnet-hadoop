@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.orcidtoresultfromsemrel.OrcidPropagationJobTest;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 
 public class ResultToCommunityJobTest {
@@ -66,7 +65,7 @@ public class ResultToCommunityJobTest {
 	}
 
 	@Test
-	public void test1() throws Exception {
+	public void testSparkResultToCommunityThroughSemRelJob() throws Exception {
 		SparkResultToCommunityThroughSemRelJob
 			.main(
 				new String[] {
