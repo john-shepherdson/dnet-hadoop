@@ -55,6 +55,18 @@ public class IndexEventSubsetJob {
 		final String indexHost = parser.get("esHost");
 		log.info("indexHost: {}", indexHost);
 
+		final String esBatchWriteRetryCount = parser.get("esBatchWriteRetryCount");
+		log.info("esBatchWriteRetryCount: {}", esBatchWriteRetryCount);
+
+		final String esBatchWriteRetryWait = parser.get("esBatchWriteRetryWait");
+		log.info("esBatchWriteRetryWait: {}", esBatchWriteRetryWait);
+
+		final String esBatchSizeEntries = parser.get("esBatchSizeEntries");
+		log.info("esBatchSizeEntries: {}", esBatchSizeEntries);
+
+		final String esNodesWanOnly = parser.get("esNodesWanOnly");
+		log.info("esNodesWanOnly: {}", esNodesWanOnly);
+
 		final int maxEventsForTopic = NumberUtils.toInt(parser.get("maxEventsForTopic"));
 		log.info("maxEventsForTopic: {}", maxEventsForTopic);
 
@@ -86,10 +98,10 @@ public class IndexEventSubsetJob {
 		esCfg.put("es.index.auto.create", "false");
 		esCfg.put("es.nodes", indexHost);
 		esCfg.put("es.mapping.id", "eventId"); // THE PRIMARY KEY
-		esCfg.put("es.batch.write.retry.count", "8");
-		esCfg.put("es.batch.write.retry.wait", "60s");
-		esCfg.put("es.batch.size.entries", "200");
-		esCfg.put("es.nodes.wan.only", "true");
+		esCfg.put("es.batch.write.retry.count", esBatchWriteRetryCount);
+		esCfg.put("es.batch.write.retry.wait", esBatchWriteRetryWait);
+		esCfg.put("es.batch.size.entries", esBatchSizeEntries);
+		esCfg.put("es.nodes.wan.only", esNodesWanOnly);
 
 		log.info("*** Start indexing");
 		JavaEsSpark.saveJsonToEs(inputRdd, index, esCfg);
