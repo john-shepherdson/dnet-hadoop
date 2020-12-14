@@ -108,7 +108,7 @@ public class SparkResultToCommunityFromOrganizationJob {
 					.stream()
 					.map(con -> con.getId())
 					.collect(Collectors.toList());
-				Result res = new Result();
+				R res = (R) ret.getClass().newInstance();
 				res.setId(ret.getId());
 				List<Context> propagatedContexts = new ArrayList<>();
 				for (String cId : communitySet) {
