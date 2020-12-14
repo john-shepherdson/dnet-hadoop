@@ -37,6 +37,26 @@
             <description>the elasticsearch host</description>
         </property>
         <property>
+            <name>esBatchWriteRetryCount</name>
+            <value>8</value>
+            <description>an ES configuration property</description>
+        </property>
+		<property>
+            <name>esBatchWriteRetryWait</name>
+            <value>60s</value>
+            <description>an ES configuration property</description>
+        </property>
+		<property>
+            <name>esBatchSizeEntries</name>
+            <value>200</value>
+            <description>an ES configuration property</description>
+        </property>
+		<property>
+            <name>esNodesWanOnly</name>
+            <value>true</value>
+            <description>an ES configuration property</description>
+        </property>
+        <property>
         	<name>maxIndexedEventsForDsAndTopic</name>
         	<description>the max number of events for each couple (ds/topic)</description>
         </property>
@@ -125,6 +145,10 @@
             <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
+            <arg>--esBatchWriteRetryCount</arg><arg>${esBatchWriteRetryCount}</arg>
+            <arg>--esBatchWriteRetryWait</arg><arg>${esBatchWriteRetryWait}</arg>
+            <arg>--esBatchSizeEntries</arg><arg>${esBatchSizeEntries}</arg>
+            <arg>--esNodesWanOnly</arg><arg>${esNodesWanOnly}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>

@@ -18,6 +18,30 @@
 		"paramRequired": true
 	},
 	{
+		"paramName": "esBatchWriteRetryCount",
+		"paramLongName": "esBatchWriteRetryCount",
+		"paramDescription": "an ES configuration property",
+		"paramRequired": true
+	},
+	{
+		"paramName": "esBatchWriteRetryWait",
+		"paramLongName": "esBatchWriteRetryWait",
+		"paramDescription": "an ES configuration property",
+		"paramRequired": true
+	},
+	{
+		"paramName": "esBatchSizeEntries",
+		"paramLongName": "esBatchSizeEntries",
+		"paramDescription": "an ES configuration property",
+		"paramRequired": true
+	},
+	{
+		"paramName": "esNodesWanOnly",
+		"paramLongName": "esNodesWanOnly",
+		"paramDescription": "an ES configuration property",
+		"paramRequired": true
+	},
+	{
 		"paramName": "broker",
 		"paramLongName": "brokerApiBaseUrl",
 		"paramDescription": "the url of the broker service api",
