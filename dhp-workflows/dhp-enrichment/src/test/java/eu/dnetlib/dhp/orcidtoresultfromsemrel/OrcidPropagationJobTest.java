@@ -170,6 +170,7 @@ public class OrcidPropagationJobTest {
 					.filter(
 						"id = '50|dedup_wf_001::95b033c0c3961f6a1cdcd41a99a9632e' "
 							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = '" +
+
 							ModelConstants.ORCID_PENDING + "'")
 					.count());
 

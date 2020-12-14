@@ -1,34 +1,25 @@
 
-package eu.dnetlib.dhp.oa.graph.dump;
+package eu.dnetlib.dhp.common;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
-import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-public class ResultMapper implements Serializable {
+public class GraphResultMapper implements Serializable {
 
 	public static <E extends eu.dnetlib.dhp.schema.oaf.OafEntity> Result map(
-		E in, Map<String, String> communityMap, String dumpType) {
+		E in) {
 
-		Result out;
-		if (Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
-			out = new GraphResult();
-		} else {
-			out = new CommunityResult();
-		}
+		CommunityResult out = new CommunityResult();
 
 		eu.dnetlib.dhp.schema.oaf.Result input = (eu.dnetlib.dhp.schema.oaf.Result) in;
 		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> ort = Optional.ofNullable(input.getResulttype());
@@ -217,14 +208,10 @@ public class ResultMapper implements Serializable {
 				.ofNullable(input.getInstance());
 
 			if (oInst.isPresent()) {
-				if (Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
-					((GraphResult) out)
-						.setInstance(oInst.get().stream().map(i -> getGraphInstance(i)).collect(Collectors.toList()));
-				} else {
-					((CommunityResult) out)
-						.setInstance(
-							oInst.get().stream().map(i -> getCommunityInstance(i)).collect(Collectors.toList()));
-				}
+				out
+					.setInstance(
+						oInst.get().stream().map(i -> getInstance(i)).collect(Collectors.toList()));
+
 			}
 
 			Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> oL = Optional.ofNullable(input.getLanguage());
@@ -296,87 +283,19 @@ public class ResultMapper implements Serializable {
 			out.setType(input.getResulttype().getClassid());
 		}
 
-		if (!Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
-			((CommunityResult) out)
-				.setCollectedfrom(
-					input
-						.getCollectedfrom()
-						.stream()
-						.map(cf -> KeyValue.newInstance(cf.getKey(), cf.getValue()))
-						.collect(Collectors.toList()));
+		out
+			.setCollectedfrom(
+				input
+					.getCollectedfrom()
+					.stream()
+					.map(cf -> KeyValue.newInstance(cf.getKey(), cf.getValue()))
+					.collect(Collectors.toList()));
 
-			Set<String> communities = communityMap.keySet();
-			List<Context> contextList = Optional
-				.ofNullable(
-					input
-						.getContext())
-				.map(
-					value -> value
-						.stream()
-						.map(c -> {
-							String community_id = c.getId();
-							if (community_id.indexOf("::") > 0) {
-								community_id = community_id.substring(0, community_id.indexOf("::"));
-							}
-							if (communities.contains(community_id)) {
-								Context context = new Context();
-								context.setCode(community_id);
-								context.setLabel(communityMap.get(community_id));
-								Optional<List<DataInfo>> dataInfo = Optional.ofNullable(c.getDataInfo());
-								if (dataInfo.isPresent()) {
-									List<Provenance> provenance = new ArrayList<>();
-									provenance
-										.addAll(
-											dataInfo
-												.get()
-												.stream()
-												.map(
-													di -> Optional
-														.ofNullable(di.getProvenanceaction())
-														.map(
-															provenanceaction -> Provenance
-																.newInstance(
-																	provenanceaction.getClassname(), di.getTrust()))
-														.orElse(null))
-												.filter(Objects::nonNull)
-												.collect(Collectors.toSet()));
-
-									context.setProvenance(getUniqueProvenance(provenance));
-								}
-								return context;
-							}
-							return null;
-						})
-						.filter(Objects::nonNull)
-						.collect(Collectors.toList()))
-				.orElse(new ArrayList<>());
-
-			if (contextList.size() > 0) {
-				Set<Integer> hashValue = new HashSet<>();
-				List<Context> remainigContext = new ArrayList<>();
-				contextList.forEach(c -> {
-					if (!hashValue.contains(c.hashCode())) {
-						remainigContext.add(c);
-						hashValue.add(c.hashCode());
-					}
-				});
-				((CommunityResult) out).setContext(remainigContext);
-			}
-		}
 		return out;
 
 	}
 
-	private static Instance getGraphInstance(eu.dnetlib.dhp.schema.oaf.Instance i) {
-		Instance instance = new Instance();
-
-		setCommonValue(i, instance);
-
-		return instance;
-
-	}
-
-	private static CommunityInstance getCommunityInstance(eu.dnetlib.dhp.schema.oaf.Instance i) {
+	private static CommunityInstance getInstance(eu.dnetlib.dhp.schema.oaf.Instance i) {
 		CommunityInstance instance = new CommunityInstance();
 
 		setCommonValue(i, instance);
@@ -426,48 +345,6 @@ public class ResultMapper implements Serializable {
 
 	}
 
-	private static List<Provenance> getUniqueProvenance(List<Provenance> provenance) {
-		Provenance iProv = new Provenance();
-
-		Provenance hProv = new Provenance();
-		Provenance lProv = new Provenance();
-
-		for (Provenance p : provenance) {
-			switch (p.getProvenance()) {
-				case Constants.HARVESTED:
-					hProv = getHighestTrust(hProv, p);
-					break;
-				case Constants.INFERRED:
-					iProv = getHighestTrust(iProv, p);
-					// To be removed as soon as the new beta run has been done
-					// this fixex issue of not set trust during bulktagging
-					if (StringUtils.isEmpty(iProv.getTrust())) {
-						iProv.setTrust(Constants.DEFAULT_TRUST);
-					}
-					break;
-				case Constants.USER_CLAIM:
-					lProv = getHighestTrust(lProv, p);
-					break;
-			}
-
-		}
-
-		return Arrays
-			.asList(iProv, hProv, lProv)
-			.stream()
-			.filter(p -> !StringUtils.isEmpty(p.getProvenance()))
-			.collect(Collectors.toList());
-
-	}
-
-	private static Provenance getHighestTrust(Provenance hProv, Provenance p) {
-		if (StringUtils.isNoneEmpty(hProv.getTrust(), p.getTrust()))
-			return hProv.getTrust().compareTo(p.getTrust()) > 0 ? hProv : p;
-
-		return (StringUtils.isEmpty(p.getTrust()) && !StringUtils.isEmpty(hProv.getTrust())) ? hProv : p;
-
-	}
-
 	private static Subject getSubject(StructuredProperty s) {
 		Subject subject = new Subject();
 		subject.setSubject(ControlledField.newInstance(s.getQualifier().getClassid(), s.getValue()));
@@ -503,7 +380,7 @@ public class ResultMapper implements Serializable {
 
 	private static Pid getOrcid(List<StructuredProperty> p) {
 		for (StructuredProperty pid : p) {
-			if (pid.getQualifier().getClassid().equals(Constants.ORCID)) {
+			if (pid.getQualifier().getClassid().equals(ModelConstants.ORCID)) {
 				Optional<DataInfo> di = Optional.ofNullable(pid.getDataInfo());
 				if (di.isPresent()) {
 					return Pid

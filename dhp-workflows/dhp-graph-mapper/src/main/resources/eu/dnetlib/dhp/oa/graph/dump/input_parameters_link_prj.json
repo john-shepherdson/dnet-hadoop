@@ -1,11 +1,4 @@
 [
-
-	{
-		"paramName":"cmp",
-		"paramLongName":"communityMapPath",
-		"paramDescription": "the path to the serialization of the community map",
-		"paramRequired": true
-	},
 	{
 		"paramName":"s",
 		"paramLongName":"sourcePath",
@@ -31,10 +24,10 @@
 		"paramRequired": true
 	},
 	{
-		"paramName":"dt",
-		"paramLongName":"dumpType",
-		"paramDescription": "the type of the dump (complete for the whole graph, community for the products related to communities, funder for the results with at least a link to project",
-		"paramRequired": false
+		"paramName":"rp",
+		"paramLongName":"relationPath",
+		"paramDescription": "the path to the relations",
+		"paramRequired": true
 	}
 ]
 
