@@ -116,15 +116,15 @@
         </configuration>
     </global>
 
-    <start to="ensure_working_path"/>
+    <start to="ensure_output_dir"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     
-    <action name="ensure_working_path">
+    <action name="ensure_output_dir">
         <fs>
-            <mkdir path='${workingDir}'/>
+            <mkdir path='${outputDir}'/>
         </fs>
         <ok to="start_entities_and_rels"/>
         <error to="Kill"/>
