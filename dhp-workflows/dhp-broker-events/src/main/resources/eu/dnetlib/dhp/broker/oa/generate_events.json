@@ -28,5 +28,11 @@
 		"paramLongName": "datasourceIdBlacklist",
 		"paramDescription": "a black list (comma separeted, - for empty list) of datasource ids",
 		"paramRequired": true
+	},
+	{
+		"paramName": "topicWhitelist",
+		"paramLongName": "topicWhitelist",
+		"paramDescription": "a white list (comma separeted, * for all) of topics",
+		"paramRequired": true
 	}
 ]

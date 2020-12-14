@@ -59,6 +59,9 @@ public class GenerateEventsJob {
 		final Set<String> dsIdBlacklist = ClusterUtils.parseParamAsList(parser, "datasourceIdBlacklist");
 		log.info("datasourceIdBlacklist: {}", StringUtils.join(dsIdBlacklist, ","));
 
+		final Set<String> topicWhitelist = ClusterUtils.parseParamAsList(parser, "topicWhitelist");
+		log.info("topicWhitelist: {}", StringUtils.join(topicWhitelist, ","));
+
 		final SparkConf conf = new SparkConf();
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
@@ -75,7 +78,7 @@ public class GenerateEventsJob {
 			final Dataset<Event> dataset = groups
 				.map(
 					g -> EventFinder
-						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, accumulators),
+						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, topicWhitelist, accumulators),
 					Encoders
 						.bean(EventGroup.class))
 				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
