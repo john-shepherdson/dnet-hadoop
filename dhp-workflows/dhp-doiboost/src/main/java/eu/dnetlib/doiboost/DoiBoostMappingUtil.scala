@@ -35,7 +35,8 @@ object DoiBoostMappingUtil {
   //STATIC STRING
   val MAG = "microsoft"
   val MAG_NAME = "Microsoft Academic Graph"
-  val ORCID = "ORCID"
+  val ORCID = "orcid"
+  val ORCID_PENDING = "orcid_pending"
   val CROSSREF = "Crossref"
   val UNPAYWALL = "UnpayWall"
   val GRID_AC = "grid.ac"
