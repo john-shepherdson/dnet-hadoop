@@ -43,7 +43,7 @@ public class SparkDownloadOrcidWorks {
 	public static final String ORCID_XML_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 	public static final DateTimeFormatter ORCID_XML_DATETIMEFORMATTER = DateTimeFormatter
 		.ofPattern(ORCID_XML_DATETIME_FORMAT);
-	public static final String lastUpdateValue = "2020-09-29 00:00:00";
+	public static final String lastUpdateValue = "2020-11-18 00:00:05";
 
 	public static void main(String[] args) throws IOException, Exception {
 
@@ -89,6 +89,7 @@ public class SparkDownloadOrcidWorks {
 					.longAccumulator("error_parsing_xml_found");
 				LongAccumulator downloadedRecordsAcc = spark.sparkContext().longAccumulator("downloaded_records");
 				LongAccumulator errorHTTP403Acc = spark.sparkContext().longAccumulator("error_HTTP_403");
+				LongAccumulator errorHTTP404Acc = spark.sparkContext().longAccumulator("error_HTTP_404");
 				LongAccumulator errorHTTP409Acc = spark.sparkContext().longAccumulator("error_HTTP_409");
 				LongAccumulator errorHTTP503Acc = spark.sparkContext().longAccumulator("error_HTTP_503");
 				LongAccumulator errorHTTP525Acc = spark.sparkContext().longAccumulator("error_HTTP_525");
@@ -163,6 +164,8 @@ public class SparkDownloadOrcidWorks {
 							switch (statusCode) {
 								case 403:
 									errorHTTP403Acc.add(1);
+								case 404:
+									errorHTTP404Acc.add(1);
 								case 409:
 									errorHTTP409Acc.add(1);
 								case 503:
@@ -186,16 +189,11 @@ public class SparkDownloadOrcidWorks {
 									.compressArgument(IOUtils.toString(response.getEntity().getContent())));
 					} catch (Throwable e) {
 						logger.info("Downloading " + orcidId, e.getMessage());
-						if (downloaded.getStatusCode() == 503) {
-							throw new RuntimeException("Orcid request rate limit reached (HTTP 503)");
-						}
 						downloaded.setErrorMessage(e.getMessage());
 						return downloaded.toTuple2();
 					}
 					return downloaded.toTuple2();
 				};
-
-//				sc.hadoopConfiguration().set("mapreduce.output.fileoutputformat.compress", "true");
 
 				updatedAuthorsRDD
 					.flatMap(retrieveWorkUrlFunction)
@@ -203,12 +201,7 @@ public class SparkDownloadOrcidWorks {
 					.map(downloadWorkFunction)
 					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
 					.saveAsTextFile(workingPath.concat(outputPath), GzipCodec.class);
-//						.saveAsNewAPIHadoopFile(
-//						workingPath.concat(outputPath),
-//						Text.class,
-//						Text.class,
-//						SequenceFileOutputFormat.class,
-//						sc.hadoopConfiguration());
+
 				logger.info("updatedAuthorsAcc: " + updatedAuthorsAcc.value().toString());
 				logger.info("parsedAuthorsAcc: " + parsedAuthorsAcc.value().toString());
 				logger.info("parsedWorksAcc: " + parsedWorksAcc.value().toString());

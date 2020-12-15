@@ -35,12 +35,12 @@ public class SparkUpdateOrcidWorks {
 		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 	public static void main(String[] args) throws IOException, Exception {
-		Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidDatasets.class);
+		Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidWorks.class);
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkUpdateOrcidDatasets.class
+					SparkUpdateOrcidWorks.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/doiboost/download_orcid_data.json")));
 		parser.parseArgument(args);
@@ -83,7 +83,7 @@ public class SparkUpdateOrcidWorks {
 					String statusCode = getJsonValue(jElement, "statusCode");
 					work.setStatusCode(statusCode);
 					String downloadDate = getJsonValue(jElement, "lastModifiedDate");
-					work.setDownloadDate("2020-11-18 00:00:05.644768");
+					work.setDownloadDate("2020-12-15 00:00:01.000000");
 					if (statusCode.equals("200")) {
 						String compressedData = getJsonValue(jElement, "compressedData");
 						if (StringUtils.isEmpty(compressedData)) {

@@ -34,7 +34,7 @@ public class SparkDownloadOrcidAuthors {
 
 	static Logger logger = LoggerFactory.getLogger(SparkDownloadOrcidAuthors.class);
 	static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	static final String lastUpdate = "2020-09-29 00:00:00";
+	static final String lastUpdate = "2020-11-18 00:00:05";
 
 	public static void main(String[] args) throws IOException, Exception {
 
@@ -69,6 +69,7 @@ public class SparkDownloadOrcidAuthors {
 				LongAccumulator modifiedRecordsAcc = spark.sparkContext().longAccumulator("to_download_records");
 				LongAccumulator downloadedRecordsAcc = spark.sparkContext().longAccumulator("downloaded_records");
 				LongAccumulator errorHTTP403Acc = spark.sparkContext().longAccumulator("error_HTTP_403");
+				LongAccumulator errorHTTP404Acc = spark.sparkContext().longAccumulator("error_HTTP_404");
 				LongAccumulator errorHTTP409Acc = spark.sparkContext().longAccumulator("error_HTTP_409");
 				LongAccumulator errorHTTP503Acc = spark.sparkContext().longAccumulator("error_HTTP_503");
 				LongAccumulator errorHTTP525Acc = spark.sparkContext().longAccumulator("error_HTTP_525");
@@ -113,6 +114,8 @@ public class SparkDownloadOrcidAuthors {
 							switch (statusCode) {
 								case 403:
 									errorHTTP403Acc.add(1);
+								case 404:
+									errorHTTP404Acc.add(1);
 								case 409:
 									errorHTTP409Acc.add(1);
 								case 503:
@@ -149,7 +152,7 @@ public class SparkDownloadOrcidAuthors {
 				logger.info("Authors modified count: " + authorsModifiedRDD.count());
 				logger.info("Start downloading ...");
 				authorsModifiedRDD
-					.repartition(10)
+					.repartition(100)
 					.map(downloadRecordFunction)
 					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
 					.saveAsNewAPIHadoopFile(
@@ -158,10 +161,12 @@ public class SparkDownloadOrcidAuthors {
 						Text.class,
 						SequenceFileOutputFormat.class,
 						sc.hadoopConfiguration());
+
 				logger.info("parsedRecordsAcc: " + parsedRecordsAcc.value().toString());
 				logger.info("modifiedRecordsAcc: " + modifiedRecordsAcc.value().toString());
 				logger.info("downloadedRecordsAcc: " + downloadedRecordsAcc.value().toString());
 				logger.info("errorHTTP403Acc: " + errorHTTP403Acc.value().toString());
+				logger.info("errorHTTP404Acc: " + errorHTTP404Acc.value().toString());
 				logger.info("errorHTTP409Acc: " + errorHTTP409Acc.value().toString());
 				logger.info("errorHTTP503Acc: " + errorHTTP503Acc.value().toString());
 				logger.info("errorHTTP525Acc: " + errorHTTP525Acc.value().toString());

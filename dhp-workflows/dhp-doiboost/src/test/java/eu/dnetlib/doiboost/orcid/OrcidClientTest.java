@@ -52,43 +52,6 @@ public class OrcidClientTest {
 //	'https://api.orcid.org/v3.0/0000-0001-7291-3210/record'
 
 	@Test
-	private void multipleDownloadTest() throws Exception {
-		int toDownload = 10;
-		long start = System.currentTimeMillis();
-		OrcidDownloader downloader = new OrcidDownloader();
-		TarArchiveInputStream input = new TarArchiveInputStream(
-			new GzipCompressorInputStream(new FileInputStream("/tmp/last_modified.csv.tar")));
-		TarArchiveEntry entry = input.getNextTarEntry();
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
-		int rowNum = 0;
-		int entryNum = 0;
-		int modified = 0;
-		while (entry != null) {
-			br = new BufferedReader(new InputStreamReader(input)); // Read directly from tarInput
-			String line;
-			while ((line = br.readLine()) != null) {
-				String[] values = line.toString().split(",");
-				List<String> recordInfo = Arrays.asList(values);
-				String orcidId = recordInfo.get(0);
-				if (downloader.isModified(orcidId, recordInfo.get(3))) {
-					slowedDownDownload(orcidId);
-					modified++;
-				}
-				rowNum++;
-				if (modified > toDownload) {
-					break;
-				}
-			}
-			entryNum++;
-			entry = input.getNextTarEntry();
-		}
-		long end = System.currentTimeMillis();
-		logToFile("start test: " + new Date(start).toString());
-		logToFile("end test: " + new Date(end).toString());
-	}
-
-	@Test
 	private void downloadTest(String orcid) throws Exception {
 		String record = testDownloadRecord(orcid, REQUEST_TYPE_RECORD);
 		String filename = "/tmp/downloaded_record_".concat(orcid).concat(".xml");
@@ -226,37 +189,6 @@ public class OrcidClientTest {
 			assertTrue(entryNum == 1);
 			entry = input.getNextTarEntry();
 		}
-	}
-
-	@Test
-	private void lambdaFileCounterTest() throws Exception {
-		final String lastUpdate = "2020-09-29 00:00:00";
-		OrcidDownloader downloader = new OrcidDownloader();
-		TarArchiveInputStream input = new TarArchiveInputStream(
-			new GzipCompressorInputStream(new FileInputStream("/tmp/last_modified.csv.tar")));
-		TarArchiveEntry entry = input.getNextTarEntry();
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
-		int rowNum = 0;
-		int entryNum = 0;
-		int modified = 0;
-		while (entry != null) {
-			br = new BufferedReader(new InputStreamReader(input)); // Read directly from tarInput
-			String line;
-			while ((line = br.readLine()) != null) {
-				String[] values = line.toString().split(",");
-				List<String> recordInfo = Arrays.asList(values);
-				String orcidId = recordInfo.get(0);
-				if (downloader.isModified(orcidId, recordInfo.get(3))) {
-					modified++;
-				}
-				rowNum++;
-			}
-			entryNum++;
-			entry = input.getNextTarEntry();
-		}
-		logToFile("rowNum: " + rowNum);
-		logToFile("modified: " + modified);
 	}
 
 	public static void logToFile(String log)

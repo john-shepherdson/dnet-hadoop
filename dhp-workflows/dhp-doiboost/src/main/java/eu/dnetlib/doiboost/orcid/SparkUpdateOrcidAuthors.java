@@ -36,12 +36,12 @@ public class SparkUpdateOrcidAuthors {
 		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 	public static void main(String[] args) throws IOException, Exception {
-		Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidDatasets.class);
+		Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidAuthors.class);
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkUpdateOrcidDatasets.class
+					SparkUpdateOrcidAuthors.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/doiboost/download_orcid_data.json")));
 		parser.parseArgument(args);
@@ -95,7 +95,7 @@ public class SparkUpdateOrcidAuthors {
 								authorSummary = XMLRecordParser
 									.VTDParseAuthorSummary(xmlAuthor.getBytes());
 								authorSummary.setStatusCode(statusCode);
-								authorSummary.setDownloadDate("2020-11-18 00:00:05.644768");
+								authorSummary.setDownloadDate("2020-12-15 00:00:01.000000");
 								authorSummary.setBase64CompressData(compressedData);
 								return authorSummary;
 							} catch (Exception e) {
@@ -105,7 +105,7 @@ public class SparkUpdateOrcidAuthors {
 						}
 					} else {
 						authorSummary.setStatusCode(statusCode);
-						authorSummary.setDownloadDate("2020-11-18 00:00:05.644768");
+						authorSummary.setDownloadDate("2020-12-15 00:00:01.000000");
 						errorCodeAuthorsFoundAcc.add(1);
 					}
 					return authorSummary;
