@@ -1,8 +1,8 @@
 [
 	{
 		"paramName": "o",
-		"paramLongName": "workingPath",
-		"paramDescription": "the path where the temporary data will be stored",
+		"paramLongName": "outputDir",
+		"paramDescription": "the path where the data will be stored",
 		"paramRequired": true
 	},
 	{

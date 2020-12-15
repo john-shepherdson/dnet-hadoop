@@ -1,36 +1,13 @@
-<workflow-app name="update broker notifications" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="reindex_events" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
         <property>
-            <name>graphInputPath</name>
-            <description>the path where the graph is stored</description>
-        </property>
-        <property>
             <name>outputDir</name>
-            <description>the path where the the generated data are stored</description>
-        </property>
-		<property>
-            <name>datasourceIdWhitelist</name>
-            <value>-</value>
-            <description>a white list (comma separeted, - for empty list) of datasource ids</description>
-        </property>
-		<property>
-            <name>datasourceTypeWhitelist</name>
-            <value>-</value>
-            <description>a white list (comma separeted, - for empty list) of datasource types</description>
-        </property>
-		<property>
-            <name>datasourceIdBlacklist</name>
-            <value>-</value>
-            <description>a black list (comma separeted, - for empty list) of datasource ids</description>
+            <description>the path where the the generated data will be stored</description>
         </property>
         <property>
             <name>esEventIndexName</name>
             <description>the elasticsearch index name for events</description>
-        </property>
-        <property>
-            <name>esNotificationsIndexName</name>
-            <description>the elasticsearch index name for notifications</description>
         </property>
         <property>
             <name>esIndexHost</name>
@@ -119,18 +96,18 @@
         </configuration>
     </global>
 
-    <start to="index_notifications"/>
+    <start to="index_event_subset"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-    
-    <action name="index_notifications">
+        
+     <action name="index_event_subset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>IndexNotificationsOnESJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.IndexNotificationsJob</class>
+            <name>IndexEventSubsetOnESJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.IndexEventSubsetJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -143,19 +120,21 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
-            <arg>--index</arg><arg>${esNotificationsIndexName}</arg>
+            <arg>--index</arg><arg>${esEventIndexName}</arg>
             <arg>--esHost</arg><arg>${esIndexHost}</arg>
             <arg>--esBatchWriteRetryCount</arg><arg>${esBatchWriteRetryCount}</arg>
             <arg>--esBatchWriteRetryWait</arg><arg>${esBatchWriteRetryWait}</arg>
             <arg>--esBatchSizeEntries</arg><arg>${esBatchSizeEntries}</arg>
             <arg>--esNodesWanOnly</arg><arg>${esNodesWanOnly}</arg>
+            <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
     
-    	
+   
+
     <end name="End"/>
 
 </workflow-app>

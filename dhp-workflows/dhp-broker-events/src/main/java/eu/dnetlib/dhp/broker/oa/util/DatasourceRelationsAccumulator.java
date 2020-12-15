@@ -59,9 +59,18 @@ public class DatasourceRelationsAccumulator implements Serializable {
 		final DatasourceRelationsAccumulator res = new DatasourceRelationsAccumulator();
 		collectedFromSet
 			.stream()
-			.map(s -> new Tuple3<>(r.getId(), s, BrokerConstants.COLLECTED_FROM_REL))
+			.map(
+				s -> new Tuple3<>(ConversionUtils.cleanOpenaireId(r.getId()), ConversionUtils.cleanOpenaireId(s),
+					BrokerConstants.COLLECTED_FROM_REL))
 			.forEach(res::addTuple);
-		hostedBySet.stream().map(s -> new Tuple3<>(r.getId(), s, BrokerConstants.HOSTED_BY_REL)).forEach(res::addTuple);
+
+		hostedBySet
+			.stream()
+			.map(
+				s -> new Tuple3<>(ConversionUtils.cleanOpenaireId(r.getId()), ConversionUtils.cleanOpenaireId(s),
+					BrokerConstants.HOSTED_BY_REL))
+			.forEach(res::addTuple);
+
 		return res;
 	}
 

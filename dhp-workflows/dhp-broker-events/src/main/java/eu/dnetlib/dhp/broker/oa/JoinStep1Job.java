@@ -40,10 +40,10 @@ public class JoinStep1Job {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String joinedEntitiesPath = workingPath + "/joinedEntities_step1";
+		final String joinedEntitiesPath = workingDir + "/joinedEntities_step1";
 		log.info("joinedEntitiesPath: {}", joinedEntitiesPath);
 
 		final SparkConf conf = new SparkConf();
@@ -55,10 +55,10 @@ public class JoinStep1Job {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_entities");
 
 			final Dataset<OaBrokerMainEntity> sources = ClusterUtils
-				.readPath(spark, workingPath + "/joinedEntities_step0", OaBrokerMainEntity.class);
+				.readPath(spark, workingDir + "/joinedEntities_step0", OaBrokerMainEntity.class);
 
 			final Dataset<RelatedProject> typedRels = ClusterUtils
-				.readPath(spark, workingPath + "/relatedProjects", RelatedProject.class);
+				.readPath(spark, workingDir + "/relatedProjects", RelatedProject.class);
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, RelatedProject>, OaBrokerMainEntity> aggr = new RelatedProjectAggregator()
 				.toColumn();
