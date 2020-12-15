@@ -64,7 +64,7 @@ public class PrepareRelatedSoftwaresJob {
 				.map(ConversionUtils::oafSoftwareToBrokerSoftware, Encoders.bean(OaBrokerRelatedSoftware.class));
 
 			final Dataset<Relation> rels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
+				.loadRelations(graphPath, spark)
 				.filter(r -> r.getDataInfo().getDeletedbyinference())
 				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
 				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))

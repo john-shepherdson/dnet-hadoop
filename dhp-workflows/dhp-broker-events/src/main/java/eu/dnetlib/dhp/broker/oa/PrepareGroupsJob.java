@@ -63,7 +63,7 @@ public class PrepareGroupsJob {
 				.readPath(spark, workingDir + "/joinedEntities_step4", OaBrokerMainEntity.class);
 
 			final Dataset<Relation> mergedRels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
+				.loadRelations(graphPath, spark)
 				.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, Relation>, ResultGroup> aggr = new ResultAggregator()

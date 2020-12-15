@@ -62,7 +62,7 @@ public class PrepareRelatedDatasetsJob {
 				.map(ConversionUtils::oafDatasetToBrokerDataset, Encoders.bean(OaBrokerRelatedDataset.class));
 
 			final Dataset<Relation> rels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
+				.loadRelations(graphPath, spark)
 				.filter(r -> r.getDataInfo().getDeletedbyinference())
 				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
 				.filter(r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
@@ -72,7 +72,8 @@ public class PrepareRelatedDatasetsJob {
 			final Dataset<RelatedDataset> dataset = rels
 				.joinWith(datasets, datasets.col("openaireId").equalTo(rels.col("target")), "inner")
 				.map(t -> {
-					final RelatedDataset rel = new RelatedDataset(t._1.getSource(), t._2);
+					final RelatedDataset rel = new RelatedDataset(t._1.getSource(),
+						t._2);
 					rel.getRelDataset().setRelType(t._1.getRelClass());
 					return rel;
 				}, Encoders.bean(RelatedDataset.class));

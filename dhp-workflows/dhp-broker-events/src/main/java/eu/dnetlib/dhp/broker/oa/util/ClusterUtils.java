@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class ClusterUtils {
 
@@ -28,6 +29,16 @@ public class ClusterUtils {
 
 	public static void removeDir(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+	}
+
+	public static Dataset<Relation> loadRelations(final String graphPath, final SparkSession spark) {
+		return ClusterUtils
+			.readPath(spark, graphPath + "/relation", Relation.class)
+			.map(r -> {
+				r.setSource(ConversionUtils.cleanOpenaireId(r.getSource()));
+				r.setTarget(ConversionUtils.cleanOpenaireId(r.getTarget()));
+				return r;
+			}, Encoders.bean(Relation.class));
 	}
 
 	public static <R> Dataset<R> readPath(
