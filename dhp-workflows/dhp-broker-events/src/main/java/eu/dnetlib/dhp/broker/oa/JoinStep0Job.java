@@ -42,10 +42,10 @@ public class JoinStep0Job {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String joinedEntitiesPath = workingPath + "/joinedEntities_step0";
+		final String joinedEntitiesPath = workingDir + "/joinedEntities_step0";
 		log.info("joinedEntitiesPath: {}", joinedEntitiesPath);
 
 		final SparkConf conf = new SparkConf();
@@ -57,10 +57,10 @@ public class JoinStep0Job {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_entities");
 
 			final Dataset<OaBrokerMainEntity> sources = ClusterUtils
-				.readPath(spark, workingPath + "/simpleEntities", OaBrokerMainEntity.class);
+				.readPath(spark, workingDir + "/simpleEntities", OaBrokerMainEntity.class);
 
 			final Dataset<RelatedDatasource> typedRels = ClusterUtils
-				.readPath(spark, workingPath + "/relatedDatasources", RelatedDatasource.class);
+				.readPath(spark, workingDir + "/relatedDatasources", RelatedDatasource.class);
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, RelatedDatasource>, OaBrokerMainEntity> aggr = new RelatedDatasourceAggregator()
 				.toColumn();
