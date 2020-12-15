@@ -129,7 +129,7 @@ public class ConversionUtils {
 		return res;
 	}
 
-	private static String cleanOpenaireId(final String id) {
+	public static String cleanOpenaireId(final String id) {
 		return id.contains("|") ? StringUtils.substringAfter(id, "|") : id;
 	}
 
