@@ -351,8 +351,6 @@ public class Project extends OafEntity implements Serializable {
 			? p.getFundedamount()
 			: fundedamount;
 
-		// programme = mergeLists(programme, p.getProgramme());
-
 		h2020classification = mergeLists(h2020classification, p.getH2020classification());
 
 		mergeOAFDataInfo(e);
