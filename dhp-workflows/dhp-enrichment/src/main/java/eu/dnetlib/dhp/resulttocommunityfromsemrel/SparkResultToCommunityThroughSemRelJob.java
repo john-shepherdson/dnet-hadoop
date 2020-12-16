@@ -130,7 +130,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 						})
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
-				Result r = new Result();
+				R r = (R) ret.getClass().newInstance();
 				r.setId(ret.getId());
 				r.setContext(contextList);
 				ret.mergeFrom(r);

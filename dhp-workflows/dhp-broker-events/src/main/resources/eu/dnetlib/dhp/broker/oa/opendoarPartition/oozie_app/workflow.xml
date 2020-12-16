@@ -1,60 +1,13 @@
-<workflow-app name="create broker events - partial" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="partitionEventsByOpendoarIds" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
         <property>
-            <name>graphInputPath</name>
-            <description>the path where the graph is stored</description>
+            <name>opendoarIds</name>
+            <description>the opendoar IDs whitelist (comma separated)</description>
         </property>
         <property>
-            <name>workingPath</name>
+            <name>outputDir</name>
             <description>the path where the the generated data will be stored</description>
-        </property>
-		<property>
-            <name>datasourceIdWhitelist</name>
-            <value>-</value>
-            <description>a white list (comma separeted, - for empty list) of datasource ids</description>
-        </property>
-		<property>
-            <name>datasourceTypeWhitelist</name>
-            <value>-</value>
-            <description>a white list (comma separeted, - for empty list) of datasource types</description>
-        </property>
-		<property>
-            <name>datasourceIdBlacklist</name>
-            <value>-</value>
-            <description>a black list (comma separeted, - for empty list) of datasource ids</description>
-        </property>
-        <property>
-            <name>esEventIndexName</name>
-            <description>the elasticsearch index name for events</description>
-        </property>
-        <property>
-            <name>esNotificationsIndexName</name>
-            <description>the elasticsearch index name for notifications</description>
-        </property>
-        <property>
-            <name>esIndexHost</name>
-            <description>the elasticsearch host</description>
-        </property>
-        <property>
-        	<name>maxIndexedEventsForDsAndTopic</name>
-        	<description>the max number of events for each couple (ds/topic)</description>
-        </property>
-        <property>
-        	<name>brokerApiBaseUrl</name>
-        	<description>the url of the broker service api</description>
-        </property>
-        <property>
-        	<name>brokerDbUrl</name>
-        	<description>the url of the broker database</description>
-        </property>
-        <property>
-        	<name>brokerDbUser</name>
-        	<description>the user of the broker database</description>
-        </property>
-        <property>
-        	<name>brokerDbPassword</name>
-        	<description>the password of the broker database</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -111,13 +64,13 @@
         </configuration>
     </global>
 
-    <start to="partition"/>
+    <start to="opendoarPartition"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     
-   <action name="partition">
+   <action name="opendoarPartition">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -134,8 +87,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--graphPath</arg><arg>${graphInputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
+            <arg>--opendoarIds</arg><arg>${opendoarIds}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

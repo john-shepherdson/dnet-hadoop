@@ -1,8 +1,8 @@
 [
 	{
-		"paramName": "wp",
-		"paramLongName": "workingPath",
-		"paramDescription": "the working path",
+		"paramName": "o",
+		"paramLongName": "outputDir",
+		"paramDescription": "the path where generated data are stored",
 		"paramRequired": true
 	},
 	{

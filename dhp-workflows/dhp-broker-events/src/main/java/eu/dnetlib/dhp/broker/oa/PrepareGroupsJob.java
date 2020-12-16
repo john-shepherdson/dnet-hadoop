@@ -45,10 +45,10 @@ public class PrepareGroupsJob {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String groupsPath = workingPath + "/duplicates";
+		final String groupsPath = workingDir + "/duplicates";
 		log.info("groupsPath: {}", groupsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -60,10 +60,10 @@ public class PrepareGroupsJob {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_groups");
 
 			final Dataset<OaBrokerMainEntity> results = ClusterUtils
-				.readPath(spark, workingPath + "/joinedEntities_step4", OaBrokerMainEntity.class);
+				.readPath(spark, workingDir + "/joinedEntities_step4", OaBrokerMainEntity.class);
 
 			final Dataset<Relation> mergedRels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
+				.loadRelations(graphPath, spark)
 				.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, Relation>, ResultGroup> aggr = new ResultAggregator()

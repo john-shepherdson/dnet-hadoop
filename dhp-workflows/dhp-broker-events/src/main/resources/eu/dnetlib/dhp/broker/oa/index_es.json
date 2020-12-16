@@ -1,8 +1,8 @@
 [
 	{
 		"paramName": "o",
-		"paramLongName": "workingPath",
-		"paramDescription": "the workinh path",
+		"paramLongName": "outputDir",
+		"paramDescription": "the data path",
 		"paramRequired": true
 	},
 	{
@@ -15,6 +15,30 @@
 		"paramName": "es",
 		"paramLongName": "esHost",
 		"paramDescription": "the ES host",
+		"paramRequired": true
+	},
+	{
+		"paramName": "esBatchWriteRetryCount",
+		"paramLongName": "esBatchWriteRetryCount",
+		"paramDescription": "an ES configuration property",
+		"paramRequired": true
+	},
+	{
+		"paramName": "esBatchWriteRetryWait",
+		"paramLongName": "esBatchWriteRetryWait",
+		"paramDescription": "an ES configuration property",
+		"paramRequired": true
+	},
+	{
+		"paramName": "esBatchSizeEntries",
+		"paramLongName": "esBatchSizeEntries",
+		"paramDescription": "an ES configuration property",
+		"paramRequired": true
+	},
+	{
+		"paramName": "esNodesWanOnly",
+		"paramLongName": "esNodesWanOnly",
+		"paramDescription": "an ES configuration property",
 		"paramRequired": true
 	}
 ]

@@ -200,7 +200,7 @@ case object Crossref2Oaf {
     a.setSurname(family)
     a.setFullname(s"$given $family")
     if (StringUtils.isNotBlank(orcid))
-      a.setPid(List(createSP(orcid, ORCID, PID_TYPES)).asJava)
+      a.setPid(List(createSP(orcid, ORCID_PENDING, PID_TYPES, generateDataInfo())).asJava)
 
     a
   }
@@ -248,7 +248,7 @@ case object Crossref2Oaf {
 
 
     def snsfRule(award:String): String = {
-      var tmp1 = StringUtils.substringAfter(award,"_")
+      val tmp1 = StringUtils.substringAfter(award,"_")
       val tmp2 = StringUtils.substringBefore(tmp1,"/")
       logger.debug(s"From $award to $tmp2")
       tmp2
@@ -294,7 +294,7 @@ case object Crossref2Oaf {
     }
 
     def getProjectId (nsPrefix:String, targetId:String):String = {
-      "40|$nsPrefix::$targetId"
+      s"40|$nsPrefix::$targetId"
     }
 
 
