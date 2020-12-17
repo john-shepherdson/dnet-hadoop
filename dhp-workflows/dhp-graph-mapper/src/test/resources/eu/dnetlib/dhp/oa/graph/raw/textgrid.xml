@@ -6,29 +6,29 @@
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
                 xmlns:dri="http://www.driver-repository.eu/namespace/dri"
                 xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <dri:objIdentifier>r3f52792889d::000051aa1f61d77d2c0b340091f8024e</dri:objIdentifier>
-        <dri:recordIdentifier>textgrid:q9cv.0</dri:recordIdentifier>
-        <dri:dateOfCollection>2020-11-17T09:34:11.128+01:00</dri:dateOfCollection>
+        <dri:objIdentifier>r3f52792889d::00002412cb25f2f3047712d00ab2c8eb</dri:objIdentifier>
+        <dri:recordIdentifier>hdl:11858/00-1734-0000-0003-EE73-2</dri:recordIdentifier>
+        <dri:dateOfCollection>2020-12-16T10:04:03.148Z</dri:dateOfCollection>
         <oaf:datasourceprefix>r3f52792889d</oaf:datasourceprefix>
-        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">textgrid:q9cv.0</identifier>
-        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2012-01-21T13:35:20Z</datestamp>
-        <dr:dateOfTransformation>2020-11-17T19:08:56.703+01:00</dr:dateOfTransformation>
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">textgrid:rn8z.0</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2012-01-29T20:54:12Z</datestamp>
+        <dr:dateOfTransformation>2020-12-16T16:02:37.562Z</dr:dateOfTransformation>
     </oai:header>
     <metadata>
         <datacite:resource xmlns="http://www.openarchives.org/OAI/2.0/"
                            xmlns:dc="http://purl.org/dc/elements/1.1/"
                            xmlns:dri="http://www.driver-repository.eu/namespace/dri"
                            xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <datacite:identifier identifierType="Handle">hdl:11858/00-1734-0000-0003-7664-F</datacite:identifier>
+            <datacite:identifier identifierType="Handle">hdl:11858/00-1734-0000-0003-EE73-2</datacite:identifier>
             <datacite:creators>
                 <datacite:creator>
-                    <datacite:creatorName>Hoffmann von Fallersleben, August Heinrich</datacite:creatorName>
-                    <datacite:nameIdentifier nameIdentifierScheme="pnd" schemeURI="https://de.dariah.eu/pnd-service">118552589</datacite:nameIdentifier>
+                    <datacite:creatorName>Liliencron, Detlev von</datacite:creatorName>
+                    <datacite:nameIdentifier nameIdentifierScheme="pnd" schemeURI="https://ref.de.dariah.eu/pndsearch/pndquery.xql?id=">118572954</datacite:nameIdentifier>
                 </datacite:creator>
             </datacite:creators>
             <datacite:titles>
-                <datacite:title titleType="Other">Mailied</datacite:title>
-                <datacite:title titleType="Other">August Heinrich Hoffmann von Fallersleben: Unpolitische Lieder von Hoffmann von Fallersleben, 1. + 2. Theil, 1. Theil, Hamburg: Hoffmann und Campe, 1841.</datacite:title>
+                <datacite:title titleType="Other">Auf dem Trocknen</datacite:title>
+                <datacite:title titleType="Other">Detlev von Liliencron: Gute Nacht. Hinterlassene Gedichte, Berlin: Schuster &amp; Loeffler, 1909.</datacite:title>
             </datacite:titles>
             <datacite:publisher>TextGrid</datacite:publisher>
             <datacite:publicationYear>2012</datacite:publicationYear>
@@ -38,21 +38,21 @@
                 </datacite:contributor>
                 <datacite:contributor contributorType="Other">
                     <datacite:contributorName>Digitale Bibliothek</datacite:contributorName>
-                    <datacite:nameIdentifier nameIdentifierScheme="textgrid">TGPR-372fe6dc-57f2-6cd4-01b5-2c4bbefcfd3c</datacite:nameIdentifier>
+                    <datacite:nameIdentifier nameIdentifierScheme="textgrid" schemeURI="http://www.textgridlab.org/schema/textgrid-metadata_2010.xsd">TGPR-372fe6dc-57f2-6cd4-01b5-2c4bbefcfd3c</datacite:nameIdentifier>
                 </datacite:contributor>
             </datacite:contributors>
             <datacite:dates>
-                <datacite:date dateType="Created">2012-01-21T13:35:20Z</datacite:date>
-                <datacite:date dateType="Issued">2012-01-21T13:35:20Z</datacite:date>
-                <datacite:date dateType="Updated">2012-01-21T13:35:20Z</datacite:date>
+                <datacite:date dateType="Created">2012-01-29T20:54:12Z</datacite:date>
+                <datacite:date dateType="Issued">2012-01-29T20:54:12Z</datacite:date>
+                <datacite:date dateType="Updated">2012-01-29T20:54:12Z</datacite:date>
             </datacite:dates>
             <datacite:resourceType resourceTypeGeneral="Dataset"/>
             <alternateIdentifiers xmlns="http://datacite.org/schema/kernel-3">
-                <datacite:alternateIdentifier alternateIdentifierType="URI" xmlns="http://www.openarchives.org/OAI/2.0/">textgrid:q9cv.0</datacite:alternateIdentifier>
-                <alternateIdentifier alternateIdentifierType="URL">http://hdl.handle.net/hdl:11858/00-1734-0000-0003-7664-F</alternateIdentifier>
+                <datacite:alternateIdentifier alternateIdentifierType="URI" xmlns="http://www.openarchives.org/OAI/2.0/">textgrid:rn8z.0</datacite:alternateIdentifier>
+                <alternateIdentifier alternateIdentifierType="URL">http://hdl.handle.net/hdl:11858/00-1734-0000-0003-EE73-2</alternateIdentifier>
             </alternateIdentifiers>
             <datacite:relatedIdentifiers>
-                <datacite:relatedIdentifier relatedIdentifierType="Handle" relationType="IsPartOf">hdl:11858/00-1734-0000-0003-7666-B</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="Handle" relationType="IsPartOf">hdl:11858/00-1734-0000-0003-EE72-4</datacite:relatedIdentifier>
             </datacite:relatedIdentifiers>
             <datacite:sizes>
                 <datacite:size>527 Bytes</datacite:size>
@@ -77,17 +77,18 @@
             <datacite:geoLocations>
                 <datacite:geoLocation>
                     <datacite:geoLocationPlace
-                            xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Hamburg</datacite:geoLocationPlace>
+                            xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">Berlin</datacite:geoLocationPlace>
                 </datacite:geoLocation>
             </datacite:geoLocations>
         </datacite:resource>
-        <oaf:identifier identifierType="handle">hdl:11858/00-1734-0000-0003-7664-F</oaf:identifier>
+        <oaf:identifier identifierType="handle">hdl:11858/00-1734-0000-0003-EE73-2</oaf:identifier>
         <dr:CobjCategory type="dataset">0021</dr:CobjCategory>
         <oaf:refereed>0002</oaf:refereed>
-        <oaf:dateAccepted>2012-01-21</oaf:dateAccepted>
+        <oaf:dateAccepted>2012-01-29</oaf:dateAccepted>
         <oaf:accessrights>OPEN</oaf:accessrights>
         <oaf:license>http://creativecommons.org/licenses/by/3.0/de/legalcode</oaf:license>
         <oaf:language>und</oaf:language>
+        <oaf:country>DE</oaf:country>
         <oaf:hostedBy id="re3data_____::r3d100011365" name="TextGrid Repository"/>
         <oaf:collectedFrom id="re3data_____::r3d100011365" name="TextGrid Repository"/>
     </metadata>
@@ -95,11 +96,11 @@
            xmlns:dri="http://www.driver-repository.eu/namespace/dri"
            xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
-            <originDescription altered="true" harvestDate="2020-11-17T09:34:11.128+01:00">
+            <originDescription altered="true" harvestDate="2020-12-16T10:04:03.148Z">
                 <baseURL>https%3A%2F%2Fdev.textgridlab.org%2F1.0%2Ftgoaipmh%2Foai</baseURL>
-                <identifier>textgrid:q9cv.0</identifier>
-                <datestamp>2012-01-21T13:35:20Z</datestamp>
-                <metadataNamespace>http://schema.datacite.org/oai/oai-1.0/</metadataNamespace>
+                <identifier>textgrid:rn8z.0</identifier>
+                <datestamp>2012-01-29T20:54:12Z</datestamp>
+                <metadataNamespace/>
             </originDescription>
         </provenance>
         <oaf:datainfo>
@@ -107,9 +108,10 @@
             <oaf:deletedbyinference>false</oaf:deletedbyinference>
             <oaf:trust>0.9</oaf:trust>
             <oaf:inferenceprovenance/>
-            <oaf:provenanceaction classid="sysimport:crosswalk"
-                                  classname="sysimport:crosswalk"
+            <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+                                  classname="sysimport:crosswalk:datasetarchive"
                                   schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
         </oaf:datainfo>
     </about>
 </record>
+
