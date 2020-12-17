@@ -9,8 +9,8 @@ import java.util.List;
  */
 
 public class BipScore implements Serializable {
-	private String id; //doi
-	private List<Score> scoreList; //unit as given in the inputfile
+	private String id; // doi
+	private List<Score> scoreList; // unit as given in the inputfile
 
 	public String getId() {
 		return id;
