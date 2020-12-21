@@ -16,7 +16,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class CleaningFunctions {
 
 	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
-	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
+	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 
 	public static final Set<String> PID_BLACKLIST = new HashSet<>();
@@ -211,14 +211,31 @@ public class CleaningFunctions {
 													.map(Qualifier::getClassid)
 													.orElse(""))
 											.orElse("");
-										if (pidProvenance.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
-											p.getQualifier().setClassid(ModelConstants.ORCID);
-										} else {
-											p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+										if (p
+											.getQualifier()
+											.getClassid()
+											.toLowerCase()
+											.contains(ModelConstants.ORCID)) {
+											if (pidProvenance
+												.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+												p.getQualifier().setClassid(ModelConstants.ORCID);
+											} else {
+												p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+											}
+											final String orcid = p
+												.getValue()
+												.trim()
+												.toLowerCase()
+												.replaceAll(ORCID_CLEANING_REGEX, "$1-$2-$3-$4");
+											if (orcid.length() == 19) {
+												p.setValue(orcid);
+											} else {
+												p.setValue("");
+											}
 										}
-										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
 										return p;
 									})
+									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.collect(
 										Collectors
 											.toMap(
