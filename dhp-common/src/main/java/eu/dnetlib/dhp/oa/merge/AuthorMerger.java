@@ -73,7 +73,7 @@ public class AuthorMerger {
 		if (base == null || enrich == null)
 			return;
 
-		//<pidComparableString, Author> (if an Author has more than 1 pid, it appears 2 times in the list)
+		// <pidComparableString, Author> (if an Author has more than 1 pid, it appears 2 times in the list)
 		final Map<String, Author> basePidAuthorMap = base
 			.stream()
 			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
@@ -84,7 +84,7 @@ public class AuthorMerger {
 					.map(p -> new Tuple2<>(pidToComparableString(p), a)))
 			.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
-		//<pid, Author> (list of pid that are missing in the other list)
+		// <pid, Author> (list of pid that are missing in the other list)
 		final List<Tuple2<StructuredProperty, Author>> pidToEnrich = enrich
 			.stream()
 			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
@@ -95,7 +95,6 @@ public class AuthorMerger {
 					.filter(p -> !basePidAuthorMap.containsKey(pidToComparableString(p)))
 					.map(p -> new Tuple2<>(p, a)))
 			.collect(Collectors.toList());
-
 
 		pidToEnrich
 			.forEach(
