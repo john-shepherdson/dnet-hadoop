@@ -22,9 +22,9 @@ import scala.Tuple2;
 
 public class AuthorMergerTest {
 
-	String publicationsBasePath;
+	private String publicationsBasePath;
 
-	List<List<Author>> authors;
+	private List<List<Author>> authors;
 
 	@BeforeEach
 	public void setUp() throws Exception {

@@ -52,21 +52,7 @@ public class AuthorMerger {
 	}
 
 	public static List<Author> mergeAuthor(final List<Author> a, final List<Author> b) {
-		int pa = countAuthorsPids(a);
-		int pb = countAuthorsPids(b);
-		List<Author> base, enrich;
-		int sa = authorsSize(a);
-		int sb = authorsSize(b);
-
-		if (sa == sb) {
-			base = pa > pb ? a : b;
-			enrich = pa > pb ? b : a;
-		} else {
-			base = sa > sb ? a : b;
-			enrich = sa > sb ? b : a;
-		}
-		enrichPidFromList(base, enrich, THRESHOLD);
-		return base;
+		return mergeAuthor(a, b, THRESHOLD);
 	}
 
 	private static void enrichPidFromList(List<Author> base, List<Author> enrich, Double threshold) {
