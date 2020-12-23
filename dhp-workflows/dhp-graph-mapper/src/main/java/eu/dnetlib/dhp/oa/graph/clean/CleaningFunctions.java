@@ -89,7 +89,7 @@ public class CleaningFunctions {
 		} else if (value instanceof Organization) {
 			Organization o = (Organization) value;
 			if (Objects.isNull(o.getCountry()) || StringUtils.isBlank(o.getCountry().getClassid())) {
-				o.setCountry(qualifier(ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_COUNTRY_TYPE));
+				o.setCountry(ModelConstants.UNKNOWN_COUNTRY);
 			}
 		} else if (value instanceof Relation) {
 			// nothing to clean here

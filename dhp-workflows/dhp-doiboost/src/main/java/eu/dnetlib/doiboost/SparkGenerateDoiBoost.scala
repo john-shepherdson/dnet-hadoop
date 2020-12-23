@@ -2,6 +2,7 @@ package eu.dnetlib.doiboost
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.oa.merge.AuthorMerger
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Organization, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.doiboost.mag.ConversionUtil
 import org.apache.commons.io.IOUtils
@@ -132,7 +133,7 @@ object SparkGenerateDoiBoost {
           o.setLegalname(DoiBoostMappingUtil.asField(affiliation.DisplayName.get))
         if (affiliation.OfficialPage.isDefined)
           o.setWebsiteurl(DoiBoostMappingUtil.asField(affiliation.OfficialPage.get))
-        o.setCountry(DoiBoostMappingUtil.getUnknownCountry())
+        o.setCountry(ModelConstants.UNKNOWN_COUNTRY)
         o
       }
       else

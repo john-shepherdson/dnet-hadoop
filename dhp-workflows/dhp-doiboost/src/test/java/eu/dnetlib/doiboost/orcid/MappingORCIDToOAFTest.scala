@@ -1,9 +1,9 @@
 package eu.dnetlib.doiboost.orcid
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.oaf.Publication
 import eu.dnetlib.doiboost.orcid.SparkConvertORCIDToOAF.getClass
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
-import org.codehaus.jackson.map.ObjectMapper
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
