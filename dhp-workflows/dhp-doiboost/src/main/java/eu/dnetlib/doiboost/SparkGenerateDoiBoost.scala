@@ -31,7 +31,7 @@ object SparkGenerateDoiBoost {
     import spark.implicits._
 
     val hostedByMapPath = parser.get("hostedByMapPath")
-    val workingDirPath = parser.get("workingDirPath")
+    val workingDirPath = parser.get("workingPath")
 
 
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]

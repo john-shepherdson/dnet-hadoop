@@ -11,7 +11,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 
-object SparkPreProcessMAG {
+object SparkProcessMAG {
   def main(args: Array[String]): Unit = {
 
     val logger: Logger = LoggerFactory.getLogger(getClass)
