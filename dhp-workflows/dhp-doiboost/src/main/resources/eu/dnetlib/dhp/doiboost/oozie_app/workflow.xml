@@ -309,7 +309,7 @@
             <arg>--dbDatasetPath</arg><arg>${workingPath}/crossrefDataset</arg>
             <arg>--crossRefRelation</arg><arg>${workingPath}/crossrefRelation</arg>
             <arg>--dbaffiliationRelationPath</arg><arg>${workingPath}/doiBoostPublicationAffiliation</arg>
-            <arg>-do</arg><arg>${workingPath}/doiBoostOrganization</arg>
+            <arg>--dbOrganizationPath</arg><arg>${workingPath}/doiBoostOrganization</arg>
             <arg>--targetPath</arg><arg>${workingPath}/actionDataSet</arg>
             <arg>--sFilePath</arg><arg>${outputPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
