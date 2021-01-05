@@ -6,5 +6,5 @@
   {"paramName": "da",   "paramLongName":"dbaffiliationRelationPath",        "paramDescription": "the MAG Publication Path",        "paramRequired": true},
   {"paramName": "do",   "paramLongName":"dbOrganizationPath",               "paramDescription": "the MAG Publication Path",        "paramRequired": true},
   {"paramName": "w",    "paramLongName":"targetPath",                       "paramDescription": "the Working Path",                "paramRequired": true},
-  {"paramName": "sp",    "paramLongName":"sFilePath",                       "paramDescription": "the Sequence file Path",          "paramRequired": true},
+  {"paramName": "sp",    "paramLongName":"sFilePath",                       "paramDescription": "the Sequence file Path",          "paramRequired": true}
 ]
