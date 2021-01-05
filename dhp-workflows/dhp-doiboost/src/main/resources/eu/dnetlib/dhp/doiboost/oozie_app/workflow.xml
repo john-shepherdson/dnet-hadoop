@@ -36,7 +36,6 @@
 
 
         <!-- Crossref Parameters -->
-
         <property>
             <name>inputPathCrossref</name>
             <description>the Crossref input path</description>
@@ -44,6 +43,14 @@
         <property>
             <name>crossrefTimestamp</name>
             <description>Timestamp for the Crossref incremental Harvesting</description>
+        </property>
+        <property>
+            <name>esServer</name>
+            <description>elasticsearch server url for the Crossref Harvesting</description>
+        </property>
+        <property>
+            <name>esIndex</name>
+            <description>elasticsearch index name for the Crossref Harvesting</description>
         </property>
 
         <!--    MAG Parameters    -->
@@ -65,10 +72,18 @@
             <description>the ORCID working path</description>
         </property>
 
-
-
-
     </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
 
     <start to="resume_from"/>
 
@@ -85,20 +100,18 @@
         </switch>
     </decision>
 
-
-
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
     <action name="ImportCrossRef">
         <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.doiboost.crossref.CrossrefImporter</main-class>
-            <arg>-t</arg><arg>${inputPathCrossref}/index_update</arg>
-            <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-ts</arg><arg>${timestamp}</arg>
+            <arg>--targetPath</arg><arg>${inputPathCrossref}/index_update</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--esServer</arg><arg>${esServer}</arg>
+            <arg>--esIndex</arg><arg>${esIndex}</arg>
+            <arg>--timestamp</arg><arg>${crossrefTimestamp}</arg>
         </java>
         <ok to="GenerateCrossrefDataset"/>
         <error to="Kill"/>
