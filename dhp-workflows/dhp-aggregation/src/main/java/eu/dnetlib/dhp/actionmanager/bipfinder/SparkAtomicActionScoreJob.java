@@ -126,7 +126,7 @@ public class SparkAtomicActionScoreJob implements Serializable {
 			}, Encoders.bean(BipScore.class))
 			.groupByKey((MapFunction<BipScore, String>) value -> value.getId(), Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, BipScore, I>) (k, it) -> {
-				Result ret = inputClazz.newInstance();
+				Result ret = new Result();
 				BipScore first = it.next();
 				ret.setId(first.getId());
 
