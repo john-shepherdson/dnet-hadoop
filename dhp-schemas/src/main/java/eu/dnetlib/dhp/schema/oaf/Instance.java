@@ -21,6 +21,8 @@ public class Instance implements Serializable {
 
 	private KeyValue collectedfrom;
 
+	private List<StructuredProperty> pid;
+
 	private Field<String> dateofacceptance;
 
 	// ( article | book ) processing charges. Defined here to cope with possible wrongly typed
@@ -87,6 +89,14 @@ public class Instance implements Serializable {
 
 	public void setCollectedfrom(KeyValue collectedfrom) {
 		this.collectedfrom = collectedfrom;
+	}
+
+	public List<StructuredProperty> getPid() {
+		return pid;
+	}
+
+	public void setPid(List<StructuredProperty> pid) {
+		this.pid = pid;
 	}
 
 	public Field<String> getDateofacceptance() {
