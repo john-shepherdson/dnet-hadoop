@@ -102,10 +102,11 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
+		instance.setPid(prepareResultPids(doc, info));
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
-			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
+			.setAccessright(prepareAccessRight(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
 		instance.setRefereed(prepareQualifier(doc, "//oaf:refereed", DNET_REVIEW_LEVELS));
 		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
@@ -150,14 +151,20 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//datacite:date")) {
 			final String dateType = ((Node) o).valueOf("@dateType");
 			if (StringUtils.isBlank(dateType)
-				&& !dateType.equalsIgnoreCase("Accepted")
-				&& !dateType.equalsIgnoreCase("Issued")
-				&& !dateType.equalsIgnoreCase("Updated")
-				&& !dateType.equalsIgnoreCase("Available")) {
+				|| (!dateType.equalsIgnoreCase("Accepted")
+					&& !dateType.equalsIgnoreCase("Issued")
+					&& !dateType.equalsIgnoreCase("Updated")
+					&& !dateType.equalsIgnoreCase("Available"))) {
 				res
 					.add(
 						structuredProperty(
-							((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATA_CITE_DATE, DNET_DATA_CITE_DATE,
+							((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATACITE_DATE, DNET_DATACITE_DATE,
+							info));
+			} else {
+				res
+					.add(
+						structuredProperty(
+							((Node) o).getText(), dateType, dateType, DNET_DATACITE_DATE, DNET_DATACITE_DATE,
 							info));
 			}
 		}
@@ -186,13 +193,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//datacite:description[@descriptionType='Abstract']", info)
-			.stream()
-			.map(d -> {
-				d.setValue(StringUtils.left(d.getValue(), ModelHardLimits.MAX_ABSTRACT_LENGTH));
-				return d;
-			})
-			.collect(Collectors.toList());
+		return prepareListFields(doc, "//datacite:description[@descriptionType='Abstract']", info);
 	}
 
 	@Override

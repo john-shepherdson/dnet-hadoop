@@ -258,7 +258,7 @@ object DLIToOAF {
     result.setDateofacceptance(asField(inputPublication.getRelevantdate.get(0).getValue))
     result.setPublisher(inputPublication.getPublisher)
     result.setSource(inputPublication.getSource)
-    result.setBestaccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    result.setBestaccessright(createAccessRight("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
 
     val dois = result.getPid.asScala.filter(p => "doi".equalsIgnoreCase(p.getQualifier.getClassname)).map(p => p.getValue)
     if (dois.isEmpty)
@@ -337,7 +337,7 @@ object DLIToOAF {
     result.setDateofacceptance(asField(d.getRelevantdate.get(0).getValue))
     result.setPublisher(d.getPublisher)
     result.setSource(d.getSource)
-    result.setBestaccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    result.setBestaccessright(createAccessRight("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
 
 
     val instance_urls = if (fpids.head.length < 5) s"https://www.rcsb.org/structure/${fpids.head}" else s"https://dx.doi.org/${fpids.head}"
@@ -373,7 +373,7 @@ object DLIToOAF {
     if (originalInstance != null && originalInstance.getHostedby != null)
       i.setHostedby(originalInstance.getHostedby)
 
-    i.setAccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    i.setAccessright(createAccessRight("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
     i.setDateofacceptance(doa)
 
     i

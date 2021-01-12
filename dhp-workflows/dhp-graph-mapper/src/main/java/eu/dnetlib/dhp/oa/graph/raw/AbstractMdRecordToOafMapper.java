@@ -4,7 +4,13 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -15,7 +21,7 @@ import org.dom4j.Node;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.LicenseComparator;
+import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -416,6 +422,20 @@ public abstract class AbstractMdRecordToOafMapper {
 		}
 		return doc.valueOf("//*[local-name()='header']/*[local-name()='identifier']");
 
+	}
+
+	protected AccessRight prepareAccessRight(final Node node, final String xpath, final String schemeId) {
+		Qualifier qualifier = prepareQualifier(node.valueOf(xpath).trim(), schemeId);
+		AccessRight accessRight = new AccessRight();
+		accessRight.setClassid(qualifier.getClassid());
+		accessRight.setClassname(qualifier.getClassname());
+		accessRight.setSchemeid(qualifier.getSchemeid());
+		accessRight.setSchemename(qualifier.getSchemename());
+
+		// TODO set the OAStatus
+		// accessRight.setOaStatus(...);
+
+		return accessRight;
 	}
 
 	protected Qualifier prepareQualifier(final Node node, final String xpath, final String schemeId) {

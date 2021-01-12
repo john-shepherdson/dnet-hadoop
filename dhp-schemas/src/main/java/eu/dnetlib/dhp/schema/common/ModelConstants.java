@@ -20,7 +20,8 @@ public class ModelConstants {
 	public static final String DNET_ACCESS_MODES = "dnet:access_modes";
 	public static final String DNET_LANGUAGES = "dnet:languages";
 	public static final String DNET_PID_TYPES = "dnet:pid_types";
-	public static final String DNET_DATA_CITE_DATE = "dnet:dataCite_date";
+	public static final String DNET_DATACITE_DATE = "dnet:dataCite_date";
+	public static final String DNET_DATACITE_TITLE = "dnet:dataCite_title";
 	public static final String DNET_DATA_CITE_RESOURCE = "dnet:dataCite_resource";
 	public static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
 	public static final String DNET_COUNTRY_TYPE = "dnet:countries";

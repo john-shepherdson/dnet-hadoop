@@ -3,12 +3,13 @@ package eu.dnetlib.dhp.schema.common;
 
 import java.util.Comparator;
 
+import eu.dnetlib.dhp.schema.oaf.AccessRight;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
-public class LicenseComparator implements Comparator<Qualifier> {
+public class AccessRightComparator<T extends Qualifier> implements Comparator<T> {
 
 	@Override
-	public int compare(Qualifier left, Qualifier right) {
+	public int compare(T left, T right) {
 
 		if (left == null && right == null)
 			return 0;

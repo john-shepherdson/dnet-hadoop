@@ -84,7 +84,7 @@ public class CleaningFunctions {
 		} else if (value instanceof Organization) {
 			Organization o = (Organization) value;
 			if (Objects.isNull(o.getCountry()) || StringUtils.isBlank(o.getCountry().getClassid())) {
-				o.setCountry(qualifier("UNKNOWN", "Unknown", ModelConstants.DNET_COUNTRY_TYPE));
+				o.setCountry(ModelConstants.UNKNOWN_COUNTRY);
 			}
 		} else if (value instanceof Relation) {
 			// nothing to clean here
@@ -152,12 +152,14 @@ public class CleaningFunctions {
 			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
 				r
 					.setResourcetype(
-						qualifier("UNKNOWN", "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
+						qualifier(ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
 			}
 			if (Objects.nonNull(r.getInstance())) {
 				for (Instance i : r.getInstance()) {
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
-						i.setAccessright(qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
+						i
+							.setAccessright(
+								accessRight(ModelConstants.UNKNOWN, "not available", ModelConstants.DNET_ACCESS_MODES));
 					}
 					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
 						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
@@ -203,6 +205,7 @@ public class CleaningFunctions {
 										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
 										return p;
 									})
+									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.collect(
 										Collectors
 											.toMap(
@@ -248,33 +251,16 @@ public class CleaningFunctions {
 		}
 	}
 
+	private static AccessRight accessRight(String classid, String classname, String scheme) {
+		return OafMapperUtils
+			.accessRight(
+				classid, classname, scheme, scheme);
+	}
+
 	private static Qualifier qualifier(String classid, String classname, String scheme) {
 		return OafMapperUtils
 			.qualifier(
 				classid, classname, scheme, scheme);
-	}
-
-	/**
-	 * Utility method that filter PID values on a per-type basis.
-	 * @param pid the PID whose value will be checked.
-	 * @return true the PID containing the normalised value.
-	 */
-	private static boolean filterPid(StructuredProperty pid) {
-		String value = Optional
-			.ofNullable(pid.getValue())
-			.map(s -> StringUtils.replaceAll(s, "\\s", ""))
-			.orElse("");
-		if (StringUtils.isBlank(value)) {
-			return false;
-		}
-		switch (pid.getQualifier().getClassid()) {
-
-			// TODO add cleaning for more PID types as needed
-			case "doi":
-				return value.startsWith("10.");
-			default:
-				return true;
-		}
 	}
 
 	/**
@@ -291,7 +277,7 @@ public class CleaningFunctions {
 
 			// TODO add cleaning for more PID types as needed
 			case "doi":
-				pid.setValue(value.toLowerCase().replaceAll(DOI_PREFIX_REGEX, "10."));
+				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX_REGEX, ""));
 				break;
 		}
 		return pid;

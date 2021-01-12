@@ -15,6 +15,8 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
 
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils;
+
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
 case class mappingAffiliation(name: String) {}
@@ -179,14 +181,14 @@ case object Crossref2Oaf {
 
     if(has_review != JNothing) {
       instance.setRefereed(
-        createQualifier("0001", "peerReviewed", "dnet:review_levels", "dnet:review_levels"))
+        OafUtils.createQualifier("0001", "peerReviewed", "dnet:review_levels", "dnet:review_levels"))
     }
 
 
     instance.setAccessright(getRestrictedQualifier())
     result.setInstance(List(instance).asJava)
-    instance.setInstancetype(createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
-    result.setResourcetype(createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
+    instance.setInstancetype(OafUtils.createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
+    result.setResourcetype(OafUtils.createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {

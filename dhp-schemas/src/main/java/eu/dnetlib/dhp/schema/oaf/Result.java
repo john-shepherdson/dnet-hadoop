@@ -2,12 +2,11 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.LicenseComparator;
+import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 
 public class Result extends OafEntity implements Serializable {
 
@@ -248,7 +247,7 @@ public class Result extends OafEntity implements Serializable {
 		instance = mergeLists(instance, r.getInstance());
 
 		if (r.getBestaccessright() != null
-			&& new LicenseComparator().compare(r.getBestaccessright(), bestaccessright) < 0)
+			&& new AccessRightComparator().compare(r.getBestaccessright(), bestaccessright) < 0)
 			bestaccessright = r.getBestaccessright();
 
 		if (r.getResulttype() != null && compareTrust(this, r) < 0)

@@ -105,6 +105,29 @@ public class OafMapperUtils {
 		return qualifier("UNKNOWN", "Unknown", schemeid, schemename);
 	}
 
+	public static AccessRight accessRight(
+		final String classid,
+		final String classname,
+		final String schemeid,
+		final String schemename) {
+		return accessRight(classid, classname, schemeid, schemename, null);
+	}
+
+	public static AccessRight accessRight(
+		final String classid,
+		final String classname,
+		final String schemeid,
+		final String schemename,
+		final OAStatus oaStatus) {
+		final AccessRight accessRight = new AccessRight();
+		accessRight.setClassid(classid);
+		accessRight.setClassname(classname);
+		accessRight.setSchemeid(schemeid);
+		accessRight.setSchemename(schemename);
+		accessRight.setOaStatus(oaStatus);
+		return accessRight;
+	}
+
 	public static Qualifier qualifier(
 		final String classid,
 		final String classname,

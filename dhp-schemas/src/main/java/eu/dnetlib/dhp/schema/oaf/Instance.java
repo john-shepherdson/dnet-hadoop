@@ -8,7 +8,7 @@ public class Instance implements Serializable {
 
 	private Field<String> license;
 
-	private Qualifier accessright;
+	private AccessRight accessright;
 
 	private Qualifier instancetype;
 
@@ -41,11 +41,11 @@ public class Instance implements Serializable {
 		this.license = license;
 	}
 
-	public Qualifier getAccessright() {
+	public AccessRight getAccessright() {
 		return accessright;
 	}
 
-	public void setAccessright(Qualifier accessright) {
+	public void setAccessright(AccessRight accessright) {
 		this.accessright = accessright;
 	}
 

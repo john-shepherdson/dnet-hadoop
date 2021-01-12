@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.schema.scholexplorer
 
-import eu.dnetlib.dhp.schema.oaf.{DataInfo, Field, KeyValue, Qualifier, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{AccessRight, DataInfo, Field, KeyValue, Qualifier, StructuredProperty}
 
 object OafUtils {
 
@@ -37,6 +37,15 @@ object OafUtils {
     q.setSchemeid(schemeId)
     q.setSchemename(schemeName)
     q
+  }
+
+  def createAccessRight(classId: String, className: String, schemeId: String, schemeName: String): AccessRight = {
+    val accessRight: AccessRight = new AccessRight
+    accessRight.setClassid(classId)
+    accessRight.setClassname(className)
+    accessRight.setSchemeid(schemeId)
+    accessRight.setSchemename(schemeName)
+    accessRight
   }
 
 
