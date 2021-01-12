@@ -56,6 +56,9 @@ object UnpayWallToOAF {
     i.setAccessright(getOpenAccessQualifier())
     i.setUrl(List(oaLocation.url.get).asJava)
 
+    // Ticket #6281 added pid to Instance
+    i.setPid(pub.getPid.asScala.filter(p => p.getQualifier.getClassid.equalsIgnoreCase("doi")).asJava)
+
     if (oaLocation.license.isDefined)
       i.setLicense(asField(oaLocation.license.get))
     pub.setInstance(List(i).asJava)
