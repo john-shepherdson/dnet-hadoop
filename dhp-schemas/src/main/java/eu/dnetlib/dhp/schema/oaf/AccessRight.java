@@ -8,20 +8,20 @@ import java.util.Optional;
  */
 public class AccessRight extends Qualifier {
 
-	private OAStatus oaStatus;
+	private OpenAccessRoute openAccessRoute;
 
-	public OAStatus getOaStatus() {
-		return oaStatus;
+	public OpenAccessRoute getOpenAccessRoute() {
+		return openAccessRoute;
 	}
 
-	public void setOaStatus(OAStatus oaStatus) {
-		this.oaStatus = oaStatus;
+	public void setOpenAccessRoute(OpenAccessRoute openAccessRoute) {
+		this.openAccessRoute = openAccessRoute;
 	}
 
 	public String toComparableString() {
 		String s = super.toComparableString();
 		return Optional
-			.ofNullable(getOaStatus())
+			.ofNullable(getOpenAccessRoute())
 			.map(x -> s + "::" + x.toString())
 			.orElse(s);
 	}

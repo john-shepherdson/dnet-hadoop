@@ -6,7 +6,7 @@ package eu.dnetlib.dhp.schema.oaf;
  *
  * https://support.unpaywall.org/support/solutions/articles/44001777288-what-do-the-types-of-oa-status-green-gold-hybrid-and-bronze-mean-
  */
-public enum OAStatus {
+public enum OpenAccessRoute {
 
 	gold, green, hybrid, bronze
 

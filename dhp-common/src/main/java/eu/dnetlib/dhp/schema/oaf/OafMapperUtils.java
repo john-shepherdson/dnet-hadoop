@@ -118,13 +118,13 @@ public class OafMapperUtils {
 		final String classname,
 		final String schemeid,
 		final String schemename,
-		final OAStatus oaStatus) {
+		final OpenAccessRoute openAccessRoute) {
 		final AccessRight accessRight = new AccessRight();
 		accessRight.setClassid(classid);
 		accessRight.setClassname(classname);
 		accessRight.setSchemeid(schemeid);
 		accessRight.setSchemename(schemename);
-		accessRight.setOaStatus(oaStatus);
+		accessRight.setOpenAccessRoute(openAccessRoute);
 		return accessRight;
 	}
 
