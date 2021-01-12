@@ -343,6 +343,9 @@ object DLIToOAF {
     val instance_urls = if (fpids.head.length < 5) s"https://www.rcsb.org/structure/${fpids.head}" else s"https://dx.doi.org/${fpids.head}"
 
     val i: Instance = createInstance(instance_urls, firstInstanceOrNull(d.getInstance()), result.getDateofacceptance, true)
+
+    // Ticket #6281 added pid to Instance
+    i.setPid(result.getPid)
     if (i != null)
       result.setInstance(List(i).asJava)
 
