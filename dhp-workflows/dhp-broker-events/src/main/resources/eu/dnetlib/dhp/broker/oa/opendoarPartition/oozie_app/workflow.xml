@@ -6,7 +6,7 @@
             <description>the opendoar IDs whitelist (comma separated)</description>
         </property>
         <property>
-            <name>workingPath</name>
+            <name>outputDir</name>
             <description>the path where the the generated data will be stored</description>
         </property>
         <property>
