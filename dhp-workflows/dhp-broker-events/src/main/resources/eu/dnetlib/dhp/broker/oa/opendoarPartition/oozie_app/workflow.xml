@@ -6,7 +6,7 @@
             <description>the opendoar IDs whitelist (comma separated)</description>
         </property>
         <property>
-            <name>outputDir</name>
+            <name>workingPath</name>
             <description>the path where the the generated data will be stored</description>
         </property>
         <property>
@@ -87,7 +87,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--outputDir</arg><arg>${outputDir}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--opendoarIds</arg><arg>${opendoarIds}</arg>
         </spark>
         <ok to="End"/>
