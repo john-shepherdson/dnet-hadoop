@@ -36,7 +36,7 @@ import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 public class PartitionEventsByDsIdJob {
 
 	private static final Logger log = LoggerFactory.getLogger(PartitionEventsByDsIdJob.class);
-	private static final String OPENDOAR_NSPREFIX = "10|opendoar____::";
+	private static final String OPENDOAR_NSPREFIX = "opendoar____::";
 
 	public static void main(final String[] args) throws Exception {
 
@@ -123,6 +123,7 @@ public class PartitionEventsByDsIdJob {
 
 		final ShortEventMessageWithGroupId res = new ShortEventMessageWithGroupId();
 
+		res.setEventId(e.getEventId());
 		res.setOriginalId(payload.getResult().getOriginalId());
 		res.setTitle(payload.getResult().getTitles().stream().filter(StringUtils::isNotBlank).findFirst().orElse(null));
 		res.setTopic(e.getTopic());
