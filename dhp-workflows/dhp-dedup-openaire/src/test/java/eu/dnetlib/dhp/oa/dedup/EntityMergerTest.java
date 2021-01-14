@@ -10,9 +10,10 @@ import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.*;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -100,8 +101,8 @@ public class EntityMergerTest implements Serializable {
 		assertEquals(pub_merged.getDateofacceptance().getValue(), "2018-09-30");
 
 		// verify authors
-		assertEquals(pub_merged.getAuthor().size(), 9);
-		assertEquals(AuthorMerger.countAuthorsPids(pub_merged.getAuthor()), 4);
+		assertEquals(13, pub_merged.getAuthor().size());
+		assertEquals(4, AuthorMerger.countAuthorsPids(pub_merged.getAuthor()));
 
 		// verify title
 		int count = 0;

@@ -87,7 +87,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
             <arg>--opendoarIds</arg><arg>${opendoarIds}</arg>
         </spark>
         <ok to="End"/>
