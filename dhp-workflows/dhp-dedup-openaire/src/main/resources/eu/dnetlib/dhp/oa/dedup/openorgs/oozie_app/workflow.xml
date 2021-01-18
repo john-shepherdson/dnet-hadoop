@@ -93,13 +93,12 @@
         <error to="Kill"/>
     </action>
 
-    <!--extract simrels from relations and copy into the organization_simrel-->
-    <action name="copySimRels">
+    <action name="CopySimRels">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Copy Similarity Relations</name>
-            <class>eu.dnetlib.dhp.oa.dedup.SparkCopySimRels</class>
+            <name>Copy Merge Relations</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCopyRels</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -113,64 +112,10 @@
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--entityType</arg><arg>organization</arg>
+            <arg>--destination</arg><arg>simrel</arg>
             <arg>--numPartitions</arg><arg>8000</arg>
-        </spark>
-        <ok to="CreateDedupRecord"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <!-- il root record è openorgs, le simrel fra le openorgs e gli altri record restano -->
-    <!-- per le organizzazioni: openorgs SOLO QUELLE VALIDATE, altre TUTTE -->
-    <!--create the deduprecords using relations taken from openorgs: CHECK IF IT WORKS -->
-    <action name="CreateDedupRecord">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Create Dedup Record</name>
-            <class>eu.dnetlib.dhp.oa.dedup.SparkCreateDedupRecord</class>
-            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
-            </spark-opts>
-            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
-        </spark>
-        <ok to="UpdateEntity"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="UpdateEntity">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Update Entity</name>
-            <class>eu.dnetlib.dhp.oa.dedup.SparkUpdateEntity</class>
-            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
-            </spark-opts>
-            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--dedupGraphPath</arg><arg>${dedupGraphPath}</arg>
         </spark>
         <ok to="CreateSimRels"/>
         <error to="Kill"/>

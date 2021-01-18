@@ -169,6 +169,61 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
         </spark>
+        <ok to="CopyMergeRels"/>
+        <error to="Kill"/>
+    </action>
+
+    <!-- copy organization relations in the working dir-->
+    <action name="CopyMergeRels">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Copy Merge Relations</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCopyRels</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--entityType</arg><arg>organization</arg>
+            <arg>--destination</arg><arg>mergerel</arg>
+            <arg>--numPartitions</arg><arg>8000</arg>
+        </spark>
+        <ok to="CopyEntities"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CopyOpenorgs">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Copy Entities</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCopyOpenorgs</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+        </spark>
         <ok to="UpdateEntity"/>
         <error to="Kill"/>
     </action>

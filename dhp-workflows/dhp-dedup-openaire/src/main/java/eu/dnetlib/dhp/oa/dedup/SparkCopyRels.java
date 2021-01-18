@@ -6,12 +6,10 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.config.DedupConfig;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
@@ -22,10 +20,10 @@ import java.io.IOException;
 import java.util.Optional;
 
 //copy simrels (verified) from relation to the workdir in order to make them available for the deduplication
-public class SparkCopySimRels extends AbstractSparkAction{
-    private static final Logger log = LoggerFactory.getLogger(SparkCopySimRels.class);
+public class SparkCopyRels extends AbstractSparkAction{
+    private static final Logger log = LoggerFactory.getLogger(SparkCopyRels.class);
 
-    public SparkCopySimRels(ArgumentApplicationParser parser, SparkSession spark) {
+    public SparkCopyRels(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
     }
 
@@ -33,13 +31,13 @@ public class SparkCopySimRels extends AbstractSparkAction{
         ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils
                         .toString(
-                                SparkCreateSimRels.class
+                                SparkCopyRels.class
                                         .getResourceAsStream(
-                                                "/eu/dnetlib/dhp/oa/dedup/createSimRels_parameters.json")));
+                                                "/eu/dnetlib/dhp/oa/dedup/copyRels_parameters.json")));
         parser.parseArgument(args);
 
         SparkConf conf = new SparkConf();
-        new SparkCreateSimRels(parser, getSparkSession(conf))
+        new SparkCopyRels(parser, getSparkSession(conf))
                 .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
@@ -49,9 +47,10 @@ public class SparkCopySimRels extends AbstractSparkAction{
 
         // read oozie parameters
         final String graphBasePath = parser.get("graphBasePath");
-        final String isLookUpUrl = parser.get("isLookUpUrl");
         final String actionSetId = parser.get("actionSetId");
         final String workingPath = parser.get("workingPath");
+        final String destination = parser.get("destination");
+        final String entity = parser.get("entityType");
         final int numPartitions = Optional
                 .ofNullable(parser.get("numPartitions"))
                 .map(Integer::valueOf)
@@ -59,26 +58,32 @@ public class SparkCopySimRels extends AbstractSparkAction{
 
         log.info("numPartitions: '{}'", numPartitions);
         log.info("graphBasePath: '{}'", graphBasePath);
-        log.info("isLookUpUrl:   '{}'", isLookUpUrl);
         log.info("actionSetId:   '{}'", actionSetId);
         log.info("workingPath:   '{}'", workingPath);
+        log.info("entity:        '{}'", entity);
 
-        // for each dedup configuration
-        for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
+        log.info("Copying " + destination + " for: '{}'", entity);
 
-            final String entity = dedupConf.getWf().getEntityType();
-            final String subEntity = dedupConf.getWf().getSubEntityValue();
-            log.info("Copying simrels for: '{}'", subEntity);
-
-            final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity);
-            removeOutputDir(spark, outputPath);
-
-            final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
-
-            JavaRDD<Relation> simRels = spark.read().textFile(relationPath).map(patchRelFn(), Encoders.bean(Relation.class)).toJavaRDD().filter(r -> filterRels(r, entity));
-
-            simRels.saveAsTextFile(outputPath);
+        final String outputPath;
+        if (destination.contains("mergerel")) {
+            outputPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, entity);
         }
+        else {
+            outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, entity);
+        }
+
+        removeOutputDir(spark, outputPath);
+
+        final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
+
+        JavaRDD<Relation> simRels =
+                spark.read()
+                        .textFile(relationPath)
+                        .map(patchRelFn(), Encoders.bean(Relation.class))
+                        .toJavaRDD()
+                        .filter(r -> filterRels(r, entity));
+
+        simRels.saveAsTextFile(outputPath);
     }
 
     private static MapFunction<String, Relation> patchRelFn() {
