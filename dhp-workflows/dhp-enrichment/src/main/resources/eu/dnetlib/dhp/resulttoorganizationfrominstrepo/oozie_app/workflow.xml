@@ -141,6 +141,7 @@
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
+            <arg>--blacklist</arg><arg>${blacklist}</arg>
         </spark>
         <ok to="fork_join_apply_resulttoorganization_propagation"/>
         <error to="Kill"/>

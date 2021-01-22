@@ -104,7 +104,7 @@ public class PrepareResultOrcidAssociationStep1 {
 			+ "               LATERAL VIEW EXPLODE (author) a AS MyT "
 			+ "               LATERAL VIEW EXPLODE (MyT.pid) p AS MyP "
 			+ "               WHERE lower(MyP.qualifier.classid) = '" + ModelConstants.ORCID + "' or "
-			+ "                       lower(MyP.qalifier.classid) = '" + ModelConstants.ORCID_PENDING + "') tmp "
+			+ "                       lower(MyP.qualifier.classid) = '" + ModelConstants.ORCID_PENDING + "') tmp "
 			+ "               GROUP BY id) r_t "
 			+ " JOIN ("
 			+ "        SELECT source, target "

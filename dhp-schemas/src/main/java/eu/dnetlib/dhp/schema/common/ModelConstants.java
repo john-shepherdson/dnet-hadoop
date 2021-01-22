@@ -105,6 +105,8 @@ public class ModelConstants {
 	public static final KeyValue UNKNOWN_REPOSITORY = keyValue(
 		"10|openaire____::55045bd2a65019fd8e6741a755395c8c", "Unknown Repository");
 
+	public static final Qualifier UNKNOWN_COUNTRY = qualifier(UNKNOWN, "Unknown", DNET_COUNTRY_TYPE, DNET_COUNTRY_TYPE);
+
 	private static Qualifier qualifier(
 		final String classid,
 		final String classname,

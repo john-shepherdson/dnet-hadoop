@@ -1,26 +1,20 @@
 package eu.dnetlib.dhp.`export`
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Instance, Publication, Relation, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.io.compress.GzipCodec
 import org.apache.hadoop.mapred.SequenceFileOutputFormat
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.expressions.Window
-import org.apache.spark.{SparkConf, SparkContext}
-import org.codehaus.jackson.map.ObjectMapper
+import org.apache.spark.SparkConf
 
 import scala.collection.mutable.ArrayBuffer
-import scala.collection.JavaConverters._
 
 object SparkExportContentForOpenAire {
-
-
-
 
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
@@ -177,12 +171,5 @@ object SparkExportContentForOpenAire {
 
     fRels.union(fpubs).union(fdats).rdd.map(s => (new Text(s._1), new Text(s._2))).saveAsHadoopFile(s"$workingPath/export/rawset", classOf[Text], classOf[Text], classOf[SequenceFileOutputFormat[Text,Text]], classOf[GzipCodec])
   }
-
-
-
-
-
-
-
 
 }
