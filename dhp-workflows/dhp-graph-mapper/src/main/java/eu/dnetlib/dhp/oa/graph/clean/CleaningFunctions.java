@@ -190,6 +190,15 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
+				r
+					.setAuthor(
+						r
+							.getAuthor()
+							.stream()
+							.filter(a -> Objects.nonNull(a))
+							.filter(a -> StringUtils.isNotBlank(StringUtils.trim(a.getFullname())))
+							.collect(Collectors.toList()));
+
 				boolean nullRank = r
 					.getAuthor()
 					.stream()
