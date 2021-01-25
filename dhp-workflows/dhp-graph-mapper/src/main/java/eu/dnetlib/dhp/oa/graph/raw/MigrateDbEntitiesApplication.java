@@ -57,7 +57,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import eu.dnetlib.dhp.oa.graph.raw.common.VerifyNsPrefixPredicate;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
