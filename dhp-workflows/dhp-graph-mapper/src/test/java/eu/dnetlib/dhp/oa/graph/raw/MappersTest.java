@@ -380,6 +380,15 @@ public class MappersTest {
 	}
 
 	@Test
+	void testTextGridNoAuthor() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("textgrid-noauthor.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+	}
+	@Test
 	void testBologna() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf-bologna.xml"));
 		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);

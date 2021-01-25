@@ -51,31 +51,35 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			final Node n = (Node) o;
 			final Author author = new Author();
 			final String fullname = n.valueOf("./datacite:creatorName");
-			author.setFullname(fullname);
-
-			final PacePerson pp = new PacePerson(fullname, false);
 			final String name = n.valueOf("./datacite:givenName");
-			if (StringUtils.isBlank(name) & pp.isAccurate()) {
-				author.setName(pp.getNormalisedFirstName());
-			} else {
-				author.setName(name);
-			}
-
 			final String surname = n.valueOf("./datacite:familyName");
-			if (StringUtils.isBlank(surname) & pp.isAccurate()) {
-				author.setSurname(pp.getNormalisedSurname());
-			} else {
-				author.setSurname(surname);
-			}
+			if(StringUtils.isNotBlank(fullname) || StringUtils.isNotBlank(name) || StringUtils.isNotBlank(surname)){
+				author.setFullname(fullname);
 
-			if (StringUtils.isBlank(author.getFullname())) {
-				author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
-			}
+				final PacePerson pp = new PacePerson(fullname, false);
 
-			author.setAffiliation(prepareListFields(n, "./datacite:affiliation", info));
-			author.setPid(preparePids(n, info));
-			author.setRank(pos++);
-			res.add(author);
+				if (StringUtils.isBlank(name) & pp.isAccurate()) {
+					author.setName(pp.getNormalisedFirstName());
+				} else {
+					author.setName(name);
+				}
+
+
+				if (StringUtils.isBlank(surname) & pp.isAccurate()) {
+					author.setSurname(pp.getNormalisedSurname());
+				} else {
+					author.setSurname(surname);
+				}
+
+				if (StringUtils.isBlank(author.getFullname())) {
+					author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
+				}
+
+				author.setAffiliation(prepareListFields(n, "./datacite:affiliation", info));
+				author.setPid(preparePids(n, info));
+				author.setRank(pos++);
+				res.add(author);
+			}
 		}
 		return res;
 	}
