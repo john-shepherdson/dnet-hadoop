@@ -85,6 +85,9 @@
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+    <!--TODO-->
+    <!-- facendo le query su openaire e openorgs deve creare l'input set, solo di organizzazioni -->
+
     <action name="resetOrgSimRels">
         <fs>
             <delete path="${workingPath}/${actionSetId}/organization_simrel"/>
