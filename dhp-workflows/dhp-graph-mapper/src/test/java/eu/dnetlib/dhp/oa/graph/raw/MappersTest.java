@@ -388,6 +388,7 @@ public class MappersTest {
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
 	}
+
 	@Test
 	void testBologna() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf-bologna.xml"));

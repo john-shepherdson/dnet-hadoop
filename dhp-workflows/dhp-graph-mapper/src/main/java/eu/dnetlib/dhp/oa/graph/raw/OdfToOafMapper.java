@@ -53,7 +53,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			final String fullname = n.valueOf("./datacite:creatorName");
 			final String name = n.valueOf("./datacite:givenName");
 			final String surname = n.valueOf("./datacite:familyName");
-			if(StringUtils.isNotBlank(fullname) || StringUtils.isNotBlank(name) || StringUtils.isNotBlank(surname)){
+			if (StringUtils.isNotBlank(fullname) || StringUtils.isNotBlank(name) || StringUtils.isNotBlank(surname)) {
 				author.setFullname(fullname);
 
 				final PacePerson pp = new PacePerson(fullname, false);
@@ -63,7 +63,6 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				} else {
 					author.setName(name);
 				}
-
 
 				if (StringUtils.isBlank(surname) & pp.isAccurate()) {
 					author.setSurname(pp.getNormalisedSurname());
