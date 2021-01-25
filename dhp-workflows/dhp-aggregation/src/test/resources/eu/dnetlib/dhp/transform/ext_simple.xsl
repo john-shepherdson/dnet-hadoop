@@ -1,7 +1,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:oai="http://www.openarchives.org/OAI/2.0/"
                 xmlns:oaf="http://namespace.openaire.eu/oaf"
-                xmlns:eg="http://eu/dnetlib/trasform/extension"
+                xmlns:dnetFunction="http://eu/dnetlib/trasform/extension"
                 version="2.0"
                 exclude-result-prefixes="xsl">
     <xsl:template match="/">
@@ -9,7 +9,7 @@
             <xsl:copy-of select="//oai:header"/>
             <metadata>
                 <xsl:for-each select="//*[local-name()='subject']">
-                    <subject><xsl:value-of select="eg:clean(.,'dnet:languages')"/></subject>
+                    <subject><xsl:value-of select="dnetFunction:clean(.,'dnet:languages')"/></subject>
                 </xsl:for-each>
             </metadata>
             <oaf:about>
