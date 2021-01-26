@@ -110,6 +110,16 @@ public class CleaningFunctions {
 					.setLanguage(
 						qualifier("und", "Undetermined", ModelConstants.DNET_LANGUAGES));
 			}
+			if (Objects.nonNull(r.getCountry())) {
+				r
+					.setCountry(
+						r
+							.getCountry()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(c -> StringUtils.isNotBlank(c.getClassid()))
+							.collect(Collectors.toList()));
+			}
 			if (Objects.nonNull(r.getSubject())) {
 				r
 					.setSubject(
