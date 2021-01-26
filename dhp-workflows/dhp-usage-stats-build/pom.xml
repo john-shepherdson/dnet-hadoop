@@ -1,29 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-
-<!--     <parent> 
-        <artifactId>dhp-workflows</artifactId >
-        <groupId>eu.dnetlib.dhp</groupId>
-        <version>1.1.7-SNAPSHOT</version>
-    </parent>
-    <groupId>eu.dnetlib</groupId> -->
-<!--     <parent>
-        <groupId>eu.dnetlib.dhp</groupId>
-        <artifactId>dhp-workflows</artifactId>
-        <version>1.1.7-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>dhp-usage-stats-update</artifactId> -->
-    
     <parent>
         <artifactId>dhp-workflows</artifactId>
         <groupId>eu.dnetlib.dhp</groupId>
-        <version>1.1.7-SNAPSHOT</version>
+        <version>1.2.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dhp-usage-stats-build</artifactId>
-<build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>pl.project13.maven</groupId>
