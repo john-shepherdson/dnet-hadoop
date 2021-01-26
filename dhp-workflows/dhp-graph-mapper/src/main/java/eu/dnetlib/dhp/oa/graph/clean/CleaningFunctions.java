@@ -206,7 +206,8 @@ public class CleaningFunctions {
 							.getAuthor()
 							.stream()
 							.filter(a -> Objects.nonNull(a))
-							.filter(a -> StringUtils.isNotBlank(StringUtils.trim(a.getFullname())))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
 							.collect(Collectors.toList()));
 
 				boolean nullRank = r
