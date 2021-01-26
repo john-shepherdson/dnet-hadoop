@@ -7,7 +7,7 @@ import java.util.HashMap;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableConsumer;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Country;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;

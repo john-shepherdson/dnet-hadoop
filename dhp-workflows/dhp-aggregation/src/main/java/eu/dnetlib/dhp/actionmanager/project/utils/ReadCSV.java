@@ -17,7 +17,7 @@ import org.apache.hadoop.fs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.httpconnector.HttpConnector;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**

@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.actionmanager.project.httpconnector;
 
+import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -29,12 +31,12 @@ public class HttpConnectorTest {
 
 	@Test
 
-	public void testGetInputSource() throws CollectorServiceException {
+	public void testGetInputSource() throws DnetCollectorException {
 		System.out.println(connector.getInputSource(URL));
 	}
 
 	@Test
-	public void testGoodServers() throws CollectorServiceException {
+	public void testGoodServers() throws DnetCollectorException {
 		System.out.println(connector.getInputSource(URL_GOODSNI_SERVER));
 	}
 
