@@ -1,37 +1,68 @@
-<record xmlns="http://www.openarchives.org/OAI/2.0/">
-    <header>
-        <identifier>oai:research.chalmers.se:243692</identifier>
-        <datestamp>2018-01-25T18:04:43Z</datestamp>
-        <setSpec>openaire</setSpec>
-    </header>
-    <metadata>
-        <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-            <dc:title>Incipient Berezinskii-Kosterlitz-Thouless transition in two-dimensional coplanar Josephson junctions</dc:title>
-            <dc:identifier>https://research.chalmers.se/en/publication/243692</dc:identifier>
-            <dc:date>2016</dc:date>
-            <dc:creator>Massarotti, D.</dc:creator>
-            <dc:creator>Jouault, B.</dc:creator>
-            <dc:creator>Rouco, V.</dc:creator>
-            <dc:creator>Charpentier, Sophie</dc:creator>
-            <dc:creator>Bauch, Thilo</dc:creator>
-            <dc:creator>Michon, A.</dc:creator>
-            <dc:creator>De Candia, A.</dc:creator>
-            <dc:creator>Lucignano, P.</dc:creator>
-            <dc:creator>Lombardi, Floriana</dc:creator>
-            <dc:creator>Tafuri, F.</dc:creator>
-            <dc:creator>Tagliacozzo, A.</dc:creator>
-            <dc:subject>Acoli</dc:subject>
-            <dc:subject>Abkhazian</dc:subject>
-            <dc:subject>Condensed Matter Physics</dc:subject>
-            <dc:description>Superconducting hybrid junctions are revealing a variety of effects. Some of them are due to the special layout of these devices, which often use a coplanar configuration with relatively large barrier channels and the possibility of hosting Pearl vortices. A Josephson junction with a quasi-ideal two-dimensional barrier has been realized by growing graphene on SiC with Al electrodes. Chemical vapor deposition offers centimeter size monolayer areas where it is possible to realize a comparative analysis of different devices with nominally the same barrier. In samples with a graphene gap below 400 nm, we have found evidence of Josephson coherence in the presence of an incipient Berezinskii-Kosterlitz-Thouless transition. When the magnetic field is cycled, a remarkable hysteretic collapse and revival of the Josephson supercurrent occurs. Similar hysteresis are found in granular systems and are usually justified within the Bean critical state model (CSM). We show that the CSM, with appropriate account for the low-dimensional geometry, can partly explain the odd features measured in these junctions.</dc:description>
-            <dc:relation>info:eu-repo/grantAgreement/EC/FP7/604391//Graphene-Based Revolutions in ICT And Beyond (Graphene Flagship)/</dc:relation>
-            <dc:relation>info:eu-repo/semantics/altIdentifier/doi/10.1103/PhysRevB.94.054525</dc:relation>
-            <dc:type>info:eu-repo/semantics/article</dc:type>
-            <dc:source>Physical Review B vol.94(2016)</dc:source>
-            <dc:rights>info:eu-repo/semantics/openAccess</dc:rights>
+<?xml version="1.0" encoding="UTF-8"?>
+<oai:record xmlns="http://namespace.openaire.eu/"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+            xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:oaf="http://namespace.openaire.eu/oaf"
+            xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+            xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <oai:header>
+        <dri:objIdentifier>od______2294::00029b7f0a2a7e090e55b625a9079d83</dri:objIdentifier>
+        <dri:recordIdentifier>oai:pub.uni-bielefeld.de:2578942</dri:recordIdentifier>
+        <dri:dateOfCollection>2018-11-23T15:15:33.974+01:00</dri:dateOfCollection>
+        <oaf:datasourceprefix>od______2294</oaf:datasourceprefix>
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">oai:pub.uni-bielefeld.de:2578942</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2018-07-24T13:01:16Z</datestamp>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">conference</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">ddc:000</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">conferenceFtxt</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">driver</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">open_access</setSpec>
+    </oai:header>
+    <metadata xmlns="http://www.openarchives.org/OAI/2.0/">
+        <oai_dc:dc xmlns="http://www.openarchives.org/OAI/2.0/oai_dc/"
+                   xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+            <dc:title>Mobile recommendation agents making online use of visual attention information at the point of sale</dc:title>
+            <dc:creator>Pfeiffer, Thies</dc:creator>
+            <dc:creator>Pfeiffer, Jella</dc:creator>
+            <dc:creator>Meißner, Martin</dc:creator>
+            <dc:creator>Davis, Fred</dc:creator>
+            <dc:creator>Riedl, René</dc:creator>
+            <dc:creator>Jan, vom Brocke</dc:creator>
+            <dc:creator>Léger, Pierre-Majorique</dc:creator>
+            <dc:creator>Randolph, Adriane</dc:creator>
+            <dc:subject>Mobile Cognitive Assistance Systems
+                Information Systems</dc:subject>
+            <dc:subject>ddc:000</dc:subject>
+            <dc:description>We aim to utilize online information about visual attention for developing mobile recommendation agents (RAs) for use at the point of sale. Up to now, most RAs are focussed exclusively at personalization in an e-commerce setting. Very little is known, however, about mobile RAs that offer information and assistance at the point of sale based on individual-level feature based preference models (Murray and Häubl 2009). Current attempts provide information about products at the point of sale by manually scanning barcodes or using RFID (Kowatsch et al. 2011, Heijden 2005), e.g. using specific apps for smartphones. We argue that an online access to the current visual attention of the user offers a much larger potential. Integrating mobile eye tracking into ordinary glasses would yield a direct benefit of applying neuroscience methods in the user’s everyday life. First, learning from consumers’ attentional processes over time and adapting recommendations based on this learning allows us to provide very accurate and relevant recommendations, potentially increasing the perceived usefulness. Second, our proposed system needs little explicit user input (no scanning or navigation on screen) making it easy to use. Thus, instead of learning from click behaviour and past customer ratings, as it is the case in the e-commerce setting, the mobile RA learns from eye movements by participating online in every day decision processes. We argue that mobile RAs should be built based on current research in human judgment and decision making (Murray et al. 2010). In our project, we therefore follow a two-step approach: In the empirical basic research stream, we aim to understand the user’s interaction with the product shelf: the actions and patterns of user’s behaviour (eye movements, gestures, approaching a product closer) and their correspondence to the user’s informational needs. In the empirical system development stream, we create prototypes of mobile RAs and test experimentally the factors that influence the user’s adoption. For example, we suggest that a user’s involvement in the process, such as a need for exact nutritional information or for assistance (e.g., reading support for elderly) will influence the user’s intention to use such as system. The experiments are conducted both in our immersive virtual reality supermarket presented in a CAVE, where we can also easily display information to the user and track the eye movement in great accuracy, as well as in real-world supermarkets (see Figure 1), so that the findings can be better generalized to natural decision situations (Gidlöf et al. 2013). In a first pilot study with five randomly chosen participants in a supermarket, we evaluated which sort of mobile RAs consumers favour in order to get a first impression of the user’s acceptance of the technology. Figure 1 shows an excerpt of one consumer’s eye movements during a decision process. First results show long eye cascades and short fixations on many products in situations where users are uncertain and in need for support. Furthermore, we find a surprising acceptance of the technology itself throughout all ages (23 – 61 years). At the same time, consumers express serious fear of being manipulated by such a technology. For that reason, they strongly prefer the information to be provided by trusted third party or shared with family members and friends (see also Murray and Häubl 2009). Our pilot will be followed by a larger field experiment in March in order to learn more about factors that influence the user’s acceptance as well as the eye movement patterns that reflect typical phases of decision processes and indicate the need for support by a RA.</dc:description>
+            <dc:date>2013</dc:date>
+            <dc:type>info:eu-repo/semantics/conferenceObject</dc:type>
+            <dc:type>doc-type:conferenceObject</dc:type>
+            <dc:type>text</dc:type>
+            <dc:identifier>https://pub.uni-bielefeld.de/record/2578942</dc:identifier>
+            <dc:identifier>https://pub.uni-bielefeld.de/download/2578942/2602478</dc:identifier>
+            <dc:source>Pfeiffer T, Pfeiffer J, Meißner M. Mobile recommendation agents making online use of visual attention information at the point of sale. In: Davis F, Riedl R, Jan vom B, Léger P-M, Randolph A, eds. <em>Proceedings of the Gmunden Retreat on NeuroIS 2013</em>. 2013: 3-3.</dc:source>
             <dc:language>eng</dc:language>
-            <dc:audience>Researchers</dc:audience>
-            <dc:format>application/pdf</dc:format>
+            <dc:rights>info:eu-repo/semantics/openAccess</dc:rights>
         </oai_dc:dc>
     </metadata>
-</record>
+    <about xmlns="">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2018-11-23T15:15:33.974+01:00">
+                <baseURL>http://pub.uni-bielefeld.de/oai</baseURL>
+                <identifier>oai:pub.uni-bielefeld.de:2578942</identifier>
+                <datestamp>2018-07-24T13:01:16Z</datestamp>
+                <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:repository"
+                                  classname="sysimport:crosswalk:repository"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</oai:record>

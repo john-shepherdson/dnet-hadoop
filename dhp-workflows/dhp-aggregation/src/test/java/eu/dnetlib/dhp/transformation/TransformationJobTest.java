@@ -2,15 +2,23 @@
 package eu.dnetlib.dhp.transformation;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.lenient;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.transform.stream.StreamSource;
 
+import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
@@ -18,27 +26,33 @@ import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import eu.dnetlib.dhp.collection.CollectionJobTest;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.functions.Cleaner;
-import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
-import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
-import eu.dnetlib.dhp.utils.DHPUtils;
-import net.sf.saxon.s9api.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TransformationJobTest {
 
 	private static SparkSession spark;
+
+	@Mock
+	private ISLookUpService isLookUpService;
+
+	private VocabularyGroup vocabularies;
+
+	@BeforeEach
+	public void setUp() throws ISLookUpException, IOException {
+		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
+
+		lenient()
+				.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
+				.thenReturn(synonyms());
+		vocabularies = VocabularyGroup.loadVocsFromIS(isLookUpService);
+	}
 
 	@BeforeAll
 	public static void beforeAll() {
@@ -53,64 +67,51 @@ public class TransformationJobTest {
 		spark.stop();
 	}
 
-	@Mock
-	private LongAccumulator accumulator;
 
 	@Test
+	@DisplayName("Test Transform Single XML using XSLTTransformator")
 	public void testTransformSaxonHE() throws Exception {
 
-		Map<String, Vocabulary> vocabularies = new HashMap<>();
-		vocabularies.put("dnet:languages", VocabularyHelper.getVocabularyFromAPI("dnet:languages"));
-		Cleaner cleanFunction = new Cleaner(vocabularies);
-		Processor proc = new Processor(false);
-		proc.registerExtensionFunction(cleanFunction);
-		final XsltCompiler comp = proc.newXsltCompiler();
-		XsltExecutable exp = comp
-			.compile(
-				new StreamSource(
-					this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/ext_simple.xsl")));
-		XdmNode source = proc
-			.newDocumentBuilder()
-			.build(
-				new StreamSource(
-					this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input.xml")));
-		XsltTransformer trans = exp.load();
-		trans.setInitialContextNode(source);
-		final StringWriter output = new StringWriter();
-		Serializer out = proc.newSerializer(output);
-		out.setOutputProperty(Serializer.Property.METHOD, "xml");
-		out.setOutputProperty(Serializer.Property.INDENT, "yes");
-		trans.setDestination(out);
-		trans.transform();
-		System.out.println(output.toString());
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input.xml")));
+
+
+		// We Load the XSLT trasformation Rule from the classpath
+		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/ext_simple.xsl");
+
+		//Print the record
+		System.out.println(tr.call(mr).getBody());
+		//TODO Create significant Assert
+
 	}
+
+
+
 
 	@DisplayName("Test TransformSparkJobNode.main")
 	@Test
 	public void transformTest(@TempDir Path testDir) throws Exception {
+
 		final String mdstore_input = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
 		final String mdstore_output = testDir.toString() + "/version";
-		final String xslt = DHPUtils
-			.compressString(
-				IOUtils
-					.toString(
-						this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml")));
-		TransformSparkJobNode
-			.main(
-				new String[] {
-					"-issm", "true",
-					"-i", mdstore_input,
-					"-o", mdstore_output,
-					"-d", "1",
-					"-w", "1",
-					"-tr", xslt,
-					"-t", "true",
-					"-ru", "",
-					"-rp", "",
-					"-rh", "",
-					"-ro", "",
-					"-rr", ""
-				});
+
+
+		mockupTrasformationRule("simpleTRule","/eu/dnetlib/dhp/transform/ext_simple.xsl");
+
+//		final String arguments = "-issm true -i %s -o %s -d 1 -w 1 -tp XSLT_TRANSFORM -tr simpleTRule";
+
+		final Map<String,String > parameters =  Stream.of(new String[][] {
+				{ "dateOfTransformation", "1234" },
+				{ "transformationPlugin", "XSLT_TRANSFORM" },
+				{ "transformationRule", "simpleTRule" },
+
+		}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+		TransformSparkJobNode.transformRecords(parameters,isLookUpService,spark,mdstore_input, mdstore_output);
+
+
+
 
 		// TODO introduce useful assertions
 	}
@@ -127,39 +128,27 @@ public class TransformationJobTest {
 		Files.deleteIfExists(tempDirWithPrefix);
 	}
 
-	@Test
-	public void testTransformFunction() throws Exception {
-		SAXReader reader = new SAXReader();
-		Document document = reader.read(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml"));
-		Node node = document.selectSingleNode("//CODE/*[local-name()='stylesheet']");
-		final String xslt = node.asXML();
-		Map<String, Vocabulary> vocabularies = new HashMap<>();
-		vocabularies.put("dnet:languages", VocabularyHelper.getVocabularyFromAPI("dnet:languages"));
 
-		TransformFunction tf = new TransformFunction(accumulator, accumulator, accumulator, xslt, 1, vocabularies);
+	private void mockupTrasformationRule(final String trule, final String path)throws Exception {
+		final String trValue = IOUtils.toString(this.getClass().getResourceAsStream(path));
 
-		MetadataRecord record = new MetadataRecord();
-		record
-			.setBody(
-				IOUtils
-					.toString(
-						this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input.xml")));
-
-		final MetadataRecord result = tf.call(record);
-		assertNotNull(result.getBody());
-
-		System.out.println(result.getBody());
+		lenient().when(isLookUpService.quickSearchProfile(String.format(TransformationFactory.TRULE_XQUERY,trule)))
+				.thenReturn(Collections.singletonList(trValue));
 	}
 
-	@Test
-	public void extractTr() throws Exception {
+	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
+		final String trValue = IOUtils.toString(this.getClass().getResourceAsStream(path));
+		final LongAccumulator la = new LongAccumulator();
+		return new XSLTTransformationFunction(new AggregationCounter(la,la,la),trValue, 0,vocabularies);
+	}
 
-		final String xmlTr = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml"));
+	private List<String> vocs() throws IOException {
+		return IOUtils
+				.readLines(TransformationJobTest.class.getResourceAsStream("/eu/dnetlib/dhp/transform/terms.txt"));
+	}
 
-		SAXReader reader = new SAXReader();
-		Document document = reader.read(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml"));
-		Node node = document.selectSingleNode("//CODE/*[local-name()='stylesheet']");
-
-		System.out.println(node.asXML());
+	private List<String> synonyms() throws IOException {
+		return IOUtils
+				.readLines(TransformationJobTest.class.getResourceAsStream("/eu/dnetlib/dhp/transform/synonyms.txt"));
 	}
 }
