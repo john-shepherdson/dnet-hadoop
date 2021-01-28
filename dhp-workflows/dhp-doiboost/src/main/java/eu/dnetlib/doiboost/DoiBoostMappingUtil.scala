@@ -111,12 +111,12 @@ object DoiBoostMappingUtil {
       result.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
     }
     result.getInstance().asScala.foreach(i => {
-      i.setHostedby(getUbknownHostedBy())
+      i.setHostedby(getUnknownHostedBy())
     })
     result
   }
 
-  def getUbknownHostedBy():KeyValue = {
+  def getUnknownHostedBy():KeyValue = {
     val hb = new KeyValue
     hb.setValue("Unknown Repository")
     hb.setKey(s"10|$OPENAIRE_PREFIX::55045bd2a65019fd8e6741a755395c8c")

@@ -15,11 +15,11 @@ object OafUtils {
   }
 
 
-  def generateDataInfo(trust: String = "0.9", invisibile: Boolean = false): DataInfo = {
+  def generateDataInfo(trust: String = "0.9", invisible: Boolean = false): DataInfo = {
     val di = new DataInfo
     di.setDeletedbyinference(false)
     di.setInferred(false)
-    di.setInvisible(false)
+    di.setInvisible(invisible)
     di.setTrust(trust)
     di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
     di
