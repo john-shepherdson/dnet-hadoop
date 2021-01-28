@@ -110,6 +110,16 @@ public class CleaningFunctions {
 					.setLanguage(
 						qualifier("und", "Undetermined", ModelConstants.DNET_LANGUAGES));
 			}
+			if (Objects.nonNull(r.getCountry())) {
+				r
+					.setCountry(
+						r
+							.getCountry()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(c -> StringUtils.isNotBlank(c.getClassid()))
+							.collect(Collectors.toList()));
+			}
 			if (Objects.nonNull(r.getSubject())) {
 				r
 					.setSubject(
@@ -190,6 +200,16 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
+				r
+					.setAuthor(
+						r
+							.getAuthor()
+							.stream()
+							.filter(a -> Objects.nonNull(a))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+							.collect(Collectors.toList()));
+
 				boolean nullRank = r
 					.getAuthor()
 					.stream()
@@ -210,6 +230,7 @@ public class CleaningFunctions {
 								a
 									.getPid()
 									.stream()
+									.filter(Objects::nonNull)
 									.filter(p -> Objects.nonNull(p.getQualifier()))
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {

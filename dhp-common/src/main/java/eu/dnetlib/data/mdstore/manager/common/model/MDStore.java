@@ -2,12 +2,15 @@
 package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "mdstores")
@@ -37,6 +40,13 @@ public class MDStore implements Serializable {
 
 	@Column(name = "api_id")
 	private String apiId;
+
+	@Column(name = "hdfs_path")
+	private String hdfsPath;
+
+	@Column(name = "creation_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date creationDate;
 
 	public String getId() {
 		return id;
@@ -94,9 +104,28 @@ public class MDStore implements Serializable {
 		this.apiId = apiId;
 	}
 
+	public String getHdfsPath() {
+		return hdfsPath;
+	}
+
+	public void setHdfsPath(final String hdfsPath) {
+		this.hdfsPath = hdfsPath;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(final Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
 	public static MDStore newInstance(
-		final String format, final String layout, final String interpretation) {
-		return newInstance(format, layout, interpretation, null, null, null);
+		final String format,
+		final String layout,
+		final String interpretation,
+		final String hdfsBasePath) {
+		return newInstance(format, layout, interpretation, null, null, null, hdfsBasePath);
 	}
 
 	public static MDStore newInstance(
@@ -105,15 +134,23 @@ public class MDStore implements Serializable {
 		final String interpretation,
 		final String dsName,
 		final String dsId,
-		final String apiId) {
+		final String apiId,
+		final String hdfsBasePath) {
+
+		final String mdId = "md-" + UUID.randomUUID();
+
 		final MDStore md = new MDStore();
-		md.setId("md-" + UUID.randomUUID());
+		md.setId(mdId);
 		md.setFormat(format);
 		md.setLayout(layout);
 		md.setInterpretation(interpretation);
+		md.setCreationDate(new Date());
 		md.setDatasourceName(dsName);
 		md.setDatasourceId(dsId);
 		md.setApiId(apiId);
+		md.setHdfsPath(String.format("%s/%s", hdfsBasePath, mdId));
+
 		return md;
 	}
+
 }
