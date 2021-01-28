@@ -43,6 +43,10 @@ public class MDStoreWithInfo implements Serializable {
 	@Column(name = "current_version")
 	private String currentVersion;
 
+	@Column(name = "creation_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date creationDate;
+
 	@Column(name = "lastupdate")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastUpdate;
@@ -52,6 +56,9 @@ public class MDStoreWithInfo implements Serializable {
 
 	@Column(name = "n_versions")
 	private long numberOfVersions = 0;
+
+	@Column(name = "hdfs_path")
+	private String hdfsPath;
 
 	public String getId() {
 		return id;
@@ -117,6 +124,14 @@ public class MDStoreWithInfo implements Serializable {
 		this.currentVersion = currentVersion;
 	}
 
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(final Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
 	public Date getLastUpdate() {
 		return lastUpdate;
 	}
@@ -139,5 +154,13 @@ public class MDStoreWithInfo implements Serializable {
 
 	public void setNumberOfVersions(final long numberOfVersions) {
 		this.numberOfVersions = numberOfVersions;
+	}
+
+	public String getHdfsPath() {
+		return hdfsPath;
+	}
+
+	public void setHdfsPath(final String hdfsPath) {
+		this.hdfsPath = hdfsPath;
 	}
 }
