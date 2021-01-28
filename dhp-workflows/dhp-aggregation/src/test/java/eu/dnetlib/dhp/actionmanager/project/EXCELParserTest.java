@@ -6,16 +6,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-
 import eu.dnetlib.dhp.actionmanager.project.utils.EXCELParser;
+import eu.dnetlib.dhp.collection.worker.CollectorException;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 
 @Disabled
 public class EXCELParserTest {
@@ -31,7 +30,7 @@ public class EXCELParserTest {
 	}
 
 	@Test
-	public void test1() throws DnetCollectorException, IOException, InvalidFormatException, ClassNotFoundException,
+	public void test1() throws CollectorException, IOException, InvalidFormatException, ClassNotFoundException,
 		IllegalAccessException, InstantiationException {
 
 		EXCELParser excelParser = new EXCELParser();

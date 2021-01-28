@@ -1,19 +1,16 @@
 
-package eu.dnetlib.dhp.transformation.functions;
+package eu.dnetlib.dhp.transformation.xslt;
 
-import java.util.Map;
-import java.util.Optional;
-
-import eu.dnetlib.dhp.transformation.vocabulary.Term;
-import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import net.sf.saxon.s9api.*;
 import scala.Serializable;
 
 public class Cleaner implements ExtensionFunction, Serializable {
 
-	private final Map<String, Vocabulary> vocabularies;
+	private final VocabularyGroup vocabularies;
 
-	public Cleaner(Map<String, Vocabulary> vocabularies) {
+	public Cleaner(final VocabularyGroup vocabularies) {
 		this.vocabularies = vocabularies;
 	}
 
@@ -39,14 +36,9 @@ public class Cleaner implements ExtensionFunction, Serializable {
 	public XdmValue call(XdmValue[] xdmValues) throws SaxonApiException {
 		final String currentValue = xdmValues[0].itemAt(0).getStringValue();
 		final String vocabularyName = xdmValues[1].itemAt(0).getStringValue();
-		Optional<Term> cleanedValue = vocabularies
-			.get(vocabularyName)
-			.getTerms()
-			.stream()
-			.filter(it -> it.getNativeName().equalsIgnoreCase(currentValue))
-			.findAny();
+		Qualifier cleanedValue = vocabularies.getSynonymAsQualifier(vocabularyName, currentValue);
 
 		return new XdmAtomicValue(
-			cleanedValue.isPresent() ? cleanedValue.get().getCode() : currentValue);
+			cleanedValue != null ? cleanedValue.getClassid() : currentValue);
 	}
 }

@@ -17,8 +17,8 @@ import org.apache.hadoop.fs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 
 /**
  * Applies the parsing of a csv file and writes the Serialization of it in hdfs

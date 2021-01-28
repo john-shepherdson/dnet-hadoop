@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.actionmanager.project.utils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,8 +14,8 @@ import org.apache.hadoop.fs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 
 /**
  * Applies the parsing of an excel file and writes the Serialization of it in hdfs

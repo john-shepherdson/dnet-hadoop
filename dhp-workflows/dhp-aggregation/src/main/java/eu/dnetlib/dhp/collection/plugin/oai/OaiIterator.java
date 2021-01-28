@@ -16,7 +16,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
+import eu.dnetlib.dhp.collection.worker.CollectorException;
 import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
 
@@ -58,7 +58,7 @@ public class OaiIterator implements Iterator<String> {
 			this.started = true;
 			try {
 				this.token = firstPage();
-			} catch (final DnetCollectorException e) {
+			} catch (final CollectorException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -80,7 +80,7 @@ public class OaiIterator implements Iterator<String> {
 			while (queue.isEmpty() && token != null && !token.isEmpty()) {
 				try {
 					token = otherPages(token);
-				} catch (final DnetCollectorException e) {
+				} catch (final CollectorException e) {
 					throw new RuntimeException(e);
 				}
 			}
@@ -92,7 +92,7 @@ public class OaiIterator implements Iterator<String> {
 	public void remove() {
 	}
 
-	private String firstPage() throws DnetCollectorException {
+	private String firstPage() throws CollectorException {
 		try {
 			String url = baseUrl + "?verb=ListRecords&metadataPrefix=" + URLEncoder.encode(mdFormat, "UTF-8");
 			if (set != null && !set.isEmpty()) {
@@ -108,7 +108,7 @@ public class OaiIterator implements Iterator<String> {
 
 			return downloadPage(url);
 		} catch (final UnsupportedEncodingException e) {
-			throw new DnetCollectorException(e);
+			throw new CollectorException(e);
 		}
 	}
 
@@ -126,18 +126,18 @@ public class OaiIterator implements Iterator<String> {
 		return result.trim();
 	}
 
-	private String otherPages(final String resumptionToken) throws DnetCollectorException {
+	private String otherPages(final String resumptionToken) throws CollectorException {
 		try {
 			return downloadPage(
 				baseUrl
 					+ "?verb=ListRecords&resumptionToken="
 					+ URLEncoder.encode(resumptionToken, "UTF-8"));
 		} catch (final UnsupportedEncodingException e) {
-			throw new DnetCollectorException(e);
+			throw new CollectorException(e);
 		}
 	}
 
-	private String downloadPage(final String url) throws DnetCollectorException {
+	private String downloadPage(final String url) throws CollectorException {
 
 		final String xml = httpConnector.getInputSource(url);
 		Document doc;
@@ -151,7 +151,7 @@ public class OaiIterator implements Iterator<String> {
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
 				if (resumptionToken == null) {
-					throw new DnetCollectorException("Error parsing cleaned document:" + cleaned, e1);
+					throw new CollectorException("Error parsing cleaned document:" + cleaned, e1);
 				}
 				return resumptionToken;
 			}
@@ -164,7 +164,7 @@ public class OaiIterator implements Iterator<String> {
 				log.warn("noRecordsMatch for oai call: " + url);
 				return null;
 			} else {
-				throw new DnetCollectorException(code + " - " + errorNode.getText());
+				throw new CollectorException(code + " - " + errorNode.getText());
 			}
 		}
 

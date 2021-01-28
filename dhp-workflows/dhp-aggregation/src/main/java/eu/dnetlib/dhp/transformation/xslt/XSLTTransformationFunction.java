@@ -1,41 +1,35 @@
 
-package eu.dnetlib.dhp.transformation;
+package eu.dnetlib.dhp.transformation.xslt;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
-import java.util.Map;
 
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.util.LongAccumulator;
 
+import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.functions.Cleaner;
-import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
 import net.sf.saxon.s9api.*;
 
-public class TransformFunction implements MapFunction<MetadataRecord, MetadataRecord> {
+public class XSLTTransformationFunction implements MapFunction<MetadataRecord, MetadataRecord> {
 
-	private final LongAccumulator totalItems;
-	private final LongAccumulator errorItems;
-	private final LongAccumulator transformedItems;
+	private final AggregationCounter aggregationCounter;
+
 	private final String transformationRule;
+
 	private final Cleaner cleanFunction;
 
 	private final long dateOfTransformation;
 
-	public TransformFunction(
-		LongAccumulator totalItems,
-		LongAccumulator errorItems,
-		LongAccumulator transformedItems,
+	public XSLTTransformationFunction(
+		final AggregationCounter aggregationCounter,
 		final String transformationRule,
 		long dateOfTransformation,
-		final Map<String, Vocabulary> vocabularies)
+		final VocabularyGroup vocabularies)
 		throws Exception {
-		this.totalItems = totalItems;
-		this.errorItems = errorItems;
-		this.transformedItems = transformedItems;
+		this.aggregationCounter = aggregationCounter;
 		this.transformationRule = transformationRule;
 		this.dateOfTransformation = dateOfTransformation;
 		cleanFunction = new Cleaner(vocabularies);
@@ -43,7 +37,7 @@ public class TransformFunction implements MapFunction<MetadataRecord, MetadataRe
 
 	@Override
 	public MetadataRecord call(MetadataRecord value) {
-		totalItems.add(1);
+		aggregationCounter.getTotalItems().add(1);
 		try {
 			Processor processor = new Processor(false);
 			processor.registerExtensionFunction(cleanFunction);
@@ -64,10 +58,10 @@ public class TransformFunction implements MapFunction<MetadataRecord, MetadataRe
 			final String xml = output.toString();
 			value.setBody(xml);
 			value.setDateOfTransformation(dateOfTransformation);
-			transformedItems.add(1);
+			aggregationCounter.getProcessedItems().add(1);
 			return value;
 		} catch (Throwable e) {
-			errorItems.add(1);
+			aggregationCounter.getErrorItems().add(1);
 			return null;
 		}
 	}

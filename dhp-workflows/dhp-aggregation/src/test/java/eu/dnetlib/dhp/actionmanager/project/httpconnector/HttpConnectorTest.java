@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.actionmanager.project.httpconnector;
 
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -10,6 +8,9 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import eu.dnetlib.dhp.collection.worker.CollectorException;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 
 @Disabled
 public class HttpConnectorTest {
@@ -31,12 +32,12 @@ public class HttpConnectorTest {
 
 	@Test
 
-	public void testGetInputSource() throws DnetCollectorException {
+	public void testGetInputSource() throws CollectorException {
 		System.out.println(connector.getInputSource(URL));
 	}
 
 	@Test
-	public void testGoodServers() throws DnetCollectorException {
+	public void testGoodServers() throws CollectorException {
 		System.out.println(connector.getInputSource(URL_GOODSNI_SERVER));
 	}
 
