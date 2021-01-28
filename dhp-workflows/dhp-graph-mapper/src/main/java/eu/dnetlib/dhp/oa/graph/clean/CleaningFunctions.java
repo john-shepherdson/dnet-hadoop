@@ -59,17 +59,19 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
-				r.getAuthor()
-						.stream()
-						.filter(Objects::nonNull)
-						.forEach(a -> {
-							if (Objects.nonNull(a.getPid())) {
-								a.getPid()
-									.stream()
-									.filter(Objects::nonNull)
-									.forEach(p -> fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES));
-							}
-				});
+				r
+					.getAuthor()
+					.stream()
+					.filter(Objects::nonNull)
+					.forEach(a -> {
+						if (Objects.nonNull(a.getPid())) {
+							a
+								.getPid()
+								.stream()
+								.filter(Objects::nonNull)
+								.forEach(p -> fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES));
+						}
+					});
 			}
 			if (value instanceof Publication) {
 

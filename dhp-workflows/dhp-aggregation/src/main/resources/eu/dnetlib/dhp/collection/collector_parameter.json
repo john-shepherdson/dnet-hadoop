@@ -1,0 +1,6 @@
+[
+  {"paramName":"p",   "paramLongName":"hdfsPath",           "paramDescription": "the path where storing the sequential file",           "paramRequired": true},
+  {"paramName":"a",   "paramLongName":"apidescriptor",      "paramDescription": "the JSON encoding of the API Descriptor",              "paramRequired": true},
+  {"paramName":"n",   "paramLongName":"namenode",           "paramDescription": "the Name Node URI",                                    "paramRequired": true},
+  {"paramName":"w",   "paramLongName":"workflowId",         "paramDescription": "the identifier of the dnet Workflow",                  "paramRequired": false}
+]

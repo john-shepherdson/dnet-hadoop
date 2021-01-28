@@ -19,7 +19,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
+import eu.dnetlib.dhp.collection.worker.CollectorException;
 
 public class HttpConnector {
 
@@ -42,9 +42,9 @@ public class HttpConnector {
 	 *
 	 * @param requestUrl the URL
 	 * @return the content of the downloaded resource
-	 * @throws DnetCollectorException when retrying more than maxNumberOfRetry times
+	 * @throws CollectorException when retrying more than maxNumberOfRetry times
 	 */
-	public String getInputSource(final String requestUrl) throws DnetCollectorException {
+	public String getInputSource(final String requestUrl) throws CollectorException {
 		return attemptDownlaodAsString(requestUrl, 1, new CollectorPluginErrorLogList());
 	}
 
@@ -53,15 +53,15 @@ public class HttpConnector {
 	 *
 	 * @param requestUrl the URL
 	 * @return the content of the downloaded resource as InputStream
-	 * @throws DnetCollectorException when retrying more than maxNumberOfRetry times
+	 * @throws CollectorException when retrying more than maxNumberOfRetry times
 	 */
-	public InputStream getInputSourceAsStream(final String requestUrl) throws DnetCollectorException {
+	public InputStream getInputSourceAsStream(final String requestUrl) throws CollectorException {
 		return attemptDownload(requestUrl, 1, new CollectorPluginErrorLogList());
 	}
 
 	private String attemptDownlaodAsString(
 		final String requestUrl, final int retryNumber, final CollectorPluginErrorLogList errorList)
-		throws DnetCollectorException {
+		throws CollectorException {
 		try {
 			final InputStream s = attemptDownload(requestUrl, 1, new CollectorPluginErrorLogList());
 			try {
@@ -75,16 +75,16 @@ public class HttpConnector {
 				IOUtils.closeQuietly(s);
 			}
 		} catch (final InterruptedException e) {
-			throw new DnetCollectorException(e);
+			throw new CollectorException(e);
 		}
 	}
 
 	private InputStream attemptDownload(
 		final String requestUrl, final int retryNumber, final CollectorPluginErrorLogList errorList)
-		throws DnetCollectorException {
+		throws CollectorException {
 
 		if (retryNumber > maxNumberOfRetry) {
-			throw new DnetCollectorException("Max number of retries exceeded. Cause: \n " + errorList);
+			throw new CollectorException("Max number of retries exceeded. Cause: \n " + errorList);
 		}
 
 		log.debug("Downloading " + requestUrl + " - try: " + retryNumber);
@@ -144,7 +144,7 @@ public class HttpConnector {
 				return attemptDownload(requestUrl, retryNumber + 1, errorList);
 			}
 		} catch (final InterruptedException e) {
-			throw new DnetCollectorException(e);
+			throw new CollectorException(e);
 		}
 	}
 
@@ -173,13 +173,13 @@ public class HttpConnector {
 	}
 
 	private String obtainNewLocation(final Map<String, List<String>> headerMap)
-		throws DnetCollectorException {
+		throws CollectorException {
 		for (final String key : headerMap.keySet()) {
 			if (key != null && key.toLowerCase().equals("location") && headerMap.get(key).size() > 0) {
 				return headerMap.get(key).get(0);
 			}
 		}
-		throw new DnetCollectorException(
+		throw new CollectorException(
 			"The requested url has been MOVED, but 'location' param is MISSING");
 	}
 

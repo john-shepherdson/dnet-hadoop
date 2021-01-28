@@ -9,11 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -30,10 +25,15 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
+import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
 import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.message.Message;
 import eu.dnetlib.message.MessageManager;
 import eu.dnetlib.message.MessageType;
@@ -59,10 +59,9 @@ public class TransformSparkJobNode {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String inputPath = parser.get("input");
-		final String outputPath = parser.get("output");
+		final String inputPath = parser.get("mdstoreInputPath");
+		final String outputPath = parser.get("mdstoreOutputPath");
 		// TODO this variable will be used after implementing Messaging with DNet Aggregator
-		final String workflowId = parser.get("workflowId");
 
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info(String.format("isLookupUrl: %s", isLookupUrl));
@@ -76,24 +75,22 @@ public class TransformSparkJobNode {
 			spark -> transformRecords(parser.getObjectMap(), isLookupService, spark, inputPath, outputPath));
 	}
 
-
-	public static void transformRecords(final Map<String,String>args, final ISLookUpService isLookUpService, final SparkSession spark, final String inputPath, final String outputPath) throws DnetTransformationException {
+	public static void transformRecords(final Map<String, String> args, final ISLookUpService isLookUpService,
+		final SparkSession spark, final String inputPath, final String outputPath) throws DnetTransformationException {
 
 		final LongAccumulator totalItems = spark.sparkContext().longAccumulator("TotalItems");
 		final LongAccumulator errorItems = spark.sparkContext().longAccumulator("errorItems");
 		final LongAccumulator transformedItems = spark.sparkContext().longAccumulator("transformedItems");
-		final AggregationCounter ct = new AggregationCounter(totalItems, errorItems,transformedItems );
+		final AggregationCounter ct = new AggregationCounter(totalItems, errorItems, transformedItems);
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
 		final Dataset<MetadataRecord> mdstoreInput = spark.read().format("parquet").load(inputPath).as(encoder);
-		final MapFunction<MetadataRecord, MetadataRecord> XSLTTransformationFunction = TransformationFactory.getTransformationPlugin(args,ct, isLookUpService);
+		final MapFunction<MetadataRecord, MetadataRecord> XSLTTransformationFunction = TransformationFactory
+			.getTransformationPlugin(args, ct, isLookUpService);
 		mdstoreInput.map(XSLTTransformationFunction, encoder).write().save(outputPath);
 
-		log.info("Transformed item "+ ct.getProcessedItems().count());
-		log.info("Total item "+ ct.getTotalItems().count());
-		log.info("Transformation Error item "+ ct.getErrorItems().count());
+		log.info("Transformed item " + ct.getProcessedItems().count());
+		log.info("Total item " + ct.getTotalItems().count());
+		log.info("Transformation Error item " + ct.getErrorItems().count());
 	}
-
-
-
 
 }

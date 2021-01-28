@@ -1,16 +1,16 @@
 
 package eu.dnetlib.dhp.collection.worker;
 
-public class DnetCollectorException extends Exception {
+public class CollectorException extends Exception {
 
 	/** */
 	private static final long serialVersionUID = -290723075076039757L;
 
-	public DnetCollectorException() {
+	public CollectorException() {
 		super();
 	}
 
-	public DnetCollectorException(
+	public CollectorException(
 		final String message,
 		final Throwable cause,
 		final boolean enableSuppression,
@@ -18,15 +18,15 @@ public class DnetCollectorException extends Exception {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
-	public DnetCollectorException(final String message, final Throwable cause) {
+	public CollectorException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 
-	public DnetCollectorException(final String message) {
+	public CollectorException(final String message) {
 		super(message);
 	}
 
-	public DnetCollectorException(final Throwable cause) {
+	public CollectorException(final Throwable cause) {
 		super(cause);
 	}
 }

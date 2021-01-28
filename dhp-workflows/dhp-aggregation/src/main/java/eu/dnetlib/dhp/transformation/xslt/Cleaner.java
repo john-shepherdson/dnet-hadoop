@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.transformation.xslt;
 
-
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import net.sf.saxon.s9api.*;
@@ -40,6 +39,6 @@ public class Cleaner implements ExtensionFunction, Serializable {
 		Qualifier cleanedValue = vocabularies.getSynonymAsQualifier(vocabularyName, currentValue);
 
 		return new XdmAtomicValue(
-			cleanedValue != null  ? cleanedValue.getClassid() : currentValue);
+			cleanedValue != null ? cleanedValue.getClassid() : currentValue);
 	}
 }

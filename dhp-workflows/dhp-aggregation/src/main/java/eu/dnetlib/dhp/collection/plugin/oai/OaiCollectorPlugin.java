@@ -15,7 +15,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.collector.worker.model.ApiDescriptor;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
+import eu.dnetlib.dhp.collection.worker.CollectorException;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
 
@@ -27,7 +27,7 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 	private OaiIteratorFactory oaiIteratorFactory;
 
 	@Override
-	public Stream<String> collect(final ApiDescriptor api) throws DnetCollectorException {
+	public Stream<String> collect(final ApiDescriptor api) throws CollectorException {
 		final String baseUrl = api.getBaseUrl();
 		final String mdFormat = api.getParams().get(FORMAT_PARAM);
 		final String setParam = api.getParams().get(OAI_SET_PARAM);
@@ -46,19 +46,19 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 		}
 
 		if (baseUrl == null || baseUrl.isEmpty()) {
-			throw new DnetCollectorException("Param 'baseurl' is null or empty");
+			throw new CollectorException("Param 'baseurl' is null or empty");
 		}
 
 		if (mdFormat == null || mdFormat.isEmpty()) {
-			throw new DnetCollectorException("Param 'mdFormat' is null or empty");
+			throw new CollectorException("Param 'mdFormat' is null or empty");
 		}
 
 		if (fromDate != null && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-			throw new DnetCollectorException("Invalid date (YYYY-MM-DD): " + fromDate);
+			throw new CollectorException("Invalid date (YYYY-MM-DD): " + fromDate);
 		}
 
 		if (untilDate != null && !untilDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-			throw new DnetCollectorException("Invalid date (YYYY-MM-DD): " + untilDate);
+			throw new CollectorException("Invalid date (YYYY-MM-DD): " + untilDate);
 		}
 
 		final Iterator<Iterator<String>> iters = sets

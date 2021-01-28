@@ -13,28 +13,32 @@
   },
   {
     "paramName": "i",
-    "paramLongName": "input",
+    "paramLongName": "mdstoreInputPath",
     "paramDescription": "the path of the sequencial file to read",
     "paramRequired": true
   },
   {
     "paramName": "o",
-    "paramLongName": "output",
+    "paramLongName": "mdstoreOutputPath",
     "paramDescription": "the path of the result DataFrame on HDFS",
     "paramRequired": true
   },
   {
-    "paramName": "w",
-    "paramLongName": "workflowId",
-    "paramDescription": "the identifier of the dnet Workflow",
-    "paramRequired": true
-  },
-  {
     "paramName": "tr",
-    "paramLongName": "transformationRule",
+    "paramLongName": "transformationRuleTitle",
     "paramDescription": "the transformation Rule to apply to the input MDStore",
     "paramRequired": true
   },
+
+  {
+    "paramName": "i",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "the Information System Service LookUp URL",
+    "paramRequired": true
+  },
+
+
+
   {
     "paramName": "tp",
     "paramLongName": "transformationPlugin",
