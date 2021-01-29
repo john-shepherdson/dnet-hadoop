@@ -16,6 +16,8 @@ import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.data.mdstore.manager.common.model.MDStoreCurrentVersion;
+import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.model.mdstore.Provenance;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
@@ -35,6 +37,17 @@ public class CollectionJobTest {
 	@AfterAll
 	public static void afterAll() {
 		spark.stop();
+	}
+
+	@Test
+	public void testJSONSerialization() throws Exception {
+		final String s = IOUtils.toString(getClass().getResourceAsStream("input.json"));
+		System.out.println("s = " + s);
+		final ObjectMapper mapper = new ObjectMapper();
+		MDStoreVersion mi = mapper.readValue(s, MDStoreVersion.class);
+
+		assertNotNull(mi);
+
 	}
 
 	@Test

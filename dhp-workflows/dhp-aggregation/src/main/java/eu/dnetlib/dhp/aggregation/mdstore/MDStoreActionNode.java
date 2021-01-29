@@ -38,8 +38,8 @@ public class MDStoreActionNode {
 	public static final String COMMIT_VERSION_URL = "%s/version/%s/commit/%s";
 	public static final String ROLLBACK_VERSION_URL = "%s/version/%s/abort";
 
-	public static final String READ_LOCK_URL = "%s/mdstores/mdstore/%s/startReading";
-	public static final String READ_UNLOCK_URL = "%s/mdstores/version/%s/endReading";
+	public static final String READ_LOCK_URL = "%s/mdstore/%s/startReading";
+	public static final String READ_UNLOCK_URL = "%s/version/%s/endReading";
 
 	private static final String MDSTOREVERSIONPARAM = "mdStoreVersion";
 	private static final String MDSTOREREADLOCKPARAM = "mdStoreReadLockVersion";
@@ -94,11 +94,7 @@ public class MDStoreActionNode {
 				System.setProperty("hadoop.home.dir", "/");
 				// Get the filesystem - HDFS
 				FileSystem fs = FileSystem.get(URI.create(hdfsuri), conf);
-				String mdStoreSizeParam = argumentParser.get("mdStoreSize");
 
-				if (StringUtils.isBlank(mdStoreSizeParam)) {
-					throw new IllegalArgumentException("missing or empty argument mdStoreSize");
-				}
 				Path hdfstoreSizepath = new Path(mdStoreVersion.getHdfsPath() + "/size");
 
 				FSDataInputStream inputStream = fs.open(hdfstoreSizepath);
