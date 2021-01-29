@@ -116,7 +116,9 @@ public class MDStoreVersion implements Serializable {
 	@Override
 	public String toString() {
 		return String
-			.format("MDStoreVersion [id=%s, mdstore=%s, writing=%s, readCount=%s, lastUpdate=%s, size=%s, hdfsPath=%s]", id, mdstore, writing, readCount, lastUpdate, size, hdfsPath);
+			.format(
+				"MDStoreVersion [id=%s, mdstore=%s, writing=%s, readCount=%s, lastUpdate=%s, size=%s, hdfsPath=%s]", id,
+				mdstore, writing, readCount, lastUpdate, size, hdfsPath);
 	}
 
 	@Override
@@ -126,8 +128,12 @@ public class MDStoreVersion implements Serializable {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (this == obj) { return true; }
-		if (!(obj instanceof MDStoreVersion)) { return false; }
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof MDStoreVersion)) {
+			return false;
+		}
 		final MDStoreVersion other = (MDStoreVersion) obj;
 		return Objects.equals(id, other.id);
 	}

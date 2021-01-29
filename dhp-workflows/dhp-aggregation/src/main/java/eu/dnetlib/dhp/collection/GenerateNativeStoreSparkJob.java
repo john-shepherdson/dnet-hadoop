@@ -3,13 +3,17 @@ package eu.dnetlib.dhp.collection;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.ByteArrayInputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -19,6 +23,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -28,7 +33,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
+import eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.collection.worker.CollectorWorkerApplication;
+import eu.dnetlib.dhp.common.rest.DNetRestClient;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.model.mdstore.Provenance;
 import eu.dnetlib.message.MessageManager;
@@ -36,6 +45,7 @@ import eu.dnetlib.message.MessageManager;
 public class GenerateNativeStoreSparkJob {
 
 	private static final Logger log = LoggerFactory.getLogger(GenerateNativeStoreSparkJob.class);
+	private static final String DATASET_NAME = "/store";
 
 	public static void main(String[] args) throws Exception {
 
@@ -50,11 +60,15 @@ public class GenerateNativeStoreSparkJob {
 		final String provenanceArgument = parser.get("provenance");
 		log.info("Provenance is {}", provenanceArgument);
 		final Provenance provenance = jsonMapper.readValue(provenanceArgument, Provenance.class);
+
 		final String dateOfCollectionArgs = parser.get("dateOfCollection");
 		log.info("dateOfCollection is {}", dateOfCollectionArgs);
 		final long dateOfCollection = new Long(dateOfCollectionArgs);
-		final String sequenceFileInputPath = parser.get("input");
-		log.info("sequenceFileInputPath is {}", dateOfCollectionArgs);
+
+		String mdStoreVersion = parser.get("mdStoreVersion");
+		log.info("mdStoreVersion is {}", mdStoreVersion);
+
+		final MDStoreVersion currentVersion = jsonMapper.readValue(mdStoreVersion, MDStoreVersion.class);
 
 		Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
@@ -70,7 +84,9 @@ public class GenerateNativeStoreSparkJob {
 				final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 				final JavaPairRDD<IntWritable, Text> inputRDD = sc
-					.sequenceFile(sequenceFileInputPath, IntWritable.class, Text.class);
+					.sequenceFile(
+						currentVersion.getHdfsPath() + CollectorWorkerApplication.SEQUENTIAL_FILE_NAME,
+						IntWritable.class, Text.class);
 
 				final LongAccumulator totalItems = sc.sc().longAccumulator("TotalItems");
 				final LongAccumulator invalidRecords = sc.sc().longAccumulator("InvalidRecords");
@@ -89,12 +105,26 @@ public class GenerateNativeStoreSparkJob {
 					.distinct();
 
 				final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
-				final Dataset<MetadataRecord> mdstore = spark.createDataset(nativeStore.rdd(), encoder);
-				final LongAccumulator mdStoreRecords = sc.sc().longAccumulator("MDStoreRecords");
-				mdStoreRecords.add(mdstore.count());
+				Dataset<MetadataRecord> mdstore = spark.createDataset(nativeStore.rdd(), encoder);
 
-				mdstore.write().format("parquet").save(parser.get("output"));
+				mdstore
+					.write()
+					.mode(SaveMode.Overwrite)
+					.format("parquet")
+					.save(currentVersion.getHdfsPath() + DATASET_NAME);
+				mdstore = spark.read().load(currentVersion.getHdfsPath() + DATASET_NAME).as(encoder);
 
+				final Long total = mdstore.count();
+
+				FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
+
+				FSDataOutputStream output = fs.create(new Path(currentVersion.getHdfsPath() + "/size"));
+
+				final BufferedOutputStream os = new BufferedOutputStream(output);
+
+				os.write(total.toString().getBytes(StandardCharsets.UTF_8));
+
+				os.close();
 			});
 
 	}

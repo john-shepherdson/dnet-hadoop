@@ -30,15 +30,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "i",
-    "paramLongName": "input",
-    "paramDescription": "the path of the sequencial file to read",
-    "paramRequired": true
-  },
-  {
-    "paramName": "o",
-    "paramLongName": "output",
-    "paramDescription": "the path of the result DataFrame on HDFS",
+    "paramName": "mv",
+    "paramLongName": "mdStoreVersion",
+    "paramDescription": "the Metadata Store Version Info",
     "paramRequired": true
   },
   {

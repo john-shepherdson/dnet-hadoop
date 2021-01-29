@@ -2,25 +2,18 @@
 package eu.dnetlib.dhp.collector.worker;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
 
-import java.io.File;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.collector.worker.model.ApiDescriptor;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.worker.CollectorWorker;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
-import eu.dnetlib.message.Message;
-import eu.dnetlib.message.MessageManager;
+import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
 @Disabled
 public class DnetCollectorWorkerApplicationTests {

@@ -1,11 +1,6 @@
 <workflow-app name="CollectionWorkflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>mdStorePath</name>
-            <description>the path of the native mdstore</description>
-        </property>
-
-        <property>
             <name>apiDescription</name>
             <description>A json encoding of the API Description class</description>
         </property>
@@ -16,7 +11,7 @@
         </property>
         <property>
             <name>identifierPath</name>
-            <description>An xpath to retrieve the metadata idnentifier for the generation of DNet Identifier </description>
+            <description>An xpath to retrieve the metadata identifier for the generation of DNet Identifier </description>
         </property>
 
         <property>
@@ -33,26 +28,78 @@
             <name>workflowId</name>
             <description>The identifier of the workflow</description>
         </property>
+
+        <property>
+            <name>mdStoreID</name>
+            <description>The identifier of the mdStore</description>
+        </property>
+
+        <property>
+            <name>mdStoreManagerURI</name>
+            <description>The URI of the MDStore Manager</description>
+        </property>
+
+        <property>
+            <name>collectionMode</name>
+            <description>Should be Refresh or Incremental</description>
+        </property>
+
     </parameters>
     <global>
         <job-tracker>${jobTracker}</job-tracker>
         <name-node>${nameNode}</name-node>
     </global>
 
-    <start to="CollectionWorker"/>
+
+    <start to="StartTransaction"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+
+    <decision name="collection_mode">
+        <switch>
+            <case to="StartTransaction">${wf:conf('collectionMode') eq 'REFRESH'}</case>
+            <case to="BeginRead">${wf:conf('collectionMode') eq 'INCREMENTAL'}</case>
+            <default to="ImportDatacite"/>
+        </switch>
+    </decision>
+
+    <action name="BeginRead">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_LOCK</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreID}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="StartTransaction"/>
+        <error to="Kill"/>
+    </action>
+
+
+
+    <action name="StartTransaction">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>NEW_VERSION</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreID}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="CollectionWorker"/>
+        <error to="Kill"/>
+    </action>
+
     <action name="CollectionWorker">
         <java>
             <main-class>eu.dnetlib.dhp.collection.worker.CollectorWorkerApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${workingDir}/sequenceFile_${mdstoreVersion}</arg>
             <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
         </java>
         <ok to="GenerateNativeStoreSparkJob"/>
-        <error to="Kill"/>
+        <error to="RollBack"/>
     </action>
 
     <action name="GenerateNativeStoreSparkJob">
@@ -75,13 +122,56 @@
             <arg>--dateOfCollection</arg><arg>${timestamp}</arg>
             <arg>--provenance</arg><arg>${dataSourceInfo}</arg>
             <arg>--xpath</arg><arg>${identifierPath}</arg>
-            <arg>--input</arg><arg>${workingDir}/sequenceFile</arg>
-            <arg>--output</arg><arg>${mdStorePath}</arg>
-            <arg>-w</arg><arg>${workflowId}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
         </spark>
+        <ok to="collection_mode_end"/>
+        <error to="RollBack"/>
+    </action>
+
+
+    <decision name="collection_mode_end">
+        <switch>
+            <case to="CommitVersion">${wf:conf('collectionMode') eq 'REFRESH'}</case>
+            <case to="EndRead">${wf:conf('collectionMode') eq 'INCREMENTAL'}</case>
+            <default to="ImportDatacite"/>
+        </switch>
+    </decision>
+
+    <action name="EndRead">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="CommitVersion"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CommitVersion">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+    <action name="RollBack">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('CollectionWorker')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
+        <error to="Kill"/>
+    </action>
+
 
     <end name="End"/>
 </workflow-app>
