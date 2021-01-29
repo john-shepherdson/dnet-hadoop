@@ -2,6 +2,7 @@
 package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,5 +48,23 @@ public class MDStoreCurrentVersion implements Serializable {
 
 	public static MDStoreCurrentVersion newInstance(final MDStoreVersion v) {
 		return newInstance(v.getMdstore(), v.getId());
+	}
+
+	@Override
+	public String toString() {
+		return String.format("MDStoreCurrentVersion [mdstore=%s, currentVersion=%s]", mdstore, currentVersion);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(currentVersion, mdstore);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) { return true; }
+		if (!(obj instanceof MDStoreCurrentVersion)) { return false; }
+		final MDStoreCurrentVersion other = (MDStoreCurrentVersion) obj;
+		return Objects.equals(currentVersion, other.currentVersion) && Objects.equals(mdstore, other.mdstore);
 	}
 }

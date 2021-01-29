@@ -3,6 +3,7 @@ package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -163,4 +164,24 @@ public class MDStoreWithInfo implements Serializable {
 	public void setHdfsPath(final String hdfsPath) {
 		this.hdfsPath = hdfsPath;
 	}
+
+	@Override
+	public String toString() {
+		return String
+			.format("MDStoreWithInfo [id=%s, format=%s, layout=%s, interpretation=%s, datasourceName=%s, datasourceId=%s, apiId=%s, currentVersion=%s, creationDate=%s, lastUpdate=%s, size=%s, numberOfVersions=%s, hdfsPath=%s]", id, format, layout, interpretation, datasourceName, datasourceId, apiId, currentVersion, creationDate, lastUpdate, size, numberOfVersions, hdfsPath);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) { return true; }
+		if (!(obj instanceof MDStoreWithInfo)) { return false; }
+		final MDStoreWithInfo other = (MDStoreWithInfo) obj;
+		return Objects.equals(id, other.id);
+	}
+
 }
