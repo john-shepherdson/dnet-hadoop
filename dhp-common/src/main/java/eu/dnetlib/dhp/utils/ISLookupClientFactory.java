@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-// import javax.xml.ws.BindingProvider;
+// import javax.xml.ws.BindingProvider;  // deprecated since v9 and removed in v11 (https://docs.oracle.com/javase/9/docs/api/java.xml.bind-summary.html#packages.summary)
 import jakarta.xml.ws.BindingProvider;
 
 public class ISLookupClientFactory {
