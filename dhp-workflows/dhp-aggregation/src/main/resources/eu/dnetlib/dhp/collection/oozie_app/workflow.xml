@@ -41,7 +41,7 @@
 
         <property>
             <name>collectionMode</name>
-            <description>Should be Refresh or Incremental</description>
+            <description>Should be REFRESH or INCREMENTAL</description>
         </property>
 
     </parameters>
@@ -164,8 +164,8 @@
     <action name="RollBack">
         <java>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
-            <arg>--action</arg><arg>COMMIT</arg>
-            <arg>--mdStoreVersion</arg><arg>${wf:actionData('CollectionWorker')['mdStoreVersion']}</arg>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
         </java>
         <ok to="Kill"/>
