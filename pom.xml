@@ -94,6 +94,13 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>jakarta.platform</groupId>
+			<artifactId>jakarta.jakartaee-api</artifactId>
+			<version>${jakarta.jakartaee-api.version}</version>
+			<scope>provided</scope>
+		  </dependency>
+
+		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<version>${junit-jupiter.version}</version>
@@ -715,5 +722,6 @@
 		<common.text.version>1.8</common.text.version>
 		<org.apache.httpcomponents.version>4.5.3</org.apache.httpcomponents.version>
 		<net.alchim31.maven.version>4.0.1</net.alchim31.maven.version>
+		<jakarta.jakartaee-api.version>9.0.0</jakarta.jakartaee-api.version>
 	</properties>
 </project>

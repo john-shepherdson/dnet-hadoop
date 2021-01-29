@@ -3,13 +3,13 @@ package eu.dnetlib.dhp.utils;
 
 import java.util.Map;
 
-import javax.xml.ws.BindingProvider;
-
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+// import javax.xml.ws.BindingProvider;
+import jakarta.xml.ws.BindingProvider;
 
 public class ISLookupClientFactory {
 
@@ -43,8 +43,10 @@ public class ISLookupClientFactory {
 			requestContext.put("com.sun.xml.internal.ws.connect.timeout", connectTimeout);
 			requestContext.put("com.sun.xml.ws.request.timeout", requestTimeout);
 			requestContext.put("com.sun.xml.ws.connect.timeout", connectTimeout);
-			requestContext.put("javax.xml.ws.client.receiveTimeout", requestTimeout);
-			requestContext.put("javax.xml.ws.client.connectionTimeout", connectTimeout);
+//			requestContext.put("javax.xml.ws.client.receiveTimeout", requestTimeout);
+//			requestContext.put("javax.xml.ws.client.connectionTimeout", connectTimeout);
+			requestContext.put("jakarta.xml.ws.client.receiveTimeout", requestTimeout);
+			requestContext.put("jakarta.xml.ws.client.connectionTimeout", connectTimeout);
 		}
 
 		return service;
