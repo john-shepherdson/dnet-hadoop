@@ -108,6 +108,7 @@ object ImportDatacite {
 
     val cnt = writeSequenceFile(hdfsTargetPath, ts, conf)
 
+
     log.info(s"Imported from Datacite API $cnt documents")
 
     if (cnt  > 0) {

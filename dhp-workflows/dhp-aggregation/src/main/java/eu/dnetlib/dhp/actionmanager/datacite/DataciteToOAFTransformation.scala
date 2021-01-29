@@ -11,9 +11,10 @@ import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
 
 import java.nio.charset.CodingErrorAction
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.{Date, Locale}
 import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 import scala.io.{Codec, Source}
@@ -43,6 +44,8 @@ object DataciteToOAFTransformation {
   implicit val codec: Codec = Codec("UTF-8")
   codec.onMalformedInput(CodingErrorAction.REPLACE)
   codec.onUnmappableCharacter(CodingErrorAction.REPLACE)
+
+
 
   private val PID_VOCABULARY = "dnet:pid_types"
   val COBJ_VOCABULARY = "dnet:publication_resource"
@@ -298,8 +301,13 @@ object DataciteToOAFTransformation {
     result.setPid(List(pid).asJava)
     result.setId(OafMapperUtils.createOpenaireId(50, s"datacite____::$doi", true))
     result.setOriginalId(List(doi).asJava)
-    result.setDateofcollection(s"${dateOfCollection}")
-    result.setDateoftransformation(s"$ts")
+
+    val d = new Date(dateOfCollection*1000)
+    val ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
+
+
+    result.setDateofcollection(ISO8601FORMAT.format(d))
+    result.setDateoftransformation(ISO8601FORMAT.format(ts))
     result.setDataInfo(dataInfo)
 
     val creators = (json \\ "creators").extractOrElse[List[CreatorType]](List())

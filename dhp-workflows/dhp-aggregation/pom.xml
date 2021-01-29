@@ -37,7 +37,7 @@
         </plugins>
 
     </build>
-  
+
     <dependencies>
 
         <dependency>
@@ -58,15 +58,9 @@
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        
-         <dependency>
+
+        <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-schemas</artifactId>
             <version>${project.version}</version>

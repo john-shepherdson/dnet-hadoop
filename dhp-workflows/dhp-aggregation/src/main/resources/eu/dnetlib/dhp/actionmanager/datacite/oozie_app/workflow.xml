@@ -13,12 +13,24 @@
             <name>nativeInputPath</name>
             <description>the path of the input MDStore</description>
         </property>
+
+
     </parameters>
 
-    <start to="ImportDatacite"/>
+    <start to="resume_from"/>
+
+
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="TransformJob">${wf:conf('resumeFrom') eq 'TransformJob'}</case>
+            <case to="ExportDataset">${wf:conf('resumeFrom') eq 'ExportDataset'}</case>
+            <default to="ImportDatacite"/>
+        </switch>
+    </decision>
 
     <action name="ImportDatacite">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -69,6 +81,14 @@
             <arg>-tr</arg><arg>${isLookupUrl}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
+        <ok to="DeletePathIfExists"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="DeletePathIfExists">
+        <fs>
+            <delete path='${mdstoreOutputPath}_raw_AS'/>
+        </fs>
         <ok to="ExportDataset"/>
         <error to="Kill"/>
     </action>
