@@ -51,7 +51,7 @@
     </global>
 
 
-    <start to="StartTransaction"/>
+    <start to="collection_mode"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -61,7 +61,7 @@
         <switch>
             <case to="StartTransaction">${wf:conf('collectionMode') eq 'REFRESH'}</case>
             <case to="BeginRead">${wf:conf('collectionMode') eq 'INCREMENTAL'}</case>
-            <default to="ImportDatacite"/>
+            <default to="StartTransaction"/>
         </switch>
     </decision>
 
@@ -99,7 +99,7 @@
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
         </java>
         <ok to="GenerateNativeStoreSparkJob"/>
-        <error to="RollBack"/>
+        <error to="FailCollection"/>
     </action>
 
     <action name="GenerateNativeStoreSparkJob">
@@ -123,9 +123,10 @@
             <arg>--provenance</arg><arg>${dataSourceInfo}</arg>
             <arg>--xpath</arg><arg>${identifierPath}</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--readMdStoreVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
         </spark>
         <ok to="collection_mode_end"/>
-        <error to="RollBack"/>
+        <error to="FailCollection"/>
     </action>
 
 
@@ -133,7 +134,7 @@
         <switch>
             <case to="CommitVersion">${wf:conf('collectionMode') eq 'REFRESH'}</case>
             <case to="EndRead">${wf:conf('collectionMode') eq 'INCREMENTAL'}</case>
-            <default to="ImportDatacite"/>
+            <default to="CommitVersion"/>
         </switch>
     </decision>
 
@@ -160,6 +161,28 @@
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="FailCollection">
+        <switch>
+            <case to="RollBack">${wf:conf('collectionMode') eq 'REFRESH'}</case>
+            <case to="EndReadRollBack">${wf:conf('collectionMode') eq 'INCREMENTAL'}</case>
+            <default to="RollBack"/>
+        </switch>
+    </decision>
+
+    <action name="EndReadRollBack">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="RollBack"/>
+        <error to="Kill"/>
+    </action>
+
+
 
     <action name="RollBack">
         <java>

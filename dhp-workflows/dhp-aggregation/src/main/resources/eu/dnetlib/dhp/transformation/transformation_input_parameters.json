@@ -13,19 +13,19 @@
   },
   {
     "paramName": "i",
-    "paramLongName": "mdstoreInputPath",
-    "paramDescription": "the path of the sequencial file to read",
+    "paramLongName": "mdstoreInputVersion",
+    "paramDescription": "the mdStore Version bean of the Input",
     "paramRequired": true
   },
   {
     "paramName": "o",
-    "paramLongName": "mdstoreOutputPath",
-    "paramDescription": "the path of the result DataFrame on HDFS",
+    "paramLongName": "mdstoreOutputVersion",
+    "paramDescription": "the mdStore Version bean of the Output",
     "paramRequired": true
   },
   {
     "paramName": "tr",
-    "paramLongName": "transformationRuleTitle",
+    "paramLongName": "transformationRuleId",
     "paramDescription": "the transformation Rule to apply to the input MDStore",
     "paramRequired": true
   },

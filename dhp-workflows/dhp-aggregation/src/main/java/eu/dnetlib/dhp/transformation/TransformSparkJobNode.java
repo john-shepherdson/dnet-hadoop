@@ -3,14 +3,11 @@ package eu.dnetlib.dhp.transformation;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.ByteArrayInputStream;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -18,25 +15,18 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.aggregation.common.AggregationUtility;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
-import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.message.Message;
-import eu.dnetlib.message.MessageManager;
-import eu.dnetlib.message.MessageType;
 
 public class TransformSparkJobNode {
 
@@ -59,9 +49,13 @@ public class TransformSparkJobNode {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String inputPath = parser.get("mdstoreInputPath");
-		final String outputPath = parser.get("mdstoreOutputPath");
+		final String mdstoreInputVersion = parser.get("mdstoreInputVersion");
+		final String mdstoreOutputVersion = parser.get("mdstoreOutputVersion");
 		// TODO this variable will be used after implementing Messaging with DNet Aggregator
+
+		final ObjectMapper jsonMapper = new ObjectMapper();
+		final MDStoreVersion nativeMdStoreVersion = jsonMapper.readValue(mdstoreInputVersion, MDStoreVersion.class);
+		final MDStoreVersion cleanedMdStoreVersion = jsonMapper.readValue(mdstoreOutputVersion, MDStoreVersion.class);
 
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info(String.format("isLookupUrl: %s", isLookupUrl));
@@ -72,11 +66,14 @@ public class TransformSparkJobNode {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> transformRecords(parser.getObjectMap(), isLookupService, spark, inputPath, outputPath));
+			spark -> transformRecords(
+				parser.getObjectMap(), isLookupService, spark, nativeMdStoreVersion.getHdfsPath(),
+				cleanedMdStoreVersion.getHdfsPath()));
 	}
 
 	public static void transformRecords(final Map<String, String> args, final ISLookUpService isLookUpService,
-		final SparkSession spark, final String inputPath, final String outputPath) throws DnetTransformationException {
+		final SparkSession spark, final String inputPath, final String outputPath)
+		throws DnetTransformationException, IOException {
 
 		final LongAccumulator totalItems = spark.sparkContext().longAccumulator("TotalItems");
 		final LongAccumulator errorItems = spark.sparkContext().longAccumulator("errorItems");
@@ -86,11 +83,13 @@ public class TransformSparkJobNode {
 		final Dataset<MetadataRecord> mdstoreInput = spark.read().format("parquet").load(inputPath).as(encoder);
 		final MapFunction<MetadataRecord, MetadataRecord> XSLTTransformationFunction = TransformationFactory
 			.getTransformationPlugin(args, ct, isLookUpService);
-		mdstoreInput.map(XSLTTransformationFunction, encoder).write().save(outputPath);
+		mdstoreInput.map(XSLTTransformationFunction, encoder).write().save(outputPath + "/store");
 
 		log.info("Transformed item " + ct.getProcessedItems().count());
 		log.info("Total item " + ct.getTotalItems().count());
 		log.info("Transformation Error item " + ct.getErrorItems().count());
+
+		AggregationUtility.writeTotalSizeOnHDFS(spark, ct.getProcessedItems().count(), outputPath + "/size");
 	}
 
 }

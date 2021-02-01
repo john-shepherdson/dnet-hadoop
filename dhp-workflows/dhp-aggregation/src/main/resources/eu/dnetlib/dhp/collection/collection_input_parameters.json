@@ -36,6 +36,12 @@
     "paramRequired": true
   },
   {
+    "paramName": "rmv",
+    "paramLongName": "readMdStoreVersion",
+    "paramDescription": "the Read Lock Metadata Store Version bean",
+    "paramRequired": false
+  },
+  {
     "paramName": "w",
     "paramLongName": "workflowId",
     "paramDescription": "the identifier of the dnet Workflow",

@@ -1,25 +1,25 @@
 <workflow-app name="Transformation_Workflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>mdstoreInputPath</name>
-            <description>the path of the native MDStore</description>
+            <name>mdStoreInputId</name>
+            <description>the identifier of the native MDStore</description>
         </property>
-
         <property>
-            <name>mdstoreOutputPath</name>
+            <name>mdStoreOutputId</name>
+            <description>the identifier of the cleaned MDStore</description>
+        </property>
+        <property>
+            <name>mdStoreManagerURI</name>
             <description>the path of the cleaned mdstore</description>
         </property>
-
         <property>
-            <name>transformationRuleTitle</name>
+            <name>transformationRuleId</name>
             <description>The transformation Rule to apply</description>
         </property>
-
         <property>
             <name>transformationPlugin</name>
             <description>The transformation Plugin</description>
         </property>
-
         <property>
             <name>dateOfTransformation</name>
             <description>The timestamp of the transformation date</description>
@@ -28,10 +28,33 @@
 
     </parameters>
 
-    <start to="TransformJob"/>
+    <start to="BeginRead"/>
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="BeginRead">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_LOCK</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreInputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="StartTransaction"/>
+        <error to="Kill"/>
+    </action>
+    <action name="StartTransaction">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>NEW_VERSION</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="TransformJob"/>
+        <error to="EndReadRollBack"/>
+    </action>
 
     <action name="TransformJob">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -49,15 +72,60 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--mdstoreInputPath</arg><arg>${mdstoreInputPath}</arg>
-            <arg>--mdstoreOutputPath</arg><arg>${mdstoreOutputPath}</arg>
+            <arg>--mdstoreInputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
             <arg>--dateOfTransformation</arg><arg>${dateOfTransformation}</arg>
             <arg>--transformationPlugin</arg><arg>${transformationPlugin}</arg>
-            <arg>--transformationRuleTitle</arg><arg>${transformationRuleTitle}</arg>
-
-
+            <arg>--transformationRuleId</arg><arg>${transformationRuleId}</arg>
         </spark>
+        <ok to="EndRead"/>
+        <error to="EndReadRollBack"/>
+    </action>
+
+    <action name="EndRead">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="CommitVersion"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CommitVersion">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
         <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="EndReadRollBack">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="RollBack"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="RollBack">
+        <java>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
         <error to="Kill"/>
     </action>
 

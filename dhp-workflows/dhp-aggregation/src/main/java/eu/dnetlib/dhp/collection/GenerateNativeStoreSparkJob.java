@@ -5,9 +5,9 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,10 +20,9 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoder;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.expressions.Aggregator;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -34,18 +33,61 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
-import eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode;
+import eu.dnetlib.dhp.aggregation.common.AggregationUtility;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.worker.CollectorWorkerApplication;
-import eu.dnetlib.dhp.common.rest.DNetRestClient;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.model.mdstore.Provenance;
-import eu.dnetlib.message.MessageManager;
+import scala.Tuple2;
 
 public class GenerateNativeStoreSparkJob {
 
 	private static final Logger log = LoggerFactory.getLogger(GenerateNativeStoreSparkJob.class);
 	private static final String DATASET_NAME = "/store";
+
+	public static class MDStoreAggregator extends Aggregator<MetadataRecord, MetadataRecord, MetadataRecord> {
+
+		@Override
+		public MetadataRecord zero() {
+			return new MetadataRecord();
+		}
+
+		@Override
+		public MetadataRecord reduce(MetadataRecord b, MetadataRecord a) {
+
+			return getLatestRecord(b, a);
+		}
+
+		private MetadataRecord getLatestRecord(MetadataRecord b, MetadataRecord a) {
+			if (b == null)
+				return a;
+
+			if (a == null)
+				return b;
+			return (a.getDateOfCollection() > b.getDateOfCollection()) ? a : b;
+		}
+
+		@Override
+		public MetadataRecord merge(MetadataRecord b, MetadataRecord a) {
+			return getLatestRecord(b, a);
+		}
+
+		@Override
+		public MetadataRecord finish(MetadataRecord j) {
+			return j;
+		}
+
+		@Override
+		public Encoder<MetadataRecord> bufferEncoder() {
+			return Encoders.kryo(MetadataRecord.class);
+		}
+
+		@Override
+		public Encoder<MetadataRecord> outputEncoder() {
+			return Encoders.kryo(MetadataRecord.class);
+		}
+
+	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -70,6 +112,12 @@ public class GenerateNativeStoreSparkJob {
 
 		final MDStoreVersion currentVersion = jsonMapper.readValue(mdStoreVersion, MDStoreVersion.class);
 
+		String readMdStoreVersionParam = parser.get("readMdStoreVersion");
+		log.info("readMdStoreVersion is {}", readMdStoreVersionParam);
+
+		final MDStoreVersion readMdStoreVersion = StringUtils.isBlank(readMdStoreVersionParam) ? null
+			: jsonMapper.readValue(readMdStoreVersionParam, MDStoreVersion.class);
+
 		Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
@@ -77,6 +125,9 @@ public class GenerateNativeStoreSparkJob {
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		SparkConf conf = new SparkConf();
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		conf.registerKryoClasses(Collections.singleton(MetadataRecord.class).toArray(new Class[] {}));
+
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
@@ -105,8 +156,27 @@ public class GenerateNativeStoreSparkJob {
 					.distinct();
 
 				final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
+
 				Dataset<MetadataRecord> mdstore = spark.createDataset(nativeStore.rdd(), encoder);
 
+				if (readMdStoreVersion != null) {
+					// INCREMENTAL MODE
+
+					Dataset<MetadataRecord> currentMdStoreVersion = spark
+						.read()
+						.load(readMdStoreVersion.getHdfsPath() + DATASET_NAME)
+						.as(encoder);
+					TypedColumn<MetadataRecord, MetadataRecord> aggregator = new MDStoreAggregator().toColumn();
+
+					mdstore = currentMdStoreVersion
+						.union(mdstore)
+						.groupByKey(
+							(MapFunction<MetadataRecord, String>) MetadataRecord::getId,
+							Encoders.STRING())
+						.agg(aggregator)
+						.map((MapFunction<Tuple2<String, MetadataRecord>, MetadataRecord>) Tuple2::_2, encoder);
+
+				}
 				mdstore
 					.write()
 					.mode(SaveMode.Overwrite)
@@ -116,17 +186,8 @@ public class GenerateNativeStoreSparkJob {
 
 				final Long total = mdstore.count();
 
-				FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
-
-				FSDataOutputStream output = fs.create(new Path(currentVersion.getHdfsPath() + "/size"));
-
-				final BufferedOutputStream os = new BufferedOutputStream(output);
-
-				os.write(total.toString().getBytes(StandardCharsets.UTF_8));
-
-				os.close();
+				AggregationUtility.writeTotalSizeOnHDFS(spark, total, currentVersion.getHdfsPath() + "/size");
 			});
-
 	}
 
 	public static MetadataRecord parseRecord(

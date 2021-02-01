@@ -9,7 +9,9 @@
         <oai:record>
             <xsl:copy-of select="//oai:header"/>
             <metadata>
-                <xsl:for-each select="//oai:set">
+
+                <xsl:copy-of select="//oai:metadata/*"/>
+                <xsl:for-each select="//oai:setSpec">
                     <dr:CobjCategory><xsl:value-of select="vocabulary:clean(.,'dnet:publication_resource')"/></dr:CobjCategory>
                 </xsl:for-each>
             </metadata>
