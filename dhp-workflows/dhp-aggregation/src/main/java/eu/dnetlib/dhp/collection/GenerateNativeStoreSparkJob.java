@@ -157,8 +157,9 @@ public class GenerateNativeStoreSparkJob {
 
 				final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
 
-				Dataset<MetadataRecord> mdstore = spark.createDataset(nativeStore.rdd(), encoder);
+				final Dataset<MetadataRecord> mdstore = spark.createDataset(nativeStore.rdd(), encoder);
 
+				final String targetPath = currentVersion.getHdfsPath() + DATASET_NAME;
 				if (readMdStoreVersion != null) {
 					// INCREMENTAL MODE
 
@@ -168,26 +169,33 @@ public class GenerateNativeStoreSparkJob {
 						.as(encoder);
 					TypedColumn<MetadataRecord, MetadataRecord> aggregator = new MDStoreAggregator().toColumn();
 
-					mdstore = currentMdStoreVersion
-						.union(mdstore)
-						.groupByKey(
-							(MapFunction<MetadataRecord, String>) MetadataRecord::getId,
-							Encoders.STRING())
-						.agg(aggregator)
-						.map((MapFunction<Tuple2<String, MetadataRecord>, MetadataRecord>) Tuple2::_2, encoder);
+					saveDataset(
+						currentMdStoreVersion
+							.union(mdstore)
+							.groupByKey(
+								(MapFunction<MetadataRecord, String>) MetadataRecord::getId,
+								Encoders.STRING())
+							.agg(aggregator)
+							.map((MapFunction<Tuple2<String, MetadataRecord>, MetadataRecord>) Tuple2::_2, encoder),
+						targetPath);
 
+				} else {
+					saveDataset(mdstore, targetPath);
 				}
-				mdstore
-					.write()
-					.mode(SaveMode.Overwrite)
-					.format("parquet")
-					.save(currentVersion.getHdfsPath() + DATASET_NAME);
-				mdstore = spark.read().load(currentVersion.getHdfsPath() + DATASET_NAME).as(encoder);
 
-				final Long total = mdstore.count();
+				final Long total = spark.read().load(targetPath).count();
 
 				AggregationUtility.writeTotalSizeOnHDFS(spark, total, currentVersion.getHdfsPath() + "/size");
 			});
+	}
+
+	private static void saveDataset(final Dataset<MetadataRecord> currentMdStore, final String targetPath) {
+		currentMdStore
+			.write()
+			.mode(SaveMode.Overwrite)
+			.format("parquet")
+			.save(targetPath);
+
 	}
 
 	public static MetadataRecord parseRecord(
