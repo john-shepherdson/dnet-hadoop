@@ -1,11 +1,6 @@
 
 package eu.dnetlib.dhp.collection.worker;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.Properties;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +11,6 @@ import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
-import eu.dnetlib.dhp.common.rest.DNetRestClient;
 
 /**
  * DnetCollectortWorkerApplication is the main class responsible to start the Dnet Collection into HDFS. This module
@@ -31,7 +25,7 @@ public class CollectorWorkerApplication {
 
 	private static final CollectorPluginFactory collectorPluginFactory = new CollectorPluginFactory();
 
-	public static String SEQUENTIAL_FILE_NAME = "/sequence_file";
+	public static String SEQUENCE_FILE_NAME = "/sequence_file";
 
 	/**
 	 * @param args
@@ -61,7 +55,7 @@ public class CollectorWorkerApplication {
 
 		final ApiDescriptor api = jsonMapper.readValue(apiDescriptor, ApiDescriptor.class);
 		final CollectorWorker worker = new CollectorWorker(collectorPluginFactory, api, hdfsuri,
-			currentVersion.getHdfsPath() + SEQUENTIAL_FILE_NAME);
+			currentVersion.getHdfsPath() + SEQUENCE_FILE_NAME);
 		worker.collect();
 
 	}
