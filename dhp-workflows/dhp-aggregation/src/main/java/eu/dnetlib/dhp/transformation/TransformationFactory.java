@@ -18,7 +18,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 public class TransformationFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(TransformationFactory.class);
-	public static final String TRULE_XQUERY = "for $x in collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType') where $x//TITLE = \"%s\" return $x//CODE/text()";
+	public static final String TRULE_XQUERY = "for $x in collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType') where $x//RESOURCE_IDENTIFIER/@value = \"%s\" return $x//CODE/text()";
 
 	public static MapFunction<MetadataRecord, MetadataRecord> getTransformationPlugin(
 		final Map<String, String> jobArgument, final AggregationCounter counters, final ISLookUpService isLookupService)
@@ -54,15 +54,15 @@ public class TransformationFactory {
 		}
 	}
 
-	private static String queryTransformationRuleFromIS(final String transformationRuleName,
+	private static String queryTransformationRuleFromIS(final String transformationRuleId,
 		final ISLookUpService isLookUpService) throws Exception {
-		final String query = String.format(TRULE_XQUERY, transformationRuleName);
+		final String query = String.format(TRULE_XQUERY, transformationRuleId);
 		log.info("asking query to IS: " + query);
 		List<String> result = isLookUpService.quickSearchProfile(query);
 
 		if (result == null || result.isEmpty())
 			throw new DnetTransformationException(
-				"Unable to find transformation rule with name: " + transformationRuleName);
+				"Unable to find transformation rule with name: " + transformationRuleId);
 		return result.get(0);
 	}
 
