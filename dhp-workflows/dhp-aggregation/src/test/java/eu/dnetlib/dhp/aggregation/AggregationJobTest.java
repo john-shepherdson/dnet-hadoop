@@ -145,7 +145,7 @@ public class AggregationJobTest {
     }
 
 
-    //@Test
+    @Test
     @Order(3)
     public void testTransformSparkJob() throws Exception {
 

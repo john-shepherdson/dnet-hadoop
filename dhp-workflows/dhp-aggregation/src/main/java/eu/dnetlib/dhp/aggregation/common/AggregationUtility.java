@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -20,6 +21,8 @@ import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 public class AggregationUtility {
 
 	private static final Logger log = LoggerFactory.getLogger(AggregationUtility.class);
+
+	public static final ObjectMapper MAPPER = new ObjectMapper();
 
 	public static void writeTotalSizeOnHDFS(final SparkSession spark, final Long total, final String path)
 		throws IOException {

@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.collection.worker;
 
+import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +26,6 @@ public class CollectorWorkerApplication {
 	private static final Logger log = LoggerFactory.getLogger(CollectorWorkerApplication.class);
 
 	private static final CollectorPluginFactory collectorPluginFactory = new CollectorPluginFactory();
-
-	public static String SEQUENCE_FILE_NAME = "/sequence_file";
 
 	/**
 	 * @param args

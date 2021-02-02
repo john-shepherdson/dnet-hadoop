@@ -2,14 +2,17 @@
 package eu.dnetlib.dhp.transformation;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
+import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.aggregation.common.AggregationConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
+
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
@@ -76,29 +79,36 @@ public class TransformSparkJobNode {
 			conf,
 			isSparkSessionManaged,
 			spark -> transformRecords(
-				parser.getObjectMap(), isLookupService, spark, nativeMdStoreVersion.getHdfsPath() + "/store",
-				cleanedMdStoreVersion.getHdfsPath() + "/store"));
+				parser.getObjectMap(), isLookupService, spark, nativeMdStoreVersion.getHdfsPath() + MDSTORE_DATA_PATH,
+				cleanedMdStoreVersion.getHdfsPath() + MDSTORE_DATA_PATH));
 	}
 
 	public static void transformRecords(final Map<String, String> args, final ISLookUpService isLookUpService,
 		final SparkSession spark, final String inputPath, final String outputPath)
 		throws DnetTransformationException, IOException {
 
-		final LongAccumulator totalItems = spark.sparkContext().longAccumulator("TotalItems");
-		final LongAccumulator errorItems = spark.sparkContext().longAccumulator("errorItems");
-		final LongAccumulator transformedItems = spark.sparkContext().longAccumulator("transformedItems");
+		final LongAccumulator totalItems = spark.sparkContext().longAccumulator(CONTENT_TOTALITEMS);
+		final LongAccumulator errorItems = spark.sparkContext().longAccumulator(CONTENT_INVALIDRECORDS);
+		final LongAccumulator transformedItems = spark.sparkContext().longAccumulator(CONTENT_TRANSFORMEDRECORDS);
 		final AggregationCounter ct = new AggregationCounter(totalItems, errorItems, transformedItems);
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
-		final Dataset<MetadataRecord> mdstoreInput = spark.read().format("parquet").load(inputPath).as(encoder);
-		final MapFunction<MetadataRecord, MetadataRecord> XSLTTransformationFunction = TransformationFactory
- 			.getTransformationPlugin(args, ct, isLookUpService);
-		mdstoreInput.map(XSLTTransformationFunction, encoder).write().save(outputPath + "/store");
+
+		saveDataset(
+				spark.read()
+						.format("parquet")
+						.load(inputPath)
+						.as(encoder)
+						.map(
+							TransformationFactory.getTransformationPlugin(args, ct, isLookUpService),
+							encoder),
+				outputPath + MDSTORE_DATA_PATH);
+
 
 		log.info("Transformed item " + ct.getProcessedItems().count());
 		log.info("Total item " + ct.getTotalItems().count());
 		log.info("Transformation Error item " + ct.getErrorItems().count());
 
-		AggregationUtility.writeTotalSizeOnHDFS(spark, ct.getProcessedItems().count(), outputPath + "/size");
+		writeTotalSizeOnHDFS(spark, ct.getProcessedItems().count(), outputPath + MDSTORE_SIZE_PATH);
 	}
 
 }
