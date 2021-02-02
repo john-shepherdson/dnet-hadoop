@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -52,11 +53,11 @@ public class TransformSparkJobNode {
 
 		final MDStoreVersion nativeMdStoreVersion = MAPPER.readValue(mdstoreInputVersion, MDStoreVersion.class);
 		final String inputPath = nativeMdStoreVersion.getHdfsPath() + MDSTORE_DATA_PATH;
-		log.info("input path: {}", inputPath);
+		log.info("inputPath: {}", inputPath);
 
 		final MDStoreVersion cleanedMdStoreVersion = MAPPER.readValue(mdstoreOutputVersion, MDStoreVersion.class);
-		final String outputPath = cleanedMdStoreVersion.getHdfsPath() + MDSTORE_DATA_PATH;
-		log.info("output path: {}", outputPath);
+		final String outputBasePath = cleanedMdStoreVersion.getHdfsPath();
+		log.info("outputBasePath: {}", outputBasePath);
 
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info(String.format("isLookupUrl: %s", isLookupUrl));
@@ -76,12 +77,12 @@ public class TransformSparkJobNode {
 			isSparkSessionManaged,
 			spark -> {
 				transformRecords(
-					parser.getObjectMap(), isLookupService, spark, inputPath, outputPath);
+					parser.getObjectMap(), isLookupService, spark, inputPath, outputBasePath);
 			});
 	}
 
 	public static void transformRecords(final Map<String, String> args, final ISLookUpService isLookUpService,
-		final SparkSession spark, final String inputPath, final String outputPath)
+		final SparkSession spark, final String inputPath, final String outputBasePath)
 		throws DnetTransformationException, IOException {
 
 		final LongAccumulator totalItems = spark.sparkContext().longAccumulator(CONTENT_TOTALITEMS);
@@ -90,22 +91,21 @@ public class TransformSparkJobNode {
 		final AggregationCounter ct = new AggregationCounter(totalItems, errorItems, transformedItems);
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
 
-		saveDataset(
-			spark
+		final Dataset<MetadataRecord> mdstore = spark
 				.read()
 				.format("parquet")
 				.load(inputPath)
 				.as(encoder)
 				.map(
-					TransformationFactory.getTransformationPlugin(args, ct, isLookUpService),
-					encoder),
-			outputPath + MDSTORE_DATA_PATH);
+						TransformationFactory.getTransformationPlugin(args, ct, isLookUpService),
+						encoder);
+		saveDataset(mdstore, outputBasePath + MDSTORE_DATA_PATH);
 
 		log.info("Transformed item " + ct.getProcessedItems().count());
 		log.info("Total item " + ct.getTotalItems().count());
 		log.info("Transformation Error item " + ct.getErrorItems().count());
 
-		writeTotalSizeOnHDFS(spark, ct.getProcessedItems().count(), outputPath + MDSTORE_SIZE_PATH);
+		writeTotalSizeOnHDFS(spark, mdstore.count(), outputBasePath + MDSTORE_SIZE_PATH);
 	}
 
 }
