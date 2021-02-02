@@ -18,7 +18,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 public class TransformationFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(TransformationFactory.class);
-	public static final String TRULE_XQUERY = "for $x in collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType') where $x//RESOURCE_IDENTIFIER/@value = \"%s\" return $x//CODE/text()";
+	public static final String TRULE_XQUERY = "for $x in collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType') where $x//RESOURCE_IDENTIFIER/@value = \"%s\" return $x//CODE/*[local-name() =\"stylesheet\"]";
 
 	public static MapFunction<MetadataRecord, MetadataRecord> getTransformationPlugin(
 		final Map<String, String> jobArgument, final AggregationCounter counters, final ISLookUpService isLookupService)
@@ -57,7 +57,7 @@ public class TransformationFactory {
 	private static String queryTransformationRuleFromIS(final String transformationRuleId,
 		final ISLookUpService isLookUpService) throws Exception {
 		final String query = String.format(TRULE_XQUERY, transformationRuleId);
-		log.info("asking query to IS: " + query);
+		System.out.println("asking query to IS: " + query);
 		List<String> result = isLookUpService.quickSearchProfile(query);
 
 		if (result == null || result.isEmpty())

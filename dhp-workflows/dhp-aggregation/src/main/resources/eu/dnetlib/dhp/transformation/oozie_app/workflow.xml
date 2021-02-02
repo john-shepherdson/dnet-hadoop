@@ -18,11 +18,16 @@
         </property>
         <property>
             <name>transformationPlugin</name>
+            <value>XSLT_TRANSFORM</value>
             <description>The transformation Plugin</description>
         </property>
         <property>
             <name>dateOfTransformation</name>
             <description>The timestamp of the transformation date</description>
+        </property>
+        <property>
+            <name>isLookupUrl</name>
+            <description>The IS lookUp service endopoint</description>
         </property>
 
 
@@ -35,22 +40,36 @@
 
     <action name="BeginRead">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
             <arg>--action</arg><arg>READ_LOCK</arg>
             <arg>--mdStoreID</arg><arg>${mdStoreInputId}</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <capture-output/>
+
         </java>
         <ok to="StartTransaction"/>
         <error to="Kill"/>
     </action>
     <action name="StartTransaction">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
             <arg>--action</arg><arg>NEW_VERSION</arg>
             <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <capture-output/>
+
         </java>
         <ok to="TransformJob"/>
         <error to="EndReadRollBack"/>
@@ -62,7 +81,7 @@
             <mode>cluster</mode>
             <name>Transform MetadataStore</name>
             <class>eu.dnetlib.dhp.transformation.TransformSparkJobNode</class>
-            <jar>dhp-aggregations-${projectVersion}.jar</jar>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
@@ -72,11 +91,12 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--mdstoreInputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
-            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdstoreInputVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
             <arg>--dateOfTransformation</arg><arg>${dateOfTransformation}</arg>
             <arg>--transformationPlugin</arg><arg>${transformationPlugin}</arg>
             <arg>--transformationRuleId</arg><arg>${transformationRuleId}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="EndRead"/>
         <error to="EndReadRollBack"/>
@@ -84,6 +104,13 @@
 
     <action name="EndRead">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
             <arg>--action</arg><arg>READ_UNLOCK</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
@@ -96,6 +123,12 @@
 
     <action name="CommitVersion">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
             <arg>--action</arg><arg>COMMIT</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
@@ -108,18 +141,30 @@
 
     <action name="EndReadRollBack">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
             <arg>--action</arg><arg>READ_UNLOCK</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
             <capture-output/>
-        </java>
+            </java>
         <ok to="RollBack"/>
         <error to="Kill"/>
     </action>
 
     <action name="RollBack">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
             <arg>--action</arg><arg>ROLLBACK</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>

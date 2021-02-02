@@ -24,6 +24,7 @@ import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
 import eu.dnetlib.dhp.aggregation.common.AggregationUtility;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -60,15 +61,23 @@ public class TransformSparkJobNode {
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info(String.format("isLookupUrl: %s", isLookupUrl));
 
+		final String dateOfTransformation = parser.get("dateOfTransformation");
+		log.info(String.format("dateOfTransformation: %s", dateOfTransformation));
+
+
 		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+
+		final VocabularyGroup vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService);
+
+		log.info("Retrieved {} vocabularies", vocabularies.vocabularyNames().size());
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> transformRecords(
-				parser.getObjectMap(), isLookupService, spark, nativeMdStoreVersion.getHdfsPath(),
-				cleanedMdStoreVersion.getHdfsPath()));
+				parser.getObjectMap(), isLookupService, spark, nativeMdStoreVersion.getHdfsPath() + "/store",
+				cleanedMdStoreVersion.getHdfsPath() + "/store"));
 	}
 
 	public static void transformRecords(final Map<String, String> args, final ISLookUpService isLookUpService,
@@ -82,7 +91,7 @@ public class TransformSparkJobNode {
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
 		final Dataset<MetadataRecord> mdstoreInput = spark.read().format("parquet").load(inputPath).as(encoder);
 		final MapFunction<MetadataRecord, MetadataRecord> XSLTTransformationFunction = TransformationFactory
-			.getTransformationPlugin(args, ct, isLookUpService);
+ 			.getTransformationPlugin(args, ct, isLookUpService);
 		mdstoreInput.map(XSLTTransformationFunction, encoder).write().save(outputPath + "/store");
 
 		log.info("Transformed item " + ct.getProcessedItems().count());

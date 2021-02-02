@@ -38,6 +38,7 @@ import eu.dnetlib.dhp.collection.CollectionJobTest;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -73,6 +74,9 @@ public class TransformationJobTest {
 	public static void afterAll() {
 		spark.stop();
 	}
+
+
+
 
 	@Test
 	@DisplayName("Test Transform Single XML using XSLTTransformator")
