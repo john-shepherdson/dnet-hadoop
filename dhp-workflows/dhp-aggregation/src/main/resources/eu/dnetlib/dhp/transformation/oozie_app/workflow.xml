@@ -29,11 +29,10 @@
             <name>isLookupUrl</name>
             <description>The IS lookUp service endopoint</description>
         </property>
-
-
     </parameters>
 
     <start to="BeginRead"/>
+
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
@@ -51,11 +50,11 @@
             <arg>--mdStoreID</arg><arg>${mdStoreInputId}</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <capture-output/>
-
         </java>
         <ok to="StartTransaction"/>
         <error to="Kill"/>
     </action>
+
     <action name="StartTransaction">
         <java>
             <configuration>
@@ -69,7 +68,6 @@
             <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <capture-output/>
-
         </java>
         <ok to="TransformJob"/>
         <error to="EndReadRollBack"/>
@@ -173,8 +171,7 @@
         <ok to="Kill"/>
         <error to="Kill"/>
     </action>
-
-
-
+    
     <end name="End"/>
+
 </workflow-app>

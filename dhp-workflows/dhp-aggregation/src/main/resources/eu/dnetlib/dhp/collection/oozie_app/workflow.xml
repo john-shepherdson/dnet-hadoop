@@ -4,7 +4,6 @@
             <name>apiDescription</name>
             <description>A json encoding of the API Description class</description>
         </property>
-
         <property>
             <name>dataSourceInfo</name>
             <description>A json encoding of the Datasource Info</description>
@@ -13,49 +12,42 @@
             <name>identifierPath</name>
             <description>An xpath to retrieve the metadata identifier for the generation of DNet Identifier </description>
         </property>
-
         <property>
             <name>metadataEncoding</name>
             <description> The type of the metadata XML/JSON</description>
         </property>
-
         <property>
             <name>timestamp</name>
             <description>The timestamp of the collection date</description>
         </property>
-
         <property>
             <name>workflowId</name>
             <description>The identifier of the workflow</description>
         </property>
-
         <property>
             <name>mdStoreID</name>
             <description>The identifier of the mdStore</description>
         </property>
-
         <property>
             <name>mdStoreManagerURI</name>
             <description>The URI of the MDStore Manager</description>
         </property>
-
         <property>
             <name>collectionMode</name>
             <description>Should be REFRESH or INCREMENTAL</description>
         </property>
-
     </parameters>
+
     <global>
         <job-tracker>${jobTracker}</job-tracker>
         <name-node>${nameNode}</name-node>
     </global>
 
-
     <start to="collection_mode"/>
+
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-
 
     <decision name="collection_mode">
         <switch>
@@ -76,8 +68,6 @@
         <ok to="StartTransaction"/>
         <error to="Kill"/>
     </action>
-
-
 
     <action name="StartTransaction">
         <java>
@@ -128,7 +118,6 @@
         <ok to="collection_mode_end"/>
         <error to="FailCollection"/>
     </action>
-
 
     <decision name="collection_mode_end">
         <switch>
@@ -182,8 +171,6 @@
         <error to="Kill"/>
     </action>
 
-
-
     <action name="RollBack">
         <java>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
@@ -195,6 +182,6 @@
         <error to="Kill"/>
     </action>
 
-
     <end name="End"/>
+
 </workflow-app>
