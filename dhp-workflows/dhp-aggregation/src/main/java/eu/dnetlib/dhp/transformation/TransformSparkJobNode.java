@@ -1,19 +1,17 @@
 
 package eu.dnetlib.dhp.transformation;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
 import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
+import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.saveDataset;
+import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.writeTotalSizeOnHDFS;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.aggregation.common.AggregationConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -25,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
-import eu.dnetlib.dhp.aggregation.common.AggregationUtility;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
@@ -67,7 +64,6 @@ public class TransformSparkJobNode {
 		final String dateOfTransformation = parser.get("dateOfTransformation");
 		log.info(String.format("dateOfTransformation: %s", dateOfTransformation));
 
-
 		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
 
 		final VocabularyGroup vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService);
@@ -94,15 +90,15 @@ public class TransformSparkJobNode {
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
 
 		saveDataset(
-				spark.read()
-						.format("parquet")
-						.load(inputPath)
-						.as(encoder)
-						.map(
-							TransformationFactory.getTransformationPlugin(args, ct, isLookUpService),
-							encoder),
-				outputPath + MDSTORE_DATA_PATH);
-
+			spark
+				.read()
+				.format("parquet")
+				.load(inputPath)
+				.as(encoder)
+				.map(
+					TransformationFactory.getTransformationPlugin(args, ct, isLookUpService),
+					encoder),
+			outputPath + MDSTORE_DATA_PATH);
 
 		log.info("Transformed item " + ct.getProcessedItems().count());
 		log.info("Total item " + ct.getTotalItems().count());

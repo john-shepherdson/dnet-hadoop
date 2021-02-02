@@ -75,9 +75,6 @@ public class TransformationJobTest {
 		spark.stop();
 	}
 
-
-
-
 	@Test
 	@DisplayName("Test Transform Single XML using XSLTTransformator")
 	public void testTransformSaxonHE() throws Exception {

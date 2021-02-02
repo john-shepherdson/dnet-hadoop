@@ -1,11 +1,16 @@
 
 package eu.dnetlib.dhp.collection;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.model.mdstore.Provenance;
+import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
+import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
@@ -22,17 +27,14 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.model.mdstore.Provenance;
 import scala.Tuple2;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
-import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class GenerateNativeStoreSparkJob {
 
