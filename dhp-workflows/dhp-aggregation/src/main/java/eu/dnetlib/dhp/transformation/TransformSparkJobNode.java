@@ -92,13 +92,13 @@ public class TransformSparkJobNode {
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
 
 		final Dataset<MetadataRecord> mdstore = spark
-				.read()
-				.format("parquet")
-				.load(inputPath)
-				.as(encoder)
-				.map(
-						TransformationFactory.getTransformationPlugin(args, ct, isLookUpService),
-						encoder);
+			.read()
+			.format("parquet")
+			.load(inputPath)
+			.as(encoder)
+			.map(
+				TransformationFactory.getTransformationPlugin(args, ct, isLookUpService),
+				encoder);
 		saveDataset(mdstore, outputBasePath + MDSTORE_DATA_PATH);
 
 		log.info("Transformed item " + ct.getProcessedItems().count());
