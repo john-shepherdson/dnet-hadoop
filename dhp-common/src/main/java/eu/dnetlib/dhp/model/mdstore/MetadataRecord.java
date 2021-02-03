@@ -26,13 +26,13 @@ public class MetadataRecord implements Serializable {
 	private String body;
 
 	/** the date when the record has been stored */
-	private long dateOfCollection;
+	private Long dateOfCollection;
 
 	/** the date when the record has been stored */
-	private long dateOfTransformation;
+	private Long dateOfTransformation;
 
 	public MetadataRecord() {
-		this.dateOfCollection = System.currentTimeMillis();
+
 	}
 
 	public MetadataRecord(
@@ -40,7 +40,7 @@ public class MetadataRecord implements Serializable {
 		String encoding,
 		Provenance provenance,
 		String body,
-		long dateOfCollection) {
+		Long dateOfCollection) {
 
 		this.originalId = originalId;
 		this.encoding = encoding;
@@ -90,19 +90,19 @@ public class MetadataRecord implements Serializable {
 		this.body = body;
 	}
 
-	public long getDateOfCollection() {
+	public Long getDateOfCollection() {
 		return dateOfCollection;
 	}
 
-	public void setDateOfCollection(long dateOfCollection) {
+	public void setDateOfCollection(Long dateOfCollection) {
 		this.dateOfCollection = dateOfCollection;
 	}
 
-	public long getDateOfTransformation() {
+	public Long getDateOfTransformation() {
 		return dateOfTransformation;
 	}
 
-	public void setDateOfTransformation(long dateOfTransformation) {
+	public void setDateOfTransformation(Long dateOfTransformation) {
 		this.dateOfTransformation = dateOfTransformation;
 	}
 

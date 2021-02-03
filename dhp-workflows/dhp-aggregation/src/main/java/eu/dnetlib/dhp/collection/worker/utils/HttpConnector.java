@@ -16,14 +16,14 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.collection.worker.CollectorException;
 
 public class HttpConnector {
 
-	private static final Log log = LogFactory.getLog(HttpConnector.class);
+	private static final Logger log = LoggerFactory.getLogger(HttpConnector.class);
 
 	private int maxNumberOfRetry = 6;
 	private int defaultDelay = 120; // seconds
@@ -45,7 +45,20 @@ public class HttpConnector {
 	 * @throws CollectorException when retrying more than maxNumberOfRetry times
 	 */
 	public String getInputSource(final String requestUrl) throws CollectorException {
-		return attemptDownlaodAsString(requestUrl, 1, new CollectorPluginErrorLogList());
+		return attemptDownloadAsString(requestUrl, 1, new CollectorPluginErrorLogList());
+	}
+
+	/**
+	 * Given the URL returns the content via HTTP GET
+	 *
+	 * @param requestUrl the URL
+	 * @param errorLogList the list of errors
+	 * @return the content of the downloaded resource
+	 * @throws CollectorException when retrying more than maxNumberOfRetry times
+	 */
+	public String getInputSource(final String requestUrl, CollectorPluginErrorLogList errorLogList)
+		throws CollectorException {
+		return attemptDownloadAsString(requestUrl, 1, errorLogList);
 	}
 
 	/**
@@ -59,18 +72,20 @@ public class HttpConnector {
 		return attemptDownload(requestUrl, 1, new CollectorPluginErrorLogList());
 	}
 
-	private String attemptDownlaodAsString(
+	private String attemptDownloadAsString(
 		final String requestUrl, final int retryNumber, final CollectorPluginErrorLogList errorList)
 		throws CollectorException {
+
+		log.info("requesting URL [{}]", requestUrl);
 		try {
 			final InputStream s = attemptDownload(requestUrl, 1, new CollectorPluginErrorLogList());
 			try {
 				return IOUtils.toString(s);
 			} catch (final IOException e) {
-				log.error("error while retrieving from http-connection occured: " + requestUrl, e);
+				log.error("error while retrieving from http-connection occurred: {}", requestUrl, e);
 				Thread.sleep(defaultDelay * 1000);
 				errorList.add(e.getMessage());
-				return attemptDownlaodAsString(requestUrl, retryNumber + 1, errorList);
+				return attemptDownloadAsString(requestUrl, retryNumber + 1, errorList);
 			} finally {
 				IOUtils.closeQuietly(s);
 			}
@@ -87,7 +102,7 @@ public class HttpConnector {
 			throw new CollectorException("Max number of retries exceeded. Cause: \n " + errorList);
 		}
 
-		log.debug("Downloading " + requestUrl + " - try: " + retryNumber);
+		log.debug("requesting URL [{}], try {}", requestUrl, retryNumber);
 		try {
 			InputStream input = null;
 
@@ -103,7 +118,7 @@ public class HttpConnector {
 
 				final int retryAfter = obtainRetryAfter(urlConn.getHeaderFields());
 				if (retryAfter > 0 && urlConn.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
-					log.warn("waiting and repeating request after " + retryAfter + " sec.");
+					log.warn("waiting and repeating request after {} sec.", retryAfter);
 					Thread.sleep(retryAfter * 1000);
 					errorList.add("503 Service Unavailable");
 					urlConn.disconnect();
@@ -111,7 +126,7 @@ public class HttpConnector {
 				} else if (urlConn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
 					|| urlConn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
 					final String newUrl = obtainNewLocation(urlConn.getHeaderFields());
-					log.debug("The requested url has been moved to " + newUrl);
+					log.debug("The requested url has been moved to {}", newUrl);
 					errorList
 						.add(
 							String
@@ -121,15 +136,11 @@ public class HttpConnector {
 					urlConn.disconnect();
 					return attemptDownload(newUrl, retryNumber + 1, errorList);
 				} else if (urlConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-					log
-						.error(
-							String
-								.format(
-									"HTTP error: %s %s", urlConn.getResponseCode(), urlConn.getResponseMessage()));
+					final String msg = String
+						.format("HTTP error: %s %s", urlConn.getResponseCode(), urlConn.getResponseMessage());
+					log.error(msg);
 					Thread.sleep(defaultDelay * 1000);
-					errorList
-						.add(
-							String.format("%s %s", urlConn.getResponseCode(), urlConn.getResponseMessage()));
+					errorList.add(msg);
 					urlConn.disconnect();
 					return attemptDownload(requestUrl, retryNumber + 1, errorList);
 				} else {
@@ -138,7 +149,7 @@ public class HttpConnector {
 					return input;
 				}
 			} catch (final IOException e) {
-				log.error("error while retrieving from http-connection occured: " + requestUrl, e);
+				log.error("error while retrieving from http-connection occurred: {}", requestUrl, e);
 				Thread.sleep(defaultDelay * 1000);
 				errorList.add(e.getMessage());
 				return attemptDownload(requestUrl, retryNumber + 1, errorList);
@@ -149,12 +160,12 @@ public class HttpConnector {
 	}
 
 	private void logHeaderFields(final HttpURLConnection urlConn) throws IOException {
-		log.debug("StatusCode: " + urlConn.getResponseMessage());
+		log.debug("StatusCode: {}", urlConn.getResponseMessage());
 
 		for (final Map.Entry<String, List<String>> e : urlConn.getHeaderFields().entrySet()) {
 			if (e.getKey() != null) {
 				for (final String v : e.getValue()) {
-					log.debug("  key: " + e.getKey() + " - value: " + v);
+					log.debug("  key: {} value: {}", e.getKey(), v);
 				}
 			}
 		}
@@ -181,37 +192,6 @@ public class HttpConnector {
 		}
 		throw new CollectorException(
 			"The requested url has been MOVED, but 'location' param is MISSING");
-	}
-
-	/**
-	 * register for https scheme; this is a workaround and not intended for the use in trusted environments
-	 */
-	public void initTrustManager() {
-		final X509TrustManager tm = new X509TrustManager() {
-
-			@Override
-			public void checkClientTrusted(final X509Certificate[] xcs, final String string) {
-			}
-
-			@Override
-			public void checkServerTrusted(final X509Certificate[] xcs, final String string) {
-			}
-
-			@Override
-			public X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-		};
-		try {
-			final SSLContext ctx = SSLContext.getInstance("TLS");
-			ctx.init(null, new TrustManager[] {
-				tm
-			}, null);
-			HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
-		} catch (final GeneralSecurityException e) {
-			log.fatal(e);
-			throw new IllegalStateException(e);
-		}
 	}
 
 	public int getMaxNumberOfRetry() {

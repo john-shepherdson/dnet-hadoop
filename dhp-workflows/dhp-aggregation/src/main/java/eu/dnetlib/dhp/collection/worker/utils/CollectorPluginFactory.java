@@ -7,7 +7,7 @@ import eu.dnetlib.dhp.collection.worker.CollectorException;
 
 public class CollectorPluginFactory {
 
-	public CollectorPlugin getPluginByProtocol(final String protocol) throws CollectorException {
+	public static CollectorPlugin getPluginByProtocol(final String protocol) throws CollectorException {
 		if (protocol == null)
 			throw new CollectorException("protocol cannot be null");
 		switch (protocol.toLowerCase().trim()) {

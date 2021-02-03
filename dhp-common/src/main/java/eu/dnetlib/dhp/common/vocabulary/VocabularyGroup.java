@@ -67,6 +67,10 @@ public class VocabularyGroup implements Serializable {
 
 	private final Map<String, Vocabulary> vocs = new HashMap<>();
 
+	public Set<String> vocabularyNames() {
+		return vocs.keySet();
+	}
+
 	public void addVocabulary(final String id, final String name) {
 		vocs.put(id.toLowerCase(), new Vocabulary(id, name));
 	}

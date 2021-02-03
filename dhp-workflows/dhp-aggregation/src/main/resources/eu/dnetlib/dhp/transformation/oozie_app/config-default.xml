@@ -15,4 +15,5 @@
         <name>oozie.action.sharelib.for.spark</name>
         <value>spark2</value>
     </property>
+
 </configuration>
