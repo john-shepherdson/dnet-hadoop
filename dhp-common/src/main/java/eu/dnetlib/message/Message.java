@@ -1,9 +1,15 @@
 
 package eu.dnetlib.message;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Message {
+public class Message implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 401753881204524893L;
 
 	private String workflowId;
 
@@ -54,5 +60,10 @@ public class Message {
 
 	public void setBody(final Map<String, String> body) {
 		this.body = body;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Message [workflowId=%s, jobName=%s, type=%s, body=%s]", workflowId, jobName, type, body);
 	}
 }
