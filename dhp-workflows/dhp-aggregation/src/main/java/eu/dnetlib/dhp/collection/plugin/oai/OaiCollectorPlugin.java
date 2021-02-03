@@ -9,12 +9,15 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.collection.worker.CollectorException;
+import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginErrorLogList;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
@@ -26,8 +29,19 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 
 	private OaiIteratorFactory oaiIteratorFactory;
 
+	private final CollectorPluginErrorLogList errorLogList = new CollectorPluginErrorLogList();
+
 	@Override
 	public Stream<String> collect(final ApiDescriptor api) throws CollectorException {
+		try {
+			return doCollect(api);
+		} catch (CollectorException e) {
+			errorLogList.add(e.getMessage());
+			throw e;
+		}
+	}
+
+	private Stream<String> doCollect(ApiDescriptor api) throws CollectorException {
 		final String baseUrl = api.getBaseUrl();
 		final String mdFormat = api.getParams().get(FORMAT_PARAM);
 		final String setParam = api.getParams().get(OAI_SET_PARAM);
@@ -65,7 +79,7 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 			.stream()
 			.map(
 				set -> getOaiIteratorFactory()
-					.newIterator(baseUrl, mdFormat, set, fromDate, untilDate))
+					.newIterator(baseUrl, mdFormat, set, fromDate, untilDate, errorLogList))
 			.iterator();
 
 		return StreamSupport
@@ -78,5 +92,10 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 			oaiIteratorFactory = new OaiIteratorFactory();
 		}
 		return oaiIteratorFactory;
+	}
+
+	@Override
+	public CollectorPluginErrorLogList getCollectionErrors() {
+		return errorLogList;
 	}
 }

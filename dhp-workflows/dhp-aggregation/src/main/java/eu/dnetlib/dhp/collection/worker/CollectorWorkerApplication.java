@@ -2,6 +2,8 @@
 package eu.dnetlib.dhp.collection.worker;
 
 import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
+import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
+import static eu.dnetlib.dhp.application.ApplicationUtils.*;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -10,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
+import eu.dnetlib.dhp.aggregation.common.AggregationUtility;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginErrorLogList;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
@@ -24,8 +28,6 @@ import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 public class CollectorWorkerApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectorWorkerApplication.class);
-
-	private static final CollectorPluginFactory collectorPluginFactory = new CollectorPluginFactory();
 
 	/**
 	 * @param args
@@ -49,14 +51,16 @@ public class CollectorWorkerApplication {
 		final String mdStoreVersion = argumentParser.get("mdStoreVersion");
 		log.info("mdStoreVersion is {}", mdStoreVersion);
 
-		final ObjectMapper jsonMapper = new ObjectMapper();
+		final MDStoreVersion currentVersion = MAPPER.readValue(mdStoreVersion, MDStoreVersion.class);
+		final String hdfsPath = currentVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
+		log.info("hdfs path is {}", hdfsPath);
 
-		final MDStoreVersion currentVersion = jsonMapper.readValue(mdStoreVersion, MDStoreVersion.class);
+		final ApiDescriptor api = MAPPER.readValue(apiDescriptor, ApiDescriptor.class);
 
-		final ApiDescriptor api = jsonMapper.readValue(apiDescriptor, ApiDescriptor.class);
-		final CollectorWorker worker = new CollectorWorker(collectorPluginFactory, api, hdfsuri,
-			currentVersion.getHdfsPath() + SEQUENCE_FILE_NAME);
-		worker.collect();
+		final CollectorWorker worker = new CollectorWorker(api, hdfsuri, hdfsPath);
+		CollectorPluginErrorLogList errors = worker.collect();
+
+		populateOOZIEEnv("collectorErrors", errors.toString());
 
 	}
 

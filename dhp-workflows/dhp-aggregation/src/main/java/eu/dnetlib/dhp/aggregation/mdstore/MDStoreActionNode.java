@@ -1,6 +1,9 @@
 
 package eu.dnetlib.dhp.aggregation.mdstore;
 
+import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
+import static eu.dnetlib.dhp.application.ApplicationUtils.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -16,11 +19,8 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.collection.worker.CollectorWorker;
 import eu.dnetlib.dhp.common.rest.DNetRestClient;
 
 public class MDStoreActionNode {
@@ -28,10 +28,7 @@ public class MDStoreActionNode {
 
 	enum MDAction {
 		NEW_VERSION, ROLLBACK, COMMIT, READ_LOCK, READ_UNLOCK
-
 	}
-
-	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public static String NEW_VERSION_URI = "%s/mdstore/%s/newVersion";
 
@@ -48,13 +45,13 @@ public class MDStoreActionNode {
 		final ArgumentApplicationParser argumentParser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					CollectorWorker.class
+					MDStoreActionNode.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/collection/mdstore_action_parameters.json")));
 		argumentParser.parseArgument(args);
 
 		final MDAction action = MDAction.valueOf(argumentParser.get("action"));
-		log.info("Curren action is {}", action);
+		log.info("Current action is {}", action);
 
 		final String mdStoreManagerURI = argumentParser.get("mdStoreManagerURI");
 		log.info("mdStoreManagerURI is {}", mdStoreManagerURI);
@@ -67,7 +64,7 @@ public class MDStoreActionNode {
 				}
 				final MDStoreVersion currentVersion = DNetRestClient
 					.doGET(String.format(NEW_VERSION_URI, mdStoreManagerURI, mdStoreID), MDStoreVersion.class);
-				populateOOZIEEnv(MDSTOREVERSIONPARAM, mapper.writeValueAsString(currentVersion));
+				populateOOZIEEnv(MDSTOREVERSIONPARAM, MAPPER.writeValueAsString(currentVersion));
 				break;
 			}
 			case COMMIT: {
@@ -77,7 +74,7 @@ public class MDStoreActionNode {
 					throw new IllegalArgumentException("missing or empty argument namenode");
 				}
 				final String mdStoreVersion_params = argumentParser.get("mdStoreVersion");
-				final MDStoreVersion mdStoreVersion = mapper.readValue(mdStoreVersion_params, MDStoreVersion.class);
+				final MDStoreVersion mdStoreVersion = MAPPER.readValue(mdStoreVersion_params, MDStoreVersion.class);
 
 				if (StringUtils.isBlank(mdStoreVersion.getId())) {
 					throw new IllegalArgumentException(
@@ -110,7 +107,7 @@ public class MDStoreActionNode {
 			}
 			case ROLLBACK: {
 				final String mdStoreVersion_params = argumentParser.get("mdStoreVersion");
-				final MDStoreVersion mdStoreVersion = mapper.readValue(mdStoreVersion_params, MDStoreVersion.class);
+				final MDStoreVersion mdStoreVersion = MAPPER.readValue(mdStoreVersion_params, MDStoreVersion.class);
 
 				if (StringUtils.isBlank(mdStoreVersion.getId())) {
 					throw new IllegalArgumentException(
@@ -127,12 +124,12 @@ public class MDStoreActionNode {
 				}
 				final MDStoreVersion currentVersion = DNetRestClient
 					.doGET(String.format(READ_LOCK_URL, mdStoreManagerURI, mdStoreID), MDStoreVersion.class);
-				populateOOZIEEnv(MDSTOREREADLOCKPARAM, mapper.writeValueAsString(currentVersion));
+				populateOOZIEEnv(MDSTOREREADLOCKPARAM, MAPPER.writeValueAsString(currentVersion));
 				break;
 			}
 			case READ_UNLOCK: {
 				final String mdStoreVersion_params = argumentParser.get("readMDStoreId");
-				final MDStoreVersion mdStoreVersion = mapper.readValue(mdStoreVersion_params, MDStoreVersion.class);
+				final MDStoreVersion mdStoreVersion = MAPPER.readValue(mdStoreVersion_params, MDStoreVersion.class);
 
 				if (StringUtils.isBlank(mdStoreVersion.getId())) {
 					throw new IllegalArgumentException(
@@ -148,13 +145,4 @@ public class MDStoreActionNode {
 
 	}
 
-	public static void populateOOZIEEnv(final String paramName, String value) throws Exception {
-		File file = new File(System.getProperty("oozie.action.output.properties"));
-		Properties props = new Properties();
-
-		props.setProperty(paramName, value);
-		OutputStream os = new FileOutputStream(file);
-		props.store(os, "");
-		os.close();
-	}
 }

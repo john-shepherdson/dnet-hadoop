@@ -40,7 +40,7 @@ public class DnetCollectorWorkerApplicationTests {
 	public void testFeeding(@TempDir Path testDir) throws Exception {
 
 		System.out.println(testDir.toString());
-		CollectorWorker worker = new CollectorWorker(new CollectorPluginFactory(), getApi(),
+		CollectorWorker worker = new CollectorWorker(getApi(),
 			"file://" + testDir.toString() + "/file.seq", testDir.toString() + "/file.seq");
 		worker.collect();
 

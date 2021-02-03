@@ -15,15 +15,17 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.collection.worker.CollectorException;
+import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginErrorLogList;
 import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
 import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
 
 public class OaiIterator implements Iterator<String> {
 
-	private static final Log log = LogFactory.getLog(OaiIterator.class); // NOPMD by marko on
-	// 11/24/08 5:02 PM
+	private static final Logger log = LoggerFactory.getLogger(OaiIterator.class);
 
 	private final Queue<String> queue = new PriorityBlockingQueue<>();
 	private final SAXReader reader = new SAXReader();
@@ -36,6 +38,7 @@ public class OaiIterator implements Iterator<String> {
 	private String token;
 	private boolean started;
 	private final HttpConnector httpConnector;
+	private CollectorPluginErrorLogList errorLogList;
 
 	public OaiIterator(
 		final String baseUrl,
@@ -43,7 +46,8 @@ public class OaiIterator implements Iterator<String> {
 		final String set,
 		final String fromDate,
 		final String untilDate,
-		final HttpConnector httpConnector) {
+		final HttpConnector httpConnector,
+		final CollectorPluginErrorLogList errorLogList) {
 		this.baseUrl = baseUrl;
 		this.mdFormat = mdFormat;
 		this.set = set;
@@ -51,6 +55,7 @@ public class OaiIterator implements Iterator<String> {
 		this.untilDate = untilDate;
 		this.started = false;
 		this.httpConnector = httpConnector;
+		this.errorLogList = errorLogList;
 	}
 
 	private void verifyStarted() {
@@ -139,7 +144,7 @@ public class OaiIterator implements Iterator<String> {
 
 	private String downloadPage(final String url) throws CollectorException {
 
-		final String xml = httpConnector.getInputSource(url);
+		final String xml = httpConnector.getInputSource(url, errorLogList);
 		Document doc;
 		try {
 			doc = reader.read(new StringReader(xml));
@@ -173,5 +178,9 @@ public class OaiIterator implements Iterator<String> {
 		}
 
 		return doc.valueOf("//*[local-name()='resumptionToken']");
+	}
+
+	public CollectorPluginErrorLogList getErrorLogList() {
+		return errorLogList;
 	}
 }
