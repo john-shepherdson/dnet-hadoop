@@ -62,8 +62,12 @@ public class MDStoreCurrentVersion implements Serializable {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (this == obj) { return true; }
-		if (!(obj instanceof MDStoreCurrentVersion)) { return false; }
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof MDStoreCurrentVersion)) {
+			return false;
+		}
 		final MDStoreCurrentVersion other = (MDStoreCurrentVersion) obj;
 		return Objects.equals(currentVersion, other.currentVersion) && Objects.equals(mdstore, other.mdstore);
 	}

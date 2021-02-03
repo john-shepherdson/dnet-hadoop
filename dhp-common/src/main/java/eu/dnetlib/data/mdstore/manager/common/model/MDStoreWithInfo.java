@@ -168,7 +168,10 @@ public class MDStoreWithInfo implements Serializable {
 	@Override
 	public String toString() {
 		return String
-			.format("MDStoreWithInfo [id=%s, format=%s, layout=%s, interpretation=%s, datasourceName=%s, datasourceId=%s, apiId=%s, currentVersion=%s, creationDate=%s, lastUpdate=%s, size=%s, numberOfVersions=%s, hdfsPath=%s]", id, format, layout, interpretation, datasourceName, datasourceId, apiId, currentVersion, creationDate, lastUpdate, size, numberOfVersions, hdfsPath);
+			.format(
+				"MDStoreWithInfo [id=%s, format=%s, layout=%s, interpretation=%s, datasourceName=%s, datasourceId=%s, apiId=%s, currentVersion=%s, creationDate=%s, lastUpdate=%s, size=%s, numberOfVersions=%s, hdfsPath=%s]",
+				id, format, layout, interpretation, datasourceName, datasourceId, apiId, currentVersion, creationDate,
+				lastUpdate, size, numberOfVersions, hdfsPath);
 	}
 
 	@Override
@@ -178,8 +181,12 @@ public class MDStoreWithInfo implements Serializable {
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (this == obj) { return true; }
-		if (!(obj instanceof MDStoreWithInfo)) { return false; }
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof MDStoreWithInfo)) {
+			return false;
+		}
 		final MDStoreWithInfo other = (MDStoreWithInfo) obj;
 		return Objects.equals(id, other.id);
 	}
