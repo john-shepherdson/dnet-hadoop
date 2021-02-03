@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oai:record xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+            xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:oai="http://www.openarchives.org/OAI/2.0/">
+    <oai:header>
+        <dri:objIdentifier>r3c4b2081b22::0007d64b38bb2b399120f9993f95d911</dri:objIdentifier>
+        <dri:recordIdentifier>60a0a5b0-b63c-473f-b8bc-207ea037eb3b</dri:recordIdentifier>
+        <dri:dateOfCollection>2021-01-28T17:24:33.095+01:00</dri:dateOfCollection>
+        <oaf:datasourceprefix>r3c4b2081b22</oaf:datasourceprefix>
+        <dr:dateOfTransformation>2021-02-03T10:16:27.948+01:00</dr:dateOfTransformation>
+    </oai:header>
+    <oai:metadata>
+        <datacite:resource
+                xmlns:datacite="http://datacite.org/schema/kernel-4"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
+            <datacite:identifier identifierType="URL">http://data.europa.eu/88u/dataset/60a0a5b0-b63c-473f-b8bc-207ea037eb3b</datacite:identifier>
+            <datacite:creators/>
+            <datacite:titles>
+                <datacite:title xml:lang="en">GMIS - Favourable feeding habitat of adult Atlantic bluefin tuna (ABFT) Monthly 1998-2017 (frequency of occurence, %)</datacite:title>
+            </datacite:titles>
+            <datacite:publisher>JRC</datacite:publisher>
+            <datacite:publicationYear>2019</datacite:publicationYear>
+            <datacite:dates>
+                <datacite:date dateType="Issued">2019-07-09</datacite:date>
+            </datacite:dates>
+            <datacite:resourceType resourceTypeGeneral="Dataset">Dataset</datacite:resourceType>
+            <datacite:descriptions>
+                <datacite:description descriptionType="Abstract" xml:lang="en">The favourable feeding habitat of the Atlantic bluefin tuna is daily identified linking their ecological traits with environmental variables from satellite remote sensing and physical ocean models. The feeding habitat is mostly related to the occurrence of productive oceanic features (such as eddies) that are detected by satellite sensors  of ocean colour (chlorophyll-a fronts). The physical variables used are sea surface temperature and sea surface height anomaly. More information: https://fishreg.jrc.ec.europa.eu/fish-habitat, Peer-reviewed publication: http://www.sciencedirect.com/science/article/pii/S0079661116000070</datacite:description>
+            </datacite:descriptions>
+            <datacite:subjects>
+                <datacite:subject>protected area</datacite:subject>
+                <datacite:subject>environmental monitoring</datacite:subject>
+                <datacite:subject>oceanography</datacite:subject>
+                <datacite:subject>ocean</datacite:subject>
+                <datacite:subject>Environmental Monitoring Facilities</datacite:subject>
+                <datacite:subject>Environment</datacite:subject>
+                <datacite:subject>Protected Sites</datacite:subject>
+                <datacite:subject>Oceanographic Geographical Features</datacite:subject>
+                <datacite:subject>environmental data</datacite:subject>
+                <datacite:subject classid="eu-data-theme"
+                                  classname="EU Data Theme"
+                                  schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">http://publications.europa.eu/resource/authority/data-theme/TECH</datacite:subject>
+                <datacite:subject classid="eu-data-theme"
+                                  classname="EU Data Theme"
+                                  schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">http://publications.europa.eu/resource/authority/data-theme/ENVI</datacite:subject>
+                <datacite:subject classid="eurovoc" classname="EuroVoc"
+                                  schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">http://eurovoc.europa.eu/2114</datacite:subject>
+                <datacite:subject classid="eurovoc" classname="EuroVoc"
+                                  schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">http://eurovoc.europa.eu/2107</datacite:subject>
+                <datacite:subject classid="eurovoc" classname="EuroVoc"
+                                  schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">http://eurovoc.europa.eu/4801</datacite:subject>
+                <datacite:subject classid="eurovoc" classname="EuroVoc"
+                                  schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">http://eurovoc.europa.eu/3140</datacite:subject>
+            </datacite:subjects>
+            <datacite:formats>
+                <datacite:format>http://publications.europa.eu/resource/authority/file-type/OP_DATPRO</datacite:format>
+            </datacite:formats>
+            <datacite:geoLocations>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ESH</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ESP</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/EST</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ETH</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/DNK</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/DZA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/EGY</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ERI</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/FIN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/FRA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/1A0</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/AUT</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/BGR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/MDA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/MCO</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/LUX</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/LTU</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/MAR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/LVA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/LBN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/JOR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/LIE</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/LBY</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/TUN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/TUR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SVK</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SVN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SRB</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SSD</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/TCD</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/TGO</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SWE</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SYR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/AND</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/BFA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GRC</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GNB</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GGY</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GEO</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GBR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/FRO</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GMB</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GIN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GIB</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GHA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/MKD</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/MLI</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/MLT</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/MNE</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/MRT</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/NER</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/NGA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/NLD</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/NOR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/POL</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ALB</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/BEN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/VAT</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/UKR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/CAF</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/BLR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/CIV</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/CHE</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/CPV</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/CMR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/CZE</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/CYP</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/DJI</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/DEU</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ITA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/JEY</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ISL</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ISR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/IRL</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/IRQ</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/HUN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/IMN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/GRL</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/HRV</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ALA</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/BEL</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/BIH</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SLE</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SEN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SDN</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SAU</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/RUS</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/ROU</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/PSE</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/PRT</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SOM</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+                <datacite:geoLocation>
+                    <datacite:geoLocationPlace>http://publications.europa.eu/resource/authority/country/SMR</datacite:geoLocationPlace>
+                </datacite:geoLocation>
+            </datacite:geoLocations>
+        </datacite:resource>
+        <oaf:country>EU</oaf:country>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <dr:CobjCategory type="dataset">0021</dr:CobjCategory>
+        <oaf:dateAccepted>2019-07-09</oaf:dateAccepted>
+        <oaf:hostedBy id="re3data_____::r3d100011728" name="European Union Open Data Portal"/>
+        <oaf:collectedFrom id="re3data_____::r3d100011728" name="European Union Open Data Portal"/>
+        <oaf:license>CC_BY_4_0</oaf:license>
+        <oaf:language>ENG</oaf:language>
+    </oai:metadata>
+    <about xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2021-01-28T17:24:33.095+01:00">
+                <baseURL>https%3A%2F%2Fdata.europa.eu%2Feuodp%2Fdata%2Fapiodp%2Faction%2Fpackage_search</baseURL>
+                <identifier/>
+                <datestamp/>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk"
+                                  classname="sysimport:crosswalk"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</oai:record>
+
