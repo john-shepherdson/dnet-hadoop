@@ -7,7 +7,7 @@
         <dri:recordIdentifier>60a0a5b0-b63c-473f-b8bc-207ea037eb3b</dri:recordIdentifier>
         <dri:dateOfCollection>2021-01-28T17:24:33.095+01:00</dri:dateOfCollection>
         <oaf:datasourceprefix>r3c4b2081b22</oaf:datasourceprefix>
-        <dr:dateOfTransformation>2021-02-03T10:16:27.948+01:00</dr:dateOfTransformation>
+        <dr:dateOfTransformation>2021-02-03T16:57:03.099+01:00</dr:dateOfTransformation>
     </oai:header>
     <oai:metadata>
         <datacite:resource
@@ -334,6 +334,7 @@
                 </datacite:geoLocation>
             </datacite:geoLocations>
         </datacite:resource>
+        <oaf:identifier identifierType="data.europa.eu">http://data.europa.eu/88u/dataset/60a0a5b0-b63c-473f-b8bc-207ea037eb3b</oaf:identifier>
         <oaf:country>EU</oaf:country>
         <oaf:accessrights>OPEN</oaf:accessrights>
         <dr:CobjCategory type="dataset">0021</dr:CobjCategory>

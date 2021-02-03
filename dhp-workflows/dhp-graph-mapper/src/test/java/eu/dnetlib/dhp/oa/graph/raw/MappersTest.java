@@ -420,7 +420,7 @@ public class MappersTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertEquals(0, p.getAuthor().size());
-		assertEquals(0, p.getPid().size());
+		assertEquals(1, p.getPid().size());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
 		assertEquals("dataset", p.getResulttype().getClassname());
 		assertEquals(1, p.getInstance().size());
