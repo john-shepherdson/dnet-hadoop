@@ -149,14 +149,14 @@ public class OaiIterator implements Iterator<String> {
 		try {
 			doc = reader.read(new StringReader(xml));
 		} catch (final DocumentException e) {
-			log.warn("Error parsing xml, I try to clean it: " + xml, e);
+			log.warn("Error parsing xml, I try to clean it. {}", e.getMessage());
 			final String cleaned = XmlCleaner.cleanAllEntities(xml);
 			try {
 				doc = reader.read(new StringReader(cleaned));
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
 				if (resumptionToken == null) {
-					throw new CollectorException("Error parsing cleaned document:" + cleaned, e1);
+					throw new CollectorException("Error parsing cleaned document:\n" + cleaned, e1);
 				}
 				return resumptionToken;
 			}

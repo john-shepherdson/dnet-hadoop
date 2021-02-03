@@ -87,6 +87,7 @@
             <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <capture-output/>
         </java>
         <ok to="GenerateNativeStoreSparkJob"/>
         <error to="FailCollection"/>
@@ -133,7 +134,6 @@
             <arg>--action</arg><arg>READ_UNLOCK</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
-            <capture-output/>
         </java>
         <ok to="CommitVersion"/>
         <error to="Kill"/>
@@ -165,7 +165,6 @@
             <arg>--action</arg><arg>READ_UNLOCK</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
-            <capture-output/>
         </java>
         <ok to="RollBack"/>
         <error to="Kill"/>
