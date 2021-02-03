@@ -15,7 +15,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningFunctions {
 
-	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
+	public static final String DOI_PREFIX_REGEX = "^10\\.";
 
 	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
 	public static final int ORCID_LEN = 19;
@@ -59,13 +59,19 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
-				r.getAuthor().forEach(a -> {
-					if (Objects.nonNull(a.getPid())) {
-						a.getPid().forEach(p -> {
-							fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES);
-						});
-					}
-				});
+				r
+					.getAuthor()
+					.stream()
+					.filter(Objects::nonNull)
+					.forEach(a -> {
+						if (Objects.nonNull(a.getPid())) {
+							a
+								.getPid()
+								.stream()
+								.filter(Objects::nonNull)
+								.forEach(p -> fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES));
+						}
+					});
 			}
 			if (value instanceof Publication) {
 
@@ -103,6 +109,16 @@ public class CleaningFunctions {
 				r
 					.setLanguage(
 						qualifier("und", "Undetermined", ModelConstants.DNET_LANGUAGES));
+			}
+			if (Objects.nonNull(r.getCountry())) {
+				r
+					.setCountry(
+						r
+							.getCountry()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(c -> StringUtils.isNotBlank(c.getClassid()))
+							.collect(Collectors.toList()));
 			}
 			if (Objects.nonNull(r.getSubject())) {
 				r
@@ -184,6 +200,16 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
+				r
+					.setAuthor(
+						r
+							.getAuthor()
+							.stream()
+							.filter(a -> Objects.nonNull(a))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+							.collect(Collectors.toList()));
+
 				boolean nullRank = r
 					.getAuthor()
 					.stream()
@@ -204,6 +230,7 @@ public class CleaningFunctions {
 								a
 									.getPid()
 									.stream()
+									.filter(Objects::nonNull)
 									.filter(p -> Objects.nonNull(p.getQualifier()))
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {
@@ -308,7 +335,7 @@ public class CleaningFunctions {
 
 			// TODO add cleaning for more PID types as needed
 			case "doi":
-				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX_REGEX, ""));
+				pid.setValue(value.toLowerCase().replaceAll(DOI_PREFIX_REGEX, "10."));
 				break;
 		}
 		return pid;
