@@ -16,7 +16,7 @@ import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
 @Disabled
-public class DnetCollectorWorkerApplicationTests {
+public class CollectorWorkerApplicationTests {
 
 	@Test
 	public void testFindPlugin() throws Exception {

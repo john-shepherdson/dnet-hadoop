@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.collection.worker.CollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector2;
 
 @Disabled
 public class HttpConnectorTest {
 
 	private static final Log log = LogFactory.getLog(HttpConnectorTest.class);
-	private static HttpConnector connector;
+	private static HttpConnector2 connector;
 
 	private static final String URL = "http://cordis.europa.eu/data/reference/cordisref-H2020topics.xlsx";
 	private static final String URL_MISCONFIGURED_SERVER = "https://www.alexandria.unisg.ch/cgi/oai2?verb=Identify";
@@ -27,7 +27,7 @@ public class HttpConnectorTest {
 
 	@BeforeAll
 	public static void setUp() {
-		connector = new HttpConnector();
+		connector = new HttpConnector2();
 	}
 
 	@Test

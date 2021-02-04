@@ -9,8 +9,6 @@ import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
@@ -20,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.collection.worker.CollectorException;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginErrorLogList;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector2;
 import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
 
 public class OaiIterator implements Iterator<String> {
@@ -37,7 +35,7 @@ public class OaiIterator implements Iterator<String> {
 	private final String untilDate;
 	private String token;
 	private boolean started;
-	private final HttpConnector httpConnector;
+	private final HttpConnector2 httpConnector;
 	private CollectorPluginErrorLogList errorLogList;
 
 	public OaiIterator(
@@ -46,7 +44,7 @@ public class OaiIterator implements Iterator<String> {
 		final String set,
 		final String fromDate,
 		final String untilDate,
-		final HttpConnector httpConnector,
+		final HttpConnector2 httpConnector,
 		final CollectorPluginErrorLogList errorLogList) {
 		this.baseUrl = baseUrl;
 		this.mdFormat = mdFormat;

@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.actionmanager.project.utils.EXCELParser;
 import eu.dnetlib.dhp.collection.worker.CollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector;
+import eu.dnetlib.dhp.collection.worker.utils.HttpConnector2;
 
 @Disabled
 public class EXCELParserTest {
 
 	private static Path workingDir;
-	private HttpConnector httpConnector = new HttpConnector();
+	private HttpConnector2 httpConnector = new HttpConnector2();
 	private static final String URL = "http://cordis.europa.eu/data/reference/cordisref-H2020topics.xlsx";
 
 	@BeforeAll
