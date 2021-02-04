@@ -19,15 +19,18 @@ import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
 /**
- * DnetCollectortWorkerApplication is the main class responsible to start the Dnet Collection into HDFS. This module
- * will be executed on the hadoop cluster and taking in input some parameters that tells it which is the right collector
- * plugin to use and where store the data into HDFS path
+ * CollectorWorkerApplication is the main class responsible to start the metadata collection process, storing the outcomes
+ * into HDFS. This application will be executed on the hadoop cluster, where invoked in the context of the metadata collection
+ * oozie workflow, it will receive all the input parameters necessary to instantiate the specific collection plugin and the
+ * relative specific configurations
  *
- * @author Sandro La Bruzzo
+ * @author Sandro La Bruzzo, Claudio Atzori
  */
 public class CollectorWorkerApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectorWorkerApplication.class);
+
+	public static final String COLLECTOR_WORKER_ERRORS = "collectorWorker-errors";
 
 	/**
 	 * @param args
@@ -60,7 +63,7 @@ public class CollectorWorkerApplication {
 		final CollectorWorker worker = new CollectorWorker(api, hdfsuri, hdfsPath);
 		CollectorPluginErrorLogList errors = worker.collect();
 
-		populateOOZIEEnv("collectorErrors", errors.toString());
+		populateOOZIEEnv(COLLECTOR_WORKER_ERRORS, errors.toString());
 
 	}
 
