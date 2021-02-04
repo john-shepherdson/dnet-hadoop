@@ -32,6 +32,11 @@
             <name>mdStoreManagerURI</name>
             <description>The URI of the MDStore Manager</description>
         </property>
+
+        <property>
+            <name>dnetMessageManagerURL</name>
+            <description>The URI of the Dnet Message Manager</description>
+        </property>
         <property>
             <name>collectionMode</name>
             <description>Should be REFRESH or INCREMENTAL</description>
@@ -86,7 +91,10 @@
             <main-class>eu.dnetlib.dhp.collection.worker.CollectorWorkerApplication</main-class>
             <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--workflowId</arg><arg>${workflowId}</arg>
+            <arg>--dnetMessageManagerURL</arg><arg>${dnetMessageManagerURL}</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+
             <capture-output/>
         </java>
         <ok to="GenerateNativeStoreSparkJob"/>
