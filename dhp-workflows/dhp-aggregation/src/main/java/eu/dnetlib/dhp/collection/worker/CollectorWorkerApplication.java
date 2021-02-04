@@ -7,6 +7,8 @@ import static eu.dnetlib.dhp.application.ApplicationUtils.*;
 
 import java.io.IOException;
 
+import eu.dnetlib.dhp.message.Message;
+import eu.dnetlib.dhp.message.MessageSender;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -57,17 +59,27 @@ public class CollectorWorkerApplication {
 		final String mdStoreVersion = argumentParser.get("mdStoreVersion");
 		log.info("mdStoreVersion is {}", mdStoreVersion);
 
+		final String dnetMessageManagerURL = argumentParser.get("dnetMessageManagerURL");
+		log.info("dnetMessageManagerURL is {}", dnetMessageManagerURL);
+
+		final String workflowId = argumentParser.get("workflowId");
+		log.info("workflowId is {}", workflowId);
+
+		final MessageSender ms = new MessageSender(dnetMessageManagerURL,workflowId);
+
 		final MDStoreVersion currentVersion = MAPPER.readValue(mdStoreVersion, MDStoreVersion.class);
 		final String hdfsPath = currentVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
 		log.info("hdfs path is {}", hdfsPath);
 
 		final ApiDescriptor api = MAPPER.readValue(apiDescriptor, ApiDescriptor.class);
 
-		final CollectorWorker worker = new CollectorWorker(api, hdfsuri, hdfsPath);
+		final CollectorWorker worker = new CollectorWorker(api, hdfsuri, hdfsPath, ms);
 		CollectorPluginErrorLogList errors = worker.collect();
 
 		populateOOZIEEnv(COLLECTOR_WORKER_ERRORS, errors.toString());
 
 	}
+
+
 
 }

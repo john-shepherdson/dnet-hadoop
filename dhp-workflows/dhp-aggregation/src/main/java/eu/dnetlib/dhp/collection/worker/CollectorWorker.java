@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import eu.dnetlib.dhp.message.Message;
+import eu.dnetlib.dhp.message.MessageSender;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -29,13 +31,18 @@ public class CollectorWorker {
 
 	private final String hdfsPath;
 
+	private final MessageSender messageSender;
+
+
 	public CollectorWorker(
 		final ApiDescriptor api,
 		final String hdfsuri,
-		final String hdfsPath) {
+		final String hdfsPath,
+		final MessageSender messageSender) {
 		this.api = api;
 		this.hdfsuri = hdfsuri;
 		this.hdfsPath = hdfsPath;
+		this.messageSender = messageSender;
 	}
 
 	public CollectorPluginErrorLogList collect() throws IOException, CollectorException {
@@ -58,6 +65,7 @@ public class CollectorWorker {
 
 		final CollectorPlugin plugin = CollectorPluginFactory.getPluginByProtocol(api.getProtocol());
 		final AtomicInteger counter = new AtomicInteger(0);
+
 		try (SequenceFile.Writer writer = SequenceFile
 			.createWriter(
 				conf,
@@ -71,6 +79,8 @@ public class CollectorWorker {
 				.forEach(
 					content -> {
 						key.set(counter.getAndIncrement());
+						if (counter.get()% 500 == 0)
+							messageSender.sendMessage(counter.longValue(), null);
 						value.set(content);
 						try {
 							writer.append(key, value);
@@ -79,6 +89,7 @@ public class CollectorWorker {
 						}
 					});
 		} finally {
+			messageSender.sendMessage(counter.longValue(),counter.longValue());
 			return plugin.getCollectionErrors();
 		}
 	}
