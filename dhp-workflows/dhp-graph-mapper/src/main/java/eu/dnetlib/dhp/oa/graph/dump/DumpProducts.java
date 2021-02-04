@@ -11,17 +11,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 
-import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 /**
@@ -33,7 +28,7 @@ public class DumpProducts implements Serializable {
 	public void run(Boolean isSparkSessionManaged, String inputPath, String outputPath, String communityMapPath,
 		Class<? extends OafEntity> inputClazz,
 		Class<? extends eu.dnetlib.dhp.schema.dump.oaf.Result> outputClazz,
-		boolean graph) {
+		String dumpType) {
 
 		SparkConf conf = new SparkConf();
 
@@ -42,7 +37,7 @@ public class DumpProducts implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				execDump(spark, inputPath, outputPath, communityMapPath, inputClazz, outputClazz, graph);
+				execDump(spark, inputPath, outputPath, communityMapPath, inputClazz, outputClazz, dumpType);
 			});
 	}
 
@@ -53,13 +48,13 @@ public class DumpProducts implements Serializable {
 		String communityMapPath,
 		Class<I> inputClazz,
 		Class<O> outputClazz,
-		boolean graph) {
+		String dumpType) {
 
 		CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
 
 		Utils
 			.readPath(spark, inputPath, inputClazz)
-			.map((MapFunction<I, O>) value -> execMap(value, communityMap, graph), Encoders.bean(outputClazz))
+			.map((MapFunction<I, O>) value -> execMap(value, communityMap, dumpType), Encoders.bean(outputClazz))
 			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -70,18 +65,18 @@ public class DumpProducts implements Serializable {
 
 	private static <I extends OafEntity, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> O execMap(I value,
 		CommunityMap communityMap,
-		boolean graph) {
+		String dumpType) {
 
 		Optional<DataInfo> odInfo = Optional.ofNullable(value.getDataInfo());
 		if (odInfo.isPresent()) {
-			if (odInfo.get().getDeletedbyinference()) {
+			if (odInfo.get().getDeletedbyinference() || odInfo.get().getInvisible()) {
 				return null;
 			}
 		} else {
 			return null;
 		}
 
-		if (!graph) {
+		if (Constants.DUMPTYPE.COMMUNITY.getType().equals(dumpType)) {
 			Set<String> communities = communityMap.keySet();
 
 			Optional<List<Context>> inputContext = Optional
@@ -102,7 +97,8 @@ public class DumpProducts implements Serializable {
 				return null;
 			}
 		}
-		return (O) ResultMapper.map(value, communityMap, graph);
+
+		return (O) ResultMapper.map(value, communityMap, dumpType);
 
 	}
 }

@@ -1,10 +1,11 @@
 package eu.dnetlib.doiboost.orcid
 
-import eu.dnetlib.dhp.schema.oaf.{Author, Publication}
+import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
+import eu.dnetlib.dhp.schema.orcid.OrcidDOI
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil.{ORCID, PID_TYPES, createSP, generateDataInfo, generateIdentifier}
 import org.apache.commons.lang.StringUtils
-import org.codehaus.jackson.map.ObjectMapper
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
@@ -17,7 +18,7 @@ case class ORCIDItem(oid:String,name:String,surname:String,creditName:String,err
 case class ORCIDElement(doi:String, authors:List[ORCIDItem]) {}
 object ORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(ORCIDToOAF.getClass)
-  val mapper = new ObjectMapper
+  val mapper = new ObjectMapper()
 
   def isJsonValid(inputStr: String): Boolean = {
     import java.io.IOException
@@ -43,16 +44,19 @@ object ORCIDToOAF {
   }
 
 
-  def convertTOOAF(input:ORCIDElement) :Publication = {
-    val doi = input.doi
+  def convertTOOAF(input:OrcidDOI) :Publication = {
+    val doi = input.getDoi
     val pub:Publication = new Publication
-    pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+    pub.setPid(List(createSP(doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
     pub.setId(generateIdentifier(pub, doi.toLowerCase))
     try{
-      pub.setAuthor(input.authors.map(a=> {
-        generateAuthor(a.name, a.surname, a.creditName, a.oid)
-      }).asJava)
+
+      val l:List[Author]= input.getAuthors.asScala.map(a=> {
+              generateAuthor(a.getName, a.getSurname, a.getCreditName, a.getOid)
+            })(collection.breakOut)
+
+      pub.setAuthor(l.asJava)
       pub.setCollectedfrom(List(DoiBoostMappingUtil.createORIDCollectedFrom()).asJava)
       pub.setDataInfo(DoiBoostMappingUtil.generateDataInfo())
       pub
@@ -61,6 +65,13 @@ object ORCIDToOAF {
         logger.info(s"ERROR ON GENERATE Publication from $input")
         null
     }
+  }
+
+  def generateOricPIDDatainfo():DataInfo = {
+    val di =DoiBoostMappingUtil.generateDataInfo("0.91")
+    di.getProvenanceaction.setClassid("sysimport:crosswalk:entityregistry")
+    di.getProvenanceaction.setClassname("Harvested")
+    di
   }
 
   def generateAuthor(given: String, family: String, fullName:String, orcid: String): Author = {
@@ -72,7 +83,7 @@ object ORCIDToOAF {
     else
       a.setFullname(s"$given $family")
     if (StringUtils.isNotBlank(orcid))
-      a.setPid(List(createSP(orcid, ORCID, PID_TYPES)).asJava)
+      a.setPid(List(createSP(orcid, ORCID, PID_TYPES, generateOricPIDDatainfo())).asJava)
 
     a
   }

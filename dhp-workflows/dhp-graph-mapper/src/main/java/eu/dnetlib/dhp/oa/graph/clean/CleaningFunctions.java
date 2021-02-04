@@ -15,8 +15,11 @@ import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningFunctions {
 
-	public static final String DOI_URL_PREFIX_REGEX = "(^http(s?):\\/\\/)(((dx\\.)?doi\\.org)|(handle\\.test\\.datacite\\.org))\\/";
-	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
+	public static final String DOI_PREFIX_REGEX = "^10\\.";
+
+	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
+	public static final int ORCID_LEN = 19;
+
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 
 	public static final Set<String> PID_BLACKLIST = new HashSet<>();
@@ -56,13 +59,19 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
-				r.getAuthor().forEach(a -> {
-					if (Objects.nonNull(a.getPid())) {
-						a.getPid().forEach(p -> {
-							fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES);
-						});
-					}
-				});
+				r
+					.getAuthor()
+					.stream()
+					.filter(Objects::nonNull)
+					.forEach(a -> {
+						if (Objects.nonNull(a.getPid())) {
+							a
+								.getPid()
+								.stream()
+								.filter(Objects::nonNull)
+								.forEach(p -> fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES));
+						}
+					});
 			}
 			if (value instanceof Publication) {
 
@@ -86,7 +95,7 @@ public class CleaningFunctions {
 		} else if (value instanceof Organization) {
 			Organization o = (Organization) value;
 			if (Objects.isNull(o.getCountry()) || StringUtils.isBlank(o.getCountry().getClassid())) {
-				o.setCountry(qualifier("UNKNOWN", "Unknown", ModelConstants.DNET_COUNTRY_TYPE));
+				o.setCountry(ModelConstants.UNKNOWN_COUNTRY);
 			}
 		} else if (value instanceof Relation) {
 			// nothing to clean here
@@ -100,6 +109,16 @@ public class CleaningFunctions {
 				r
 					.setLanguage(
 						qualifier("und", "Undetermined", ModelConstants.DNET_LANGUAGES));
+			}
+			if (Objects.nonNull(r.getCountry())) {
+				r
+					.setCountry(
+						r
+							.getCountry()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(c -> StringUtils.isNotBlank(c.getClassid()))
+							.collect(Collectors.toList()));
 			}
 			if (Objects.nonNull(r.getSubject())) {
 				r
@@ -153,12 +172,14 @@ public class CleaningFunctions {
 			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
 				r
 					.setResourcetype(
-						qualifier("UNKNOWN", "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
+						qualifier(ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
 			}
 			if (Objects.nonNull(r.getInstance())) {
 				for (Instance i : r.getInstance()) {
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
-						i.setAccessright(qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
+						i
+							.setAccessright(
+								qualifier(ModelConstants.UNKNOWN, "not available", ModelConstants.DNET_ACCESS_MODES));
 					}
 					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
 						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
@@ -173,12 +194,22 @@ public class CleaningFunctions {
 				if (Objects.isNull(bestaccessrights)) {
 					r
 						.setBestaccessright(
-							qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
+							qualifier(ModelConstants.UNKNOWN, "not available", ModelConstants.DNET_ACCESS_MODES));
 				} else {
 					r.setBestaccessright(bestaccessrights);
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
+				r
+					.setAuthor(
+						r
+							.getAuthor()
+							.stream()
+							.filter(a -> Objects.nonNull(a))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+							.collect(Collectors.toList()));
+
 				boolean nullRank = r
 					.getAuthor()
 					.stream()
@@ -199,6 +230,7 @@ public class CleaningFunctions {
 								a
 									.getPid()
 									.stream()
+									.filter(Objects::nonNull)
 									.filter(p -> Objects.nonNull(p.getQualifier()))
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {
@@ -211,14 +243,31 @@ public class CleaningFunctions {
 													.map(Qualifier::getClassid)
 													.orElse(""))
 											.orElse("");
-										if (pidProvenance.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
-											p.getQualifier().setClassid(ModelConstants.ORCID);
-										} else {
-											p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+										if (p
+											.getQualifier()
+											.getClassid()
+											.toLowerCase()
+											.contains(ModelConstants.ORCID)) {
+											if (pidProvenance
+												.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+												p.getQualifier().setClassid(ModelConstants.ORCID);
+											} else {
+												p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+											}
+											final String orcid = p
+												.getValue()
+												.trim()
+												.toLowerCase()
+												.replaceAll(ORCID_CLEANING_REGEX, "$1-$2-$3-$4");
+											if (orcid.length() == ORCID_LEN) {
+												p.setValue(orcid);
+											} else {
+												p.setValue("");
+											}
 										}
-										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
 										return p;
 									})
+									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.collect(
 										Collectors
 											.toMap(
@@ -286,7 +335,7 @@ public class CleaningFunctions {
 
 			// TODO add cleaning for more PID types as needed
 			case "doi":
-				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX_REGEX, ""));
+				pid.setValue(value.toLowerCase().replaceAll(DOI_PREFIX_REGEX, "10."));
 				break;
 		}
 		return pid;

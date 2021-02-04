@@ -1,0 +1,171 @@
+<workflow-app name="BipFinderScore" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>inputPath</name>
+            <description>the input path of the resources to be extended</description>
+        </property>
+
+        <property>
+            <name>bipScorePath</name>
+            <description>the path where to find the bipFinder scores</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the path where to store the actionset</description>
+        </property>
+    </parameters>
+
+    <start to="deleteoutputpath"/>
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <action name="deleteoutputpath">
+        <fs>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="atomicactions"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="atomicactions">
+        <path start="atomicactions_publication"/>
+        <path start="atomicactions_dataset"/>
+        <path start="atomicactions_orp"/>
+        <path start="atomicactions_software"/>
+    </fork>
+
+    <action name="atomicactions_publication">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the atomic action with the bip finder scores for publications</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${inputPath}/publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
+            <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
+        </spark>
+        <ok to="join_aa"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="atomicactions_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the atomic action with the bip finder scores for datasets</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${inputPath}/dataset</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
+            <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
+        </spark>
+        <ok to="join_aa"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="atomicactions_orp">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the atomic action with the bip finder scores for orp</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${inputPath}/otherresearchproduct</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
+        </spark>
+        <ok to="join_aa"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="atomicactions_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the atomic action with the bip finder scores for software</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${inputPath}/software</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/software</arg>
+            <arg>--bipScorePath</arg><arg>${bipScorePath}</arg>
+        </spark>
+        <ok to="join_aa"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="join_aa" to="collectandsave"/>
+
+    <action name="collectandsave">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>saves all the aa produced for the several types of results in the as output path</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.CollectAndSave</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingDir}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

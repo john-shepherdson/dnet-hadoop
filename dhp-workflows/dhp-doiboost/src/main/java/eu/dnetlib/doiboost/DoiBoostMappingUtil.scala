@@ -4,14 +4,13 @@ import eu.dnetlib.dhp.schema.action.AtomicAction
 import eu.dnetlib.dhp.schema.oaf.{DataInfo, Dataset, Field, Instance, KeyValue, Oaf, Organization, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
-import org.codehaus.jackson.map.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
-import scala.io.Source
 
 
 case class HostedByItemType(id: String, officialname: String, issn: String, eissn: String, lissn: String, openAccess: Boolean) {}
@@ -19,23 +18,18 @@ case class HostedByItemType(id: String, officialname: String, issn: String, eiss
 case class DoiBoostAffiliation(PaperId:Long, AffiliationId:Long, GridId:Option[String], OfficialPage:Option[String], DisplayName:Option[String]){}
 
 object DoiBoostMappingUtil {
-  def getUnknownCountry(): Qualifier = {
-    createQualifier("UNKNOWN","UNKNOWN","dnet:countries","dnet:countries")
-  }
-
-
 
   def generateMAGAffiliationId(affId: String): String = {
     s"20|microsoft___$SEPARATOR${DHPUtils.md5(affId)}"
   }
-
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
   //STATIC STRING
   val MAG = "microsoft"
   val MAG_NAME = "Microsoft Academic Graph"
-  val ORCID = "ORCID"
+  val ORCID = "orcid"
+  val ORCID_PENDING = "orcid_pending"
   val CROSSREF = "Crossref"
   val UNPAYWALL = "UnpayWall"
   val GRID_AC = "grid.ac"
