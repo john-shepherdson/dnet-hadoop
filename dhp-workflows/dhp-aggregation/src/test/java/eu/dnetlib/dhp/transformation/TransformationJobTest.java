@@ -1,20 +1,12 @@
 
 package eu.dnetlib.dhp.transformation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.lenient;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.xml.transform.stream.StreamSource;
-
+import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
+import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.collection.CollectionJobTest;
+import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -24,50 +16,40 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
-import org.dom4j.Document;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
-import eu.dnetlib.dhp.collection.CollectionJobTest;
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.MDSTORE_DATA_PATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
-public class TransformationJobTest {
+public class TransformationJobTest extends AbstractVocabularyTest {
 
 	private static SparkSession spark;
 
-	@Mock
-	private ISLookUpService isLookUpService;
-
-	private VocabularyGroup vocabularies;
-
-	@BeforeEach
-	public void setUp() throws ISLookUpException, IOException {
-		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
-
-		lenient()
-			.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
-			.thenReturn(synonyms());
-		vocabularies = VocabularyGroup.loadVocsFromIS(isLookUpService);
-	}
-
 	@BeforeAll
-	public static void beforeAll() {
+	public static void beforeAll() throws IOException, ISLookUpException {
 		SparkConf conf = new SparkConf();
 		conf.setAppName(CollectionJobTest.class.getSimpleName());
 		conf.setMaster("local");
 		spark = SparkSession.builder().config(conf).getOrCreate();
+	}
+
+
+	@BeforeEach
+	public void setUp() throws IOException, ISLookUpException {
+		setUpVocabulary();
 	}
 
 	@AfterAll
@@ -101,8 +83,6 @@ public class TransformationJobTest {
 
 		mockupTrasformationRule("simpleTRule", "/eu/dnetlib/dhp/transform/ext_simple.xsl");
 
-//		final String arguments = "-issm true -i %s -o %s -d 1 -w 1 -tp XSLT_TRANSFORM -tr simpleTRule";
-
 		final Map<String, String> parameters = Stream.of(new String[][] {
 			{
 				"dateOfTransformation", "1234"
@@ -111,7 +91,7 @@ public class TransformationJobTest {
 				"transformationPlugin", "XSLT_TRANSFORM"
 			},
 			{
-				"transformationRuleTitle", "simpleTRule"
+				"transformationRuleId", "simpleTRule"
 			},
 
 		}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
@@ -121,7 +101,7 @@ public class TransformationJobTest {
 		// TODO introduce useful assertions
 
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
-		final Dataset<MetadataRecord> mOutput = spark.read().format("parquet").load(mdstore_output).as(encoder);
+		final Dataset<MetadataRecord> mOutput = spark.read().format("parquet").load(mdstore_output+MDSTORE_DATA_PATH).as(encoder);
 
 		final Long total = mOutput.count();
 
@@ -151,13 +131,7 @@ public class TransformationJobTest {
 		Files.deleteIfExists(tempDirWithPrefix);
 	}
 
-	private void mockupTrasformationRule(final String trule, final String path) throws Exception {
-		final String trValue = IOUtils.toString(this.getClass().getResourceAsStream(path));
 
-		lenient()
-			.when(isLookUpService.quickSearchProfile(String.format(TransformationFactory.TRULE_XQUERY, trule)))
-			.thenReturn(Collections.singletonList(trValue));
-	}
 
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
 		final String trValue = IOUtils.toString(this.getClass().getResourceAsStream(path));
@@ -165,13 +139,5 @@ public class TransformationJobTest {
 		return new XSLTTransformationFunction(new AggregationCounter(la, la, la), trValue, 0, vocabularies);
 	}
 
-	private List<String> vocs() throws IOException {
-		return IOUtils
-			.readLines(TransformationJobTest.class.getResourceAsStream("/eu/dnetlib/dhp/transform/terms.txt"));
-	}
 
-	private List<String> synonyms() throws IOException {
-		return IOUtils
-			.readLines(TransformationJobTest.class.getResourceAsStream("/eu/dnetlib/dhp/transform/synonyms.txt"));
-	}
 }
