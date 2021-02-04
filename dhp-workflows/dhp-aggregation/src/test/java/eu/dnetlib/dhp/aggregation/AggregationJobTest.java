@@ -1,12 +1,19 @@
 
 package eu.dnetlib.dhp.aggregation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
-import eu.dnetlib.dhp.collection.GenerateNativeStoreSparkJob;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.TransformSparkJobNode;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.MDSTORE_DATA_PATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,22 +33,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.MDSTORE_DATA_PATH;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
+import eu.dnetlib.dhp.collection.GenerateNativeStoreSparkJob;
+import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.TransformSparkJobNode;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(MockitoExtension.class)
-public class AggregationJobTest extends AbstractVocabularyTest{
+public class AggregationJobTest extends AbstractVocabularyTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -57,8 +59,6 @@ public class AggregationJobTest extends AbstractVocabularyTest{
 	private static String provenance;
 
 	private static final Logger log = LoggerFactory.getLogger(AggregationJobTest.class);
-
-
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -85,8 +85,6 @@ public class AggregationJobTest extends AbstractVocabularyTest{
 			.config(conf)
 			.getOrCreate();
 	}
-
-
 
 	@AfterAll
 	public static void afterAll() throws IOException {
@@ -161,36 +159,42 @@ public class AggregationJobTest extends AbstractVocabularyTest{
 		MDStoreVersion mdStoreV2 = prepareVersion("/eu/dnetlib/dhp/collection/mdStoreVersion_2.json");
 		MDStoreVersion mdStoreCleanedVersion = prepareVersion("/eu/dnetlib/dhp/collection/mdStoreCleanedVersion.json");
 
-
 		mockupTrasformationRule("simpleTRule", "/eu/dnetlib/dhp/transform/ext_simple.xsl");
 
 		final Map<String, String> parameters = Stream.of(new String[][] {
-				{
-						"dateOfTransformation", "1234"
-				},
-				{
-						"transformationPlugin", "XSLT_TRANSFORM"
-				},
-				{
-						"transformationRuleId", "simpleTRule"
-				},
+			{
+				"dateOfTransformation", "1234"
+			},
+			{
+				"transformationPlugin", "XSLT_TRANSFORM"
+			},
+			{
+				"transformationRuleId", "simpleTRule"
+			},
 
 		}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
-		TransformSparkJobNode.transformRecords(parameters, isLookUpService, spark, mdStoreV2.getHdfsPath()+MDSTORE_DATA_PATH, mdStoreCleanedVersion.getHdfsPath());
+		TransformSparkJobNode
+			.transformRecords(
+				parameters, isLookUpService, spark, mdStoreV2.getHdfsPath() + MDSTORE_DATA_PATH,
+				mdStoreCleanedVersion.getHdfsPath());
 
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
-		final Dataset<MetadataRecord> mOutput = spark.read().format("parquet").load(mdStoreCleanedVersion.getHdfsPath()+MDSTORE_DATA_PATH).as(encoder);
+		final Dataset<MetadataRecord> mOutput = spark
+			.read()
+			.format("parquet")
+			.load(mdStoreCleanedVersion.getHdfsPath() + MDSTORE_DATA_PATH)
+			.as(encoder);
 
 		final Long total = mOutput.count();
 
 		final long recordTs = mOutput
-				.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
-				.count();
+			.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
+			.count();
 
 		final long recordNotEmpty = mOutput
-				.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
-				.count();
+			.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
+			.count();
 
 		assertEquals(total, recordTs);
 

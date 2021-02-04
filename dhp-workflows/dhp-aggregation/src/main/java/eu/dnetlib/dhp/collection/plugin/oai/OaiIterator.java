@@ -113,6 +113,7 @@ public class OaiIterator implements Iterator<String> {
 
 			return downloadPage(url);
 		} catch (final UnsupportedEncodingException e) {
+			errorLogList.add(e.getMessage());
 			throw new CollectorException(e);
 		}
 	}
@@ -138,6 +139,7 @@ public class OaiIterator implements Iterator<String> {
 					+ "?verb=ListRecords&resumptionToken="
 					+ URLEncoder.encode(resumptionToken, "UTF-8"));
 		} catch (final UnsupportedEncodingException e) {
+			errorLogList.add(e.getMessage());
 			throw new CollectorException(e);
 		}
 	}
@@ -150,12 +152,14 @@ public class OaiIterator implements Iterator<String> {
 			doc = reader.read(new StringReader(xml));
 		} catch (final DocumentException e) {
 			log.warn("Error parsing xml, I try to clean it. {}", e.getMessage());
+			errorLogList.add(e.getMessage());
 			final String cleaned = XmlCleaner.cleanAllEntities(xml);
 			try {
 				doc = reader.read(new StringReader(cleaned));
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
 				if (resumptionToken == null) {
+					errorLogList.add(e1.getMessage());
 					throw new CollectorException("Error parsing cleaned document:\n" + cleaned, e1);
 				}
 				return resumptionToken;
@@ -166,10 +170,14 @@ public class OaiIterator implements Iterator<String> {
 		if (errorNode != null) {
 			final String code = errorNode.valueOf("@code");
 			if ("noRecordsMatch".equalsIgnoreCase(code.trim())) {
-				log.warn("noRecordsMatch for oai call: " + url);
+				final String msg = "noRecordsMatch for oai call : " + url;
+				log.warn(msg);
+				errorLogList.add(msg);
 				return null;
 			} else {
-				throw new CollectorException(code + " - " + errorNode.getText());
+				final String msg = code + " - " + errorNode.getText();
+				errorLogList.add(msg);
+				throw new CollectorException(msg);
 			}
 		}
 

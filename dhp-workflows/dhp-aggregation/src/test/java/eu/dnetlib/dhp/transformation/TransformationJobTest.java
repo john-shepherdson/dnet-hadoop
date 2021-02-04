@@ -1,12 +1,18 @@
 
 package eu.dnetlib.dhp.transformation;
 
-import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
-import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
-import eu.dnetlib.dhp.collection.CollectionJobTest;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.MDSTORE_DATA_PATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.lenient;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -21,17 +27,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.MDSTORE_DATA_PATH;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.lenient;
+import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
+import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.collection.CollectionJobTest;
+import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 @ExtendWith(MockitoExtension.class)
 public class TransformationJobTest extends AbstractVocabularyTest {
@@ -45,7 +46,6 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		conf.setMaster("local");
 		spark = SparkSession.builder().config(conf).getOrCreate();
 	}
-
 
 	@BeforeEach
 	public void setUp() throws IOException, ISLookUpException {
@@ -101,7 +101,11 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		// TODO introduce useful assertions
 
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
-		final Dataset<MetadataRecord> mOutput = spark.read().format("parquet").load(mdstore_output+MDSTORE_DATA_PATH).as(encoder);
+		final Dataset<MetadataRecord> mOutput = spark
+			.read()
+			.format("parquet")
+			.load(mdstore_output + MDSTORE_DATA_PATH)
+			.as(encoder);
 
 		final Long total = mOutput.count();
 
@@ -131,13 +135,10 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		Files.deleteIfExists(tempDirWithPrefix);
 	}
 
-
-
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
 		final String trValue = IOUtils.toString(this.getClass().getResourceAsStream(path));
 		final LongAccumulator la = new LongAccumulator();
 		return new XSLTTransformationFunction(new AggregationCounter(la, la, la), trValue, 0, vocabularies);
 	}
-
 
 }

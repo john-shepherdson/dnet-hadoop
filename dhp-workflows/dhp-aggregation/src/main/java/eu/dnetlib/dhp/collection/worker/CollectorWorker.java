@@ -29,16 +29,13 @@ public class CollectorWorker {
 
 	private final String hdfsPath;
 
-	private CollectorPlugin plugin;
-
 	public CollectorWorker(
 		final ApiDescriptor api,
 		final String hdfsuri,
-		final String hdfsPath) throws CollectorException {
+		final String hdfsPath) {
 		this.api = api;
 		this.hdfsuri = hdfsuri;
 		this.hdfsPath = hdfsPath;
-		this.plugin = CollectorPluginFactory.getPluginByProtocol(api.getProtocol());
 	}
 
 	public CollectorPluginErrorLogList collect() throws IOException, CollectorException {
@@ -59,6 +56,7 @@ public class CollectorWorker {
 
 		log.info("Created path " + hdfswritepath.toString());
 
+		final CollectorPlugin plugin = CollectorPluginFactory.getPluginByProtocol(api.getProtocol());
 		final AtomicInteger counter = new AtomicInteger(0);
 		try (SequenceFile.Writer writer = SequenceFile
 			.createWriter(

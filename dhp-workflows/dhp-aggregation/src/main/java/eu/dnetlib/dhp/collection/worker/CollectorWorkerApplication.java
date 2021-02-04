@@ -5,6 +5,9 @@ import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
 import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
 import static eu.dnetlib.dhp.application.ApplicationUtils.*;
 
+import java.io.IOException;
+
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +38,7 @@ public class CollectorWorkerApplication {
 	/**
 	 * @param args
 	 */
-	public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) throws ParseException, IOException, CollectorException {
 
 		final ArgumentApplicationParser argumentParser = new ArgumentApplicationParser(
 			IOUtils
