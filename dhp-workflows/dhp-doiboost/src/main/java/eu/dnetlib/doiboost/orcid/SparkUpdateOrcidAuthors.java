@@ -95,7 +95,7 @@ public class SparkUpdateOrcidAuthors {
 								authorSummary = XMLRecordParser
 									.VTDParseAuthorSummary(xmlAuthor.getBytes());
 								authorSummary.setStatusCode(statusCode);
-								authorSummary.setDownloadDate("2020-12-15 00:00:01.000000");
+								authorSummary.setDownloadDate(Long.toString(System.currentTimeMillis()));
 								authorSummary.setBase64CompressData(compressedData);
 								return authorSummary;
 							} catch (Exception e) {
@@ -105,7 +105,7 @@ public class SparkUpdateOrcidAuthors {
 						}
 					} else {
 						authorSummary.setStatusCode(statusCode);
-						authorSummary.setDownloadDate("2020-12-15 00:00:01.000000");
+						authorSummary.setDownloadDate(Long.toString(System.currentTimeMillis()));
 						errorCodeAuthorsFoundAcc.add(1);
 					}
 					return authorSummary;

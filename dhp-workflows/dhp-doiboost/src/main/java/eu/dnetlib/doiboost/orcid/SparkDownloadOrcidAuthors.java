@@ -28,13 +28,14 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.doiboost.orcid.model.DownloadedRecordData;
+import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import scala.Tuple2;
 
 public class SparkDownloadOrcidAuthors {
 
 	static Logger logger = LoggerFactory.getLogger(SparkDownloadOrcidAuthors.class);
 	static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	static final String lastUpdate = "2020-11-18 00:00:05";
+	static String lastUpdate;
 
 	public static void main(String[] args) throws IOException, Exception {
 
@@ -57,6 +58,8 @@ public class SparkDownloadOrcidAuthors {
 		final String token = parser.get("token");
 		final String lambdaFileName = parser.get("lambdaFileName");
 		logger.info("lambdaFileName: ", lambdaFileName);
+
+		lastUpdate = HDFSUtil.readFromTextFile(workingPath.concat("last_update.txt"));
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -181,6 +184,9 @@ public class SparkDownloadOrcidAuthors {
 		try {
 			if (modifiedDate.length() != 19) {
 				modifiedDate = modifiedDate.substring(0, 19);
+			}
+			if (lastUpdate.length() != 19) {
+				lastUpdate = lastUpdate.substring(0, 19);
 			}
 			modifiedDateDt = new SimpleDateFormat(DATE_FORMAT).parse(modifiedDate);
 			lastUpdateDt = new SimpleDateFormat(DATE_FORMAT).parse(lastUpdate);

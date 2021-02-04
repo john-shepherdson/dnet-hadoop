@@ -31,6 +31,7 @@ import com.google.gson.JsonParser;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.doiboost.orcid.model.DownloadedRecordData;
+import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
 import scala.Tuple2;
 
@@ -43,7 +44,7 @@ public class SparkDownloadOrcidWorks {
 	public static final String ORCID_XML_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 	public static final DateTimeFormatter ORCID_XML_DATETIMEFORMATTER = DateTimeFormatter
 		.ofPattern(ORCID_XML_DATETIME_FORMAT);
-	public static final String lastUpdateValue = "2020-11-18 00:00:05";
+	public static String lastUpdateValue;
 
 	public static void main(String[] args) throws IOException, Exception {
 
@@ -63,6 +64,11 @@ public class SparkDownloadOrcidWorks {
 		logger.info("workingPath: ", workingPath);
 		final String outputPath = parser.get("outputPath");
 		final String token = parser.get("token");
+
+		lastUpdateValue = HDFSUtil.readFromTextFile(workingPath.concat("last_update.txt"));
+		if (lastUpdateValue.length() != 19) {
+			lastUpdateValue = lastUpdateValue.substring(0, 19);
+		}
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(

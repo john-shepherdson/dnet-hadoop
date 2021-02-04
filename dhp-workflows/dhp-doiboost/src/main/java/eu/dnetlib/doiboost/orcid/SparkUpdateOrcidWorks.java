@@ -27,6 +27,7 @@ import com.google.gson.JsonParser;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.orcid.Work;
 import eu.dnetlib.dhp.schema.orcid.WorkDetail;
+import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
 
 public class SparkUpdateOrcidWorks {
@@ -83,7 +84,7 @@ public class SparkUpdateOrcidWorks {
 					String statusCode = getJsonValue(jElement, "statusCode");
 					work.setStatusCode(statusCode);
 					String downloadDate = getJsonValue(jElement, "lastModifiedDate");
-					work.setDownloadDate("2020-12-15 00:00:01.000000");
+					work.setDownloadDate(Long.toString(System.currentTimeMillis()));
 					if (statusCode.equals("200")) {
 						String compressedData = getJsonValue(jElement, "compressedData");
 						if (StringUtils.isEmpty(compressedData)) {
@@ -165,6 +166,10 @@ public class SparkUpdateOrcidWorks {
 				logger.info("errorLoadingJsonWorksFoundAcc: " + errorLoadingWorksJsonFoundAcc.value().toString());
 				logger.info("errorParsingXMLWorksFoundAcc: " + errorParsingWorksXMLFoundAcc.value().toString());
 
+				String lastModifiedDateFromLambdaFile = HDFSUtil
+					.readFromTextFile(workingPath.concat("last_modified_date_from_lambda_file.txt"));
+				HDFSUtil.writeToTextFile(workingPath.concat("last_update.txt"), lastModifiedDateFromLambdaFile);
+				logger.info("last_update file updated");
 			});
 	}
 
