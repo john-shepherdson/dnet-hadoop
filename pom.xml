@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.dnetlib.dhp</groupId>
 	<artifactId>dhp</artifactId>
-	<version>1.2.4-SNAPSHOT</version>
+	<version>1.2.4-branch_hadoop_aggregator-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<licenses>
