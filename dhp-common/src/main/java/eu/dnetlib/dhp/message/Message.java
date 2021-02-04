@@ -1,5 +1,5 @@
 
-package eu.dnetlib.message;
+package eu.dnetlib.dhp.message;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -15,18 +15,15 @@ public class Message implements Serializable {
 
 	private String jobName;
 
-	private MessageType type;
-
 	private Map<String, String> body;
 
 	public Message() {
 	}
 
-	public Message(final String workflowId, final String jobName, final MessageType type,
+	public Message(final String workflowId, final String jobName,
 		final Map<String, String> body) {
 		this.workflowId = workflowId;
 		this.jobName = jobName;
-		this.type = type;
 		this.body = body;
 	}
 
@@ -46,14 +43,6 @@ public class Message implements Serializable {
 		this.jobName = jobName;
 	}
 
-	public MessageType getType() {
-		return type;
-	}
-
-	public void setType(final MessageType type) {
-		this.type = type;
-	}
-
 	public Map<String, String> getBody() {
 		return body;
 	}
@@ -64,6 +53,6 @@ public class Message implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.format("Message [workflowId=%s, jobName=%s, type=%s, body=%s]", workflowId, jobName, type, body);
+		return String.format("Message [workflowId=%s, jobName=%s, body=%s]", workflowId, jobName, body);
 	}
 }
