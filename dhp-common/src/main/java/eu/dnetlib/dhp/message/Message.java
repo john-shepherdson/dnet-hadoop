@@ -10,7 +10,6 @@ public class Message implements Serializable {
 	public static String CURRENT_PARAM = "current";
 	public static String TOTAL_PARAM = "total";
 
-
 	/**
 	 *
 	 */
