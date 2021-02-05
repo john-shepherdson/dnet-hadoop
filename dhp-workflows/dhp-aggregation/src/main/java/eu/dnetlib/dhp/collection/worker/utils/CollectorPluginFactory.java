@@ -7,14 +7,15 @@ import eu.dnetlib.dhp.collection.worker.CollectorException;
 
 public class CollectorPluginFactory {
 
-	public static CollectorPlugin getPluginByProtocol(final String protocol) throws CollectorException {
+	public static CollectorPlugin getPluginByProtocol(final HttpClientParams clientParams, final String protocol)
+		throws UnknownCollectorPluginException {
 		if (protocol == null)
-			throw new CollectorException("protocol cannot be null");
+			throw new UnknownCollectorPluginException("protocol cannot be null");
 		switch (protocol.toLowerCase().trim()) {
 			case "oai":
-				return new OaiCollectorPlugin();
+				return new OaiCollectorPlugin(clientParams);
 			default:
-				throw new CollectorException("UNknown protocol");
+				throw new UnknownCollectorPluginException("Unknown protocol");
 		}
 	}
 }

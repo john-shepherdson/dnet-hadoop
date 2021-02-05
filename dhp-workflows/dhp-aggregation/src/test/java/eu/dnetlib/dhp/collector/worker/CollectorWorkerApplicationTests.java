@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.collection.worker.CollectorWorker;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
+import eu.dnetlib.dhp.collection.worker.utils.HttpClientParams;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
 @Disabled
@@ -21,8 +22,9 @@ public class CollectorWorkerApplicationTests {
 	@Test
 	public void testFindPlugin() throws Exception {
 		final CollectorPluginFactory collectorPluginEnumerator = new CollectorPluginFactory();
-		assertNotNull(collectorPluginEnumerator.getPluginByProtocol("oai"));
-		assertNotNull(collectorPluginEnumerator.getPluginByProtocol("OAI"));
+		final HttpClientParams clientParams = new HttpClientParams();
+		assertNotNull(collectorPluginEnumerator.getPluginByProtocol(clientParams, "oai"));
+		assertNotNull(collectorPluginEnumerator.getPluginByProtocol(clientParams, "OAI"));
 	}
 
 	@Test

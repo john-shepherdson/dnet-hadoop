@@ -94,8 +94,21 @@
             <arg>--workflowId</arg><arg>${workflowId}</arg>
             <arg>--dnetMessageManagerURL</arg><arg>${dnetMessageManagerURL}</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
-
+            <arg>--maxNumberOfRetry</arg><arg>${maxNumberOfRetry}</arg>
+            <arg>--retryDelay</arg><arg>${retryDelay}</arg>
+            <arg>--connectTimeOut</arg><arg>${connectTimeOut}</arg>
+            <arg>--readTimeOut</arg><arg>${readTimeOut}</arg>
             <capture-output/>
+        </java>
+        <ok to="CollectorReport"/>
+        <error to="CollectorReport"/>
+    </action>
+
+    <action name="CollectorReport">
+        <java>
+            <main-class>eu.dnetlib.dhp.collection.worker.CollectorWorkerReporter</main-class>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="GenerateNativeStoreSparkJob"/>
         <error to="FailCollection"/>

@@ -105,7 +105,8 @@ public class TransformSparkJobNode {
 		log.info("Total item " + ct.getTotalItems().count());
 		log.info("Transformation Error item " + ct.getErrorItems().count());
 
-		writeTotalSizeOnHDFS(spark, mdstore.count(), outputBasePath + MDSTORE_SIZE_PATH);
+		writeHdfsFile(
+			spark.sparkContext().hadoopConfiguration(), "" + mdstore.count(), outputBasePath + MDSTORE_SIZE_PATH);
 	}
 
 }

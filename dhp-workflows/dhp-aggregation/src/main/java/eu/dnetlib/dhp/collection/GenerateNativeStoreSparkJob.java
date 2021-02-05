@@ -28,8 +28,6 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
@@ -47,7 +45,7 @@ public class GenerateNativeStoreSparkJob {
 				.toString(
 					GenerateNativeStoreSparkJob.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/collection/collection_input_parameters.json")));
+							"/eu/dnetlib/dhp/collection/generate_native_input_parameters.json")));
 		parser.parseArgument(args);
 
 		final String provenanceArgument = parser.get("provenance");
@@ -148,7 +146,9 @@ public class GenerateNativeStoreSparkJob {
 		final Long total = spark.read().load(targetPath).count();
 		log.info("collected {} records for datasource '{}'", total, provenance.getDatasourceName());
 
-		writeTotalSizeOnHDFS(spark, total, currentVersion.getHdfsPath() + MDSTORE_SIZE_PATH);
+		writeHdfsFile(
+			spark.sparkContext().hadoopConfiguration(), total.toString(),
+			currentVersion.getHdfsPath() + MDSTORE_SIZE_PATH);
 	}
 
 	public static class MDStoreAggregator extends Aggregator<MetadataRecord, MetadataRecord, MetadataRecord> {

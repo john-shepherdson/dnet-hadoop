@@ -1,14 +1,13 @@
 
 package eu.dnetlib.dhp.collection.worker;
 
+import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.SEQUENCE_FILE_NAME;
+import static eu.dnetlib.dhp.application.ApplicationUtils.*;
+
 import java.io.IOException;
-import java.net.URI;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.dnetlib.dhp.message.Message;
-import eu.dnetlib.dhp.message.MessageSender;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
@@ -16,10 +15,14 @@ import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginErrorLogList;
 import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
+import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginReport;
+import eu.dnetlib.dhp.collection.worker.utils.HttpClientParams;
+import eu.dnetlib.dhp.collection.worker.utils.UnknownCollectorPluginException;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
+import eu.dnetlib.dhp.message.MessageSender;
 
 public class CollectorWorker {
 
@@ -27,70 +30,71 @@ public class CollectorWorker {
 
 	private final ApiDescriptor api;
 
-	private final String hdfsuri;
+	private final Configuration conf;
 
-	private final String hdfsPath;
+	private final MDStoreVersion mdStoreVersion;
+
+	private final HttpClientParams clientParams;
+
+	private final CollectorPluginReport report;
 
 	private final MessageSender messageSender;
 
-
 	public CollectorWorker(
 		final ApiDescriptor api,
-		final String hdfsuri,
-		final String hdfsPath,
-		final MessageSender messageSender) {
+		final Configuration conf,
+		final MDStoreVersion mdStoreVersion,
+		final HttpClientParams clientParams,
+		final MessageSender messageSender,
+		final CollectorPluginReport report) {
 		this.api = api;
-		this.hdfsuri = hdfsuri;
-		this.hdfsPath = hdfsPath;
+		this.conf = conf;
+		this.mdStoreVersion = mdStoreVersion;
+		this.clientParams = clientParams;
 		this.messageSender = messageSender;
+		this.report = report;
 	}
 
-	public CollectorPluginErrorLogList collect() throws IOException, CollectorException {
+	public void collect() throws UnknownCollectorPluginException, CollectorException, IOException {
 
-		// ====== Init HDFS File System Object
-		Configuration conf = new Configuration();
-		// Set FileSystem URI
-		conf.set("fs.defaultFS", hdfsuri);
-		// Because of Maven
-		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-		conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+		final String outputPath = mdStoreVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
+		log.info("outputPath path is {}", outputPath);
 
-		System.setProperty("hadoop.home.dir", "/");
-		// Get the filesystem - HDFS
-
-		FileSystem.get(URI.create(hdfsuri), conf);
-		Path hdfswritepath = new Path(hdfsPath);
-
-		log.info("Created path " + hdfswritepath.toString());
-
-		final CollectorPlugin plugin = CollectorPluginFactory.getPluginByProtocol(api.getProtocol());
+		final CollectorPlugin plugin = CollectorPluginFactory.getPluginByProtocol(clientParams, api.getProtocol());
 		final AtomicInteger counter = new AtomicInteger(0);
 
 		try (SequenceFile.Writer writer = SequenceFile
 			.createWriter(
 				conf,
-				SequenceFile.Writer.file(hdfswritepath),
+				SequenceFile.Writer.file(new Path(outputPath)),
 				SequenceFile.Writer.keyClass(IntWritable.class),
 				SequenceFile.Writer.valueClass(Text.class))) {
 			final IntWritable key = new IntWritable(counter.get());
 			final Text value = new Text();
 			plugin
-				.collect(api)
+				.collect(api, report)
 				.forEach(
 					content -> {
 						key.set(counter.getAndIncrement());
-						if (counter.get()% 500 == 0)
+						if (counter.get() % 500 == 0)
 							messageSender.sendMessage(counter.longValue(), null);
 						value.set(content);
 						try {
 							writer.append(key, value);
-						} catch (IOException e) {
+						} catch (Throwable e) {
+							report.put(e.getClass().getName(), e.getMessage());
+							log.warn("setting report to failed");
+							report.setSuccess(false);
 							throw new RuntimeException(e);
 						}
 					});
+		} catch (Throwable e) {
+			report.put(e.getClass().getName(), e.getMessage());
+			log.warn("setting report to failed");
+			report.setSuccess(false);
 		} finally {
-			messageSender.sendMessage(counter.longValue(),counter.longValue());
-			return plugin.getCollectionErrors();
+			messageSender.sendMessage(counter.longValue(), counter.longValue());
 		}
 	}
+
 }

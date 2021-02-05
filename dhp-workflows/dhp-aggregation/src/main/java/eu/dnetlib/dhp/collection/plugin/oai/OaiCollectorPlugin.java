@@ -9,15 +9,14 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.collection.worker.CollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginErrorLogList;
+import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginReport;
+import eu.dnetlib.dhp.collection.worker.utils.HttpClientParams;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
@@ -29,19 +28,15 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 
 	private OaiIteratorFactory oaiIteratorFactory;
 
-	private final CollectorPluginErrorLogList errorLogList = new CollectorPluginErrorLogList();
+	private HttpClientParams clientParams;
 
-	@Override
-	public Stream<String> collect(final ApiDescriptor api) throws CollectorException {
-		try {
-			return doCollect(api);
-		} catch (CollectorException e) {
-			errorLogList.add(e.getMessage());
-			throw e;
-		}
+	public OaiCollectorPlugin(HttpClientParams clientParams) {
+		this.clientParams = clientParams;
 	}
 
-	private Stream<String> doCollect(ApiDescriptor api) throws CollectorException {
+	@Override
+	public Stream<String> collect(final ApiDescriptor api, final CollectorPluginReport report)
+		throws CollectorException {
 		final String baseUrl = api.getBaseUrl();
 		final String mdFormat = api.getParams().get(FORMAT_PARAM);
 		final String setParam = api.getParams().get(OAI_SET_PARAM);
@@ -79,7 +74,7 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 			.stream()
 			.map(
 				set -> getOaiIteratorFactory()
-					.newIterator(baseUrl, mdFormat, set, fromDate, untilDate, errorLogList))
+					.newIterator(baseUrl, mdFormat, set, fromDate, untilDate, getClientParams(), report))
 			.iterator();
 
 		return StreamSupport
@@ -94,8 +89,11 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 		return oaiIteratorFactory;
 	}
 
-	@Override
-	public CollectorPluginErrorLogList getCollectionErrors() {
-		return errorLogList;
+	public HttpClientParams getClientParams() {
+		return clientParams;
+	}
+
+	public void setClientParams(HttpClientParams clientParams) {
+		this.clientParams = clientParams;
 	}
 }

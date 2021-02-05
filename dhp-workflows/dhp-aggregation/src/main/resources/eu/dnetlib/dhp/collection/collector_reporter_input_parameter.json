@@ -1,0 +1,14 @@
+[
+  {
+    "paramName": "n",
+    "paramLongName": "namenode",
+    "paramDescription": "the Name Node URI",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mv",
+    "paramLongName": "mdStoreVersion",
+    "paramDescription": "the MDStore Version bean",
+    "paramRequired": true
+  }
+]

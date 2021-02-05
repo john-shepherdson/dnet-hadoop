@@ -17,13 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.collection.worker.CollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginErrorLogList;
+import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginReport;
 import eu.dnetlib.dhp.collection.worker.utils.HttpConnector2;
 import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
 
 public class OaiIterator implements Iterator<String> {
 
 	private static final Logger log = LoggerFactory.getLogger(OaiIterator.class);
+
+	private final static String REPORT_PREFIX = "oai:";
 
 	private final Queue<String> queue = new PriorityBlockingQueue<>();
 	private final SAXReader reader = new SAXReader();
@@ -36,7 +38,7 @@ public class OaiIterator implements Iterator<String> {
 	private String token;
 	private boolean started;
 	private final HttpConnector2 httpConnector;
-	private CollectorPluginErrorLogList errorLogList;
+	private CollectorPluginReport errorLogList;
 
 	public OaiIterator(
 		final String baseUrl,
@@ -45,7 +47,7 @@ public class OaiIterator implements Iterator<String> {
 		final String fromDate,
 		final String untilDate,
 		final HttpConnector2 httpConnector,
-		final CollectorPluginErrorLogList errorLogList) {
+		final CollectorPluginReport errorLogList) {
 		this.baseUrl = baseUrl;
 		this.mdFormat = mdFormat;
 		this.set = set;
@@ -111,7 +113,7 @@ public class OaiIterator implements Iterator<String> {
 
 			return downloadPage(url);
 		} catch (final UnsupportedEncodingException e) {
-			errorLogList.add(e.getMessage());
+			errorLogList.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e);
 		}
 	}
@@ -137,7 +139,7 @@ public class OaiIterator implements Iterator<String> {
 					+ "?verb=ListRecords&resumptionToken="
 					+ URLEncoder.encode(resumptionToken, "UTF-8"));
 		} catch (final UnsupportedEncodingException e) {
-			errorLogList.add(e.getMessage());
+			errorLogList.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e);
 		}
 	}
@@ -150,14 +152,14 @@ public class OaiIterator implements Iterator<String> {
 			doc = reader.read(new StringReader(xml));
 		} catch (final DocumentException e) {
 			log.warn("Error parsing xml, I try to clean it. {}", e.getMessage());
-			errorLogList.add(e.getMessage());
+			errorLogList.put(e.getClass().getName(), e.getMessage());
 			final String cleaned = XmlCleaner.cleanAllEntities(xml);
 			try {
 				doc = reader.read(new StringReader(cleaned));
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
 				if (resumptionToken == null) {
-					errorLogList.add(e1.getMessage());
+					errorLogList.put(e1.getClass().getName(), e1.getMessage());
 					throw new CollectorException("Error parsing cleaned document:\n" + cleaned, e1);
 				}
 				return resumptionToken;
@@ -166,15 +168,15 @@ public class OaiIterator implements Iterator<String> {
 
 		final Node errorNode = doc.selectSingleNode("/*[local-name()='OAI-PMH']/*[local-name()='error']");
 		if (errorNode != null) {
-			final String code = errorNode.valueOf("@code");
-			if ("noRecordsMatch".equalsIgnoreCase(code.trim())) {
+			final String code = errorNode.valueOf("@code").trim();
+			if ("noRecordsMatch".equalsIgnoreCase(code)) {
 				final String msg = "noRecordsMatch for oai call : " + url;
 				log.warn(msg);
-				errorLogList.add(msg);
+				errorLogList.put(REPORT_PREFIX + code, msg);
 				return null;
 			} else {
 				final String msg = code + " - " + errorNode.getText();
-				errorLogList.add(msg);
+				errorLogList.put(REPORT_PREFIX + "error", msg);
 				throw new CollectorException(msg);
 			}
 		}
@@ -186,7 +188,7 @@ public class OaiIterator implements Iterator<String> {
 		return doc.valueOf("//*[local-name()='resumptionToken']");
 	}
 
-	public CollectorPluginErrorLogList getErrorLogList() {
+	public CollectorPluginReport getErrorLogList() {
 		return errorLogList;
 	}
 }

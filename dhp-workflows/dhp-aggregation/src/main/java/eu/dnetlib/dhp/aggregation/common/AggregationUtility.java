@@ -2,9 +2,14 @@
 package eu.dnetlib.dhp.aggregation.common;
 
 import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -25,16 +30,31 @@ public class AggregationUtility {
 
 	public static final ObjectMapper MAPPER = new ObjectMapper();
 
-	public static void writeTotalSizeOnHDFS(final SparkSession spark, final Long total, final String path)
+	public static void writeHdfsFile(final Configuration conf, final String content, final String path)
 		throws IOException {
 
-		log.info("writing size ({}) info file {}", total, path);
-		try (FileSystem fs = FileSystem.get(spark.sparkContext().hadoopConfiguration());
+		log.info("writing file {}, size {}", path, content.length());
+		try (FileSystem fs = FileSystem.get(conf);
 			BufferedOutputStream os = new BufferedOutputStream(fs.create(new Path(path)))) {
-			os.write(total.toString().getBytes(StandardCharsets.UTF_8));
+			os.write(content.getBytes(StandardCharsets.UTF_8));
 			os.flush();
 		}
+	}
 
+	public static String readHdfsFile(Configuration conf, String path) throws IOException {
+		log.info("reading file {}", path);
+
+		try (FileSystem fs = FileSystem.get(conf)) {
+			final Path p = new Path(path);
+			if (!fs.exists(p)) {
+				throw new FileNotFoundException(path);
+			}
+			return IOUtils.toString(fs.open(p));
+		}
+	}
+
+	public static <T> T readHdfsFileAs(Configuration conf, String path, Class<T> clazz) throws IOException {
+		return MAPPER.readValue(readHdfsFile(conf, path), clazz);
 	}
 
 	public static <T> void saveDataset(final Dataset<T> mdstore, final String targetPath) {

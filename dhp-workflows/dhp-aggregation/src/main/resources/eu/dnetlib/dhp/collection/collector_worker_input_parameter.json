@@ -23,12 +23,34 @@
     "paramDescription": "the End point URL to send Messages",
     "paramRequired": true
   },
-
-
   {
     "paramName": "w",
     "paramLongName": "workflowId",
     "paramDescription": "the identifier of the dnet Workflow",
     "paramRequired": true
+  },
+  {
+    "paramName": "mr",
+    "paramLongName": "maxNumberOfRetry",
+    "paramDescription": "the maximum number of admitted connection retries",
+    "paramRequired": false
+  },
+  {
+    "paramName": "rd",
+    "paramLongName": "retryDelay",
+    "paramDescription": "the delay (ms) between retries",
+    "paramRequired": false
+  },
+  {
+    "paramName": "ct",
+    "paramLongName": "connectTimeOut",
+    "paramDescription": "the maximum allowed time (ms) to connect to the remote host",
+    "paramRequired": false
+  },
+  {
+    "paramName": "rt",
+    "paramLongName": "readTimeOut",
+    "paramDescription": "the maximum allowed time (ms) to receive content from the remote host",
+    "paramRequired": false
   }
 ]

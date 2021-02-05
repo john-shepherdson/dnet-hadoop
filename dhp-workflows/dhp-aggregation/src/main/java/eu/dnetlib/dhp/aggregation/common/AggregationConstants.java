@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.aggregation.common;
 public class AggregationConstants {
 
 	public static final String SEQUENCE_FILE_NAME = "/sequence_file";
+	public static final String REPORT_FILE_NAME = "/report";
 	public static final String MDSTORE_DATA_PATH = "/store";
 	public static final String MDSTORE_SIZE_PATH = "/size";
 
