@@ -1,7 +1,7 @@
 
-package eu.dnetlib.dhp.collection.worker.utils;
+package eu.dnetlib.dhp.collection.worker;
 
-import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.MAPPER;
+import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class CollectorPluginReport extends LinkedHashMap<String, String> impleme
 	}
 
 	public Boolean isSuccess() {
-		return Boolean.valueOf(get(SUCCESS));
+		return containsKey(SUCCESS) && Boolean.valueOf(get(SUCCESS));
 	}
 
 	public void setSuccess(Boolean success) {
@@ -58,7 +58,7 @@ public class CollectorPluginReport extends LinkedHashMap<String, String> impleme
 		if (Objects.nonNull(fos)) {
 			log.info("writing report {} to {}", data, path.toString());
 			IOUtils.write(data, fos);
-			ApplicationUtils.populateOOZIEEnv(this);
+			populateOOZIEEnv(this);
 		}
 	}
 }

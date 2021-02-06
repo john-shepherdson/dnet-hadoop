@@ -2,10 +2,7 @@
 package eu.dnetlib.dhp.collection.worker;
 
 import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.REPORT_FILE_NAME;
-import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
-import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.MAPPER;
-import static eu.dnetlib.dhp.application.ApplicationUtils.getHadoopConfiguration;
-import static eu.dnetlib.dhp.application.ApplicationUtils.populateOOZIEEnv;
+import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -13,15 +10,11 @@ import java.util.Objects;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
-import eu.dnetlib.dhp.aggregation.common.AggregationUtility;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginReport;
-import eu.dnetlib.dhp.collection.worker.utils.UnknownCollectorPluginException;
 
 /**
  * CollectorWorkerReporter

@@ -17,9 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.collection.worker.CollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginReport;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector2;
-import eu.dnetlib.dhp.collection.worker.utils.XmlCleaner;
+import eu.dnetlib.dhp.collection.worker.CollectorPluginReport;
+import eu.dnetlib.dhp.collection.worker.HttpConnector2;
+import eu.dnetlib.dhp.collection.worker.XmlCleaner;
 
 public class OaiIterator implements Iterator<String> {
 

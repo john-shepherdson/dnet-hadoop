@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.actionmanager.project.utils.EXCELParser;
 import eu.dnetlib.dhp.collection.worker.CollectorException;
-import eu.dnetlib.dhp.collection.worker.utils.HttpConnector2;
+import eu.dnetlib.dhp.collection.worker.HttpConnector2;
 
 @Disabled
 public class EXCELParserTest {

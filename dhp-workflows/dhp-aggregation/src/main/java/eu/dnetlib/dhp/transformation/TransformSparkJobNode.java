@@ -2,8 +2,8 @@
 package eu.dnetlib.dhp.transformation;
 
 import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
-import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
 import java.io.IOException;
 import java.util.Map;

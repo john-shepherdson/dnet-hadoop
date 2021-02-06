@@ -1,5 +1,7 @@
 
-package eu.dnetlib.dhp.collection.worker.utils;
+package eu.dnetlib.dhp.collection.worker;
+
+import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +14,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.dnetlib.dhp.collection.worker.CollectorException;
 
 /**
  * Migrated from https://svn.driver.research-infrastructures.eu/driver/dnet45/modules/dnet-modular-collector-service/trunk/src/main/java/eu/dnetlib/data/collector/plugins/HttpConnector.java
@@ -162,11 +162,19 @@ public class HttpConnector2 {
 				}
 			}
 			throw new CollectorException(
-				String.format("Unexpected status code: %s error %s", urlConn.getResponseCode(), report));
+				String
+					.format(
+						"Unexpected status code: %s errors: %s", urlConn.getResponseCode(),
+						MAPPER.writeValueAsString(report)));
 		} catch (MalformedURLException | SocketException | UnknownHostException e) {
 			log.error(e.getMessage(), e);
 			report.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e.getMessage(), e);
+		} catch (SocketTimeoutException e) {
+			log.error(e.getMessage(), e);
+			report.put(e.getClass().getName(), e.getMessage());
+			backoffAndSleep(getClientParams().getRetryDelay() * retryNumber * 1000);
+			return attemptDownload(requestUrl, retryNumber + 1, report);
 		}
 	}
 

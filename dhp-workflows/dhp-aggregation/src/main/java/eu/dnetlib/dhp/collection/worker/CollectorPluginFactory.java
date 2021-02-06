@@ -1,9 +1,8 @@
 
-package eu.dnetlib.dhp.collection.worker.utils;
+package eu.dnetlib.dhp.collection.worker;
 
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
-import eu.dnetlib.dhp.collection.worker.CollectorException;
 
 public class CollectorPluginFactory {
 

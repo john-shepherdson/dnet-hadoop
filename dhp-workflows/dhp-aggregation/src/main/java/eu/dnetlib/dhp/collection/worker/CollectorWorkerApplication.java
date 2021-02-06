@@ -2,29 +2,21 @@
 package eu.dnetlib.dhp.collection.worker;
 
 import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
-import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
-import static eu.dnetlib.dhp.application.ApplicationUtils.*;
+import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
 import java.io.IOException;
 import java.util.Optional;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileSystemUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
-import eu.dnetlib.dhp.aggregation.common.AggregationUtility;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginReport;
-import eu.dnetlib.dhp.collection.worker.utils.HttpClientParams;
-import eu.dnetlib.dhp.collection.worker.utils.UnknownCollectorPluginException;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 import eu.dnetlib.dhp.message.MessageSender;
 

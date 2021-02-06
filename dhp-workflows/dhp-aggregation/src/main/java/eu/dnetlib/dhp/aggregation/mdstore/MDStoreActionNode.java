@@ -1,18 +1,14 @@
 
 package eu.dnetlib.dhp.aggregation.mdstore;
 
-import static eu.dnetlib.dhp.aggregation.common.AggregationUtility.*;
+import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
 import static eu.dnetlib.dhp.application.ApplicationUtils.*;
+import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.net.URI;
-import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -80,29 +76,20 @@ public class MDStoreActionNode {
 					throw new IllegalArgumentException(
 						"invalid MDStoreVersion value current is " + mdStoreVersion_params);
 				}
+				Path hdfstoreSizepath = new Path(mdStoreVersion.getHdfsPath() + MDSTORE_SIZE_PATH);
 
-				Configuration conf = new Configuration();
-				// Set FileSystem URI
-				conf.set("fs.defaultFS", hdfsuri);
-				// Because of Maven
-				conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-				conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+				try (
+					FileSystem fs = FileSystem.get(URI.create(hdfsuri), getHadoopConfiguration(hdfsuri));
+					FSDataInputStream inputStream = fs.open(hdfstoreSizepath)) {
 
-				System.setProperty("hadoop.home.dir", "/");
-				// Get the filesystem - HDFS
-				FileSystem fs = FileSystem.get(URI.create(hdfsuri), conf);
+					final Long mdStoreSize = Long.parseLong(IOUtils.toString(inputStream));
 
-				Path hdfstoreSizepath = new Path(mdStoreVersion.getHdfsPath() + "/size");
+					fs.create(hdfstoreSizepath);
+					DNetRestClient
+						.doGET(
+							String.format(COMMIT_VERSION_URL, mdStoreManagerURI, mdStoreVersion.getId(), mdStoreSize));
+				}
 
-				FSDataInputStream inputStream = fs.open(hdfstoreSizepath);
-
-				final Long mdStoreSize = Long.parseLong(IOUtils.toString(inputStream));
-
-				inputStream.close();
-				fs.create(hdfstoreSizepath);
-
-				DNetRestClient
-					.doGET(String.format(COMMIT_VERSION_URL, mdStoreManagerURI, mdStoreVersion.getId(), mdStoreSize));
 				break;
 			}
 			case ROLLBACK: {

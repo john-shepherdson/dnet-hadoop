@@ -3,17 +3,13 @@ package eu.dnetlib.dhp.collector.worker;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.nio.file.Path;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.collection.worker.CollectorWorker;
-import eu.dnetlib.dhp.collection.worker.utils.CollectorPluginFactory;
-import eu.dnetlib.dhp.collection.worker.utils.HttpClientParams;
+import eu.dnetlib.dhp.collection.worker.CollectorPluginFactory;
+import eu.dnetlib.dhp.collection.worker.HttpClientParams;
 import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
 @Disabled

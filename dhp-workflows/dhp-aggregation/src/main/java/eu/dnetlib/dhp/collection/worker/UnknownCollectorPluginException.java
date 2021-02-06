@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection.worker.utils;
+package eu.dnetlib.dhp.collection.worker;
 
 public class UnknownCollectorPluginException extends Exception {
 
