@@ -95,6 +95,7 @@
             <arg>--dnetMessageManagerURL</arg><arg>${dnetMessageManagerURL}</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--maxNumberOfRetry</arg><arg>${maxNumberOfRetry}</arg>
+            <arg>--requestDelay</arg><arg>${requestDelay}</arg>
             <arg>--retryDelay</arg><arg>${retryDelay}</arg>
             <arg>--connectTimeOut</arg><arg>${connectTimeOut}</arg>
             <arg>--readTimeOut</arg><arg>${readTimeOut}</arg>

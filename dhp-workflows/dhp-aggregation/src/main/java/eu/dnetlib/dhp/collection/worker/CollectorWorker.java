@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.collection.worker;
 
-import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.SEQUENCE_FILE_NAME;
+import static eu.dnetlib.dhp.common.Constants.SEQUENCE_FILE_NAME;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,8 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
+import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 import eu.dnetlib.dhp.message.MessageSender;
 
 public class CollectorWorker {

@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.collection;
 
-import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
+import static eu.dnetlib.dhp.common.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.utils.DHPUtils.*;
 

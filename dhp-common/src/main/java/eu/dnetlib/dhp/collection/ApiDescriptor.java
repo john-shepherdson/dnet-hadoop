@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collector.worker.model;
+package eu.dnetlib.dhp.collection;
 
 import java.util.HashMap;
 import java.util.Map;

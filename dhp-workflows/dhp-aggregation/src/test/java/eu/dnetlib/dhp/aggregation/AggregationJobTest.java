@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.aggregation;
 
-import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.MDSTORE_DATA_PATH;
+import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;

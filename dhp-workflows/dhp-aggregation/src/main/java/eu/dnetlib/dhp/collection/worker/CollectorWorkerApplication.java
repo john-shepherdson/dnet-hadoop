@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.collection.worker;
 
-import static eu.dnetlib.dhp.aggregation.common.AggregationConstants.*;
+import static eu.dnetlib.dhp.common.Constants.*;
 import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
+import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.message.MessageSender;
 
 /**
@@ -55,7 +55,7 @@ public class CollectorWorkerApplication {
 		final String mdStoreVersion = argumentParser.get("mdStoreVersion");
 		log.info("mdStoreVersion is {}", mdStoreVersion);
 
-		final String dnetMessageManagerURL = argumentParser.get("dnetMessageManagerURL");
+		final String dnetMessageManagerURL = argumentParser.get(DNET_MESSAGE_MGR_URL);
 		log.info("dnetMessageManagerURL is {}", dnetMessageManagerURL);
 
 		final String workflowId = argumentParser.get("workflowId");
@@ -87,15 +87,23 @@ public class CollectorWorkerApplication {
 		clientParams
 			.setMaxNumberOfRetry(
 				Optional
-					.ofNullable(argumentParser.get("maxNumberOfRetry"))
+					.ofNullable(argumentParser.get(MAX_NUMBER_OF_RETRY))
 					.map(Integer::parseInt)
 					.orElse(HttpClientParams._maxNumberOfRetry));
 		log.info("maxNumberOfRetry is {}", clientParams.getMaxNumberOfRetry());
 
 		clientParams
+			.setRequestDelay(
+				Optional
+					.ofNullable(argumentParser.get(REQUEST_DELAY))
+					.map(Integer::parseInt)
+					.orElse(HttpClientParams._requestDelay));
+		log.info("requestDelay is {}", clientParams.getRequestDelay());
+
+		clientParams
 			.setRetryDelay(
 				Optional
-					.ofNullable(argumentParser.get("retryDelay"))
+					.ofNullable(argumentParser.get(RETRY_DELAY))
 					.map(Integer::parseInt)
 					.orElse(HttpClientParams._retryDelay));
 		log.info("retryDelay is {}", clientParams.getRetryDelay());
@@ -103,7 +111,7 @@ public class CollectorWorkerApplication {
 		clientParams
 			.setConnectTimeOut(
 				Optional
-					.ofNullable(argumentParser.get("connectTimeOut"))
+					.ofNullable(argumentParser.get(CONNECT_TIMEOUT))
 					.map(Integer::parseInt)
 					.orElse(HttpClientParams._connectTimeOut));
 		log.info("connectTimeOut is {}", clientParams.getConnectTimeOut());
@@ -111,7 +119,7 @@ public class CollectorWorkerApplication {
 		clientParams
 			.setReadTimeOut(
 				Optional
-					.ofNullable(argumentParser.get("readTimeOut"))
+					.ofNullable(argumentParser.get(READ_TIMEOUT))
 					.map(Integer::parseInt)
 					.orElse(HttpClientParams._readTimeOut));
 		log.info("readTimeOut is {}", clientParams.getReadTimeOut());

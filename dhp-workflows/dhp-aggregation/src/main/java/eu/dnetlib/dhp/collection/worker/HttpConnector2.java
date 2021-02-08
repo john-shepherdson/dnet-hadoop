@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Migrated from https://svn.driver.research-infrastructures.eu/driver/dnet45/modules/dnet-modular-collector-service/trunk/src/main/java/eu/dnetlib/data/collector/plugins/HttpConnector.java
  *
- * @author jochen, michele, andrea, alessia
+ * @author jochen, michele, andrea, alessia, claudio
  */
 public class HttpConnector2 {
 
@@ -83,14 +83,22 @@ public class HttpConnector2 {
 		final CollectorPluginReport report) throws CollectorException, IOException {
 
 		if (retryNumber > getClientParams().getMaxNumberOfRetry()) {
-			throw new CollectorException("Max number of retries exceeded. Cause: \n " + report);
+			final String msg = String
+				.format(
+					"Max number of retries (%s/%s) exceeded, failing.",
+					retryNumber, getClientParams().getMaxNumberOfRetry());
+			log.error(msg);
+			throw new CollectorException(msg);
 		}
 
-		log.info("Downloading attempt {} [{}]", retryNumber, requestUrl);
+		log.info("Request attempt {} [{}]", retryNumber, requestUrl);
 
 		InputStream input = null;
 
 		try {
+			if (getClientParams().getRequestDelay() > 0) {
+				backoffAndSleep(getClientParams().getRequestDelay());
+			}
 			final HttpURLConnection urlConn = (HttpURLConnection) new URL(requestUrl).openConnection();
 			urlConn.setInstanceFollowRedirects(false);
 			urlConn.setReadTimeout(getClientParams().getReadTimeOut() * 1000);
@@ -190,10 +198,10 @@ public class HttpConnector2 {
 		}
 	}
 
-	private void backoffAndSleep(int sleepTime) throws CollectorException {
-		log.info("I'm going to sleep for {}ms", sleepTime);
+	private void backoffAndSleep(int sleepTimeMs) throws CollectorException {
+		log.info("I'm going to sleep for {}ms", sleepTimeMs);
 		try {
-			Thread.sleep(sleepTime);
+			Thread.sleep(sleepTimeMs);
 		} catch (InterruptedException e) {
 			log.error(e.getMessage(), e);
 			throw new CollectorException(e);

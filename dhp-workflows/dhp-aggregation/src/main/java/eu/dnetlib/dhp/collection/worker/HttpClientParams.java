@@ -6,22 +6,46 @@ package eu.dnetlib.dhp.collection.worker;
  */
 public class HttpClientParams {
 
+	// Defaults
 	public static int _maxNumberOfRetry = 3;
+	public static int _requestDelay = 0; // milliseconds
 	public static int _retryDelay = 10; // seconds
 	public static int _connectTimeOut = 10; // seconds
 	public static int _readTimeOut = 30; // seconds
 
+	/**
+	 * Maximum number of allowed retires before failing
+	 */
 	private int maxNumberOfRetry;
+
+	/**
+	 * Delay between request (Milliseconds)
+	 */
+	private int requestDelay;
+
+	/**
+	 * Time to wait after a failure before retrying (Seconds)
+	 */
 	private int retryDelay;
+
+	/**
+	 * Connect timeout (Seconds)
+	 */
 	private int connectTimeOut;
+
+	/**
+	 * Read timeout (Seconds)
+	 */
 	private int readTimeOut;
 
 	public HttpClientParams() {
-		this(_maxNumberOfRetry, _retryDelay, _connectTimeOut, _readTimeOut);
+		this(_maxNumberOfRetry, _requestDelay, _retryDelay, _connectTimeOut, _readTimeOut);
 	}
 
-	public HttpClientParams(int maxNumberOfRetry, int retryDelay, int connectTimeOut, int readTimeOut) {
+	public HttpClientParams(int maxNumberOfRetry, int requestDelay, int retryDelay, int connectTimeOut,
+		int readTimeOut) {
 		this.maxNumberOfRetry = maxNumberOfRetry;
+		this.requestDelay = requestDelay;
 		this.retryDelay = retryDelay;
 		this.connectTimeOut = connectTimeOut;
 		this.readTimeOut = readTimeOut;
@@ -33,6 +57,14 @@ public class HttpClientParams {
 
 	public void setMaxNumberOfRetry(int maxNumberOfRetry) {
 		this.maxNumberOfRetry = maxNumberOfRetry;
+	}
+
+	public int getRequestDelay() {
+		return requestDelay;
+	}
+
+	public void setRequestDelay(int requestDelay) {
+		this.requestDelay = requestDelay;
 	}
 
 	public int getRetryDelay() {

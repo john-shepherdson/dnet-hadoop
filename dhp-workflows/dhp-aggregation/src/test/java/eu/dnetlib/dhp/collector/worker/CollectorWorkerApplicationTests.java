@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.worker.CollectorPluginFactory;
 import eu.dnetlib.dhp.collection.worker.HttpClientParams;
-import eu.dnetlib.dhp.collector.worker.model.ApiDescriptor;
 
 @Disabled
 public class CollectorWorkerApplicationTests {

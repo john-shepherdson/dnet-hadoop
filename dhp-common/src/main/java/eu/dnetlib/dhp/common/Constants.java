@@ -27,4 +27,24 @@ public class Constants {
 		coarCodeLabelMap.put("c_f1cf", "EMBARGO");
 	}
 
+	public static final String SEQUENCE_FILE_NAME = "/sequence_file";
+	public static final String REPORT_FILE_NAME = "/report";
+	public static final String MDSTORE_DATA_PATH = "/store";
+	public static final String MDSTORE_SIZE_PATH = "/size";
+
+	public static final String COLLECTION_MODE = "collectionMode";
+	public static final String METADATA_ENCODING = "metadataEncoding";
+	public static final String OOZIE_WF_PATH = "oozieWfPath";
+	public static final String DNET_MESSAGE_MGR_URL = "dnetMessageManagerURL";
+
+	public static final String MAX_NUMBER_OF_RETRY = "maxNumberOfRetry";
+	public static final String REQUEST_DELAY = "requestDelay";
+	public static final String RETRY_DELAY = "retryDelay";
+	public static final String CONNECT_TIMEOUT = "connectTimeOut";
+	public static final String READ_TIMEOUT = "readTimeOut";
+
+	public static final String CONTENT_TOTALITEMS = "TotalItems";
+	public static final String CONTENT_INVALIDRECORDS = "InvalidRecords";
+	public static final String CONTENT_TRANSFORMEDRECORDS = "transformedItems";
+
 }
