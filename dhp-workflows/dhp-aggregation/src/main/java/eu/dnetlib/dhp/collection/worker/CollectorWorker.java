@@ -11,6 +11,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +64,8 @@ public class CollectorWorker {
 				conf,
 				SequenceFile.Writer.file(new Path(outputPath)),
 				SequenceFile.Writer.keyClass(IntWritable.class),
-				SequenceFile.Writer.valueClass(Text.class))) {
+				SequenceFile.Writer.valueClass(Text.class),
+				SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new GzipCodec()))) {
 			final IntWritable key = new IntWritable(counter.get());
 			final Text value = new Text();
 			plugin
