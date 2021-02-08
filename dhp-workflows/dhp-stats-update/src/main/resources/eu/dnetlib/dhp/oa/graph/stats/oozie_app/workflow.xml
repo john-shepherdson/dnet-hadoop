@@ -18,6 +18,10 @@
             <description>the name of the shadow schema</description>
         </property>
         <property>
+            <name>stats_tool_api_url</name>
+            <description>The url of the API of the stats tool. Is used to trigger the cache update.</description>
+        </property>
+        <property>
             <name>hive_metastore_uris</name>
             <description>hive server metastore URIs</description>
         </property>
@@ -286,6 +290,18 @@
             <argument>step19.sql</argument>
             <argument>${wf:appPath()}/scripts/step19.sql</argument>
             <file>impala-shell.sh</file>
+        </shell>
+        <ok to="Step20"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step20">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateCache.sh</exec>
+            <argument>${stats_tool_api_url}</argument>
+            <file>updateCache.sh</file>
         </shell>
         <ok to="End"/>
         <error to="Kill"/>

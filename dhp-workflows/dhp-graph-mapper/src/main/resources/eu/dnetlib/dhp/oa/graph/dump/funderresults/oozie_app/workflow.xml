@@ -121,7 +121,7 @@
             <delete path="${outputPath}"/>
             <mkdir path="${outputPath}"/>
         </fs>
-        <ok to="make_archive"/>
+        <ok to="save_community_map"/>
         <error to="Kill"/>
     </action>
 
@@ -274,7 +274,6 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/result/publication</arg>
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/publication</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/publication</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
@@ -302,7 +301,6 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/result/dataset</arg>
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/dataset</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/dataset</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
@@ -330,7 +328,6 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/result/otherresearchproduct</arg>
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/otherresearchproduct</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
@@ -358,7 +355,6 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/result/software</arg>
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/software</arg>-->
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/software</arg>
             <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
@@ -532,8 +528,7 @@
             <main-class>eu.dnetlib.dhp.oa.graph.dump.MakeTar</main-class>
             <arg>--hdfsPath</arg><arg>${outputPath}</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
-<!--            <arg>&#45;&#45;sourcePath</arg><arg>${workingDir}/resultperfunder</arg>-->
-            <arg>--sourcePath</arg><arg>/user/miriam.baglioni/graph_dump_whole_production_funder_results</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/resultperfunder</arg>
         </java>
         <ok to="should_upload"/>
         <error to="Kill"/>

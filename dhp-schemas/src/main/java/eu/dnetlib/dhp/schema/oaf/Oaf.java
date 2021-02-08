@@ -2,8 +2,12 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class Oaf implements Serializable {
 
@@ -40,9 +44,34 @@ public abstract class Oaf implements Serializable {
 		this.lastupdatetimestamp = lastupdatetimestamp;
 	}
 
-	public void mergeOAFDataInfo(Oaf e) {
-		if (e.getDataInfo() != null && compareTrust(this, e) < 0)
-			dataInfo = e.getDataInfo();
+	public void mergeFrom(Oaf o) {
+		if (Objects.isNull(o)) {
+			return;
+		}
+		setCollectedfrom(
+			Stream
+				.concat(
+					Optional
+						.ofNullable(getCollectedfrom())
+						.map(Collection::stream)
+						.orElse(Stream.empty()),
+					Optional
+						.ofNullable(o.getCollectedfrom())
+						.map(Collection::stream)
+						.orElse(Stream.empty()))
+				.distinct() // relies on KeyValue.equals
+				.collect(Collectors.toList()));
+
+		setLastupdatetimestamp(
+			Math
+				.max(
+					Optional.ofNullable(getLastupdatetimestamp()).orElse(0L),
+					Optional.ofNullable(o.getLastupdatetimestamp()).orElse(0L)));
+	}
+
+	public void mergeOAFDataInfo(Oaf o) {
+		if (o.getDataInfo() != null && compareTrust(this, o) < 0)
+			dataInfo = o.getDataInfo();
 	}
 
 	protected String extractTrust(Oaf e) {
@@ -62,7 +91,7 @@ public abstract class Oaf implements Serializable {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		Oaf oaf = (Oaf) o;
-		return Objects.equals(dataInfo, oaf.dataInfo)
+		return Objects.equals(getDataInfo(), oaf.getDataInfo())
 			&& Objects.equals(lastupdatetimestamp, oaf.lastupdatetimestamp);
 	}
 

@@ -6,7 +6,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.io.Serializable;
 import java.util.*;
 
-import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -16,18 +15,19 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.api.zenodo.Community;
+import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
 /**
- * Preparation of the Project information to be added to the dumped results. For each result associated to at least one
- * Project, a serialization of an instance af ResultProject closs is done. ResultProject contains the resultId, and the
- * list of Projects (as in eu.dnetlib.dhp.schema.dump.oaf.community.Project) it is associated to
+ * Splits the dumped results by funder and stores them in a folder named as the funder nsp (for all the funders, but the EC
+ * for the EC it specifies also the fundingStream (FP7 or H2020)
  */
 public class SparkDumpFunderResults implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkDumpFunderResults.class);
@@ -73,7 +73,9 @@ public class SparkDumpFunderResults implements Serializable {
 
 		Dataset<Relation> relation = Utils
 			.readPath(spark, relationPath + "/relation", Relation.class)
-			.filter("dataInfo.deletedbyinference = false and lower(relClass) = '" + Constants.RESULT_PROJECT_IS_PRODUCED_BY.toLowerCase()+ "'");
+			.filter(
+				"dataInfo.deletedbyinference = false and lower(relClass) = '"
+					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
 
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
@@ -87,18 +89,17 @@ public class SparkDumpFunderResults implements Serializable {
 			.distinct()
 			.collectAsList();
 
-
 		funderList.forEach(funder -> {
 			String fundernsp = funder.substring(3);
 			String funderdump;
-			if (fundernsp.startsWith("corda")){
+			if (fundernsp.startsWith("corda")) {
 				funderdump = "EC_";
-				if(fundernsp.endsWith("h2020")){
+				if (fundernsp.endsWith("h2020")) {
 					funderdump += "H2020";
-				}else{
+				} else {
 					funderdump += "FP7";
 				}
-			}else{
+			} else {
 				funderdump = fundernsp.substring(0, fundernsp.indexOf("_")).toUpperCase();
 			}
 			writeFunderResult(funder, result, outputPath + "/" + funderdump);

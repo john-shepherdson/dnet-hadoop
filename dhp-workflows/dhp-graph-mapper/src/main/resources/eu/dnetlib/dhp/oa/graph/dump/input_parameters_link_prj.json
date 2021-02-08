@@ -22,12 +22,13 @@
 		"paramLongName":"resultTableName",
 		"paramDescription": "the name of the result table we are currently working on",
 		"paramRequired": true
-	},	{
-	"paramName":"rp",
-	"paramLongName":"relationPath",
-	"paramDescription": "the path to the relations",
-	"paramRequired": true
-}
+	},
+	{
+		"paramName":"rp",
+		"paramLongName":"relationPath",
+		"paramDescription": "the path to the relations",
+		"paramRequired": true
+	}
 ]
 
 

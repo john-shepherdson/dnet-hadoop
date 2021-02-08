@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
@@ -141,7 +142,10 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
 		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
-
+		assertTrue(r1.getValidated());
+		assertTrue(r2.getValidated());
+		assertEquals(r1.getValidationDate(), "2020-01-01");
+		assertEquals(r2.getValidationDate(), "2020-01-01");
 		// System.out.println(new ObjectMapper().writeValueAsString(p));
 		// System.out.println(new ObjectMapper().writeValueAsString(r1));
 		// System.out.println(new ObjectMapper().writeValueAsString(r2));
@@ -246,6 +250,10 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
 		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+		assertTrue(r1.getValidated());
+		assertTrue(r2.getValidated());
+		assertEquals(r1.getValidationDate(), "2020-01-01");
+		assertEquals(r2.getValidationDate(), "2020-01-01");
 	}
 
 	@Test
@@ -355,7 +363,31 @@ public class MappersTest {
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
-		System.out.println(p.getTitle().get(0).getValue());
+		assertEquals(1, p.getAuthor().size());
+		assertEquals("OPEN", p.getBestaccessright().getClassid());
+		assertTrue(StringUtils.isNotBlank(p.getPid().get(0).getValue()));
+		assertTrue(StringUtils.isNotBlank(p.getPid().get(0).getQualifier().getClassid()));
+		assertEquals("dataset", p.getResulttype().getClassname());
+		assertEquals(1, p.getInstance().size());
+		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
+		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
+		assertValidId(p.getInstance().get(0).getHostedby().getKey());
+		assertEquals(
+			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+		assertEquals(1, p.getInstance().get(0).getUrl().size());
+//		System.out.println(p.getInstance().get(0).getUrl().get(0));
+//		System.out.println(p.getInstance().get(0).getHostedby().getValue());
+		System.out.println(p.getPid().get(0).getValue());
+	}
+
+	@Test
+	void testTextGridNoAuthor() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("textgrid-noauthor.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
 	}
 
 	@Test
@@ -373,6 +405,34 @@ public class MappersTest {
 		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		System.out.println(p.getTitle().get(0).getValue());
+	}
+
+	@Test
+	void testEUOpenDataPortal() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("eu_odp.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		final Dataset p = (Dataset) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(0, p.getAuthor().size());
+		assertEquals(1, p.getPid().size());
+		assertEquals("OPEN", p.getBestaccessright().getClassid());
+		assertEquals("dataset", p.getResulttype().getClassname());
+		assertEquals(1, p.getInstance().size());
+		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
+		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
+		assertValidId(p.getInstance().get(0).getHostedby().getKey());
+		assertEquals(
+			"CC_BY_4_0", p.getInstance().get(0).getLicense().getValue());
+		assertEquals(1, p.getInstance().get(0).getUrl().size());
+		assertEquals(1, p.getInstance().size());
+		System.out.println(p.getInstance().get(0).getUrl().get(0));
+		System.out.println(p.getInstance().get(0).getHostedby().getValue());
 	}
 
 	private void assertValidId(final String id) {
