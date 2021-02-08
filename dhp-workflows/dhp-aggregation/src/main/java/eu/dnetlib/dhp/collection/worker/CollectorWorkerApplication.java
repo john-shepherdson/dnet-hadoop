@@ -41,10 +41,12 @@ public class CollectorWorkerApplication {
 		final ArgumentApplicationParser argumentParser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					CollectorWorker.class
+					CollectorWorkerApplication.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/collection/collector_worker_input_parameter.json")));
 		argumentParser.parseArgument(args);
+
+		log.info("Java Xmx: {}m", Runtime.getRuntime().maxMemory() / (1024 * 1024));
 
 		final String hdfsuri = argumentParser.get("namenode");
 		log.info("hdfsURI is {}", hdfsuri);

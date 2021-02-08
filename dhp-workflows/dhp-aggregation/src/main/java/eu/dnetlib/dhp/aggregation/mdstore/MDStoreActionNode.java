@@ -45,6 +45,8 @@ public class MDStoreActionNode {
 							"/eu/dnetlib/dhp/collection/mdstore_action_parameters.json")));
 		argumentParser.parseArgument(args);
 
+		log.info("Java Xmx: {}m", Runtime.getRuntime().maxMemory() / (1024 * 1024));
+
 		final MDAction action = MDAction.valueOf(argumentParser.get("action"));
 		log.info("Current action is {}", action);
 

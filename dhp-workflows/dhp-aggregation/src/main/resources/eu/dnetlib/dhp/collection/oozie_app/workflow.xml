@@ -41,6 +41,14 @@
             <name>collectionMode</name>
             <description>Should be REFRESH or INCREMENTAL</description>
         </property>
+
+        <property>
+            <name>collection_java_xmx</name>
+            <value>-Xmx200m</value>
+            <description>Used to configure the heap size for the map JVM process. Should be 80% of mapreduce.map.memory.mb.</description>
+        </property>
+
+
     </parameters>
 
     <global>
@@ -65,6 +73,7 @@
     <action name="BeginRead">
         <java>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <java-opts>${collection_java_xmx}</java-opts>
             <arg>--action</arg><arg>READ_LOCK</arg>
             <arg>--mdStoreID</arg><arg>${mdStoreID}</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
@@ -77,6 +86,7 @@
     <action name="StartTransaction">
         <java>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <java-opts>${collection_java_xmx}</java-opts>
             <arg>--action</arg><arg>NEW_VERSION</arg>
             <arg>--mdStoreID</arg><arg>${mdStoreID}</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
@@ -89,6 +99,7 @@
     <action name="CollectionWorker">
         <java>
             <main-class>eu.dnetlib.dhp.collection.worker.CollectorWorkerApplication</main-class>
+            <java-opts>${collection_java_xmx}</java-opts>
             <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
             <arg>--workflowId</arg><arg>${workflowId}</arg>
@@ -108,6 +119,7 @@
     <action name="CollectorReport">
         <java>
             <main-class>eu.dnetlib.dhp.collection.worker.CollectorWorkerReporter</main-class>
+            <java-opts>${collection_java_xmx}</java-opts>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
         </java>
@@ -153,6 +165,7 @@
     <action name="EndRead">
         <java>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <java-opts>${collection_java_xmx}</java-opts>
             <arg>--action</arg><arg>READ_UNLOCK</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
@@ -164,6 +177,7 @@
     <action name="CommitVersion">
         <java>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <java-opts>${collection_java_xmx}</java-opts>
             <arg>--action</arg><arg>COMMIT</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
@@ -184,6 +198,7 @@
     <action name="EndReadRollBack">
         <java>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <java-opts>${collection_java_xmx}</java-opts>
             <arg>--action</arg><arg>READ_UNLOCK</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
@@ -195,6 +210,7 @@
     <action name="RollBack">
         <java>
             <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <java-opts>${collection_java_xmx}</java-opts>
             <arg>--action</arg><arg>ROLLBACK</arg>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
