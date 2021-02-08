@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
@@ -404,6 +405,34 @@ public class MappersTest {
 		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		System.out.println(p.getTitle().get(0).getValue());
+	}
+
+	@Test
+	void testEUOpenDataPortal() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("eu_odp.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		final Dataset p = (Dataset) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(0, p.getAuthor().size());
+		assertEquals(1, p.getPid().size());
+		assertEquals("OPEN", p.getBestaccessright().getClassid());
+		assertEquals("dataset", p.getResulttype().getClassname());
+		assertEquals(1, p.getInstance().size());
+		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
+		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
+		assertValidId(p.getInstance().get(0).getHostedby().getKey());
+		assertEquals(
+			"CC_BY_4_0", p.getInstance().get(0).getLicense().getValue());
+		assertEquals(1, p.getInstance().get(0).getUrl().size());
+		assertEquals(1, p.getInstance().size());
+		System.out.println(p.getInstance().get(0).getUrl().get(0));
+		System.out.println(p.getInstance().get(0).getHostedby().getValue());
 	}
 
 	private void assertValidId(final String id) {
