@@ -39,6 +39,8 @@
                 <creator rank="4">Saykally, Jessica N.</creator>
                 <creator rank="5">Keeley, Kristen L.</creator>
                 <creator rank="6">Haris Hatic</creator>
+                <creator rank="7" name="Miriam" surname="Baglioni" orcid_pending="0000-0002-2273-9004">Baglioni, Miriam</creator>
+                <creator rank="8" name="Michele" surname="De Bonis" orcid="0000-0002-2273-9004">De Bonis, Michele</creator>
                 <dateofacceptance>2017-06-01</dateofacceptance>
                 <description>Withania somnifera has been used in traditional medicine for a variety
                     of neural disorders. Recently, chronic neurodegenerative conditions have been
@@ -115,7 +117,7 @@
                 <source>Cell Transplantation</source>
                 <resulttype classid="publication" classname="publication"
                             schemeid="dnet:result_typologies" schemename="dnet:result_typologies"/>
-                <resourcetype/>
+                <resourcetype classid="Book" classname="Book" schemeid="dnet:dataCite_resource" schemename="dnet:dataCite_resource" />
                 <journal issn="0963-6897" eissn="1555-3892" ep="1201" iss="7" sp="1193" vol="26"
                 >Cell Transplantation</journal>
                 <context id="NIH" label="National Institutes of Health" type="funding">
