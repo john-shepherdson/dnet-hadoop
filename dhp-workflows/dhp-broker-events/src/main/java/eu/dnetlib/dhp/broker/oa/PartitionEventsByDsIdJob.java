@@ -36,7 +36,7 @@ import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 public class PartitionEventsByDsIdJob {
 
 	private static final Logger log = LoggerFactory.getLogger(PartitionEventsByDsIdJob.class);
-	private static final String OPENDOAR_NSPREFIX = "10|opendoar____::";
+	private static final String OPENDOAR_NSPREFIX = "opendoar____::";
 
 	public static void main(final String[] args) throws Exception {
 
@@ -55,10 +55,10 @@ public class PartitionEventsByDsIdJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
-		final String partitionPath = parser.get("workingPath") + "/eventsByOpendoarId";
+		final String partitionPath = parser.get("outputDir") + "/eventsByOpendoarId";
 		log.info("partitionPath: {}", partitionPath);
 
 		final String opendoarIds = parser.get("opendoarIds");
@@ -91,6 +91,7 @@ public class PartitionEventsByDsIdJob {
 				.write()
 				.partitionBy("group")
 				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
 				.json(partitionPath);
 
 		});
@@ -122,6 +123,7 @@ public class PartitionEventsByDsIdJob {
 
 		final ShortEventMessageWithGroupId res = new ShortEventMessageWithGroupId();
 
+		res.setEventId(e.getEventId());
 		res.setOriginalId(payload.getResult().getOriginalId());
 		res.setTitle(payload.getResult().getTitles().stream().filter(StringUtils::isNotBlank).findFirst().orElse(null));
 		res.setTopic(e.getTopic());

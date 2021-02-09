@@ -35,7 +35,7 @@ public class MigrateDbEntitiesApplicationTest {
 
 	private MigrateDbEntitiesApplication app;
 
-	@Mock
+	@Mock(lenient = true)
 	private ResultSet rs;
 
 	@Mock

@@ -49,23 +49,22 @@ public abstract class Oaf implements Serializable {
 			return;
 		}
 		setCollectedfrom(
-				Stream
-						.concat(
-								Optional
-										.ofNullable(getCollectedfrom())
-										.map(Collection::stream)
-										.orElse(Stream.empty()),
-								Optional
-										.ofNullable(o.getCollectedfrom())
-										.map(Collection::stream)
-										.orElse(Stream.empty()))
-						.distinct() // relies on KeyValue.equals
-						.collect(Collectors.toList()));
-
-		mergeOAFDataInfo(o);
+			Stream
+				.concat(
+					Optional
+						.ofNullable(getCollectedfrom())
+						.map(Collection::stream)
+						.orElse(Stream.empty()),
+					Optional
+						.ofNullable(o.getCollectedfrom())
+						.map(Collection::stream)
+						.orElse(Stream.empty()))
+				.distinct() // relies on KeyValue.equals
+				.collect(Collectors.toList()));
 
 		setLastupdatetimestamp(
-				Math.max(
+			Math
+				.max(
 					Optional.ofNullable(getLastupdatetimestamp()).orElse(0L),
 					Optional.ofNullable(o.getLastupdatetimestamp()).orElse(0L)));
 	}
