@@ -50,9 +50,7 @@ public class SparkGenLastModifiedSeq {
 		outputPath = parser.get("outputPath");
 		lambdaFileName = parser.get("lambdaFileName");
 		String lambdaFileUri = hdfsServerUri.concat(workingPath).concat(lambdaFileName);
-		String lastModifiedDateFromLambdaFileUri = hdfsServerUri
-			.concat(workingPath)
-			.concat("last_modified_date_from_lambda_file.txt");
+		String lastModifiedDateFromLambdaFileUri = "last_modified_date_from_lambda_file.txt";
 
 		SparkConf sparkConf = new SparkConf();
 		runWithSparkSession(
@@ -101,7 +99,9 @@ public class SparkGenLastModifiedSeq {
 						}
 					}
 				}
-				HDFSUtil.writeToTextFile(lastModifiedDateFromLambdaFileUri, lastModifiedAuthorDate);
+				HDFSUtil
+					.writeToTextFile(
+						hdfsServerUri, workingPath, lastModifiedDateFromLambdaFileUri, lastModifiedAuthorDate);
 				Log.info("Saved rows from lamda csv tar file: " + rowsNum);
 			});
 	}

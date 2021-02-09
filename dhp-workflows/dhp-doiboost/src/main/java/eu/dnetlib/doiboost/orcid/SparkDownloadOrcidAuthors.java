@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,7 +32,6 @@ public class SparkDownloadOrcidAuthors {
 
 	static Logger logger = LoggerFactory.getLogger(SparkDownloadOrcidAuthors.class);
 	static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	static String lastUpdate;
 
 	public static void main(String[] args) throws Exception {
 
@@ -54,14 +54,18 @@ public class SparkDownloadOrcidAuthors {
 		final String token = parser.get("token");
 		final String lambdaFileName = parser.get("lambdaFileName");
 		logger.info("lambdaFileName: {}", lambdaFileName);
-
-		lastUpdate = HDFSUtil.readFromTextFile(workingPath.concat("last_update.txt"));
+		final String hdfsServerUri = parser.get("hdfsServerUri");
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				String lastUpdate = HDFSUtil.readFromTextFile(hdfsServerUri, workingPath, "last_update.txt");
+				logger.info("lastUpdate: ", lastUpdate);
+				if (StringUtils.isBlank(lastUpdate)) {
+					throw new RuntimeException("last update info not found");
+				}
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 				LongAccumulator parsedRecordsAcc = spark.sparkContext().longAccumulator("parsed_records");
@@ -77,13 +81,14 @@ public class SparkDownloadOrcidAuthors {
 				logger.info("Retrieving data from lamda sequence file");
 				JavaPairRDD<Text, Text> lamdaFileRDD = sc
 					.sequenceFile(workingPath + lambdaFileName, Text.class, Text.class);
-				logger.info("Data retrieved: " + lamdaFileRDD.count());
+				final long lamdaFileRDDCount = lamdaFileRDD.count();
+				logger.info("Data retrieved: " + lamdaFileRDDCount);
 
 				Function<Tuple2<Text, Text>, Boolean> isModifiedAfterFilter = data -> {
 					String orcidId = data._1().toString();
 					String lastModifiedDate = data._2().toString();
 					parsedRecordsAcc.add(1);
-					if (isModified(orcidId, lastModifiedDate)) {
+					if (isModified(orcidId, lastModifiedDate, lastUpdate)) {
 						modifiedRecordsAcc.add(1);
 						return true;
 					}
@@ -96,51 +101,42 @@ public class SparkDownloadOrcidAuthors {
 					final DownloadedRecordData downloaded = new DownloadedRecordData();
 					downloaded.setOrcidId(orcidId);
 					downloaded.setLastModifiedDate(lastModifiedDate);
-					try (CloseableHttpClient client = HttpClients.createDefault()) {
-						HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/record");
-						httpGet.addHeader("Accept", "application/vnd.orcid+xml");
-						httpGet.addHeader("Authorization", String.format("Bearer %s", token));
-						long startReq = System.currentTimeMillis();
-						CloseableHttpResponse response = client.execute(httpGet);
-						long endReq = System.currentTimeMillis();
-						long reqTime = endReq - startReq;
-						if (reqTime < 1000) {
-							Thread.sleep(1000 - reqTime);
+					CloseableHttpClient client = HttpClients.createDefault();
+					HttpGet httpGet = new HttpGet("https://api.orcid.org/v3.0/" + orcidId + "/record");
+					httpGet.addHeader("Accept", "application/vnd.orcid+xml");
+					httpGet.addHeader("Authorization", String.format("Bearer %s", token));
+					long startReq = System.currentTimeMillis();
+					CloseableHttpResponse response = client.execute(httpGet);
+					long endReq = System.currentTimeMillis();
+					long reqTime = endReq - startReq;
+					if (reqTime < 1000) {
+						Thread.sleep(1000 - reqTime);
+					}
+					int statusCode = response.getStatusLine().getStatusCode();
+					downloaded.setStatusCode(statusCode);
+					if (statusCode != 200) {
+						switch (statusCode) {
+							case 403:
+								errorHTTP403Acc.add(1);
+							case 404:
+								errorHTTP404Acc.add(1);
+							case 409:
+								errorHTTP409Acc.add(1);
+							case 503:
+								errorHTTP503Acc.add(1);
+							case 525:
+								errorHTTP525Acc.add(1);
+							default:
+								errorHTTPGenericAcc.add(1);
 						}
-						int statusCode = response.getStatusLine().getStatusCode();
-						downloaded.setStatusCode(statusCode);
-						if (statusCode != 200) {
-							switch (statusCode) {
-								case 403:
-									errorHTTP403Acc.add(1);
-								case 404:
-									errorHTTP404Acc.add(1);
-								case 409:
-									errorHTTP409Acc.add(1);
-								case 503:
-									errorHTTP503Acc.add(1);
-									throw new RuntimeException("Orcid request rate limit reached (HTTP 503)");
-								case 525:
-									errorHTTP525Acc.add(1);
-								default:
-									errorHTTPGenericAcc.add(1);
-									logger
-										.info(
-											"Downloading " + orcidId + " status code: "
-												+ response.getStatusLine().getStatusCode());
-							}
-							return downloaded.toTuple2();
-						}
-						downloadedRecordsAcc.add(1);
-						downloaded
-							.setCompressedData(
-								ArgumentApplicationParser
-									.compressArgument(IOUtils.toString(response.getEntity().getContent())));
-					} catch (Throwable e) {
-						logger.info("Downloading " + orcidId, e.getMessage());
-						downloaded.setErrorMessage(e.getMessage());
 						return downloaded.toTuple2();
 					}
+					downloadedRecordsAcc.add(1);
+					downloaded
+						.setCompressedData(
+							ArgumentApplicationParser
+								.compressArgument(IOUtils.toString(response.getEntity().getContent())));
+					client.close();
 					return downloaded.toTuple2();
 				};
 
@@ -148,7 +144,9 @@ public class SparkDownloadOrcidAuthors {
 
 				logger.info("Start execution ...");
 				JavaPairRDD<Text, Text> authorsModifiedRDD = lamdaFileRDD.filter(isModifiedAfterFilter);
-				logger.info("Authors modified count: " + authorsModifiedRDD.count());
+				long authorsModifiedCount = authorsModifiedRDD.count();
+				logger.info("Authors modified count: " + authorsModifiedCount);
+
 				logger.info("Start downloading ...");
 				authorsModifiedRDD
 					.repartition(100)
@@ -174,21 +172,27 @@ public class SparkDownloadOrcidAuthors {
 
 	}
 
-	private static boolean isModified(String orcidId, String modifiedDate) {
+	public static boolean isModified(String orcidId, String modifiedDate, String lastUpdate) {
 		Date modifiedDateDt;
 		Date lastUpdateDt;
+		String lastUpdateRedux = "";
 		try {
+			if (modifiedDate.equals("last_modified")) {
+				return false;
+			}
 			if (modifiedDate.length() != 19) {
 				modifiedDate = modifiedDate.substring(0, 19);
 			}
 			if (lastUpdate.length() != 19) {
-				lastUpdate = lastUpdate.substring(0, 19);
+				lastUpdateRedux = lastUpdate.substring(0, 19);
+			} else {
+				lastUpdateRedux = lastUpdate;
 			}
 			modifiedDateDt = new SimpleDateFormat(DATE_FORMAT).parse(modifiedDate);
-			lastUpdateDt = new SimpleDateFormat(DATE_FORMAT).parse(lastUpdate);
+			lastUpdateDt = new SimpleDateFormat(DATE_FORMAT).parse(lastUpdateRedux);
 		} catch (Exception e) {
-			logger.info("[" + orcidId + "] Parsing date: ", e.getMessage());
-			return true;
+			throw new RuntimeException("[" + orcidId + "] modifiedDate <" + modifiedDate + "> lastUpdate <" + lastUpdate
+				+ "> Parsing date: " + e.getMessage());
 		}
 		return modifiedDateDt.after(lastUpdateDt);
 	}

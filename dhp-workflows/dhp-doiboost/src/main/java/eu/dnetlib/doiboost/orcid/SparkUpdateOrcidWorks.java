@@ -50,7 +50,7 @@ public class SparkUpdateOrcidWorks {
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
 		final String workingPath = parser.get("workingPath");
-//		final String outputPath = parser.get("outputPath");
+		final String hdfsServerUri = parser.get("hdfsServerUri");
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -167,8 +167,8 @@ public class SparkUpdateOrcidWorks {
 				logger.info("errorParsingXMLWorksFoundAcc: " + errorParsingWorksXMLFoundAcc.value().toString());
 
 				String lastModifiedDateFromLambdaFile = HDFSUtil
-					.readFromTextFile(workingPath.concat("last_modified_date_from_lambda_file.txt"));
-				HDFSUtil.writeToTextFile(workingPath.concat("last_update.txt"), lastModifiedDateFromLambdaFile);
+					.readFromTextFile(hdfsServerUri, workingPath, "last_modified_date_from_lambda_file.txt");
+				HDFSUtil.writeToTextFile(hdfsServerUri, workingPath, "last_update.txt", lastModifiedDateFromLambdaFile);
 				logger.info("last_update file updated");
 			});
 	}

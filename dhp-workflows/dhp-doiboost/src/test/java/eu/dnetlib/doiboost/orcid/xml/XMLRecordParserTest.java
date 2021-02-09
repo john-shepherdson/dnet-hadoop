@@ -90,22 +90,22 @@ public class XMLRecordParserTest {
 		assertNotNull(jsonData);
 	}
 
-	@Test
-	private void testWorkIdLastModifiedDateXMLParser() throws Exception {
-		String xml = IOUtils
-			.toString(
-				this.getClass().getResourceAsStream("record_0000-0001-5004-5918.xml"));
-		Map<String, String> workIdLastModifiedDate = XMLRecordParser.retrieveWorkIdLastModifiedDate(xml.getBytes());
-		workIdLastModifiedDate.forEach((k, v) -> {
-			try {
-				OrcidClientTest
-					.logToFile(
-						k + " " + v + " isModified after " + SparkDownloadOrcidWorks.lastUpdateValue + ": "
-							+ SparkDownloadOrcidWorks.isModified("0000-0001-5004-5918", v));
-			} catch (IOException e) {
-			}
-		});
-	}
+//	@Test
+//	private void testWorkIdLastModifiedDateXMLParser() throws Exception {
+//		String xml = IOUtils
+//			.toString(
+//				this.getClass().getResourceAsStream("record_0000-0001-5004-5918.xml"));
+//		Map<String, String> workIdLastModifiedDate = XMLRecordParser.retrieveWorkIdLastModifiedDate(xml.getBytes());
+//		workIdLastModifiedDate.forEach((k, v) -> {
+//			try {
+//				OrcidClientTest
+//					.logToFile(
+//						k + " " + v + " isModified after " + SparkDownloadOrcidWorks.lastUpdateValue + ": "
+//							+ SparkDownloadOrcidWorks.isModified("0000-0001-5004-5918", v));
+//			} catch (IOException e) {
+//			}
+//		});
+//	}
 
 	@Test
 	public void testAuthorSummaryXMLParser() throws Exception {

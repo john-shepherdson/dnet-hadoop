@@ -10,11 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -25,9 +21,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.spark.sql.catalyst.expressions.objects.AssertNotNull;
 import org.junit.jupiter.api.Test;
-import org.mortbay.log.Log;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
@@ -162,14 +156,17 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	private void lambdaFileReaderTest() throws Exception {
+	public void lambdaFileReaderTest() throws Exception {
+		String last_update = "2021-01-12 00:00:06.685137";
 		TarArchiveInputStream input = new TarArchiveInputStream(
-			new GzipCompressorInputStream(new FileInputStream("/develop/last_modified.csv.tar")));
+			new GzipCompressorInputStream(new FileInputStream("/tmp/last_modified.csv.tar")));
 		TarArchiveEntry entry = input.getNextTarEntry();
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
-		int rowNum = 0;
+		int rowNum = 1;
+		int modifiedNum = 1;
 		int entryNum = 0;
+		boolean firstNotModifiedFound = false;
 		while (entry != null) {
 			br = new BufferedReader(new InputStreamReader(input)); // Read directly from tarInput
 			String line;
@@ -177,18 +174,31 @@ public class OrcidClientTest {
 				String[] values = line.toString().split(",");
 				List<String> recordInfo = Arrays.asList(values);
 				assertTrue(recordInfo.size() == 4);
-
+				String orcid = recordInfo.get(0);
+				String modifiedDate = recordInfo.get(3);
 				rowNum++;
-				if (rowNum == 1) {
+				if (rowNum == 2) {
 					assertTrue(recordInfo.get(3).equals("last_modified"));
-				} else if (rowNum == 2) {
-					assertTrue(recordInfo.get(0).equals("0000-0002-0499-7333"));
+				} else {
+//					SparkDownloadOrcidAuthors.lastUpdate = last_update;
+//					boolean isModified = SparkDownloadOrcidAuthors.isModified(orcid, modifiedDate);
+//					if (isModified) {
+//						modifiedNum++;
+//					} else {
+//						if (!firstNotModifiedFound) {
+//							firstNotModifiedFound = true;
+//							logToFile(orcid + " - " + modifiedDate + " > " + isModified);
+//						}
+//					}
+
 				}
 			}
 			entryNum++;
 			assertTrue(entryNum == 1);
 			entry = input.getNextTarEntry();
+
 		}
+		logToFile("modifiedNum : " + modifiedNum + " / " + rowNum);
 	}
 
 	public static void logToFile(String log)
@@ -304,7 +314,8 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	public void testUpdatedRecord() throws Exception {
+	@Ignore
+	private void testUpdatedRecord() throws Exception {
 		final String base64CompressedRecord = IOUtils
 			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));
 		final String record = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
@@ -312,7 +323,8 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	public void testUpdatedWork() throws Exception {
+	@Ignore
+	private void testUpdatedWork() throws Exception {
 		final String base64CompressedWork = "H4sIAAAAAAAAAM1XS2/jNhC+51cQOuxJsiXZSR03Vmq0G6Bo013E6R56oyXaZiOJWpKy4y783zvUg5Ksh5uiCJogisX5Zjj85sHx3f1rFKI94YKyeGE4I9tAJPZZQOPtwvj9+cGaGUhIHAc4ZDFZGEcijHvv6u7A+MtcPVCSSgsUQObYzuzaccBEguVuYYxt+LHgbwKP6a11M3WnY6UzrpB7KuiahlQeF0aSrkPqGwhcisWcxpLwGIcLYydlMh+PD4fDiHGfBvDcjmMxLhGlBglSH8vsIH0qGlLqBFRIGvvDWjWQ1iMJJ2CKBANqGlNqMbkj3IpxRPq1KkypFZFoDRHa0aRfq8JoNjhnfIAJJS6xPouiIQJyeYmGQzE+cO5cXqITcItBlKyASExD0a93jiwtvJDjYXDDAqBPHoH2wMmVWGNf8xyyaEBiSTeUDHHWBpd2Nmmc10yfbgHQrHCyIRxKjQwRUoFKPRwEnIgBnQJQVdGeQgJaCRN0OMnPkaUFVbD9WkpaIndQJowf+8EFoIpTErJjBFQOBavElFpfUxwC9ZcqvQErdQXhe+oPFF8BaObupYzVsYEOARzSoZBWmKqaBMHcV0Wf8oG0beIqD+Gdkz0lhyE3NajUW6fhQFSV9Nw/MCBYyofYa0EN7wrBz13eP+Y+J6obWgE8Pdd2JpYD94P77Ezmjj13b0bu5PqPu3EXumEnxEJaEVxSUIHammsra+53z44zt2/m1/bItaeVtQ6dhs3c4XytvW75IYUchMKvEHVUyqmnWBFAS0VJrqSvQde6vp251ux2NtFuKcVOi+oK9YY0M0Cn6o4J6WkvtEK2XJ1vfPGAZxSoK8lb+SxJBbLQx1CohOLndjJUywQWUFmqEi3G6Zaqf/7buOyYJd5IYpfmf0XipfP18pDR9cQCeEuJQI/Lx36bFbVnpBeL2UwmqQw7ApAvf4GeGGQdEbENgolui/wdpjHaYCmPCIPPAmGBIsxfoLUhyRCB0SeCakEBJRKBtfJ+UBbI15TG4PaGBAhWthx8DmFYtHZQujv1CWbLLdzmmUKmHEOWCe1/zdu78bn/+YH+hCOqOzcXfFwuP6OVT/P710crwqGXFrpNaM2GT3MXarw01i15TIi3pmtJXgtbTVGf3h6HKfF+wBAnPyTfdCChudlm5gZaoG//F9pPZsGQcqqbyZN5hBau5OoIJ3PPwjTKDuG4s5MZp2rMzF5PZoK34IT6PIFOPrk+mTiVO5aJH2C+JJRjE/06eoRfpJxa4VgyYaLlaJUv/EhCfATMU/76gEOfmehL/qbJNNHjaFna+CQYB8wvo9PpPFJ5MOrJ1Ix7USBZqBl7KRNOx1d3jex7SG6zuijqCMWRusBsncjZSrM2u82UJmqzpGhvUJN2t6caIM9QQgO9c0t40UROnWsJd2Rbs+nsxpna9u30ttNkjechmzHjEST+X5CkkuNY0GzQkzyFseAf7lSZuLwdh1xSXKvvQJ4g4abTYgPV7uMt3rskohlJmMa82kQkshtyBEIYqQ+YB8X3oRHg7iFKi/bZP+Ao+T6BJhIT/vNPi8ffZs+flk+r2v0WNroZiyWn6xRmadHqTJXsjLJczElAZX6TnJdoWTM1SI2gfutv3rjeBt5t06rVvNuWup29246tlvluO+u2/G92bK9DXheL6uFd/Q3EaRDZqBIAAA==";
 		final String work = ArgumentApplicationParser.decompressValue(base64CompressedWork);
 		logToFile("\n\nwork updated \n\n" + work);
