@@ -294,6 +294,28 @@
                         >rcuk________::23feba2a5ca7f6b6016bf3a45180da50</to>
                         <legalname>University of Delhi</legalname>
                     </rel>
+                    <rel inferred="false" trust="0.9" inferenceprovenance="" provenanceaction="sysimport:crosswalk:repository">
+                       <validated date="2021-01-01">true</validated>
+                        <to class="isProducedBy" scheme="dnet:result_project_relations" type="project">corda_______::30c6b5ab90f30666de1d112fb93d8c77</to>
+                        <code>227878</code>
+                        <funding>
+                            <funder id="ec__________::EC" shortname="EC" name="European Commission" jurisdiction="EU" />
+                            <funding_level_0 name="FP7">ec__________::EC::FP7</funding_level_0>
+                            <funding_level_1 name="SP2">ec__________::EC::FP7::SP2</funding_level_1>
+                            <funding_level_2 name="ERC">ec__________::EC::FP7::SP2::ERC</funding_level_2>
+                        </funding>
+                        <title>Complex structure and dynamics of collective motion</title>
+                        <acronym>COLLMOT</acronym>
+                        <contracttype classid="ERC" classname="Support for frontier research (ERC)" schemeid="ec:FP7contractTypes" schemename="ec:FP7contractTypes" />
+                    </rel>
+                    <rel inferred="true" trust="0.72" inferenceprovenance="iis::document_referencedProjects" provenanceaction="iis">
+                        <to class="isProducedBy" scheme="dnet:result_project_relations" type="project">irb_hr______::2330a1d0dac71ffbe15fbcbc807288d4</to>
+                        <code>108-1083570-3635</code>
+                        <funding>
+                            <funder id="irb_hr______::MZOS" shortname="MZOS" name="Ministry of Science, Education and Sports of the Republic of Croatia (MSES)" jurisdiction="HR" />
+                        </funding>
+                        <title>Pentadecapeptide BPC 157 - further investigations</title>
+                    </rel>
                 </rels>
                 <children>
                     <instance id="openaire____::55045bd2a65019fd8e6741a755395c8c">

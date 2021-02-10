@@ -14,7 +14,8 @@ public class GraphMappingUtils {
 
 	public static final String SEPARATOR = "_";
 
-	public static Set<String> authorPidTypes = Sets.newHashSet(
+	public static Set<String> authorPidTypes = Sets
+		.newHashSet(
 			ModelConstants.ORCID, ModelConstants.ORCID_PENDING, "magidentifier");
 
 	public static String removePrefix(final String s) {
