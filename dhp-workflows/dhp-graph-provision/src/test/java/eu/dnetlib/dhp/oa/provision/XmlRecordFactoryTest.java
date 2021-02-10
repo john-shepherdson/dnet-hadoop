@@ -11,14 +11,12 @@ import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import com.clearspring.analytics.util.Lists;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
