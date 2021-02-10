@@ -1096,7 +1096,8 @@ public class XmlRecordFactory implements Serializable {
 		final HashSet<String> fields = Sets.newHashSet(mapFields(link, contexts));
 		return templateFactory
 			.getRel(
-				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, rel.getDataInfo());
+				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, rel.getDataInfo(), rel.getValidated(),
+				rel.getValidationDate());
 	}
 
 	private List<String> listChildren(
