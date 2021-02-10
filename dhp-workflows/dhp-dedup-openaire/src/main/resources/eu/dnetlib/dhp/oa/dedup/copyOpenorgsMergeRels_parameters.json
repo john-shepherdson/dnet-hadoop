@@ -18,9 +18,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "e",
-    "paramLongName": "entityType",
-    "paramDescription": "type of the entity for the merge relations",
+    "paramName": "la",
+    "paramLongName": "isLookUpUrl",
+    "paramDescription": "the url for the lookup service",
     "paramRequired": true
   },
   {

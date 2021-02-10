@@ -1,17 +1,47 @@
-SELECT local_id AS id1, oa_original_id AS id2 FROM openaire_simrels WHERE reltype = 'is_similar'
+-- relations approved by the user
+SELECT
+	local_id                                              AS id1,
+	oa_original_id                                        AS id2,
+	'openaire____::openorgs'                              AS collectedfromid,
+	'OpenOrgs Database'                                   AS collectedfromname,
+	false                                                 AS inferred,
+	false                                                 AS deletedbyinference,
+	0.99                                                  AS trust,
+	''                                                    AS inferenceprovenance,
+	'isSimilarTo'                                         AS relclass
+FROM oa_duplicates WHERE reltype = 'is_similar'
 
 UNION ALL
 
+-- relations between openorgs and mesh (alternative names)
 SELECT
-	o.id                                                     AS id1,
-	'openorgsmesh'||substring(o.id, 13)||'-'||md5(a.acronym) AS id2
-FROM acronyms a
-	LEFT OUTER JOIN organizations o ON (a.id = o.id)
-
-UNION ALL
-		
-SELECT
-	o.id                                                     AS id1,
-	'openorgsmesh'||substring(o.id, 13)||'-'||md5(n.name)    AS id2
+	o.id                                                  AS id1,
+	'openorgsmesh'||substring(o.id, 13)||'-'||md5(n.name) AS id2,
+	'openaire____::openorgs'                              AS collectedfromid,
+	'OpenOrgs Database'                                   AS collectedfromname,
+	false                                                 AS inferred,
+	false                                                 AS deletedbyinference,
+	0.99                                                  AS trust,
+	''                                                    AS inferenceprovenance,
+	'isSimilarTo'                                          AS relclass
 FROM other_names n
 	LEFT OUTER JOIN organizations o ON (n.id = o.id)
+
+UNION ALL
+
+-- diff relations approved by the user
+SELECT
+	local_id                                              AS id1,
+	oa_original_id                                        AS id2,
+	'openaire____::openorgs'                              AS collectedfromid,
+	'OpenOrgs Database'                                   AS collectedfromname,
+	false                                                 AS inferred,
+	false                                                 AS deletedbyinference,
+	0.99                                                  AS trust,
+	''                                                    AS inferenceprovenance,
+	'isDifferentFrom'                                     AS relclass
+FROM oa_duplicates WHERE reltype = 'is_different'
+
+
+--TODO ???
+--Creare relazioni isDifferentFrom anche tra i suggerimenti: (A is_similar B) and (A is_different C) => (B is_different C)

@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.oa.graph.raw.common.MigrateAction;
 import eu.dnetlib.dhp.oa.graph.raw.common.VerifyNsPrefixPredicate;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Context;
@@ -75,6 +76,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	public static final String SOURCE_TYPE = "source_type";
 	public static final String TARGET_TYPE = "target_type";
+
+	private static final String ORG_ORG_RELTYPE = "organizationOrganization";
+	private static final String ORG_ORG_SUBRELTYPE = "dedup";
 
 	private final DbClient dbClient;
 
@@ -114,35 +118,53 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 		final Predicate<Oaf> verifyNamespacePrefix = new VerifyNsPrefixPredicate(nsPrefixBlacklist);
 
-		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
-		log.info("processClaims: {}", processClaims);
+		final MigrateAction process = parser.get("action") != null ? MigrateAction.valueOf(parser.get("action"))
+			: MigrateAction.openaire;
+		log.info("migrateAction: {}", process);
 
 		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, dbUrl, dbUser,
 			dbPassword, isLookupUrl)) {
-			if (processClaims) {
-				log.info("Processing claims...");
-				smdbe.execute("queryClaims.sql", smdbe::processClaims);
-			} else {
-				log.info("Processing datasources...");
-				smdbe.execute("queryDatasources.sql", smdbe::processDatasource, verifyNamespacePrefix);
 
-				log.info("Processing projects...");
-				if (dbSchema.equalsIgnoreCase("beta")) {
-					smdbe.execute("queryProjects.sql", smdbe::processProject, verifyNamespacePrefix);
-				} else {
-					smdbe.execute("queryProjects_production.sql", smdbe::processProject, verifyNamespacePrefix);
-				}
+			switch (process) {
+				case claims:
+					log.info("Processing claims...");
+					smdbe.execute("queryClaims.sql", smdbe::processClaims);
+					break;
+				case openaire:
+					log.info("Processing datasources...");
+					smdbe.execute("queryDatasources.sql", smdbe::processDatasource, verifyNamespacePrefix);
 
-				log.info("Processing orgs...");
-				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
+					log.info("Processing projects...");
+					if (dbSchema.equalsIgnoreCase("beta")) {
+						smdbe.execute("queryProjects.sql", smdbe::processProject, verifyNamespacePrefix);
+					} else {
+						smdbe.execute("queryProjects_production.sql", smdbe::processProject, verifyNamespacePrefix);
+					}
 
-				log.info("Processing relationsNoRemoval ds <-> orgs ...");
-				smdbe
-					.execute(
-						"queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization, verifyNamespacePrefix);
+					log.info("Processing Organizations...");
+					smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
-				log.info("Processing projects <-> orgs ...");
-				smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
+					log.info("Processing relationsNoRemoval ds <-> orgs ...");
+					smdbe
+						.execute(
+							"queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization,
+							verifyNamespacePrefix);
+
+					log.info("Processing projects <-> orgs ...");
+					smdbe
+						.execute(
+							"queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
+					break;
+				case openorgs:
+					log.info("Processing Openorgs...");
+					smdbe
+						.execute(
+							"queryOrganizationsFromOpenOrgsDB.sql", smdbe::processOrganization, verifyNamespacePrefix);
+
+					log.info("Processing Openorgs Merge Rels...");
+					smdbe.execute("querySimilarityFromOpenOrgsDB.sql", smdbe::processOrgOrgSimRels);
+
+					break;
 			}
 			log.info("All done.");
 		}
@@ -582,6 +604,43 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			return journal(
 				rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
 				rs.getString("issnLinking"), info);
+		}
+	}
+
+	public List<Oaf> processOrgOrgSimRels(final ResultSet rs) {
+		try {
+			final DataInfo info = prepareDataInfo(rs); // TODO
+
+			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
+			final String orgId2 = createOpenaireId(40, rs.getString("id2"), true);
+			final String relClass = rs.getString("relclass");
+
+			final List<KeyValue> collectedFrom = listKeyValues(
+				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
+
+			final Relation r1 = new Relation();
+			r1.setRelType(ORG_ORG_RELTYPE);
+			r1.setSubRelType(ORG_ORG_SUBRELTYPE);
+			r1.setRelClass(relClass);
+			r1.setSource(orgId1);
+			r1.setTarget(orgId2);
+			r1.setCollectedfrom(collectedFrom);
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+
+			final Relation r2 = new Relation();
+			r2.setRelType(ORG_ORG_RELTYPE);
+			r2.setSubRelType(ORG_ORG_SUBRELTYPE);
+			r2.setRelClass(relClass);
+			r2.setSource(orgId2);
+			r2.setTarget(orgId1);
+			r2.setCollectedfrom(collectedFrom);
+			r2.setDataInfo(info);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+
+			return Arrays.asList(r1, r2);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 

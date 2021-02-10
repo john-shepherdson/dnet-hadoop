@@ -13,6 +13,10 @@
             <description>id of the actionSet</description>
         </property>
         <property>
+            <name>actionSetIdOpenorgs</name>
+            <description>id of the actionSet for OpenOrgs dedup</description>
+        </property>
+        <property>
             <name>workingPath</name>
             <description>path for the working directory</description>
         </property>
@@ -169,17 +173,17 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
         </spark>
-        <ok to="CopyMergeRels"/>
+        <ok to="CopyOpenorgsMergeRels"/>
         <error to="Kill"/>
     </action>
 
-    <!-- copy organization relations in the working dir-->
-    <action name="CopyMergeRels">
+    <!-- copy organization relations in the working dir (in the organization_mergerel dir)-->
+    <action name="CopyOpenorgsMergeRels">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Copy Merge Relations</name>
-            <class>eu.dnetlib.dhp.oa.dedup.SparkCopyRels</class>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCopyOpenorgsMergeRels</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -193,15 +197,15 @@
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
-            <arg>--entityType</arg><arg>organization</arg>
-            <arg>--destination</arg><arg>mergerel</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
         <ok to="CopyEntities"/>
         <error to="Kill"/>
     </action>
 
+    <!-- copy openorgs to the working dir (in the organization_deduprecord dir)-->
     <action name="CopyOpenorgs">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -222,7 +226,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
         </spark>
         <ok to="UpdateEntity"/>
         <error to="Kill"/>
@@ -253,15 +257,28 @@
         <error to="Kill"/>
     </action>
 
+    <!-- copy all relations without openorgs relations to the dedupgraph -->
     <action name="copyRelations">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/relation"/>
-            </prepare>
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/relation</arg>
-            <arg>${dedupGraphPath}/relation</arg>
-        </distcp>
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Update Entity</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCopyRelationsNoOpenorgs</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--dedupGraphPath</arg><arg>${dedupGraphPath}</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

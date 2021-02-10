@@ -1,4 +1,24 @@
+
 package eu.dnetlib.dhp.oa.dedup;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.pace.config.DedupConfig;
+import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
+import org.dom4j.DocumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -6,24 +26,12 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import org.apache.commons.io.IOUtils;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SparkSession;
-import org.dom4j.DocumentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Optional;
 
 //copy simrels (verified) from relation to the workdir in order to make them available for the deduplication
-public class SparkCopyRels extends AbstractSparkAction{
-    private static final Logger log = LoggerFactory.getLogger(SparkCopyRels.class);
+public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
+    private static final Logger log = LoggerFactory.getLogger(SparkCopyOpenorgsMergeRels.class);
 
-    public SparkCopyRels(ArgumentApplicationParser parser, SparkSession spark) {
+    public SparkCopyOpenorgsSimRels(ArgumentApplicationParser parser, SparkSession spark) {
         super(parser, spark);
     }
 
@@ -31,13 +39,13 @@ public class SparkCopyRels extends AbstractSparkAction{
         ArgumentApplicationParser parser = new ArgumentApplicationParser(
                 IOUtils
                         .toString(
-                                SparkCopyRels.class
+                                SparkCopyOpenorgsSimRels.class
                                         .getResourceAsStream(
-                                                "/eu/dnetlib/dhp/oa/dedup/copyRels_parameters.json")));
+                                                "/eu/dnetlib/dhp/oa/dedup/copyOpenorgsMergeRels_parameters.json")));
         parser.parseArgument(args);
 
         SparkConf conf = new SparkConf();
-        new SparkCopyRels(parser, getSparkSession(conf))
+        new SparkCopyOpenorgsSimRels(parser, getSparkSession(conf))
                 .run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
     }
 
@@ -49,8 +57,6 @@ public class SparkCopyRels extends AbstractSparkAction{
         final String graphBasePath = parser.get("graphBasePath");
         final String actionSetId = parser.get("actionSetId");
         final String workingPath = parser.get("workingPath");
-        final String destination = parser.get("destination");
-        final String entity = parser.get("entityType");
         final int numPartitions = Optional
                 .ofNullable(parser.get("numPartitions"))
                 .map(Integer::valueOf)
@@ -60,30 +66,24 @@ public class SparkCopyRels extends AbstractSparkAction{
         log.info("graphBasePath: '{}'", graphBasePath);
         log.info("actionSetId:   '{}'", actionSetId);
         log.info("workingPath:   '{}'", workingPath);
-        log.info("entity:        '{}'", entity);
 
-        log.info("Copying " + destination + " for: '{}'", entity);
+        log.info("Copying OpenOrgs SimRels");
 
-        final String outputPath;
-        if (destination.contains("mergerel")) {
-            outputPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, entity);
-        }
-        else {
-            outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, entity);
-        }
+        final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, "organization");
 
         removeOutputDir(spark, outputPath);
 
         final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
-        JavaRDD<Relation> simRels =
-                spark.read()
-                        .textFile(relationPath)
-                        .map(patchRelFn(), Encoders.bean(Relation.class))
-                        .toJavaRDD()
-                        .filter(r -> filterRels(r, entity));
+        JavaRDD<Relation> rawRels = spark
+                .read()
+                .textFile(relationPath)
+                .map(patchRelFn(), Encoders.bean(Relation.class))
+                .toJavaRDD()
+                .filter(this::isOpenorgs)
+                .filter(this::filterOpenorgsRels);
 
-        simRels.saveAsTextFile(outputPath);
+        save(spark.createDataset(rawRels.rdd(),Encoders.bean(Relation.class)), outputPath, SaveMode.Append);
     }
 
     private static MapFunction<String, Relation> patchRelFn() {
@@ -96,20 +96,23 @@ public class SparkCopyRels extends AbstractSparkAction{
         };
     }
 
-    private boolean filterRels(Relation rel, String entityType) {
+    private boolean filterOpenorgsRels(Relation rel) {
 
-        switch(entityType) {
-            case "result":
-                if (rel.getRelClass().equals("isSimilarTo") && rel.getRelType().equals("resultResult") && rel.getSubRelType().equals("dedup"))
+        if (rel.getRelClass().equals("isSimilarTo") && rel.getRelType().equals("organizationOrganization") && rel.getSubRelType().equals("dedup"))
+            return true;
+        return false;
+    }
+
+    private boolean isOpenorgs(Relation rel) {
+
+        if (rel.getCollectedfrom() != null) {
+            for (KeyValue k: rel.getCollectedfrom()) {
+                if (k.getValue().equals("OpenOrgs Database")) {
                     return true;
-                break;
-            case "organization":
-                if (rel.getRelClass().equals("isSimilarTo") && rel.getRelType().equals("organizationOrganization") && rel.getSubRelType().equals("dedup"))
-                    return true;
-                break;
-            default:
-                return false;
+                }
+            }
         }
         return false;
     }
 }
+
