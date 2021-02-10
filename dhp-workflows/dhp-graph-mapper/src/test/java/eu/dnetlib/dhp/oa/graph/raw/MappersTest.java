@@ -334,6 +334,7 @@ public class MappersTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
 	}
 
 	@Test
