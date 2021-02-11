@@ -136,7 +136,17 @@
         </configuration>
     </global>
 
-    <start to="ensure_output_dir"/>
+	<start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+        	<case to="ensure_output_dir">${wf:conf('resumeFrom') eq 'ensure_output_dir'}</case>
+            <case to="index_event_subset">${wf:conf('resumeFrom') eq 'index_event_subset'}</case>
+            <case to="stats">${wf:conf('resumeFrom') eq 'stats'}</case>
+            <case to="index_notifications">${wf:conf('resumeFrom') eq 'index_notifications'}</case>
+            <default to="ensure_output_dir"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
