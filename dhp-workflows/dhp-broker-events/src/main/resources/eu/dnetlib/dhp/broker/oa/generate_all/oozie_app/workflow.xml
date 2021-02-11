@@ -505,6 +505,33 @@
             <arg>--maxEventsForTopic</arg><arg>${maxIndexedEventsForDsAndTopic}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
+        <ok to="stats"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="stats">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateStatsJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.GenerateStatsJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
+            <arg>--dbUrl</arg><arg>${brokerDbUrl}</arg>
+            <arg>--dbUser</arg><arg>${brokerDbUser}</arg>
+            <arg>--dbPassword</arg><arg>${brokerDbPassword}</arg>
+            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
+        </spark>
         <ok to="index_notifications"/>
         <error to="Kill"/>
     </action>
@@ -535,37 +562,10 @@
             <arg>--esNodesWanOnly</arg><arg>${esNodesWanOnly}</arg>
             <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
         </spark>
-        <ok to="stats"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="stats">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>GenerateStatsJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.GenerateStatsJob</class>
-            <jar>dhp-broker-events-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
-            </spark-opts>
-            <arg>--outputDir</arg><arg>${outputDir}</arg>
-            <arg>--dbUrl</arg><arg>${brokerDbUrl}</arg>
-            <arg>--dbUser</arg><arg>${brokerDbUser}</arg>
-            <arg>--dbPassword</arg><arg>${brokerDbPassword}</arg>
-            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
-        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
+    
     <end name="End"/>
 
 </workflow-app>
