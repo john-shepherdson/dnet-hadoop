@@ -63,7 +63,7 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 			return value;
 		} catch (Throwable e) {
 			aggregationCounter.getErrorItems().add(1);
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
 }

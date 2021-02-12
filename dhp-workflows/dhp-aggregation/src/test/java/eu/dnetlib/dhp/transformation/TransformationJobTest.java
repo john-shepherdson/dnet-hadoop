@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import eu.dnetlib.dhp.transformation.xslt.DateCleaner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -28,8 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
-
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.transformation.xslt.DateCleaner;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
@@ -56,18 +55,16 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		spark.stop();
 	}
 
-
 	@Test
 	@DisplayName("Test Date cleaner")
 	public void testDateCleaner() throws Exception {
 		DateCleaner dc = new DateCleaner();
-		assertEquals(dc.clean("20/09/1982"),"1982-09-20");
-		assertEquals(dc.clean("20-09-2002"),"2002-09-20");
-		assertEquals(dc.clean("2002-09-20"),"2002-09-20");
-		assertEquals(dc.clean("2002-9"),"2002-09-01");
-		assertEquals(dc.clean("2021"),"2021-01-01");
+		assertEquals(dc.clean("20/09/1982"), "1982-09-20");
+		assertEquals(dc.clean("20-09-2002"), "2002-09-20");
+		assertEquals(dc.clean("2002-09-20"), "2002-09-20");
+		assertEquals(dc.clean("2002-9"), "2002-09-01");
+		assertEquals(dc.clean("2021"), "2021-01-01");
 	}
-
 
 	@Test
 	@DisplayName("Test Transform Single XML using XSLTTransformator")
@@ -80,11 +77,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		// We Load the XSLT transformation Rule from the classpath
 		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
 
-
 		MetadataRecord result = tr.call(mr);
-
-
-
 
 		// Print the record
 		System.out.println(result.getBody());

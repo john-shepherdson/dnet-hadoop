@@ -106,7 +106,8 @@ public class TransformSparkJobNode {
 		log.info("Transformation Error item " + ct.getErrorItems().count());
 
 		writeHdfsFile(
-			spark.sparkContext().hadoopConfiguration(), "" + mdstore.count(), outputBasePath + MDSTORE_SIZE_PATH);
+			spark.sparkContext().hadoopConfiguration(),
+			"" + spark.read().load(outputBasePath + MDSTORE_DATA_PATH).count(), outputBasePath + MDSTORE_SIZE_PATH);
 	}
 
 }
