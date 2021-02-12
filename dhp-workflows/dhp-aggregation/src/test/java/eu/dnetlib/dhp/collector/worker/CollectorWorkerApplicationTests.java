@@ -9,19 +9,9 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.worker.CollectorPluginFactory;
-import eu.dnetlib.dhp.collection.worker.HttpClientParams;
 
 @Disabled
 public class CollectorWorkerApplicationTests {
-
-	@Test
-	public void testFindPlugin() throws Exception {
-		final CollectorPluginFactory collectorPluginEnumerator = new CollectorPluginFactory();
-		final HttpClientParams clientParams = new HttpClientParams();
-		assertNotNull(collectorPluginEnumerator.getPluginByProtocol(clientParams, "oai"));
-		assertNotNull(collectorPluginEnumerator.getPluginByProtocol(clientParams, "OAI"));
-	}
 
 	@Test
 	public void testCollectionOAI() throws Exception {

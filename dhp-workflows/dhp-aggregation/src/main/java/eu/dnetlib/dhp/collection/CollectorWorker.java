@@ -1,23 +1,27 @@
 
-package eu.dnetlib.dhp.collection.worker;
+package eu.dnetlib.dhp.collection;
 
 import static eu.dnetlib.dhp.common.Constants.SEQUENCE_FILE_NAME;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.hadoop.conf.Configuration;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.io.compress.DeflateCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
-import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
 import eu.dnetlib.dhp.message.MessageSender;
 
 public class CollectorWorker {
@@ -26,7 +30,7 @@ public class CollectorWorker {
 
 	private final ApiDescriptor api;
 
-	private final Configuration conf;
+	private final FileSystem fileSystem;
 
 	private final MDStoreVersion mdStoreVersion;
 
@@ -38,13 +42,13 @@ public class CollectorWorker {
 
 	public CollectorWorker(
 		final ApiDescriptor api,
-		final Configuration conf,
+		final FileSystem fileSystem,
 		final MDStoreVersion mdStoreVersion,
 		final HttpClientParams clientParams,
 		final MessageSender messageSender,
 		final CollectorPluginReport report) {
 		this.api = api;
-		this.conf = conf;
+		this.fileSystem = fileSystem;
 		this.mdStoreVersion = mdStoreVersion;
 		this.clientParams = clientParams;
 		this.messageSender = messageSender;
@@ -56,16 +60,16 @@ public class CollectorWorker {
 		final String outputPath = mdStoreVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
 		log.info("outputPath path is {}", outputPath);
 
-		final CollectorPlugin plugin = CollectorPluginFactory.getPluginByProtocol(clientParams, api.getProtocol());
+		final CollectorPlugin plugin = getCollectorPlugin();
 		final AtomicInteger counter = new AtomicInteger(0);
 
 		try (SequenceFile.Writer writer = SequenceFile
 			.createWriter(
-				conf,
+				fileSystem.getConf(),
 				SequenceFile.Writer.file(new Path(outputPath)),
 				SequenceFile.Writer.keyClass(IntWritable.class),
 				SequenceFile.Writer.valueClass(Text.class),
-				SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new GzipCodec()))) {
+				SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new DeflateCodec()))) {
 			final IntWritable key = new IntWritable(counter.get());
 			final Text value = new Text();
 			plugin
@@ -91,6 +95,28 @@ public class CollectorWorker {
 			report.setSuccess(false);
 		} finally {
 			messageSender.sendMessage(counter.longValue(), counter.longValue());
+		}
+	}
+
+	private CollectorPlugin getCollectorPlugin() throws UnknownCollectorPluginException {
+		switch (StringUtils.lowerCase(StringUtils.trim(api.getProtocol()))) {
+			case "oai":
+				return new OaiCollectorPlugin(clientParams);
+			case "other":
+				final String plugin = Optional
+					.ofNullable(api.getParams().get("other_plugin_type"))
+					.orElseThrow(() -> new UnknownCollectorPluginException("other_plugin_type"));
+
+				switch (plugin) {
+					case "mdstore_mongodb_dump":
+						return new MongoDbDumpCollectorPlugin(fileSystem);
+					case "mdstore_mongodb":
+						return new MongoDbCollectorPlugin();
+					default:
+						throw new UnknownCollectorPluginException("Unknown plugin type: " + plugin);
+				}
+			default:
+				throw new UnknownCollectorPluginException("Unknown protocol: " + api.getProtocol());
 		}
 	}
 

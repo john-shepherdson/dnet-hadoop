@@ -16,10 +16,10 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.collection.worker.CollectorException;
-import eu.dnetlib.dhp.collection.worker.CollectorPluginReport;
-import eu.dnetlib.dhp.collection.worker.HttpConnector2;
-import eu.dnetlib.dhp.collection.worker.XmlCleaner;
+import eu.dnetlib.dhp.collection.CollectorException;
+import eu.dnetlib.dhp.collection.CollectorPluginReport;
+import eu.dnetlib.dhp.collection.HttpConnector2;
+import eu.dnetlib.dhp.collection.XmlCleaner;
 
 public class OaiIterator implements Iterator<String> {
 

@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection.worker;
+package eu.dnetlib.dhp.collection;
 
 import static eu.dnetlib.dhp.utils.DHPUtils.*;
 

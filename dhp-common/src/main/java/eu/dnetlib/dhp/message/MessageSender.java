@@ -1,6 +1,9 @@
 
 package eu.dnetlib.dhp.message;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
@@ -30,13 +33,15 @@ public class MessageSender {
 
 	private final String workflowId;
 
+	private ExecutorService executorService = Executors.newCachedThreadPool();
+
 	public MessageSender(final String dnetMessageEndpoint, final String workflowId) {
 		this.workflowId = workflowId;
 		this.dnetMessageEndpoint = dnetMessageEndpoint;
 	}
 
 	public void sendMessage(final Message message) {
-		new Thread(() -> _sendMessage(message)).start();
+		executorService.submit(() -> _sendMessage(message));
 	}
 
 	public void sendMessage(final Long current, final Long total) {
@@ -67,7 +72,6 @@ public class MessageSender {
 				.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT_MS)
 				.setSocketTimeout(SOCKET_TIMEOUT_MS)
 				.build();
-			;
 
 			try (final CloseableHttpClient client = HttpClients
 				.custom()

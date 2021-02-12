@@ -1,8 +1,9 @@
 
-package eu.dnetlib.dhp.aggregation;
+package eu.dnetlib.dhp.collection;
 
 import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,14 +37,14 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
-import eu.dnetlib.dhp.collection.GenerateNativeStoreSparkJob;
+import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.model.mdstore.Provenance;
 import eu.dnetlib.dhp.transformation.TransformSparkJobNode;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(MockitoExtension.class)
-public class AggregationJobTest extends AbstractVocabularyTest {
+public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -58,18 +59,20 @@ public class AggregationJobTest extends AbstractVocabularyTest {
 	private static final String xpath = "//*[local-name()='header']/*[local-name()='identifier']";
 	private static String provenance;
 
-	private static final Logger log = LoggerFactory.getLogger(AggregationJobTest.class);
+	private static final Logger log = LoggerFactory.getLogger(GenerateNativeStoreSparkJobTest.class);
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		provenance = IOUtils
-			.toString(AggregationJobTest.class.getResourceAsStream("/eu/dnetlib/dhp/collection/provenance.json"));
-		workingDir = Files.createTempDirectory(AggregationJobTest.class.getSimpleName());
+			.toString(
+				GenerateNativeStoreSparkJobTest.class
+					.getResourceAsStream("/eu/dnetlib/dhp/collection/provenance.json"));
+		workingDir = Files.createTempDirectory(GenerateNativeStoreSparkJobTest.class.getSimpleName());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
 
-		conf.setAppName(AggregationJobTest.class.getSimpleName());
+		conf.setAppName(GenerateNativeStoreSparkJobTest.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
@@ -81,7 +84,7 @@ public class AggregationJobTest extends AbstractVocabularyTest {
 		encoder = Encoders.bean(MetadataRecord.class);
 		spark = SparkSession
 			.builder()
-			.appName(AggregationJobTest.class.getSimpleName())
+			.appName(GenerateNativeStoreSparkJobTest.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}
@@ -202,6 +205,67 @@ public class AggregationJobTest extends AbstractVocabularyTest {
 
 	}
 
+	@Test
+	public void testJSONSerialization() throws Exception {
+		final String s = IOUtils.toString(getClass().getResourceAsStream("mdStoreVersion_1.json"));
+		System.out.println("s = " + s);
+		final ObjectMapper mapper = new ObjectMapper();
+		MDStoreVersion mi = mapper.readValue(s, MDStoreVersion.class);
+
+		assertNotNull(mi);
+
+	}
+
+	@Test
+	public void testGenerationMetadataRecord() throws Exception {
+
+		final String xml = IOUtils.toString(this.getClass().getResourceAsStream("./record.xml"));
+
+		final MetadataRecord record = GenerateNativeStoreSparkJob
+			.parseRecord(
+				xml,
+				"./*[local-name()='record']/*[local-name()='header']/*[local-name()='identifier']",
+				"XML",
+				new Provenance("foo", "bar", "ns_prefix"),
+				System.currentTimeMillis(),
+				null,
+				null);
+
+		assertNotNull(record.getId());
+		assertNotNull(record.getOriginalId());
+	}
+
+	@Test
+	public void testEquals() throws IOException {
+
+		final String xml = IOUtils.toString(this.getClass().getResourceAsStream("./record.xml"));
+		final MetadataRecord record = GenerateNativeStoreSparkJob
+			.parseRecord(
+				xml,
+				"./*[local-name()='record']/*[local-name()='header']/*[local-name()='identifier']",
+				"XML",
+				new Provenance("foo", "bar", "ns_prefix"),
+				System.currentTimeMillis(),
+				null,
+				null);
+		final MetadataRecord record1 = GenerateNativeStoreSparkJob
+			.parseRecord(
+				xml,
+				"./*[local-name()='record']/*[local-name()='header']/*[local-name()='identifier']",
+				"XML",
+				new Provenance("foo", "bar", "ns_prefix"),
+				System.currentTimeMillis(),
+				null,
+				null);
+
+		record.setBody("ciao");
+		record1.setBody("mondo");
+
+		assertNotNull(record);
+		assertNotNull(record1);
+		assertEquals(record, record1);
+	}
+
 	protected void verify(MDStoreVersion mdStoreVersion) throws IOException {
 		Assertions.assertTrue(new File(mdStoreVersion.getHdfsPath()).exists());
 
@@ -226,7 +290,7 @@ public class AggregationJobTest extends AbstractVocabularyTest {
 		Assertions.assertEquals(seqFileSize, uniqueIds, "the size must be equal");
 	}
 
-	private MDStoreVersion prepareVersion(String filename) throws IOException {
+	public MDStoreVersion prepareVersion(String filename) throws IOException {
 		MDStoreVersion mdstore = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResource(filename)), MDStoreVersion.class);
 		mdstore.setHdfsPath(String.format(mdstore.getHdfsPath(), workingDir.toString()));

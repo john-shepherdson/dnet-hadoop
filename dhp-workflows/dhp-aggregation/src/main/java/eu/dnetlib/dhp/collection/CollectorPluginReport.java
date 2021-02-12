@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection.worker;
+package eu.dnetlib.dhp.collection;
 
 import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
@@ -17,14 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import eu.dnetlib.dhp.application.ApplicationUtils;
-
 public class CollectorPluginReport extends LinkedHashMap<String, String> implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectorPluginReport.class);
-
-	@JsonIgnore
-	private FileSystem fs;
 
 	@JsonIgnore
 	private Path path;
@@ -38,9 +33,7 @@ public class CollectorPluginReport extends LinkedHashMap<String, String> impleme
 	}
 
 	public CollectorPluginReport(FileSystem fs, Path path) throws IOException {
-		this.fs = fs;
 		this.path = path;
-
 		this.fos = fs.create(path);
 	}
 
