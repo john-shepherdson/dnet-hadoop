@@ -41,6 +41,7 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 		try {
 			Processor processor = new Processor(false);
 			processor.registerExtensionFunction(cleanFunction);
+			processor.registerExtensionFunction(new DateCleaner());
 			final XsltCompiler comp = processor.newXsltCompiler();
 			XsltExecutable xslt = comp
 				.compile(new StreamSource(new ByteArrayInputStream(transformationRule.getBytes())));

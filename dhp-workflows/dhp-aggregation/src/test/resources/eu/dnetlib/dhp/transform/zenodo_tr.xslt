@@ -4,8 +4,9 @@
         xmlns:oai="http://www.openarchives.org/OAI/2.0/"
         xmlns:oaf="http://namespace.openaire.eu/oaf"
         xmlns:vocabulary="http://eu/dnetlib/trasform/extension"
+        xmlns:dateCleaner="http://eu/dnetlib/trasform/dates"
         xmlns:dr="http://www.driver-repository.eu/namespace/dr"
-        exclude-result-prefixes="xsl vocabulary">
+        exclude-result-prefixes="xsl vocabulary dateCleaner">
     <xsl:param name="varOfficialName"/>
     <xsl:param name="varDsType"/>
     <xsl:param name="varDataSourceId"/>
@@ -53,7 +54,7 @@
 
                 <xsl:if test="//*[local-name()='date']/@dateType='Available'">
                     <xsl:variable name='varEmbargoEndDate'
-                                  select="vocabulary:clean(normalize-space(//*[local-name()='date'][@dateType='Available']), 'DateISO8601')"/>
+                                  select="dateCleaner:dateISO(normalize-space(//*[local-name()='date'][@dateType='Available']))"/>
                     <xsl:choose>
                         <xsl:when test="string-length($varEmbargoEndDate) > 0">
                             <oaf:embargoenddate>
@@ -112,7 +113,7 @@
 
                 <oaf:dateAccepted>
                     <xsl:value-of
-                            select="normalize-space(//*[local-name()='publicationYear'])"/>
+                            select="dateCleaner:dateISO(normalize-space(//*[local-name()='publicationYear']))"/>
                 </oaf:dateAccepted>
                 <xsl:choose>
 

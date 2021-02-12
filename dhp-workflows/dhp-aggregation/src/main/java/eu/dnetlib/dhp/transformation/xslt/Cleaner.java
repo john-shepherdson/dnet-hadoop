@@ -35,7 +35,7 @@ public class Cleaner implements ExtensionFunction, Serializable {
 	@Override
 	public XdmValue call(XdmValue[] xdmValues) throws SaxonApiException {
 		XdmValue r = xdmValues[0];
-		if (r.size() == 0){
+		if (r.size() == 0) {
 			return new XdmAtomicValue("");
 		}
 		final String currentValue = xdmValues[0].itemAt(0).getStringValue();
