@@ -28,7 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
-import eu.dnetlib.dhp.collection.CollectionJobTest;
+
 import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -41,7 +41,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 	@BeforeAll
 	public static void beforeAll() throws IOException, ISLookUpException {
 		SparkConf conf = new SparkConf();
-		conf.setAppName(CollectionJobTest.class.getSimpleName());
+		conf.setAppName(TransformationJobTest.class.getSimpleName());
 		conf.setMaster("local");
 		spark = SparkSession.builder().config(conf).getOrCreate();
 	}
