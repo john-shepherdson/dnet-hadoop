@@ -6,6 +6,7 @@
                 version="2.0"
                 exclude-result-prefixes="xsl vocabulary">
     <xsl:template match="/">
+
         <oai:record>
             <xsl:copy-of select="//oai:header"/>
             <metadata>

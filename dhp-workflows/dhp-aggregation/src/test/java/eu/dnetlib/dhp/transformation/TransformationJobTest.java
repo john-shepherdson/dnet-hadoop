@@ -61,13 +61,19 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
-		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input.xml")));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_zenodo.xml")));
 
 		// We Load the XSLT transformation Rule from the classpath
-		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/ext_simple.xsl");
+		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
+
+
+		MetadataRecord result = tr.call(mr);
+
+
+
 
 		// Print the record
-		System.out.println(tr.call(mr).getBody());
+		System.out.println(result.getBody());
 		// TODO Create significant Assert
 
 	}

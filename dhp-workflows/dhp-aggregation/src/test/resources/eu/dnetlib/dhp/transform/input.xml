@@ -6,7 +6,7 @@
         <setSpec>PSNCRepository:PSNCExternalRepository:Departments</setSpec>
         <setSpec>PSNCRepository:PSNCExternalRepository:Departments:NetworkServices</setSpec>
         <setSpec>PSNCRepository:PSNCExternalRepository</setSpec>
-        <setSpec>PSNCRepository:PSNCExternalRepository:publications</setSpec>
+        <setSpec>aRTIcle - Letter to the editor</setSpec>
         <setSpec>PSNCRepository</setSpec>
     </header>
     <metadata>

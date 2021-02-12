@@ -27,13 +27,17 @@ public class Cleaner implements ExtensionFunction, Serializable {
 	@Override
 	public SequenceType[] getArgumentTypes() {
 		return new SequenceType[] {
-			SequenceType.makeSequenceType(ItemType.STRING, OccurrenceIndicator.ONE),
+			SequenceType.makeSequenceType(ItemType.STRING, OccurrenceIndicator.ZERO_OR_MORE),
 			SequenceType.makeSequenceType(ItemType.STRING, OccurrenceIndicator.ONE)
 		};
 	}
 
 	@Override
 	public XdmValue call(XdmValue[] xdmValues) throws SaxonApiException {
+		XdmValue r = xdmValues[0];
+		if (r.size() == 0){
+			return new XdmAtomicValue("");
+		}
 		final String currentValue = xdmValues[0].itemAt(0).getStringValue();
 		final String vocabularyName = xdmValues[1].itemAt(0).getStringValue();
 		Qualifier cleanedValue = vocabularies.getSynonymAsQualifier(vocabularyName, currentValue);
