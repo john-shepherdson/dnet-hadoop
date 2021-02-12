@@ -16,7 +16,7 @@ public class Cleaner implements ExtensionFunction, Serializable {
 
 	@Override
 	public QName getName() {
-		return new QName("http://eu/dnetlib/trasform/extension", "clean");
+		return new QName("http://eu/dnetlib/transform/extension", "clean");
 	}
 
 	@Override
