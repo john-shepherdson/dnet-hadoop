@@ -53,11 +53,21 @@ abstract class AbstractRestClient extends Iterator[String]{
   }
 
 
+
+
   private def doHTTPRequest[A <: HttpUriRequest](r: A) :String ={
     val client = HttpClients.createDefault
     try {
-      val response = client.execute(r)
-      IOUtils.toString(response.getEntity.getContent)
+      var tries = 4
+      while (tries > 0) {
+        val response = client.execute(r)
+        if (response.getStatusLine.getStatusCode > 400) {
+          tries -= 1
+        }
+        else
+          return IOUtils.toString(response.getEntity.getContent)
+      }
+      ""
     } catch {
       case e: Throwable =>
         throw new RuntimeException("Error on executing request ", e)

@@ -66,7 +66,7 @@ object DataciteToOAFTransformation {
   val unknown_repository: HostedByMapType = HostedByMapType("openaire____::1256f046-bf1f-4afc-8b47-d0b147148b18", "Unknown Repository", "Unknown Repository", Some(1.0F))
 
   val dataInfo: DataInfo = generateDataInfo("0.9")
-  val DATACITE_COLLECTED_FROM: KeyValue = OafMapperUtils.keyValue("openaire____::datacite", "Datacite")
+  val DATACITE_COLLECTED_FROM: KeyValue = OafMapperUtils.keyValue("openaire____::9e3be59865b2c1c335d32dae2fe7b254", "Datacite")
 
   val hostedByMap: Map[String, HostedByMapType] = {
     val s = Source.fromInputStream(getClass.getResourceAsStream("hostedBy_map.json")).mkString
