@@ -98,7 +98,7 @@
 
     <action name="CollectionWorker">
         <java>
-            <main-class>eu.dnetlib.dhp.collection.worker.CollectorWorkerApplication</main-class>
+            <main-class>eu.dnetlib.dhp.collection.CollectorWorkerApplication</main-class>
             <java-opts>${collection_java_xmx}</java-opts>
             <arg>--apidescriptor</arg><arg>${apiDescription}</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
@@ -118,7 +118,7 @@
 
     <action name="CollectorReport">
         <java>
-            <main-class>eu.dnetlib.dhp.collection.worker.CollectorWorkerReporter</main-class>
+            <main-class>eu.dnetlib.dhp.collection.CollectorWorkerReporter</main-class>
             <java-opts>${collection_java_xmx}</java-opts>
             <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>

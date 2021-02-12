@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection.worker;
+package eu.dnetlib.dhp.collection;
 
 import static eu.dnetlib.dhp.common.Constants.*;
 import static eu.dnetlib.dhp.utils.DHPUtils.*;
@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.message.MessageSender;
 
 /**
@@ -31,6 +29,12 @@ import eu.dnetlib.dhp.message.MessageSender;
 public class CollectorWorkerApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectorWorkerApplication.class);
+
+	private FileSystem fileSystem;
+
+	public CollectorWorkerApplication(FileSystem fileSystem) {
+		this.fileSystem = fileSystem;
+	}
 
 	/**
 	 * @param args
@@ -63,6 +67,18 @@ public class CollectorWorkerApplication {
 		final String workflowId = argumentParser.get("workflowId");
 		log.info("workflowId is {}", workflowId);
 
+		final HttpClientParams clientParams = getClientParams(argumentParser);
+
+		final ApiDescriptor api = MAPPER.readValue(apiDescriptor, ApiDescriptor.class);
+		final FileSystem fileSystem = FileSystem.get(getHadoopConfiguration(hdfsuri));
+
+		new CollectorWorkerApplication(fileSystem)
+			.run(mdStoreVersion, clientParams, api, dnetMessageManagerURL, workflowId);
+	}
+
+	protected void run(String mdStoreVersion, HttpClientParams clientParams, ApiDescriptor api,
+		String dnetMessageManagerURL, String workflowId) throws IOException {
+
 		final MessageSender ms = new MessageSender(dnetMessageManagerURL, workflowId);
 
 		final MDStoreVersion currentVersion = MAPPER.readValue(mdStoreVersion, MDStoreVersion.class);
@@ -70,13 +86,9 @@ public class CollectorWorkerApplication {
 		final String reportPath = currentVersion.getHdfsPath() + REPORT_FILE_NAME;
 		log.info("report path is {}", reportPath);
 
-		final HttpClientParams clientParams = getClientParams(argumentParser);
-
-		final ApiDescriptor api = MAPPER.readValue(apiDescriptor, ApiDescriptor.class);
-		final Configuration conf = getHadoopConfiguration(hdfsuri);
-
-		try (CollectorPluginReport report = new CollectorPluginReport(FileSystem.get(conf), new Path(reportPath))) {
-			final CollectorWorker worker = new CollectorWorker(api, conf, currentVersion, clientParams, ms, report);
+		try (CollectorPluginReport report = new CollectorPluginReport(fileSystem, new Path(reportPath))) {
+			final CollectorWorker worker = new CollectorWorker(api, fileSystem, currentVersion, clientParams, ms,
+				report);
 			worker.collect();
 			report.setSuccess(true);
 		} catch (Throwable e) {

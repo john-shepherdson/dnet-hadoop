@@ -14,10 +14,10 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
+import eu.dnetlib.dhp.collection.CollectorException;
+import eu.dnetlib.dhp.collection.CollectorPluginReport;
+import eu.dnetlib.dhp.collection.HttpClientParams;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import eu.dnetlib.dhp.collection.worker.CollectorException;
-import eu.dnetlib.dhp.collection.worker.CollectorPluginReport;
-import eu.dnetlib.dhp.collection.worker.HttpClientParams;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
 

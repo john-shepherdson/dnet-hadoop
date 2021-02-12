@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,10 +40,10 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@BeforeAll
 	public static void beforeAll() throws IOException, ISLookUpException {
-//		SparkConf conf = new SparkConf();
-//		conf.setAppName(CollectionJobTest.class.getSimpleName());
-//		conf.setMaster("local");
-//		spark = SparkSession.builder().config(conf).getOrCreate();
+		SparkConf conf = new SparkConf();
+		conf.setAppName(CollectionJobTest.class.getSimpleName());
+		conf.setMaster("local");
+		spark = SparkSession.builder().config(conf).getOrCreate();
 	}
 
 	@BeforeEach
@@ -55,7 +53,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@AfterAll
 	public static void afterAll() {
-//		spark.stop();
+		spark.stop();
 	}
 
 
@@ -82,7 +80,11 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		// We Load the XSLT transformation Rule from the classpath
 		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
 
+
 		MetadataRecord result = tr.call(mr);
+
+
+
 
 		// Print the record
 		System.out.println(result.getBody());

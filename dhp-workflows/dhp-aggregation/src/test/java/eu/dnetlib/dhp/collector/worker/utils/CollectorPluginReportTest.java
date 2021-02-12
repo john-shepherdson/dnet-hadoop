@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import eu.dnetlib.dhp.collection.worker.CollectorPluginReport;
+import eu.dnetlib.dhp.collection.CollectorPluginReport;
 
 public class CollectorPluginReportTest {
 
