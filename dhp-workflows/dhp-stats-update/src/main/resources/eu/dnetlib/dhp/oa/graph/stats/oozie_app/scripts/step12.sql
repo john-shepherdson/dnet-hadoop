@@ -36,3 +36,16 @@ CREATE OR REPLACE VIEW ${stats_db_name}.result AS SELECT *, bestlicence AS acces
 -- To see with Antonis if the following is needed and where it should be placed
 -------------------------------------------------------------------------------
 CREATE TABLE ${stats_db_name}.numbers_country AS SELECT org.country AS country, count(distinct rd.datasource) AS datasources, count(distinct r.id) AS publications FROM ${stats_db_name}.result r, ${stats_db_name}.result_datasources rd, ${stats_db_name}.datasource d, ${stats_db_name}.datasource_organizations dor, ${stats_db_name}.organization org WHERE r.id=rd.id AND rd.datasource=d.id AND d.id=dor.id AND dor.organization=org.id AND r.type='publication' AND r.bestlicence='Open Access' GROUP BY org.country;
+
+ANALYZE TABLE ${stats_db_name}.datasource COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.datasource COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.numbers_country COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.numbers_country COMPUTE STATISTICS FOR COLUMNS;

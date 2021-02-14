@@ -57,3 +57,12 @@ UNION ALL
 SELECT * FROM ${stats_db_name}.software_sources
 UNION ALL
 SELECT * FROM ${stats_db_name}.otherresearchproduct_sources;
+
+ANALYZE TABLE ${stats_db_name}.publication_sources COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_sources COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.datast_sources COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_sources COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software_sources COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_sources COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_sources COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_sources COMPUTE STATISTICS FOR COLUMNS;

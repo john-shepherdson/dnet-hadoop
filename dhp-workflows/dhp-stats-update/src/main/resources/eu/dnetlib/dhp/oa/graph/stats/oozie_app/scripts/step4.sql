@@ -5,7 +5,6 @@
 --------------------------------------------------------
 
 -- Software temporary table supporting updates
-DROP TABLE IF EXISTS ${stats_db_name}.software_tmp;
 CREATE TABLE ${stats_db_name}.software_tmp (id STRING,   title STRING,   publisher STRING,   journal STRING,   date STRING,   year STRING,   bestlicence STRING,   embargo_end_date STRING,   delayed BOOLEAN,   authors INT,   source STRING,   abstract BOOLEAN,   type STRING )  clustered by (id) INTO 100 buckets stored AS orc tblproperties('transactional'='true');
 
 INSERT INTO ${stats_db_name}.software_tmp SELECT substr(s.id, 4) as id, s.title[0].value AS title, s.publisher.value AS publisher, CAST(NULL AS string) AS journal, 
@@ -34,3 +33,20 @@ CREATE TABLE ${stats_db_name}.software_oids AS SELECT substr(p.id, 4) AS id, oid
 CREATE TABLE ${stats_db_name}.software_pids AS SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value AS pid FROM ${openaire_db_name}.software p LATERAL VIEW explode(p.pid) pids AS ppid where p.datainfo.deletedbyinference=false;
 
 CREATE TABLE ${stats_db_name}.software_topics AS SELECT substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS type, subjects.subject.value AS topic FROM ${openaire_db_name}.software p LATERAL VIEW explode(p.subject) subjects AS subject where p.datainfo.deletedbyinference=false;
+
+ANALYZE TABLE ${stats_db_name}.software_tmp COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_tmp COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software_classifications COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_classifications COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software_concepts COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_concepts COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software_datasources COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_datasources COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software_languages COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_languages COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software_oids COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_oids COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software_pids COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_pids COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.software_topics COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.software_topics COMPUTE STATISTICS FOR COLUMNS;

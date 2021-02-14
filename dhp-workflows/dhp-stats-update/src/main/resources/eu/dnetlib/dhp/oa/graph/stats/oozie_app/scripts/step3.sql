@@ -5,7 +5,6 @@
 ------------------------------------------------------
 
 -- Dataset temporary table supporting updates
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_tmp;
 CREATE TABLE ${stats_db_name}.dataset_tmp (id STRING, title STRING, publisher STRING, journal STRING, date STRING, year STRING, bestlicence STRING, embargo_end_date STRING, delayed BOOLEAN,   authors INT,   source STRING,   abstract BOOLEAN,   type STRING ) clustered by (id) into 100 buckets stored AS orc tblproperties('transactional'='true');
 
 INSERT INTO ${stats_db_name}.dataset_tmp SELECT substr(d.id, 4) AS id, d.title[0].value AS title, d.publisher.value AS publisher, cast(null AS string) AS journal, 
@@ -34,3 +33,20 @@ CREATE TABLE ${stats_db_name}.dataset_oids AS SELECT substr(p.id, 4) AS id, oids
 CREATE TABLE ${stats_db_name}.dataset_pids AS SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value AS pid FROM ${openaire_db_name}.dataset p LATERAL VIEW explode(p.pid) pids AS ppid where p.datainfo.deletedbyinference=false;
 
 CREATE TABLE ${stats_db_name}.dataset_topics AS SELECT substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS type, subjects.subject.value AS topic FROM ${openaire_db_name}.dataset p LATERAL VIEW explode(p.subject) subjects AS subject where p.datainfo.deletedbyinference=false;
+
+ANALYZE TABLE ${stats_db_name}.dataset_tmp COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_tmp COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.dataset_classifications COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_classifications COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.dataset_concepts COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_concepts COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.dataset_datasources COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_datasources COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.dataset_languages COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_languages COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.dataset_oids COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_oids COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.dataset_pids COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_pids COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.dataset_topics COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_topics COMPUTE STATISTICS FOR COLUMNS;

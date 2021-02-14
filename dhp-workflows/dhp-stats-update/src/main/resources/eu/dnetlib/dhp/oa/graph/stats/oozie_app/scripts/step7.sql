@@ -24,8 +24,11 @@ CREATE OR REPLACE VIEW ${stats_db_name}.result_pids AS SELECT * FROM ${stats_db_
 
 CREATE OR REPLACE VIEW ${stats_db_name}.result_topics AS SELECT * FROM ${stats_db_name}.publication_topics UNION ALL SELECT * FROM ${stats_db_name}.software_topics UNION ALL SELECT * FROM ${stats_db_name}.dataset_topics UNION ALL SELECT * FROM ${stats_db_name}.otherresearchproduct_topics;
 
-DROP TABLE IF EXISTS ${stats_db_name}.result_organization;
 CREATE TABLE ${stats_db_name}.result_organization AS SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization FROM ${openaire_db_name}.relation r WHERE r.reltype='resultOrganization' and r.datainfo.deletedbyinference=false;
 
-DROP TABLE IF EXISTS ${stats_db_name}.result_projects;
 CREATE TABLE ${stats_db_name}.result_projects AS select pr.result AS id, pr.id AS project, datediff(p.enddate, p.startdate) AS daysfromend FROM ${stats_db_name}.result r JOIN ${stats_db_name}.project_results pr ON r.id=pr.result JOIN ${stats_db_name}.project_tmp p ON p.id=pr.id;
+
+ANALYZE TABLE ${stats_db_name}.result_organization COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.result_organization COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS FOR COLUMNS;

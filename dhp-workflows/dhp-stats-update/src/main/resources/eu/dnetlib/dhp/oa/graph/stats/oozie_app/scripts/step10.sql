@@ -19,3 +19,6 @@ CREATE OR REPLACE VIEW  ${stats_db_name}.concept AS SELECT * FROM ${external_sta
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 create table ${stats_db_name}.creation_date as select date_format(current_date(), 'dd-MM-yyyy') as date;
+
+ANALYZE TABLE ${stats_db_name}.creation_date COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.creation_date COMPUTE STATISTICS FOR COLUMNS;

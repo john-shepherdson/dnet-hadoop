@@ -30,3 +30,10 @@ from rcount
 group by rcount.pid;
 
 create view ${stats_db_name}.rndexpenditure as select * from stats_ext.rndexpediture
+
+ANALYZE TABLE ${stats_db_name}.result_projectcount COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.result_projectcount COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.result_fundercount COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.result_fundercount COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.project_resultcount COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.project_resultcount COMPUTE STATISTICS FOR COLUMNS;

@@ -42,3 +42,6 @@ UPDATE ${stats_db_name}.software_tmp SET delayed = 'yes' WHERE software_tmp.id I
 UPDATE ${stats_db_name}.otherresearchproduct_tmp SET delayed = 'yes' WHERE otherresearchproduct_tmp.id IN (SELECT distinct r.id FROM ${stats_db_name}.result r, ${stats_db_name}.project_results pr, ${stats_db_name}.project_tmp p WHERE r.id=pr.result AND pr.id=p.id AND to_date(r.date)-to_date(p.enddate) > 0);
 
 CREATE OR REPLACE VIEW ${stats_db_name}.project_results_publication AS SELECT result_projects.id AS result, result_projects.project AS project_results, result.date as resultdate, project.enddate as projectenddate, result_projects.daysfromend AS daysfromend FROM  ${stats_db_name}.result_projects, ${stats_db_name}.result, ${stats_db_name}.project WHERE result_projects.id=result.id AND result.type='publication' AND project.id=result_projects.project;
+
+ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS FOR COLUMNS;

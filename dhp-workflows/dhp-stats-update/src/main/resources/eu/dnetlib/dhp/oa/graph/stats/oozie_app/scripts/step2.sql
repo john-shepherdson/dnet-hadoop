@@ -5,8 +5,6 @@
 --------------------------------------------------------------
 
 -- Publication temporary table
-DROP TABLE IF EXISTS ${stats_db_name}.publication_tmp;
-
 CREATE TABLE ${stats_db_name}.publication_tmp (id STRING,   title STRING,   publisher STRING,   journal STRING,   date STRING,   year STRING,   bestlicence STRING,   embargo_end_date STRING,   delayed BOOLEAN,   authors INT,   source STRING,   abstract BOOLEAN,   type STRING )  clustered by (id) into 100 buckets stored as orc tblproperties('transactional'='true');
 
 INSERT INTO ${stats_db_name}.publication_tmp SELECT substr(p.id, 4) as id, p.title[0].value as title, p.publisher.value as publisher, p.journal.name as journal , 
@@ -42,3 +40,22 @@ CREATE TABLE ${stats_db_name}.publication_topics as select substr(p.id, 4) AS id
 
 -- Publication_citations
 CREATE TABLE ${stats_db_name}.publication_citations AS SELECT substr(p.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS result FROM ${openaire_db_name}.publication p lateral view explode(p.extrainfo) citations AS citation WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") !="" and p.datainfo.deletedbyinference=false;
+
+ANALYZE TABLE ${stats_db_name}.publication_tmp COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_tmp COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication_classifications COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_classifications COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication_concepts COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_concepts COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication_datasources COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_datasources COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication_languages COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_languages COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication_oids COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_oids COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication_pids COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_pids COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication_topics COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_topics COMPUTE STATISTICS FOR COLUMNS;
+ANALYZE TABLE ${stats_db_name}.publication_citations COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.publication_citations COMPUTE STATISTICS FOR COLUMNS;
