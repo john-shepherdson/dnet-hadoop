@@ -110,18 +110,6 @@
             <arg>--retryDelay</arg><arg>${retryDelay}</arg>
             <arg>--connectTimeOut</arg><arg>${connectTimeOut}</arg>
             <arg>--readTimeOut</arg><arg>${readTimeOut}</arg>
-            <capture-output/>
-        </java>
-        <ok to="CollectorReport"/>
-        <error to="CollectorReport"/>
-    </action>
-
-    <action name="CollectorReport">
-        <java>
-            <main-class>eu.dnetlib.dhp.collection.CollectorWorkerReporter</main-class>
-            <java-opts>${collection_java_xmx}</java-opts>
-            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
-            <arg>--namenode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="GenerateNativeStoreSparkJob"/>
         <error to="FailCollection"/>

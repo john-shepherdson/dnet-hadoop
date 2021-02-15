@@ -38,20 +38,16 @@ public class CollectorWorker {
 
 	private final CollectorPluginReport report;
 
-	private final MessageSender messageSender;
-
 	public CollectorWorker(
 		final ApiDescriptor api,
 		final FileSystem fileSystem,
 		final MDStoreVersion mdStoreVersion,
 		final HttpClientParams clientParams,
-		final MessageSender messageSender,
 		final CollectorPluginReport report) {
 		this.api = api;
 		this.fileSystem = fileSystem;
 		this.mdStoreVersion = mdStoreVersion;
 		this.clientParams = clientParams;
-		this.messageSender = messageSender;
 		this.report = report;
 	}
 
@@ -78,23 +74,21 @@ public class CollectorWorker {
 					content -> {
 						key.set(counter.getAndIncrement());
 						if (counter.get() % 500 == 0)
-							messageSender.sendMessage(counter.longValue(), null);
+							report.ongoing(counter.longValue(), null);
 						value.set(content);
 						try {
 							writer.append(key, value);
 						} catch (Throwable e) {
 							report.put(e.getClass().getName(), e.getMessage());
 							log.warn("setting report to failed");
-							report.setSuccess(false);
 							throw new RuntimeException(e);
 						}
 					});
 		} catch (Throwable e) {
 			report.put(e.getClass().getName(), e.getMessage());
 			log.warn("setting report to failed");
-			report.setSuccess(false);
 		} finally {
-			messageSender.sendMessage(counter.longValue(), counter.longValue());
+			report.ongoing(counter.longValue(), counter.longValue());
 		}
 	}
 

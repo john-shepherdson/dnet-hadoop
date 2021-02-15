@@ -3,29 +3,34 @@ package eu.dnetlib.dhp.message;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Message implements Serializable {
 
+	private static final long serialVersionUID = 401753881204524893L;
+
 	public static String CURRENT_PARAM = "current";
 	public static String TOTAL_PARAM = "total";
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 401753881204524893L;
+	private MessageType messageType;
 
 	private String workflowId;
 
 	private Map<String, String> body;
 
-	public Message() {
-		body = new HashMap<>();
+	public Message(final MessageType messageType, final String workflowId) {
+		this(messageType, workflowId, new LinkedHashMap<>());
 	}
 
-	public Message(final String workflowId, final Map<String, String> body) {
+	public Message(final MessageType messageType, final String workflowId, final Map<String, String> body) {
+		this.messageType = messageType;
 		this.workflowId = workflowId;
 		this.body = body;
+	}
+
+	public MessageType getMessageType() {
+		return messageType;
 	}
 
 	public String getWorkflowId() {
@@ -46,6 +51,7 @@ public class Message implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.format("Message [workflowId=%s, body=%s]", workflowId, body);
+		return String.format("Message [type=%s, workflowId=%s, body=%s]", messageType, workflowId, body);
 	}
+
 }

@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.message;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,13 +46,15 @@ public class MessageSender {
 	}
 
 	public void sendMessage(final Long current, final Long total) {
-		sendMessage(createMessage(current, total));
+		sendMessage(createOngoingMessage(current, total));
 	}
 
-	private Message createMessage(final Long current, final Long total) {
+	public void sendReport(final Map<String, String> report) {
+		sendMessage(new Message(MessageType.REPORT, workflowId, report));
+	}
 
-		final Message m = new Message();
-		m.setWorkflowId(workflowId);
+	private Message createOngoingMessage(final Long current, final Long total) {
+		final Message m = new Message(MessageType.ONGOING, workflowId);
 		m.getBody().put(Message.CURRENT_PARAM, current.toString());
 		if (total != null) {
 			m.getBody().put(Message.TOTAL_PARAM, total.toString());

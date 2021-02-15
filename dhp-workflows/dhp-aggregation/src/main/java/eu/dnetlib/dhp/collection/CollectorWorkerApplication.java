@@ -77,22 +77,15 @@ public class CollectorWorkerApplication {
 	}
 
 	protected void run(String mdStoreVersion, HttpClientParams clientParams, ApiDescriptor api,
-		String dnetMessageManagerURL, String workflowId) throws IOException {
+		String dnetMessageManagerURL, String workflowId)
+		throws IOException, CollectorException, UnknownCollectorPluginException {
 
 		final MessageSender ms = new MessageSender(dnetMessageManagerURL, workflowId);
 
 		final MDStoreVersion currentVersion = MAPPER.readValue(mdStoreVersion, MDStoreVersion.class);
 
-		final String reportPath = currentVersion.getHdfsPath() + REPORT_FILE_NAME;
-		log.info("report path is {}", reportPath);
-
-		try (CollectorPluginReport report = new CollectorPluginReport(fileSystem, new Path(reportPath))) {
-			final CollectorWorker worker = new CollectorWorker(api, fileSystem, currentVersion, clientParams, ms,
-				report);
-			worker.collect();
-			report.setSuccess(true);
-		} catch (Throwable e) {
-			log.info("got exception {}, ignoring", e.getMessage());
+		try (CollectorPluginReport report = new CollectorPluginReport(ms)) {
+			new CollectorWorker(api, fileSystem, currentVersion, clientParams, report).collect();
 		}
 	}
 
