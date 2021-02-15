@@ -19,6 +19,8 @@ public class Message implements Serializable {
 
 	private Map<String, String> body;
 
+	public Message() {}
+
 	public Message(final MessageType messageType, final String workflowId) {
 		this(messageType, workflowId, new LinkedHashMap<>());
 	}
@@ -31,6 +33,10 @@ public class Message implements Serializable {
 
 	public MessageType getMessageType() {
 		return messageType;
+	}
+
+	public void setMessageType(MessageType messageType) {
+		this.messageType = messageType;
 	}
 
 	public String getWorkflowId() {
