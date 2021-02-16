@@ -19,7 +19,8 @@ public class Message implements Serializable {
 
 	private Map<String, String> body;
 
-	public Message() {}
+	public Message() {
+	}
 
 	public Message(final MessageType messageType, final String workflowId) {
 		this(messageType, workflowId, new LinkedHashMap<>());

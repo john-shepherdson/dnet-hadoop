@@ -38,7 +38,7 @@ public class OaiIterator implements Iterator<String> {
 	private String token;
 	private boolean started;
 	private final HttpConnector2 httpConnector;
-	private CollectorPluginReport errorLogList;
+	private CollectorPluginReport report;
 
 	public OaiIterator(
 		final String baseUrl,
@@ -47,7 +47,7 @@ public class OaiIterator implements Iterator<String> {
 		final String fromDate,
 		final String untilDate,
 		final HttpConnector2 httpConnector,
-		final CollectorPluginReport errorLogList) {
+		final CollectorPluginReport report) {
 		this.baseUrl = baseUrl;
 		this.mdFormat = mdFormat;
 		this.set = set;
@@ -55,7 +55,7 @@ public class OaiIterator implements Iterator<String> {
 		this.untilDate = untilDate;
 		this.started = false;
 		this.httpConnector = httpConnector;
-		this.errorLogList = errorLogList;
+		this.report = report;
 	}
 
 	private void verifyStarted() {
@@ -113,7 +113,7 @@ public class OaiIterator implements Iterator<String> {
 
 			return downloadPage(url);
 		} catch (final UnsupportedEncodingException e) {
-			errorLogList.put(e.getClass().getName(), e.getMessage());
+			report.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e);
 		}
 	}
@@ -139,27 +139,27 @@ public class OaiIterator implements Iterator<String> {
 					+ "?verb=ListRecords&resumptionToken="
 					+ URLEncoder.encode(resumptionToken, "UTF-8"));
 		} catch (final UnsupportedEncodingException e) {
-			errorLogList.put(e.getClass().getName(), e.getMessage());
+			report.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e);
 		}
 	}
 
 	private String downloadPage(final String url) throws CollectorException {
 
-		final String xml = httpConnector.getInputSource(url, errorLogList);
+		final String xml = httpConnector.getInputSource(url, report);
 		Document doc;
 		try {
 			doc = reader.read(new StringReader(xml));
 		} catch (final DocumentException e) {
 			log.warn("Error parsing xml, I try to clean it. {}", e.getMessage());
-			errorLogList.put(e.getClass().getName(), e.getMessage());
+			report.put(e.getClass().getName(), e.getMessage());
 			final String cleaned = XmlCleaner.cleanAllEntities(xml);
 			try {
 				doc = reader.read(new StringReader(cleaned));
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
 				if (resumptionToken == null) {
-					errorLogList.put(e1.getClass().getName(), e1.getMessage());
+					report.put(e1.getClass().getName(), e1.getMessage());
 					throw new CollectorException("Error parsing cleaned document:\n" + cleaned, e1);
 				}
 				return resumptionToken;
@@ -172,11 +172,11 @@ public class OaiIterator implements Iterator<String> {
 			if ("noRecordsMatch".equalsIgnoreCase(code)) {
 				final String msg = "noRecordsMatch for oai call : " + url;
 				log.warn(msg);
-				errorLogList.put(REPORT_PREFIX + code, msg);
+				report.put(REPORT_PREFIX + code, msg);
 				return null;
 			} else {
 				final String msg = code + " - " + errorNode.getText();
-				errorLogList.put(REPORT_PREFIX + "error", msg);
+				report.put(REPORT_PREFIX + "error", msg);
 				throw new CollectorException(msg);
 			}
 		}
@@ -188,7 +188,7 @@ public class OaiIterator implements Iterator<String> {
 		return doc.valueOf("//*[local-name()='resumptionToken']");
 	}
 
-	public CollectorPluginReport getErrorLogList() {
-		return errorLogList;
+	public CollectorPluginReport getReport() {
+		return report;
 	}
 }

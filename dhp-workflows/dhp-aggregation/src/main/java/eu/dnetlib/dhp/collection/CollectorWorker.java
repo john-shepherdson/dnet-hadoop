@@ -5,6 +5,8 @@ import static eu.dnetlib.dhp.common.Constants.SEQUENCE_FILE_NAME;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,11 +24,11 @@ import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
-import eu.dnetlib.dhp.message.MessageSender;
 
 public class CollectorWorker {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectorWorker.class);
+	public static final int ONGOING_REPORT_FREQUENCY_MS = 5000;
 
 	private final ApiDescriptor api;
 
@@ -59,6 +61,14 @@ public class CollectorWorker {
 		final CollectorPlugin plugin = getCollectorPlugin();
 		final AtomicInteger counter = new AtomicInteger(0);
 
+		final Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				report.ongoing(counter.longValue(), null);
+			}
+		}, 5000, ONGOING_REPORT_FREQUENCY_MS);
+
 		try (SequenceFile.Writer writer = SequenceFile
 			.createWriter(
 				fileSystem.getConf(),
@@ -73,21 +83,18 @@ public class CollectorWorker {
 				.forEach(
 					content -> {
 						key.set(counter.getAndIncrement());
-						if (counter.get() % 500 == 0)
-							report.ongoing(counter.longValue(), null);
 						value.set(content);
 						try {
 							writer.append(key, value);
 						} catch (Throwable e) {
-							report.put(e.getClass().getName(), e.getMessage());
-							log.warn("setting report to failed");
 							throw new RuntimeException(e);
 						}
 					});
 		} catch (Throwable e) {
 			report.put(e.getClass().getName(), e.getMessage());
-			log.warn("setting report to failed");
+			throw new CollectorException(e);
 		} finally {
+			timer.cancel();
 			report.ongoing(counter.longValue(), counter.longValue());
 		}
 	}

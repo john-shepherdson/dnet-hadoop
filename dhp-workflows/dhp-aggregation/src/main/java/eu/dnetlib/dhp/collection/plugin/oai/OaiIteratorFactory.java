@@ -18,9 +18,8 @@ public class OaiIteratorFactory {
 		final String fromDate,
 		final String untilDate,
 		final HttpClientParams clientParams,
-		final CollectorPluginReport errorLogList) {
-		return new OaiIterator(baseUrl, mdFormat, set, fromDate, untilDate, getHttpConnector(clientParams),
-			errorLogList);
+		final CollectorPluginReport report) {
+		return new OaiIterator(baseUrl, mdFormat, set, fromDate, untilDate, getHttpConnector(clientParams), report);
 	}
 
 	private HttpConnector2 getHttpConnector(HttpClientParams clientParams) {
