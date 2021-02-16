@@ -1094,6 +1094,8 @@ public class XmlRecordFactory implements Serializable {
 				String.format("missing scheme for: <%s - %s>", type.toString(), targetType));
 		}
 		final HashSet<String> fields = Sets.newHashSet(mapFields(link, contexts));
+		if (rel.getValidated() == null)
+			rel.setValidated(false);
 		return templateFactory
 			.getRel(
 				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, rel.getDataInfo(), rel.getValidated(),

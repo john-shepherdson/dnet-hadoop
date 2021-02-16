@@ -25,7 +25,7 @@
 "relClass": "isProducedBy",
 "source": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
 "target": "40|corda__h2020::79a0e16c122c9a18eb60e4a5e64b620d",
-"validated": false,
+"validated": null,
 "validationDate": null,
 "properties": []
 }
