@@ -29,6 +29,14 @@
             <name>isLookupUrl</name>
             <description>The IS lookUp service endopoint</description>
         </property>
+        <property>
+            <name>workflowId</name>
+            <description>The identifier of the workflow</description>
+        </property>
+        <property>
+            <name>dnetMessageManagerURL</name>
+            <description>The URI of the Dnet Message Manager</description>
+        </property>
     </parameters>
 
     <start to="BeginRead"/>
@@ -95,6 +103,8 @@
             <arg>--transformationPlugin</arg><arg>${transformationPlugin}</arg>
             <arg>--transformationRuleId</arg><arg>${transformationRuleId}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--workflowId</arg><arg>${workflowId}</arg>
+            <arg>--dnetMessageManagerURL</arg><arg>${dnetMessageManagerURL}</arg>
         </spark>
         <ok to="EndRead"/>
         <error to="EndReadRollBack"/>

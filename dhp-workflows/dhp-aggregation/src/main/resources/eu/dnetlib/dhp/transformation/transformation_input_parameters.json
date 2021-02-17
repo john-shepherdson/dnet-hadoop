@@ -36,9 +36,18 @@
     "paramDescription": "the Information System Service LookUp URL",
     "paramRequired": true
   },
-
-
-
+  {
+    "paramName": "dm",
+    "paramLongName": "dnetMessageManagerURL",
+    "paramDescription": "the End point URL to send Messages",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workflowId",
+    "paramDescription": "the identifier of the dnet Workflow",
+    "paramRequired": true
+  },
   {
     "paramName": "tp",
     "paramLongName": "transformationPlugin",

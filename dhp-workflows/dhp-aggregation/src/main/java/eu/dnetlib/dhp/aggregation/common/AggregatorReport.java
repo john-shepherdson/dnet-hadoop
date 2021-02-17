@@ -8,13 +8,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import eu.dnetlib.dhp.utils.DHPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.message.MessageSender;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class AggregatorReport extends LinkedHashMap<String, String> implements Closeable {
 
