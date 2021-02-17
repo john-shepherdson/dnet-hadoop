@@ -57,7 +57,7 @@ public class TransformSparkJobNode {
 		final MDStoreVersion nativeMdStoreVersion = MAPPER.readValue(mdstoreInputVersion, MDStoreVersion.class);
 		final String inputPath = nativeMdStoreVersion.getHdfsPath() + MDSTORE_DATA_PATH;
 		log.info("inputPath: {}", inputPath);
-		ParquetReader
+
 		final MDStoreVersion cleanedMdStoreVersion = MAPPER.readValue(mdstoreOutputVersion, MDStoreVersion.class);
 		final String outputBasePath = cleanedMdStoreVersion.getHdfsPath();
 		log.info("outputBasePath: {}", outputBasePath);
