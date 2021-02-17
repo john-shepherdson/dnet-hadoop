@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class AggregatorReport extends LinkedHashMap<String, String> implements C
 			this.forEach((k, v) -> log.info("{} - {}", k, v));
 
 			Map<String, String> m = new HashMap<>();
-			m.put(getClass().getSimpleName().toLowerCase(), new Gson().toJson(values()));
+			m.put(getClass().getSimpleName().toLowerCase(), DHPUtils.MAPPER.writeValueAsString(values()));
 			messageSender.sendReport(m);
 		}
 	}
