@@ -65,7 +65,7 @@ public class ReadReportsListFromDatacite {
 
 			logger.info("Checking report with id " + reportID);
 			String sqlCheckIfReportExists = "SELECT source FROM " + ConnectDB.getDataSetUsageStatsDBSchema()
-				+ ".datacitereports_tmp where reportid=?";
+				+ ".datacitereports where reportid=?";
 			PreparedStatement stGetReportID = ConnectDB.getHiveConnection().prepareStatement(sqlCheckIfReportExists);
 			stGetReportID.setString(1, reportID);
 
@@ -76,7 +76,7 @@ public class ReadReportsListFromDatacite {
 				dropTmpReportsTable();
 			} else {
 				String sqlInsertReport = "INSERT INTO " + ConnectDB.getDataSetUsageStatsDBSchema()
-					+ " .datacitereports_tmp "
+					+ " .datacitereports "
 					+ "SELECT\n"
 					+ "  get_json_object(json, '$.report.id') AS reportid,\n"
 					+ "  get_json_object(json, '$.report.report-header.report-name') AS name,\n"
@@ -105,7 +105,7 @@ public class ReadReportsListFromDatacite {
 					ResultSet rstmpReportAll = stmt.getResultSet();
 					if (rstmpReportAll.next()) {
 						String listDatasets = rstmpReportAll.getString(1);
-						logger.info("Adding uncompressed performance for " + reportID);
+						logger.info("No compressed performance found");
 						this.readDatasetsReport(listDatasets, reportID);
 					}
 
@@ -125,9 +125,6 @@ public class ReadReportsListFromDatacite {
 	}
 
 	public void readDatasetsReport(String prettyDatasetsReports, String reportId) throws Exception {
-		logger.info("Reading Datasets performance for report " + reportId);
-		logger.info("Write Performance Report To File");
-		ConnectDB.getHiveConnection().setAutoCommit(false);
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = objectMapper.readValue(prettyDatasetsReports, JsonNode.class);
 		String datasetsReports = jsonNode.toString();
@@ -154,7 +151,8 @@ public class ReadReportsListFromDatacite {
 		fin.writeChar('\n');
 		fin.close();
 
-		logger.info("Reading Performance Report From File...");
+		logger.info("Write Compress Report To File");
+		logger.info("Reading Compress Report From File...");
 
 		String sqlCreateTempTableForDatasets = "CREATE TEMPORARY TABLE " + ConnectDB.getDataSetUsageStatsDBSchema()
 			+ ".tmpjsoncompressesed (report_datasets array<struct<dataset_id:array<struct<value:string>>,dataset_title:string, data_type:string, "
@@ -177,7 +175,7 @@ public class ReadReportsListFromDatacite {
 		stmt.execute(sqlCreateTempTableForDatasets);
 
 		String sqlInsertToDatasetsPerformance = "INSERT INTO " + ConnectDB.getDataSetUsageStatsDBSchema()
-			+ ".datasetsperformance_tmp SELECT dataset.dataset_id[0].value ds_type, "
+			+ ".datasetsperformance SELECT dataset.dataset_id[0].value ds_type, "
 			+ " dataset.dataset_title ds_title, "
 			+ " dataset.yop yop, "
 			+ " dataset.data_type dataset_type, "
@@ -198,7 +196,7 @@ public class ReadReportsListFromDatacite {
 
 		stmt.executeUpdate(sqlInsertToDatasetsPerformance);
 
-		logger.info("Datasets Performance Inserted for Report " + reportId);
+		logger.info("Datasets Performance Inserted ");
 
 		stmt.execute("Drop table " + ConnectDB.getDataSetUsageStatsDBSchema() + ".tmpjsoncompressesed");
 
@@ -296,93 +294,32 @@ public class ReadReportsListFromDatacite {
 	}
 
 	public void createUsageStatisticsTable() throws SQLException {
+		logger.info("Dropping Downloads Stats table");
 		Statement stmt = ConnectDB.getHiveConnection().createStatement();
-
-		logger.info("Updating Datacite Reports table");
-		String createDataciteReportsTable = "INSERT INTO " + ConnectDB.getDataSetUsageStatsDBSchema()
-			+ ".datacitereports "
-			+ "SELECT * FROM " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datacitereports_tmp";
-		stmt.executeUpdate(createDataciteReportsTable);
-		logger.info("Datacite Reports Table updated");
-
-		logger.info("Updating Datasets Performance table");
-		String createDatasetPerformanceTable = "INSERT INTO " + ConnectDB.getDataSetUsageStatsDBSchema()
-			+ ".datasetsperformance "
-			+ "SELECT * FROM " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datasetsperformance_tmp";
-		stmt.executeUpdate(createDatasetPerformanceTable);
-		logger.info("DatasetsPerformance Table updated");
+		String dropDownloadsTable = "DROP TABLE IF EXISTS " + ConnectDB.getDataSetUsageStatsDBSchema()
+			+ ".datacite_downloads";
+		stmt.executeUpdate(dropDownloadsTable);
 
 		logger.info("Creating Downloads Stats table");
 		String createDownloadsTable = "CREATE TABLE " + ConnectDB.getDataSetUsageStatsDBSchema()
-			+ ".datacite_downloads STORED AS PARQUET as "
+			+ ".datacite_downloads as "
 			+ "SELECT 'Datacite' source, d.id repository_id, od.id result_id, regexp_replace(substring(string(period_end),0,7),'-','/') date, count, '0' openaire "
 			+ "FROM " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datasetsperformance "
 			+ "JOIN " + ConnectDB.getStatsDBSchema() + ".datasource d on name=platform "
 			+ "JOIN " + ConnectDB.getStatsDBSchema() + ".result_oids od on string(ds_type)=od.oid "
-			+ "where metric_type='total-dataset-requests' ";
+			+ "where metric_type='total-dataset-requests'";
 		stmt.executeUpdate(createDownloadsTable);
 		logger.info("Downloads Stats table created");
 
 		logger.info("Creating Views Stats table");
-		String createViewsTable = "CREATE TABLE " + ConnectDB.getDataSetUsageStatsDBSchema()
-			+ ".datacite_views STORED AS PARQUET as "
+		String createViewsTable = "CREATE TABLE " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datacite_views as "
 			+ "SELECT 'Datacite' source, d.id repository_id, od.id result_id, regexp_replace(substring(string(period_end),0,7),'-','/') date, count, '0' openaire "
 			+ "FROM " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datasetsperformance "
 			+ "JOIN " + ConnectDB.getStatsDBSchema() + ".datasource d on name=platform "
 			+ "JOIN " + ConnectDB.getStatsDBSchema() + ".result_oids od on string(ds_type)=od.oid "
-			+ "where metric_type='total-dataset-investigations' ";
+			+ "where metric_type='total-dataset-investigations'";
 		stmt.executeUpdate(createViewsTable);
 		logger.info("Views Stats table created");
-
-		logger.info("Building Permanent Datasets Usage Stats DB");
-
-		logger.info("Dropping view datacitereports on permanent datacite usagestats DB");
-		String sql = "DROP VIEW IF EXISTS " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacitereports";
-		stmt.executeUpdate(sql);
-		logger.info("Dropped view datacitereports on permanent datacite usagestats DB");
-
-		logger.info("Create view datacitereports on permanent datacite usagestats DB");
-		sql = "CREATE VIEW IF NOT EXISTS " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacitereports"
-			+ " AS SELECT * FROM " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datacitereports";
-		stmt.executeUpdate(sql);
-		logger.info("Created view datacitereports on permanent datasets usagestats DB");
-
-		logger.info("Dropping view datasetsperformance on permanent datacite usagestats DB");
-		sql = "DROP VIEW IF EXISTS " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datasetsperformance";
-		stmt.executeUpdate(sql);
-		logger.info("Dropped view datasetsperformance on permanent datacite usagestats DB");
-
-		logger.info("Create view datasetsperformance on permanent datacite usagestats DB");
-		sql = "CREATE VIEW IF NOT EXISTS " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datasetsperformance"
-			+ " AS SELECT * FROM " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datasetsperformance";
-		stmt.executeUpdate(sql);
-		logger.info("Created view datasetsperformance on permanent datasets usagestats DB");
-
-		logger.info("Dropping view datacite_views on permanent datacite usagestats DB");
-		sql = "DROP VIEW IF EXISTS " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacite_views";
-		stmt.executeUpdate(sql);
-		logger.info("Dropped view datacite_views on permanent datacite usagestats DB");
-
-		logger.info("Create view datacite_views on permanent datacite usagestats DB");
-		sql = "CREATE VIEW IF NOT EXISTS " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacite_views"
-			+ " AS SELECT * FROM " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datacite_views";
-		stmt.executeUpdate(sql);
-		logger.info("Created view datacite_views on permanent datasets usagestats DB");
-
-		logger.info("Dropping view datacite_downloads on permanent datacite usagestats DB");
-		sql = "DROP VIEW IF EXISTS " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacite_downloads";
-		stmt.executeUpdate(sql);
-		logger.info("Dropped view datacite_downloads on permanent datacite usagestats DB");
-
-		logger.info("Create view datacite_downloads on permanent datacite usagestats DB");
-		sql = "CREATE VIEW IF NOT EXISTS " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacite_downloads"
-			+ " AS SELECT * FROM " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datacite_downloads";
-		stmt.executeUpdate(sql);
-		logger.info("Created view datacite_downloads on permanent datasets usagestats DB");
-
-		stmt.close();
-		ConnectDB.getHiveConnection().close();
-		logger.info("Completed Building Permanent Datasets Usage Stats DB");
 	}
 
 }

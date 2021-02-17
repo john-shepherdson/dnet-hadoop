@@ -1,4 +1,4 @@
-<workflow-app name="Datacite Datasets Usage Stats" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Usage Datasets Stats" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>hiveMetastoreUris</name>
@@ -52,8 +52,6 @@
             <arg>${impalaJdbcUrl}</arg>
             <arg>--datasetUsageStatsDBSchema</arg>
             <arg>${datasetUsageStatsDBSchema}</arg>
-            <arg>--datasetsUsageStatsPermanentDBSchema</arg>
-            <arg>${datasetsUsageStatsPermanentDBSchema}</arg>           
             <arg>--statsDBSchema</arg>
             <arg>${statsDBSchema}</arg>
             <arg>--recreateDbAndTables</arg>
