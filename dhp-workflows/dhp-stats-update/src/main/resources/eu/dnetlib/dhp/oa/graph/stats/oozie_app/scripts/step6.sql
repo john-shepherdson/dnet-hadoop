@@ -70,7 +70,7 @@ create table ${stats_db_name}.funder as
 select distinct xpath_string(fund, '//funder/id')        as id,
                 xpath_string(fund, '//funder/name')      as name,
                 xpath_string(fund, '//funder/shortname') as shortname
-from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fundingtree as fund
+from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fundingtree as fund;
 
 ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS;
 ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS FOR COLUMNS;
