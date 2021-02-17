@@ -5,11 +5,8 @@ import static eu.dnetlib.dhp.common.Constants.SEQUENCE_FILE_NAME;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -20,15 +17,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
+import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
+import eu.dnetlib.dhp.aggregation.common.ReporterCallback;
+import eu.dnetlib.dhp.aggregation.common.ReportingJob;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
 
-public class CollectorWorker {
+public class CollectorWorker extends ReportingJob {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectorWorker.class);
-	public static final int ONGOING_REPORT_FREQUENCY_MS = 5000;
 
 	private final ApiDescriptor api;
 
@@ -38,19 +37,17 @@ public class CollectorWorker {
 
 	private final HttpClientParams clientParams;
 
-	private final CollectorPluginReport report;
-
 	public CollectorWorker(
 		final ApiDescriptor api,
 		final FileSystem fileSystem,
 		final MDStoreVersion mdStoreVersion,
 		final HttpClientParams clientParams,
-		final CollectorPluginReport report) {
+		final AggregatorReport report) {
+		super(report);
 		this.api = api;
 		this.fileSystem = fileSystem;
 		this.mdStoreVersion = mdStoreVersion;
 		this.clientParams = clientParams;
-		this.report = report;
 	}
 
 	public void collect() throws UnknownCollectorPluginException, CollectorException, IOException {
@@ -61,13 +58,7 @@ public class CollectorWorker {
 		final CollectorPlugin plugin = getCollectorPlugin();
 		final AtomicInteger counter = new AtomicInteger(0);
 
-		final Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				report.ongoing(counter.longValue(), null);
-			}
-		}, 5000, ONGOING_REPORT_FREQUENCY_MS);
+		scheduleReport(counter);
 
 		try (SequenceFile.Writer writer = SequenceFile
 			.createWriter(
@@ -94,30 +85,46 @@ public class CollectorWorker {
 			report.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e);
 		} finally {
-			timer.cancel();
+			shutdown();
 			report.ongoing(counter.longValue(), counter.longValue());
 		}
 	}
 
+	private void scheduleReport(AtomicInteger counter) {
+		schedule(new ReporterCallback() {
+			@Override
+			public Long getCurrent() {
+				return counter.longValue();
+			}
+
+			@Override
+			public Long getTotal() {
+				return null;
+			}
+		});
+	}
+
 	private CollectorPlugin getCollectorPlugin() throws UnknownCollectorPluginException {
-		switch (StringUtils.lowerCase(StringUtils.trim(api.getProtocol()))) {
-			case "oai":
+
+		switch (CollectorPlugin.NAME.valueOf(api.getProtocol())) {
+			case oai:
 				return new OaiCollectorPlugin(clientParams);
-			case "other":
-				final String plugin = Optional
+			case other:
+				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(api.getParams().get("other_plugin_type"))
-					.orElseThrow(() -> new UnknownCollectorPluginException("other_plugin_type"));
+					.map(CollectorPlugin.NAME.OTHER_NAME::valueOf)
+					.get();
 
 				switch (plugin) {
-					case "mdstore_mongodb_dump":
+					case mdstore_mongodb_dump:
 						return new MongoDbDumpCollectorPlugin(fileSystem);
-					case "mdstore_mongodb":
+					case mdstore_mongodb:
 						return new MongoDbCollectorPlugin();
 					default:
-						throw new UnknownCollectorPluginException("Unknown plugin type: " + plugin);
+						throw new UnknownCollectorPluginException("plugin is not managed: " + plugin);
 				}
 			default:
-				throw new UnknownCollectorPluginException("Unknown protocol: " + api.getProtocol());
+				throw new UnknownCollectorPluginException("protocol is not managed: " + api.getProtocol());
 		}
 	}
 

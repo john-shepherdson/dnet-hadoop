@@ -13,9 +13,9 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.CollectorPluginReport;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 
 public class MongoDbCollectorPlugin implements CollectorPlugin {
@@ -26,7 +26,7 @@ public class MongoDbCollectorPlugin implements CollectorPlugin {
 	public static final String MONGODB_DBNAME = "mongodb_dbname";
 
 	@Override
-	public Stream<String> collect(ApiDescriptor api, CollectorPluginReport report) throws CollectorException {
+	public Stream<String> collect(ApiDescriptor api, AggregatorReport report) throws CollectorException {
 
 		final String host = Optional
 			.ofNullable(api.getParams().get(MONGODB_HOST))

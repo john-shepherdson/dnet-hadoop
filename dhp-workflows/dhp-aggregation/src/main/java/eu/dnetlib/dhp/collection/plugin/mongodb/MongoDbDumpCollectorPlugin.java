@@ -12,9 +12,9 @@ import java.util.zip.GZIPInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
+import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.CollectorPluginReport;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -30,7 +30,7 @@ public class MongoDbDumpCollectorPlugin implements CollectorPlugin {
 	}
 
 	@Override
-	public Stream<String> collect(ApiDescriptor api, CollectorPluginReport report) throws CollectorException {
+	public Stream<String> collect(ApiDescriptor api, AggregatorReport report) throws CollectorException {
 
 		final Path path = Optional
 			.ofNullable(api.getParams().get("path"))

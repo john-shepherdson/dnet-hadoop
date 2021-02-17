@@ -13,9 +13,9 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
+import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.CollectorPluginReport;
 import eu.dnetlib.dhp.collection.HttpClientParams;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 
@@ -35,7 +35,7 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 	}
 
 	@Override
-	public Stream<String> collect(final ApiDescriptor api, final CollectorPluginReport report)
+	public Stream<String> collect(final ApiDescriptor api, final AggregatorReport report)
 		throws CollectorException {
 		final String baseUrl = api.getBaseUrl();
 		final String mdFormat = api.getParams().get(FORMAT_PARAM);

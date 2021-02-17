@@ -10,11 +10,11 @@ import java.util.Optional;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
+import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.message.MessageSender;
 
@@ -80,11 +80,10 @@ public class CollectorWorkerApplication {
 		String dnetMessageManagerURL, String workflowId)
 		throws IOException, CollectorException, UnknownCollectorPluginException {
 
+		final MDStoreVersion currentVersion = MAPPER.readValue(mdStoreVersion, MDStoreVersion.class);
 		final MessageSender ms = new MessageSender(dnetMessageManagerURL, workflowId);
 
-		final MDStoreVersion currentVersion = MAPPER.readValue(mdStoreVersion, MDStoreVersion.class);
-
-		try (CollectorPluginReport report = new CollectorPluginReport(ms)) {
+		try (AggregatorReport report = new AggregatorReport(ms)) {
 			new CollectorWorker(api, fileSystem, currentVersion, clientParams, report).collect();
 		}
 	}

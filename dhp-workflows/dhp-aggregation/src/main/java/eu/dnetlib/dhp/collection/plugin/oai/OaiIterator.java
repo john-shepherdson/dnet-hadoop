@@ -16,8 +16,8 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.CollectorPluginReport;
 import eu.dnetlib.dhp.collection.HttpConnector2;
 import eu.dnetlib.dhp.collection.XmlCleaner;
 
@@ -38,7 +38,7 @@ public class OaiIterator implements Iterator<String> {
 	private String token;
 	private boolean started;
 	private final HttpConnector2 httpConnector;
-	private CollectorPluginReport report;
+	private AggregatorReport report;
 
 	public OaiIterator(
 		final String baseUrl,
@@ -47,7 +47,7 @@ public class OaiIterator implements Iterator<String> {
 		final String fromDate,
 		final String untilDate,
 		final HttpConnector2 httpConnector,
-		final CollectorPluginReport report) {
+		final AggregatorReport report) {
 		this.baseUrl = baseUrl;
 		this.mdFormat = mdFormat;
 		this.set = set;
@@ -188,7 +188,7 @@ public class OaiIterator implements Iterator<String> {
 		return doc.valueOf("//*[local-name()='resumptionToken']");
 	}
 
-	public CollectorPluginReport getReport() {
+	public AggregatorReport getReport() {
 		return report;
 	}
 }

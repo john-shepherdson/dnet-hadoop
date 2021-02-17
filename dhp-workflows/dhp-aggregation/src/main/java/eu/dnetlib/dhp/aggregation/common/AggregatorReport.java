@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection;
+package eu.dnetlib.dhp.aggregation.common;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -11,21 +11,20 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.message.MessageSender;
 
-public class CollectorPluginReport extends LinkedHashMap<String, String> implements Closeable {
+public class AggregatorReport extends LinkedHashMap<String, String> implements Closeable {
 
-	private static final Logger log = LoggerFactory.getLogger(CollectorPluginReport.class);
+	private static final Logger log = LoggerFactory.getLogger(AggregatorReport.class);
 
 	private MessageSender messageSender;
 
-	public CollectorPluginReport() {
+	public AggregatorReport() {
 	}
 
-	public CollectorPluginReport(MessageSender messageSender) throws IOException {
+	public AggregatorReport(MessageSender messageSender) throws IOException {
 		this.messageSender = messageSender;
 	}
 

@@ -15,6 +15,8 @@ import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
+
 /**
  * Migrated from https://svn.driver.research-infrastructures.eu/driver/dnet45/modules/dnet-modular-collector-service/trunk/src/main/java/eu/dnetlib/data/collector/plugins/HttpConnector.java
  *
@@ -42,17 +44,17 @@ public class HttpConnector2 {
 	}
 
 	/**
-	 * @see HttpConnector2#getInputSource(java.lang.String, CollectorPluginReport)
+	 * @see HttpConnector2#getInputSource(java.lang.String, AggregatorReport)
 	 */
 	public InputStream getInputSourceAsStream(final String requestUrl) throws CollectorException {
 		return IOUtils.toInputStream(getInputSource(requestUrl));
 	}
 
 	/**
-	 * @see HttpConnector2#getInputSource(java.lang.String, CollectorPluginReport)
+	 * @see HttpConnector2#getInputSource(java.lang.String, AggregatorReport)
 	 */
 	public String getInputSource(final String requestUrl) throws CollectorException {
-		return attemptDownloadAsString(requestUrl, 1, new CollectorPluginReport());
+		return attemptDownloadAsString(requestUrl, 1, new AggregatorReport());
 	}
 
 	/**
@@ -63,13 +65,13 @@ public class HttpConnector2 {
 	 * @return the content of the downloaded resource
 	 * @throws CollectorException when retrying more than maxNumberOfRetry times
 	 */
-	public String getInputSource(final String requestUrl, CollectorPluginReport report)
+	public String getInputSource(final String requestUrl, AggregatorReport report)
 		throws CollectorException {
 		return attemptDownloadAsString(requestUrl, 1, report);
 	}
 
 	private String attemptDownloadAsString(final String requestUrl, final int retryNumber,
-		final CollectorPluginReport report) throws CollectorException {
+		final AggregatorReport report) throws CollectorException {
 
 		try (InputStream s = attemptDownload(requestUrl, retryNumber, report)) {
 			return IOUtils.toString(s);
@@ -80,7 +82,7 @@ public class HttpConnector2 {
 	}
 
 	private InputStream attemptDownload(final String requestUrl, final int retryNumber,
-		final CollectorPluginReport report) throws CollectorException, IOException {
+		final AggregatorReport report) throws CollectorException, IOException {
 
 		if (retryNumber > getClientParams().getMaxNumberOfRetry()) {
 			final String msg = String
