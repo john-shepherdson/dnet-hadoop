@@ -1,0 +1,58 @@
+<workflow-app name="Python sample" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>hiveMetastoreUris</name>
+            <description>Hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hiveJdbcUrl</name>
+            <description>Hive server jdbc url</description>
+        </property>
+        <property>
+            <name>impalaJdbcUrl</name>
+            <description>Impala server jdbc url</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>${hiveMetastoreUris}</value>
+            </property>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+        </configuration>
+    </global>
+
+   <start to="python-check"/>
+    <action name="python-check">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>testpython.py</exec>
+	    <file>python/testpython.py</file> 	
+            <capture-output/>
+        </shell>
+        <ok to="end"/>
+        <error to="fail"/>
+    </action>
+    <kill name="fail">
+    <message>Python action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

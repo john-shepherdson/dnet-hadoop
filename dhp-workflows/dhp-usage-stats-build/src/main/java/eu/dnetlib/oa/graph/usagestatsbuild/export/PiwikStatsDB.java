@@ -132,7 +132,7 @@ public class PiwikStatsDB {
 			+ "max(views) AS count, max(openaire_referrer) AS openaire "
 			+ "FROM " + ConnectDB.getUsageStatsDBSchema() + ".openaire_result_views_monthly_tmp p, "
 			+ ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro "
-			+ "WHERE p.source=d.piwik_id AND p.id=ro.oid AND ro.oid!='200' "
+			+ "WHERE p.source=d.piwik_id AND p.id=ro.oid AND ro.oid!='200' AND d.id!='re3data_____::7b0ad08687b2c960d5aeef06f811d5e6' "
 			+ "GROUP BY d.id, ro.id, month "
 			+ "ORDER BY d.id, ro.id, month ";
 		stmt.executeUpdate(create_views_stats);
@@ -145,7 +145,7 @@ public class PiwikStatsDB {
 			+ "FROM " + ConnectDB.getUsageStatsDBSchema() + ".openaire_result_views_monthly_tmp p, "
 			+ ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro "
 			+ "WHERE p.source=" + ExecuteWorkflow.portalMatomoID
-			+ " AND p.source=d.piwik_id and p.id=ro.id AND ro.oid!='200' "
+			+ " AND p.source=d.piwik_id and p.id=ro.id AND ro.oid!='200' AND d.id!='re3data_____::7b0ad08687b2c960d5aeef06f811d5e6' "
 			+ "GROUP BY d.id, ro.id, month "
 			+ "ORDER BY d.id, ro.id, month ";
 		stmt.executeUpdate(create_pageviews_stats);
@@ -194,7 +194,7 @@ public class PiwikStatsDB {
 			+ "max(downloads) AS count, max(openaire_referrer) AS openaire "
 			+ "FROM " + ConnectDB.getUsageStatsDBSchema() + ".openaire_result_downloads_monthly_tmp p, "
 			+ ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro "
-			+ "WHERE p.source=d.piwik_id and p.id=ro.oid AND ro.oid!='200' "
+			+ "WHERE p.source=d.piwik_id and p.id=ro.oid AND ro.oid!='200' AND d.id!='re3data_____::7b0ad08687b2c960d5aeef06f811d5e6' "
 			+ "GROUP BY d.id, ro.id, month "
 			+ "ORDER BY d.id, ro.id, month ";
 		stmt.executeUpdate(sql);
