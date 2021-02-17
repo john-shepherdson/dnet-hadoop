@@ -105,7 +105,7 @@ public class ReadReportsListFromDatacite {
 					ResultSet rstmpReportAll = stmt.getResultSet();
 					if (rstmpReportAll.next()) {
 						String listDatasets = rstmpReportAll.getString(1);
-						logger.info("No compressed performance found");
+						logger.info("Adding uncompressed performance for " + reportID);
 						this.readDatasetsReport(listDatasets, reportID);
 					}
 
@@ -125,6 +125,9 @@ public class ReadReportsListFromDatacite {
 	}
 
 	public void readDatasetsReport(String prettyDatasetsReports, String reportId) throws Exception {
+		logger.info("Reading Datasets performance for report " + reportId);
+		logger.info("Write Performance Report To File");
+
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = objectMapper.readValue(prettyDatasetsReports, JsonNode.class);
 		String datasetsReports = jsonNode.toString();
@@ -151,8 +154,7 @@ public class ReadReportsListFromDatacite {
 		fin.writeChar('\n');
 		fin.close();
 
-		logger.info("Write Compress Report To File");
-		logger.info("Reading Compress Report From File...");
+		logger.info("Reading Performance Report From File...");
 
 		String sqlCreateTempTableForDatasets = "CREATE TEMPORARY TABLE " + ConnectDB.getDataSetUsageStatsDBSchema()
 			+ ".tmpjsoncompressesed (report_datasets array<struct<dataset_id:array<struct<value:string>>,dataset_title:string, data_type:string, "
@@ -196,7 +198,7 @@ public class ReadReportsListFromDatacite {
 
 		stmt.executeUpdate(sqlInsertToDatasetsPerformance);
 
-		logger.info("Datasets Performance Inserted ");
+		logger.info("Datasets Performance Inserted for Report " + reportId);
 
 		stmt.execute("Drop table " + ConnectDB.getDataSetUsageStatsDBSchema() + ".tmpjsoncompressesed");
 

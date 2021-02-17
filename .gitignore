@@ -24,4 +24,3 @@
 spark-warehouse
 /**/job-override.properties
 /**/*.log
-
