@@ -50,7 +50,7 @@ FROM (
 
 ANALYZE TABLE ${stats_db_name}.publication_licenses COMPUTE STATISTICS;
 ANALYZE TABLE ${stats_db_name}.publication_licenses COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.datast_licenses COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_licenses COMPUTE STATISTICS;
 ANALYZE TABLE ${stats_db_name}.dataset_licenses COMPUTE STATISTICS FOR COLUMNS;
 ANALYZE TABLE ${stats_db_name}.software_licenses COMPUTE STATISTICS;
 ANALYZE TABLE ${stats_db_name}.software_licenses COMPUTE STATISTICS FOR COLUMNS;

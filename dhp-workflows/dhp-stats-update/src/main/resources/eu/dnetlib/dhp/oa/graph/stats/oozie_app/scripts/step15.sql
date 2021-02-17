@@ -37,7 +37,7 @@ select * from ${stats_db_name}.otherresearchproduct_refereed;
 
 ANALYZE TABLE ${stats_db_name}.publication_refereed COMPUTE STATISTICS;
 ANALYZE TABLE ${stats_db_name}.publication_refereed COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.datast_refereed COMPUTE STATISTICS;
+ANALYZE TABLE ${stats_db_name}.dataset_refereed COMPUTE STATISTICS;
 ANALYZE TABLE ${stats_db_name}.dataset_refereed COMPUTE STATISTICS FOR COLUMNS;
 ANALYZE TABLE ${stats_db_name}.software_refereed COMPUTE STATISTICS;
 ANALYZE TABLE ${stats_db_name}.software_refereed COMPUTE STATISTICS FOR COLUMNS;
