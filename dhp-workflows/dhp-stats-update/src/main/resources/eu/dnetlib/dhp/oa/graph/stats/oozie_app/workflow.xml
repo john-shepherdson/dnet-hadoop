@@ -58,7 +58,7 @@
         </configuration>
     </global>
 
-    <start to="Step1"/>
+    <start to="step21-createMonitorDB"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -322,6 +322,7 @@
             <exec>monitor.sh</exec>
             <argument>${stats-db-name}</argument>
             <argument>${monitor-db-name}</argument>
+            <argument>${monitor_db_shadow_name}</argument>
             <argument>${wf:appPath()}/scripts/step21-createMonitorDB.sql</argument>
             <file>monitor.sh</file>
         </shell>
