@@ -19,6 +19,7 @@ cat step21-createMonitorDB.sql | sed s/SOURCE/$1/g | sed s/TARGET/$2/g1 | impala
 echo "Impala shell finished"
 
 echo "Updating shadow monitor database"
-impala-shell -d $SHADOW -q "show tables" --delimited | sed 's/^/drop view if exists $SHADOW./' | sed 's/$/;/' | impala-shell -f -
-impala-shell -d $TARGET -q "show tables" --delimited | sed 's/\(.*\)/create view $SHADOW.\1 as select * from $TARGET.\1;/' | impala-shell -f -
+impala-shell -q "create database if not exists ${SHADOW}"
+impala-shell -d $SHADOW -q "show tables" --delimited | sed "s/^/drop view if exists ${SHADOW}./" | sed "s/$/;/" | impala-shell -f -
+impala-shell -d $TARGET -q "show tables" --delimited | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${TARGET}.\1;/" | impala-shell -f -
 echo "Shadow db ready!"
