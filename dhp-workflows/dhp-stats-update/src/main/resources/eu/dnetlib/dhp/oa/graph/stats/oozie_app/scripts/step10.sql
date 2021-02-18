@@ -43,6 +43,6 @@ FROM ${external_stats_db_name}.concept;
 ------------------------------------------------------------------------------------------------
 create table ${stats_db_name}.creation_date as
 select date_format(current_date(), 'dd-MM-yyyy') as date;
-
-ANALYZE TABLE ${stats_db_name}.creation_date COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.creation_date COMPUTE STATISTICS FOR COLUMNS;
+--
+-- ANALYZE TABLE ${stats_db_name}.creation_date COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.creation_date COMPUTE STATISTICS FOR COLUMNS;

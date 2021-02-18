@@ -114,5 +114,5 @@ WHERE result_projects.id = result.id
   AND result.type = 'publication'
   AND project.id = result_projects.project;
 
-ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS FOR COLUMNS;

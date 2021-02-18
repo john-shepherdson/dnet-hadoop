@@ -72,13 +72,13 @@ select distinct xpath_string(fund, '//funder/id')        as id,
                 xpath_string(fund, '//funder/shortname') as shortname
 from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fundingtree as fund;
 
-ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.project_organizations COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.project_organizations COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.project_results COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.project_results COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.project_tmp COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.project_tmp COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.funder COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.funder COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.project_organizations COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.project_organizations COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.project_results COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.project_results COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.project_tmp COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.project_tmp COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.funder COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.funder COMPUTE STATISTICS FOR COLUMNS;

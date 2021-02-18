@@ -260,31 +260,6 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
-        <ok to="Step17"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="Step17">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hive_jdbc_url}</jdbc-url>
-            <script>scripts/step17.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>stats_db_shadow_name=${stats_db_shadow_name}</param>
-        </hive2>
-        <ok to="Step18"/>
-        <error to="Kill"/>
-    </action>
-    
-    <action name="Step18">
-        <shell xmlns="uri:oozie:shell-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <exec>impala-shell.sh</exec>
-            <argument>${stats_db_name}</argument>
-            <argument>step18.sql</argument>
-            <argument>${wf:appPath()}/scripts/step18.sql</argument>
-            <file>impala-shell.sh</file>
-        </shell>
         <ok to="Step19"/>
         <error to="Kill"/>
     </action>
@@ -293,11 +268,10 @@
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <exec>impala-shell.sh</exec>
+            <exec>finalizedb.sh</exec>
+            <argument>stats_db_name</argument>
             <argument>${stats_db_shadow_name}</argument>
-            <argument>step19.sql</argument>
-            <argument>${wf:appPath()}/scripts/step19.sql</argument>
-            <file>impala-shell.sh</file>
+            <file>finalizedb.sh</file>
         </shell>
         <ok to="step20-createMonitorDB"/>
         <error to="Kill"/>

@@ -65,15 +65,15 @@ WHERE r.id = rd.id
   AND r.bestlicence = 'Open Access'
 GROUP BY org.country;
 
-ANALYZE TABLE ${stats_db_name}.datasource COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.datasource COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.publication COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.publication COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.software COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.software COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.numbers_country COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.numbers_country COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.datasource COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.datasource COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.publication COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.publication COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.software COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.software COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.numbers_country COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.numbers_country COMPUTE STATISTICS FOR COLUMNS;

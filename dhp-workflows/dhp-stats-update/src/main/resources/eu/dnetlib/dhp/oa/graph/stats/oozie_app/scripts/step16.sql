@@ -79,13 +79,13 @@ join ${stats_db_name}.datasource_organizations dor on dor.id=d.id
 join ${stats_db_name}.organization o on o.id=dor.organization
 where o.country is not null and o.country!='';
 
-ANALYZE TABLE ${stats_db_name}.result_peerreviewed COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.result_peerreviewed COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.result_greenoa COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.result_greenoa COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.result_gold COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.result_gold COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.result_affiliated_country COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.result_affiliated_country COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.result_deposited_country COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.result_deposited_country COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.result_peerreviewed COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.result_peerreviewed COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.result_greenoa COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.result_greenoa COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.result_gold COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.result_gold COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.result_affiliated_country COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.result_affiliated_country COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.result_deposited_country COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.result_deposited_country COMPUTE STATISTICS FOR COLUMNS;

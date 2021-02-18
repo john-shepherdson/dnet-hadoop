@@ -135,7 +135,7 @@ FROM ${stats_db_name}.result r
          JOIN ${stats_db_name}.project_results pr ON r.id = pr.result
          JOIN ${stats_db_name}.project_tmp p ON p.id = pr.id;
 
-ANALYZE TABLE ${stats_db_name}.result_organization COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.result_organization COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.result_organization COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.result_organization COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS FOR COLUMNS;

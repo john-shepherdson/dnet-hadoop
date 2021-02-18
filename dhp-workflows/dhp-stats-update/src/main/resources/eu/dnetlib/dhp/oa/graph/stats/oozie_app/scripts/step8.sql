@@ -99,11 +99,11 @@ CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
 SELECT datasource AS id, id AS result
 FROM ${stats_db_name}.result_datasources;
 
-ANALYZE TABLE ${stats_db_name}.datasource_tmp COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.datasource_tmp COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.datasource_languages COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.datasource_languages COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.datasource_oids COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.datasource_oids COMPUTE STATISTICS FOR COLUMNS;
-ANALYZE TABLE ${stats_db_name}.datasource_organizations COMPUTE STATISTICS;
-ANALYZE TABLE ${stats_db_name}.datasource_organizations COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.datasource_tmp COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.datasource_tmp COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.datasource_languages COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.datasource_languages COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.datasource_oids COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.datasource_oids COMPUTE STATISTICS FOR COLUMNS;
+-- ANALYZE TABLE ${stats_db_name}.datasource_organizations COMPUTE STATISTICS;
+-- ANALYZE TABLE ${stats_db_name}.datasource_organizations COMPUTE STATISTICS FOR COLUMNS;
