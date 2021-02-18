@@ -1,4 +1,3 @@
-
 package eu.dnetlib.dhp.common.vocabulary;
 
 import java.io.Serializable;
@@ -134,6 +133,11 @@ public class VocabularyGroup implements Serializable {
 		return vocs.get(vocId).getSynonymAsQualifier(syn);
 	}
 
+	/**
+	 * termExists
+	 * 
+	 * two methods: without and with caseSensitive check
+	 */
 	public boolean termExists(final String vocId, final String id) {
 		return termExists(vocId, id, Boolean.FALSE);
 	}
