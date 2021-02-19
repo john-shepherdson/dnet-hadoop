@@ -269,7 +269,7 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <exec>finalizedb.sh</exec>
-            <argument>stats_db_name</argument>
+            <argument>${stats_db_name}</argument>
             <argument>${stats_db_shadow_name}</argument>
             <file>finalizedb.sh</file>
         </shell>
