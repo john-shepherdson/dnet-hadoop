@@ -89,7 +89,7 @@ public class TransformationFunctionProxy implements ExtensionFunction, Serializa
 
 		values.add(aInput);
 		try {
-			String conversion
+			String conversion;
 // 			log.debug("conversion input: " + aInput);
 //			producer.send(new ProducerRecord<String, String>("transformation-vocab", "conversion innput", aInput));
 
