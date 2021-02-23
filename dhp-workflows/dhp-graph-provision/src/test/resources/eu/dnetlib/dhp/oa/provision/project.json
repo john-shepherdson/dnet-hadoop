@@ -1,0 +1,109 @@
+{
+  "id": "40|corda__h2020::79a0e16c122c9a18eb60e4a5e64b620d",
+  "originalId": [],
+  "pid": [],
+  "dateofcollection": "2020-01-01",
+  "dateoftransformation": "2020-01-01",
+  "extraInfo": [],
+  "oaiprovenance": null,
+  "websiteurl": {
+    "value": "https://web.site",
+    "datainfo": null
+  },
+  "code": {
+    "value": "79a0e",
+    "datainfo": null
+  },
+  "acronym": {
+    "value": "79a0e_acronym",
+    "datainfo": null
+  },
+  "title": {
+    "value": "79a0e_title",
+    "datainfo": null
+  },
+  "startdate": {
+    "value": "2019-02-01",
+    "datainfo": null
+  },
+  "enddate": {
+    "value": "2021-01-09",
+    "datainfo": null
+  },
+  "callidentifier": {
+    "value": "79a0e_callID",
+    "datainfo": null
+  },
+  "keywords": {
+    "value": "",
+    "datainfo": null
+  },
+  "duration": {
+    "value": "",
+    "datainfo": null
+  },
+  "ecsc39": {
+    "value": "true",
+    "datainfo": null
+  },
+  "oamandatepublications": {
+    "value": "true",
+    "datainfo": null
+  },
+  "ecarticle29_3": {
+    "value": "false",
+    "datainfo": null
+  },
+  "optional1": {
+    "value": "",
+    "datainfo": null
+  },
+  "optional2": {
+    "value": "",
+    "datainfo": null
+  },
+  "jsonextrainfo":{
+    "value": "",
+    "datainfo": null
+  },
+  "contactfullname":{
+    "value": "",
+    "datainfo": null
+  },
+  "contactfax": {
+    "value": "",
+    "datainfo": null
+  },
+  "contactphone": {
+    "value": "",
+    "datainfo": null
+  },
+  "contactemail": {
+    "value": "",
+    "datainfo": null
+  },
+  "summary": {
+    "value": "79a0e_description",
+    "datainfo": null
+  },
+  "currency": {
+    "value": "EUR",
+    "datainfo": null
+  },
+  "totalcost": 120000,
+  "fundedamount": 18000,
+  "h2020topiccode": "",
+  "h2020topicdescription": "",
+  "h2020classification": [],
+  "subjects": [
+    {
+      "value": "",
+      "qualifier": null,
+      "datainfo": null
+    }
+  ],
+  "fundingtree": []
+
+}
+
+
