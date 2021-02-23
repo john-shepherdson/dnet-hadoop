@@ -18,6 +18,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,8 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorSummary;
+import eu.dnetlib.dhp.schema.orcid.Work;
 import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcid.json.JsonHelper;
 import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
@@ -61,8 +64,6 @@ public class SparkGenEnrichedOrcidWorks {
 			.orElse(Boolean.TRUE);
 		final String workingPath = parser.get("workingPath");
 		final String outputEnrichedWorksPath = parser.get("outputEnrichedWorksPath");
-		final String outputWorksPath = parser.get("outputWorksPath");
-		final String hdfsServerUri = parser.get("hdfsServerUri");
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -71,26 +72,39 @@ public class SparkGenEnrichedOrcidWorks {
 			spark -> {
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-				JavaPairRDD<Text, Text> summariesRDD = sc
-					.sequenceFile(workingPath + "authors/authors.seq", Text.class, Text.class);
-				Dataset<AuthorData> summariesDataset = spark
+				Dataset<AuthorData> authorDataset = spark
 					.createDataset(
-						summariesRDD.map(seq -> loadAuthorFromJson(seq._1(), seq._2())).rdd(),
+						sc
+							.textFile(workingPath.concat("last_orcid_dataset/authors/*"))
+							.map(item -> OBJECT_MAPPER.readValue(item, AuthorSummary.class))
+							.filter(authorSummary -> authorSummary.getAuthorData() != null)
+							.map(authorSummary -> authorSummary.getAuthorData())
+							.rdd(),
 						Encoders.bean(AuthorData.class));
-				logger.info("Authors data loaded: " + summariesDataset.count());
+				logger.info("Authors data loaded: " + authorDataset.count());
 
-				JavaPairRDD<Text, Text> activitiesRDD = sc
-					.sequenceFile(workingPath + outputWorksPath + "*.seq", Text.class, Text.class);
-				Dataset<WorkDetail> activitiesDataset = spark
+				Dataset<WorkDetail> workDataset = spark
 					.createDataset(
-						activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(),
+						sc
+							.textFile(workingPath.concat("last_orcid_dataset/works/*"))
+							.map(item -> OBJECT_MAPPER.readValue(item, Work.class))
+							.filter(work -> work.getWorkDetail() != null)
+							.map(work -> work.getWorkDetail())
+							.filter(work -> work.getErrorCode() == null)
+							.filter(
+								work -> work
+									.getExtIds()
+									.stream()
+									.filter(e -> e.getType() != null)
+									.noneMatch(e -> e.getType().equalsIgnoreCase("doi")))
+							.rdd(),
 						Encoders.bean(WorkDetail.class));
-				logger.info("Works data loaded: " + activitiesDataset.count());
+				logger.info("Works data loaded: " + workDataset.count());
 
-				JavaRDD<Tuple2<String, String>> enrichedWorksRDD = activitiesDataset
+				JavaRDD<Tuple2<String, String>> enrichedWorksRDD = workDataset
 					.joinWith(
-						summariesDataset,
-						activitiesDataset.col("oid").equalTo(summariesDataset.col("oid")), "inner")
+						authorDataset,
+						workDataset.col("oid").equalTo(authorDataset.col("oid")), "inner")
 					.map(
 						(MapFunction<Tuple2<WorkDetail, AuthorData>, Tuple2<String, String>>) value -> {
 							WorkDetail w = value._1;
@@ -149,32 +163,5 @@ public class SparkGenEnrichedOrcidWorks {
 				logger.info("errorsNotFoundAuthors: " + errorsNotFoundAuthors.value().toString());
 				logger.info("errorsInvalidType: " + errorsInvalidType.value().toString());
 			});
-	}
-
-	private static AuthorData loadAuthorFromJson(Text orcidId, Text json) {
-		AuthorData authorData = new AuthorData();
-		authorData.setOid(orcidId.toString());
-		JsonElement jElement = new JsonParser().parse(json.toString());
-		authorData.setName(getJsonValue(jElement, "name"));
-		authorData.setSurname(getJsonValue(jElement, "surname"));
-		authorData.setCreditName(getJsonValue(jElement, "creditname"));
-		return authorData;
-	}
-
-	private static WorkDetail loadWorkFromJson(Text orcidId, Text json) {
-
-		WorkDetail workData = new Gson().fromJson(json.toString(), WorkDetail.class);
-		return workData;
-	}
-
-	private static String getJsonValue(JsonElement jElement, String property) {
-		if (jElement.getAsJsonObject().has(property)) {
-			JsonElement name = null;
-			name = jElement.getAsJsonObject().get(property);
-			if (name != null && !name.isJsonNull()) {
-				return name.getAsString();
-			}
-		}
-		return new String("");
 	}
 }
