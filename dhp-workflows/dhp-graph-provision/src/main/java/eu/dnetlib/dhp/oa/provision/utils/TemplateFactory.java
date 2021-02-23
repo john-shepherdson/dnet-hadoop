@@ -73,7 +73,9 @@ public class TemplateFactory {
 		final Collection<String> fields,
 		final String semanticclass,
 		final String semantischeme,
-		final DataInfo info) {
+		final DataInfo info,
+		final boolean validated,
+		final String validationDate) {
 		return getTemplate(resources.getRel())
 			.add("type", type)
 			.add("objIdentifier", escapeXml(removePrefix(objIdentifier)))
@@ -86,6 +88,8 @@ public class TemplateFactory {
 			.add(
 				"provenanceaction",
 				info.getProvenanceaction() != null ? info.getProvenanceaction().getClassid() : "")
+			.add("validated", validated)
+			.add("validationdate", validationDate)
 			.render();
 	}
 
