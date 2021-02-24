@@ -116,7 +116,7 @@ public class SparkDumpFunderResults implements Serializable {
 			}
 			for (Project p : r.getProjects()) {
 				if (p.getId().startsWith(nsp)) {
-					if (nsp.equals("40|irb")) {
+					if (nsp.startsWith("40|irb")) {
 						if (p.getFunder().getShortName().equals(funderName))
 							return r;
 						else
@@ -137,11 +137,11 @@ public class SparkDumpFunderResults implements Serializable {
 	private static void writeFunderResult(String funder, Dataset<CommunityResult> results, String outputPath,
 		String funderDump) {
 
-		if (funder.equals("40|irb")) {
+		if (funder.startsWith("40|irb")) {
 			dumpResults(funder, results, outputPath, "CSF", "HRZZ");
 			dumpResults(funder, results, outputPath, "MSES", "MZOS");
 		} else
-			dumpResults(funder, results, outputPath, funderDump, null);
+			dumpResults(funder, results, outputPath, funderDump, funderDump);
 
 	}
 
