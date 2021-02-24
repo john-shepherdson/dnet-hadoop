@@ -1,23 +1,19 @@
 
 package eu.dnetlib.dhp.transformation.xslt;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
 
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import net.sf.saxon.s9api.QName;
 
 public class TransformationFunctionProxyTest {
-	@Mock
 	private VocabularyGroup vocabularies;
 
 	private TransformationFunctionProxy transformationFunctionProxy;
 
-	@Before
 	public void setup() {
 		this.transformationFunctionProxy = new TransformationFunctionProxy(vocabularies);
 	}
