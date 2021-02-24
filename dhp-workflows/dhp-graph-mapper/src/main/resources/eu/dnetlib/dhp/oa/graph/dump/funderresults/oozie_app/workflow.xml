@@ -3,7 +3,7 @@
     <parameters>
         <property>
             <name>upload</name>
-            <value>false</value>
+            <value>true</value>
             <description>true to upload the dump for the funders in Zenodo</description>
         </property>
         <property>
