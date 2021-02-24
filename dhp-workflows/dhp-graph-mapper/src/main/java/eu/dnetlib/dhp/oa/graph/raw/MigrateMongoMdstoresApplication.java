@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
-import eu.dnetlib.dhp.oa.graph.raw.common.MdstoreClient;
+import eu.dnetlib.dhp.common.MdstoreClient;
 
 public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication
 	implements Closeable {

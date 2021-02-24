@@ -21,7 +21,7 @@ import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.aggregation.common.ReporterCallback;
 import eu.dnetlib.dhp.aggregation.common.ReportingJob;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.mongodb.MDStoreCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
 
@@ -119,7 +119,7 @@ public class CollectorWorker extends ReportingJob {
 					case mdstore_mongodb_dump:
 						return new MongoDbDumpCollectorPlugin(fileSystem);
 					case mdstore_mongodb:
-						return new MongoDbCollectorPlugin();
+						return new MDStoreCollectorPlugin();
 					default:
 						throw new UnknownCollectorPluginException("plugin is not managed: " + plugin);
 				}

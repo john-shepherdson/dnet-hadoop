@@ -1,13 +1,16 @@
 
-package eu.dnetlib.dhp.oa.graph.raw.common;
+package eu.dnetlib.dhp.common;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.QueryBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +35,16 @@ public class MdstoreClient implements Closeable {
 	public MdstoreClient(final String baseUrl, final String dbName) {
 		this.client = new MongoClient(new MongoClientURI(baseUrl));
 		this.db = getDb(client, dbName);
+	}
+
+	public MongoCollection<Document> mdStore(final String mdId) {
+		BasicDBObject query = (BasicDBObject) QueryBuilder.start("mdId").is(mdId).get();
+
+		final String currentId = Optional.ofNullable(getColl(db, COLL_METADATA_MANAGER, true).find(query))
+				.map(r -> r.first())
+				.map(d -> d.getString("currentId"))
+				.orElseThrow(() -> new IllegalArgumentException("cannot find current mdstore id for: " + mdId));
+		return getColl(db, currentId, true);
 	}
 
 	public Map<String, String> validCollections(

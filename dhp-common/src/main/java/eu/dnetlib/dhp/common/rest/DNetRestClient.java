@@ -11,8 +11,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class DNetRestClient {
+
+	private static final Logger log = LoggerFactory.getLogger(DNetRestClient.class);
 
 	private static ObjectMapper mapper = new ObjectMapper();
 
@@ -44,6 +51,14 @@ public class DNetRestClient {
 
 	private static String doHTTPRequest(final HttpUriRequest r) throws Exception {
 		CloseableHttpClient client = HttpClients.createDefault();
+
+		log.info("performing HTTP request, method {} on URI {}", r.getMethod(), r.getURI().toString());
+		log.info("request headers: {}",
+				Arrays.asList(r.getAllHeaders())
+						.stream()
+						.map(h -> h.getName() + ":" + h.getValue())
+						.collect(Collectors.joining(",")));
+
 		CloseableHttpResponse response = client.execute(r);
 		return IOUtils.toString(response.getEntity().getContent());
 	}
