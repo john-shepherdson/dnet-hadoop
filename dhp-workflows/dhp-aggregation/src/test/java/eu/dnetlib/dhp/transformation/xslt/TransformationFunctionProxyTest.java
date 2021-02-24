@@ -2,12 +2,11 @@
 package eu.dnetlib.dhp.transformation.xslt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.SequenceType;
 
 public class TransformationFunctionProxyTest {
 	private VocabularyGroup vocabularies;
@@ -21,9 +20,10 @@ public class TransformationFunctionProxyTest {
 	@Test
 	public void shouldGetName() {
 		QName actualValue = transformationFunctionProxy.getName();
+		String nameSpaceUri = actualValue.getNamespaceURI();
 		String prefixName = actualValue.getPrefix();
 
-		assertEquals("http://eu/dnetlib/transform/functionProxy", actualValue.uri);
+		assertEquals("http://eu/dnetlib/transform/functionProxy", nameSpaceUri);
 		assertEquals("TransformationFunction", prefixName);
 	}
 
@@ -41,24 +41,4 @@ public class TransformationFunctionProxyTest {
 		// TODO: assert scenario
 	}
 
-	@Test
-	public void shouldCall() {
-		// TODO: initialize args
-		XdmValue[] xdmValues;
-
-		XdmValue actualValue = transformationFunctionProxy.call(xdmValues);
-
-		// TODO: assert scenario
-	}
-
-	@Test
-	public void shouldConvertString() {
-		// TODO: initialize args
-		String aInput;
-		String aVocabularyName;
-
-		String actualValue = transformationFunctionProxy.convertString(aInput, aVocabularyName);
-
-		// TODO: assert scenario
-	}
 }
