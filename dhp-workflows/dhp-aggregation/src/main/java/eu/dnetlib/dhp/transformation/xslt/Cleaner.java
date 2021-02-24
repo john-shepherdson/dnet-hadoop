@@ -4,7 +4,10 @@ package eu.dnetlib.dhp.transformation.xslt;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import net.sf.saxon.s9api.*;
-import scala.Serializable;
+
+import java.io.Serializable;
+
+import static eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction.QNAME_BASE_URI;
 
 public class Cleaner implements ExtensionFunction, Serializable {
 
@@ -16,7 +19,7 @@ public class Cleaner implements ExtensionFunction, Serializable {
 
 	@Override
 	public QName getName() {
-		return new QName("http://eu/dnetlib/transform/extension", "clean");
+		return new QName(QNAME_BASE_URI + "/clean", "clean");
 	}
 
 	@Override

@@ -3,8 +3,8 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oai="http://www.openarchives.org/OAI/2.0/"
         xmlns:oaf="http://namespace.openaire.eu/oaf"
-        xmlns:vocabulary="http://eu/dnetlib/trasform/extension"
-        xmlns:dateCleaner="http://eu/dnetlib/trasform/dates"
+        xmlns:vocabulary="http://eu/dnetlib/transform/clean"
+        xmlns:dateCleaner="http://eu/dnetlib/transform/dateISO"
         xmlns:dr="http://www.driver-repository.eu/namespace/dr"
         exclude-result-prefixes="xsl vocabulary dateCleaner">
     <xsl:param name="varOfficialName"/>

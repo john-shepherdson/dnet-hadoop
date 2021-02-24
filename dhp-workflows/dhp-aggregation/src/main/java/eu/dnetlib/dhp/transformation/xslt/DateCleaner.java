@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.transformation.xslt;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -8,7 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.saxon.s9api.*;
-import scala.Serializable;
+
+import static eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction.QNAME_BASE_URI;
 
 public class DateCleaner implements ExtensionFunction, Serializable {
 
@@ -91,7 +93,7 @@ public class DateCleaner implements ExtensionFunction, Serializable {
 
 	@Override
 	public QName getName() {
-		return new QName("http://eu/dnetlib/trasform/dates", "dateISO");
+		return new QName(QNAME_BASE_URI + "/dateISO", "dateISO");
 	}
 
 	@Override

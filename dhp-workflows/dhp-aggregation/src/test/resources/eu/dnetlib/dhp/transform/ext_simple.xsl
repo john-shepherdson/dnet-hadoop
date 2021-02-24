@@ -1,7 +1,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:oai="http://www.openarchives.org/OAI/2.0/"
                 xmlns:oaf="http://namespace.openaire.eu/oaf"
-                xmlns:vocabulary="http://eu/dnetlib/transform/extension"
+                xmlns:vocabulary="http://eu/dnetlib/transform/clean"
                 xmlns:dr="http://www.driver-repository.eu/namespace/dr"
                 version="2.0"
                 exclude-result-prefixes="xsl vocabulary">

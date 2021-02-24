@@ -15,6 +15,8 @@ import net.sf.saxon.s9api.*;
 
 public class XSLTTransformationFunction implements MapFunction<MetadataRecord, MetadataRecord> {
 
+	public final static String QNAME_BASE_URI = "http://eu/dnetlib/transform";
+
 	private final AggregationCounter aggregationCounter;
 
 	private final String transformationRule;

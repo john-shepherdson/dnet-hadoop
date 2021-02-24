@@ -5,7 +5,6 @@ import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,24 +34,9 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 @ExtendWith(MockitoExtension.class)
 public class TransformationJobTest extends AbstractVocabularyTest {
 
-	private static SparkSession spark;
-
-	@BeforeAll
-	public static void beforeAll() throws IOException, ISLookUpException {
-		SparkConf conf = new SparkConf();
-		conf.setAppName(TransformationJobTest.class.getSimpleName());
-		conf.setMaster("local");
-		spark = SparkSession.builder().config(conf).getOrCreate();
-	}
-
 	@BeforeEach
 	public void setUp() throws IOException, ISLookUpException {
 		setUpVocabulary();
-	}
-
-	@AfterAll
-	public static void afterAll() {
-		spark.stop();
 	}
 
 	@Test
@@ -82,68 +66,61 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		// Print the record
 		System.out.println(result.getBody());
 		// TODO Create significant Assert
-
 	}
 
-	@DisplayName("Test TransformSparkJobNode.main")
 	@Test
+	@DisplayName("Test TransformSparkJobNode.main")
 	public void transformTest(@TempDir Path testDir) throws Exception {
 
-		final String mdstore_input = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
-		final String mdstore_output = testDir.toString() + "/version";
+		SparkConf conf = new SparkConf();
+		conf.setAppName(TransformationJobTest.class.getSimpleName());
+		conf.setMaster("local");
 
-		mockupTrasformationRule("simpleTRule", "/eu/dnetlib/dhp/transform/ext_simple.xsl");
+		try(SparkSession spark = SparkSession.builder().config(conf).getOrCreate()) {
 
-		final Map<String, String> parameters = Stream.of(new String[][] {
-			{
-				"dateOfTransformation", "1234"
-			},
-			{
-				"transformationPlugin", "XSLT_TRANSFORM"
-			},
-			{
-				"transformationRuleId", "simpleTRule"
-			},
+			final String mdstore_input = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
+			final String mdstore_output = testDir.toString() + "/version";
 
-		}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+			mockupTrasformationRule("simpleTRule", "/eu/dnetlib/dhp/transform/ext_simple.xsl");
 
-		TransformSparkJobNode.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output);
+			final Map<String, String> parameters = Stream.of(new String[][]{
+					{
+							"dateOfTransformation", "1234"
+					},
+					{
+							"transformationPlugin", "XSLT_TRANSFORM"
+					},
+					{
+							"transformationRuleId", "simpleTRule"
+					},
 
-		// TODO introduce useful assertions
+			}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
-		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
-		final Dataset<MetadataRecord> mOutput = spark
-			.read()
-			.format("parquet")
-			.load(mdstore_output + MDSTORE_DATA_PATH)
-			.as(encoder);
+			TransformSparkJobNode.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output);
 
-		final Long total = mOutput.count();
+			// TODO introduce useful assertions
 
-		final long recordTs = mOutput
-			.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
-			.count();
+			final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
+			final Dataset<MetadataRecord> mOutput = spark
+					.read()
+					.format("parquet")
+					.load(mdstore_output + MDSTORE_DATA_PATH)
+					.as(encoder);
 
-		final long recordNotEmpty = mOutput
-			.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
-			.count();
+			final Long total = mOutput.count();
 
-		assertEquals(total, recordTs);
+			final long recordTs = mOutput
+					.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
+					.count();
 
-		assertEquals(total, recordNotEmpty);
+			final long recordNotEmpty = mOutput
+					.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
+					.count();
 
-	}
+			assertEquals(total, recordTs);
 
-	@Test
-	public void tryLoadFolderOnCP() throws Exception {
-		final String path = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
-		System.out.println("path = " + path);
-
-		Path tempDirWithPrefix = Files.createTempDirectory("mdstore_output");
-
-		System.out.println(tempDirWithPrefix.toFile().getAbsolutePath());
-
-		Files.deleteIfExists(tempDirWithPrefix);
+			assertEquals(total, recordNotEmpty);
+		}
 	}
 
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
