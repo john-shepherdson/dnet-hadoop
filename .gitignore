@@ -7,6 +7,8 @@
 *.iws
 *~
 .vscode
+.metals
+.bloop
 .classpath
 /*/.classpath
 /*/*/.classpath
