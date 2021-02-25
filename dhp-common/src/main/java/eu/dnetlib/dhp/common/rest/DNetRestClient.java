@@ -1,6 +1,9 @@
 
 package eu.dnetlib.dhp.common.rest;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -9,13 +12,10 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DNetRestClient {
 
@@ -53,11 +53,14 @@ public class DNetRestClient {
 		CloseableHttpClient client = HttpClients.createDefault();
 
 		log.info("performing HTTP request, method {} on URI {}", r.getMethod(), r.getURI().toString());
-		log.info("request headers: {}",
-				Arrays.asList(r.getAllHeaders())
-						.stream()
-						.map(h -> h.getName() + ":" + h.getValue())
-						.collect(Collectors.joining(",")));
+		log
+			.info(
+				"request headers: {}",
+				Arrays
+					.asList(r.getAllHeaders())
+					.stream()
+					.map(h -> h.getName() + ":" + h.getValue())
+					.collect(Collectors.joining(",")));
 
 		CloseableHttpResponse response = client.execute(r);
 		return IOUtils.toString(response.getEntity().getContent());
