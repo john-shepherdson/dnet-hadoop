@@ -85,8 +85,7 @@
             </spark-opts>
             <arg>-w</arg><arg>${workingPath}/</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-f</arg><arg>-</arg>
-            <arg>-ow</arg><arg>no_doi_works/</arg>
+            <arg>-i</arg><arg>last_orcid_dataset</arg>
             <arg>-oew</arg><arg>no_doi_dataset</arg>
         </spark>
         <ok to="End"/>

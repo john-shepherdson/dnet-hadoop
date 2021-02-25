@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
@@ -57,26 +59,33 @@ public class SparkGenEnrichedOrcidWorks {
 				.toString(
 					SparkGenEnrichedOrcidWorks.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/doiboost/gen_enriched_orcid_works_parameters.json")));
+							"/eu/dnetlib/dhp/doiboost/gen_orcid-no-doi_params.json")));
 		parser.parseArgument(args);
 		Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
+		final String hdfsServerUri = parser.get("hdfsServerUri");
 		final String workingPath = parser.get("workingPath");
 		final String outputEnrichedWorksPath = parser.get("outputEnrichedWorksPath");
+		final String orcidDataFolder = parser.get("orcidDataFolder");
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				String lastUpdate = HDFSUtil.readFromTextFile(hdfsServerUri, workingPath, "last_update.txt");
+				if (StringUtils.isBlank(lastUpdate)) {
+					throw new RuntimeException("last update info not found");
+				}
+				final String dateOfCollection = lastUpdate.substring(0, 10);
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 				Dataset<AuthorData> authorDataset = spark
 					.createDataset(
 						sc
-							.textFile(workingPath.concat("last_orcid_dataset/authors/*"))
+							.textFile(workingPath.concat(orcidDataFolder).concat("/authors/*"))
 							.map(item -> OBJECT_MAPPER.readValue(item, AuthorSummary.class))
 							.filter(authorSummary -> authorSummary.getAuthorData() != null)
 							.map(authorSummary -> authorSummary.getAuthorData())
@@ -87,7 +96,7 @@ public class SparkGenEnrichedOrcidWorks {
 				Dataset<WorkDetail> workDataset = spark
 					.createDataset(
 						sc
-							.textFile(workingPath.concat("last_orcid_dataset/works/*"))
+							.textFile(workingPath.concat(orcidDataFolder).concat("/works/*"))
 							.map(item -> OBJECT_MAPPER.readValue(item, Work.class))
 							.filter(work -> work.getWorkDetail() != null)
 							.map(work -> work.getWorkDetail())
@@ -134,7 +143,8 @@ public class SparkGenEnrichedOrcidWorks {
 					errorsGeneric,
 					errorsInvalidTitle,
 					errorsNotFoundAuthors,
-					errorsInvalidType);
+					errorsInvalidType,
+						dateOfCollection);
 				JavaRDD<Publication> oafPublicationRDD = enrichedWorksRDD
 					.map(
 						e -> {

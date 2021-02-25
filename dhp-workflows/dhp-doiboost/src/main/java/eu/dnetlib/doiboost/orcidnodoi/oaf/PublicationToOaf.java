@@ -36,6 +36,7 @@ public class PublicationToOaf implements Serializable {
 	public static final String OPENAIRE_PREFIX = "openaire____";
 	public static final String SEPARATOR = "::";
 
+	private String dateOfCollection = "";
 	private final LongAccumulator parsedPublications;
 	private final LongAccumulator enrichedPublications;
 	private final LongAccumulator errorsGeneric;
@@ -49,13 +50,15 @@ public class PublicationToOaf implements Serializable {
 		LongAccumulator errorsGeneric,
 		LongAccumulator errorsInvalidTitle,
 		LongAccumulator errorsNotFoundAuthors,
-		LongAccumulator errorsInvalidType) {
+		LongAccumulator errorsInvalidType,
+		String dateOfCollection) {
 		this.parsedPublications = parsedPublications;
 		this.enrichedPublications = enrichedPublications;
 		this.errorsGeneric = errorsGeneric;
 		this.errorsInvalidTitle = errorsInvalidTitle;
 		this.errorsNotFoundAuthors = errorsNotFoundAuthors;
 		this.errorsInvalidType = errorsInvalidType;
+		this.dateOfCollection = dateOfCollection;
 	}
 
 	public PublicationToOaf() {
@@ -137,7 +140,7 @@ public class PublicationToOaf implements Serializable {
 
 		publication.setLastupdatetimestamp(new Date().getTime());
 
-		publication.setDateofcollection("2020-10-14");
+		publication.setDateofcollection(dateOfCollection);
 		publication.setDateoftransformation(DumpToActionsUtility.now_ISO8601());
 
 		// Adding external ids
