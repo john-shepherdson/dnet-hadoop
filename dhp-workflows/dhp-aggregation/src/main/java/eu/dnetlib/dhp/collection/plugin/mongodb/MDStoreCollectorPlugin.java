@@ -7,27 +7,29 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.bson.Document;
+
 import com.mongodb.client.MongoCollection;
-import eu.dnetlib.dhp.common.MdstoreClient;
 
 import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.CollectorException;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import org.bson.Document;
+import eu.dnetlib.dhp.common.MdstoreClient;
 
 public class MDStoreCollectorPlugin implements CollectorPlugin {
 
-	public static final String MONGODB_BASEURL = "mongodb_baseurl";
 	public static final String MONGODB_DBNAME = "mongodb_dbname";
-	public static final String MDSTORE_ID = "mongodb_collection";
+	public static final String MDSTORE_ID = "mdstore_id";
 
 	@Override
 	public Stream<String> collect(ApiDescriptor api, AggregatorReport report) throws CollectorException {
 
 		final String mongoBaseUrl = Optional
-			.ofNullable(api.getParams().get(MONGODB_BASEURL))
-			.orElseThrow(() -> new CollectorException(String.format("missing parameter '%s'", MONGODB_BASEURL)));
+			.ofNullable(api.getBaseUrl())
+			.orElseThrow(
+				() -> new CollectorException(
+					"missing mongodb baseUrl, expected in eu.dnetlib.dhp.collection.ApiDescriptor.baseUrl"));
 
 		final String dbName = Optional
 			.ofNullable(api.getParams().get(MONGODB_DBNAME))

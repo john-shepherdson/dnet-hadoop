@@ -9,16 +9,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.QueryBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bson.Document;
 
 import com.google.common.collect.Iterables;
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.QueryBuilder;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
@@ -40,10 +40,11 @@ public class MdstoreClient implements Closeable {
 	public MongoCollection<Document> mdStore(final String mdId) {
 		BasicDBObject query = (BasicDBObject) QueryBuilder.start("mdId").is(mdId).get();
 
-		final String currentId = Optional.ofNullable(getColl(db, COLL_METADATA_MANAGER, true).find(query))
-				.map(r -> r.first())
-				.map(d -> d.getString("currentId"))
-				.orElseThrow(() -> new IllegalArgumentException("cannot find current mdstore id for: " + mdId));
+		final String currentId = Optional
+			.ofNullable(getColl(db, COLL_METADATA_MANAGER, true).find(query))
+			.map(r -> r.first())
+			.map(d -> d.getString("currentId"))
+			.orElseThrow(() -> new IllegalArgumentException("cannot find current mdstore id for: " + mdId));
 		return getColl(db, currentId, true);
 	}
 
