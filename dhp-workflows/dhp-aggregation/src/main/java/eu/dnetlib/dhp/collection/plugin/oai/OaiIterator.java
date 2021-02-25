@@ -1,7 +1,9 @@
 
 package eu.dnetlib.dhp.collection.plugin.oai;
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Iterator;
@@ -11,8 +13,11 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +33,6 @@ public class OaiIterator implements Iterator<String> {
 	private final static String REPORT_PREFIX = "oai:";
 
 	private final Queue<String> queue = new PriorityBlockingQueue<>();
-	private final SAXReader reader = new SAXReader();
 
 	private final String baseUrl;
 	private final String set;
@@ -149,13 +153,13 @@ public class OaiIterator implements Iterator<String> {
 		final String xml = httpConnector.getInputSource(url, report);
 		Document doc;
 		try {
-			doc = reader.read(new StringReader(xml));
+			doc = DocumentHelper.parseText(xml);
 		} catch (final DocumentException e) {
 			log.warn("Error parsing xml, I try to clean it. {}", e.getMessage());
 			report.put(e.getClass().getName(), e.getMessage());
 			final String cleaned = XmlCleaner.cleanAllEntities(xml);
 			try {
-				doc = reader.read(new StringReader(cleaned));
+				doc = DocumentHelper.parseText(xml);
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
 				if (resumptionToken == null) {
@@ -182,7 +186,15 @@ public class OaiIterator implements Iterator<String> {
 		}
 
 		for (final Object o : doc.selectNodes("//*[local-name()='ListRecords']/*[local-name()='record']")) {
-			queue.add(((Node) o).asXML());
+			final StringWriter sw = new StringWriter();
+			final XMLWriter writer = new XMLWriter(sw, OutputFormat.createPrettyPrint());
+			try {
+				writer.write((Node) o);
+				queue.add(sw.toString());
+			} catch (IOException e) {
+				report.put(e.getClass().getName(), e.getMessage());
+				throw new CollectorException("Error parsing XML record:\n" + ((Node) o).asXML(), e);
+			}
 		}
 
 		return doc.valueOf("//*[local-name()='resumptionToken']");
