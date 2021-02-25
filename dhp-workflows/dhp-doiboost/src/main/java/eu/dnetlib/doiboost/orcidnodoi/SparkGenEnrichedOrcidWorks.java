@@ -4,6 +4,7 @@ package eu.dnetlib.doiboost.orcidnodoi;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 

@@ -106,20 +106,12 @@ public class PublicationToOaf implements Serializable {
 	public static final String PID_TYPES = "dnet:pid_types";
 
 	public Oaf generatePublicationActionsFromJson(final String json) {
-		try {
-			if (parsedPublications != null) {
-				parsedPublications.add(1);
-			}
-			JsonElement jElement = new JsonParser().parse(json);
-			JsonObject jObject = jElement.getAsJsonObject();
-			return generatePublicationActionsFromDump(jObject);
-		} catch (Throwable t) {
-			logger.error("creating publication: " + t.getMessage());
-			if (errorsGeneric != null) {
-				errorsGeneric.add(1);
-			}
-			return null;
+		if (parsedPublications != null) {
+			parsedPublications.add(1);
 		}
+		JsonElement jElement = new JsonParser().parse(json);
+		JsonObject jObject = jElement.getAsJsonObject();
+		return generatePublicationActionsFromDump(jObject);
 	}
 
 	public Oaf generatePublicationActionsFromDump(final JsonObject rootElement) {
@@ -217,6 +209,13 @@ public class PublicationToOaf implements Serializable {
 		if (StringUtils.isNotBlank(type)) {
 			publication.setResourcetype(mapQualifier(type, type, "dnet:dataCite_resource", "dnet:dataCite_resource"));
 
+			Map<String, String> publicationType = typologiesMapping.get(type);
+			if ((publicationType == null || publicationType.isEmpty()) && errorsInvalidType != null) {
+				errorsInvalidType.add(1);
+				logger.error("publication_type_not_found: " + type);
+				return null;
+			}
+
 			final String typeValue = typologiesMapping.get(type).get("value");
 			cobjValue = typologiesMapping.get(type).get("cobj");
 			final Instance instance = new Instance();
@@ -260,10 +259,16 @@ public class PublicationToOaf implements Serializable {
 		if (authors != null && authors.size() > 0) {
 			publication.setAuthor(authors);
 		} else {
-			if (errorsNotFoundAuthors != null) {
-				errorsNotFoundAuthors.add(1);
+			if (authors == null) {
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				String json = gson.toJson(rootElement);
+				throw new RuntimeException("not_valid_authors: " + json);
+			} else {
+				if (errorsNotFoundAuthors != null) {
+					errorsNotFoundAuthors.add(1);
+				}
+				return null;
 			}
-			return null;
 		}
 		String classValue = getDefaultResulttype(cobjValue);
 		publication
