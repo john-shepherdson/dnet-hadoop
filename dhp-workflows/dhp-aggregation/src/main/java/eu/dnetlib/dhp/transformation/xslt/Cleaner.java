@@ -1,13 +1,13 @@
 
 package eu.dnetlib.dhp.transformation.xslt;
 
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import net.sf.saxon.s9api.*;
+import static eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction.QNAME_BASE_URI;
 
 import java.io.Serializable;
 
-import static eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction.QNAME_BASE_URI;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import net.sf.saxon.s9api.*;
 
 public class Cleaner implements ExtensionFunction, Serializable {
 

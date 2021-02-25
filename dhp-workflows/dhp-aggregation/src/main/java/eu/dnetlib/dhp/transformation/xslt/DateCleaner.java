@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.transformation.xslt;
 
+import static eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction.QNAME_BASE_URI;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -9,8 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.saxon.s9api.*;
-
-import static eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction.QNAME_BASE_URI;
 
 public class DateCleaner implements ExtensionFunction, Serializable {
 

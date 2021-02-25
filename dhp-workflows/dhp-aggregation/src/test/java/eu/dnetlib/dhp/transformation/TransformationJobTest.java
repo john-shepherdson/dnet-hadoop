@@ -76,23 +76,26 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		conf.setAppName(TransformationJobTest.class.getSimpleName());
 		conf.setMaster("local");
 
-		try(SparkSession spark = SparkSession.builder().config(conf).getOrCreate()) {
+		try (SparkSession spark = SparkSession.builder().config(conf).getOrCreate()) {
 
-			final String mdstore_input = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
+			final String mdstore_input = this
+				.getClass()
+				.getResource("/eu/dnetlib/dhp/transform/mdstorenative")
+				.getFile();
 			final String mdstore_output = testDir.toString() + "/version";
 
 			mockupTrasformationRule("simpleTRule", "/eu/dnetlib/dhp/transform/ext_simple.xsl");
 
-			final Map<String, String> parameters = Stream.of(new String[][]{
-					{
-							"dateOfTransformation", "1234"
-					},
-					{
-							"transformationPlugin", "XSLT_TRANSFORM"
-					},
-					{
-							"transformationRuleId", "simpleTRule"
-					},
+			final Map<String, String> parameters = Stream.of(new String[][] {
+				{
+					"dateOfTransformation", "1234"
+				},
+				{
+					"transformationPlugin", "XSLT_TRANSFORM"
+				},
+				{
+					"transformationRuleId", "simpleTRule"
+				},
 
 			}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
@@ -102,20 +105,20 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 			final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
 			final Dataset<MetadataRecord> mOutput = spark
-					.read()
-					.format("parquet")
-					.load(mdstore_output + MDSTORE_DATA_PATH)
-					.as(encoder);
+				.read()
+				.format("parquet")
+				.load(mdstore_output + MDSTORE_DATA_PATH)
+				.as(encoder);
 
 			final Long total = mOutput.count();
 
 			final long recordTs = mOutput
-					.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
-					.count();
+				.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
+				.count();
 
 			final long recordNotEmpty = mOutput
-					.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
-					.count();
+				.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
+				.count();
 
 			assertEquals(total, recordTs);
 
