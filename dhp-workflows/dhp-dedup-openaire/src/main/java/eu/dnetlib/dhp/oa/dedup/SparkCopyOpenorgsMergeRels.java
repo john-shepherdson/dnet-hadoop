@@ -6,14 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.pace.config.DedupConfig;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -21,10 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.config.DedupConfig;
 
 //copy simrels (verified) from relation to the workdir in order to make them available for the deduplication
 public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
@@ -83,17 +85,17 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 			.textFile(relationPath)
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
-			.filter(this::isOpenorgs) //takes only relations coming from openorgs
-			.filter(this::filterOpenorgsRels) //takes only isSimilarTo relations between organizations from openorgs
-			.filter(this::excludeOpenorgsMesh) //excludes relations between an organization and an openorgsmesh
-			.filter(this::excludeNonOpenorgs); //excludes relations with no openorgs id involved
+			.filter(this::isOpenorgs) // takes only relations coming from openorgs
+			.filter(this::filterOpenorgsRels) // takes only isSimilarTo relations between organizations from openorgs
+			.filter(this::excludeOpenorgsMesh) // excludes relations between an organization and an openorgsmesh
+			.filter(this::excludeNonOpenorgs); // excludes relations with no openorgs id involved
 
-		//turn openorgs isSimilarTo relations into mergerels
-		JavaRDD<Relation> mergeRels = rawRels.flatMap(rel -> {
+		// turn openorgs isSimilarTo relations into mergerels
+		JavaRDD<Relation> mergeRelsRDD = rawRels.flatMap(rel -> {
 			List<Relation> mergerels = new ArrayList<>();
 
-			String openorgsId = rel.getSource().contains("openorgs____")? rel.getSource() : rel.getTarget();
-			String mergedId = rel.getSource().contains("openorgs____")? rel.getTarget() : rel.getSource();
+			String openorgsId = rel.getSource().contains("openorgs____") ? rel.getSource() : rel.getTarget();
+			String mergedId = rel.getSource().contains("openorgs____") ? rel.getTarget() : rel.getSource();
 
 			mergerels.add(rel(openorgsId, mergedId, "merges", dedupConf));
 			mergerels.add(rel(mergedId, openorgsId, "isMergedIn", dedupConf));
@@ -101,7 +103,13 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 			return mergerels.iterator();
 		});
 
-		mergeRels.saveAsTextFile(outputPath);
+		spark
+			.createDataset(
+				mergeRelsRDD.rdd(),
+				Encoders.bean(Relation.class))
+			.write()
+			.mode(SaveMode.Append)
+			.parquet(outputPath);
 	}
 
 	private static MapFunction<String, Relation> patchRelFn() {
@@ -116,7 +124,8 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 	private boolean filterOpenorgsRels(Relation rel) {
 
-		if (rel.getRelClass().equals("isSimilarTo") && rel.getRelType().equals("organizationOrganization") && rel.getSubRelType().equals("dedup"))
+		if (rel.getRelClass().equals("isSimilarTo") && rel.getRelType().equals("organizationOrganization")
+			&& rel.getSubRelType().equals("dedup"))
 			return true;
 		return false;
 	}
@@ -124,7 +133,7 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 	private boolean isOpenorgs(Relation rel) {
 
 		if (rel.getCollectedfrom() != null) {
-			for (KeyValue k: rel.getCollectedfrom()) {
+			for (KeyValue k : rel.getCollectedfrom()) {
 				if (k.getValue().equals("OpenOrgs Database")) {
 					return true;
 				}

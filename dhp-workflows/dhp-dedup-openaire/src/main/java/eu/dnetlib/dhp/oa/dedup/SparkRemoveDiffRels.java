@@ -27,6 +27,8 @@ import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.graph.ConnectedComponent;
 import eu.dnetlib.dhp.oa.dedup.graph.GraphProcessor;
@@ -95,6 +97,9 @@ public class SparkRemoveDiffRels extends AbstractSparkAction {
 
 			final String relationPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
 
+			final String openorgsMergeRelsPath = DedupUtility
+				.createOpenorgsMergeRelsPath(workingPath, actionSetId, subEntity);
+
 			final int maxIterations = dedupConf.getWf().getMaxIterations();
 			log.info("Max iterations {}", maxIterations);
 
@@ -105,67 +110,103 @@ public class SparkRemoveDiffRels extends AbstractSparkAction {
 				.where("relClass == 'merges'")
 				.toJavaRDD();
 
+			System.out.println("mergeRelsRDD = " + mergeRelsRDD.count());
+
+//			JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRelsRDD = spark
+//				.read()
+//				.textFile(relationPath)
+//				.map(patchRelFn(), Encoders.bean(Relation.class))
+//				.toJavaRDD()
+//				.filter(r -> filterRels(r, entity))
+//				.map(rel -> {
+//					if (rel.getSource().compareTo(rel.getTarget()) < 0)
+//						return new Tuple2<>(new Tuple2<>(rel.getSource(), rel.getTarget()), "diffRel");
+//					else
+//						return new Tuple2<>(new Tuple2<>(rel.getTarget(), rel.getSource()), "diffRel");
+//				});
+			// THIS IS FOR TESTING PURPOSE
 			JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRelsRDD = spark
 				.read()
-				.textFile(relationPath)
-				.map(patchRelFn(), Encoders.bean(Relation.class))
+				.load(mergeRelsPath)
+				.as(Encoders.bean(Relation.class))
 				.toJavaRDD()
-				.filter(r -> filterRels(r, entity))
 				.map(rel -> {
 					if (rel.getSource().compareTo(rel.getTarget()) < 0)
 						return new Tuple2<>(new Tuple2<>(rel.getSource(), rel.getTarget()), "diffRel");
 					else
 						return new Tuple2<>(new Tuple2<>(rel.getTarget(), rel.getSource()), "diffRel");
+				})
+				.distinct();
+
+			System.out.println("diffRelsRDD = " + diffRelsRDD.count());
+
+//			JavaRDD<Tuple2<Tuple2<String, String>, String>> flatMergeRels = mergeRelsRDD
+//				.mapToPair(rel -> new Tuple2<>(rel.getSource(), rel.getTarget()))
+//				.groupByKey()
+//				.flatMap(g -> {
+//					List<Tuple2<Tuple2<String, String>, String>> rels = new ArrayList<>();
+//
+//					List<String> ids = StreamSupport
+//						.stream(g._2().spliterator(), false)
+//						.collect(Collectors.toList());
+//
+//					for (int i = 0; i < ids.size(); i++) {
+//						for (int j = i + 1; j < ids.size(); j++) {
+//							if (ids.get(i).compareTo(ids.get(j)) < 0)
+//								rels.add(new Tuple2<>(new Tuple2<>(ids.get(i), ids.get(j)), g._1()));
+//							else
+//								rels.add(new Tuple2<>(new Tuple2<>(ids.get(j), ids.get(i)), g._1()));
+//						}
+//					}
+//					return rels.iterator();
+//
+//				});
+			JavaRDD<Tuple2<Tuple2<String, String>, String>> mergeRels = mergeRelsRDD
+				.map(rel -> {
+					if (rel.getSource().compareTo(rel.getTarget()) < 0)
+						return new Tuple2<>(new Tuple2<>(rel.getSource(), rel.getTarget()), "mergeRel");
+					else
+						return new Tuple2<>(new Tuple2<>(rel.getTarget(), rel.getSource()), "mergeRel");
 				});
+			System.out.println("mergeRelsProcessed = " + mergeRels.count());
 
-			JavaRDD<Tuple2<Tuple2<String, String>, String>> flatMergeRels = mergeRelsRDD
-				.mapToPair(rel -> new Tuple2<>(rel.getSource(), rel.getTarget()))
-				.groupByKey()
-				.flatMap(g -> {
-					List<Tuple2<Tuple2<String, String>, String>> rels = new ArrayList<>();
-
-					List<String> ids = StreamSupport
-						.stream(g._2().spliterator(), false)
-						.collect(Collectors.toList());
-
-					for (int i = 0; i < ids.size(); i++) {
-						for (int j = i + 1; j < ids.size(); j++) {
-							if (ids.get(i).compareTo(ids.get(j)) < 0)
-								rels.add(new Tuple2<>(new Tuple2<>(ids.get(i), ids.get(j)), g._1()));
-							else
-								rels.add(new Tuple2<>(new Tuple2<>(ids.get(j), ids.get(i)), g._1()));
-						}
-					}
-					return rels.iterator();
-
-				});
-
-			JavaRDD<Relation> purgedMergeRels = flatMergeRels
+//			JavaRDD<Relation> purgedMergeRels = flatMergeRels
+//				.union(diffRelsRDD)
+//				.mapToPair(rel -> new Tuple2<>(rel._1(), Arrays.asList(rel._2())))
+//				.reduceByKey((a, b) -> {
+//					List<String> list = new ArrayList<String>();
+//					list.addAll(a);
+//					list.addAll(b);
+//					return list;
+//				})
+//				.filter(rel -> rel._2().size() == 1)
+//				.mapToPair(rel -> new Tuple2<>(rel._2().get(0), rel._1()))
+//				.flatMap(rel -> {
+//					List<Tuple2<String, String>> rels = new ArrayList<>();
+//					String source = rel._1();
+//					rels.add(new Tuple2<>(source, rel._2()._1()));
+//					rels.add(new Tuple2<>(source, rel._2()._2()));
+//					return rels.iterator();
+//				})
+//				.distinct()
+//				.flatMap(rel -> tupleToMergeRel(rel, dedupConf));
+			JavaRDD<Relation> purgedMergeRels = mergeRels
 				.union(diffRelsRDD)
-				.mapToPair(rel -> new Tuple2<>(rel._1(), Arrays.asList(rel._2())))
-				.reduceByKey((a, b) -> {
-					List<String> list = new ArrayList<String>();
-					list.addAll(a);
-					list.addAll(b);
-					return list;
-				})
-				.filter(rel -> rel._2().size() == 1)
-				.mapToPair(rel -> new Tuple2<>(rel._2().get(0), rel._1()))
-				.flatMap(rel -> {
-					List<Tuple2<String, String>> rels = new ArrayList<>();
-					String source = rel._1();
-					rels.add(new Tuple2<>(source, rel._2()._1()));
-					rels.add(new Tuple2<>(source, rel._2()._2()));
-					return rels.iterator();
-				})
-				.distinct()
-				.flatMap(rel -> tupleToMergeRel(rel, dedupConf));
+				.mapToPair(t -> new Tuple2<>(t._1()._1() + "|||" + t._1()._2(), t._2()))
+				.groupByKey()
+				.filter(g -> Iterables.size(g._2()) == 1)
+				.flatMap(
+					t -> tupleToMergeRel(
+						new Tuple2<>(t._1().split("\\|\\|\\|")[0], t._1().split("\\|\\|\\|")[1]),
+						dedupConf));
+
+			System.out.println("purgedMergeRels = " + purgedMergeRels.count());
 
 			spark
 				.createDataset(purgedMergeRels.rdd(), Encoders.bean(Relation.class))
 				.write()
 				.mode(SaveMode.Overwrite)
-				.json(mergeRelsPath);
+				.json(openorgsMergeRelsPath);
 		}
 	}
 

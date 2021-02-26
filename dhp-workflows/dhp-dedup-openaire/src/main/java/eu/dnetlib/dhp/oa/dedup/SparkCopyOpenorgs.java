@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -19,6 +20,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -34,7 +36,7 @@ public class SparkCopyOpenorgs extends AbstractSparkAction {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkCopyOpenorgs.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/oa/dedup/copyOpenorgs_parameters.json")));
 		parser.parseArgument(args);
@@ -72,7 +74,7 @@ public class SparkCopyOpenorgs extends AbstractSparkAction {
 
 		final Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
 
-		filterEntities(spark, entityPath, clazz)
+		filterOpenorgs(spark, entityPath)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -80,21 +82,20 @@ public class SparkCopyOpenorgs extends AbstractSparkAction {
 
 	}
 
-	public static <T extends OafEntity> Dataset<T> filterEntities(
+	public static Dataset<Organization> filterOpenorgs(
 		final SparkSession spark,
-		final String entitiesInputPath,
-		final Class<T> clazz) {
+		final String entitiesInputPath) {
 
-		// <id, json_entity>
-		Dataset<T> entities = spark
-			.read()
-			.textFile(entitiesInputPath)
-			.map(
-				(MapFunction<String, T>) it -> {
-					T entity = OBJECT_MAPPER.readValue(it, clazz);
-					return entity;
-				},
-				Encoders.kryo(clazz));
+		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		Dataset<Organization> entities = spark
+			.createDataset(
+				sc
+					.textFile(entitiesInputPath)
+					.map(it -> OBJECT_MAPPER.readValue(it, Organization.class))
+					.rdd(),
+				Encoders.bean(Organization.class));
+
+		entities.show();
 
 		return entities.filter(entities.col("id").contains("openorgs____"));
 	}

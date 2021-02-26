@@ -95,6 +95,11 @@ public class DedupUtility {
 		return String.format("%s/%s/%s_simrel", basePath, actionSetId, entityType);
 	}
 
+	public static String createOpenorgsMergeRelsPath(
+		final String basePath, final String actionSetId, final String entityType) {
+		return String.format("%s/%s/%s_openorgs_mergerels", basePath, actionSetId, entityType);
+	}
+
 	public static String createMergeRelPath(
 		final String basePath, final String actionSetId, final String entityType) {
 		return String.format("%s/%s/%s_mergerel", basePath, actionSetId, entityType);

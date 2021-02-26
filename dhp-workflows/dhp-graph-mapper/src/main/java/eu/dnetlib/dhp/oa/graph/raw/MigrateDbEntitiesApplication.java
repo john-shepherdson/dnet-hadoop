@@ -612,7 +612,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final DataInfo info = prepareDataInfo(rs); // TODO
 
 			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
-			final String orgId2 = createOpenaireId(40, rs.getString("id2"), true);
+			final String orgId2 = createOpenaireId(20, rs.getString("id2"), true);
 			final String relClass = rs.getString("relclass");
 
 			final List<KeyValue> collectedFrom = listKeyValues(

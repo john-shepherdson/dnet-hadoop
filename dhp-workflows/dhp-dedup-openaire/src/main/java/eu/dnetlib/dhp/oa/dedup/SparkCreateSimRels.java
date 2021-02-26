@@ -10,6 +10,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -81,7 +82,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			log.info("Creating simrels for: '{}'", subEntity);
 
 			final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity);
-			removeOutputDir(spark, outputPath);
 
 			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -99,13 +99,19 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 				.createSortedBlocks(mapDocuments, dedupConf)
 				.repartition(numPartitions);
 
-			// create relations by comparing only elements in the same group
-			Deduper
-				.computeRelations(sc, blocks, dedupConf)
-				.map(t -> createSimRel(t._1(), t._2(), entity))
-				.repartition(numPartitions)
-				.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-				.saveAsTextFile(outputPath);
+			Dataset<Relation> simRels = spark
+				.createDataset(
+					Deduper
+						.computeRelations(sc, blocks, dedupConf)
+						.map(t -> createSimRel(t._1(), t._2(), entity))
+						.repartition(numPartitions)
+						.rdd(),
+					Encoders.bean(Relation.class));
+
+			save(simRels, outputPath, SaveMode.Append);
+
+			log.info("Generated " + simRels.count() + " Similarity Relations");
+
 		}
 	}
 
