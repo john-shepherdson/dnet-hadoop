@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.actionmanager.datacite
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord
+import eu.dnetlib.dhp.schema.mdstore.MetadataRecord
 import eu.dnetlib.dhp.schema.oaf.Oaf
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.spark.SparkConf

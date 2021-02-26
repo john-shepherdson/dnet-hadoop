@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.model.mdstore.Provenance;
+import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import scala.Tuple2;
 
 public class GenerateNativeStoreSparkJob {

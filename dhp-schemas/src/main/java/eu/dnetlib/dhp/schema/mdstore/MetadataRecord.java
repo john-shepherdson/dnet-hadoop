@@ -1,12 +1,14 @@
 
-package eu.dnetlib.dhp.model.mdstore;
+package eu.dnetlib.dhp.schema.mdstore;
 
 import java.io.Serializable;
 
-import eu.dnetlib.dhp.utils.DHPUtils;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 
-/** This class models a record inside the new Metadata store collection on HDFS * */
-public class MetadataRecord implements Serializable {
+/**
+ * This class models a record in a Metadata store collection on HDFS
+ */
+	public class MetadataRecord implements Serializable {
 
 	/** The D-Net Identifier associated to the record */
 	private String id;
@@ -47,7 +49,7 @@ public class MetadataRecord implements Serializable {
 		this.provenance = provenance;
 		this.body = body;
 		this.dateOfCollection = dateOfCollection;
-		this.id = DHPUtils.generateIdentifier(originalId, this.provenance.getNsPrefix());
+		this.id = ModelSupport.generateIdentifier(originalId, this.provenance.getNsPrefix());
 	}
 
 	public String getId() {

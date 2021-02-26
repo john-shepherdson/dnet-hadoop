@@ -38,8 +38,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.model.mdstore.Provenance;
+import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.transformation.TransformSparkJobNode;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

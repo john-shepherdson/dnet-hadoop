@@ -10,7 +10,7 @@ import org.apache.spark.api.java.function.MapFunction;
 
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import net.sf.saxon.s9api.*;
 
 public class XSLTTransformationFunction implements MapFunction<MetadataRecord, MetadataRecord> {

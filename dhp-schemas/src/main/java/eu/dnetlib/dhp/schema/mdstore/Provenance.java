@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.model.mdstore;
+package eu.dnetlib.dhp.schema.mdstore;
 
 import java.io.Serializable;
 
