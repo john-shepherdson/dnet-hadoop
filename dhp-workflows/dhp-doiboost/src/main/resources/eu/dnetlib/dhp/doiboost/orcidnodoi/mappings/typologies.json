@@ -31,5 +31,13 @@
   "annotation":           {"cobj":"0018", "value":	"Annotation"},
   "physical-object":      {"cobj":"0028", "value":	"PhysicalObject"},
   "preprint":             {"cobj":"0016", "value":	"Preprint"},
-  "software":             {"cobj":"0029", "value":	"Software"}
+  "software":             {"cobj":"0029", "value":	"Software"},
+  "journal-issue":        {"cobj":"0001", "value":	"Article"},
+  "translation":          {"cobj":"0038", "value":	"Other literature type"},
+  "artistic-performance": {"cobj":"0020", "value":	"Other ORP type"},
+  "online-resource":      {"cobj":"0020", "value":	"Other ORP type"},
+  "registered-copyright": {"cobj":"0020", "value":	"Other ORP type"},
+  "trademark":            {"cobj":"0020", "value":	"Other ORP type"},
+  "invention":            {"cobj":"0020", "value":	"Other ORP type"},
+  "spin-off-company":     {"cobj":"0020", "value":	"Other ORP type"}
 }

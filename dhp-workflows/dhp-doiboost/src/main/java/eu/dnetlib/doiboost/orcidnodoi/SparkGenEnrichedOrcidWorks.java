@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
@@ -38,6 +37,7 @@ import eu.dnetlib.dhp.schema.orcid.AuthorSummary;
 import eu.dnetlib.dhp.schema.orcid.Work;
 import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcid.json.JsonHelper;
+import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 import scala.Tuple2;
@@ -137,6 +137,8 @@ public class SparkGenEnrichedOrcidWorks {
 					.sparkContext()
 					.longAccumulator("errorsNotFoundAuthors");
 				final LongAccumulator errorsInvalidType = spark.sparkContext().longAccumulator("errorsInvalidType");
+				final LongAccumulator otherTypeFound = spark.sparkContext().longAccumulator("otherTypeFound");
+
 				final PublicationToOaf publicationToOaf = new PublicationToOaf(
 					parsedPublications,
 					enrichedPublications,
@@ -144,7 +146,8 @@ public class SparkGenEnrichedOrcidWorks {
 					errorsInvalidTitle,
 					errorsNotFoundAuthors,
 					errorsInvalidType,
-						dateOfCollection);
+					otherTypeFound,
+					dateOfCollection);
 				JavaRDD<Publication> oafPublicationRDD = enrichedWorksRDD
 					.map(
 						e -> {
@@ -173,6 +176,7 @@ public class SparkGenEnrichedOrcidWorks {
 				logger.info("errorsInvalidTitle: " + errorsInvalidTitle.value().toString());
 				logger.info("errorsNotFoundAuthors: " + errorsNotFoundAuthors.value().toString());
 				logger.info("errorsInvalidType: " + errorsInvalidType.value().toString());
+				logger.info("otherTypeFound: " + otherTypeFound.value().toString());
 			});
 	}
 }

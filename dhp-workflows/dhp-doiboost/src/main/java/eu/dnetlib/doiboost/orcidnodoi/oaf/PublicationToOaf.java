@@ -43,6 +43,7 @@ public class PublicationToOaf implements Serializable {
 	private final LongAccumulator errorsInvalidTitle;
 	private final LongAccumulator errorsNotFoundAuthors;
 	private final LongAccumulator errorsInvalidType;
+	private final LongAccumulator otherTypeFound;
 
 	public PublicationToOaf(
 		LongAccumulator parsedPublications,
@@ -51,6 +52,7 @@ public class PublicationToOaf implements Serializable {
 		LongAccumulator errorsInvalidTitle,
 		LongAccumulator errorsNotFoundAuthors,
 		LongAccumulator errorsInvalidType,
+		LongAccumulator otherTypeFound,
 		String dateOfCollection) {
 		this.parsedPublications = parsedPublications;
 		this.enrichedPublications = enrichedPublications;
@@ -58,6 +60,7 @@ public class PublicationToOaf implements Serializable {
 		this.errorsInvalidTitle = errorsInvalidTitle;
 		this.errorsNotFoundAuthors = errorsNotFoundAuthors;
 		this.errorsInvalidType = errorsInvalidType;
+		this.otherTypeFound = otherTypeFound;
 		this.dateOfCollection = dateOfCollection;
 	}
 
@@ -68,6 +71,8 @@ public class PublicationToOaf implements Serializable {
 		this.errorsInvalidTitle = null;
 		this.errorsNotFoundAuthors = null;
 		this.errorsInvalidType = null;
+		this.otherTypeFound = null;
+		this.dateOfCollection = null;
 	}
 
 	private static Map<String, Pair<String, String>> datasources = new HashMap<String, Pair<String, String>>() {
@@ -221,6 +226,14 @@ public class PublicationToOaf implements Serializable {
 
 			final String typeValue = typologiesMapping.get(type).get("value");
 			cobjValue = typologiesMapping.get(type).get("cobj");
+			// this dataset must contain only publication
+			if (cobjValue.equals("0020")) {
+				if (otherTypeFound != null) {
+					otherTypeFound.add(1);
+				}
+				return null;
+			}
+
 			final Instance instance = new Instance();
 
 			// Adding hostedby
