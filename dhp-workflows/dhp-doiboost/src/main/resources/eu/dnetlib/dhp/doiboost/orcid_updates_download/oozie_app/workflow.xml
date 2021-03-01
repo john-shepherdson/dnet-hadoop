@@ -286,6 +286,32 @@
             <delete path='${workingPath}/orcid_dataset/new_authors'/>
             <delete path='${workingPath}/orcid_dataset/new_works'/>
         </fs>
+        <ok to="updateLastOrcidAuthorsDataset"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="updateLastOrcidAuthorsDataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${workingPath}/last_orcid_dataset/authors"/>
+                <mkdir path="${workingPath}/last_orcid_dataset/authors"/>
+            </prepare>
+            <arg>${workingPath}/orcid_dataset/authors/*</arg>
+            <arg>${workingPath}/last_orcid_dataset/authors</arg>
+        </distcp>
+        <ok to="updateLastOrcidWorksDataset"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="updateLastOrcidWorksDataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${workingPath}/last_orcid_dataset/works"/>
+                <mkdir path="${workingPath}/last_orcid_dataset/works"/>
+            </prepare>
+            <arg>${workingPath}/orcid_dataset/works/*</arg>
+            <arg>${workingPath}/last_orcid_dataset/works</arg>
+        </distcp>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
