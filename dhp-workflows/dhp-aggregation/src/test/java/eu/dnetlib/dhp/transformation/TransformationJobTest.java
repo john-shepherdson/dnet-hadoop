@@ -60,6 +60,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 		// We Load the XSLT transformation Rule from the classpath
 		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
+//		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_datarepo_datacite.xsl");
 
 		MetadataRecord result = tr.call(mr);
 

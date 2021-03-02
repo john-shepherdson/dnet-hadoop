@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.common.vocabulary;
 
 import java.io.Serializable;
@@ -143,7 +144,7 @@ public class VocabularyGroup implements Serializable {
 	}
 
 	public boolean termExists(final String vocId, final String id, final Boolean caseSensitive) {
-		if(Boolean.TRUE.equals(caseSensitive)) {
+		if (Boolean.TRUE.equals(caseSensitive)) {
 			return vocabularyExists(vocId) && vocs.get(vocId).termExists(id);
 		}
 		return vocabularyExists(vocId) && vocs.get(vocId.toLowerCase()).termExists(id);

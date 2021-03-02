@@ -15,7 +15,7 @@
     <xsl:param name="varMESTD" select="'mestd_______::'" />
     <xsl:param name="varMZOS" select="'irb_hr______::'" />
     <xsl:param name="varNHMRC" select="'nhmrc_______::'" />
-    <xsl:pasram name="varNIH" select="'nih_________::'" />
+    <xsl:param name="varNIH" select="'nih_________::'" />
     <xsl:param name="varNSF" select="'nsf_________::'" />
     <xsl:param name="varNWO" select="'nwo_________::'" />
     <xsl:param name="varRCUK" select="'rcuk________::'" />
