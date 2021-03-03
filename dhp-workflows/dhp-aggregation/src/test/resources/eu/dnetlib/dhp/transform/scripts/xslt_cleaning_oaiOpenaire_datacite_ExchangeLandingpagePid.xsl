@@ -2,6 +2,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
                 version="2.0"
  		        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
                 xmlns:oaf="http://namespace.openaire.eu/oaf"
                 xmlns:dr="http://www.driver-repository.eu/namespace/dr"
                 xmlns:datacite="http://datacite.org/schema/kernel-4"
@@ -60,7 +61,6 @@
                  select="vocabulary:clean( //*[local-name()='resourceType']/@resourceTypeGeneral, 'dnet:publication_resource')"/>
                  <!-- select="vocabulary:clean( distinct-values(//*[local-name()='resourceType'][1]/@uri, 'dnet:publication_resource')" /-->
                  <xsl:variable name="varSuperType"    select="vocabulary:clean( $varCobjCategory, 'dnet:result_typologies')"/>
-
 
   <xsl:template match="/">
     <xsl:variable name="datasourcePrefix"
@@ -177,7 +177,6 @@
                                <xsl:attribute name="alternateIdentifierType" select="./@*[local-name()=('identifierType', 'alternateIdentifierType')]"/>
                                <xsl:value-of select="."/>
               </datacite:alternateIdentifier>
-
         </xsl:for-each>
 
         <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = 'pmid']">
@@ -186,7 +185,6 @@
                                <xsl:value-of select="concat('https://www.ncbi.nlm.nih.gov/pubmed/', .)" />
               </datacite:alternateIdentifier>
         </xsl:for-each>
-
 
  <!--
         <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = ('handle')][//oaf:datasourceprefix = 'od______1318']">
@@ -353,7 +351,6 @@
                         </xsl:when>
                 </xsl:choose>
          </oaf:accessrights>
-
 
            <xsl:for-each select="distinct-values(//*[local-name()='licenseCondition']/(.[not(./@uri)][not(contains(., 'copyright')) and not(. = 'other')], .[./@uri]/@uri))">
              <oaf:license>
@@ -656,7 +653,6 @@
        <xsl:apply-templates select="node()|@*"/>
      </xsl:copy>
   </xsl:template>
-
 
 
   <xsl:template match="//*[local-name() = 'resource']/*[local-name()='identifier']">

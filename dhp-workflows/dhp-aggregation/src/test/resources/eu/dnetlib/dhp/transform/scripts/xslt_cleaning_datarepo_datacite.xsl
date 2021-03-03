@@ -83,6 +83,7 @@
                 </xsl:for-each>
                 <xsl:if test="//*[local-name()='date']/@dateType='Available' and //*[local-name()='datasourceprefix']!='r33ffb097cef'">
                     <xsl:variable name="varEmbargoEndDate" select="dateCleaner:dateISO( normalize-space(//*[local-name()='date'][@dateType='Available']))" />
+
                     <xsl:choose>
                         <xsl:when test="string-length($varEmbargoEndDate) &gt; 0">
                             <oaf:embargoenddate>
@@ -98,6 +99,7 @@
                 <xsl:variable name="varTypLst" select="distinct-values((//*[local-name()='resourceType']/(., @resourceTypeGeneral)))" />
                 <xsl:variable name="varCobjCatLst" select="distinct-values((for $i in $varTypLst      return vocabulary:clean( normalize-space($i), 'dnet:publication_resource')))" />
                 <xsl:variable name="varCobjSupLst" select="for $i in $varCobjCatLst      return concat($i, '###', vocabulary:clean( normalize-space($i), 'dnet:result_typologies'))" />
+
                 <dr:CobjCategory>
                     <xsl:choose>
                         <xsl:when test="count($varCobjSupLst[not(substring-after(., '###') = 'other') and not(substring-before(., '###') = ('0038', '0039', '0040'))]) &gt; 0">

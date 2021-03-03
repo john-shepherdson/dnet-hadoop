@@ -1,4 +1,3 @@
-
 package eu.dnetlib.dhp.common.vocabulary;
 
 import java.io.Serializable;
