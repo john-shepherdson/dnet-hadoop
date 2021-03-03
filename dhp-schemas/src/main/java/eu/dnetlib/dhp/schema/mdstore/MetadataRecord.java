@@ -8,7 +8,7 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 /**
  * This class models a record in a Metadata store collection on HDFS
  */
-	public class MetadataRecord implements Serializable {
+public class MetadataRecord implements Serializable {
 
 	/** The D-Net Identifier associated to the record */
 	private String id;

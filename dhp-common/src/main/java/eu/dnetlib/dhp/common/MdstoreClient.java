@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
 import com.mongodb.BasicDBObject;
@@ -21,8 +23,6 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.QueryBuilder;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MdstoreClient implements Closeable {
 
