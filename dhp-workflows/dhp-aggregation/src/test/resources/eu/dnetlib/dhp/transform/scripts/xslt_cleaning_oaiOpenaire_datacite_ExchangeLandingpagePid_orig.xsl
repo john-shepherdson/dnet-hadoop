@@ -1,7 +1,6 @@
 <!-- complete literature v4: xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid ; transformation script production , 2021-02-17 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-                version="2.0"
- 		        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.1"
+ 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xmlns:oaf="http://namespace.openaire.eu/oaf"
                 xmlns:dr="http://www.driver-repository.eu/namespace/dr"
                 xmlns:datacite="http://datacite.org/schema/kernel-4"
@@ -9,9 +8,9 @@
                 xmlns:dri="http://www.driver-repository.eu/namespace/dri"
                 xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:vocabulary="http://eu/dnetlib/transform/clean"
-                xmlns:dateCleaner="http://eu/dnetlib/transform/dateISO"
-                exclude-result-prefixes="xsl vocabulary dateCleaner">
+        	xmlns:TransformationFunction="eu.dnetlib.data.collective.transformation.core.xsl.ext.TransformationFunctionProxy"
+                extension-element-prefixes="TransformationFunction"
+                exclude-result-prefixes="TransformationFunction">
 
   <xsl:param name="varOfficialName" />
   <xsl:param name="varDsType" />
@@ -53,13 +52,12 @@
 
   <xsl:param name="index" select="0"/>
   <xsl:param name="transDate" select="current-dateTime()"/>
+  <xsl:variable name="tf" select="TransformationFunction:getInstance()"/>
 
 <!-- several different type statements in Refubium -->
 <!-- toDo: apply priority levels -->
-                 <xsl:variable name='varCobjCategory' 
-                 select="vocabulary:clean( //*[local-name()='resourceType']/@resourceTypeGeneral, 'dnet:publication_resource')"/>
-                 <!-- select="vocabulary:clean( distinct-values(//*[local-name()='resourceType'][1]/@uri, 'dnet:publication_resource')" /-->
-                 <xsl:variable name="varSuperType"    select="vocabulary:clean( $varCobjCategory, 'dnet:result_typologies')"/>
+                 <xsl:variable name='varCobjCategory' select="TransformationFunction:convertString($tf, distinct-values(//*[local-name()='resourceType'][1]/@uri), 'TextTypologies')" />
+                 <xsl:variable name="varSuperType" select="TransformationFunction:convertString($tf, $varCobjCategory, 'SuperTypes')"/>
 
 
   <xsl:template match="/">
@@ -80,8 +78,14 @@
 
       <metadata>
 
+<!-- drop oaire resource -->
+<!--
+        <xsl:apply-templates select="//*[local-name() = 'metadata']//*[local-name() = 'resource']"/>
+-->
+
 <datacite:resource>
 
+<!-- datacite:identifier -->
 <xsl:choose>
 
         <!-- cut off DOI resolver prefix to just get the number part -->
@@ -177,22 +181,85 @@
                                <xsl:attribute name="alternateIdentifierType" select="./@*[local-name()=('identifierType', 'alternateIdentifierType')]"/>
                                <xsl:value-of select="."/>
               </datacite:alternateIdentifier>
-
+<!--
+        <xsl:copy-of select="//datacite:alternateIdentifier[not($varCobjCategory = '0001' and ./@alternateIdentifierType = 'ISSN')][not(//oaf:datasourceprefix = 'od______4225' and ends-with(., 'pdf'))]"  copy-namespaces="no"/>
+        <xsl:copy-of select="//datacite:identifier[not(//oaf:datasourceprefix = 'od______4225' and ends-with(., 'pdf'))]"  copy-namespaces="no"/>
+-->
+        </xsl:for-each>
+<!-- DOI, handle moved to datacite:identifier
+        <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[(contains(., '://dx.doi.org/10.')) or (@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = 'doi')][not(//oaf:datasourceprefix = ('od______1318'))]">
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'DOI'"/>
+                               <xsl:value-of select=".[not(contains(., '://dx.doi.org/') or contains(., '://doi.org'))], .[contains(., '://dx.doi.org/') or contains(., '://doi.org')]/substring-after(., 'doi.org/')" />
+              </datacite:alternateIdentifier>
         </xsl:for-each>
 
+        <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = 'handle'][not(//oaf:datasourceprefix = ('od______1514', 'od______1318'))]">
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'handle'"/>
+                               <xsl:value-of select=".[not(contains(., '://hdl.handle.net/'))], .[contains(., '://hdl.handle.net/')]/substring-after(., '://hdl.handle.net/')" />
+              </datacite:alternateIdentifier>
+        </xsl:for-each>
+
+        <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = 'doi'][not(//oaf:datasourceprefix = ('od______1318', 'od______1514', 'od______1388', 'od______4225')) and not(contains(//dri:recordIdentifier, 'www.qeios.com')) and not(//*[local-name() = 'baseURL' and . = 'http://radar.brookes.ac.uk/radar/oai'])]">
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'URL'"/>
+                               <xsl:value-of select=".[not(contains(., '://dx.doi.org/'))]/concat('http://dx.doi.org/', .), .[contains(., '://dx.doi.org/')]" />
+              </datacite:alternateIdentifier>
+        </xsl:for-each>
+        <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = 'handle'][not(//oaf:datasourceprefix = ('od______1514', 'od______1318', 'od______1388', 'od______1472'))]">
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'URL'"/>
+                               <xsl:value-of select=".[not(contains(., '://hdl.handle.net/'))]/concat('http://hdl.handle.net/', .), .[contains(., '://hdl.handle.net/')]" />
+              </datacite:alternateIdentifier>
+        </xsl:for-each>
+-->
         <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = 'pmid']">
+<!--
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'PMID'"/>
+                               <xsl:value-of select="." />
+              </datacite:alternateIdentifier>
+-->
               <datacite:alternateIdentifier>
                                <xsl:attribute name="alternateIdentifierType" select="'URL'"/>
                                <xsl:value-of select="concat('https://www.ncbi.nlm.nih.gov/pubmed/', .)" />
               </datacite:alternateIdentifier>
         </xsl:for-each>
 
+<!--
+        <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = 'handle'][//oaf:datasourceprefix = 'od______1514']">
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'handle'"/>
+                               <xsl:value-of select="substring-after(., '://uvadoc.uva.es/handle/')" />
+              </datacite:alternateIdentifier>
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'URL'"/>
+                               <xsl:value-of select="concat('http://hdl.handle.net/', substring-after(., '://uvadoc.uva.es/handle/'))" />
+              </datacite:alternateIdentifier>
+        </xsl:for-each>
+-->
 
- <!--
         <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = ('handle')][//oaf:datasourceprefix = 'od______1318']">
+<!-- [@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = ('handle', 'doi')] -->
+<!--
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'handle'"/>
+                               <xsl:value-of select="substring-after(., 'info:hdl:')" />
+              </datacite:alternateIdentifier>
+
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'URL'"/>
+                               <xsl:value-of select="concat('https://orbi.uliege.be/handle/', substring-after(., 'info:hdl:'))" />
+              </datacite:alternateIdentifier>
+              <datacite:alternateIdentifier>
+                               <xsl:attribute name="alternateIdentifierType" select="'URL'"/>
+                               <xsl:value-of select="concat('http://hdl.handle.net/', substring-after(., 'info:hdl:'))" />
+              </datacite:alternateIdentifier>
+-->
 
         </xsl:for-each>
-    -->
+
         <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)[@*[local-name()=('identifierType', 'alternateIdentifierType')]/lower-case(.) = ('handle')][//oaf:datasourceprefix = 'od______1726']">
               <datacite:alternateIdentifier>
                                <xsl:attribute name="alternateIdentifierType" select="'handle'"/>
@@ -215,8 +282,21 @@
 
 </datacite:alternateIdentifiers>
 
+<!-- 
+                                       [$varCobjCategory = '0001' and ./@alternateIdentifierType = 'ISSN'][1]">
+-->
 <datacite:relatedIdentifiers>
+<!-- 
+        <xsl:for-each select="//datacite:relatedIdentifier">
+              <datacite:relatedIdentifier>
+                               <xsl:attribute name="relatedIdentifierType" select="./@relatedIdentifierType"/>
+                               <xsl:attribute name="relationType" select="./@relationType"/>
+                               <xsl:value-of select="." />
+              </datacite:relatedIdentifier>
+        </xsl:for-each>
 
+        <xsl:copy-of select="//*[local-name() = 'relatedIdentifier']"  copy-namespaces="no"/>
+-->
         <xsl:copy-of select="//datacite:relatedIdentifier"  copy-namespaces="no"/>
 
         <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)
@@ -246,7 +326,7 @@
         </xsl:for-each>
         <xsl:for-each select="distinct-values(//dc:language)">
                <datacite:language>
-                       <xsl:value-of select="vocabulary:clean( ., 'dnet:languages')"/>
+                       <xsl:value-of select="TransformationFunction:convertString($tf, ., 'Languages')"/>
                </datacite:language>
         </xsl:for-each>
         <xsl:if test="//dc:publisher">
@@ -269,14 +349,107 @@
                </datacite:format>
         </xsl:for-each>
 
+<!--
+      <xsl:copy-of select="//oaire:resource/datacite:*[not(local-name() = 'alternateIdentifiers')]" copy-namespaces="no" />
+-->
         <xsl:apply-templates select="(//*[local-name()='resource'], //*[local-name() = 'oai_openaire'])/datacite:*[not(local-name() = ('identifier', 'alternateIdentifiers', 'alternateIdentifier', 'relatedIdentifiers', 'relatedIdentifier'))]"/>
 
         <xsl:apply-templates select="//*[local-name()='resource']/titles[//*[contains(., 'radar.brookes.ac.uk')]]"/>
 <xsl:copy-of select="//*[local-name()='resource']//*[local-name() = 'title'][//*[contains(., 'radar.brookes.ac.uk')]]"  copy-namespaces="no"/>
 
 </datacite:resource>
+<!--
+        <xsl:if test="//oaf:datasourceprefix = 'od______4225'">
+               <oaf:identifier>
+                       <xsl:attribute name="identifierType" select="'landingPage'"/>
+                       <xsl:value-of select="concat('https://repository.rothamsted.ac.uk/item/', substring-after(//dri:recordIdentifier, 'oai:repository.rothamsted.ac.uk:'))"/>
+               </oaf:identifier>
+        </xsl:if>
 
-            <xsl:variable name='varEmbargoEndDate' select="dateCleaner:dateISO(normalize-space(//*[local-name()='date'][@dateType='Available']))"/>
+        <xsl:if test="//oaf:datasourceprefix = 'od______1318'">
+               <oaf:identifier>
+                       <xsl:attribute name="identifierType" select="'landingPage'"/>
+                       <xsl:value-of select="concat('https://orbi.uliege.be/handle/', substring-after(//dri:recordIdentifier, 'oai:orbi.ulg.ac.be:'))"/>
+               </oaf:identifier>
+        </xsl:if>
+
+        <xsl:if test="//oaf:datasourceprefix = 'od______1514'">
+               <oaf:identifier>
+                       <xsl:attribute name="identifierType" select="'landingPage'"/>
+                       <xsl:value-of select="concat('http://uvadoc.uva.es/handle/', substring-after(//datacite:identifier, 'http://uvadoc.uva.es/handle/'))"/>
+               </oaf:identifier>
+        </xsl:if>
+
+        <xsl:if test="//oaf:datasourceprefix = 'od______1388'">
+               <oaf:identifier>
+                       <xsl:attribute name="identifierType" select="'landingPage'"/>
+                       <xsl:value-of select="concat('http://rabida.uhu.es/dspace/handle/', substring-after(//dri:recordIdentifier, 'oai:rabida.uhu.es:'))"/>
+               </oaf:identifier>
+        </xsl:if>
+
+        <xsl:if test="//oaf:datasourceprefix = 'od______1472'">
+               <oaf:identifier>
+                       <xsl:attribute name="identifierType" select="'landingPage'"/>
+                       <xsl:value-of select="concat('https://gredos.usal.es/handle/', substring-after(//dri:recordIdentifier, 'oai:gredos.usal.es:'))"/>
+               </oaf:identifier>
+        </xsl:if>
+
+        <xsl:if test="contains(//dri:recordIdentifier, 'refubium.fu-berlin.de') or contains(//dri:recordIdentifier, 'www.qeios.com')  or //*[local-name() = 'baseURL' and .= 'http://radar.brookes.ac.uk/radar/oai']">
+               <oaf:identifier>
+                       <xsl:attribute name="identifierType" select="'landingPage'"/>
+                       <xsl:value-of select="//datacite:identifier[contains(., '://refubium.fu-berlin.de/') or contains(., '://www.qeios.com') or contains(., '://radar.brookes.ac.uk/radar/items/')]"/>
+               </oaf:identifier>
+        </xsl:if>
+
+
+<xsl:choose>
+        <xsl:when test="//datacite:identifier[lower-case(./@identifierType) = 'doi'][contains(., '://dx.doi.org/')]">
+               <oaf:identifier>
+                     <xsl:attribute name="identifierType" select="'doi'"/>
+                     <xsl:value-of select="//datacite:identifier[lower-case(./@identifierType) = 'doi'][contains(., '://dx.doi.org/')]/substring-after(., '://dx.doi.org/')"/>
+               </oaf:identifier>
+        </xsl:when>
+        <xsl:when test="//datacite:identifier[lower-case(./@identifierType) = 'handle'][not(. = '123456789')][contains(., '://hdl.handle.net/')][not(//oaf:datasourceprefix = ('od______1388', 'od______1472'))]">
+               <oaf:identifier>
+                     <xsl:attribute name="identifierType" select="'handle'"/>
+                     <xsl:value-of select="//datacite:identifier[lower-case(./@identifierType) = 'handle'][not(. = '123456789')][contains(., '://hdl.handle.net/')]/substring-after(., '://hdl.handle.net/')"/>
+               </oaf:identifier>
+        </xsl:when>
+</xsl:choose>
+-->
+
+<!--
+<xsl:for-each select="//*[local-name() = 'resource']/*[local-name()='identifier'][@identifierType='Handle'][not(. = '123456789')]">
+<oaf:identifier>
+   <xsl:attribute name="identifierType">
+               <xsl:value-of select="'handle'"/>
+   </xsl:attribute>
+   <xsl:value-of select="."/>
+</oaf:identifier>
+</xsl:for-each>
+
+<xsl:for-each select="//*[local-name() = 'resource']/*[local-name()='identifier'][@identifierType='DOI']">
+<oaf:identifier>
+   <xsl:attribute name="identifierType" select="'doi'"/>
+   <xsl:if test="contains(., '://dx.doi.org/')">
+           <xsl:value-of select="substring-after(., '://dx.doi.org/')"/>
+   </xsl:if>
+   <xsl:if test="not(contains(., '://dx.doi.org/'))">
+           <xsl:value-of select="."/>
+   </xsl:if>
+</oaf:identifier>
+</xsl:for-each>
+
+
+<xsl:for-each select="//*[local-name() = 'resource']/*[local-name()='identifier'][@identifierType='URL'][not(ends-with(., '.pdf'))]">
+<oaf:identifier>
+   <xsl:attribute name="identifierType" select="'URL'"/>
+   <xsl:value-of select="."/>
+</oaf:identifier>
+</xsl:for-each>
+-->
+
+            <xsl:variable name='varEmbargoEndDate' select="TransformationFunction:convertString($tf, normalize-space(//*[local-name()='date'][@dateType='Available']), 'DateISO8601')"/>
          <xsl:if test="//*[local-name()='date']/@dateType='Available' and //*[local-name()='datasourceprefix']!='r33ffb097cef'">
             <xsl:choose>
               <xsl:when test="string-length($varEmbargoEndDate) > 0">
@@ -294,23 +467,15 @@
 
            <xsl:when test="lower-case(//*[local-name()='resourceType']/@resourceTypeGeneral)=('dataset', 'software', 'literature', 'other research product')">
 
-           <dr:CobjCategory>
-            <xsl:variable name="varCobjCategory"
-                          select="vocabulary:clean( //*[local-name()='resourceType']/@resourceTypeGeneral, 'dnet:publication_resource')"/>
-            <xsl:variable name="varSuperType"
-                          select="vocabulary:clean( $varCobjCategory, 'dnet:result_typologies')"/>
-
-            <xsl:attribute name="type">
-                <xsl:value-of select="$varSuperType"/>
-            </xsl:attribute>
-            <xsl:value-of select="$varCobjCategory"/>
-        </dr:CobjCategory>
-           <!--
              <dr:CobjCategory>
+<!--
+                 <xsl:attribute name="type" select="//*[local-name()='resourceType']/@resourceTypeGeneral"/>
+               <xsl:value-of select="TransformationFunction:convertString($tf, distinct-values(//*[local-name()='resourceType']/@uri), 'TextTypologies')" />
+-->
                  <xsl:attribute name="type" select="//oaf:datasourceprefix[. = '_______qeios' and contains(//dri:recordIdentifier, '/definition/')]/'other', //oaf:datasourceprefix[not(. = '_______qeios' and contains(//dri:recordIdentifier, '/definition/'))]/$varSuperType"/>
                  <xsl:value-of select="$varCobjCategory" />
              </dr:CobjCategory>
-            -->
+
            </xsl:when>
            <xsl:otherwise>
                <xsl:call-template name="terminate"/>
@@ -319,7 +484,7 @@
 
 <!-- review status -->
 <xsl:variable name="varRefereed" select="for $i in (//*[local-name() = 'resource']/*[local-name() = ('resourceType', 'version')]/(., @uri)) 
-                                                                           return vocabulary:clean( normalize-space($i), 'dnet:review_levels')"/>
+                                                                           return TransformationFunction:convertString($tf, normalize-space($i), 'ReviewLevels')"/>
 <xsl:choose>
      <xsl:when test="count($varRefereed[. = '0001']) > 0">
           <oaf:refereed>
@@ -334,19 +499,18 @@
 </xsl:choose>
 
          <oaf:dateAccepted>
-
-         <xsl:value-of 
-               select="dateCleaner:dateISO( normalize-space(//datacite:date[@dateType = 'Issued']))"/>
+<!-- 
+               <xsl:value-of select="TransformationFunction:convertString($tf, normalize-space(//datacite:dates/datacite:date[@dateType = 'Issued']), 'DateISO8601')"/>           
+-->
+               <xsl:value-of select="TransformationFunction:convertString($tf, normalize-space(//datacite:date[@dateType = 'Issued']), 'DateISO8601')"/>
          </oaf:dateAccepted>
 
 
          <oaf:accessrights>
-                <xsl:variable name='varAccessRights' 
-                            select="vocabulary:clean( (//*[local-name() = 'rights']/@rightsURI, //*[local-name() = 'licenseCondition']/@uri)[1], 'dnet:access_modes')" />
+                 <xsl:variable name='varAccessRights' select="TransformationFunction:convertString($tf, (//*[local-name() = 'rights']/@rightsURI, //*[local-name() = 'licenseCondition']/@uri)[1], 'AccessRights')" />
                 <xsl:choose>
                         <xsl:when test="not($varAccessRights = 'EMBARGO' and not((xs:date( max( ($varEmbargoEndDate, '0001-01-01') ) ) gt current-date())))">
-                               <xsl:value-of 
-                                 select="vocabulary:clean( (//*[local-name() = 'rights']/@rightsURI, //*[local-name() = 'licenseCondition']/@uri)[1], 'dnet:access_modes')"/>
+                               <xsl:value-of select="TransformationFunction:convertString($tf, (//*[local-name() = 'rights']/@rightsURI, //*[local-name() = 'licenseCondition']/@uri)[1], 'AccessRights')"/>
                         </xsl:when>
                         <xsl:when test="$varAccessRights = 'EMBARGO' and not((xs:date( max( ($varEmbargoEndDate, '0001-01-01') ) ) gt current-date()))">
                                <xsl:value-of select="'OPEN'"/>
@@ -354,6 +518,12 @@
                 </xsl:choose>
          </oaf:accessrights>
 
+<!--
+if xpath:"(xs:date( max( ($varEmbargoEnd, '0001-01-01') ) ) gt current-date())" oaf:accessrights = "EMBARGO"; else $var0 = "''";
+if xpath:"//dc:rights[starts-with(normalize-space(.), 'info:eu-repo/semantics') and not(starts-with(normalize-space(.), 'info:eu-repo/semantics/embargo')) and not((xs:date( max( ($varEmbargoEnd, '0001-01-01') ) ) gt current-date()))]" oaf:accessrights = Convert(xpath:"//dc:rights[starts-with(normalize-space(.), 'info:eu-repo/semantics')]", AccessRights); else $var0 = "''";
+if xpath:"//dc:rights[starts-with(normalize-space(.), 'info:eu-repo/semantics/embargo') and not((xs:date( max( ($varEmbargoEnd, '0001-01-01') ) ) gt current-date()))]" oaf:accessrights = "OPEN"; else $var0 = "''";
+if xpath:"count(//dc:rights[starts-with(normalize-space(.), 'info:eu-repo/semantics/')]) eq 0  and not($varDatasourceid = 'opendoar____::3532')" oaf:accessrights = "OPEN"; else $var0 = "''";
+-->
 
            <xsl:for-each select="distinct-values(//*[local-name()='licenseCondition']/(.[not(./@uri)][not(contains(., 'copyright')) and not(. = 'other')], .[./@uri]/@uri))">
              <oaf:license>
@@ -362,8 +532,22 @@
             </xsl:for-each>
 
          <oaf:language>
-           <xsl:value-of select="vocabulary:clean( //*[local-name()='language'], 'dnet:languages')" />
+           <xsl:value-of select="TransformationFunction:convert($tf, //*[local-name()='language'], 'Languages')" />
          </oaf:language>
+
+<!--
+    <xsl:if test="//*[local-name() = 'rights'][starts-with(normalize-space(.), 'info:eu-repo/semantics/embargoedAccess')]">
+        <oaf:embargoenddate>
+          <xsl:value-of select="//*[local-name()='date']/@dateType='Available'"/>
+        </oaf:embargoenddate>
+    </xsl:if>
+-->
+
+<!--
+         <xsl:if test="not(//*[local-name()='nameIdentifier'][starts-with(., 'info:eu-repo/grant')])">
+                        <xsl:call-template name="terminate"/>
+            </xsl:if>
+-->
 
          <xsl:for-each select="//oaire:fundingReference[./oaire:awardNumber]">
             <xsl:choose>
@@ -657,9 +841,103 @@
      </xsl:copy>
   </xsl:template>
 
+<!--
+  <xsl:template match="//*[local-name() = 'resource']/*[local-name()='alternateIdentifiers']">
+    <xsl:copy copy-namespaces="no">
+     <xsl:copy-of select="./*[not($varCobjCategory = '0001' and ./@alternateIdentifierType = 'ISSN')]"  copy-namespaces="no"/>
 
+    <xsl:if test="//*[local-name() = 'resource']/*[local-name()='identifier'][lower-case(@identifierType)='handle']">
+          <datacite:alternateIdentifier>
+          <xsl:attribute name="alternateIdentifierType">
+             <xsl:value-of select="'URL'"/>
+          </xsl:attribute>
+              <xsl:value-of
+                  select="//oaire:resource/(datacite:identifier[./@identifierType = 'handle' and not(contains(., '://hdl.handle.net/'))]/concat('http://hdl.handle.net/', .), datacite:identifier[contains(., '://hdl.handle.net/')])" />
+          </datacite:alternateIdentifier>
+    </xsl:if>
+
+    <xsl:if test="//*[local-name() = 'resource']/*[local-name()='identifier'][@identifierType='URN']">
+      <xsl:element name="alternateIdentifier" namespace="http://www.openarchives.org/OAI/2.0/">
+          <xsl:attribute name="alternateIdentifierType">
+             <xsl:value-of select="'URL'"/>
+          </xsl:attribute>
+              <xsl:value-of
+                  select="concat('http://nbn-resolving.org/', //*[local-name() = 'resource']/*[local-name()='identifier'])" />
+      </xsl:element>
+    </xsl:if>
+
+    <xsl:if test="//*[local-name() = 'resource']/*[local-name()='identifier'][@identifierType='DOI']">
+          <datacite:alternateIdentifier>
+          <xsl:attribute name="alternateIdentifierType">
+             <xsl:value-of select="'URL'"/>
+          </xsl:attribute>
+              <xsl:value-of
+                  select="//oaire:resource/(datacite:identifier[./@identifierType = 'doi' and not(contains(., '://dx.doi.org/'))]/concat('http://dx.doi.org/', .), datacite:identifier[contains(., '://dx.doi.org/')])" />
+          </datacite:alternateIdentifier>
+    </xsl:if>
+    </xsl:copy>
+  </xsl:template>
+-->
 
   <xsl:template match="//*[local-name() = 'resource']/*[local-name()='identifier']">
+<!-- cut off DOI resolver prefix to just get the number part -->
+<!--
+  <xsl:if test=".[@identifierType='DOI'][contains(., '://dx.doi.org/')]">
+    <xsl:copy copy-namespaces="no">
+        <xsl:attribute name="identifierType">
+           <xsl:value-of select="'DOI'"/>
+        </xsl:attribute>
+            <xsl:value-of
+                select="substring-after(., '://dx.doi.org/')" />
+    </xsl:copy>
+ </xsl:if>
+  <xsl:if test=".[@identifierType='HANDLE'][contains(., '://hdl.handle.net/')]">
+    <xsl:copy copy-namespaces="no">
+        <xsl:attribute name="identifierType">
+           <xsl:value-of select="'handle'"/>
+        </xsl:attribute>
+            <xsl:value-of
+                select="substring-after(., '://hdl.handle.net/')" />
+    </xsl:copy>
+ </xsl:if>
+     <xsl:copy-of select=".[not(contains(., '://dx.doi.org/') or contains(., 'hdl.handle.net/'))]"  copy-namespaces="no"/>
+
+
+    <xsl:if test="not(//*[local-name() = 'resource']/*[local-name()='alternateIdentifiers'])">
+      <xsl:element name="alternateIdentifiers" namespace="http://www.openarchives.org/OAI/2.0/">
+    <xsl:if test=".[@identifierType='Handle']">
+    <xsl:element name="alternateIdentifier" namespace="http://www.openarchives.org/OAI/2.0/">
+        <xsl:attribute name="alternateIdentifierType">
+           <xsl:value-of select="'URL'"/>
+        </xsl:attribute>
+            <xsl:value-of
+                select="concat('http://hdl.handle.net/', .)" />
+    </xsl:element>
+    </xsl:if>
+    <xsl:if test=".[@identifierType='URN']">
+    <xsl:element name="alternateIdentifier" namespace="http://www.openarchives.org/OAI/2.0/">
+        <xsl:attribute name="alternateIdentifierType">
+           <xsl:value-of select="'URL'"/>
+        </xsl:attribute>
+            <xsl:value-of
+                select="concat('http://nbn-resolving.org/', .)" />
+    </xsl:element>
+    </xsl:if>
+    <xsl:if test=".[@identifierType='DOI']">
+    <xsl:element name="alternateIdentifier" namespace="http://www.openarchives.org/OAI/2.0/">
+        <xsl:attribute name="alternateIdentifierType">
+           <xsl:value-of select="'URL'"/>
+        </xsl:attribute>
+            <xsl:value-of
+                select="concat('http://dx.doi.org/', .)" />
+    </xsl:element>
+    </xsl:if>
+
+    </xsl:element>
+    </xsl:if>
+-->
+
+
 
 <!-- funding -->
 <xsl:for-each select="//*[local-name()='fundingReference']">
@@ -780,6 +1058,14 @@
 </xsl:for-each>
  
   </xsl:template>
+
+<!--
+  <xsl:template match="//*[local-name()='language']">
+         <oaf:language>
+           <xsl:value-of select="TransformationFunction:convert($tf, //*[local-name()='language'], 'Languages')" />
+         </oaf:language>
+  </xsl:template>
+-->
 
                        <xsl:template match="//*[local-name() = 'header']">
 <xsl:copy>

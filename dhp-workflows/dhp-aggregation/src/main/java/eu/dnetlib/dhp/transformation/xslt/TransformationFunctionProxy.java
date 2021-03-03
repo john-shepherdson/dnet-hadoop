@@ -5,12 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import net.sf.saxon.s9api.*;
 import scala.Serializable;
 
-// import eu.dnetlib.data.collective.transformation.engine.functions.ProcessingException;
+//import eu.dnetlib.data.collective.transformation.engine.functions.ProcessingException;
 
 // import org.apache.kafka.clients.producer.KafkaProducer;
 // import org.apache.kafka.clients.producer.Producer;
@@ -76,12 +77,12 @@ public class TransformationFunctionProxy implements ExtensionFunction, Serializa
 	}
 
 	/**
-	 * normalize values given as an input value by using a vocabulary 
+ 	 * normalize values given as an input value by using a vocabulary 
 	 * @param aInput - the value as a String
 	 * @param aVocabularyName - the name of the vocabulary, which must be known for the vocabulary registry
 	 * @return
 	 */
-	public synchronized String convertString(String aInput, String aVocabularyName) {
+	public synchronized String convertString(String aInput, String aVocabularyName){
 		List<String> values = new LinkedList<>();
 
 //		Producer<String, String> producer = new KafkaProducer<>(props);
@@ -104,12 +105,15 @@ public class TransformationFunctionProxy implements ExtensionFunction, Serializa
 //			producer.send(new ProducerRecord<String, String>("transformation-vocab", "convert failed", aVocabularyName));
 			throw new IllegalStateException(e);
 		}
-		/*
-		 * catch (KafkaException e) { // For all other exceptions, just abort the transaction and try again.
-		 * producer.abortTransaction(); }
-		 */
+/*		 catch (KafkaException e) {
+			     // For all other exceptions, just abort the transaction and try again.
+				 producer.abortTransaction();
+		}
+*/
 //		producer.close();
 
 	}
+
+
 
 }

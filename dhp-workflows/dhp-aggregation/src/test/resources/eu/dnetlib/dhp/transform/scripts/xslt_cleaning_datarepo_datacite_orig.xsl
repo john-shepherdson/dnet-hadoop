@@ -1,14 +1,5 @@
 <!-- 20210224 , title: xslt_cleaning_datarepo_datacite , copy from production -->
-<xsl:stylesheet 
-      xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-      xmlns:oaf="http://namespace.openaire.eu/oaf" 
-      xmlns:oai="http://www.openarchives.org/OAI/2.0/" 
-      xmlns:datacite="http://datacite.org/schema/kernel-3" 
-      xmlns:dr="http://www.driver-repository.eu/namespace/dr" 
-      xmlns:vocabulary="http://eu/dnetlib/transform/clean"
-      xmlns:dateCleaner="http://eu/dnetlib/transform/dateISO"
-      exclude-result-prefixes="xsl vocabulary dateCleaner"
-      version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:datacite="http://datacite.org/schema/kernel-3" xmlns:TransformationFunction="eu.dnetlib.data.collective.transformation.core.xsl.ext.TransformationFunctionProxy" xmlns:dr="http://www.driver-repository.eu/namespace/dr" exclude-result-prefixes="TransformationFunction" extension-element-prefixes="TransformationFunction" version="2.0">
     <xsl:param name="varOfficialName" />
     <xsl:param name="varDsType" />
     <xsl:param name="varDataSourceId" />
@@ -36,6 +27,7 @@
     <xsl:param name="varWT" select="'wt__________::'" />
     <xsl:param name="index" select="0" />
     <xsl:param name="transDate" select="current-dateTime()" />
+    <xsl:variable name="tf" select="TransformationFunction:getInstance()" />
     <xsl:variable name="datasourcePrefix" select="normalize-space(//oaf:datasourceprefix)" />
     <xsl:template match="/">
         <xsl:call-template name="validRecord" />
@@ -82,7 +74,7 @@
                     </oaf:identifier>
                 </xsl:for-each>
                 <xsl:if test="//*[local-name()='date']/@dateType='Available' and //*[local-name()='datasourceprefix']!='r33ffb097cef'">
-                    <xsl:variable name="varEmbargoEndDate" select="dateCleaner:dateISO( normalize-space(//*[local-name()='date'][@dateType='Available']))" />
+                    <xsl:variable name="varEmbargoEndDate" select="TransformationFunction:convertString($tf, normalize-space(//*[local-name()='date'][@dateType='Available']), 'DateISO8601')" />
                     <xsl:choose>
                         <xsl:when test="string-length($varEmbargoEndDate) &gt; 0">
                             <oaf:embargoenddate>
@@ -93,11 +85,35 @@
                             <xsl:call-template name="terminate" />
                         </xsl:otherwise>
                     </xsl:choose>
-                </xsl:if> 
+                </xsl:if> <!--
+					<xsl:choose>
 
+					or //*[local-name()='resourceType']/@resourceTypeGeneral/lower-case()='software' or //*[local-name()='resourceType']/@resourceTypeGeneral/lower-case()='software' or //*[local-name()='resourceType']/@resourceTypeGeneral/lower-case()='Film' or //*[local-name()='resourceType']/@resourceTypeGeneral/lower-case()='Sound' or //*[local-name()='resourceType']/@resourceTypeGeneral/lower-case()='PhysicalObject'  or //*[local-name()='resourceType']/@resourceTypeGeneral/lower-case()='Audiovisual'">
+					<xsl:when test="lower-case(//*[local-name()='resourceType']/@resourceTypeGeneral)=('dataset', 'software', 'collection', 'film', 'sound', 'physicalobject', 'audiovisual')">
+
+					<xsl:when test="lower-case(//*[local-name()='resourceType']/@resourceTypeGeneral)=('dataset', 'software', 'collection', 'film', 'sound', 'physicalobject', 'audiovisual', 'model', 'workflow', 'service', 'image') or  //*[local-name()='resourceType'][lower-case(@resourceTypeGeneral)='other' and lower-case(.)=('study', 'research data', 'image', 'photos et images')] or //*[local-name()='resourceType'][lower-case(.)='article'] or (//*[local-name()='resourceType'][lower-case(./@resourceTypeGeneral)='other' and lower-case(.)=('study', 'egi virtual appliance')])">
+
+					</xsl:when>
+					<xsl:otherwise>
+					<xsl:call-template name="terminate"/>
+					</xsl:otherwise>
+					</xsl:choose>
+					-->
+                <!--
+					<dr:CobjCategory>
+					<xsl:value-of
+					select="TransformationFunction:convertString($tf, distinct-values(//*[local-name()='resourceType']/@resourceTypeGeneral), 'TextTypologies')" />
+					</dr:CobjCategory>
+
+					<dr:CobjCategory>
+					<xsl:variable name='varCobjCategory' select="TransformationFunction:convertString($tf, distinct-values(//*[local-name()='resourceType']/@resourceTypeGeneral), 'TextTypologies')" />
+					<xsl:attribute name="type" select="TransformationFunction:convertString($tf, $varCobjCategory, 'SuperTypes')"/>
+					<xsl:value-of select="$varCobjCategory" />
+					</dr:CobjCategory>
+					-->
                 <xsl:variable name="varTypLst" select="distinct-values((//*[local-name()='resourceType']/(., @resourceTypeGeneral)))" />
-                <xsl:variable name="varCobjCatLst" select="distinct-values((for $i in $varTypLst      return vocabulary:clean( normalize-space($i), 'dnet:publication_resource')))" />
-                <xsl:variable name="varCobjSupLst" select="for $i in $varCobjCatLst      return concat($i, '###', vocabulary:clean( normalize-space($i), 'dnet:result_typologies'))" />
+                <xsl:variable name="varCobjCatLst" select="distinct-values((for $i in $varTypLst      return TransformationFunction:convertString($tf, normalize-space($i), 'TextTypologies')))" />
+                <xsl:variable name="varCobjSupLst" select="for $i in $varCobjCatLst      return concat($i, '###', TransformationFunction:convertString($tf, normalize-space($i), 'SuperTypes'))" />
                 <dr:CobjCategory>
                     <xsl:choose>
                         <xsl:when test="count($varCobjSupLst[not(substring-after(., '###') = 'other') and not(substring-before(., '###') = ('0038', '0039', '0040'))]) &gt; 0">
@@ -126,7 +142,9 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </dr:CobjCategory> <!-- review status --> <!-- no review hints found in resource type declarations, no version declarations found -->
-                <xsl:variable name="varRefereedConvt" select="for $i in (      //*[local-name()='resourceType']/(., @resourceTypeGeneral), //oai:setSpec, //*[local-name()='description'])      return vocabulary:clean( normalize-space($i), 'dnet:review_levels')" /> 
+                <xsl:variable name="varRefereedConvt" select="for $i in (      //*[local-name()='resourceType']/(., @resourceTypeGeneral), //oai:setSpec, //*[local-name()='description'])      return TransformationFunction:convertString($tf, normalize-space($i), 'ReviewLevels')" /> <!--
+					//<xsl:variable name="varRefereedIdntf" select="//*[local-name()=('identifier', 'alternateIdentifier')][matches(lower-case(.), '.*[\s\-\.\\_/:]preprints?[\s\-\.\\_/:].*')]/'0002' "/>
+					-->
                 <xsl:variable name="varRefereedIdntf" select="(      //*[local-name()=('identifier', 'alternateIdentifier')][count(//*[local-name()=('metadata', 'resource')]//*[local-name()=('identifier', 'alternateIdentifier')]) = 1][matches(lower-case(.), '(^|.*[\.\-_\\/\s\(\)%\d#:])pre[\.\-_\\/\s\(\)%\d#:]?prints?([\.\-_\\/\s\(\)%\d#:].*)?$')]/'0002',      //*[local-name()=('identifier', 'alternateIdentifier')][count(//*[local-name()=('metadata', 'resource')]//*[local-name()=('identifier', 'alternateIdentifier')]) = 1][matches(lower-case(.), '(^|.*[\.\-_\\/\s\(\)%\d#:])refereed([\.\-_\\/\s\(\)%\d#:].*)?$')]/'0001',      //*[local-name()=('identifier', 'alternateIdentifier')][count(//*[local-name()=('metadata', 'resource')]//*[local-name()=('identifier', 'alternateIdentifier')]) = 1][matches(lower-case(.), '.*-peer-reviewed-(fulltext-)?article-.*')]/'0001')" />
                 <xsl:variable name="varRefereedVersn" select="(//*[local-name()='version'][matches(lower-case(.), '.*peer[\s\-\.\\_/:%]?reviewed.*')]/'0001',      //*[local-name()='version'][matches(normalize-space(lower-case(.)), '^(v|vs|version|rel|release)?[\s\.\-_]*0$')]/'0002',      //*[local-name()='version'][matches(lower-case(.), '(^|[\s\-\.\\_/:%].*)(beta|draft|trial|test)([\s\-\.\\_/:%].*|$)')]/'0002',      //*[local-name()='version'][matches(lower-case(.), '.*submi(tted|ssion|ttal).*')]/'0002') " />
                 <xsl:variable name="varRefereedOther" select="(//*[local-name()='publisher'][matches(lower-case(.), '.*[\s\-\.\\_/:%]pre[\s\-\.\\_/:%]?prints?([\s\-\.\\_/:%].*|$)')]/'0002',      //*[local-name()='description'][matches(lower-case(.), '^peer[\s\-\.\\_/:%]?reviewed$')]/'0001',      //*[local-name()='description'][matches(lower-case(.), '^pre[\s\-\.\\_/:%]?prints?$')]/'0002') " />
@@ -156,12 +174,25 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:variable>
-                    <xsl:value-of select="dateCleaner:dateISO( normalize-space($theDate) )" />
+                    <xsl:value-of select="TransformationFunction:convertString($tf, normalize-space($theDate), 'DateISO8601')" />
                 </oaf:dateAccepted>
                 <xsl:choose>
+                    <!--
+					<xsl:if test="//*[local-name() = 'datasourceprefix'][.='r310e4cd113d'] and not(boolean(//*[local-name() = 'rights']/@rightsURI ) )]">
+					<oaf:skip>
+					<xsl:value-of select="TransformationFunction:skipRecord($tf, $index)"/>
+					</oaf:skip>
+					</xsl:if>
+					-->
+                    <!--          <xsl:when test="//*[local-name() = 'rights'][starts-with(normalize-space(.), 'info:eu-repo/semantics')]">
+					<oaf:accessrights>
+					<xsl:value-of select="TransformationFunction:convertString($tf, //*[local-name() = 'rights'][starts-with(normalize-space(.), 'info:eu-repo/semantics')], 'AccessRights')"/>
+					</oaf:accessrights>
+					</xsl:when>
+					-->
                     <xsl:when test="//*[local-name() = 'rights']/@rightsURI[starts-with(normalize-space(.), 'info:eu-repo/semantics')]">
                         <oaf:accessrights>
-                            <xsl:value-of select="vocabulary:clean( //*[local-name() = 'rights']/@rightsURI[starts-with(normalize-space(.), 'info:eu-repo/semantics')], 'dnet:access_modes')" />
+                            <xsl:value-of select="TransformationFunction:convertString($tf, //*[local-name() = 'rights']/@rightsURI[starts-with(normalize-space(.), 'info:eu-repo/semantics')], 'AccessRights')" />
                         </oaf:accessrights>
                     </xsl:when>
                     <xsl:otherwise>
@@ -195,11 +226,22 @@
                     </oaf:license>
                 </xsl:for-each>
                 <oaf:language>
-                    <xsl:value-of select="vocabulary:clean( //*[local-name()='language'], 'dnet:languages')" />
+                    <xsl:value-of select="TransformationFunction:convert($tf, //*[local-name()='language'], 'Languages')" />
                 </oaf:language> <!-- country DE for items from TextGrid -->
                 <xsl:if test="$varDataSourceId = 're3data_____::r3d100011365'">
                     <oaf:country>DE</oaf:country>
-                </xsl:if> 
+                </xsl:if> <!--
+					<xsl:if test="//*[local-name() = 'rights'][starts-with(normalize-space(.), 'info:eu-repo/semantics/embargoedAccess')]">
+					<oaf:embargoenddate>
+					<xsl:value-of select="//*[local-name()='date']/@dateType='Available'"/>
+					</oaf:embargoenddate>
+					</xsl:if>
+					-->
+                <!--
+					<xsl:if test="not(//*[local-name()='nameIdentifier'][starts-with(., 'info:eu-repo/grant')])">
+					<xsl:call-template name="terminate"/>
+					</xsl:if>
+					-->
                 <xsl:for-each select="//*[local-name()='nameIdentifier']">
                     <xsl:if test="matches(normalize-space(.), '(info:eu-repo/grantagreement/ec/fp7/)(\d\d\d\d\d\d)(.*)', 'i')">
                         <oaf:projectid>
