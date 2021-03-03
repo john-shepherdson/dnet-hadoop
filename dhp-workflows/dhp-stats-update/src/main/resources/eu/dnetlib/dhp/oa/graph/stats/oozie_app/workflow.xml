@@ -41,6 +41,10 @@
             <name>hive_timeout</name>
             <description>the time period, in seconds, after which Hive fails a transaction if a Hive client has not sent a hearbeat. The default value is 300 seconds.</description>
         </property>
+        <property>
+            <name>context_api_url</name>
+            <description>the base url of the context api (https://services.openaire.eu/openaire)</description>
+        </property>
     </parameters>
 
     <global>
@@ -261,6 +265,19 @@
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
         <ok to="Step19"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step17">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>contexts.sh</exec>
+            <argument>${context_api_url}</argument>
+            <argument>${stats_db_name}</argument>
+            <file>contexts.sh</file>
+        </shell>
+        <ok to="step20-createMonitorDB"/>
         <error to="Kill"/>
     </action>
         
