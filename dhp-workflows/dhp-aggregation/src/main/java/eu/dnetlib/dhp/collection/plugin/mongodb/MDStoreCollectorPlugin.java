@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.client.MongoCollection;
 
@@ -18,6 +20,8 @@ import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.common.MdstoreClient;
 
 public class MDStoreCollectorPlugin implements CollectorPlugin {
+
+	private static final Logger log = LoggerFactory.getLogger(MDStoreCollectorPlugin.class);
 
 	public static final String MONGODB_DBNAME = "mongodb_dbname";
 	public static final String MDSTORE_ID = "mdstore_id";
@@ -30,14 +34,17 @@ public class MDStoreCollectorPlugin implements CollectorPlugin {
 			.orElseThrow(
 				() -> new CollectorException(
 					"missing mongodb baseUrl, expected in eu.dnetlib.dhp.collection.ApiDescriptor.baseUrl"));
+		log.info("mongoBaseUrl: {}", mongoBaseUrl);
 
 		final String dbName = Optional
 			.ofNullable(api.getParams().get(MONGODB_DBNAME))
 			.orElseThrow(() -> new CollectorException(String.format("missing parameter '%s'", MONGODB_DBNAME)));
+		log.info("dbName: {}", dbName);
 
 		final String mdId = Optional
 			.ofNullable(api.getParams().get(MDSTORE_ID))
 			.orElseThrow(() -> new CollectorException(String.format("missing parameter '%s'", MDSTORE_ID)));
+		log.info("mdId: {}", mdId);
 
 		final MdstoreClient client = new MdstoreClient(mongoBaseUrl, dbName);
 		final MongoCollection<Document> mdstore = client.mdStore(mdId);

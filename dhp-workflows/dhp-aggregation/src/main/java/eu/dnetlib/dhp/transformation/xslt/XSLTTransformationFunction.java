@@ -3,9 +3,11 @@ package eu.dnetlib.dhp.transformation.xslt;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.spark.api.java.function.MapFunction;
 
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
@@ -44,18 +46,20 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 			Processor processor = new Processor(false);
 			processor.registerExtensionFunction(cleanFunction);
 			processor.registerExtensionFunction(new DateCleaner());
+
 			final XsltCompiler comp = processor.newXsltCompiler();
 			XsltExecutable xslt = comp
-				.compile(new StreamSource(new ByteArrayInputStream(transformationRule.getBytes())));
+				.compile(new StreamSource(IOUtils.toInputStream(transformationRule, StandardCharsets.UTF_8)));
 			XdmNode source = processor
 				.newDocumentBuilder()
-				.build(new StreamSource(new ByteArrayInputStream(value.getBody().getBytes())));
+				.build(new StreamSource(IOUtils.toInputStream(value.getBody(), StandardCharsets.UTF_8)));
 			XsltTransformer trans = xslt.load();
 			trans.setInitialContextNode(source);
 			final StringWriter output = new StringWriter();
 			Serializer out = processor.newSerializer(output);
 			out.setOutputProperty(Serializer.Property.METHOD, "xml");
 			out.setOutputProperty(Serializer.Property.INDENT, "yes");
+
 			trans.setDestination(out);
 			trans.transform();
 			final String xml = output.toString();

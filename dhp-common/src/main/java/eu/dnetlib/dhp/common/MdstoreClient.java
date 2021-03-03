@@ -21,16 +21,18 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.QueryBuilder;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MdstoreClient implements Closeable {
+
+	private static final Logger log = LoggerFactory.getLogger(MdstoreClient.class);
 
 	private final MongoClient client;
 	private final MongoDatabase db;
 
 	private static final String COLL_METADATA = "metadata";
 	private static final String COLL_METADATA_MANAGER = "metadataManager";
-
-	private static final Log log = LogFactory.getLog(MdstoreClient.class);
 
 	public MdstoreClient(final String baseUrl, final String dbName) {
 		this.client = new MongoClient(new MongoClientURI(baseUrl));
@@ -40,11 +42,16 @@ public class MdstoreClient implements Closeable {
 	public MongoCollection<Document> mdStore(final String mdId) {
 		BasicDBObject query = (BasicDBObject) QueryBuilder.start("mdId").is(mdId).get();
 
+		log.info("querying current mdId: {}", query.toJson());
+
 		final String currentId = Optional
 			.ofNullable(getColl(db, COLL_METADATA_MANAGER, true).find(query))
 			.map(r -> r.first())
 			.map(d -> d.getString("currentId"))
 			.orElseThrow(() -> new IllegalArgumentException("cannot find current mdstore id for: " + mdId));
+
+		log.info("currentId: {}", currentId);
+
 		return getColl(db, currentId, true);
 	}
 
