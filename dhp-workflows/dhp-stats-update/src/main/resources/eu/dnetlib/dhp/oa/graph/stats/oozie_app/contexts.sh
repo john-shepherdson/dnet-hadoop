@@ -9,8 +9,8 @@ echo "Downloading context data"
 curl ${CONTEXT_API}/contexts?all=true -H "accept: application/json" | /usr/local/sbin/jq -r '.[] | "\(.id),\(.label)"' > contexts.csv
 cat contexts.csv | cut -d , -f1 | xargs -I {} curl ${CONTEXT_API}/context/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split(":")[0]),\(.id),\(.label)"' > categories.csv
 cat categories.csv | cut -d , -f2 | sed 's/:/%3A/g'| xargs -I {} curl ${CONTEXT_API}/context/category/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split("::")[0])::\(.id|split("::")[1]),\(.id),\(.label)"' > concepts.csv
-cat contexts.csv  | cut -f1 -d, | sed 's/\(.*\)/\1,\1::other,other/' >> categories.csv
-cat categories.csv | cut -d, -f2 | sed 's/\(.*\)/\1,\1::other,other/' >> concepts.csv
+cat contexts.csv | sed 's/^\(.*\),\(.*\)/\1,\1::other,\2/' >> categories.csv
+cat categories.csv | grep -v ::other | sed 's/^.*,\(.*\),\(.*\)/\1,\1::other,\2/' >> concepts.csv
 
 echo "uploading context data to hdfs"
 hdfs dfs -mkdir ${TMP}
@@ -29,5 +29,8 @@ impala-shell -c "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.
 
 echo "Cleaning up"
 hdfs dfs -rm -f -r -skipTrash ${TMP}
+rm concepts.csv
+rm categories.csv
+rm contexts.csv
 
 echo "Finito!"
