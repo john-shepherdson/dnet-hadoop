@@ -362,7 +362,7 @@
 				<version>${dnet.openaire.broker.common}</version>
 			</dependency>
 
-            <dependency>
+			<dependency>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-rt-transports-http</artifactId>
 				<version>3.1.5</version>
@@ -406,20 +406,20 @@
 				<version>4.0</version>
 			</dependency>
 
-            <dependency>
-                <groupId>com.ximpleware</groupId>
-                <artifactId>vtd-xml</artifactId>
-                <version>${vtd.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>com.ximpleware</groupId>
+				<artifactId>vtd-xml</artifactId>
+				<version>${vtd.version}</version>
+			</dependency>
 
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch-hadoop</artifactId>
-                <version>7.6.0</version>
-            </dependency>
+			<dependency>
+				<groupId>org.elasticsearch</groupId>
+				<artifactId>elasticsearch-hadoop</artifactId>
+				<version>7.6.0</version>
+			</dependency>
 
 
-            <dependency>
+			<dependency>
 				<groupId>org.apache.oozie</groupId>
 				<artifactId>oozie-client</artifactId>
 				<version>${dhp.oozie.version}</version>
@@ -685,6 +685,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
 		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>

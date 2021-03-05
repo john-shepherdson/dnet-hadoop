@@ -122,7 +122,31 @@ public class VocabularyGroup implements Serializable {
 		return vocs.get(vocId.toLowerCase()).getSynonymAsQualifier(syn);
 	}
 
+	/**
+	 * getSynonymAsQualifierCaseSensitive
+	 *
+	 * refelects the situation to check caseSensitive vocabulary
+	 */
+	public Qualifier getSynonymAsQualifierCaseSensitive(final String vocId, final String syn) {
+		if (StringUtils.isBlank(vocId)) {
+			return OafMapperUtils.unknown("", "");
+		}
+		return vocs.get(vocId).getSynonymAsQualifier(syn);
+	}
+
+	/**
+	 * termExists
+	 *
+	 * two methods: without and with caseSensitive check
+	 */
 	public boolean termExists(final String vocId, final String id) {
+		return termExists(vocId, id, Boolean.FALSE);
+	}
+
+	public boolean termExists(final String vocId, final String id, final Boolean caseSensitive) {
+		if (Boolean.TRUE.equals(caseSensitive)) {
+			return vocabularyExists(vocId) && vocs.get(vocId).termExists(id);
+		}
 		return vocabularyExists(vocId) && vocs.get(vocId.toLowerCase()).termExists(id);
 	}
 

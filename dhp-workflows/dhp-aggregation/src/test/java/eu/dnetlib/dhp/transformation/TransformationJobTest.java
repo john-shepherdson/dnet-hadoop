@@ -51,13 +51,12 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 	}
 
 	@Test
-	@DisplayName("Test Transform Single XML using XSLTTransformator")
+	@DisplayName("Test Transform Single XML using zenodo_tr XSLTTransformator")
 	public void testTransformSaxonHE() throws Exception {
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_zenodo.xml")));
-
 		// We Load the XSLT transformation Rule from the classpath
 		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
 
@@ -66,6 +65,125 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 		// Print the record
 		System.out.println(result.getBody());
 		// TODO Create significant Assert
+	}
+
+	@Test
+	@DisplayName("Test Transform Inst.&Them.v4 record XML with zenodo_tr")
+	public void testTransformITGv4Zenodo() throws Exception {
+
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
+
+		MetadataRecord result = tr.call(mr);
+
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
+	}
+
+	@Test
+	@DisplayName("Test Transform Inst.&Them.v4 record XML with xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid")
+	public void testTransformITGv4() throws Exception {
+
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		XSLTTransformationFunction tr = loadTransformationRule(
+			"/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl");
+
+		MetadataRecord result = tr.call(mr);
+
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
+	}
+
+	@Test
+	@DisplayName("Test Transform record XML with xslt_cleaning_datarepo_datacite")
+	public void testTransformMostlyUsedScript() throws Exception {
+
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		XSLTTransformationFunction tr = loadTransformationRule(
+			"/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_datarepo_datacite.xsl");
+
+		MetadataRecord result = tr.call(mr);
+
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
+	}
+
+	@Test
+	@DisplayName("Test TransformSparkJobNode.main with oaiOpenaire_datacite (v4)")
+	public void transformTestITGv4OAIdatacite(@TempDir Path testDir) throws Exception {
+
+		SparkConf conf = new SparkConf();
+		conf.setAppName(TransformationJobTest.class.getSimpleName());
+		conf.setMaster("local");
+
+		try (SparkSession spark = SparkSession.builder().config(conf).getOrCreate()) {
+
+			final String mdstore_input = this
+				.getClass()
+				.getResource("/eu/dnetlib/dhp/transform/mdstorenative")
+				.getFile();
+			final String mdstore_output = testDir.toString() + "/version";
+
+			mockupTrasformationRule(
+				"simpleTRule",
+				"/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl");
+
+			final Map<String, String> parameters = Stream.of(new String[][] {
+				{
+					"dateOfTransformation", "1234"
+				},
+				{
+					"varOfficialName", "Publications at Bielefeld University"
+				},
+				{
+					"varOfficialId", "opendoar____::2294"
+				},
+				{
+					"transformationPlugin", "XSLT_TRANSFORM"
+				},
+				{
+					"transformationRuleId", "simpleTRule"
+				},
+
+			}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+			TransformSparkJobNode.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output);
+
+			// TODO introduce useful assertions
+
+			final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
+			final Dataset<MetadataRecord> mOutput = spark
+				.read()
+				.format("parquet")
+				.load(mdstore_output + MDSTORE_DATA_PATH)
+				.as(encoder);
+
+			final Long total = mOutput.count();
+
+			final long recordTs = mOutput
+				.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
+				.count();
+
+			final long recordNotEmpty = mOutput
+				.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
+				.count();
+
+			assertEquals(total, recordTs);
+
+			assertEquals(total, recordNotEmpty);
+		}
 	}
 
 	@Test
