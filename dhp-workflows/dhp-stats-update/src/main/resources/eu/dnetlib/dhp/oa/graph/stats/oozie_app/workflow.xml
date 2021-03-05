@@ -264,7 +264,7 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
-        <ok to="Step19"/>
+        <ok to="Step17"/>
         <error to="Kill"/>
     </action>
 
@@ -277,7 +277,7 @@
             <argument>${stats_db_name}</argument>
             <file>contexts.sh</file>
         </shell>
-        <ok to="step20-createMonitorDB"/>
+        <ok to="step19"/>
         <error to="Kill"/>
     </action>
         
