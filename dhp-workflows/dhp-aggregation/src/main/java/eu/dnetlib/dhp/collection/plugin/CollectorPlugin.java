@@ -10,7 +10,7 @@ import eu.dnetlib.dhp.collection.CollectorException;
 public interface CollectorPlugin {
 
 	enum NAME {
-		oai, other;
+		oai, other, rest_json2xml;
 
 		public enum OTHER_NAME {
 			mdstore_mongodb_dump, mdstore_mongodb

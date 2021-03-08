@@ -24,6 +24,7 @@ import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MDStoreCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.rest.RestCollectorPlugin;
 
 public class CollectorWorker extends ReportingJob {
 
@@ -109,6 +110,8 @@ public class CollectorWorker extends ReportingJob {
 		switch (CollectorPlugin.NAME.valueOf(api.getProtocol())) {
 			case oai:
 				return new OaiCollectorPlugin(clientParams);
+			case rest_json2xml:
+				return new RestCollectorPlugin(clientParams);
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(api.getParams().get("other_plugin_type"))
