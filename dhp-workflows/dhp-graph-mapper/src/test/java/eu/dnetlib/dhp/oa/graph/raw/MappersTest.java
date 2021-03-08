@@ -24,8 +24,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,7 +71,7 @@ public class MappersTest {
 
 		assertValidId(p.getId());
 
-		assertTrue(p.getOriginalId().size() == 2);
+		assertTrue(p.getOriginalId().size() == 1);
 		assertEquals("10.3897/oneeco.2.e13718", p.getOriginalId().get(0));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
@@ -119,8 +125,26 @@ public class MappersTest {
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
-		verifyRelations(p, r1, r2);
-
+		assertValidId(r1.getSource());
+		assertValidId(r1.getTarget());
+		assertValidId(r2.getSource());
+		assertValidId(r2.getTarget());
+		assertValidId(r1.getCollectedfrom().get(0).getKey());
+		assertValidId(r2.getCollectedfrom().get(0).getKey());
+		assertNotNull(r1.getDataInfo());
+		assertNotNull(r2.getDataInfo());
+		assertNotNull(r1.getDataInfo().getTrust());
+		assertNotNull(r2.getDataInfo().getTrust());
+		assertEquals(r1.getSource(), r2.getTarget());
+		assertEquals(r2.getSource(), r1.getTarget());
+		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
+		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
+		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
+		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+		assertTrue(r1.getValidated());
+		assertTrue(r2.getValidated());
+		assertEquals(r1.getValidationDate(), "2020-01-01");
+		assertEquals(r2.getValidationDate(), "2020-01-01");
 		// System.out.println(new ObjectMapper().writeValueAsString(p));
 		// System.out.println(new ObjectMapper().writeValueAsString(r1));
 		// System.out.println(new ObjectMapper().writeValueAsString(r2));
@@ -158,7 +182,7 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
-		assertTrue(d.getOriginalId().size() == 2);
+		assertTrue(d.getOriginalId().size() == 1);
 		assertEquals("oai:zenodo.org:3234526", d.getOriginalId().get(0));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
@@ -211,19 +235,10 @@ public class MappersTest {
 			});
 		assertEquals("0001", d.getInstance().get(0).getRefereed().getClassid());
 
-		verifyRelations(d, r1, r2);
-	}
-
-	private void verifyRelations(OafEntity e, Relation r1, Relation r2) {
-		assertEquals(e.getId(), r1.getSource());
-		assertEquals(e.getId(), r2.getTarget());
-
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());
 		assertValidId(r2.getSource());
 		assertValidId(r2.getTarget());
-		assertValidId(r1.getCollectedfrom().get(0).getKey());
-		assertValidId(r2.getCollectedfrom().get(0).getKey());
 		assertNotNull(r1.getDataInfo());
 		assertNotNull(r2.getDataInfo());
 		assertNotNull(r1.getDataInfo().getTrust());
@@ -234,6 +249,10 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
 		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+		assertTrue(r1.getValidated());
+		assertTrue(r2.getValidated());
+		assertEquals(r1.getValidationDate(), "2020-01-01");
+		assertEquals(r2.getValidationDate(), "2020-01-01");
 	}
 
 	@Test
@@ -342,6 +361,37 @@ public class MappersTest {
 		final Dataset p = (Dataset) list.get(0);
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(1, p.getAuthor().size());
+		assertEquals("OPEN", p.getBestaccessright().getClassid());
+		assertTrue(StringUtils.isNotBlank(p.getPid().get(0).getValue()));
+		assertTrue(StringUtils.isNotBlank(p.getPid().get(0).getQualifier().getClassid()));
+		assertEquals("dataset", p.getResulttype().getClassname());
+		assertEquals(1, p.getInstance().size());
+		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
+		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
+		assertValidId(p.getInstance().get(0).getHostedby().getKey());
+		assertEquals(
+			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+		assertEquals(1, p.getInstance().get(0).getUrl().size());
+//		System.out.println(p.getInstance().get(0).getUrl().get(0));
+//		System.out.println(p.getInstance().get(0).getHostedby().getValue());
+		System.out.println(p.getPid().get(0).getValue());
+	}
+
+	@Test
+	void testBologna() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf-bologna.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		System.out.println(p.getTitle().get(0).getValue());
 	}

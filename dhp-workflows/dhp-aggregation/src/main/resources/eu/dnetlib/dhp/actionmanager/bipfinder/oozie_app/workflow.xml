@@ -21,10 +21,10 @@
     </kill>
     <action name="deleteoutputpath">
         <fs>
-            <delete path='${outputPath}'/>
-            <mkdir path='${outputPath}'/>
-            <delete path='${workingDir}'/>
-            <mkdir path='${workingDir}'/>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
         </fs>
         <ok to="atomicactions"/>
         <error to="Kill"/>

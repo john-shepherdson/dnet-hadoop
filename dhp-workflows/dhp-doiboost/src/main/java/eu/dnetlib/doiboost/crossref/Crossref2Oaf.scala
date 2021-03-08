@@ -206,7 +206,7 @@ case object Crossref2Oaf {
     a.setSurname(family)
     a.setFullname(s"$given $family")
     if (StringUtils.isNotBlank(orcid))
-      a.setPid(List(createSP(orcid, ORCID, PID_TYPES, generateDataInfo())).asJava)
+      a.setPid(List(createSP(orcid, ORCID_PENDING, PID_TYPES, generateDataInfo())).asJava)
 
     a
   }

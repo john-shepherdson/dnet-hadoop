@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.merge;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,27 +33,33 @@ public class AuthorMerger {
 
 	}
 
-	public static List<Author> mergeAuthor(final List<Author> a, final List<Author> b) {
+	public static List<Author> mergeAuthor(final List<Author> a, final List<Author> b, Double threshold) {
 		int pa = countAuthorsPids(a);
 		int pb = countAuthorsPids(b);
 		List<Author> base, enrich;
 		int sa = authorsSize(a);
 		int sb = authorsSize(b);
 
-		if (pa == pb) {
-			base = sa > sb ? a : b;
-			enrich = sa > sb ? b : a;
-		} else {
+		if (sa == sb) {
 			base = pa > pb ? a : b;
 			enrich = pa > pb ? b : a;
+		} else {
+			base = sa > sb ? a : b;
+			enrich = sa > sb ? b : a;
 		}
-		enrichPidFromList(base, enrich);
+		enrichPidFromList(base, enrich, threshold);
 		return base;
 	}
 
-	private static void enrichPidFromList(List<Author> base, List<Author> enrich) {
+	public static List<Author> mergeAuthor(final List<Author> a, final List<Author> b) {
+		return mergeAuthor(a, b, THRESHOLD);
+	}
+
+	private static void enrichPidFromList(List<Author> base, List<Author> enrich, Double threshold) {
 		if (base == null || enrich == null)
 			return;
+
+		// <pidComparableString, Author> (if an Author has more than 1 pid, it appears 2 times in the list)
 		final Map<String, Author> basePidAuthorMap = base
 			.stream()
 			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
@@ -63,6 +70,7 @@ public class AuthorMerger {
 					.map(p -> new Tuple2<>(pidToComparableString(p), a)))
 			.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
+		// <pid, Author> (list of pid that are missing in the other list)
 		final List<Tuple2<StructuredProperty, Author>> pidToEnrich = enrich
 			.stream()
 			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
@@ -83,10 +91,10 @@ public class AuthorMerger {
 						.max(Comparator.comparing(Tuple2::_1));
 
 					if (simAuthor.isPresent()) {
-						double th = THRESHOLD;
+						double th = threshold;
 						// increase the threshold if the surname is too short
 						if (simAuthor.get()._2().getSurname() != null
-							&& simAuthor.get()._2().getSurname().length() <= 3)
+							&& simAuthor.get()._2().getSurname().length() <= 3 && threshold > 0.0)
 							th = 0.99;
 
 						if (simAuthor.get()._1() > th) {
@@ -156,7 +164,7 @@ public class AuthorMerger {
 	}
 
 	private static String normalize(final String s) {
-		return nfd(s)
+		String[] normalized = nfd(s)
 			.toLowerCase()
 			// do not compact the regexes in a single expression, would cause StackOverflowError
 			// in case
@@ -166,7 +174,12 @@ public class AuthorMerger {
 			.replaceAll("(\\p{Punct})+", " ")
 			.replaceAll("(\\d)+", " ")
 			.replaceAll("(\\n)+", " ")
-			.trim();
+			.trim()
+			.split(" ");
+
+		Arrays.sort(normalized);
+
+		return String.join(" ", normalized);
 	}
 
 	private static String nfd(final String s) {

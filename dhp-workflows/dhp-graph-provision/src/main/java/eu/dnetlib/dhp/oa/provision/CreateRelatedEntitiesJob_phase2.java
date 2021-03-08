@@ -27,6 +27,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -272,11 +273,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.filter(Objects::nonNull)
 			.map(Qualifier::getClassid)
 			.filter(StringUtils::isNotBlank)
-			.anyMatch(c -> "orcid".equals(c.toLowerCase()));
-	}
-
-	private static FilterFunction<JoinedEntity> filterEmptyEntityFn() {
-		return (FilterFunction<JoinedEntity>) v -> Objects.nonNull(v.getEntity());
+			.anyMatch(c -> c.toLowerCase().contains(ModelConstants.ORCID));
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

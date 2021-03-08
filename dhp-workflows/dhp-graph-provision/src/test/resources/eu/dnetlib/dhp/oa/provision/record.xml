@@ -39,6 +39,8 @@
                 <creator rank="4">Saykally, Jessica N.</creator>
                 <creator rank="5">Keeley, Kristen L.</creator>
                 <creator rank="6">Haris Hatic</creator>
+                <creator rank="7" name="Miriam" surname="Baglioni" orcid_pending="0000-0002-2273-9004">Baglioni, Miriam</creator>
+                <creator rank="8" name="Michele" surname="De Bonis" orcid="0000-0002-2273-9004">De Bonis, Michele</creator>
                 <dateofacceptance>2017-06-01</dateofacceptance>
                 <description>Withania somnifera has been used in traditional medicine for a variety
                     of neural disorders. Recently, chronic neurodegenerative conditions have been
@@ -115,7 +117,7 @@
                 <source>Cell Transplantation</source>
                 <resulttype classid="publication" classname="publication"
                             schemeid="dnet:result_typologies" schemename="dnet:result_typologies"/>
-                <resourcetype/>
+                <resourcetype classid="Book" classname="Book" schemeid="dnet:dataCite_resource" schemename="dnet:dataCite_resource" />
                 <journal issn="0963-6897" eissn="1555-3892" ep="1201" iss="7" sp="1193" vol="26"
                 >Cell Transplantation</journal>
                 <context id="NIH" label="National Institutes of Health" type="funding">
@@ -291,6 +293,28 @@
                             scheme="dnet:organization_organization_relations" type="organization"
                         >rcuk________::23feba2a5ca7f6b6016bf3a45180da50</to>
                         <legalname>University of Delhi</legalname>
+                    </rel>
+                    <rel inferred="false" trust="0.9" inferenceprovenance="" provenanceaction="sysimport:crosswalk:repository">
+                       <validated date="2021-01-01">true</validated>
+                        <to class="isProducedBy" scheme="dnet:result_project_relations" type="project">corda_______::30c6b5ab90f30666de1d112fb93d8c77</to>
+                        <code>227878</code>
+                        <funding>
+                            <funder id="ec__________::EC" shortname="EC" name="European Commission" jurisdiction="EU" />
+                            <funding_level_0 name="FP7">ec__________::EC::FP7</funding_level_0>
+                            <funding_level_1 name="SP2">ec__________::EC::FP7::SP2</funding_level_1>
+                            <funding_level_2 name="ERC">ec__________::EC::FP7::SP2::ERC</funding_level_2>
+                        </funding>
+                        <title>Complex structure and dynamics of collective motion</title>
+                        <acronym>COLLMOT</acronym>
+                        <contracttype classid="ERC" classname="Support for frontier research (ERC)" schemeid="ec:FP7contractTypes" schemename="ec:FP7contractTypes" />
+                    </rel>
+                    <rel inferred="true" trust="0.72" inferenceprovenance="iis::document_referencedProjects" provenanceaction="iis">
+                        <to class="isProducedBy" scheme="dnet:result_project_relations" type="project">irb_hr______::2330a1d0dac71ffbe15fbcbc807288d4</to>
+                        <code>108-1083570-3635</code>
+                        <funding>
+                            <funder id="irb_hr______::MZOS" shortname="MZOS" name="Ministry of Science, Education and Sports of the Republic of Croatia (MSES)" jurisdiction="HR" />
+                        </funding>
+                        <title>Pentadecapeptide BPC 157 - further investigations</title>
                     </rel>
                 </rels>
                 <children>

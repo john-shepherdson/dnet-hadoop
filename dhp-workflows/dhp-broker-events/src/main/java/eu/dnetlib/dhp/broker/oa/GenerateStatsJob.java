@@ -46,7 +46,7 @@ public class GenerateStatsJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
 		final String dbUrl = parser.get("dbUrl");

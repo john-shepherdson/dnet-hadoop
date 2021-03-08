@@ -62,8 +62,6 @@ public abstract class Oaf implements Serializable {
 				.distinct() // relies on KeyValue.equals
 				.collect(Collectors.toList()));
 
-		mergeOAFDataInfo(o);
-
 		setLastupdatetimestamp(
 			Math
 				.max(

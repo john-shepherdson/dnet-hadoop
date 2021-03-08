@@ -1,0 +1,820 @@
+{
+  "author": [
+    {
+      "affiliation": [],
+      "fullname": "Lee, Jaehyun",
+      "name": "Jaehyun",
+      "pid": [
+        {
+          "qualifier": {
+            "classid": "orcid",
+            "classname": "Open Researcher and Contributor ID",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-6638"
+        },
+        {
+          "qualifier": {
+            "classid": "orcid_pending",
+            "classname": "Open Researcher and Contributor ID",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-6639"
+        }
+      ],
+      "rank": 1,
+      "surname": "Lee"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Berrada, Salim",
+      "name": "Salim",
+      "pid": [
+        {
+          "qualifier": {
+            "classid": "orcid",
+            "classname": "Open Researcher and Contributor ID",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-9956"
+        },
+        {
+          "qualifier": {
+            "classid": "orcid_pending",
+            "classname": "Open Researcher and Contributor ID",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-9956"
+        }
+      ],
+      "rank": 2,
+      "surname": "Berrada"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Adamu-Lema, Fikru",
+      "name": "Fikru",
+      "pid": [],
+      "rank": 3,
+      "surname": "Adamu-Lema"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Nagy, Nicole",
+      "name": "Nicole",
+      "pid": [],
+      "rank": 4,
+      "surname": "Nagy"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Georgiev, Vihar P.",
+      "name": "Vihar P.",
+      "pid": [],
+      "rank": 5,
+      "surname": "Georgiev"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Sadi, Toufik",
+      "name": "Toufik",
+      "pid": [],
+      "rank": 6,
+      "surname": "Sadi"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Liang, Jie",
+      "name": "Jie",
+      "pid": [],
+      "rank": 7,
+      "surname": "Liang"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Ramos, Raphael",
+      "name": "Raphael",
+      "pid": [],
+      "rank": 8,
+      "surname": "Ramos"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Carrillo-Nunez, Hamilton",
+      "name": "Hamilton",
+      "pid": [],
+      "rank": 9,
+      "surname": "Carrillo-Nunez"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Kalita, Dipankar",
+      "name": "Dipankar",
+      "pid": [],
+      "rank": 10,
+      "surname": "Kalita"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Lilienthal, Katharina",
+      "name": "Katharina",
+      "pid": [],
+      "rank": 11,
+      "surname": "Lilienthal"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Wislicenus, Marcus",
+      "name": "Marcus",
+      "pid": [],
+      "rank": 12,
+      "surname": "Wislicenus"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Pandey, Reeturaj",
+      "name": "Reeturaj",
+      "pid": [],
+      "rank": 13,
+      "surname": "Pandey"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Chen, Bingan",
+      "name": "Bingan",
+      "pid": [],
+      "rank": 14,
+      "surname": "Chen"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Teo, Kenneth B.K.",
+      "name": "Kenneth B. K.",
+      "pid": [],
+      "rank": 15,
+      "surname": "Teo"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Goncalves, Goncalo",
+      "name": "Goncalo",
+      "pid": [],
+      "rank": 16,
+      "surname": "Goncalves"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Okuno, Hanako",
+      "name": "Hanako",
+      "pid": [],
+      "rank": 17,
+      "surname": "Okuno"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Uhlig, Benjamin",
+      "name": "Benjamin",
+      "pid": [],
+      "rank": 18,
+      "surname": "Uhlig"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Todri-Sanial, Aida",
+      "name": "Aida",
+      "pid": [],
+      "rank": 19,
+      "surname": "Todri-Sanial"
+    },
+    {
+      "affiliation": [],
+      "fullname": "Dijon",
+      "name": "",
+      "pid": [],
+      "rank": 20,
+      "surname": ""
+    },
+    {
+      "affiliation": [],
+      "fullname": "Jean",
+      "name": "",
+      "pid": [],
+      "rank": 21,
+      "surname": ""
+    }
+  ],
+  "collectedfrom": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+      "value": "VIRTA"
+    }
+  ],
+  "context": [],
+  "contributor": [],
+  "country": [],
+  "coverage": [],
+  "dataInfo": {
+    "deletedbyinference": false,
+    "inferenceprovenance": "",
+    "inferred": false,
+    "invisible": false,
+    "provenanceaction": {
+      "classid": "sysimport:crosswalk:datasetarchive",
+      "classname": "sysimport:crosswalk:datasetarchive",
+      "schemeid": "dnet:provenanceActions",
+      "schemename": "dnet:provenanceActions"
+    },
+    "trust": "0.9"
+  },
+  "dateofacceptance": {
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferenceprovenance": "",
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "trust": ""
+    },
+    "value": "2018-01-01"
+  },
+  "dateofcollection": "2020-01-27T11:32:33.729Z",
+  "dateoftransformation": "2020-01-27T12:03:59.662Z",
+  "description": [],
+  "embargoenddate": {
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferenceprovenance": "",
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "trust": ""
+    },
+    "value": ""
+  },
+  "extraInfo": [],
+  "format": [],
+  "fulltext": [],
+  "id": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
+  "instance": [
+    {
+      "accessright": {
+        "classid": "OPEN",
+        "classname": "Open Access",
+        "schemeid": "dnet:access_modes",
+        "schemename": "dnet:access_modes"
+      },
+      "collectedfrom": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferenceprovenance": "",
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "",
+            "classname": "",
+            "schemeid": "",
+            "schemename": ""
+          },
+          "trust": ""
+        },
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "dateofacceptance": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferenceprovenance": "",
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "",
+            "classname": "",
+            "schemeid": "",
+            "schemename": ""
+          },
+          "trust": ""
+        },
+        "value": "2018-01-01"
+      },
+      "distributionlocation": "",
+      "hostedby": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferenceprovenance": "",
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "",
+            "classname": "",
+            "schemeid": "",
+            "schemename": ""
+          },
+          "trust": ""
+        },
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "instancetype": {
+        "classid": "0001",
+        "classname": "Article",
+        "schemeid": "dnet:dataCite_resource",
+        "schemename": "dnet:dataCite_resource"
+      },
+      "license": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferenceprovenance": "",
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "",
+            "classname": "",
+            "schemeid": "",
+            "schemename": ""
+          },
+          "trust": ""
+        },
+        "value": ""
+      },
+      "url": [
+        "http://juuli.fi/Record/0331473718",
+        "http://dx.doi.org/10.1109/TED.2018.2853550"
+      ]
+    }
+  ],
+  "journal": {
+    "conferencedate": "",
+    "conferenceplace": "",
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferenceprovenance": "",
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "trust": ""
+    },
+    "edition": "",
+    "ep": "3892",
+    "iss": "9",
+    "issnLinking": "",
+    "issnOnline": "",
+    "issnPrinted": "0018-9383",
+    "name": "IEEE Transactions on Electron Devices",
+    "sp": "3884",
+    "vol": "65"
+  },
+  "language": {
+    "classid": "en",
+    "classname": "en",
+    "schemeid": "dnet:languages",
+    "schemename": "dnet:languages"
+  },
+  "lastupdatetimestamp": 0,
+  "originalId": [
+    "0331473718",
+    "10.1109/TED.2018.2853550",
+    "http://juuli.fi/Record/0331473718"
+  ],
+  "pid": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "doi",
+        "classname": "doi",
+        "schemeid": "dnet:pid_types",
+        "schemename": "dnet:pid_types"
+      },
+      "value": "10.1109/TED.2018.2853550"
+    }
+  ],
+  "publisher": {
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferenceprovenance": "",
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "trust": ""
+    },
+    "value": ""
+  },
+  "relevantdate": [],
+  "resourcetype": {
+    "classid": "0001",
+    "classname": "Article",
+    "schemeid": "dnet:dataCite_resource",
+    "schemename": "dnet:dataCite_resource"
+  },
+  "resulttype": {
+    "classid": "publication",
+    "classname": "publication",
+    "schemeid": "dnet:result_typologies",
+    "schemename": "dnet:result_typologies"
+  },
+  "source": [],
+  "subject": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "http://finto.fi/okm-tieteenala/en/",
+        "classname": "finto",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "ta114"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Conductivity"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Contacts"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Cu-carbon nanotubes (CNT) composites"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "density functional theory (DFT)"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Discrete Fourier transforms"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Electromigration"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "electromigration (EM)"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "electrothermal"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "interconnects"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Lattices"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "multiscale simulation"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Resistance"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "self-heating."
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Thermal conductivity"
+    }
+  ],
+  "title": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "trust": ""
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "Understanding Electromigration in Cu-CNT Composite Interconnects A Multiscale Electrothermal Simulation Study"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.provision
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.provision.scholix.Scholix
 import eu.dnetlib.dhp.provision.scholix.summary.ScholixSummary
@@ -7,7 +8,6 @@ import org.apache.commons.io.IOUtils
 import org.apache.hadoop.io.compress.GzipCodec
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
-import org.codehaus.jackson.map.ObjectMapper
 
 object SparkConvertDatasetToJson {
 
