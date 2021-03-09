@@ -52,6 +52,9 @@ public class IdentifierFactory implements Serializable {
 		PID_AUTHORITY.put(PidType.pmid, HashBiMap.create());
 		PID_AUTHORITY.get(PidType.pmid).put(EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central");
 		PID_AUTHORITY.get(PidType.pmid).put(PUBMED_CENTRAL_ID, "PubMed Central");
+
+		PID_AUTHORITY.put(PidType.arXiv, HashBiMap.create());
+		PID_AUTHORITY.get(PidType.arXiv).put(ARXIV_ID, "arXiv.org e-Print Archive");
 	}
 
 	/**
