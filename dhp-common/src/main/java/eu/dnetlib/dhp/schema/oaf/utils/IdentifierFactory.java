@@ -8,15 +8,12 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -36,7 +33,7 @@ public class IdentifierFactory implements Serializable {
 	public static final int ID_PREFIX_LEN = 12;
 
 	/**
-	 * Declares the associations PID_TYPE -> [DATASOURCE ID, NAME] considered authoritative for that PID
+	 * Declares the associations PID_TYPE -> [DATASOURCE ID, NAME] considered authoritative for that PID_TYPE
 	 */
 	public static final Map<PidType, HashBiMap<String, String>> PID_AUTHORITY = Maps.newHashMap();
 
