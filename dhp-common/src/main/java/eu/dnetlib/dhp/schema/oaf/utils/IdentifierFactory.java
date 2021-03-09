@@ -8,6 +8,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
@@ -30,6 +35,13 @@ public class IdentifierFactory implements Serializable {
 
 	public static final int ID_PREFIX_LEN = 12;
 
+	public static final HashBiMap<String, String> PID_AUTHORITY = HashBiMap.create(2);
+
+	static {
+		PID_AUTHORITY.put(ModelConstants.CROSSREF_ID, "Crossref");
+		PID_AUTHORITY.put(ModelConstants.DATACITE_ID, "Datacite");
+	}
+
 	/**
 	 * Creates an identifier from the most relevant PID (if available) in the given entity T. Returns entity.id
 	 * when no PID is available
@@ -40,6 +52,14 @@ public class IdentifierFactory implements Serializable {
 	 */
 	public static <T extends OafEntity> String createIdentifier(T entity, boolean md5) {
 		if (Objects.isNull(entity.getPid()) || entity.getPid().isEmpty()) {
+			return entity.getId();
+		}
+
+		if (Optional.ofNullable(
+				entity.getCollectedfrom())
+				.map(c -> c.stream()
+						.noneMatch(cf -> PID_AUTHORITY.containsKey(cf.getKey()) || PID_AUTHORITY.containsValue(cf.getValue())))
+				.orElse(true)) {
 			return entity.getId();
 		}
 

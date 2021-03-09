@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class CleaningFunctions {
 
-	public static final String DOI_PREFIX_REGEX = "^.*10\\.";
+	public static final String DOI_PREFIX_REGEX = "(^10\\.|\\/10.)";
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 
@@ -277,7 +277,7 @@ public class CleaningFunctions {
 
 			// TODO add cleaning for more PID types as needed
 			case "doi":
-				pid.setValue(value.toLowerCase().replaceAll(DOI_URL_PREFIX_REGEX, ""));
+				pid.setValue(value.toLowerCase().replaceAll(DOI_PREFIX_REGEX, "10."));
 				break;
 		}
 		return pid;

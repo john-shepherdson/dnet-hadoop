@@ -23,7 +23,7 @@ public class IdentifierFactoryTest {
 	public void testCreateIdentifierForPublication() throws IOException {
 
 		verifyIdentifier(
-			"publication_doi1.json", "50|doi_________::" + DHPUtils.md5("10.1016/j.cmet.2011.03.013"), true);
+			"publication_doi1.json", "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", false);
 		verifyIdentifier(
 			"publication_doi2.json", "50|doi_________::" + DHPUtils.md5("10.1016/j.cmet.2010.03.013"), true);
 		verifyIdentifier("publication_pmc1.json", "50|pmc_________::" + DHPUtils.md5("21459329"), true);

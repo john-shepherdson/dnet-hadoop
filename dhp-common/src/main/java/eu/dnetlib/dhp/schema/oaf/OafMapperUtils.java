@@ -9,9 +9,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -327,10 +327,10 @@ public class OafMapperUtils {
 
 	protected static Qualifier getBestAccessRights(final List<Instance> instanceList) {
 		if (instanceList != null) {
-			final Optional<Qualifier> min = instanceList
+			final Optional<AccessRight> min = instanceList
 				.stream()
 				.map(i -> i.getAccessright())
-				.min(new LicenseComparator());
+				.min(new AccessRightComparator<>());
 
 			final Qualifier rights = min.isPresent() ? min.get() : new Qualifier();
 
