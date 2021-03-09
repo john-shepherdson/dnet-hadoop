@@ -236,11 +236,11 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	protected Relation getRelation(final String source,
-								   final String target,
-								   final String relType,
-								   final String subRelType,
-								   final String relClass,
-								   final OafEntity entity) {
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final OafEntity entity) {
 		return getRelation(source, target, relType, subRelType, relClass, entity, null);
 	}
 
@@ -250,7 +250,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		final String subRelType,
 		final String relClass,
 		final OafEntity entity,
-	    final String validationDate) {
+		final String validationDate) {
 		final Relation rel = new Relation();
 		rel.setRelType(relType);
 		rel.setSubRelType(subRelType);

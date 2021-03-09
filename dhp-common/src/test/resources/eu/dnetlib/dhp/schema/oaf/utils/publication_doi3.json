@@ -3,8 +3,8 @@
   "instance": [
     {
       "collectedfrom": {
-        "key": "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2",
-        "value": "Crossref"
+        "key": "10|openaire____::1234",
+        "value": "Zenodo"
       },
       "pid": [
         {

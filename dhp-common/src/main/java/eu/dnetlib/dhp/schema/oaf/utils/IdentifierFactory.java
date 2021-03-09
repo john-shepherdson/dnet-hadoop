@@ -1,23 +1,23 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 /**
@@ -35,44 +35,37 @@ public class IdentifierFactory implements Serializable {
 
 	public static final int ID_PREFIX_LEN = 12;
 
-	public static final HashBiMap<String, String> PID_AUTHORITY = HashBiMap.create(2);
+	/**
+	 * Declares the associations PID_TYPE -> [DATASOURCE ID, NAME] considered authoritative for that PID
+	 */
+	public static final Map<PidType, HashBiMap<String, String>> PID_AUTHORITY = Maps.newHashMap();
 
 	static {
-		PID_AUTHORITY.put(ModelConstants.CROSSREF_ID, "Crossref");
-		PID_AUTHORITY.put(ModelConstants.DATACITE_ID, "Datacite");
+		PID_AUTHORITY.put(PidType.doi, HashBiMap.create());
+		PID_AUTHORITY.get(PidType.doi).put(CROSSREF_ID, "Crossref");
+		PID_AUTHORITY.get(PidType.doi).put(DATACITE_ID, "Datacite");
+
+		PID_AUTHORITY.put(PidType.pmc, HashBiMap.create());
+		PID_AUTHORITY.get(PidType.pmc).put(EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central");
+		PID_AUTHORITY.get(PidType.pmc).put(PUBMED_CENTRAL_ID, "PubMed Central");
+
+		PID_AUTHORITY.put(PidType.pmid, HashBiMap.create());
+		PID_AUTHORITY.get(PidType.pmid).put(EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central");
+		PID_AUTHORITY.get(PidType.pmid).put(PUBMED_CENTRAL_ID, "PubMed Central");
 	}
 
 	/**
-	 * Creates an identifier from the most relevant PID (if available) in the given entity T. Returns entity.id
-	 * when no PID is available
+	 * Creates an identifier from the most relevant PID (if available) provided by a known PID authority in the given
+	 * entity T. Returns entity.id when none of the PIDs meet the selection criteria is available.
+	 *
 	 * @param entity the entity providing PIDs and a default ID.
 	 * @param <T> the specific entity type. Currently Organization and Result subclasses are supported.
 	 * @param md5 indicates whether should hash the PID value or not.
 	 * @return an identifier from the most relevant PID, entity.id otherwise
 	 */
 	public static <T extends OafEntity> String createIdentifier(T entity, boolean md5) {
-		if (Objects.isNull(entity.getPid()) || entity.getPid().isEmpty()) {
-			return entity.getId();
-		}
 
-		if (Optional.ofNullable(
-				entity.getCollectedfrom())
-				.map(c -> c.stream()
-						.noneMatch(cf -> PID_AUTHORITY.containsKey(cf.getKey()) || PID_AUTHORITY.containsValue(cf.getValue())))
-				.orElse(true)) {
-			return entity.getId();
-		}
-
-		Map<String, List<StructuredProperty>> pids = entity
-			.getPid()
-			.stream()
-			.map(CleaningFunctions::normalizePidValue)
-			.filter(IdentifierFactory::pidFilter)
-			.collect(
-				Collectors
-					.groupingBy(
-						p -> p.getQualifier().getClassid(),
-						Collectors.mapping(p -> p, Collectors.toList())));
+		final Map<String, List<StructuredProperty>> pids = extractPids(entity);
 
 		return pids
 			.values()
@@ -91,6 +84,57 @@ public class IdentifierFactory implements Serializable {
 							.orElseGet(entity::getId))
 					.orElseGet(entity::getId))
 			.orElseGet(entity::getId);
+	}
+
+	private static <T extends OafEntity> Map<String, List<StructuredProperty>> extractPids(T entity) {
+		if (entity instanceof Result) {
+			return Optional
+				.ofNullable(((Result) entity).getInstance())
+				.map(
+					instance -> instance
+						.stream()
+						.map(
+							i -> Optional
+								.ofNullable(i.getPid())
+								.map(
+									pp -> pp
+										.stream()
+										// filter away PIDs provided by a DS that is not considered an authority for the
+										// given PID Type
+										.filter(p -> {
+											final PidType pType = PidType.tryValueOf(p.getQualifier().getClassid());
+											return Optional.ofNullable(i.getCollectedfrom()).isPresent() &&
+												Optional
+													.ofNullable(PID_AUTHORITY.get(pType))
+													.map(authorities -> {
+														final KeyValue cf = i.getCollectedfrom();
+														return authorities.containsKey(cf.getKey())
+															|| authorities.containsValue(cf.getValue());
+													})
+													.orElse(false);
+										})
+										.map(CleaningFunctions::normalizePidValue)
+										.filter(IdentifierFactory::pidFilter))
+								.orElse(Stream.empty()))
+						.flatMap(Function.identity())
+						.collect(
+							Collectors
+								.groupingBy(
+									p -> p.getQualifier().getClassid(),
+									Collectors.mapping(p -> p, Collectors.toList()))))
+				.orElse(new HashMap<>());
+		} else {
+			return entity
+				.getPid()
+				.stream()
+				.map(CleaningFunctions::normalizePidValue)
+				.filter(IdentifierFactory::pidFilter)
+				.collect(
+					Collectors
+						.groupingBy(
+							p -> p.getQualifier().getClassid(),
+							Collectors.mapping(p -> p, Collectors.toList())));
+		}
 	}
 
 	/**

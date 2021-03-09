@@ -23,28 +23,35 @@ public class IdentifierFactoryTest {
 	public void testCreateIdentifierForPublication() throws IOException {
 
 		verifyIdentifier(
-			"publication_doi1.json", "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", false);
+			"publication_doi1.json", "50|doi_________::79dbc7a2a56dc1532659f9038843256e", true);
+
 		verifyIdentifier(
-			"publication_doi2.json", "50|doi_________::" + DHPUtils.md5("10.1016/j.cmet.2010.03.013"), true);
-		verifyIdentifier("publication_pmc1.json", "50|pmc_________::" + DHPUtils.md5("21459329"), true);
+			"publication_doi2.json", "50|doi_________::79dbc7a2a56dc1532659f9038843256e", true);
+
 		verifyIdentifier(
-			"publication_urn1.json",
-			"50|urn_________::" + DHPUtils.md5("urn:nbn:nl:ui:29-f3ed5f9e-edf6-457e-8848-61b58a4075e2"), true);
+			"publication_doi3.json", "50|pmc_________::94e4cb08c93f8733b48e2445d04002ac", true);
+
+		verifyIdentifier(
+			"publication_pmc1.json", "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", true);
+
+		verifyIdentifier(
+			"publication_pmc2.json", "50|pmc_________::94e4cb08c93f8733b48e2445d04002ac", true);
 
 		final String defaultID = "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f";
 		verifyIdentifier("publication_3.json", defaultID, true);
 		verifyIdentifier("publication_4.json", defaultID, true);
 		verifyIdentifier("publication_5.json", defaultID, true);
+
 	}
 
 	@Test
 	public void testCreateIdentifierForPublicationNoHash() throws IOException {
 
-		verifyIdentifier("publication_doi1.json", "50|doi_________::10.1016/j.cmet.2011.03.013", false);
+		verifyIdentifier("publication_doi1.json", "50|doi_________::10.1016/j.cmet.2010.03.013", false);
 		verifyIdentifier("publication_doi2.json", "50|doi_________::10.1016/j.cmet.2010.03.013", false);
-		verifyIdentifier("publication_pmc1.json", "50|pmc_________::21459329", false);
+		verifyIdentifier("publication_pmc1.json", "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", false);
 		verifyIdentifier(
-			"publication_urn1.json", "50|urn_________::urn:nbn:nl:ui:29-f3ed5f9e-edf6-457e-8848-61b58a4075e2", false);
+			"publication_urn1.json", "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", false);
 
 		final String defaultID = "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f";
 		verifyIdentifier("publication_3.json", defaultID, false);

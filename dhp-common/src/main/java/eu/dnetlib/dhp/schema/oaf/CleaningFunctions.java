@@ -14,6 +14,8 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 public class CleaningFunctions {
 
 	public static final String DOI_PREFIX_REGEX = "(^10\\.|\\/10.)";
+	public static final String DOI_PREFIX = "10.";
+
 	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 
@@ -264,6 +266,29 @@ public class CleaningFunctions {
 	}
 
 	/**
+	 * Utility method that filter PID values on a per-type basis.
+	 * @param pid the PID whose value will be checked.
+	 * @return true the PID containing the normalised value.
+	 */
+	private static boolean filterPid(StructuredProperty pid) {
+		String value = Optional
+			.ofNullable(pid.getValue())
+			.map(s -> StringUtils.replaceAll(s, "\\s", ""))
+			.orElse("");
+		if (StringUtils.isBlank(value)) {
+			return false;
+		}
+		switch (pid.getQualifier().getClassid()) {
+
+			// TODO add cleaning for more PID types as needed
+			case "doi":
+				return value.startsWith(DOI_PREFIX);
+			default:
+				return true;
+		}
+	}
+
+	/**
 	 * Utility method that normalises PID values on a per-type basis.
 	 * @param pid the PID whose value will be normalised.
 	 * @return the PID containing the normalised value.
@@ -277,7 +302,7 @@ public class CleaningFunctions {
 
 			// TODO add cleaning for more PID types as needed
 			case "doi":
-				pid.setValue(value.toLowerCase().replaceAll(DOI_PREFIX_REGEX, "10."));
+				pid.setValue(value.toLowerCase().replaceFirst(DOI_PREFIX_REGEX, DOI_PREFIX));
 				break;
 		}
 		return pid;

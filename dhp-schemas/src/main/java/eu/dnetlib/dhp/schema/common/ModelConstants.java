@@ -14,6 +14,9 @@ public class ModelConstants {
 	public static String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
 	public static String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
 
+	public static String EUROPE_PUBMED_CENTRAL_ID = "10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c";
+	public static String PUBMED_CENTRAL_ID = "10|opendoar____::eda80a3d5b344bc40f3bc04f65b7a357";
+
 	public static final String DNET_SUBJECT_TYPOLOGIES = "dnet:subject_classification_typologies";
 	public static final String DNET_RESULT_TYPOLOGIES = "dnet:result_typologies";
 	public static final String DNET_PUBLICATION_RESOURCE = "dnet:publication_resource";

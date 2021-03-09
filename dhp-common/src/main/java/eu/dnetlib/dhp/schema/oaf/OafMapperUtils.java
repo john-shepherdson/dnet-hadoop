@@ -9,9 +9,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 import org.apache.commons.lang3.StringUtils;
 
+import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.utils.DHPUtils;
 

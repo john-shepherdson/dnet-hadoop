@@ -71,7 +71,7 @@ public class MappersTest {
 
 		assertValidId(p.getId());
 
-		assertEquals(2, p.getOriginalId().size());
+		assertEquals(1, p.getOriginalId().size());
 		assertTrue(p.getOriginalId().contains("10.3897/oneeco.2.e13718"));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
@@ -186,7 +186,7 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
-		assertEquals(2, d.getOriginalId().size());
+		assertEquals(1, d.getOriginalId().size());
 		assertTrue(d.getOriginalId().contains("oai:zenodo.org:3234526"));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
