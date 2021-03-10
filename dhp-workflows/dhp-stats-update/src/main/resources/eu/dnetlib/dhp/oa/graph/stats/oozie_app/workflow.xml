@@ -277,7 +277,7 @@
             <argument>${stats_db_name}</argument>
             <file>contexts.sh</file>
         </shell>
-        <ok to="step19"/>
+        <ok to="Step19"/>
         <error to="Kill"/>
     </action>
         
