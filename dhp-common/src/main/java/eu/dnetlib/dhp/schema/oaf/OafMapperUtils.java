@@ -141,6 +141,15 @@ public class OafMapperUtils {
 		return q;
 	}
 
+	public static Qualifier qualifier(final Qualifier qualifier) {
+		final Qualifier q = new Qualifier();
+		q.setClassid(qualifier.getClassid());
+		q.setClassname(qualifier.getClassname());
+		q.setSchemeid(qualifier.getSchemeid());
+		q.setSchemename(qualifier.getSchemename());
+		return q;
+	}
+
 	public static StructuredProperty structuredProperty(
 		final String value,
 		final String classid,
@@ -332,7 +341,7 @@ public class OafMapperUtils {
 				.map(i -> i.getAccessright())
 				.min(new AccessRightComparator<>());
 
-			final Qualifier rights = min.isPresent() ? min.get() : new Qualifier();
+			final Qualifier rights = min.isPresent() ? qualifier(min.get()) : new Qualifier();
 
 			if (StringUtils.isBlank(rights.getClassid())) {
 				rights.setClassid(UNKNOWN);
