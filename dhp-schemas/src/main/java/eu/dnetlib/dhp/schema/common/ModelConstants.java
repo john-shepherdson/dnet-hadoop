@@ -18,6 +18,9 @@ public class ModelConstants {
 	public static final String PUBMED_CENTRAL_ID = "10|opendoar____::eda80a3d5b344bc40f3bc04f65b7a357";
 	public static final String ARXIV_ID = "10|opendoar____::6f4922f45568161a8cdf4ad2299f6d23";
 
+	//VOCABULARY VALUE
+	public static final String ACCESS_RIGHT_OPEN = "OPEN";
+
 	public static final String DNET_SUBJECT_TYPOLOGIES = "dnet:subject_classification_typologies";
 	public static final String DNET_RESULT_TYPOLOGIES = "dnet:result_typologies";
 	public static final String DNET_PUBLICATION_RESOURCE = "dnet:publication_resource";
