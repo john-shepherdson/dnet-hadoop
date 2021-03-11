@@ -83,7 +83,7 @@ object UnpayWallToOAF {
     val i :Instance= new Instance()
 
     i.setCollectedfrom(createUnpayWallCollectedFrom())
-    i.setAccessright(getOpenAccessQualifier())
+//    i.setAccessright(getOpenAccessQualifier())
     i.setUrl(List(oaLocation.url.get).asJava)
 
     // Ticket #6281 added pid to Instance
@@ -101,6 +101,7 @@ object UnpayWallToOAF {
       a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
       a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
       a.setOpenAccessRoute(colour.get)
+      i.setAccessright(a)
     }
     pub.setInstance(List(i).asJava)
     pub
