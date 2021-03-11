@@ -58,13 +58,13 @@ object SparkProcessMAG {
     val paperAuthorAffiliation = spark.read.load(s"$sourcePath/PaperAuthorAffiliations").as[MagPaperAuthorAffiliation]
 
     paperAuthorAffiliation.joinWith(authors, paperAuthorAffiliation("AuthorId").equalTo(authors("AuthorId")))
-      .map { case (a: MagPaperAuthorAffiliation, b: MagAuthor) => (a.AffiliationId, MagPaperAuthorDenormalized(a.PaperId, b, null)) }
+      .map { case (a: MagPaperAuthorAffiliation, b: MagAuthor) => (a.AffiliationId, MagPaperAuthorDenormalized(a.PaperId, b, null, a.AuthorSequenceNumber)) }
       .joinWith(affiliation, affiliation("AffiliationId").equalTo(col("_1")), "left")
       .map(s => {
         val mpa = s._1._2
         val af = s._2
         if (af != null) {
-          MagPaperAuthorDenormalized(mpa.PaperId, mpa.author, af.DisplayName)
+          MagPaperAuthorDenormalized(mpa.PaperId, mpa.author, af.DisplayName, mpa.sequenceNumber)
         } else
           mpa
       }).groupBy("PaperId").agg(collect_list(struct($"author", $"affiliation")).as("authors"))

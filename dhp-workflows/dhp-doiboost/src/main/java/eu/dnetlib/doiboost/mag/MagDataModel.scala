@@ -32,11 +32,11 @@ case class MagAffiliation(AffiliationId: Long, Rank: Int, NormalizedName: String
 case class MagPaperAuthorAffiliation(PaperId: Long, AuthorId: Long, AffiliationId: Option[Long], AuthorSequenceNumber: Int, OriginalAuthor: String, OriginalAffiliation: String) {}
 
 
-case class MagAuthorAffiliation(author: MagAuthor, affiliation:String)
+case class MagAuthorAffiliation(author: MagAuthor, affiliation:String, sequenceNumber:Int)
 
 case class MagPaperWithAuthorList(PaperId: Long, authors: List[MagAuthorAffiliation]) {}
 
-case class MagPaperAuthorDenormalized(PaperId: Long, author: MagAuthor, affiliation:String) {}
+case class MagPaperAuthorDenormalized(PaperId: Long, author: MagAuthor, affiliation:String, sequenceNumber:Int) {}
 
 case class MagPaperUrl(PaperId: Long, SourceType: Option[Int], SourceUrl: Option[String], LanguageCode: Option[String]) {}
 
@@ -209,9 +209,9 @@ case object ConversionUtil {
     val authorsOAF = authors.authors.map { f: MagAuthorAffiliation =>
 
       val a: eu.dnetlib.dhp.schema.oaf.Author = new eu.dnetlib.dhp.schema.oaf.Author
-
-      a.setFullname(f.author.DisplayName.get)
-
+      a.setRank(f.sequenceNumber)
+      if (f.author.DisplayName.isDefined)
+        a.setFullname(f.author.DisplayName.get)
       if(f.affiliation!= null)
         a.setAffiliation(List(asField(f.affiliation)).asJava)
       a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", PID_TYPES)).asJava)

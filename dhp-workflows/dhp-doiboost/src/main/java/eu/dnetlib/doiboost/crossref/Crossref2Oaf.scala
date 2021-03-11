@@ -21,7 +21,7 @@ case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
 case class mappingAffiliation(name: String) {}
 
-case class mappingAuthor(given: Option[String], family: String, ORCID: Option[String], affiliation: Option[mappingAffiliation]) {}
+case class mappingAuthor(given: Option[String], family: String, sequence:Option[String], ORCID: Option[String], affiliation: Option[mappingAffiliation]) {}
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
@@ -162,7 +162,12 @@ case object Crossref2Oaf {
 
     //Mapping Author
     val authorList: List[mappingAuthor] = (json \ "author").extractOrElse[List[mappingAuthor]](List())
-    result.setAuthor(authorList.map(a => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull)).asJava)
+
+
+
+    val sorted_list = authorList.sortWith((a:mappingAuthor, b:mappingAuthor) => a.sequence.isDefined && a.sequence.get.equalsIgnoreCase("first"))
+
+    result.setAuthor(sorted_list.zipWithIndex.map{case (a, index) => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull, index)}.asJava)
 
     // Mapping instance
     val instance = new Instance()
@@ -205,11 +210,12 @@ case object Crossref2Oaf {
   }
 
 
-  def generateAuhtor(given: String, family: String, orcid: String): Author = {
+  def generateAuhtor(given: String, family: String, orcid: String, index:Int): Author = {
     val a = new Author
     a.setName(given)
     a.setSurname(family)
     a.setFullname(s"$given $family")
+    a.setRank(index+1)
     if (StringUtils.isNotBlank(orcid))
       a.setPid(List(createSP(orcid, ORCID_PENDING, PID_TYPES, generateDataInfo())).asJava)
 
