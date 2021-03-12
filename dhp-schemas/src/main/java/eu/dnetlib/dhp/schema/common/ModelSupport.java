@@ -381,6 +381,8 @@ public class ModelSupport {
 			Field.class,
 			GeoLocation.class,
 			Instance.class,
+			AccessRight.class,
+			OpenAccessRoute.class,
 			Journal.class,
 			KeyValue.class,
 			Oaf.class,
