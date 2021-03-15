@@ -1,6 +1,27 @@
 
 package eu.dnetlib.dhp.collection.plugin.rest;
 
+import eu.dnetlib.dhp.collection.CollectorException;
+import eu.dnetlib.dhp.collection.HttpClientParams;
+import eu.dnetlib.dhp.collection.JsonUtils;
+import org.apache.avro.test.http.Http;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.*;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -12,30 +33,8 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.*;
-
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpHeaders;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpClientParams;
-import eu.dnetlib.dhp.collection.JsonUtils;
-
 /**
- * log.debug(...) equal to  log.trace(...) in the application-logs
+ * log.info(...) equal to  log.trace(...) in the application-logs
  * <p>
  * known bug: at resumptionType 'discover' if the (resultTotal % resultSizeValue) == 0 the collecting fails -> change the resultSizeValue
  *
@@ -45,7 +44,8 @@ import eu.dnetlib.dhp.collection.JsonUtils;
  */
 public class RestIterator implements Iterator<String> {
 
-	private static final Log log = LogFactory.getLog(RestIterator.class);
+	private static final Logger log = LoggerFactory.getLogger(RestIterator.class);
+	public static final String UTF_8 = "UTF-8";
 
 	private HttpClientParams clientParams;
 
@@ -74,65 +74,15 @@ public class RestIterator implements Iterator<String> {
 	private String querySize;
 	private String authMethod;
 	private String authToken;
-	private final Queue<String> recordQueue = new PriorityBlockingQueue<String>();
+	private Queue<String> recordQueue = new PriorityBlockingQueue<String>();
 	private int discoverResultSize = 0;
 	private int pagination = 1;
-
-	/**
-	 * RestIterator class
-	 * 
-	 * compatible to version before 1.3.33
-	 * 
-	 * @param baseUrl
-	 * @param resumptionType
-	 * @param resumptionParam
-	 * @param resumptionXpath
-	 * @param resultTotalXpath
-	 * @param resultFormatParam
-	 * @param resultFormatValue
-	 * @param resultSizeParam
-	 * @param resultSizeValueStr
-	 * @param queryParams
-	 * @param entityXpath
+	/*
+	 * While resultFormatValue is added to the request parameter, this is used to say that the results are retrieved in
+	 * json. useful for cases when the target API expects a resultFormatValue != json, but the results are returned in
+	 * json. An example is the EU Open Data Portal API: resultFormatValue=standard, results are in json format.
 	 */
-	public RestIterator(
-		final HttpClientParams clientParams,
-		final String baseUrl,
-		final String resumptionType,
-		final String resumptionParam,
-		final String resumptionXpath,
-		final String resultTotalXpath,
-		final String resultFormatParam,
-		final String resultFormatValue,
-		final String resultSizeParam,
-		final String resultSizeValueStr,
-		final String queryParams,
-		final String entityXpath) {
-		this(clientParams, baseUrl, resumptionType, resumptionParam, resumptionXpath, resultTotalXpath,
-			resultFormatParam, resultFormatValue, resultSizeParam, resultSizeValueStr, queryParams, entityXpath, "",
-			"");
-	}
-
-	public RestIterator(
-		final HttpClientParams clientParams,
-		final String baseUrl,
-		final String resumptionType,
-		final String resumptionParam,
-		final String resumptionXpath,
-		final String resultTotalXpath,
-		final String resultFormatParam,
-		final String resultFormatValue,
-		final String resultSizeParam,
-		final String resultSizeValueStr,
-		final String queryParams,
-		final String entityXpath,
-		final String authMethod,
-		final String authToken,
-		final String resultOffsetParam) {
-		this(clientParams, baseUrl, resumptionType, resumptionParam, resumptionXpath, resultTotalXpath,
-			resultFormatParam, resultFormatValue, resultSizeParam, resultSizeValueStr, queryParams, entityXpath, "",
-			"");
-	}
+	private String resultOutputFormat;
 
 	/** RestIterator class
 	 *  compatible to version 1.3.33
@@ -151,17 +101,20 @@ public class RestIterator implements Iterator<String> {
 		final String queryParams,
 		final String entityXpath,
 		final String authMethod,
-		final String authToken) {
+		final String authToken,
+		final String resultOutputFormat) {
+
 		this.clientParams = clientParams;
 		this.jsonUtils = new JsonUtils();
 		this.baseUrl = baseUrl;
 		this.resumptionType = resumptionType;
 		this.resumptionParam = resumptionParam;
 		this.resultFormatValue = resultFormatValue;
-		this.queryParams = queryParams;
 		this.resultSizeValue = Integer.valueOf(resultSizeValueStr);
+		this.queryParams = queryParams;
 		this.authMethod = authMethod;
 		this.authToken = authToken;
+		this.resultOutputFormat = resultOutputFormat;
 
 		queryFormat = StringUtils.isNotBlank(resultFormatParam) ? "&" + resultFormatParam + "=" + resultFormatValue
 			: "";
@@ -188,6 +141,7 @@ public class RestIterator implements Iterator<String> {
 
 	private void initQueue() {
 		query = baseUrl + "?" + queryParams + querySize + queryFormat;
+		log.info("REST calls starting with " + query);
 	}
 
 	private void disconnect() {
@@ -217,9 +171,7 @@ public class RestIterator implements Iterator<String> {
 		synchronized (recordQueue) {
 			while (recordQueue.isEmpty() && !query.isEmpty()) {
 				try {
-					log.debug("get Query: " + query);
 					query = downloadPage(query);
-					log.debug("next queryURL from downloadPage(): " + query);
 				} catch (CollectorException e) {
 					log.debug("CollectorPlugin.next()-Exception: " + e);
 					throw new RuntimeException(e);
@@ -235,9 +187,12 @@ public class RestIterator implements Iterator<String> {
 	private String downloadPage(String query) throws CollectorException {
 		String resultJson;
 		String resultXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+		String nextQuery = "";
 		String emptyXml = resultXml + "<" + JsonUtils.wrapName + "></" + JsonUtils.wrapName + ">";
 		Node resultNode = null;
 		NodeList nodeList = null;
+		String qUrlArgument = "";
+		int urlOldResumptionSize = 0;
 		InputStream theHttpInputStream;
 
 		// check if cursor=* is initial set otherwise add it to the queryParam URL
@@ -249,20 +204,22 @@ public class RestIterator implements Iterator<String> {
 		}
 
 		try {
+			log.info("requestig URL [{}]", query);
+
 			URL qUrl = new URL(query);
 			log.debug("authMethod :" + authMethod);
-			if (this.authMethod == "bearer") {
+			if ("bearer".equalsIgnoreCase(this.authMethod)) {
 				log.trace("authMethod before inputStream: " + resultXml);
 				HttpURLConnection conn = (HttpURLConnection) qUrl.openConnection();
 				conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + authToken);
-				conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/json");
+				conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 				conn.setRequestMethod("GET");
 				theHttpInputStream = conn.getInputStream();
 			} else if (BASIC.equalsIgnoreCase(this.authMethod)) {
 				log.trace("authMethod before inputStream: " + resultXml);
 				HttpURLConnection conn = (HttpURLConnection) qUrl.openConnection();
 				conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Basic " + authToken);
-				conn.setRequestProperty(HttpHeaders.ACCEPT, "application/xml");
+				conn.setRequestProperty(HttpHeaders.ACCEPT, ContentType.APPLICATION_XML.getMimeType());
 				conn.setRequestMethod("GET");
 				theHttpInputStream = conn.getInputStream();
 			} else {
@@ -270,10 +227,10 @@ public class RestIterator implements Iterator<String> {
 			}
 
 			resultStream = theHttpInputStream;
-			if ("json".equalsIgnoreCase(resultFormatValue)) {
-				resultJson = IOUtils.toString(resultStream, "UTF-8");
+			if ("json".equals(resultOutputFormat)) {
+				resultJson = IOUtils.toString(resultStream, UTF_8);
 				resultXml = jsonUtils.convertToXML(resultJson);
-				resultStream = IOUtils.toInputStream(resultXml, "UTF-8");
+				resultStream = IOUtils.toInputStream(resultXml, UTF_8);
 			}
 
 			if (!(emptyXml).equalsIgnoreCase(resultXml)) {
@@ -283,15 +240,19 @@ public class RestIterator implements Iterator<String> {
 				for (int i = 0; i < nodeList.getLength(); i++) {
 					StringWriter sw = new StringWriter();
 					transformer.transform(new DOMSource(nodeList.item(i)), new StreamResult(sw));
-					recordQueue.add(sw.toString());
+					String toEnqueue = sw.toString();
+					if (toEnqueue == null || StringUtils.isBlank(toEnqueue) || emptyXml.equalsIgnoreCase(toEnqueue)) {
+						log.warn("The following record resulted in empty item for the feeding queue: " + resultXml);
+					} else {
+						recordQueue.add(sw.toString());
+					}
 				}
 			} else {
-				log.info("resultXml is equal with emptyXml");
+				log.warn("resultXml is equal with emptyXml");
 			}
 
 			resumptionInt += resultSizeValue;
 
-			String qUrlArgument = "";
 			switch (resumptionType.toLowerCase()) {
 				case "scan": // read of resumptionToken , evaluate next results, e.g. OAI, iterate over items
 					resumptionStr = xprResumptionPath.evaluate(resultNode);
@@ -307,7 +268,6 @@ public class RestIterator implements Iterator<String> {
 					}
 					qUrlArgument = qUrl.getQuery();
 					String[] arrayQUrlArgument = qUrlArgument.split("&");
-					int urlOldResumptionSize = 0;
 					for (String arrayUrlArgStr : arrayQUrlArgument) {
 						if (arrayUrlArgStr.startsWith(resumptionParam)) {
 							String[] resumptionKeyValue = arrayUrlArgStr.split("=");
@@ -334,7 +294,7 @@ public class RestIterator implements Iterator<String> {
 							discoverResultSize += nodeList.getLength();
 						}
 					}
-					log.debug("discoverResultSize:  " + discoverResultSize);
+					log.info("discoverResultSize:  {}", discoverResultSize);
 					break;
 
 				case "pagination":
@@ -384,25 +344,24 @@ public class RestIterator implements Iterator<String> {
 			}
 
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage(), e);
 			throw new IllegalStateException("collection failed: " + e.getMessage());
 		}
 
 		try {
 			if (resultTotal == -1) {
 				resultTotal = Integer.parseInt(xprResultTotalPath.evaluate(resultNode));
-				if (resumptionType.toLowerCase().equals("page") && !BASIC.equalsIgnoreCase(authMethod)) {
+				if (resumptionType.equalsIgnoreCase("page") && !BASIC.equalsIgnoreCase(authMethod)) {
 					resultTotal += 1;
 				} // to correct the upper bound
 				log.info("resultTotal was -1 is now: " + resultTotal);
 			}
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage(), e);
 			throw new IllegalStateException("downloadPage resultTotal couldn't parse: " + e.getMessage());
 		}
 		log.debug("resultTotal: " + resultTotal);
 		log.debug("resInt: " + resumptionInt);
-		String nextQuery;
 		if (resumptionInt <= resultTotal) {
 			nextQuery = baseUrl + "?" + queryParams + querySize + "&" + resumptionParam + "=" + resumptionStr
 				+ queryFormat;
@@ -413,6 +372,7 @@ public class RestIterator implements Iterator<String> {
 		}
 		log.debug("nextQueryUrl: " + nextQuery);
 		return nextQuery;
+
 	}
 
 	private boolean isInteger(String s) {
@@ -437,6 +397,14 @@ public class RestIterator implements Iterator<String> {
 		} catch (UnsupportedEncodingException ex) {
 			throw new RuntimeException(ex.getCause());
 		}
+	}
+
+	public String getResultFormatValue() {
+		return resultFormatValue;
+	}
+
+	public String getResultOutputFormat() {
+		return resultOutputFormat;
 	}
 
 }

@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.collection.plugin.rest;
 
+import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -23,6 +24,8 @@ import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
  */
 public class RestCollectorPlugin implements CollectorPlugin {
 
+	public static final String RESULT_SIZE_VALUE_DEFAULT = "100";
+
 	private HttpClientParams clientParams;
 
 	public RestCollectorPlugin(HttpClientParams clientParams) {
@@ -32,6 +35,7 @@ public class RestCollectorPlugin implements CollectorPlugin {
 	@Override
 	public Stream<String> collect(final ApiDescriptor api, final AggregatorReport report) throws CollectorException {
 		final String baseUrl = api.getBaseUrl();
+
 		final String resumptionType = api.getParams().get("resumptionType");
 		final String resumptionParam = api.getParams().get("resumptionParam");
 		final String resumptionXpath = api.getParams().get("resumptionXpath");
@@ -39,12 +43,14 @@ public class RestCollectorPlugin implements CollectorPlugin {
 		final String resultFormatParam = api.getParams().get("resultFormatParam");
 		final String resultFormatValue = api.getParams().get("resultFormatValue");
 		final String resultSizeParam = api.getParams().get("resultSizeParam");
-		final String resultSizeValue = (StringUtils.isBlank(api.getParams().get("resultSizeValue"))) ? "100"
-			: api.getParams().get("resultSizeValue");
 		final String queryParams = api.getParams().get("queryParams");
 		final String entityXpath = api.getParams().get("entityXpath");
 		final String authMethod = api.getParams().get("authMethod");
 		final String authToken = api.getParams().get("authToken");
+		final String resultSizeValue = Optional
+			.ofNullable(api.getParams().get("resultSizeValue"))
+			.filter(StringUtils::isNotBlank)
+			.orElse(RESULT_SIZE_VALUE_DEFAULT);
 
 		if (StringUtils.isBlank(baseUrl)) {
 			throw new CollectorException("Param 'baseUrl' is null or empty");
@@ -65,6 +71,12 @@ public class RestCollectorPlugin implements CollectorPlugin {
 			throw new CollectorException("Param 'entityXpath' is null or empty");
 		}
 
+		final String resultOutputFormat = Optional
+			.ofNullable(api.getParams().get("resultOutputFormat"))
+			.map(String::toLowerCase)
+			.filter(StringUtils::isNotBlank)
+			.orElse(resultFormatValue.toLowerCase());
+
 		RestIterator it = new RestIterator(
 			getClientParams(),
 			baseUrl,
@@ -79,7 +91,8 @@ public class RestCollectorPlugin implements CollectorPlugin {
 			queryParams,
 			entityXpath,
 			authMethod,
-			authToken);
+			authToken,
+			resultOutputFormat);
 
 		return StreamSupport
 			.stream(
