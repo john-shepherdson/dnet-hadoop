@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.io.Serializable;
@@ -10,10 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -70,6 +69,8 @@ public class IdentifierFactory implements Serializable {
 	 * @return an identifier from the most relevant PID, entity.id otherwise
 	 */
 	public static <T extends OafEntity> String createIdentifier(T entity, boolean md5) {
+
+		checkArgument(StringUtils.isNoneBlank(entity.getId()), "missing entity identifier");
 
 		final Map<String, List<StructuredProperty>> pids = extractPids(entity);
 
