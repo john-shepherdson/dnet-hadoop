@@ -2,6 +2,13 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.base.Joiner;
 
 public class StructuredProperty implements Serializable {
 
@@ -36,7 +43,12 @@ public class StructuredProperty implements Serializable {
 	}
 
 	public String toComparableString() {
-		return value != null ? value.toLowerCase() : "";
+		return Stream
+			.of(
+				getQualifier().toComparableString(),
+				Optional.ofNullable(getValue()).map(String::toLowerCase).orElse(""))
+			.filter(StringUtils::isNotBlank)
+			.collect(Collectors.joining("||"));
 	}
 
 	@Override

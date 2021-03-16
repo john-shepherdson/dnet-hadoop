@@ -10,8 +10,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -54,6 +56,10 @@ public class IdentifierFactory implements Serializable {
 		PID_AUTHORITY.get(PidType.arXiv).put(ARXIV_ID, "arXiv.org e-Print Archive");
 	}
 
+	public static List<StructuredProperty> getPids(List<StructuredProperty> pid, KeyValue collectedFrom) {
+		return pidFromInstance(pid, collectedFrom).collect(Collectors.toList());
+	}
+
 	/**
 	 * Creates an identifier from the most relevant PID (if available) provided by a known PID authority in the given
 	 * entity T. Returns entity.id when none of the PIDs meet the selection criteria is available.
@@ -91,37 +97,7 @@ public class IdentifierFactory implements Serializable {
 			return Optional
 				.ofNullable(((Result) entity).getInstance())
 				.map(
-					instance -> instance
-						.stream()
-						.map(
-							i -> Optional
-								.ofNullable(i.getPid())
-								.map(
-									pp -> pp
-										.stream()
-										// filter away PIDs provided by a DS that is not considered an authority for the
-										// given PID Type
-										.filter(p -> {
-											final PidType pType = PidType.tryValueOf(p.getQualifier().getClassid());
-											return Optional.ofNullable(i.getCollectedfrom()).isPresent() &&
-												Optional
-													.ofNullable(PID_AUTHORITY.get(pType))
-													.map(authorities -> {
-														final KeyValue cf = i.getCollectedfrom();
-														return authorities.containsKey(cf.getKey())
-															|| authorities.containsValue(cf.getValue());
-													})
-													.orElse(false);
-										})
-										.map(CleaningFunctions::normalizePidValue)
-										.filter(IdentifierFactory::pidFilter))
-								.orElse(Stream.empty()))
-						.flatMap(Function.identity())
-						.collect(
-							Collectors
-								.groupingBy(
-									p -> p.getQualifier().getClassid(),
-									Collectors.mapping(p -> p, Collectors.toList()))))
+					instance -> mapPids(instance))
 				.orElse(new HashMap<>());
 		} else {
 			return entity
@@ -135,6 +111,42 @@ public class IdentifierFactory implements Serializable {
 							p -> p.getQualifier().getClassid(),
 							Collectors.mapping(p -> p, Collectors.toList())));
 		}
+	}
+
+	private static Map<String, List<StructuredProperty>> mapPids(List<Instance> instance) {
+		return instance
+			.stream()
+			.map(i -> pidFromInstance(i.getPid(), i.getCollectedfrom()))
+			.flatMap(Function.identity())
+			.collect(
+				Collectors
+					.groupingBy(
+						p -> p.getQualifier().getClassid(),
+						Collectors.mapping(p -> p, Collectors.toList())));
+	}
+
+	private static Stream<StructuredProperty> pidFromInstance(List<StructuredProperty> pid, KeyValue collectedFrom) {
+		return Optional
+			.ofNullable(pid)
+			.map(
+				pp -> pp
+					.stream()
+					// filter away PIDs provided by a DS that is not considered an authority for the
+					// given PID Type
+					.filter(p -> {
+						final PidType pType = PidType.tryValueOf(p.getQualifier().getClassid());
+						return Optional.ofNullable(collectedFrom).isPresent() &&
+							Optional
+								.ofNullable(PID_AUTHORITY.get(pType))
+								.map(authorities -> {
+									return authorities.containsKey(collectedFrom.getKey())
+										|| authorities.containsValue(collectedFrom.getValue());
+								})
+								.orElse(false);
+					})
+					.map(CleaningFunctions::normalizePidValue)
+					.filter(IdentifierFactory::pidFilter))
+			.orElse(Stream.empty());
 	}
 
 	/**

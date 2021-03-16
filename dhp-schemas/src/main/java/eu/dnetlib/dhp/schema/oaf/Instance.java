@@ -23,6 +23,8 @@ public class Instance implements Serializable {
 
 	private List<StructuredProperty> pid;
 
+	private List<StructuredProperty> alternateIdentifier;
+
 	private Field<String> dateofacceptance;
 
 	// ( article | book ) processing charges. Defined here to cope with possible wrongly typed
@@ -107,6 +109,14 @@ public class Instance implements Serializable {
 		this.dateofacceptance = dateofacceptance;
 	}
 
+	public List<StructuredProperty> getAlternateIdentifier() {
+		return alternateIdentifier;
+	}
+
+	public void setAlternateIdentifier(List<StructuredProperty> alternateIdentifier) {
+		this.alternateIdentifier = alternateIdentifier;
+	}
+
 	public Field<String> getProcessingchargeamount() {
 		return processingchargeamount;
 	}
@@ -159,4 +169,5 @@ public class Instance implements Serializable {
 
 		return toComparableString().equals(other.toComparableString());
 	}
+
 }
