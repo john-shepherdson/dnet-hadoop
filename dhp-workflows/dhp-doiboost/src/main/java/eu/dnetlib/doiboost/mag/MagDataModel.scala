@@ -172,7 +172,7 @@ case object ConversionUtil {
       i.setUrl(List(s"https://academic.microsoft.com/#/detail/${extractMagIdentifier(pub.getOriginalId.asScala)}").asJava)
 
     // Ticket #6281 added pid to Instance
-    i.setPid(pub.getPid.asScala.filter(p => p.getQualifier.getClassid.equalsIgnoreCase("doi")).asJava)
+    i.setPid(pub.getPid)
 
     i.setCollectedfrom(createMAGCollectedFrom())
     pub.setInstance(List(i).asJava)

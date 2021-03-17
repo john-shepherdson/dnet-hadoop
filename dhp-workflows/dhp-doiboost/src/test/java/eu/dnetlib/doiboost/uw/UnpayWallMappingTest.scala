@@ -28,7 +28,7 @@ class UnpayWallMappingTest {
 
       if(p!= null) {
         assertTrue(p.getPid.size()==1)
-        logger.info(p.getId)
+        logger.info("ID :",p.getId)
       }
       assertNotNull(line)
       assertTrue(line.nonEmpty)

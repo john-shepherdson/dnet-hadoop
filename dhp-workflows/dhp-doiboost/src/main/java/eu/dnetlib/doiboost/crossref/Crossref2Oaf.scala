@@ -180,7 +180,7 @@ case object Crossref2Oaf {
 
 
     // Ticket #6281 added pid to Instance
-    instance.setPid(result.getPid.asScala.filter(p => p.getQualifier.getClassid.equalsIgnoreCase("doi")).asJava)
+    instance.setPid(result.getPid)
 
     val has_review = (json \ "relation" \"has-review" \ "id")
 

@@ -65,11 +65,7 @@ object UnpayWallToOAF {
     val colour = get_color(is_oa, oaLocation, journal_is_oa)
     pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
 
-    //IMPORTANT
-    //The old method pub.setId(IdentifierFactory.createIdentifier(pub))
-    //will be replaced using IdentifierFactory
-    //pub.setId(generateIdentifier(pub, doi.toLowerCase))
-    pub.setId(IdentifierFactory.createIdentifier(pub))
+
 
 
     pub.setCollectedfrom(List(createUnpayWallCollectedFrom()).asJava)
@@ -87,7 +83,7 @@ object UnpayWallToOAF {
     i.setUrl(List(oaLocation.url.get).asJava)
 
     // Ticket #6281 added pid to Instance
-    i.setPid(pub.getPid.asScala.filter(p => p.getQualifier.getClassid.equalsIgnoreCase("doi")).asJava)
+    i.setPid(pub.getPid)
 
     if (oaLocation.license.isDefined)
       i.setLicense(asField(oaLocation.license.get))
@@ -104,6 +100,14 @@ object UnpayWallToOAF {
       i.setAccessright(a)
     }
     pub.setInstance(List(i).asJava)
+
+    //IMPORTANT
+    //The old method pub.setId(IdentifierFactory.createIdentifier(pub))
+    //will be replaced using IdentifierFactory
+    //pub.setId(generateIdentifier(pub, doi.toLowerCase))
+    val  id = IdentifierFactory.createIdentifier(pub)
+    logger.info(id);
+    pub.setId(IdentifierFactory.createIdentifier(pub))
     pub
 
   }

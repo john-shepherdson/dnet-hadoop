@@ -67,7 +67,7 @@ object SparkProcessMAG {
           MagPaperAuthorDenormalized(mpa.PaperId, mpa.author, af.DisplayName, mpa.sequenceNumber)
         } else
           mpa
-      }).groupBy("PaperId").agg(collect_list(struct($"author", $"affiliation")).as("authors"))
+      }).groupBy("PaperId").agg(collect_list(struct($"author", $"affiliation", $"sequenceNumber")).as("authors"))
       .write.mode(SaveMode.Overwrite).save(s"$workingPath/merge_step_1_paper_authors")
 
     logger.info("Phase 4) create First Version of publication Entity with Paper Journal and Authors")

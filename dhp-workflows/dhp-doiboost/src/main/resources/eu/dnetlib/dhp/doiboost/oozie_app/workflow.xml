@@ -55,6 +55,11 @@
 
         <!--    MAG Parameters    -->
         <property>
+            <name>MAGDumpPath</name>
+            <description>the MAG dump working path</description>
+        </property>
+
+        <property>
             <name>inputPathMAG</name>
             <description>the MAG working path</description>
         </property>
@@ -132,7 +137,10 @@
                     --executor-cores=${sparkExecutorCores}
                     --driver-memory=${sparkDriverMemory}
                     --conf spark.sql.shuffle.partitions=3840
-                    ${sparkExtraOPT}
+                    --conf spark.extraListeners=${spark2ExtraListeners}
+                    --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                    --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                    --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 </spark-opts>
                 <arg>--workingPath</arg><arg>${inputPathCrossref}</arg>
                 <arg>--master</arg><arg>yarn-cluster</arg>
@@ -147,6 +155,43 @@
             <move source="${inputPathCrossref}/crossref_ds_updated"
                   target="${inputPathCrossref}/crossref_ds"/>
         </fs>
+        <ok to="ResetMagWorkingPath"/>
+        <error to="Kill"/>
+    </action>
+
+
+
+    <!-- MAG SECTION -->
+    <action name="ResetMagWorkingPath">
+        <fs>
+            <delete path="${inputPathMAG}/dataset"/>
+            <delete path="${inputPathMAG}/process"/>
+        </fs>
+        <ok to="ConvertMagToDataset"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ConvertMagToDataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Convert Mag to Dataset</name>
+            <class>eu.dnetlib.doiboost.mag.SparkImportMagIntoDataset</class>
+            <jar>dhp-doiboost-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${MAGDumpPath}</arg>
+            <arg>--targetPath</arg><arg>${inputPathMAG}/dataset</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
         <ok to="ConvertCrossrefToOAF"/>
         <error to="Kill"/>
     </action>
@@ -164,44 +209,13 @@
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.sql.shuffle.partitions=3840
-                ${sparkExtraOPT}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${inputPathCrossref}/crossref_ds</arg>
             <arg>--targetPath</arg><arg>${workingPath}</arg>
-            <arg>--master</arg><arg>yarn-cluster</arg>
-        </spark>
-        <ok to="ResetMagWorkingPath"/>
-        <error to="Kill"/>
-    </action>
-
-
-
-    <!-- MAG SECTION -->
-    <action name="ResetMagWorkingPath">
-        <fs>
-            <delete path="${inputPathMAG}/dataset"/>
-            <delete path="${inputPathMAG}/process"/>
-            <delete path="${inputPathMAG}/dataset"/>
-        </fs>
-        <ok to="ConvertMagToDataset"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="ConvertMagToDataset">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>Convert Mag to Dataset</name>
-            <class>eu.dnetlib.doiboost.mag.SparkImportMagIntoDataset</class>
-            <jar>dhp-doiboost-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                ${sparkExtraOPT}
-            </spark-opts>
-            <arg>--sourcePath</arg><arg>${inputPathMAG}/input</arg>
-            <arg>--targetPath</arg><arg>${inputPathMAG}/dataset</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="ProcessMAG"/>
@@ -216,11 +230,14 @@
             <class>eu.dnetlib.doiboost.mag.SparkProcessMAG</class>
             <jar>dhp-doiboost-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
+                --executor-memory=${sparkExecutorIntersectionMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.sql.shuffle.partitions=3840
-                ${sparkExtraOPT}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${inputPathMAG}/dataset</arg>
             <arg>--workingPath</arg><arg>${inputPathMAG}/process</arg>
@@ -245,10 +262,14 @@
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.sql.shuffle.partitions=3840
-                ${sparkExtraOPT}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${inputPathUnpayWall}/uw_extracted</arg>
-            <arg>--targetPath</arg><arg>${workingPath}</arg>
+            <arg>--targetPath</arg><arg>${workingPath}/uwPublication</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="ProcessORCID"/>
@@ -268,10 +289,13 @@
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.sql.shuffle.partitions=3840
-                ${sparkExtraOPT}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${inputPathOrcid}</arg>
-            <arg>--targetPath</arg><arg>${workingPath}</arg>
+            <arg>--targetPath</arg><arg>${workingPath}/orcidPublication</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="CreateDOIBoost"/>
@@ -291,11 +315,15 @@
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.sql.shuffle.partitions=3840
-                ${sparkExtraOPT}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--hostedByMapPath</arg><arg>${hostedByMapPath}</arg>
-            <arg>--affiliationPath</arg><arg>${inputPathMAG}/process/Affiliations</arg>
-            <arg>--paperAffiliationPath</arg><arg>${inputPathMAG}/process/PaperAuthorAffiliations</arg>
+            <arg>--affiliationPath</arg><arg>${inputPathMAG}/dataset/Affiliations</arg>
+            <arg>--paperAffiliationPath</arg><arg>${inputPathMAG}/dataset/PaperAuthorAffiliations</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
@@ -316,7 +344,10 @@
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.sql.shuffle.partitions=3840
-                ${sparkExtraOPT}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--dbPublicationPath</arg><arg>${workingPath}/doiBoostPublicationFiltered</arg>
             <arg>--dbDatasetPath</arg><arg>${workingPath}/crossrefDataset</arg>
