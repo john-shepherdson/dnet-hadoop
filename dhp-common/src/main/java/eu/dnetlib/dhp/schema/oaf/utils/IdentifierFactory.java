@@ -171,15 +171,7 @@ public class IdentifierFactory implements Serializable {
 		if (PidBlacklistProvider.getBlacklist(s.getQualifier().getClassid()).contains(pidValue)) {
 			return false;
 		}
-		switch (PidType.tryValueOf(s.getQualifier().getClassid())) {
-			case doi:
-				final String doi = StringUtils.trim(StringUtils.lowerCase(pidValue));
-				return doi.matches(DOI_REGEX);
-			case original:
-				return false;
-			default:
-				return true;
-		}
+		return true;
 	}
 
 	private static <T extends OafEntity> String idFromPid(T entity, StructuredProperty s, boolean md5) {
