@@ -118,6 +118,9 @@ public class ModelConstants {
 
 	public static final Qualifier UNKNOWN_COUNTRY = qualifier(UNKNOWN, "Unknown", DNET_COUNTRY_TYPE, DNET_COUNTRY_TYPE);
 
+	public static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
+		"main title", "main title", DNET_DATACITE_TITLE, DNET_DATACITE_TITLE);
+
 	private static Qualifier qualifier(
 		final String classid,
 		final String classname,
