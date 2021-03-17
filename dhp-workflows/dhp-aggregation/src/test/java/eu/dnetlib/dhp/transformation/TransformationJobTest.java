@@ -106,12 +106,15 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 	@DisplayName("Test Transform record XML with xslt_cleaning_datarepo_datacite")
 	public void testTransformMostlyUsedScript() throws Exception {
 
+		String xslTransformationScript;
+		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_datarepo_datacite.xsl";
+//		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl";
+
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
 		// We Load the XSLT transformation Rule from the classpath
-		XSLTTransformationFunction tr = loadTransformationRule(
-			"/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_datarepo_datacite.xsl");
+		XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
 
 		MetadataRecord result = tr.call(mr);
 
