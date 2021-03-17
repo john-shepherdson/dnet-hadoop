@@ -60,6 +60,33 @@ public class IdentifierFactory implements Serializable {
 		return pidFromInstance(pid, collectedFrom).distinct().collect(Collectors.toList());
 	}
 
+	public static <T extends  Result> String createDOIBoostIdentifier(T entity) {
+		if (entity == null)
+			return  null;
+
+		StructuredProperty pid = null;
+		if(entity.getPid() != null ) {
+			pid = entity.getPid()
+					.stream()
+					.filter(Objects::nonNull)
+					.filter(s -> s.getQualifier()!= null && "doi".equalsIgnoreCase(s.getQualifier().getClassid()))
+					.filter(IdentifierFactory::pidFilter)
+			.findAny().orElse(null);
+		} else {
+			if (entity.getInstance()!= null) {
+				pid = entity.getInstance()
+						.stream()
+						.filter(i -> i.getPid()!= null)
+						.flatMap(i -> i.getPid().stream())
+						.filter(IdentifierFactory::pidFilter)
+						.findAny().orElse(null);
+			}
+		}
+		if (pid!= null)
+			return idFromPid(entity, pid, true);
+		return null;
+	}
+
 	/**
 	 * Creates an identifier from the most relevant PID (if available) provided by a known PID authority in the given
 	 * entity T. Returns entity.id when none of the PIDs meet the selection criteria is available.

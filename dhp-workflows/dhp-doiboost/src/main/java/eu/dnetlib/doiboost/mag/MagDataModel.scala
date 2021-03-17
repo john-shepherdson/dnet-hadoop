@@ -197,8 +197,8 @@ case object ConversionUtil {
     //IMPORTANT
     //The old method result.setId(generateIdentifier(result, doi))
     //will be replaced using IdentifierFactory
-    pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
-    pub.setId(IdentifierFactory.createIdentifier(pub))
+
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
     val originalTitles = createSP(paper.OriginalTitle, "alternative title", "dnet:dataCite_title")

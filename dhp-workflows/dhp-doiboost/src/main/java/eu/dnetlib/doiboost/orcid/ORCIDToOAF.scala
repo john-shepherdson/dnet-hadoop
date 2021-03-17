@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.orcid
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
 import eu.dnetlib.dhp.schema.orcid.OrcidDOI
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
@@ -49,7 +50,11 @@ object ORCIDToOAF {
     val pub:Publication = new Publication
     pub.setPid(List(createSP(doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
-    pub.setId(generateIdentifier(pub, doi.toLowerCase))
+
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
+    if (pub.getId == null)
+      return null
+
     try{
 
       val l:List[Author]= input.getAuthors.asScala.map(a=> {

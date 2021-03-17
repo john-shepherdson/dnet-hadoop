@@ -206,6 +206,9 @@ case object Crossref2Oaf {
     val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
     if (links.nonEmpty)
       instance.setUrl(links.asJava)
+    result.setId(IdentifierFactory.createDOIBoostIdentifier(result))
+    if (result.getId== null)
+      return null
     result
   }
 
@@ -240,6 +243,8 @@ case object Crossref2Oaf {
       return List()
     val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"));
     mappingResult(result, json, cOBJCategory)
+    if (result == null)
+      return List()
 
 
     val funderList: List[mappingFunder] = (json \ "funder").extractOrElse[List[mappingFunder]](List())
