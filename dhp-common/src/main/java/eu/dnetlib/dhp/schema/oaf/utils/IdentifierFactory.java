@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.HashBiMap;
@@ -176,7 +177,7 @@ public class IdentifierFactory implements Serializable {
 
 	private static <T extends OafEntity> String idFromPid(T entity, StructuredProperty s, boolean md5) {
 		return new StringBuilder()
-			.append(StringUtils.substringBefore(entity.getId(), ID_PREFIX_SEPARATOR))
+			.append(ModelSupport.getIdPrefix(entity.getClass()))
 			.append(ID_PREFIX_SEPARATOR)
 			.append(createPrefix(s.getQualifier().getClassid()))
 			.append(ID_SEPARATOR)
