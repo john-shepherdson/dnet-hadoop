@@ -123,9 +123,11 @@ public class MappersTest {
 			});
 		assertEquals("0001", p.getInstance().get(0).getRefereed().getClassid());
 		assertNotNull(p.getInstance().get(0).getPid());
-		assertTrue(p.getInstance().get(0).getPid().size() == 1);
-		assertEquals("doi", p.getInstance().get(0).getPid().get(0).getQualifier().getClassid());
-		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getPid().get(0).getValue());
+		assertTrue(p.getInstance().get(0).getPid().isEmpty());
+
+		assertTrue(!p.getInstance().get(0).getAlternateIdentifier().isEmpty());
+		assertEquals("doi", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
@@ -152,6 +154,78 @@ public class MappersTest {
 		// System.out.println(new ObjectMapper().writeValueAsString(p));
 		// System.out.println(new ObjectMapper().writeValueAsString(r1));
 		// System.out.println(new ObjectMapper().writeValueAsString(r2));
+	}
+
+	@Test
+	void testPublication_PubMed() throws IOException {
+
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record_pubmed.xml"));
+
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Publication);
+
+		final Publication p = (Publication) list.get(0);
+
+		assertValidId(p.getId());
+
+		assertEquals(2, p.getOriginalId().size());
+		assertTrue(p.getOriginalId().contains("oai:pubmedcentral.nih.gov:1517292"));
+
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertFalse(p.getDataInfo().getInvisible());
+		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
+		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
+
+		assertTrue(p.getAuthor().size() > 0);
+		final Optional<Author> author = p
+			.getAuthor()
+			.stream()
+			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+			.findFirst();
+		assertTrue(author.isPresent());
+
+		final StructuredProperty pid = author
+			.get()
+			.getPid()
+			.stream()
+			.findFirst()
+			.get();
+		assertEquals("0000-0001-6651-1178", pid.getValue());
+		assertEquals("ORCID", pid.getQualifier().getClassid());
+		assertEquals("Open Researcher and Contributor ID", pid.getQualifier().getClassname());
+		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
+		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
+		assertEquals("Votsi,Nefta", author.get().getFullname());
+		assertEquals("Votsi", author.get().getSurname());
+		assertEquals("Nefta", author.get().getName());
+
+		assertTrue(p.getSubject().size() > 0);
+		assertTrue(p.getPid().size() > 0);
+		assertEquals(p.getPid().get(0).getValue(), "PMC1517292");
+		assertEquals(p.getPid().get(0).getQualifier().getClassid(), "pmc");
+
+		assertNotNull(p.getInstance());
+		assertTrue(p.getInstance().size() > 0);
+		p
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
+		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+		assertNotNull(p.getInstance().get(0).getPid());
+		assertTrue(p.getInstance().get(0).getPid().size() == 2);
+
+		assertTrue(p.getInstance().get(0).getAlternateIdentifier().size() == 1);
+		assertEquals("doi", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
+
+		assertNotNull(p.getBestaccessright());
+		assertEquals("OPEN", p.getBestaccessright().getClassid());
 	}
 
 	@Test
@@ -239,9 +313,10 @@ public class MappersTest {
 			});
 		assertEquals("0001", d.getInstance().get(0).getRefereed().getClassid());
 		assertNotNull(d.getInstance().get(0).getPid());
-		assertTrue(d.getInstance().get(0).getPid().size() == 1);
-		assertEquals("doi", d.getInstance().get(0).getPid().get(0).getQualifier().getClassid());
-		assertEquals("10.5281/zenodo.3234526", d.getInstance().get(0).getPid().get(0).getValue());
+		assertTrue(d.getInstance().get(0).getPid().isEmpty());
+
+		assertEquals("doi", d.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.5281/zenodo.3234526", d.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
 
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());

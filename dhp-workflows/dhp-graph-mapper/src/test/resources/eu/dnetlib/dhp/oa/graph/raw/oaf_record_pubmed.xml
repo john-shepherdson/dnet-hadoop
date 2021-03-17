@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <header xmlns="http://namespace.openaire.eu/">
+    <dri:objIdentifier>od_______267::0000072375bc0e68fa09d4e6b7658248</dri:objIdentifier>
+    <dri:recordIdentifier>oai:pubmedcentral.nih.gov:1517292</dri:recordIdentifier>
+    <dri:dateOfCollection/>
+    <dri:mdFormat/>
+    <dri:mdFormatInterpretation/>
+    <dri:repositoryId/>
+    <dr:objectIdentifier/>
+    <dr:dateOfCollection>2020-08-03T18:38:58Z</dr:dateOfCollection>
+    <dr:dateOfTransformation>2020-08-03T19:38:58Z</dr:dateOfTransformation>
+    <oaf:datasourceprefix>od_______267</oaf:datasourceprefix>
+  </header>
+  <metadata xmlns="http://namespace.openaire.eu/">
+    <dc:title>DEATHS</dc:title>
+    <dc:creator>Nikolaidou,Charitini</dc:creator>
+    <dc:creator nameIdentifier="0000-0001-6651-1178" nameIdentifierScheme="ORCID">Votsi,Nefta</dc:creator>
+    <dc:creator>Sgardelis,Steanos</dc:creator>
+    <dc:creator>Halley,John</dc:creator>
+    <dc:creator>Pantis,John</dc:creator>
+    <dc:creator>Tsiafouli,Maria</dc:creator>
+    <dc:date>1922-07</dc:date>
+    <dc:description/>
+    <dc:identifier>https://europepmc.org/articles/PMC1517292/</dc:identifier>
+    <dc:language>eng</dc:language>
+    <dc:subject>Articles</dc:subject>
+    <dc:type>Text</dc:type>
+    <dr:CobjCategory type="publication">0038</dr:CobjCategory>
+    <dr:CobjIdentifier/>
+    <oaf:dateAccepted>1922-07-01</oaf:dateAccepted>
+    <oaf:collectedDatasourceid>opendoar____::267</oaf:collectedDatasourceid>
+    <oaf:accessrights>OPEN</oaf:accessrights>
+    <oaf:hostedBy id="opendoar____::908" name="Europe PubMed Central"/>
+    <oaf:collectedFrom id="opendoar____::267" name="PubMed Central"/>
+    <oaf:identifier identifierType="pmc">PMC1517292</oaf:identifier>
+    <oaf:identifier identifierType="pmid">18738762</oaf:identifier>
+    <oaf:identifier identifierType="doi">10.3897/oneeco.2.e13718</oaf:identifier>
+  </metadata>
+  <about>
+    <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+      <originDescription altered="true" harvestDate="2018-07-13T13:07:32.339Z">
+        <baseURL>https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi</baseURL>
+        <identifier>oai:pubmedcentral.nih.gov:1517292</identifier>
+        <datestamp>2006-08-14</datestamp>
+        <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+      </originDescription>
+    </provenance>
+    <oaf:datainfo>
+      <oaf:inferred>false</oaf:inferred>
+      <oaf:deletedbyinference>false</oaf:deletedbyinference>
+      <oaf:trust>0.9</oaf:trust>
+      <oaf:inferenceprovenance/>
+      <oaf:provenanceaction classid="sysimport:crosswalk:repository"
+                            classname="sysimport:crosswalk:repository"
+                            schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+    </oaf:datainfo>
+  </about>
+</record>

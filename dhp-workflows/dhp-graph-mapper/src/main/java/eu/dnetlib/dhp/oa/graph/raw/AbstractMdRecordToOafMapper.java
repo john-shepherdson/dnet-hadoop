@@ -284,8 +284,8 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
 		r.setPid(prepareResultPids(doc, info));
-		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection|//dri:dateOfCollection"));
-		r.setDateoftransformation(doc.valueOf("//dr:dateOfTransformation|//dri:dateOfTransformation"));
+		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection/text()|//dri:dateOfCollection/text()"));
+		r.setDateoftransformation(doc.valueOf("//dr:dateOfTransformation/text()|//dri:dateOfTransformation/text()"));
 		r.setExtraInfo(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 		r.setOaiprovenance(prepareOAIprovenance(doc));
 		r.setAuthor(prepareAuthors(doc, info));

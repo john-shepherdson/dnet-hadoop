@@ -5,7 +5,9 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +21,7 @@ import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -125,7 +128,17 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
-		instance.setPid(prepareResultPids(doc, info));
+
+		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
+		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
+
+		final Set<StructuredProperty> pids = pid.stream().collect(Collectors.toCollection(HashSet::new));
+
+		instance
+			.setAlternateIdentifier(
+				alternateIdentifier.stream().filter(i -> !pids.contains(i)).collect(Collectors.toList()));
+		instance.setPid(pid);
+
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
