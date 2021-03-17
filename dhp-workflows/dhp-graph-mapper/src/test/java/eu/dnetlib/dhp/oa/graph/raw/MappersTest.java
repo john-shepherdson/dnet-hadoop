@@ -108,9 +108,7 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
 
-		assertTrue(p.getPid().size() > 0);
-		assertEquals(p.getPid().get(0).getValue(), "10.3897/oneeco.2.e13718");
-		assertEquals(p.getPid().get(0).getQualifier().getClassid(), "doi");
+		assertTrue(p.getPid().isEmpty());
 
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
@@ -398,7 +396,12 @@ public class MappersTest {
 		assertEquals(1, d.getAuthor().size());
 		assertEquals(1, d.getSubject().size());
 		assertEquals(1, d.getInstance().size());
-		assertEquals(1, d.getPid().size());
+		assertTrue(d.getPid().isEmpty());
+
+		assertTrue(d.getInstance().get(0).getPid().isEmpty());
+		assertEquals(1, d.getInstance().get(0).getAlternateIdentifier().size());
+		assertEquals("handle", d.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+
 		assertNotNull(d.getInstance().get(0).getUrl());
 	}
 
@@ -447,8 +450,8 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertEquals(1, p.getAuthor().size());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
-		assertTrue(StringUtils.isNotBlank(p.getPid().get(0).getValue()));
-		assertTrue(StringUtils.isNotBlank(p.getPid().get(0).getQualifier().getClassid()));
+
+		assertTrue(p.getPid().isEmpty());
 		assertEquals("dataset", p.getResulttype().getClassname());
 		assertEquals(1, p.getInstance().size());
 		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
@@ -456,10 +459,14 @@ public class MappersTest {
 		assertValidId(p.getInstance().get(0).getHostedby().getKey());
 		assertEquals(
 			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+
+		assertEquals(1, p.getInstance().size());
+		assertEquals(1, p.getInstance().get(0).getAlternateIdentifier().size());
+		assertEquals("handle", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals(
+			"hdl:11858/00-1734-0000-0003-EE73-2", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
+
 		assertEquals(1, p.getInstance().get(0).getUrl().size());
-//		System.out.println(p.getInstance().get(0).getUrl().get(0));
-//		System.out.println(p.getInstance().get(0).getHostedby().getValue());
-		System.out.println(p.getPid().get(0).getValue());
 	}
 
 	@Test

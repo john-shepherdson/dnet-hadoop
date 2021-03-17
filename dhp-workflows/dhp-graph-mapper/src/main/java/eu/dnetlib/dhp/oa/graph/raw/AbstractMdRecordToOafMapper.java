@@ -4,13 +4,8 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -21,7 +16,6 @@ import org.dom4j.Node;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -56,9 +50,6 @@ public abstract class AbstractMdRecordToOafMapper {
 		nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
 		nsContext.put("datacite", DATACITE_SCHEMA_KERNEL_3);
 	}
-
-	protected static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
-		"main title", "main title", "dnet:dataCite_title", "dnet:dataCite_title");
 
 	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible,
 		final boolean shouldHashId) {
@@ -279,11 +270,9 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setDataInfo(info);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
-
 		r.setOriginalId(Lists.newArrayList(findOriginalId(doc)));
-
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
-		r.setPid(prepareResultPids(doc, info));
+		r.setPid(IdentifierFactory.getPids(prepareResultPids(doc, info), collectedFrom));
 		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection/text()|//dri:dateOfCollection/text()"));
 		r.setDateoftransformation(doc.valueOf("//dr:dateOfTransformation/text()|//dri:dateOfTransformation/text()"));
 		r.setExtraInfo(new ArrayList<>()); // NOT PRESENT IN MDSTORES

@@ -56,7 +56,7 @@ public class IdentifierFactory implements Serializable {
 	}
 
 	public static List<StructuredProperty> getPids(List<StructuredProperty> pid, KeyValue collectedFrom) {
-		return pidFromInstance(pid, collectedFrom).collect(Collectors.toList());
+		return pidFromInstance(pid, collectedFrom).distinct().collect(Collectors.toList());
 	}
 
 	/**
