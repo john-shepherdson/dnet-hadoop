@@ -196,6 +196,8 @@ object DoiBoostMappingUtil {
     //Case empty publication
     if (publication == null)
       return false
+    if (publication.getId == null || publication.getId.isEmpty)
+      return false
 
     //Case publication with no title
     if (publication.getTitle == null || publication.getTitle.size == 0)
