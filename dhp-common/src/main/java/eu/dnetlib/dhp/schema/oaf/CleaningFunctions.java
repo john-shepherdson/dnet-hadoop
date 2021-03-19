@@ -5,13 +5,13 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Sets;
-import eu.dnetlib.dhp.schema.oaf.utils.PidBlacklistProvider;
 import org.apache.commons.lang3.StringUtils;
 
 import com.clearspring.analytics.util.Lists;
+import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.utils.PidBlacklistProvider;
 
 public class CleaningFunctions {
 
@@ -148,16 +148,18 @@ public class CleaningFunctions {
 			}
 			if (Objects.nonNull(r.getInstance())) {
 
-
-
 				for (Instance i : r.getInstance()) {
 					final Set<StructuredProperty> pids = Sets.newHashSet(i.getPid());
-					i.setAlternateIdentifier(
-							Optional.ofNullable(i.getAlternateIdentifier())
-							.map(altId -> altId.stream()
-									.filter(p -> !pids.contains(p))
-									.collect(Collectors.toList()))
-							.orElse(Lists.newArrayList()));
+					i
+						.setAlternateIdentifier(
+							Optional
+								.ofNullable(i.getAlternateIdentifier())
+								.map(
+									altId -> altId
+										.stream()
+										.filter(p -> !pids.contains(p))
+										.collect(Collectors.toList()))
+								.orElse(Lists.newArrayList()));
 
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
 						i
@@ -236,7 +238,8 @@ public class CleaningFunctions {
 	}
 
 	private static List<StructuredProperty> processPidCleaning(List<StructuredProperty> pids) {
-		return pids.stream()
+		return pids
+			.stream()
 			.filter(Objects::nonNull)
 			.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
 			.filter(sp -> !PID_BLACKLIST.contains(sp.getValue().trim().toLowerCase()))
@@ -286,8 +289,8 @@ public class CleaningFunctions {
 	public static boolean pidFilter(StructuredProperty s) {
 		final String pidValue = s.getValue();
 		if (Objects.isNull(s.getQualifier()) ||
-				StringUtils.isBlank(pidValue) ||
-				StringUtils.isBlank(pidValue.replaceAll("(?:\\n|\\r|\\t|\\s)", ""))) {
+			StringUtils.isBlank(pidValue) ||
+			StringUtils.isBlank(pidValue.replaceAll("(?:\\n|\\r|\\t|\\s)", ""))) {
 			return false;
 		}
 		if (CleaningFunctions.PID_BLACKLIST.contains(pidValue)) {

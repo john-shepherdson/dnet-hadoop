@@ -71,7 +71,7 @@ public class IdentifierFactory implements Serializable {
 				.stream()
 				.filter(Objects::nonNull)
 				.filter(s -> s.getQualifier() != null && "doi".equalsIgnoreCase(s.getQualifier().getClassid()))
-				.filter(IdentifierFactory::pidFilter)
+				.filter(CleaningFunctions::pidFilter)
 				.findAny()
 				.orElse(null);
 		} else {
@@ -81,7 +81,7 @@ public class IdentifierFactory implements Serializable {
 					.stream()
 					.filter(i -> i.getPid() != null)
 					.flatMap(i -> i.getPid().stream())
-					.filter(IdentifierFactory::pidFilter)
+					.filter(CleaningFunctions::pidFilter)
 					.findAny()
 					.orElse(null);
 			}
