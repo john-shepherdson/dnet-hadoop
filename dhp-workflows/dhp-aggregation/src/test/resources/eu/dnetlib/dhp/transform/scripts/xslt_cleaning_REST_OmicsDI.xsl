@@ -11,7 +11,8 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:vocabulary="http://eu/dnetlib/transform/clean"
                 xmlns:dateCleaner="http://eu/dnetlib/transform/dateISO"
-                exclude-result-prefixes="xsl vocabulary dateCleaner">
+                xmlns:personCleaner="http://eu/dnetlib/transform/person"
+                exclude-result-prefixes="xsl vocabulary dateCleaner personCleaner">
 
   <xsl:param name="varOfficialName" />
   <xsl:param name="varDsType" />
