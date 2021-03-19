@@ -68,11 +68,8 @@ public class SparkCopyOpenorgs extends AbstractSparkAction {
 		log.info("Copying openorgs to the working dir");
 
 		final String outputPath = DedupUtility.createDedupRecordPath(workingPath, actionSetId, subEntity);
-		removeOutputDir(spark, outputPath);
 
 		final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
-
-		final Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
 
 		filterOpenorgs(spark, entityPath)
 			.write()
@@ -95,9 +92,13 @@ public class SparkCopyOpenorgs extends AbstractSparkAction {
 					.rdd(),
 				Encoders.bean(Organization.class));
 
-		entities.show();
+		log.info("Number of organization entities processed: {}", entities.count());
 
-		return entities.filter(entities.col("id").contains("openorgs____"));
+		entities = entities.filter(entities.col("id").contains("openorgs____"));
+
+		log.info("Number of Openorgs organization entities: {}", entities.count());
+
+		return entities;
 	}
 
 }

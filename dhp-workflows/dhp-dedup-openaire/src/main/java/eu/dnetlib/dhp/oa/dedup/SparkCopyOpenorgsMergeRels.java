@@ -74,8 +74,6 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 		final String outputPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, "organization");
 
-		removeOutputDir(spark, outputPath);
-
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
 		DedupConfig dedupConf = getConfigurations(isLookUpService, actionSetId).get(0);
@@ -85,10 +83,12 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 			.textFile(relationPath)
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
-			.filter(this::isOpenorgs) // takes only relations coming from openorgs
-			.filter(this::filterOpenorgsRels) // takes only isSimilarTo relations between organizations from openorgs
-			.filter(this::excludeOpenorgsMesh) // excludes relations between an organization and an openorgsmesh
+			.filter(this::isOpenorgs)
+			.filter(this::filterOpenorgsRels)
+			.filter(this::excludeOpenorgsMesh)
 			.filter(this::excludeNonOpenorgs); // excludes relations with no openorgs id involved
+
+		log.info("Number of raw Openorgs Relations collected: {}", rawRels.count());
 
 		// turn openorgs isSimilarTo relations into mergerels
 		JavaRDD<Relation> mergeRelsRDD = rawRels.flatMap(rel -> {
@@ -102,6 +102,8 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 			return mergerels.iterator();
 		});
+
+		log.info("Number of Openorgs Merge Relations created: {}", mergeRelsRDD.count());
 
 		spark
 			.createDataset(
@@ -134,7 +136,7 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 		if (rel.getCollectedfrom() != null) {
 			for (KeyValue k : rel.getCollectedfrom()) {
-				if (k.getValue().equals("OpenOrgs Database")) {
+				if (k.getValue() != null && k.getValue().equals("OpenOrgs Database")) {
 					return true;
 				}
 			}
@@ -144,7 +146,7 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 	private boolean excludeOpenorgsMesh(Relation rel) {
 
-		if (rel.getSource().equals("openorgsmesh") || rel.getTarget().equals("openorgsmesh")) {
+		if (rel.getSource().contains("openorgsmesh") || rel.getTarget().contains("openorgsmesh")) {
 			return false;
 		}
 		return true;
@@ -152,7 +154,7 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 	private boolean excludeNonOpenorgs(Relation rel) {
 
-		if (rel.getSource().equals("openorgs____") || rel.getTarget().equals("openorgs____")) {
+		if (rel.getSource().contains("openorgs____") || rel.getTarget().contains("openorgs____")) {
 			return true;
 		}
 		return false;

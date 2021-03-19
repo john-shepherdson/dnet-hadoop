@@ -33,7 +33,7 @@ import scala.Tuple2;
 
 public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkUpdateEntity.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkCopyRelationsNoOpenorgs.class);
 
 	public SparkCopyRelationsNoOpenorgs(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -52,7 +52,7 @@ public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
-		new SparkUpdateEntity(parser, getSparkSession(conf))
+		new SparkCopyRelationsNoOpenorgs(parser, getSparkSession(conf))
 			.run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
 	}
 
@@ -69,14 +69,14 @@ public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 		final String outputPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
 
-		removeOutputDir(spark, outputPath);
-
 		JavaRDD<Relation> simRels = spark
 			.read()
 			.textFile(relationPath)
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
-			.filter(this::excludeOpenorgsRels);
+			.filter(x -> !isOpenorgs(x));
+
+		log.info("Number of non-Openorgs relations collected: {}", simRels.count());
 
 		spark
 			.createDataset(simRels.rdd(), Encoders.bean(Relation.class))
@@ -96,15 +96,15 @@ public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 		};
 	}
 
-	private boolean excludeOpenorgsRels(Relation rel) {
+	private boolean isOpenorgs(Relation rel) {
 
 		if (rel.getCollectedfrom() != null) {
 			for (KeyValue k : rel.getCollectedfrom()) {
-				if (k.getValue().equals("OpenOrgs Database")) {
-					return false;
+				if (k.getValue() != null && k.getValue().equals("OpenOrgs Database")) {
+					return true;
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 }

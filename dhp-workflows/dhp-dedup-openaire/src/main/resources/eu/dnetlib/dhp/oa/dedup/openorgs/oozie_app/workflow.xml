@@ -87,8 +87,8 @@
 
     <action name="resetOrgSimRels">
         <fs>
-            <delete path="${workingPath}/${actionSetId}/organization_simrel"/>
-            <delete path="${workingPath}/${actionSetId}/organization_mergerel"/>
+            <delete path="${workingPath}/${actionSetIdOpenorgs}/organization_simrel"/>
+            <delete path="${workingPath}/${actionSetIdOpenorgs}/organization_mergerel"/>
         </fs>
         <ok to="CreateSimRels"/>
         <error to="Kill"/>
@@ -113,7 +113,7 @@
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
@@ -142,7 +142,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
         <ok to="CreateMergeRels"/>
@@ -169,7 +169,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--cutConnectedComponent</arg><arg>${cutConnectedComponent}</arg>
         </spark>
         <ok to="PrepareOrgRels"/>
@@ -196,7 +196,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--dbUrl</arg><arg>${dbUrl}</arg>
             <arg>--dbTable</arg><arg>${dbTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
@@ -227,7 +227,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--apiUrl</arg><arg>${apiUrl}</arg>
             <arg>--dbUrl</arg><arg>${dbUrl}</arg>
             <arg>--dbTable</arg><arg>${dbTable}</arg>

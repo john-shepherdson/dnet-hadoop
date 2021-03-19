@@ -92,10 +92,22 @@
     <action name="resetWorkingPath">
         <fs>
             <delete path="${workingPath}"/>
+            <delete path="${dedupGraphPath}"/>
         </fs>
         <ok to="CreateSimRel"/>
         <error to="Kill"/>
     </action>
+
+    <!--<action name="testOpenorgs">-->
+        <!--<fs>-->
+            <!--<delete path="${workingPath}/${actionSetIdOpenorgs}/organization_simrel"/>-->
+            <!--<delete path="${workingPath}/${actionSetIdOpenorgs}/organization_mergerel"/>-->
+            <!--<delete path="${workingPath}/${actionSetIdOpenorgs}/organization_deduprecord"/>-->
+            <!--<delete path="${dedupGraphPath}"/>-->
+        <!--</fs>-->
+        <!--<ok to="CopyOpenorgsMergeRels"/>-->
+        <!--<error to="Kill"/>-->
+    <!--</action>-->
 
     <action name="CreateSimRel">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -182,7 +194,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Copy Merge Relations</name>
+            <name>Copy Openorgs Merge Relations</name>
             <class>eu.dnetlib.dhp.oa.dedup.SparkCopyOpenorgsMergeRels</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
@@ -201,7 +213,7 @@
             <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
-        <ok to="CopyEntities"/>
+        <ok to="CopyOpenorgs"/>
         <error to="Kill"/>
     </action>
 
@@ -210,7 +222,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Copy Entities</name>
+            <name>Copy Openorgs Entities</name>
             <class>eu.dnetlib.dhp.oa.dedup.SparkCopyOpenorgs</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
@@ -225,7 +237,6 @@
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
         </spark>
         <ok to="UpdateEntity"/>
@@ -262,7 +273,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Update Entity</name>
+            <name>Copy Non-Openorgs Relations</name>
             <class>eu.dnetlib.dhp.oa.dedup.SparkCopyRelationsNoOpenorgs</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>

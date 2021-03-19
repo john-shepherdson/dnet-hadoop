@@ -19,9 +19,11 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,7 +63,7 @@ public class SparkOpenorgsTest implements Serializable {
 	public static void cleanUp() throws IOException, URISyntaxException {
 
 		testGraphBasePath = Paths
-			.get(SparkOpenorgsTest.class.getResource("/eu/dnetlib/dhp/dedup/entities").toURI())
+			.get(SparkOpenorgsTest.class.getResource("/eu/dnetlib/dhp/dedup/openorgs").toURI())
 			.toFile()
 			.getAbsolutePath();
 		testOutputBasePath = createTempDirectory(SparkOpenorgsTest.class.getSimpleName() + "-")
@@ -71,9 +73,8 @@ public class SparkOpenorgsTest implements Serializable {
 			.toAbsolutePath()
 			.toString();
 
-//		FileUtils.deleteDirectory(new File(testOutputBasePath));
+		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
-		FileUtils.deleteDirectory(new File("/tmp/test-orchestrator/organization_openorgs_mergerels"));
 
 		final SparkConf conf = new SparkConf();
 		conf.set("spark.sql.shuffle.partitions", "200");
@@ -133,7 +134,7 @@ public class SparkOpenorgsTest implements Serializable {
 			.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_deduprecord")
 			.count();
 
-		assertEquals(0, orgs_deduprecord);
+		assertEquals(100, orgs_deduprecord);
 	}
 
 	@Test
@@ -161,7 +162,7 @@ public class SparkOpenorgsTest implements Serializable {
 			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
 			.count();
 
-		assertEquals(0, orgs_mergerel);
+		assertEquals(6, orgs_mergerel);
 
 	}
 
@@ -190,67 +191,7 @@ public class SparkOpenorgsTest implements Serializable {
 			.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
 			.count();
 
-		System.out.println("orgs_simrel = " + orgs_simrel);
-	}
-
-	@Test
-	public void createSimRelsTest() throws Exception {
-
-		ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					SparkCreateSimRels.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/dedup/createSimRels_parameters.json")));
-		parser
-			.parseArgument(
-				new String[] {
-					"-i", testGraphBasePath,
-					"-asi", testActionSetId,
-					"-la", "lookupurl",
-					"-w", "/tmp",
-					"-np", "50"
-				});
-
-		new SparkCreateSimRels(parser, spark).run(isLookUpService);
-
-		long orgs_simrel = spark
-			.read()
-			.textFile("/tmp/" + testActionSetId + "/organization_simrel")
-			.count();
-
-		assertEquals(3082, orgs_simrel);
-	}
-
-	@Test
-	public void createMergeRelsTest() throws Exception {
-
-		ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					SparkCreateMergeRels.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
-		parser
-			.parseArgument(
-				new String[] {
-					"-i",
-					testGraphBasePath,
-					"-asi",
-					testActionSetId,
-					"-la",
-					"lookupurl",
-					"-w",
-					"/tmp"
-				});
-
-		new SparkCreateMergeRels(parser, spark).run(isLookUpService);
-
-		long orgs_mergerel = spark
-			.read()
-			.load("/tmp/" + testActionSetId + "/organization_mergerel")
-			.count();
-		assertEquals(1272, orgs_mergerel);
+		assertEquals(96, orgs_simrel);
 	}
 
 	@Test
@@ -273,9 +214,7 @@ public class SparkOpenorgsTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-//        Dataset<Relation> relsRDD = spark.read().textFile(testDedupGraphBasePath + "/relation").map(patchRelFn(), Encoders.bean(Relation.class));
-
-		assertEquals(500, relations);
+		assertEquals(400, relations);
 	}
 
 	@AfterAll
