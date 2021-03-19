@@ -1,0 +1,128 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="923fe17a-c697-41f2-beb5-f2d72c17334c_RGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZXMvRGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZVR5cGU="/>
+        <RESOURCE_TYPE value="DedupConfigurationDSResourceType"/>
+        <RESOURCE_KIND value="DedupConfigurationDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2020-07-10T16:09:43+00:00"/>
+    </HEADER>
+    <BODY>
+        <CONFIGURATION>
+            <DESCRIPTION>Software: Decision Tree Dedup - v2.0</DESCRIPTION>
+            <DEDUPLICATION>
+                {
+                "wf" : {
+                "threshold" : "0.99",
+                "dedupRun" : "001",
+                "entityType" : "result",
+                "subEntityType" : "resulttype",
+                "subEntityValue" : "software",
+                "orderField" : "title",
+                "queueMaxSize" : "200",
+                "groupMaxSize" : "100",
+                "maxChildren" : "100",
+                "slidingWindowSize" : "50",
+                "rootBuilder" : [ "result", "resultProject_outcome_isProducedBy", "resultResult_publicationDataset_isRelatedTo", "resultResult_similarity_isAmongTopNSimilarDocuments", "resultResult_similarity_hasAmongTopNSimilarDocuments", "resultOrganization_affiliation_hasAuthorInstitution", "resultResult_part_hasPart", "resultResult_part_isPartOf", "resultResult_supplement_isSupplementTo", "resultResult_supplement_isSupplementedBy", "resultResult_version_isVersionOf" ],
+                "includeChildren" : "true"
+                },
+                "pace" : {
+                "clustering" : [
+                { "name" : "wordsStatsSuffixPrefixChain", "fields" : [ "title" ], "params" : { "mod" : "10" } },
+                { "name" : "lowercase", "fields" : [ "doi" ], "params" : { } }
+                ],
+                "decisionTree": {
+                "start": {
+                "fields": [
+                {
+                "field": "doi",
+                "comparator": "exactMatch",
+                "weight": 1,
+                "countIfUndefined": "false",
+                "params": {}
+                },
+                {
+                "field": "url",
+                "comparator": "exactMatch",
+                "weight": 1,
+                "countIfUndefined": "false",
+                "params": {}
+                }
+                ],
+                "threshold": 1,
+                "aggregation": "OR",
+                "positive": "layer1",
+                "negative": "layer2",
+                "undefined": "layer2",
+                "ignoreUndefined": "false"
+                },
+                "layer1": {
+                "fields": [
+                {
+                "field": "title",
+                "comparator": "levensteinTitleIgnoreVersion",
+                "weight": 1,
+                "countIfUndefined": "false",
+                "params": {}
+                }
+                ],
+                "threshold": 0.9,
+                "aggregation": "AVG",
+                "positive": "MATCH",
+                "negative": "NO_MATCH",
+                "undefined": "NO_MATCH",
+                "ignoreUndefined": "false"
+                },
+                "layer2": {
+                "fields": [
+                {
+                "field": "title",
+                "comparator": "levensteinTitleIgnoreVersion",
+                "weight": 1,
+                "countIfUndefined": "false",
+                "params": {}
+                }
+                ],
+                "threshold": 0.99,
+                "aggregation": "AVG",
+                "positive": "MATCH",
+                "negative": "NO_MATCH",
+                "undefined": "NO_MATCH",
+                "ignoreUndefined": "false"
+                }
+                },
+                "model" : [
+                {
+                "name" : "doi",
+                "type" : "String",
+                "path" : "$.pid[?(@.qualifier.classid == 'doi')].value"
+                },
+                {
+                "name" : "title",
+                "type" : "String",
+                "path" : "$.title[?(@.qualifier.classid == 'main title')].value",
+                "length" : 250,
+                "size" : 5
+                },
+                {
+                "name" : "url",
+                "type" : "String",
+                "path" : "$.instance.url"
+                },
+                {
+                "name" : "resulttype",
+                "type" : "String",
+                "path" : "$.resulttype.classid"
+                }
+                ],
+                "blacklists" : {},
+                "synonyms": {}
+                }
+                }
+            </DEDUPLICATION>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_UPDATE value="2001-12-31T12:00:00"/>
+        </STATUS>
+        <SECURITY_PARAMETERS>SECURITY_PARAMETERS</SECURITY_PARAMETERS>
+    </BODY>
+</RESOURCE_PROFILE>
