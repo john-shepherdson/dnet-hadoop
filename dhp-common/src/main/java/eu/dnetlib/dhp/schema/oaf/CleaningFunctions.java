@@ -5,6 +5,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Sets;
+import eu.dnetlib.dhp.schema.oaf.utils.PidBlacklistProvider;
 import org.apache.commons.lang3.StringUtils;
 
 import com.clearspring.analytics.util.Lists;
@@ -137,19 +139,7 @@ public class CleaningFunctions {
 							.collect(Collectors.toList()));
 			}
 			if (Objects.nonNull(r.getPid())) {
-				r
-					.setPid(
-						r
-							.getPid()
-							.stream()
-							.filter(Objects::nonNull)
-							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
-							.filter(sp -> !PID_BLACKLIST.contains(sp.getValue().trim().toLowerCase()))
-							.filter(sp -> Objects.nonNull(sp.getQualifier()))
-							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
-							.map(CleaningFunctions::normalizePidValue)
-							.filter(CleaningFunctions::filterPid)
-							.collect(Collectors.toList()));
+				r.setPid(processPidCleaning(r.getPid()));
 			}
 			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
 				r
@@ -157,7 +147,18 @@ public class CleaningFunctions {
 						qualifier(ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
 			}
 			if (Objects.nonNull(r.getInstance())) {
+
+
+
 				for (Instance i : r.getInstance()) {
+					final Set<StructuredProperty> pids = Sets.newHashSet(i.getPid());
+					i.setAlternateIdentifier(
+							Optional.ofNullable(i.getAlternateIdentifier())
+							.map(altId -> altId.stream()
+									.filter(p -> !pids.contains(p))
+									.collect(Collectors.toList()))
+							.orElse(Lists.newArrayList()));
+
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
 						i
 							.setAccessright(
@@ -234,6 +235,18 @@ public class CleaningFunctions {
 		return value;
 	}
 
+	private static List<StructuredProperty> processPidCleaning(List<StructuredProperty> pids) {
+		return pids.stream()
+			.filter(Objects::nonNull)
+			.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
+			.filter(sp -> !PID_BLACKLIST.contains(sp.getValue().trim().toLowerCase()))
+			.filter(sp -> Objects.nonNull(sp.getQualifier()))
+			.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+			.map(CleaningFunctions::normalizePidValue)
+			.filter(CleaningFunctions::pidFilter)
+			.collect(Collectors.toList());
+	}
+
 	protected static StructuredProperty cleanValue(StructuredProperty s) {
 		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
 		return s;
@@ -267,25 +280,23 @@ public class CleaningFunctions {
 
 	/**
 	 * Utility method that filter PID values on a per-type basis.
-	 * @param pid the PID whose value will be checked.
-	 * @return true the PID containing the normalised value.
+	 * @param s the PID whose value will be checked.
+	 * @return false if the pid matches the filter criteria, true otherwise.
 	 */
-	private static boolean filterPid(StructuredProperty pid) {
-		String value = Optional
-			.ofNullable(pid.getValue())
-			.map(s -> StringUtils.replaceAll(s, "\\s", ""))
-			.orElse("");
-		if (StringUtils.isBlank(value)) {
+	public static boolean pidFilter(StructuredProperty s) {
+		final String pidValue = s.getValue();
+		if (Objects.isNull(s.getQualifier()) ||
+				StringUtils.isBlank(pidValue) ||
+				StringUtils.isBlank(pidValue.replaceAll("(?:\\n|\\r|\\t|\\s)", ""))) {
 			return false;
 		}
-		switch (pid.getQualifier().getClassid()) {
-
-			// TODO add cleaning for more PID types as needed
-			case "doi":
-				return value.startsWith(DOI_PREFIX);
-			default:
-				return true;
+		if (CleaningFunctions.PID_BLACKLIST.contains(pidValue)) {
+			return false;
 		}
+		if (PidBlacklistProvider.getBlacklist(s.getQualifier().getClassid()).contains(pidValue)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

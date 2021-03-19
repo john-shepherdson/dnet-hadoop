@@ -106,7 +106,7 @@ public class IdentifierFactory implements Serializable {
 				.getPid()
 				.stream()
 				.map(CleaningFunctions::normalizePidValue)
-				.filter(IdentifierFactory::pidFilter)
+				.filter(CleaningFunctions::pidFilter)
 				.collect(
 					Collectors
 						.groupingBy(
@@ -136,19 +136,23 @@ public class IdentifierFactory implements Serializable {
 					// filter away PIDs provided by a DS that is not considered an authority for the
 					// given PID Type
 					.filter(p -> {
-						final PidType pType = PidType.tryValueOf(p.getQualifier().getClassid());
-						return Optional.ofNullable(collectedFrom).isPresent() &&
-							Optional
-								.ofNullable(PID_AUTHORITY.get(pType))
-								.map(authorities -> {
-									return authorities.containsKey(collectedFrom.getKey())
-										|| authorities.containsValue(collectedFrom.getValue());
-								})
-								.orElse(false);
+						return shouldFilterPid(collectedFrom, p);
 					})
 					.map(CleaningFunctions::normalizePidValue)
-					.filter(IdentifierFactory::pidFilter))
+					.filter(CleaningFunctions::pidFilter))
 			.orElse(Stream.empty());
+	}
+
+	private static boolean shouldFilterPid(KeyValue collectedFrom, StructuredProperty p) {
+		final PidType pType = PidType.tryValueOf(p.getQualifier().getClassid());
+		return pType.equals(PidType.handle) || Optional.ofNullable(collectedFrom).isPresent() &&
+			Optional
+				.ofNullable(PID_AUTHORITY.get(pType))
+				.map(authorities -> {
+					return authorities.containsKey(collectedFrom.getKey())
+						|| authorities.containsValue(collectedFrom.getValue());
+				})
+				.orElse(false);
 	}
 
 	/**
@@ -157,22 +161,6 @@ public class IdentifierFactory implements Serializable {
 	public static <T extends OafEntity> String createIdentifier(T entity) {
 
 		return createIdentifier(entity, true);
-	}
-
-	protected static boolean pidFilter(StructuredProperty s) {
-		final String pidValue = s.getValue();
-		if (Objects.isNull(s.getQualifier()) ||
-			StringUtils.isBlank(pidValue) ||
-			StringUtils.isBlank(pidValue.replaceAll("(?:\\n|\\r|\\t|\\s)", ""))) {
-			return false;
-		}
-		if (CleaningFunctions.PID_BLACKLIST.contains(pidValue)) {
-			return false;
-		}
-		if (PidBlacklistProvider.getBlacklist(s.getQualifier().getClassid()).contains(pidValue)) {
-			return false;
-		}
-		return true;
 	}
 
 	private static <T extends OafEntity> String idFromPid(T entity, StructuredProperty s, boolean md5) {
