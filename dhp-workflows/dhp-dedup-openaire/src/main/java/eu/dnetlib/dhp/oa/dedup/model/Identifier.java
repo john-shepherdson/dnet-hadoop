@@ -112,11 +112,11 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 					return 1;
 			}
 			if (getEntityType() == EntityType.dataset) {
-				if (isFromDatasourceID(lKeys, ModelConstants.CROSSREF_ID)
-					&& !isFromDatasourceID(rKeys, ModelConstants.CROSSREF_ID))
+				if (isFromDatasourceID(lKeys, ModelConstants.DATACITE_ID)
+					&& !isFromDatasourceID(rKeys, ModelConstants.DATACITE_ID))
 					return -1;
-				if (isFromDatasourceID(rKeys, ModelConstants.CROSSREF_ID)
-					&& !isFromDatasourceID(lKeys, ModelConstants.CROSSREF_ID))
+				if (isFromDatasourceID(rKeys, ModelConstants.DATACITE_ID)
+					&& !isFromDatasourceID(lKeys, ModelConstants.DATACITE_ID))
 					return 1;
 			}
 
