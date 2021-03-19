@@ -172,7 +172,7 @@ case object ConversionUtil {
       i.setUrl(List(s"https://academic.microsoft.com/#/detail/${extractMagIdentifier(pub.getOriginalId.asScala)}").asJava)
 
     // Ticket #6281 added pid to Instance
-    i.setPid(pub.getPid.asScala.filter(p => p.getQualifier.getClassid.equalsIgnoreCase("doi")).asJava)
+    i.setPid(pub.getPid)
 
     i.setCollectedfrom(createMAGCollectedFrom())
     pub.setInstance(List(i).asJava)
@@ -197,8 +197,8 @@ case object ConversionUtil {
     //IMPORTANT
     //The old method result.setId(generateIdentifier(result, doi))
     //will be replaced using IdentifierFactory
-    pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
-    pub.setId(IdentifierFactory.createIdentifier(pub))
+
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
     val originalTitles = createSP(paper.OriginalTitle, "alternative title", "dnet:dataCite_title")

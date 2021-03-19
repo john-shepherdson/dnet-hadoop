@@ -22,13 +22,11 @@ class UnpayWallMappingTest {
 
 
     for (line <-Ilist.lines) {
-
-
       val p = UnpayWallToOAF.convertToOAF(line)
 
       if(p!= null) {
-        assertTrue(p.getPid.size()==1)
-        logger.info(p.getId)
+        assertTrue(p.getInstance().size()==1)
+        logger.info(s"ID : ${p.getId}")
       }
       assertNotNull(line)
       assertTrue(line.nonEmpty)

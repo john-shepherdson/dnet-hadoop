@@ -10,12 +10,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -58,6 +58,37 @@ public class IdentifierFactory implements Serializable {
 
 	public static List<StructuredProperty> getPids(List<StructuredProperty> pid, KeyValue collectedFrom) {
 		return pidFromInstance(pid, collectedFrom).distinct().collect(Collectors.toList());
+	}
+
+	public static <T extends Result> String createDOIBoostIdentifier(T entity) {
+		if (entity == null)
+			return null;
+
+		StructuredProperty pid = null;
+		if (entity.getPid() != null) {
+			pid = entity
+				.getPid()
+				.stream()
+				.filter(Objects::nonNull)
+				.filter(s -> s.getQualifier() != null && "doi".equalsIgnoreCase(s.getQualifier().getClassid()))
+				.filter(IdentifierFactory::pidFilter)
+				.findAny()
+				.orElse(null);
+		} else {
+			if (entity.getInstance() != null) {
+				pid = entity
+					.getInstance()
+					.stream()
+					.filter(i -> i.getPid() != null)
+					.flatMap(i -> i.getPid().stream())
+					.filter(IdentifierFactory::pidFilter)
+					.findAny()
+					.orElse(null);
+			}
+		}
+		if (pid != null)
+			return idFromPid(entity, pid, true);
+		return null;
 	}
 
 	/**

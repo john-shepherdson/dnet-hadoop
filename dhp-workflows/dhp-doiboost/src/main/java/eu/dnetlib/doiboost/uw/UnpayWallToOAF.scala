@@ -55,7 +55,6 @@ object UnpayWallToOAF {
 
     val doi = (json \"doi").extract[String]
 
-
     val is_oa = (json\ "is_oa").extract[Boolean]
 
     val journal_is_oa= (json\ "journal_is_oa").extract[Boolean]
@@ -63,14 +62,6 @@ object UnpayWallToOAF {
     val oaLocation:OALocation = (json \ "best_oa_location").extractOrElse[OALocation](null)
 
     val colour = get_color(is_oa, oaLocation, journal_is_oa)
-    pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
-
-    //IMPORTANT
-    //The old method pub.setId(IdentifierFactory.createIdentifier(pub))
-    //will be replaced using IdentifierFactory
-    //pub.setId(generateIdentifier(pub, doi.toLowerCase))
-    pub.setId(IdentifierFactory.createIdentifier(pub))
-
 
     pub.setCollectedfrom(List(createUnpayWallCollectedFrom()).asJava)
     pub.setDataInfo(generateDataInfo())
@@ -86,12 +77,9 @@ object UnpayWallToOAF {
 //    i.setAccessright(getOpenAccessQualifier())
     i.setUrl(List(oaLocation.url.get).asJava)
 
-    // Ticket #6281 added pid to Instance
-    i.setPid(pub.getPid.asScala.filter(p => p.getQualifier.getClassid.equalsIgnoreCase("doi")).asJava)
-
     if (oaLocation.license.isDefined)
       i.setLicense(asField(oaLocation.license.get))
-
+    pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
 
     // Ticket #6282 Adding open Access Colour
     if (colour.isDefined) {
@@ -102,8 +90,15 @@ object UnpayWallToOAF {
       a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
       a.setOpenAccessRoute(colour.get)
       i.setAccessright(a)
+      i.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
     }
     pub.setInstance(List(i).asJava)
+
+    //IMPORTANT
+    //The old method pub.setId(IdentifierFactory.createIdentifier(pub))
+    //will be replaced using IdentifierFactory
+    //pub.setId(generateIdentifier(pub, doi.toLowerCase))
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
     pub
 
   }
