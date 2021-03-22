@@ -38,37 +38,39 @@ object SparkGenerateDOIBoostActionSet {
     val crossRefRelation            = parser.get("crossRefRelation")
     val dbaffiliationRelationPath   = parser.get("dbaffiliationRelationPath")
     val dbOrganizationPath          = parser.get("dbOrganizationPath")
-    val workingDirPath              = parser.get("targetPath")
     val sequenceFilePath            = parser.get("sFilePath")
 
     val asDataset = spark.read.load(dbDatasetPath).as[OafDataset]
+      .filter(p => p != null || p.getId != null)
       .map(d =>DoiBoostMappingUtil.fixResult(d))
       .map(d=>DoiBoostMappingUtil.toActionSet(d))(Encoders.tuple(Encoders.STRING, Encoders.STRING))
-//      .write.mode(SaveMode.Overwrite).save(s"$workingDirPath/actionSet")
+
 
     val asPublication =spark.read.load(dbPublicationPath).as[Publication]
+      .filter(p => p != null || p.getId != null)
       .map(d=>DoiBoostMappingUtil.toActionSet(d))(Encoders.tuple(Encoders.STRING, Encoders.STRING))
-//      .write.mode(SaveMode.Append).save(s"$workingDirPath/actionSet")
+
 
     val asOrganization = spark.read.load(dbOrganizationPath).as[Organization]
       .map(d=>DoiBoostMappingUtil.toActionSet(d))(Encoders.tuple(Encoders.STRING, Encoders.STRING))
-//      .write.mode(SaveMode.Append).save(s"$workingDirPath/actionSet")
+
 
 
     val asCRelation = spark.read.load(crossRefRelation).as[Relation]
+      .filter(r => r!= null || (r.getSource != null && r.getTarget != null))
       .map(d=>DoiBoostMappingUtil.toActionSet(d))(Encoders.tuple(Encoders.STRING, Encoders.STRING))
-//      .write.mode(SaveMode.Append).save(s"$workingDirPath/actionSet")
+
 
     val asRelAffiliation = spark.read.load(dbaffiliationRelationPath).as[Relation]
       .map(d=>DoiBoostMappingUtil.toActionSet(d))(Encoders.tuple(Encoders.STRING, Encoders.STRING))
-//      .write.mode(SaveMode.Append).save(s"$workingDirPath/actionSet")
+
 
 
 
 
     val d: Dataset[(String, String)] = asDataset.union(asPublication).union(asOrganization).union(asCRelation).union(asRelAffiliation)
 
-//      spark.read.load(s"$workingDirPath/actionSet").as[(String,String)]
+
 
     d.rdd.repartition(6000).map(s => (new Text(s._1), new Text(s._2))).saveAsHadoopFile(s"$sequenceFilePath", classOf[Text], classOf[Text], classOf[SequenceFileOutputFormat[Text,Text]], classOf[GzipCodec])
 
