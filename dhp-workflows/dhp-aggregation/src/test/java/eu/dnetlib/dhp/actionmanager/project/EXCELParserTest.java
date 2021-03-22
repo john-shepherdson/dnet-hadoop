@@ -12,15 +12,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import eu.dnetlib.dhp.actionmanager.project.httpconnector.CollectorServiceException;
-import eu.dnetlib.dhp.actionmanager.project.httpconnector.HttpConnector;
 import eu.dnetlib.dhp.actionmanager.project.utils.EXCELParser;
+import eu.dnetlib.dhp.collection.CollectorException;
+import eu.dnetlib.dhp.collection.HttpConnector2;
 
 @Disabled
 public class EXCELParserTest {
 
 	private static Path workingDir;
-	private HttpConnector httpConnector = new HttpConnector();
+	private HttpConnector2 httpConnector = new HttpConnector2();
 	private static final String URL = "http://cordis.europa.eu/data/reference/cordisref-H2020topics.xlsx";
 
 	@BeforeAll
@@ -30,7 +30,7 @@ public class EXCELParserTest {
 	}
 
 	@Test
-	public void test1() throws CollectorServiceException, IOException, InvalidFormatException, ClassNotFoundException,
+	public void test1() throws CollectorException, IOException, InvalidFormatException, ClassNotFoundException,
 		IllegalAccessException, InstantiationException {
 
 		EXCELParser excelParser = new EXCELParser();

@@ -21,8 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;

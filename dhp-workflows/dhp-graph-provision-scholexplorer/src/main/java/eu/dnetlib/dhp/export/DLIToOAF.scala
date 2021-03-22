@@ -224,7 +224,7 @@ object DLIToOAF {
     if (cleanedPids.isEmpty)
       return null
     result.setId(generateId(inputPublication.getId))
-    result.setDataInfo(generateDataInfo(invisibile = true))
+    result.setDataInfo(generateDataInfo(invisible = true))
     if (inputPublication.getCollectedfrom == null || inputPublication.getCollectedfrom.size() == 0 || (inputPublication.getCollectedfrom.size() == 1 && inputPublication.getCollectedfrom.get(0) == null))
       return null
     result.setCollectedfrom(inputPublication.getCollectedfrom.asScala.map(c => collectedFromMap.getOrElse(c.getKey, null)).filter(p => p != null).asJava)

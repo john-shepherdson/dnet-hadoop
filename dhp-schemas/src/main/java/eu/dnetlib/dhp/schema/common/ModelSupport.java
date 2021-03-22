@@ -3,17 +3,19 @@ package eu.dnetlib.dhp.schema.common;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
@@ -254,13 +256,6 @@ public class ModelSupport {
 					.setSubReltype("relationship"));
 		relationInverseMap
 			.put(
-				"resultResult_similarity_isAmongTopNSimilarDocuments", new RelationInverse()
-					.setInverse("hasAmongTopNSimilarDocuments")
-					.setRelation("isAmongTopNSimilarDocuments")
-					.setRelType("resultResult")
-					.setSubReltype("similarity"));
-		relationInverseMap
-			.put(
 				"resultResult_supplement_isSupplementTo", new RelationInverse()
 					.setInverse("isSupplementedBy")
 					.setRelation("isSupplementTo")
@@ -480,6 +475,20 @@ public class ModelSupport {
 
 	private static <T extends Oaf> String idFnForOafEntity(T t) {
 		return ((OafEntity) t).getId();
+	}
+
+	public static String md5(final String s) {
+		try {
+			final MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(s.getBytes(StandardCharsets.UTF_8));
+			return new String(Hex.encodeHex(md.digest()));
+		} catch (final NoSuchAlgorithmException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	public static String generateIdentifier(final String originalId, final String nsPrefix) {
+		return String.format("%s::%s", nsPrefix, md5(originalId));
 	}
 
 	public static String oldest(String dateA, String dateB) throws ParseException {

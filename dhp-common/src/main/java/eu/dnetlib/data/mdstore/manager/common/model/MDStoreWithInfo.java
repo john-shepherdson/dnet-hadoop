@@ -3,6 +3,7 @@ package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,6 +44,10 @@ public class MDStoreWithInfo implements Serializable {
 	@Column(name = "current_version")
 	private String currentVersion;
 
+	@Column(name = "creation_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date creationDate;
+
 	@Column(name = "lastupdate")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastUpdate;
@@ -52,6 +57,9 @@ public class MDStoreWithInfo implements Serializable {
 
 	@Column(name = "n_versions")
 	private long numberOfVersions = 0;
+
+	@Column(name = "hdfs_path")
+	private String hdfsPath;
 
 	public String getId() {
 		return id;
@@ -117,6 +125,14 @@ public class MDStoreWithInfo implements Serializable {
 		this.currentVersion = currentVersion;
 	}
 
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(final Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
 	public Date getLastUpdate() {
 		return lastUpdate;
 	}
@@ -140,4 +156,39 @@ public class MDStoreWithInfo implements Serializable {
 	public void setNumberOfVersions(final long numberOfVersions) {
 		this.numberOfVersions = numberOfVersions;
 	}
+
+	public String getHdfsPath() {
+		return hdfsPath;
+	}
+
+	public void setHdfsPath(final String hdfsPath) {
+		this.hdfsPath = hdfsPath;
+	}
+
+	@Override
+	public String toString() {
+		return String
+			.format(
+				"MDStoreWithInfo [id=%s, format=%s, layout=%s, interpretation=%s, datasourceName=%s, datasourceId=%s, apiId=%s, currentVersion=%s, creationDate=%s, lastUpdate=%s, size=%s, numberOfVersions=%s, hdfsPath=%s]",
+				id, format, layout, interpretation, datasourceName, datasourceId, apiId, currentVersion, creationDate,
+				lastUpdate, size, numberOfVersions, hdfsPath);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof MDStoreWithInfo)) {
+			return false;
+		}
+		final MDStoreWithInfo other = (MDStoreWithInfo) obj;
+		return Objects.equals(id, other.id);
+	}
+
 }

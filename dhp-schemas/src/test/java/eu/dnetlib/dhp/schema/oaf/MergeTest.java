@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -94,7 +95,7 @@ public class MergeTest {
 
 	@Test
 	public void mergeRelationTestParseException() {
-		assertThrows(IllegalArgumentException.class, () -> {
+		assertThrows(DateTimeParseException.class, () -> {
 			Relation a = createRel(true, "2016-04-05");
 			Relation b = createRel(true, "2016-04-05");
 			a.mergeFrom(b);

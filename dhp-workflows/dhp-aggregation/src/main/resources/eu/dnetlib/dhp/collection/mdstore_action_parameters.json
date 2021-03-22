@@ -1,0 +1,45 @@
+[
+  {
+    "paramName": "a",
+    "paramLongName": "action",
+    "paramDescription": "the JSON encoding of the API Descriptor",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mu",
+    "paramLongName": "mdStoreManagerURI",
+    "paramDescription": "the MDStore Manager URI",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mi",
+    "paramLongName": "mdStoreID",
+    "paramDescription": "the Metadata Store ID",
+    "paramRequired": false
+  },
+  {
+    "paramName": "ms",
+    "paramLongName": "mdStoreSize",
+    "paramDescription": "the Metadata Store Size",
+    "paramRequired": false
+  },
+  {
+    "paramName": "mv",
+    "paramLongName": "mdStoreVersion",
+    "paramDescription": "the Metadata Version Bean",
+    "paramRequired": false
+  },
+  {
+    "paramName": "n",
+    "paramLongName": "namenode",
+    "paramDescription": "the Name Node URI",
+    "paramRequired": false
+  },
+  {
+    "paramName": "rm",
+    "paramLongName": "readMDStoreId",
+    "paramDescription": "the ID Locked to Read",
+    "paramRequired": false
+  }
+
+]

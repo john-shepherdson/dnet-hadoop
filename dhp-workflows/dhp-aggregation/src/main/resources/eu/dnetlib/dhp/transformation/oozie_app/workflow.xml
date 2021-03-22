@@ -1,76 +1,187 @@
 <workflow-app name="Transformation_Workflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>mdstoreInputPath</name>
-            <description>the path of the input MDStore</description>
+            <name>mdStoreInputId</name>
+            <description>the identifier of the native MDStore</description>
         </property>
-
         <property>
-            <name>mdstoreOutputPath</name>
+            <name>mdStoreOutputId</name>
+            <description>the identifier of the cleaned MDStore</description>
+        </property>
+        <property>
+            <name>mdStoreManagerURI</name>
             <description>the path of the cleaned mdstore</description>
         </property>
-
         <property>
-            <name>transformationRule</name>
+            <name>transformationRuleId</name>
             <description>The transformation Rule to apply</description>
         </property>
-
         <property>
-            <name>timestamp</name>
-            <description>The timestamp of the collection date</description>
+            <name>transformationPlugin</name>
+            <value>XSLT_TRANSFORM</value>
+            <description>The transformation Plugin</description>
         </property>
-
+        <property>
+            <name>dateOfTransformation</name>
+            <description>The timestamp of the transformation date</description>
+        </property>
+        <property>
+            <name>isLookupUrl</name>
+            <description>The IS lookUp service endopoint</description>
+        </property>
         <property>
             <name>workflowId</name>
             <description>The identifier of the workflow</description>
         </property>
+        <property>
+            <name>dnetMessageManagerURL</name>
+            <description>The URI of the Dnet Message Manager</description>
+        </property>
     </parameters>
 
-    <start to="DeletePathIfExists"/>
+    <start to="BeginRead"/>
+
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-    <action name="DeletePathIfExists">
-        <fs>
-            <mkdir path='${mdstoreOutputPath}'/>
-            <delete path='${mdstoreOutputPath}'/>
-        </fs>
-        <ok to="TransformJob"/>
+
+    <action name="BeginRead">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_LOCK</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreInputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="StartTransaction"/>
         <error to="Kill"/>
     </action>
-    <action name="TransformJob">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>MDBuilder</name>
-            <class>eu.dnetlib.dhp.transformation.TransformSparkJobNode</class>
-            <jar>dhp-aggregations-1.0.0-SNAPSHOT.jar</jar>
-            <spark-opts>--num-executors 50 --conf spark.yarn.jars=&quot;hdfs://hadoop-rm1.garr-pa1.d4science.org:8020/user/oozie/share/lib/lib_20180405103059/spark2&quot;</spark-opts>
-            <arg>--dateOfCollection</arg> <arg>${timestamp}</arg>
-            <arg>-mt</arg> <arg>yarn</arg>
-            <arg>--input</arg><arg>${mdstoreInputPath}</arg>
-            <arg>--output</arg><arg>${mdstoreOutputPath}</arg>
-            <arg>-w</arg><arg>${workflowId}</arg>
-            <arg>-tr</arg><arg>${transformationRule}</arg>
-            <arg>-ru</arg><arg>${rmq_user}</arg>
-            <arg>-rp</arg><arg>${rmq_pwd}</arg>
-            <arg>-rh</arg><arg>${rmq_host}</arg>
-            <arg>-ro</arg><arg>${rmq_ongoing}</arg>
-            <arg>-rr</arg><arg>${rmq_report}</arg>
-        </spark>
-        <ok to="End"/>
-        <error to="DropInvalidStore"/>
+
+    <action name="StartTransaction">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>NEW_VERSION</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="TransformJob"/>
+        <error to="EndReadRollBack"/>
     </action>
 
-    <action name="DropInvalidStore">
-        <fs>
-            <delete path='${mdstoreOutputPath}/../'/>
-        </fs>
+    <action name="TransformJob">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Transform MetadataStore</name>
+            <class>eu.dnetlib.dhp.transformation.TransformSparkJobNode</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdstoreInputVersion</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <arg>--dateOfTransformation</arg><arg>${dateOfTransformation}</arg>
+            <arg>--transformationPlugin</arg><arg>${transformationPlugin}</arg>
+            <arg>--transformationRuleId</arg><arg>${transformationRuleId}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--workflowId</arg><arg>${workflowId}</arg>
+            <arg>--dnetMessageManagerURL</arg><arg>${dnetMessageManagerURL}</arg>
+        </spark>
+        <ok to="EndRead"/>
+        <error to="EndReadRollBack"/>
+    </action>
+
+    <action name="EndRead">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="CommitVersion"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CommitVersion">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="EndReadRollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+            </java>
+        <ok to="RollBack"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="RollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
         <ok to="Kill"/>
         <error to="Kill"/>
     </action>
-
+    
     <end name="End"/>
+
 </workflow-app>
