@@ -149,17 +149,21 @@ public class CleaningFunctions {
 			if (Objects.nonNull(r.getInstance())) {
 
 				for (Instance i : r.getInstance()) {
-					final Set<StructuredProperty> pids = Sets.newHashSet(i.getPid());
-					i
-						.setAlternateIdentifier(
-							Optional
-								.ofNullable(i.getAlternateIdentifier())
-								.map(
-									altId -> altId
-										.stream()
-										.filter(p -> !pids.contains(p))
-										.collect(Collectors.toList()))
-								.orElse(Lists.newArrayList()));
+					Optional
+						.ofNullable(i.getPid())
+						.ifPresent(pid -> {
+							final Set<StructuredProperty> pids = Sets.newHashSet(i.getPid());
+							i
+								.setAlternateIdentifier(
+									Optional
+										.ofNullable(i.getAlternateIdentifier())
+										.map(
+											altId -> altId
+												.stream()
+												.filter(p -> !pids.contains(p))
+												.collect(Collectors.toList()))
+										.orElse(Lists.newArrayList()));
+						});
 
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
 						i

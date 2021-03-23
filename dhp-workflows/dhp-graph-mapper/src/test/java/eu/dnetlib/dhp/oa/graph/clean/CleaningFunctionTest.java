@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -78,7 +79,7 @@ public class CleaningFunctionTest {
 		assertEquals("CLOSED", p_out.getInstance().get(0).getAccessright().getClassid());
 		assertEquals("Closed Access", p_out.getInstance().get(0).getAccessright().getClassname());
 
-		Set<String> pidTerms = vocabularies.getTerms("dnet:pid_types");
+		Set<String> pidTerms = vocabularies.getTerms(ModelConstants.DNET_PID_TYPES);
 		assertTrue(
 			p_out
 				.getPid()
