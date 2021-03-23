@@ -107,7 +107,7 @@ object DoiBoostMappingUtil {
 
 
   def fixResult(result: Dataset) :Dataset = {
-    val instanceType = result.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
+    val instanceType = extractInstance(result)
     if (instanceType.isDefined) {
       result.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
     }
@@ -135,6 +135,11 @@ object DoiBoostMappingUtil {
 
   }
 
+
+  def extractInstance(r:Result):Option[Instance] = {
+    r.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
+  }
+
   def fixPublication(input:((String,Publication), (String,HostedByItemType))): Publication = {
 
     val publication = input._1._2
@@ -142,7 +147,7 @@ object DoiBoostMappingUtil {
     val item = if (input._2 != null) input._2._2 else null
 
 
-    val instanceType = publication.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
+    val instanceType:Option[Instance] = extractInstance(publication)
 
     if (instanceType.isDefined) {
       publication.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
@@ -156,7 +161,8 @@ object DoiBoostMappingUtil {
         hb.setKey(generateDSId(item.id))
         if (item.openAccess)
           i.setAccessright(getOpenAccessQualifier())
-        publication.setBestaccessright(getOpenAccessQualifier())
+        val ar = getOpenAccessQualifier()
+        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
         hb.setValue("Unknown Repository")
@@ -168,10 +174,12 @@ object DoiBoostMappingUtil {
     val ar = publication.getInstance().asScala.filter(i => i.getInstancetype != null && i.getAccessright!= null && i.getAccessright.getClassid!= null).map(f=> f.getAccessright.getClassid)
     if (ar.nonEmpty) {
       if(ar.contains("OPEN")){
-        publication.setBestaccessright(getOpenAccessQualifier())
+        val ar = getOpenAccessQualifier()
+        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
-        publication.setBestaccessright(getRestrictedQualifier())
+        val ar = getRestrictedQualifier()
+        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
     }
     publication
