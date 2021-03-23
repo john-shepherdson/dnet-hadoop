@@ -5,6 +5,7 @@ import eu.dnetlib.dhp.schema.oaf.{AccessRight, DataInfo, Dataset, Field, Instanc
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
 import org.json4s
 import org.json4s.DefaultFormats
@@ -107,23 +108,17 @@ object DoiBoostMappingUtil {
 
 
   def fixResult(result: Dataset) :Dataset = {
-    val instanceType = result.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
+    val instanceType = extractInstance(result)
     if (instanceType.isDefined) {
       result.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
     }
     result.getInstance().asScala.foreach(i => {
-      i.setHostedby(getUnknownHostedBy())
+      i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY)
     })
     result
   }
 
-  def getUnknownHostedBy():KeyValue = {
-    val hb = new KeyValue
-    hb.setValue("Unknown Repository")
-    hb.setKey(s"10|$OPENAIRE_PREFIX::55045bd2a65019fd8e6741a755395c8c")
-    hb
 
-  }
 
 
   def getOpenAccessQualifier():AccessRight = {
@@ -135,6 +130,11 @@ object DoiBoostMappingUtil {
 
   }
 
+
+  def extractInstance(r:Result):Option[Instance] = {
+    r.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
+  }
+
   def fixPublication(input:((String,Publication), (String,HostedByItemType))): Publication = {
 
     val publication = input._1._2
@@ -142,7 +142,7 @@ object DoiBoostMappingUtil {
     val item = if (input._2 != null) input._2._2 else null
 
 
-    val instanceType = publication.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
+    val instanceType:Option[Instance] = extractInstance(publication)
 
     if (instanceType.isDefined) {
       publication.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
@@ -150,28 +150,30 @@ object DoiBoostMappingUtil {
 
 
     publication.getInstance().asScala.foreach(i => {
-      val hb = new KeyValue
+      var hb = new KeyValue
       if (item != null) {
         hb.setValue(item.officialname)
         hb.setKey(generateDSId(item.id))
         if (item.openAccess)
           i.setAccessright(getOpenAccessQualifier())
-        publication.setBestaccessright(getOpenAccessQualifier())
+        val ar = getOpenAccessQualifier()
+        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
-        hb.setValue("Unknown Repository")
-        hb.setKey(s"10|$OPENAIRE_PREFIX::55045bd2a65019fd8e6741a755395c8c")
+        hb = ModelConstants.UNKNOWN_REPOSITORY
       }
       i.setHostedby(hb)
     })
 
     val ar = publication.getInstance().asScala.filter(i => i.getInstancetype != null && i.getAccessright!= null && i.getAccessright.getClassid!= null).map(f=> f.getAccessright.getClassid)
     if (ar.nonEmpty) {
-      if(ar.contains("OPEN")){
-        publication.setBestaccessright(getOpenAccessQualifier())
+      if(ar.contains(ModelConstants.ACCESS_RIGHT_OPEN)){
+        val ar = getOpenAccessQualifier()
+        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
-        publication.setBestaccessright(getRestrictedQualifier())
+        val ar = getRestrictedQualifier()
+        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
     }
     publication
