@@ -111,7 +111,6 @@ public class PromoteActionPayloadFunctions {
 		SerializableSupplier<Function<G, Boolean>> isNotZeroFn,
 		Class<G> rowClazz) {
 		TypedColumn<G, G> aggregator = new TableAggregator<>(zeroFn, mergeAndGetFn, isNotZeroFn, rowClazz).toColumn();
-
 		return rowDS
 			.filter((FilterFunction<G>) o -> isNotZeroFn.get().apply(o))
 			.groupByKey((MapFunction<G, String>) x -> rowIdFn.get().apply(x), Encoders.STRING())
