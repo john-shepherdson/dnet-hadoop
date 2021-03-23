@@ -34,9 +34,16 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 @ExtendWith(MockitoExtension.class)
 public class TransformationJobTest extends AbstractVocabularyTest {
 
+	private SparkConf sparkConf;
+
 	@BeforeEach
 	public void setUp() throws IOException, ISLookUpException {
 		setUpVocabulary();
+
+		sparkConf = new SparkConf();
+		sparkConf.setMaster("local[*]");
+		sparkConf.set("spark.driver.host", "localhost");
+		sparkConf.set("spark.ui.enabled", "false");
 	}
 
 	@Test
@@ -124,11 +131,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 	@DisplayName("Test TransformSparkJobNode.main with oaiOpenaire_datacite (v4)")
 	public void transformTestITGv4OAIdatacite(@TempDir Path testDir) throws Exception {
 
-		SparkConf conf = new SparkConf();
-		conf.setAppName(TransformationJobTest.class.getSimpleName());
-		conf.setMaster("local");
-
-		try (SparkSession spark = SparkSession.builder().config(conf).getOrCreate()) {
+		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
 
 			final String mdstore_input = this
 				.getClass()
@@ -190,11 +193,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 	@DisplayName("Test TransformSparkJobNode.main")
 	public void transformTest(@TempDir Path testDir) throws Exception {
 
-		SparkConf conf = new SparkConf();
-		conf.setAppName(TransformationJobTest.class.getSimpleName());
-		conf.setMaster("local");
-
-		try (SparkSession spark = SparkSession.builder().config(conf).getOrCreate()) {
+		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
 
 			final String mdstore_input = this
 				.getClass()
