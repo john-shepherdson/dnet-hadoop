@@ -165,6 +165,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					smdbe.execute("querySimilarityFromOpenOrgsDB.sql", smdbe::processOrgOrgSimRels);
 
 					break;
+
+				case openaire_organizations:
+
+					log.info("Processing Organizations...");
+					smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
+
+					break;
 			}
 			log.info("All done.");
 		}

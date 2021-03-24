@@ -31,6 +31,8 @@ FROM organizations o
 	LEFT OUTER JOIN urls u        ON (u.id = o.id)
 	LEFT OUTER JOIN other_ids i   ON (i.id = o.id)
 	LEFT OUTER JOIN other_names n ON (n.id = o.id)
+WHERE
+    o.status = 'approved'
 GROUP BY
 	o.id,
 	o.name,
@@ -72,6 +74,8 @@ FROM other_names n
 	LEFT OUTER JOIN organizations o ON (n.id = o.id)
 	LEFT OUTER JOIN urls u          ON (u.id = o.id)
 	LEFT OUTER JOIN other_ids i     ON (i.id = o.id)
+WHERE
+    o.status = 'approved'
 GROUP BY
 	o.id,
 	o.creation_date,

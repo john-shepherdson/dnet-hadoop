@@ -12,7 +12,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -107,8 +106,9 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.mode(SaveMode.Append)
 			.jdbc(dbUrl, dbTable, connectionProperties);
 
-		if (!apiUrl.isEmpty())
-			updateSimRels(apiUrl);
+		// TODO de-comment once finished
+//		if (!apiUrl.isEmpty())
+//			updateSimRels(apiUrl);
 
 	}
 
@@ -181,7 +181,9 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 					r._1()._2().getLegalshortname() != null ? r._1()._2().getLegalshortname().getValue() : "",
 					r._1()._2().getCountry() != null ? r._1()._2().getCountry().getClassid() : "",
 					r._1()._2().getWebsiteurl() != null ? r._1()._2().getWebsiteurl().getValue() : "",
-					r._1()._2().getCollectedfrom().get(0).getValue(), ""),
+					r._1()._2().getCollectedfrom().get(0).getValue(),
+					"",
+					structuredPropertyListToString(r._1()._2().getPid())),
 				Encoders.bean(OrgSimRel.class));
 
 	}

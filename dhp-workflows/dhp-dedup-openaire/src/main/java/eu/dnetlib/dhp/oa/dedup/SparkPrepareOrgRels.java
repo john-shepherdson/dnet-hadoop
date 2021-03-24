@@ -14,6 +14,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -209,15 +210,19 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		Dataset<Tuple2<String, OrgSimRel>> relations2 = relations
 			.joinWith(entities, relations.col("_2").equalTo(entities.col("_1")), "inner")
 			.map(
-				(MapFunction<Tuple2<Tuple3<String, String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> new OrgSimRel(
-					r._1()._1(),
-					r._2()._2().getOriginalId().get(0),
-					r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
-					r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
-					r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
-					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
-					r._2()._2().getCollectedfrom().get(0).getValue(),
-					r._1()._3()),
+				(MapFunction<Tuple2<Tuple3<String, String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
+
+					return new OrgSimRel(
+						r._1()._1(),
+						r._2()._2().getOriginalId().get(0),
+						r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
+						r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
+						r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
+						r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
+						r._2()._2().getCollectedfrom().get(0).getValue(),
+						r._1()._3(),
+						structuredPropertyListToString(r._2()._2().getPid()));
+				},
 				Encoders.bean(OrgSimRel.class))
 			.map(
 				(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),
@@ -311,7 +316,8 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 					r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
 					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
 					r._2()._2().getCollectedfrom().get(0).getValue(),
-					"group::" + r._1()._1()),
+					"group::" + r._1()._1(),
+					structuredPropertyListToString(r._2()._2().getPid())),
 				Encoders.bean(OrgSimRel.class))
 			.map(
 				(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),
