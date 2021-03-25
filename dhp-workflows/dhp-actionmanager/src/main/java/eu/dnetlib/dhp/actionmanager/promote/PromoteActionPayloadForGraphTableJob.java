@@ -68,6 +68,12 @@ public class PromoteActionPayloadForGraphTableJob {
 		MergeAndGet.Strategy strategy = MergeAndGet.Strategy.valueOf(parser.get("mergeAndGetStrategy").toUpperCase());
 		logger.info("strategy: {}", strategy);
 
+		Boolean shouldGroupById = Optional
+			.ofNullable(parser.get("shouldGroupById"))
+			.map(Boolean::valueOf)
+			.orElse(true);
+		logger.info("shouldGroupById: {}", shouldGroupById);
+
 		Class<? extends Oaf> rowClazz = (Class<? extends Oaf>) Class.forName(graphTableClassName);
 		Class<? extends Oaf> actionPayloadClazz = (Class<? extends Oaf>) Class.forName(actionPayloadClassName);
 
@@ -89,7 +95,8 @@ public class PromoteActionPayloadForGraphTableJob {
 					outputGraphTablePath,
 					strategy,
 					rowClazz,
-					actionPayloadClazz);
+					actionPayloadClazz,
+					shouldGroupById);
 			});
 	}
 
@@ -115,12 +122,12 @@ public class PromoteActionPayloadForGraphTableJob {
 		String outputGraphTablePath,
 		MergeAndGet.Strategy strategy,
 		Class<G> rowClazz,
-		Class<A> actionPayloadClazz) {
+		Class<A> actionPayloadClazz, Boolean shouldGroupById) {
 		Dataset<G> rowDS = readGraphTable(spark, inputGraphTablePath, rowClazz);
 		Dataset<A> actionPayloadDS = readActionPayload(spark, inputActionPayloadPath, actionPayloadClazz);
 
 		Dataset<G> result = promoteActionPayloadForGraphTable(
-			rowDS, actionPayloadDS, strategy, rowClazz, actionPayloadClazz)
+			rowDS, actionPayloadDS, strategy, rowClazz, actionPayloadClazz, shouldGroupById)
 				.map((MapFunction<G, G>) value -> value, Encoders.bean(rowClazz));
 
 		saveGraphTable(result, outputGraphTablePath);
@@ -174,7 +181,8 @@ public class PromoteActionPayloadForGraphTableJob {
 		Dataset<A> actionPayloadDS,
 		MergeAndGet.Strategy strategy,
 		Class<G> rowClazz,
-		Class<A> actionPayloadClazz) {
+		Class<A> actionPayloadClazz,
+		Boolean shouldGroupById) {
 		logger
 			.info(
 				"Promoting action payload for graph table: payload={}, table={}",
@@ -198,9 +206,13 @@ public class PromoteActionPayloadForGraphTableJob {
 				rowClazz,
 				actionPayloadClazz);
 
-		return PromoteActionPayloadFunctions
-			.groupGraphTableByIdAndMerge(
-				joinedAndMerged, rowIdFn, mergeRowsAndGetFn, zeroFn, isNotZeroFn, rowClazz);
+		if (shouldGroupById) {
+			return PromoteActionPayloadFunctions
+				.groupGraphTableByIdAndMerge(
+					joinedAndMerged, rowIdFn, mergeRowsAndGetFn, zeroFn, isNotZeroFn, rowClazz);
+		} else {
+			return joinedAndMerged;
+		}
 	}
 
 	private static <T extends Oaf> SerializableSupplier<T> zeroFn(Class<T> clazz) {

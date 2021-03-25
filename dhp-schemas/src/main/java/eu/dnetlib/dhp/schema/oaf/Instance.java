@@ -8,7 +8,7 @@ public class Instance implements Serializable {
 
 	private Field<String> license;
 
-	private Qualifier accessright;
+	private AccessRight accessright;
 
 	private Qualifier instancetype;
 
@@ -20,6 +20,10 @@ public class Instance implements Serializable {
 	private String distributionlocation;
 
 	private KeyValue collectedfrom;
+
+	private List<StructuredProperty> pid;
+
+	private List<StructuredProperty> alternateIdentifier;
 
 	private Field<String> dateofacceptance;
 
@@ -41,11 +45,11 @@ public class Instance implements Serializable {
 		this.license = license;
 	}
 
-	public Qualifier getAccessright() {
+	public AccessRight getAccessright() {
 		return accessright;
 	}
 
-	public void setAccessright(Qualifier accessright) {
+	public void setAccessright(AccessRight accessright) {
 		this.accessright = accessright;
 	}
 
@@ -89,12 +93,28 @@ public class Instance implements Serializable {
 		this.collectedfrom = collectedfrom;
 	}
 
+	public List<StructuredProperty> getPid() {
+		return pid;
+	}
+
+	public void setPid(List<StructuredProperty> pid) {
+		this.pid = pid;
+	}
+
 	public Field<String> getDateofacceptance() {
 		return dateofacceptance;
 	}
 
 	public void setDateofacceptance(Field<String> dateofacceptance) {
 		this.dateofacceptance = dateofacceptance;
+	}
+
+	public List<StructuredProperty> getAlternateIdentifier() {
+		return alternateIdentifier;
+	}
+
+	public void setAlternateIdentifier(List<StructuredProperty> alternateIdentifier) {
+		this.alternateIdentifier = alternateIdentifier;
 	}
 
 	public Field<String> getProcessingchargeamount() {
@@ -149,4 +169,5 @@ public class Instance implements Serializable {
 
 		return toComparableString().equals(other.toComparableString());
 	}
+
 }

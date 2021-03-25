@@ -45,24 +45,24 @@ object SparkConvertORCIDToOAF {
       Encoders.kryo(classOf[Publication])
   }
 
-def run(spark:SparkSession,sourcePath:String, targetPath:String):Unit = {
-  implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
-  implicit val mapOrcid: Encoder[OrcidDOI] = Encoders.kryo[OrcidDOI]
-  implicit val tupleForJoinEncoder: Encoder[(String, Publication)] = Encoders.tuple(Encoders.STRING, mapEncoderPubs)
+  def run(spark:SparkSession,sourcePath:String, targetPath:String):Unit = {
+    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
+    implicit val mapOrcid: Encoder[OrcidDOI] = Encoders.kryo[OrcidDOI]
+    implicit val tupleForJoinEncoder: Encoder[(String, Publication)] = Encoders.tuple(Encoders.STRING, mapEncoderPubs)
 
-  val mapper = new ObjectMapper()
-  mapper.getDeserializationConfig.withFeatures(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+    val mapper = new ObjectMapper()
+    mapper.getDeserializationConfig.withFeatures(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 
-  val dataset:Dataset[OrcidDOI] = spark.createDataset(spark.sparkContext.textFile(sourcePath).map(s => mapper.readValue(s,classOf[OrcidDOI])))
+    val dataset:Dataset[OrcidDOI] = spark.createDataset(spark.sparkContext.textFile(sourcePath).map(s => mapper.readValue(s,classOf[OrcidDOI])))
 
-  logger.info("Converting ORCID to OAF")
-  dataset.map(o => ORCIDToOAF.convertTOOAF(o)).filter(p=>p!=null)
-    .map(d => (d.getId, d))
-    .groupByKey(_._1)(Encoders.STRING)
-    .agg(getPublicationAggregator().toColumn)
-    .map(p => p._2)
-    .write.mode(SaveMode.Overwrite).save(targetPath)
-}
+    logger.info("Converting ORCID to OAF")
+    dataset.map(o => ORCIDToOAF.convertTOOAF(o)).filter(p=>p!=null)
+      .map(d => (d.getId, d))
+      .groupByKey(_._1)(Encoders.STRING)
+      .agg(getPublicationAggregator().toColumn)
+      .map(p => p._2)
+      .write.mode(SaveMode.Overwrite).save(targetPath)
+  }
 
   def main(args: Array[String]): Unit = {
 

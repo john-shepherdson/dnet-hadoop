@@ -13,7 +13,7 @@
   },
   {
     "paramName": "o",
-    "paramLongName": "dedupGraphPath",
+    "paramLongName": "graphOutputPath",
     "paramDescription": "the path of the dedup graph",
     "paramRequired": true
   }

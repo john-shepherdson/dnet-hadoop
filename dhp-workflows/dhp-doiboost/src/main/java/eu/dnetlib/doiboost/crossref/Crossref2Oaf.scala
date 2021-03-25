@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.schema.oaf._
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.lang.StringUtils
@@ -14,11 +15,13 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
 
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils;
+
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
 case class mappingAffiliation(name: String) {}
 
-case class mappingAuthor(given: Option[String], family: String, ORCID: Option[String], affiliation: Option[mappingAffiliation]) {}
+case class mappingAuthor(given: Option[String], family: String, sequence:Option[String], ORCID: Option[String], affiliation: Option[mappingAffiliation]) {}
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
@@ -96,7 +99,12 @@ case object Crossref2Oaf {
     result.setOriginalId(tmp.filter(id => id != null).asJava)
 
     //Set identifier as 50 | doiboost____::md5(DOI)
+
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //will be replaced using IdentifierFactory
     result.setId(generateIdentifier(result, doi))
+    result.setId(IdentifierFactory.createIdentifier(result))
 
     // Add DataInfo
     result.setDataInfo(generateDataInfo())
@@ -154,7 +162,12 @@ case object Crossref2Oaf {
 
     //Mapping Author
     val authorList: List[mappingAuthor] = (json \ "author").extractOrElse[List[mappingAuthor]](List())
-    result.setAuthor(authorList.map(a => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull)).asJava)
+
+
+
+    val sorted_list = authorList.sortWith((a:mappingAuthor, b:mappingAuthor) => a.sequence.isDefined && a.sequence.get.equalsIgnoreCase("first"))
+
+    result.setAuthor(sorted_list.zipWithIndex.map{case (a, index) => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull, index)}.asJava)
 
     // Mapping instance
     val instance = new Instance()
@@ -166,18 +179,21 @@ case object Crossref2Oaf {
       instance.setLicense(l.head)
 
 
+    // Ticket #6281 added pid to Instance
+    instance.setPid(result.getPid)
+
     val has_review = (json \ "relation" \"has-review" \ "id")
 
     if(has_review != JNothing) {
       instance.setRefereed(
-        createQualifier("0001", "peerReviewed", "dnet:review_levels", "dnet:review_levels"))
+        OafUtils.createQualifier("0001", "peerReviewed", "dnet:review_levels", "dnet:review_levels"))
     }
 
 
     instance.setAccessright(getRestrictedQualifier())
     result.setInstance(List(instance).asJava)
-    instance.setInstancetype(createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
-    result.setResourcetype(createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
+    instance.setInstancetype(OafUtils.createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
+    result.setResourcetype(OafUtils.createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
@@ -190,17 +206,21 @@ case object Crossref2Oaf {
     val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
     if (links.nonEmpty)
       instance.setUrl(links.asJava)
+    result.setId(IdentifierFactory.createDOIBoostIdentifier(result))
+    if (result.getId== null)
+      return null
     result
   }
 
 
-  def generateAuhtor(given: String, family: String, orcid: String): Author = {
+  def generateAuhtor(given: String, family: String, orcid: String, index:Int): Author = {
     val a = new Author
     a.setName(given)
     a.setSurname(family)
     a.setFullname(s"$given $family")
+    a.setRank(index+1)
     if (StringUtils.isNotBlank(orcid))
-      a.setPid(List(createSP(orcid, ORCID, PID_TYPES, generateDataInfo())).asJava)
+      a.setPid(List(createSP(orcid, ORCID_PENDING, PID_TYPES, generateDataInfo())).asJava)
 
     a
   }
@@ -223,6 +243,8 @@ case object Crossref2Oaf {
       return List()
     val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"));
     mappingResult(result, json, cOBJCategory)
+    if (result == null)
+      return List()
 
 
     val funderList: List[mappingFunder] = (json \ "funder").extractOrElse[List[mappingFunder]](List())

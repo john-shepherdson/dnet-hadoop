@@ -1,15 +1,15 @@
 package eu.dnetlib.dhp.export
 
+import com.fasterxml.jackson.databind.ObjectMapper
+
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
 import eu.dnetlib.dhp.common.PacePerson
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{Author,  Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{Author, Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
-import org.codehaus.jackson.map.ObjectMapper
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils._
 
 import scala.collection.JavaConverters._
@@ -258,7 +258,7 @@ object DLIToOAF {
     result.setDateofacceptance(asField(inputPublication.getRelevantdate.get(0).getValue))
     result.setPublisher(inputPublication.getPublisher)
     result.setSource(inputPublication.getSource)
-    result.setBestaccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    result.setBestaccessright(createAccessRight("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
 
     val dois = result.getPid.asScala.filter(p => "doi".equalsIgnoreCase(p.getQualifier.getClassname)).map(p => p.getValue)
     if (dois.isEmpty)
@@ -337,12 +337,15 @@ object DLIToOAF {
     result.setDateofacceptance(asField(d.getRelevantdate.get(0).getValue))
     result.setPublisher(d.getPublisher)
     result.setSource(d.getSource)
-    result.setBestaccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    result.setBestaccessright(createAccessRight("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
 
 
     val instance_urls = if (fpids.head.length < 5) s"https://www.rcsb.org/structure/${fpids.head}" else s"https://dx.doi.org/${fpids.head}"
 
     val i: Instance = createInstance(instance_urls, firstInstanceOrNull(d.getInstance()), result.getDateofacceptance, true)
+
+    // Ticket #6281 added pid to Instance
+    i.setPid(result.getPid)
     if (i != null)
       result.setInstance(List(i).asJava)
 
@@ -370,7 +373,7 @@ object DLIToOAF {
     if (originalInstance != null && originalInstance.getHostedby != null)
       i.setHostedby(originalInstance.getHostedby)
 
-    i.setAccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    i.setAccessright(createAccessRight("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
     i.setDateofacceptance(doa)
 
     i

@@ -6,15 +6,13 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import junit.framework.Assert;
-
 public class SolrAdminApplicationTest extends SolrTest {
 
 	@Test
 	public void testPing() throws Exception {
 		SolrPingResponse pingResponse = miniCluster.getSolrClient().ping();
 		log.info("pingResponse: '{}'", pingResponse.getStatus());
-		Assert.assertTrue(pingResponse.getStatus() == 0);
+		Assertions.assertTrue(pingResponse.getStatus() == 0);
 	}
 
 	@Test

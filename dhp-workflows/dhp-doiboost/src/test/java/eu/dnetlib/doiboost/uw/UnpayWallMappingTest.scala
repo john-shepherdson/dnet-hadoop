@@ -1,6 +1,8 @@
 package eu.dnetlib.doiboost.uw
 
-import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.schema.oaf.OpenAccessRoute
 import org.junit.jupiter.api.Test
 
 import scala.io.Source
@@ -20,30 +22,24 @@ class UnpayWallMappingTest {
 
 
     for (line <-Ilist.lines) {
-
-
       val p = UnpayWallToOAF.convertToOAF(line)
 
       if(p!= null) {
-        assertTrue(p.getPid.size()==1)
-        logger.info(p.getId)
+        assertTrue(p.getInstance().size()==1)
+        logger.info(s"ID : ${p.getId}")
       }
       assertNotNull(line)
       assertTrue(line.nonEmpty)
     }
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
+
 
 
      val l = Ilist.lines.next()
 
-    logger.info(mapper.writeValueAsString(UnpayWallToOAF.convertToOAF(l)))
+    val item = UnpayWallToOAF.convertToOAF(l)
 
-
-
-
-
-
-
+    assertEquals(item.getInstance().get(0).getAccessright.getOpenAccessRoute, OpenAccessRoute.bronze)
+    logger.info(mapper.writeValueAsString(item))
   }
 
 }

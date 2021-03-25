@@ -3,10 +3,8 @@ package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -18,11 +16,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.util.LongAccumulator;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +32,7 @@ public class SparkDownloadOrcidAuthors {
 	static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	static final String lastUpdate = "2020-09-29 00:00:00";
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -51,12 +47,12 @@ public class SparkDownloadOrcidAuthors {
 			.orElse(Boolean.TRUE);
 		logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 		final String workingPath = parser.get("workingPath");
-		logger.info("workingPath: ", workingPath);
+		logger.info("workingPath: {}", workingPath);
 		final String outputPath = parser.get("outputPath");
-		logger.info("outputPath: ", outputPath);
+		logger.info("outputPath: {}", outputPath);
 		final String token = parser.get("token");
 		final String lambdaFileName = parser.get("lambdaFileName");
-		logger.info("lambdaFileName: ", lambdaFileName);
+		logger.info("lambdaFileName: {}", lambdaFileName);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -171,8 +167,8 @@ public class SparkDownloadOrcidAuthors {
 	}
 
 	private static boolean isModified(String orcidId, String modifiedDate) {
-		Date modifiedDateDt = null;
-		Date lastUpdateDt = null;
+		Date modifiedDateDt;
+		Date lastUpdateDt;
 		try {
 			if (modifiedDate.length() != 19) {
 				modifiedDate = modifiedDate.substring(0, 19);

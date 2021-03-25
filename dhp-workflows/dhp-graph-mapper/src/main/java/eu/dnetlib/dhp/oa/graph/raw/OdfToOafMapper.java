@@ -2,40 +2,27 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
-import com.google.common.collect.Lists;
-
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
 
-	public OdfToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
-		super(vocs, invisible);
+	public OdfToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId) {
+		super(vocs, invisible, shouldHashId);
 	}
 
 	@Override
@@ -51,31 +38,34 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			final Node n = (Node) o;
 			final Author author = new Author();
 			final String fullname = n.valueOf("./datacite:creatorName");
-			author.setFullname(fullname);
-
-			final PacePerson pp = new PacePerson(fullname, false);
 			final String name = n.valueOf("./datacite:givenName");
-			if (StringUtils.isBlank(name) & pp.isAccurate()) {
-				author.setName(pp.getNormalisedFirstName());
-			} else {
-				author.setName(name);
-			}
-
 			final String surname = n.valueOf("./datacite:familyName");
-			if (StringUtils.isBlank(surname) & pp.isAccurate()) {
-				author.setSurname(pp.getNormalisedSurname());
-			} else {
-				author.setSurname(surname);
-			}
+			if (StringUtils.isNotBlank(fullname) || StringUtils.isNotBlank(name) || StringUtils.isNotBlank(surname)) {
+				author.setFullname(fullname);
 
-			if (StringUtils.isBlank(author.getFullname())) {
-				author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
-			}
+				final PacePerson pp = new PacePerson(fullname, false);
 
-			author.setAffiliation(prepareListFields(n, "./datacite:affiliation", info));
-			author.setPid(preparePids(n, info));
-			author.setRank(pos++);
-			res.add(author);
+				if (StringUtils.isBlank(name) & pp.isAccurate()) {
+					author.setName(pp.getNormalisedFirstName());
+				} else {
+					author.setName(name);
+				}
+
+				if (StringUtils.isBlank(surname) & pp.isAccurate()) {
+					author.setSurname(pp.getNormalisedSurname());
+				} else {
+					author.setSurname(surname);
+				}
+
+				if (StringUtils.isBlank(author.getFullname())) {
+					author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
+				}
+
+				author.setAffiliation(prepareListFields(n, "./datacite:affiliation", info));
+				author.setPid(preparePids(n, info));
+				author.setRank(pos++);
+				res.add(author);
+			}
 		}
 		return res;
 	}
@@ -114,10 +104,21 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
+
+		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
+		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
+
+		final Set<StructuredProperty> pids = pid.stream().collect(Collectors.toCollection(HashSet::new));
+
+		instance
+			.setAlternateIdentifier(
+				alternateIdentifier.stream().filter(i -> !pids.contains(i)).collect(Collectors.toList()));
+		instance.setPid(pid);
+
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
-			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
+			.setAccessright(prepareAccessRight(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
 		instance.setRefereed(prepareQualifier(doc, "//oaf:refereed", DNET_REVIEW_LEVELS));
 		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
@@ -169,13 +170,13 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						structuredProperty(
-							((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATA_CITE_DATE, DNET_DATA_CITE_DATE,
+							((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATACITE_DATE, DNET_DATACITE_DATE,
 							info));
 			} else {
 				res
 					.add(
 						structuredProperty(
-							((Node) o).getText(), dateType, dateType, DNET_DATA_CITE_DATE, DNET_DATA_CITE_DATE,
+							((Node) o).getText(), dateType, dateType, DNET_DATACITE_DATE, DNET_DATACITE_DATE,
 							info));
 			}
 		}
@@ -320,11 +321,9 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Oaf> addOtherResultRels(
 		final Document doc,
-		final KeyValue collectedFrom,
-		final DataInfo info,
-		final long lastUpdateTimestamp) {
+		final OafEntity entity) {
 
-		final String docId = createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false);
+		final String docId = entity.getId();
 
 		final List<Oaf> res = new ArrayList<>();
 
@@ -336,30 +335,26 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				final String otherId = createOpenaireId(50, originalId, false);
 				final String type = ((Node) o).valueOf("@relationType");
 
-				if (type.equalsIgnoreCase("IsSupplementTo")) {
+				if (type.equalsIgnoreCase(IS_SUPPLEMENT_TO)) {
 					res
 						.add(
 							getRelation(
-								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, collectedFrom, info,
-								lastUpdateTimestamp));
+								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, entity));
 					res
 						.add(
 							getRelation(
-								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, collectedFrom, info,
-								lastUpdateTimestamp));
-				} else if (type.equalsIgnoreCase("IsPartOf")) {
-
+								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, entity));
+				} else if (type.equalsIgnoreCase(IS_PART_OF)) {
 					res
 						.add(
 							getRelation(
-								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, collectedFrom, info,
-								lastUpdateTimestamp));
+								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, entity));
 					res
 						.add(
 							getRelation(
-								otherId, docId, RESULT_RESULT, PART, HAS_PARTS, collectedFrom, info,
-								lastUpdateTimestamp));
+								otherId, docId, RESULT_RESULT, PART, HAS_PARTS, entity));
 				} else {
+					// TODO catch more semantics
 				}
 			}
 		}
@@ -390,7 +385,11 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					doc,
 					"//datacite:alternateIdentifier[@alternateIdentifierType != 'URL' and @alternateIdentifierType != 'landingPage']",
 					"@alternateIdentifierType", DNET_PID_TYPES, info));
-		return Lists.newArrayList(res);
+
+		return res
+			.stream()
+			.map(CleaningFunctions::normalizePidValue)
+			.collect(Collectors.toList());
 	}
 
 }

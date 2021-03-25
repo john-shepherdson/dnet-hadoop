@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.clean;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.schema.oaf.CleaningFunctions.*;
 
 import java.util.Optional;
 
@@ -86,9 +87,9 @@ public class CleanGraphSparkJob {
 		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
 
 		readTableFromPath(spark, inputPath, clazz)
-			.map((MapFunction<T, T>) value -> CleaningFunctions.fixVocabularyNames(value), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) value -> fixVocabularyNames(value), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
-			.map((MapFunction<T, T>) value -> CleaningFunctions.fixDefaults(value), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) value -> cleanup(value), Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -102,15 +103,9 @@ public class CleanGraphSparkJob {
 		return spark
 			.read()
 			.textFile(inputEntityPath)
-			.filter((FilterFunction<String>) s -> isEntityType(s, clazz))
-			.map((MapFunction<String, String>) s -> StringUtils.substringAfter(s, "|"), Encoders.STRING())
 			.map(
 				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, clazz),
 				Encoders.bean(clazz));
-	}
-
-	private static <T extends Oaf> boolean isEntityType(final String s, final Class<T> clazz) {
-		return StringUtils.substringBefore(s, "|").equals(clazz.getName());
 	}
 
 }

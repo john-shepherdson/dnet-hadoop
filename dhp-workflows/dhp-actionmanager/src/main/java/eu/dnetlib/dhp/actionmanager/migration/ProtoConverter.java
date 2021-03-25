@@ -82,7 +82,7 @@ public class ProtoConverter implements Serializable {
 
 	private static Instance convertInstance(ResultProtos.Result.Instance ri) {
 		final Instance i = new Instance();
-		i.setAccessright(mapQualifier(ri.getAccessright()));
+		i.setAccessright(mapAccessRight(ri.getAccessright()));
 		i.setCollectedfrom(mapKV(ri.getCollectedfrom()));
 		i.setDateofacceptance(mapStringField(ri.getDateofacceptance()));
 		i.setDistributionlocation(ri.getDistributionlocation());
@@ -510,7 +510,7 @@ public class ProtoConverter implements Serializable {
 				.map(i -> i.getAccessright())
 				.min(new LicenseComparator());
 
-			final Qualifier rights = min.isPresent() ? mapQualifier(min.get()) : new Qualifier();
+			final Qualifier rights = min.isPresent() ? mapAccessRight(min.get()) : new Qualifier();
 
 			if (StringUtils.isBlank(rights.getClassid())) {
 				rights.setClassid(UNKNOWN);
@@ -577,6 +577,15 @@ public class ProtoConverter implements Serializable {
 		qualifier.setSchemeid(q.getSchemeid());
 		qualifier.setSchemename(q.getSchemename());
 		return qualifier;
+	}
+
+	public static AccessRight mapAccessRight(FieldTypeProtos.Qualifier q) {
+		final AccessRight accessRight = new AccessRight();
+		accessRight.setClassid(q.getClassid());
+		accessRight.setClassname(q.getClassname());
+		accessRight.setSchemeid(q.getSchemeid());
+		accessRight.setSchemename(q.getSchemename());
+		return accessRight;
 	}
 
 	public static Country mapQualifierAsCountry(FieldTypeProtos.Qualifier q) {

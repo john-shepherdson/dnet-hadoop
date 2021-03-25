@@ -1,17 +1,17 @@
 package eu.dnetlib.doiboost
 
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{DataInfo, Dataset, Field, Instance, KeyValue, Oaf, Organization, Publication, Qualifier, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{AccessRight, DataInfo, Dataset, Field, Instance, KeyValue, Oaf, Organization, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
-import org.codehaus.jackson.map.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
-import scala.io.Source
 
 
 case class HostedByItemType(id: String, officialname: String, issn: String, eissn: String, lissn: String, openAccess: Boolean) {}
@@ -19,23 +19,18 @@ case class HostedByItemType(id: String, officialname: String, issn: String, eiss
 case class DoiBoostAffiliation(PaperId:Long, AffiliationId:Long, GridId:Option[String], OfficialPage:Option[String], DisplayName:Option[String]){}
 
 object DoiBoostMappingUtil {
-  def getUnknownCountry(): Qualifier = {
-    createQualifier("UNKNOWN","UNKNOWN","dnet:countries","dnet:countries")
-  }
-
-
 
   def generateMAGAffiliationId(affId: String): String = {
     s"20|microsoft___$SEPARATOR${DHPUtils.md5(affId)}"
   }
-
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
   //STATIC STRING
   val MAG = "microsoft"
   val MAG_NAME = "Microsoft Academic Graph"
-  val ORCID = "ORCID"
+  val ORCID = "orcid"
+  val ORCID_PENDING = "orcid_pending"
   val CROSSREF = "Crossref"
   val UNPAYWALL = "UnpayWall"
   val GRID_AC = "grid.ac"
@@ -131,13 +126,12 @@ object DoiBoostMappingUtil {
   }
 
 
-  def getOpenAccessQualifier():Qualifier = {
-    createQualifier("OPEN","Open Access","dnet:access_modes", "dnet:access_modes")
-
+  def getOpenAccessQualifier():AccessRight = {
+    OafUtils.createAccessRight("OPEN","Open Access","dnet:access_modes", "dnet:access_modes")
   }
 
-  def getRestrictedQualifier():Qualifier = {
-    createQualifier("RESTRICTED","Restricted","dnet:access_modes", "dnet:access_modes")
+  def getRestrictedQualifier():AccessRight = {
+    OafUtils.createAccessRight("RESTRICTED","Restricted","dnet:access_modes", "dnet:access_modes")
 
   }
 
@@ -201,6 +195,8 @@ object DoiBoostMappingUtil {
 
     //Case empty publication
     if (publication == null)
+      return false
+    if (publication.getId == null || publication.getId.isEmpty)
       return false
 
     //Case publication with no title
@@ -266,7 +262,7 @@ object DoiBoostMappingUtil {
     di.setInferred(false)
     di.setInvisible(false)
     di.setTrust(trust)
-    di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
+    di.setProvenanceaction(OafUtils.createQualifier("sysimport:actionset", "dnet:provenanceActions"))
     di
   }
 
@@ -274,7 +270,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String,className:String, schemeId: String, schemeName:String): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId,className, schemeId, schemeName))
+    sp.setQualifier(OafUtils.createQualifier(classId,className, schemeId, schemeName))
     sp.setValue(value)
     sp
 
@@ -284,7 +280,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String,className:String, schemeId: String, schemeName:String, dataInfo: DataInfo): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId,className, schemeId, schemeName))
+    sp.setQualifier(OafUtils.createQualifier(classId,className, schemeId, schemeName))
     sp.setValue(value)
     sp.setDataInfo(dataInfo)
     sp
@@ -293,7 +289,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
+    sp.setQualifier(OafUtils.createQualifier(classId, schemeId))
     sp.setValue(value)
     sp
 
@@ -303,7 +299,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String, schemeId: String, dataInfo: DataInfo): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
+    sp.setQualifier(OafUtils.createQualifier(classId, schemeId))
     sp.setValue(value)
     sp.setDataInfo(dataInfo)
     sp
@@ -355,20 +351,6 @@ object DoiBoostMappingUtil {
     cf
 
   }
-
-  def createQualifier(clsName: String, clsValue: String, schName: String, schValue: String): Qualifier = {
-    val q = new Qualifier
-    q.setClassid(clsName)
-    q.setClassname(clsValue)
-    q.setSchemeid(schName)
-    q.setSchemename(schValue)
-    q
-  }
-
-  def createQualifier(cls: String, sch: String): Qualifier = {
-    createQualifier(cls, cls, sch, sch)
-  }
-
 
   def asField[T](value: T): Field[T] = {
     val tmp = new Field[T]

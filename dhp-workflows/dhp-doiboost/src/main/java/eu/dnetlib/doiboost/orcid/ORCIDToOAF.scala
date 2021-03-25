@@ -1,11 +1,12 @@
 package eu.dnetlib.doiboost.orcid
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
 import eu.dnetlib.dhp.schema.orcid.OrcidDOI
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil.{ORCID, PID_TYPES, createSP, generateDataInfo, generateIdentifier}
 import org.apache.commons.lang.StringUtils
-import org.codehaus.jackson.map.ObjectMapper
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
@@ -18,7 +19,7 @@ case class ORCIDItem(oid:String,name:String,surname:String,creditName:String,err
 case class ORCIDElement(doi:String, authors:List[ORCIDItem]) {}
 object ORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(ORCIDToOAF.getClass)
-  val mapper = new ObjectMapper
+  val mapper = new ObjectMapper()
 
   def isJsonValid(inputStr: String): Boolean = {
     import java.io.IOException
@@ -49,12 +50,16 @@ object ORCIDToOAF {
     val pub:Publication = new Publication
     pub.setPid(List(createSP(doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
-    pub.setId(generateIdentifier(pub, doi.toLowerCase))
+
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
+    if (pub.getId == null)
+      return null
+
     try{
 
       val l:List[Author]= input.getAuthors.asScala.map(a=> {
-              generateAuthor(a.getName, a.getSurname, a.getCreditName, a.getOid)
-            })(collection.breakOut)
+        generateAuthor(a.getName, a.getSurname, a.getCreditName, a.getOid)
+      })(collection.breakOut)
 
       pub.setAuthor(l.asJava)
       pub.setCollectedfrom(List(DoiBoostMappingUtil.createORIDCollectedFrom()).asJava)

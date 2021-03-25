@@ -2,12 +2,11 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.LicenseComparator;
+import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 
 public class Result extends OafEntity implements Serializable {
 
@@ -243,12 +242,12 @@ public class Result extends OafEntity implements Serializable {
 
 		Result r = (Result) e;
 
-		// TODO consider merging also Measures
+		measures = mergeLists(measures, r.getMeasures());
 
 		instance = mergeLists(instance, r.getInstance());
 
 		if (r.getBestaccessright() != null
-			&& new LicenseComparator().compare(r.getBestaccessright(), bestaccessright) < 0)
+			&& new AccessRightComparator().compare(r.getBestaccessright(), bestaccessright) < 0)
 			bestaccessright = r.getBestaccessright();
 
 		if (r.getResulttype() != null && compareTrust(this, r) < 0)
@@ -323,13 +322,13 @@ public class Result extends OafEntity implements Serializable {
 		if (a.size() == b.size()) {
 			int msa = a
 				.stream()
-				.filter(i -> i.getValue() != null)
+				.filter(i -> i != null && i.getValue() != null)
 				.map(i -> i.getValue().length())
 				.max(Comparator.naturalOrder())
 				.orElse(0);
 			int msb = b
 				.stream()
-				.filter(i -> i.getValue() != null)
+				.filter(i -> i != null && i.getValue() != null)
 				.map(i -> i.getValue().length())
 				.max(Comparator.naturalOrder())
 				.orElse(0);

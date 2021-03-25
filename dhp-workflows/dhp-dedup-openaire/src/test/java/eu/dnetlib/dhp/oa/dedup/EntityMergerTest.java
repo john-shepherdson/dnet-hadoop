@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,13 +22,16 @@ import scala.Tuple2;
 
 public class EntityMergerTest implements Serializable {
 
-	List<Tuple2<String, Publication>> publications;
-	List<Tuple2<String, Publication>> publications2;
+	private List<Tuple2<String, Publication>> publications;
+	private List<Tuple2<String, Publication>> publications2;
+	private List<Tuple2<String, Publication>> publications3;
+	private List<Tuple2<String, Publication>> publications4;
+	private List<Tuple2<String, Publication>> publications5;
 
-	String testEntityBasePath;
-	DataInfo dataInfo;
-	String dedupId = "dedup_id";
-	Publication pub_top;
+	private String testEntityBasePath;
+	private DataInfo dataInfo;
+	private String dedupId = "00|dedup_id::1";
+	private Publication pub_top;
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -39,6 +43,9 @@ public class EntityMergerTest implements Serializable {
 
 		publications = readSample(testEntityBasePath + "/publication_merge.json", Publication.class);
 		publications2 = readSample(testEntityBasePath + "/publication_merge2.json", Publication.class);
+		publications3 = readSample(testEntityBasePath + "/publication_merge3.json", Publication.class);
+		publications4 = readSample(testEntityBasePath + "/publication_merge4.json", Publication.class);
+		publications5 = readSample(testEntityBasePath + "/publication_merge5.json", Publication.class);
 
 		pub_top = getTopPub(publications);
 
@@ -48,13 +55,17 @@ public class EntityMergerTest implements Serializable {
 
 	@Test
 	public void softwareMergerTest() throws InstantiationException, IllegalAccessException {
+
 		List<Tuple2<String, Software>> softwares = readSample(
 			testEntityBasePath + "/software_merge.json", Software.class);
 
 		Software merged = DedupRecordFactory
 			.entityMerger(dedupId, softwares.iterator(), 0, dataInfo, Software.class);
 
-		assertEquals(merged.getBestaccessright().getClassid(), "OPEN SOURCE");
+		assertEquals("OPEN SOURCE", merged.getBestaccessright().getClassid());
+
+		assertEquals("50|doi_dedup___::0968af610a356656706657e4f234b340", merged.getId());
+
 	}
 
 	@Test
@@ -63,45 +74,46 @@ public class EntityMergerTest implements Serializable {
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications.iterator(), 0, dataInfo, Publication.class);
 
-		assertEquals(dedupId, pub_merged.getId());
+		// verify id
+		assertEquals("50|doi_dedup___::0968af610a356656706657e4f234b340", pub_merged.getId());
 
-		assertEquals(pub_merged.getJournal(), pub_top.getJournal());
-		assertEquals(pub_merged.getBestaccessright().getClassid(), "OPEN");
-		assertEquals(pub_merged.getResulttype(), pub_top.getResulttype());
-		assertEquals(pub_merged.getLanguage(), pub_merged.getLanguage());
-		assertEquals(pub_merged.getPublisher(), pub_top.getPublisher());
-		assertEquals(pub_merged.getEmbargoenddate(), pub_top.getEmbargoenddate());
-		assertEquals(pub_merged.getResourcetype().getClassid(), "0004");
-		assertEquals(pub_merged.getDateoftransformation(), pub_top.getDateoftransformation());
-		assertEquals(pub_merged.getOaiprovenance(), pub_top.getOaiprovenance());
-		assertEquals(pub_merged.getDateofcollection(), pub_top.getDateofcollection());
-		assertEquals(pub_merged.getInstance().size(), 3);
-		assertEquals(pub_merged.getCountry().size(), 2);
-		assertEquals(pub_merged.getSubject().size(), 0);
-		assertEquals(pub_merged.getTitle().size(), 2);
-		assertEquals(pub_merged.getRelevantdate().size(), 0);
-		assertEquals(pub_merged.getDescription().size(), 0);
-		assertEquals(pub_merged.getSource().size(), 0);
-		assertEquals(pub_merged.getFulltext().size(), 0);
-		assertEquals(pub_merged.getFormat().size(), 0);
-		assertEquals(pub_merged.getContributor().size(), 0);
-		assertEquals(pub_merged.getCoverage().size(), 0);
-		assertEquals(pub_merged.getContext().size(), 0);
-		assertEquals(pub_merged.getExternalReference().size(), 0);
-		assertEquals(pub_merged.getOriginalId().size(), 3);
-		assertEquals(pub_merged.getCollectedfrom().size(), 3);
-		assertEquals(pub_merged.getPid().size(), 1);
-		assertEquals(pub_merged.getExtraInfo().size(), 0);
+		assertEquals(pub_top.getJournal(), pub_merged.getJournal());
+		assertEquals("OPEN", pub_merged.getBestaccessright().getClassid());
+		assertEquals(pub_top.getResulttype(), pub_merged.getResulttype());
+		assertEquals(pub_top.getLanguage(), pub_merged.getLanguage());
+		assertEquals(pub_top.getPublisher(), pub_merged.getPublisher());
+		assertEquals(pub_top.getEmbargoenddate(), pub_merged.getEmbargoenddate());
+		assertEquals(pub_top.getResourcetype().getClassid(), "");
+		assertEquals(pub_top.getDateoftransformation(), pub_merged.getDateoftransformation());
+		assertEquals(pub_top.getOaiprovenance(), pub_merged.getOaiprovenance());
+		assertEquals(pub_top.getDateofcollection(), pub_merged.getDateofcollection());
+		assertEquals(3, pub_merged.getInstance().size());
+		assertEquals(2, pub_merged.getCountry().size());
+		assertEquals(0, pub_merged.getSubject().size());
+		assertEquals(2, pub_merged.getTitle().size());
+		assertEquals(0, pub_merged.getRelevantdate().size());
+		assertEquals(0, pub_merged.getDescription().size());
+		assertEquals(0, pub_merged.getSource().size());
+		assertEquals(0, pub_merged.getFulltext().size());
+		assertEquals(0, pub_merged.getFormat().size());
+		assertEquals(0, pub_merged.getContributor().size());
+		assertEquals(0, pub_merged.getCoverage().size());
+		assertEquals(0, pub_merged.getContext().size());
+		assertEquals(0, pub_merged.getExternalReference().size());
+		assertEquals(3, pub_merged.getOriginalId().size());
+		assertEquals(3, pub_merged.getCollectedfrom().size());
+		assertEquals(1, pub_merged.getPid().size());
+		assertEquals(0, pub_merged.getExtraInfo().size());
 
 		// verify datainfo
-		assertEquals(pub_merged.getDataInfo(), dataInfo);
+		assertEquals(dataInfo, pub_merged.getDataInfo());
 
 		// verify datepicker
-		assertEquals(pub_merged.getDateofacceptance().getValue(), "2018-09-30");
+		assertEquals("2018-09-30", pub_merged.getDateofacceptance().getValue());
 
 		// verify authors
-		assertEquals(pub_merged.getAuthor().size(), 9);
-		assertEquals(AuthorMerger.countAuthorsPids(pub_merged.getAuthor()), 4);
+		assertEquals(9, pub_merged.getAuthor().size());
+		assertEquals(4, AuthorMerger.countAuthorsPids(pub_merged.getAuthor()));
 
 		// verify title
 		int count = 0;
@@ -109,7 +121,7 @@ public class EntityMergerTest implements Serializable {
 			if (title.getQualifier().getClassid().equals("main title"))
 				count++;
 		}
-		assertEquals(count, 1);
+		assertEquals(1, count);
 	}
 
 	@Test
@@ -118,9 +130,47 @@ public class EntityMergerTest implements Serializable {
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications2.iterator(), 0, dataInfo, Publication.class);
 
-		assertEquals(pub_merged.getAuthor().size(), 27);
-		// insert assertions here
+		// verify id
+		assertEquals("50|doi_dedup___::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
 
+		assertEquals(27, pub_merged.getAuthor().size());
+	}
+
+	@Test
+	public void publicationMergerTest3() throws InstantiationException, IllegalAccessException {
+
+		Publication pub_merged = DedupRecordFactory
+			.entityMerger(dedupId, publications3.iterator(), 0, dataInfo, Publication.class);
+
+		// verify id
+		assertEquals("50|doi_dedup___::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
+	}
+
+	@Test
+	public void publicationMergerTest4() throws InstantiationException, IllegalStateException, IllegalAccessException {
+
+		Publication pub_merged = DedupRecordFactory
+			.entityMerger(dedupId, publications4.iterator(), 0, dataInfo, Publication.class);
+
+		// verify id
+		assertEquals("50|dedup_wf_001::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
+	}
+
+	@Test
+	public void publicationMergerTest5() throws InstantiationException, IllegalStateException, IllegalAccessException {
+
+		System.out
+			.println(
+				publications5
+					.stream()
+					.map(p -> p._2().getId())
+					.collect(Collectors.toList()));
+
+		Publication pub_merged = DedupRecordFactory
+			.entityMerger(dedupId, publications5.iterator(), 0, dataInfo, Publication.class);
+
+		// verify id
+		assertEquals("50|dedup_wf_001::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
 	}
 
 	public DataInfo setDI() {

@@ -101,7 +101,9 @@ public class PromoteActionPayloadForGraphTableJobTest {
 							"-outputGraphTablePath",
 							"",
 							"-mergeAndGetStrategy",
-							MergeAndGet.Strategy.SELECT_NEWER_AND_GET.name()
+							MergeAndGet.Strategy.SELECT_NEWER_AND_GET.name(),
+							"--shouldGroupById",
+							"true"
 						}));
 
 			// then
@@ -141,7 +143,9 @@ public class PromoteActionPayloadForGraphTableJobTest {
 						"-outputGraphTablePath",
 						outputGraphTableDir.toString(),
 						"-mergeAndGetStrategy",
-						strategy.name()
+						strategy.name(),
+						"--shouldGroupById",
+						"true"
 					});
 
 			// then

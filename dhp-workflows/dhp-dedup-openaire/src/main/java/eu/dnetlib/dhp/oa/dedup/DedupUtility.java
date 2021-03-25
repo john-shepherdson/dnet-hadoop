@@ -70,17 +70,6 @@ public class DedupUtility {
 		return Sets.newHashSet(BlacklistAwareClusteringCombiner.filterAndCombine(doc, conf));
 	}
 
-	public static String md5(final String s) {
-		try {
-			final MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(s.getBytes(StandardCharsets.UTF_8));
-			return new String(Hex.encodeHex(md.digest()));
-		} catch (final Exception e) {
-			System.err.println("Error creating id");
-			return null;
-		}
-	}
-
 	public static String createDedupRecordPath(
 		final String basePath, final String actionSetId, final String entityType) {
 		return String.format("%s/%s/%s_deduprecord", basePath, actionSetId, entityType);

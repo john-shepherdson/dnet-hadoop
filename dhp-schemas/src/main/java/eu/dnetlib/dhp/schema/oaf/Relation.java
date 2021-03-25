@@ -3,9 +3,12 @@ package eu.dnetlib.dhp.schema.oaf;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 
 /**
  * Relation models any edge between two nodes in the OpenAIRE graph. It has a source id and a target id pointing to
@@ -106,7 +109,7 @@ public class Relation extends Oaf {
 	}
 
 	public Boolean getValidated() {
-		return validated;
+		return Objects.nonNull(validated) && validated;
 	}
 
 	public void setValidated(Boolean validated) {
@@ -129,6 +132,16 @@ public class Relation extends Oaf {
 		checkArgument(
 			Objects.equals(getSubRelType(), r.getSubRelType()), "subRelType(s) must be equal");
 		checkArgument(Objects.equals(getRelClass(), r.getRelClass()), "relClass(es) must be equal");
+
+		setValidated(getValidated() || r.getValidated());
+		try {
+			setValidationDate(ModelSupport.oldest(getValidationDate(), r.getValidationDate()));
+		} catch (ParseException e) {
+			throw new IllegalArgumentException(String
+				.format(
+					"invalid validation date format in relation [s:%s, t:%s]: %s", getSource(), getTarget(),
+					getValidationDate()));
+		}
 
 		super.mergeFrom(r);
 	}

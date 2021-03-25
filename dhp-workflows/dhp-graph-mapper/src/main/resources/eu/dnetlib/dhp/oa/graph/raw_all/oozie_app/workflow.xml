@@ -302,6 +302,7 @@
             <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims,${contentPath}/oaf_records_invisible</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
         </spark>
         <ok to="GenerateGraph_claims"/>
         <error to="Kill"/>
@@ -349,6 +350,7 @@
             <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_records,${contentPath}/odf_records</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
         </spark>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>

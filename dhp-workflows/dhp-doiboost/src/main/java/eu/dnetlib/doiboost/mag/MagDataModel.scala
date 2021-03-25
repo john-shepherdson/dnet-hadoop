@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.mag
 
 
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.json4s
@@ -31,11 +32,11 @@ case class MagAffiliation(AffiliationId: Long, Rank: Int, NormalizedName: String
 case class MagPaperAuthorAffiliation(PaperId: Long, AuthorId: Long, AffiliationId: Option[Long], AuthorSequenceNumber: Int, OriginalAuthor: String, OriginalAffiliation: String) {}
 
 
-case class MagAuthorAffiliation(author: MagAuthor, affiliation:String)
+case class MagAuthorAffiliation(author: MagAuthor, affiliation:String, sequenceNumber:Int)
 
 case class MagPaperWithAuthorList(PaperId: Long, authors: List[MagAuthorAffiliation]) {}
 
-case class MagPaperAuthorDenormalized(PaperId: Long, author: MagAuthor, affiliation:String) {}
+case class MagPaperAuthorDenormalized(PaperId: Long, author: MagAuthor, affiliation:String, sequenceNumber:Int) {}
 
 case class MagPaperUrl(PaperId: Long, SourceType: Option[Int], SourceUrl: Option[String], LanguageCode: Option[String]) {}
 
@@ -170,6 +171,9 @@ case object ConversionUtil {
     else
       i.setUrl(List(s"https://academic.microsoft.com/#/detail/${extractMagIdentifier(pub.getOriginalId.asScala)}").asJava)
 
+    // Ticket #6281 added pid to Instance
+    i.setPid(pub.getPid)
+
     i.setCollectedfrom(createMAGCollectedFrom())
     pub.setInstance(List(i).asJava)
     pub
@@ -190,8 +194,11 @@ case object ConversionUtil {
     pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
-    //Set identifier as 50|doiboost____::md5(DOI)
-    pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //will be replaced using IdentifierFactory
+
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
     val originalTitles = createSP(paper.OriginalTitle, "alternative title", "dnet:dataCite_title")
@@ -202,9 +209,9 @@ case object ConversionUtil {
     val authorsOAF = authors.authors.map { f: MagAuthorAffiliation =>
 
       val a: eu.dnetlib.dhp.schema.oaf.Author = new eu.dnetlib.dhp.schema.oaf.Author
-
-      a.setFullname(f.author.DisplayName.get)
-
+      a.setRank(f.sequenceNumber)
+      if (f.author.DisplayName.isDefined)
+        a.setFullname(f.author.DisplayName.get)
       if(f.affiliation!= null)
         a.setAffiliation(List(asField(f.affiliation)).asJava)
       a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", PID_TYPES)).asJava)

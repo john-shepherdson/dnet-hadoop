@@ -13,14 +13,6 @@
   "prefix": "10.26850",
   "author": [
     {
-      "authenticated-orcid": false,
-      "given": "Matthieu",
-      "family": "Tubino",
-      "sequence": "first",
-      "affiliation": [],
-      "ORCID": "http://orcid.org/0000-0002-1987-3907"
-    },
-    {
       "affiliation": [],
       "given": "A. C.",
       "family": "Biondo",
@@ -49,6 +41,14 @@
       "sequence": "additional",
       "affiliation": [],
       "ORCID": "http://orcid.org/0000-0001-5564-1639"
+    },
+    {
+      "authenticated-orcid": false,
+      "given": "Matthieu",
+      "family": "Tubino",
+      "sequence": "first",
+      "affiliation": [],
+      "ORCID": "http://orcid.org/0000-0002-1987-3907"
     }
   ],
   "reference-count": 0,

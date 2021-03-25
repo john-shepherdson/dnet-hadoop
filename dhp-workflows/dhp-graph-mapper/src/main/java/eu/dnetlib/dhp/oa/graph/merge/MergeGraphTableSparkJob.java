@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.graph.merge;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.xml.crypto.Data;
 
@@ -127,6 +128,13 @@ public class MergeGraphTableSparkJob {
 				}
 			}, Encoders.bean(p_clazz))
 			.filter((FilterFunction<P>) Objects::nonNull)
+			.filter((FilterFunction<P>) o -> {
+				HashSet<String> collectedFromNames = Optional
+					.ofNullable(o.getCollectedfrom())
+					.map(c -> c.stream().map(KeyValue::getValue).collect(Collectors.toCollection(HashSet::new)))
+					.orElse(new HashSet<String>());
+				return !collectedFromNames.contains("Datacite");
+			})
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

@@ -77,7 +77,7 @@ public class GenerateEntitiesApplicationTest {
 
 	protected <T extends Result> Result getResult(String xmlFileName, Class<T> clazz) throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream(xmlFileName));
-		return new OdfToOafMapper(vocs, false)
+		return new OdfToOafMapper(vocs, false, true)
 			.processMdRecord(xml)
 			.stream()
 			.filter(s -> clazz.isAssignableFrom(s.getClass()))

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -81,11 +82,16 @@ public class DedupRecordFactory {
 
 		final Collection<String> dates = Lists.newArrayList();
 		final List<List<Author>> authors = Lists.newArrayList();
+		final List<Identifier<T>> bestPids = Lists.newArrayList(); // best pids list
 
 		entities
 			.forEachRemaining(
 				t -> {
 					T duplicate = t._2();
+
+					// prepare the list of pids to use for the id generation
+					bestPids.add(Identifier.newInstance(duplicate));
+
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
 						Result r1 = (Result) duplicate;
@@ -94,6 +100,7 @@ public class DedupRecordFactory {
 						if (r1.getDateofacceptance() != null)
 							dates.add(r1.getDateofacceptance().getValue());
 					}
+
 				});
 
 		// set authors and date
@@ -102,10 +109,12 @@ public class DedupRecordFactory {
 			((Result) entity).setAuthor(AuthorMerger.merge(authors));
 		}
 
-		entity.setId(id);
+		entity.setId(IdGenerator.generate(bestPids, id));
+
 		entity.setLastupdatetimestamp(ts);
 		entity.setDataInfo(dataInfo);
 
 		return entity;
 	}
+
 }

@@ -12,6 +12,7 @@ public class Author implements Serializable {
 
 	private String surname;
 
+	// START WITH 1
 	private Integer rank;
 
 	private List<StructuredProperty> pid;

@@ -82,6 +82,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			log.info("Creating simrels for: '{}'", subEntity);
 
 			final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity);
+			removeOutputDir(spark, outputPath);
 
 			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 

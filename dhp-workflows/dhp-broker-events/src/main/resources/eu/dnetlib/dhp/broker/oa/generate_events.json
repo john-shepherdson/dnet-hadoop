@@ -1,7 +1,13 @@
 [
 	{
+		"paramName": "wp",
+		"paramLongName": "workingDir",
+		"paramDescription": "the path where the temporary data are stored",
+		"paramRequired": true
+	},
+	{
 		"paramName": "o",
-		"paramLongName": "workingPath",
+		"paramLongName": "outputDir",
 		"paramDescription": "the path where the generated events will be stored",
 		"paramRequired": true
 	},
@@ -21,6 +27,12 @@
 		"paramName": "datasourceIdBlacklist",
 		"paramLongName": "datasourceIdBlacklist",
 		"paramDescription": "a black list (comma separeted, - for empty list) of datasource ids",
+		"paramRequired": true
+	},
+	{
+		"paramName": "topicWhitelist",
+		"paramLongName": "topicWhitelist",
+		"paramDescription": "a white list (comma separeted, * for all) of topics",
 		"paramRequired": true
 	}
 ]

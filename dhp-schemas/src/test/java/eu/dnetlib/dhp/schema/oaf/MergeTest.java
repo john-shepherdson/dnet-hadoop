@@ -63,6 +63,56 @@ public class MergeTest {
 		assertEquals(3, a.getSubject().size());
 	}
 
+	@Test
+	public void mergeRelationTest() {
+
+		Relation a = createRel(null, null);
+		Relation b = createRel(null, null);
+		a.mergeFrom(b);
+		assertEquals(a, b);
+
+		a = createRel(true, null);
+		b = createRel(null, null);
+		a.mergeFrom(b);
+		assertEquals(true, a.getValidated());
+
+		a = createRel(true, null);
+		b = createRel(false, null);
+		a.mergeFrom(b);
+		assertEquals(true, a.getValidated());
+
+		a = createRel(true, null);
+		b = createRel(true, "2016-04-05T12:41:19.202Z");
+		a.mergeFrom(b);
+		assertEquals("2016-04-05T12:41:19.202Z", a.getValidationDate());
+
+		a = createRel(true, "2016-05-07T12:41:19.202Z");
+		b = createRel(true, "2016-04-05T12:41:19.202Z");
+		a.mergeFrom(b);
+		assertEquals("2016-04-05T12:41:19.202Z", a.getValidationDate());
+	}
+
+	@Test
+	public void mergeRelationTestParseException() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			Relation a = createRel(true, "2016-04-05");
+			Relation b = createRel(true, "2016-04-05");
+			a.mergeFrom(b);
+		});
+	}
+
+	private Relation createRel(Boolean validated, String validationDate) {
+		Relation rel = new Relation();
+		rel.setSource("1");
+		rel.setTarget("2");
+		rel.setRelType("reltype");
+		rel.setSubRelType("subreltype");
+		rel.setRelClass("relclass");
+		rel.setValidated(validated);
+		rel.setValidationDate(validationDate);
+		return rel;
+	}
+
 	private KeyValue setKV(final String key, final String value) {
 
 		KeyValue k = new KeyValue();

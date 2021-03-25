@@ -27,6 +27,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -220,15 +221,15 @@ public class CreateRelatedEntitiesJob_phase2 {
 				List<ExternalReference> refs = r
 					.getExternalReference()
 					.stream()
-					.limit(ProvisionConstants.MAX_EXTERNAL_ENTITIES)
+					.limit(ModelHardLimits.MAX_EXTERNAL_ENTITIES)
 					.collect(Collectors.toList());
 				r.setExternalReference(refs);
 			}
 			if (r.getAuthor() != null) {
 				List<Author> authors = Lists.newArrayList();
 				for (Author a : r.getAuthor()) {
-					a.setFullname(StringUtils.left(a.getFullname(), ProvisionConstants.MAX_AUTHOR_FULLNAME_LENGTH));
-					if (authors.size() < ProvisionConstants.MAX_AUTHORS || hasORCID(a)) {
+					a.setFullname(StringUtils.left(a.getFullname(), ModelHardLimits.MAX_AUTHOR_FULLNAME_LENGTH));
+					if (authors.size() < ModelHardLimits.MAX_AUTHORS || hasORCID(a)) {
 						authors.add(a);
 					}
 				}
@@ -240,7 +241,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.stream()
 					.filter(Objects::nonNull)
 					.map(d -> {
-						d.setValue(StringUtils.left(d.getValue(), ProvisionConstants.MAX_ABSTRACT_LENGTH));
+						d.setValue(StringUtils.left(d.getValue(), ModelHardLimits.MAX_ABSTRACT_LENGTH));
 						return d;
 					})
 					.collect(Collectors.toList());
@@ -252,10 +253,10 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.stream()
 					.filter(Objects::nonNull)
 					.map(t -> {
-						t.setValue(StringUtils.left(t.getValue(), ProvisionConstants.MAX_TITLE_LENGTH));
+						t.setValue(StringUtils.left(t.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
 						return t;
 					})
-					.limit(ProvisionConstants.MAX_TITLES)
+					.limit(ModelHardLimits.MAX_TITLES)
 					.collect(Collectors.toList());
 				r.setTitle(titles);
 			}
@@ -272,11 +273,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.filter(Objects::nonNull)
 			.map(Qualifier::getClassid)
 			.filter(StringUtils::isNotBlank)
-			.anyMatch(c -> "orcid".equals(c.toLowerCase()));
-	}
-
-	private static FilterFunction<JoinedEntity> filterEmptyEntityFn() {
-		return (FilterFunction<JoinedEntity>) v -> Objects.nonNull(v.getEntity());
+			.anyMatch(c -> c.toLowerCase().contains(ModelConstants.ORCID));
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

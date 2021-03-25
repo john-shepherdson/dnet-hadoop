@@ -48,9 +48,8 @@
     <dc:subject>provisioning services</dc:subject>
     <dc:subject>regulating services</dc:subject>
     <dc:subject>supporting services</dc:subject>
-    <dc:type>Research Article</dc:type>
-    <!--<dr:CobjCategory type="publication">0001</dr:CobjCategory>-->
-    <dr:CobjCategory>0020</dr:CobjCategory>
+    <dc:type>Research Artefact</dc:type>
+    <dr:CobjCategory type="other">0020</dr:CobjCategory>
     <oaf:dateAccepted>2017-01-01</oaf:dateAccepted>
     <oaf:projectid>corda_______::226852</oaf:projectid>
     <oaf:accessrights>OPEN</oaf:accessrights>

@@ -3,6 +3,12 @@ package eu.dnetlib.dhp.schema.common;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -375,6 +381,8 @@ public class ModelSupport {
 			Field.class,
 			GeoLocation.class,
 			Instance.class,
+			AccessRight.class,
+			OpenAccessRoute.class,
 			Journal.class,
 			KeyValue.class,
 			Oaf.class,
@@ -472,5 +480,24 @@ public class ModelSupport {
 
 	private static <T extends Oaf> String idFnForOafEntity(T t) {
 		return ((OafEntity) t).getId();
+	}
+
+	public static String oldest(String dateA, String dateB) throws ParseException {
+
+		if (StringUtils.isBlank(dateA)) {
+			return dateB;
+		}
+		if (StringUtils.isBlank(dateB)) {
+			return dateA;
+		}
+		if (StringUtils.isNotBlank(dateA) && StringUtils.isNotBlank(dateB)) {
+
+			final Date a = Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse(dateA)));
+			final Date b = Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse(dateB)));
+
+			return a.before(b) ? dateA : dateB;
+		} else {
+			return null;
+		}
 	}
 }

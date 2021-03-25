@@ -1,16 +1,16 @@
-<workflow-app name="Update Graph" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Consistency Graph" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>graphBasePath</name>
-            <description>the raw graph base path</description>
+            <description>the input graph base path</description>
         </property>
         <property>
             <name>workingPath</name>
             <description>path of the working directory</description>
         </property>
         <property>
-            <name>dedupGraphPath</name>
-            <description>path of the dedup graph</description>
+            <name>graphOutputPath</name>
+            <description>path of the output graph</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -91,116 +91,224 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--i</arg><arg>${graphBasePath}</arg>
-            <arg>--o</arg><arg>${dedupGraphPath}</arg>
-            <arg>--w</arg><arg>${workingPath}</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--o</arg><arg>${graphOutputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
         </spark>
-        <ok to="fork_copy_entities"/>
+        <ok to="group_entities"/>
         <error to="Kill"/>
     </action>
 
-    <fork name="fork_copy_entities">
-        <path start="copy_datasource"/>
-        <path start="copy_project"/>
-        <path start="copy_organization"/>
-        <path start="copy_publication"/>
-        <path start="copy_dataset"/>
-        <path start="copy_software"/>
-        <path start="copy_otherresearchproduct"/>
+    <action name="group_entities">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>group graph entities</name>
+            <class>eu.dnetlib.dhp.oa.dedup.GroupEntitiesSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--graphInputPath</arg><arg>${graphBasePath}</arg>
+            <arg>--outputPath</arg><arg>${workingPath}/grouped_entities</arg>
+        </spark>
+        <ok to="fork_dispatch_entities"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="fork_dispatch_entities">
+        <path start="dispatch_datasource"/>
+        <path start="dispatch_project"/>
+        <path start="dispatch_organization"/>
+        <path start="dispatch_publication"/>
+        <path start="dispatch_dataset"/>
+        <path start="dispatch_software"/>
+        <path start="dispatch_otherresearchproduct"/>
     </fork>
 
-    <action name="copy_datasource">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/datasource"/>
-            </prepare>
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/datasource</arg>
-            <arg>${dedupGraphPath}/datasource</arg>
-        </distcp>
-        <ok to="wait_copy"/>
+    <action name="dispatch_datasource">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch publications</name>
+            <class>eu.dnetlib.dhp.oa.dedup.DispatchEntitiesSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="copy_project">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/project"/>
-            </prepare>
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/project</arg>
-            <arg>${dedupGraphPath}/project</arg>
-        </distcp>
-        <ok to="wait_copy"/>
+    <action name="dispatch_project">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch project</name>
+            <class>eu.dnetlib.dhp.oa.dedup.DispatchEntitiesSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="copy_organization">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/organization"/>
-            </prepare>
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/organization</arg>
-            <arg>${dedupGraphPath}/organization</arg>
-        </distcp>
-        <ok to="wait_copy"/>
+    <action name="dispatch_organization">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch organization</name>
+            <class>eu.dnetlib.dhp.oa.dedup.DispatchEntitiesSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="copy_publication">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/publication"/>
-            </prepare>
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/publication</arg>
-            <arg>${dedupGraphPath}/publication</arg>
-        </distcp>
-        <ok to="wait_copy"/>
+    <action name="dispatch_publication">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch publication</name>
+            <class>eu.dnetlib.dhp.oa.dedup.DispatchEntitiesSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="copy_dataset">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/dataset"/>
-            </prepare>
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/dataset</arg>
-            <arg>${dedupGraphPath}/dataset</arg>
-        </distcp>
-        <ok to="wait_copy"/>
+    <action name="dispatch_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch dataset</name>
+            <class>eu.dnetlib.dhp.oa.dedup.DispatchEntitiesSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="copy_software">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/software"/>
-            </prepare>
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/software</arg>
-            <arg>${dedupGraphPath}/software</arg>
-        </distcp>
-        <ok to="wait_copy"/>
+    <action name="dispatch_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch software</name>
+            <class>eu.dnetlib.dhp.oa.dedup.DispatchEntitiesSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <action name="copy_otherresearchproduct">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <prepare>
-                <delete path="${dedupGraphPath}/otherresearchproduct"/>
-            </prepare>
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/otherresearchproduct</arg>
-            <arg>${dedupGraphPath}/otherresearchproduct</arg>
-        </distcp>
-        <ok to="wait_copy"/>
+    <action name="dispatch_otherresearchproduct">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Dispatch otherresearchproduct</name>
+            <class>eu.dnetlib.dhp.oa.dedup.DispatchEntitiesSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+        </spark>
+        <ok to="wait_dispatch"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait_copy" to="End"/>
+    <join name="wait_dispatch" to="End"/>
 
     <end name="End"/>
 </workflow-app>

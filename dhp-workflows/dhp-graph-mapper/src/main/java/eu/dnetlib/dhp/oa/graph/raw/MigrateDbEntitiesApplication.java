@@ -23,7 +23,15 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.asString;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listKeyValues;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -491,43 +499,47 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 				return Arrays.asList(r);
 			} else {
+				final String validationDate = rs.getString("curation_date");
+
 				final String sourceId = createOpenaireId(rs.getString(SOURCE_TYPE), rs.getString("source_id"), false);
 				final String targetId = createOpenaireId(rs.getString(TARGET_TYPE), rs.getString("target_id"), false);
 
 				final Relation r1 = new Relation();
 				final Relation r2 = new Relation();
 
-				if (rs.getString(SOURCE_TYPE).equals("project")) {
-					r1.setCollectedfrom(collectedFrom);
-					r1.setRelType(RESULT_PROJECT);
-					r1.setSubRelType(OUTCOME);
-					r1.setRelClass(PRODUCES);
-
-					r2.setCollectedfrom(collectedFrom);
-					r2.setRelType(RESULT_PROJECT);
-					r2.setSubRelType(OUTCOME);
-					r2.setRelClass(IS_PRODUCED_BY);
-				} else {
-					r1.setCollectedfrom(collectedFrom);
-					r1.setRelType(RESULT_RESULT);
-					r1.setSubRelType(RELATIONSHIP);
-					r1.setRelClass(IS_RELATED_TO);
-
-					r2.setCollectedfrom(collectedFrom);
-					r2.setRelType(RESULT_RESULT);
-					r2.setSubRelType(RELATIONSHIP);
-					r2.setRelClass(IS_RELATED_TO);
-				}
-
+				r1.setValidated(true);
+				r1.setValidationDate(validationDate);
+				r1.setCollectedfrom(collectedFrom);
 				r1.setSource(sourceId);
 				r1.setTarget(targetId);
 				r1.setDataInfo(info);
 				r1.setLastupdatetimestamp(lastUpdateTimestamp);
 
+				r2.setValidationDate(validationDate);
+				r2.setValidated(true);
+				r2.setCollectedfrom(collectedFrom);
 				r2.setSource(targetId);
 				r2.setTarget(sourceId);
 				r2.setDataInfo(info);
 				r2.setLastupdatetimestamp(lastUpdateTimestamp);
+
+				if (rs.getString(SOURCE_TYPE).equals("project")) {
+					r1.setRelType(RESULT_PROJECT);
+					r1.setSubRelType(OUTCOME);
+					r1.setRelClass(PRODUCES);
+
+					r2.setRelType(RESULT_PROJECT);
+					r2.setSubRelType(OUTCOME);
+					r2.setRelClass(IS_PRODUCED_BY);
+				} else {
+					r1.setRelType(RESULT_RESULT);
+					r1.setSubRelType(RELATIONSHIP);
+					r1.setRelClass(IS_RELATED_TO);
+
+					r2.setRelType(RESULT_RESULT);
+					r2.setSubRelType(RELATIONSHIP);
+					r2.setRelClass(IS_RELATED_TO);
+				}
 
 				return Arrays.asList(r1, r2);
 			}

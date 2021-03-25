@@ -1,11 +1,9 @@
 
 package eu.dnetlib.dhp.schema.oaf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -13,40 +11,45 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class OafMapperUtils {
 
-	public static Oaf merge(final Oaf o1, final Oaf o2) {
-		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
-			if (ModelSupport.isSubClass(o1, Result.class)) {
-
-				return mergeResults((Result) o1, (Result) o2);
-			} else if (ModelSupport.isSubClass(o1, Datasource.class)) {
-				((Datasource) o1).mergeFrom((Datasource) o2);
-			} else if (ModelSupport.isSubClass(o1, Organization.class)) {
-				((Organization) o1).mergeFrom((Organization) o2);
-			} else if (ModelSupport.isSubClass(o1, Project.class)) {
-				((Project) o1).mergeFrom((Project) o2);
-			} else {
-				throw new RuntimeException("invalid OafEntity subtype:" + o1.getClass().getCanonicalName());
-			}
-		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
-			((Relation) o1).mergeFrom((Relation) o2);
+	public static Oaf merge(final Oaf left, final Oaf right) {
+		if (ModelSupport.isSubClass(left, OafEntity.class)) {
+			return mergeEntities((OafEntity) left, (OafEntity) right);
+		} else if (ModelSupport.isSubClass(left, Relation.class)) {
+			((Relation) left).mergeFrom((Relation) right);
 		} else {
-			throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
+			throw new RuntimeException("invalid Oaf type:" + left.getClass().getCanonicalName());
 		}
-		return o1;
+		return left;
 	}
 
-	public static Result mergeResults(Result r1, Result r2) {
-		if (new ResultTypeComparator().compare(r1, r2) < 0) {
-			r1.mergeFrom(r2);
-			return r1;
+	public static OafEntity mergeEntities(OafEntity left, OafEntity right) {
+		if (ModelSupport.isSubClass(left, Result.class)) {
+			return mergeResults((Result) left, (Result) right);
+		} else if (ModelSupport.isSubClass(left, Datasource.class)) {
+			((Datasource) left).mergeFrom((Datasource) right);
+		} else if (ModelSupport.isSubClass(left, Organization.class)) {
+			((Organization) left).mergeFrom((Organization) right);
+		} else if (ModelSupport.isSubClass(left, Project.class)) {
+			((Project) left).mergeFrom((Project) right);
 		} else {
-			r2.mergeFrom(r1);
-			return r2;
+			throw new RuntimeException("invalid OafEntity subtype:" + left.getClass().getCanonicalName());
+		}
+		return left;
+	}
+
+	public static Result mergeResults(Result left, Result right) {
+		if (new ResultTypeComparator().compare(left, right) < 0) {
+			left.mergeFrom(right);
+			return left;
+		} else {
+			right.mergeFrom(left);
+			return right;
 		}
 	}
 
@@ -102,6 +105,29 @@ public class OafMapperUtils {
 		return qualifier("UNKNOWN", "Unknown", schemeid, schemename);
 	}
 
+	public static AccessRight accessRight(
+		final String classid,
+		final String classname,
+		final String schemeid,
+		final String schemename) {
+		return accessRight(classid, classname, schemeid, schemename, null);
+	}
+
+	public static AccessRight accessRight(
+		final String classid,
+		final String classname,
+		final String schemeid,
+		final String schemename,
+		final OpenAccessRoute openAccessRoute) {
+		final AccessRight accessRight = new AccessRight();
+		accessRight.setClassid(classid);
+		accessRight.setClassname(classname);
+		accessRight.setSchemeid(schemeid);
+		accessRight.setSchemename(schemename);
+		accessRight.setOpenAccessRoute(openAccessRoute);
+		return accessRight;
+	}
+
 	public static Qualifier qualifier(
 		final String classid,
 		final String classname,
@@ -112,6 +138,15 @@ public class OafMapperUtils {
 		q.setClassname(classname);
 		q.setSchemeid(schemeid);
 		q.setSchemename(schemename);
+		return q;
+	}
+
+	public static Qualifier qualifier(final Qualifier qualifier) {
+		final Qualifier q = new Qualifier();
+		q.setClassid(qualifier.getClassid());
+		q.setClassname(qualifier.getClassname());
+		q.setSchemeid(qualifier.getSchemeid());
+		q.setSchemename(qualifier.getSchemename());
 		return q;
 	}
 
@@ -293,5 +328,37 @@ public class OafMapperUtils {
 		final Function<? super T, ?> keyExtractor) {
 		final Map<Object, Boolean> seen = new ConcurrentHashMap<>();
 		return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+	}
+
+	public static Qualifier createBestAccessRights(final List<Instance> instanceList) {
+		return getBestAccessRights(instanceList);
+	}
+
+	protected static Qualifier getBestAccessRights(final List<Instance> instanceList) {
+		if (instanceList != null) {
+			final Optional<AccessRight> min = instanceList
+				.stream()
+				.map(i -> i.getAccessright())
+				.min(new AccessRightComparator<>());
+
+			final Qualifier rights = min.isPresent() ? qualifier(min.get()) : new Qualifier();
+
+			if (StringUtils.isBlank(rights.getClassid())) {
+				rights.setClassid(UNKNOWN);
+			}
+			if (StringUtils.isBlank(rights.getClassname())
+				|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
+				rights.setClassname(NOT_AVAILABLE);
+			}
+			if (StringUtils.isBlank(rights.getSchemeid())) {
+				rights.setSchemeid(DNET_ACCESS_MODES);
+			}
+			if (StringUtils.isBlank(rights.getSchemename())) {
+				rights.setSchemename(DNET_ACCESS_MODES);
+			}
+
+			return rights;
+		}
+		return null;
 	}
 }

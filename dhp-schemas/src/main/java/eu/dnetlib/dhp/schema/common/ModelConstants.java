@@ -11,13 +11,24 @@ public class ModelConstants {
 	public static final String ORCID_PENDING = "orcid_pending";
 	public static final String ORCID_CLASSNAME = "Open Researcher and Contributor ID";
 
+	public static final String CROSSREF_ID = "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2";
+	public static final String DATACITE_ID = "10|openaire____::9e3be59865b2c1c335d32dae2fe7b254";
+
+	public static final String EUROPE_PUBMED_CENTRAL_ID = "10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c";
+	public static final String PUBMED_CENTRAL_ID = "10|opendoar____::eda80a3d5b344bc40f3bc04f65b7a357";
+	public static final String ARXIV_ID = "10|opendoar____::6f4922f45568161a8cdf4ad2299f6d23";
+
+	// VOCABULARY VALUE
+	public static final String ACCESS_RIGHT_OPEN = "OPEN";
+
 	public static final String DNET_SUBJECT_TYPOLOGIES = "dnet:subject_classification_typologies";
 	public static final String DNET_RESULT_TYPOLOGIES = "dnet:result_typologies";
 	public static final String DNET_PUBLICATION_RESOURCE = "dnet:publication_resource";
 	public static final String DNET_ACCESS_MODES = "dnet:access_modes";
 	public static final String DNET_LANGUAGES = "dnet:languages";
 	public static final String DNET_PID_TYPES = "dnet:pid_types";
-	public static final String DNET_DATA_CITE_DATE = "dnet:dataCite_date";
+	public static final String DNET_DATACITE_DATE = "dnet:dataCite_date";
+	public static final String DNET_DATACITE_TITLE = "dnet:dataCite_title";
 	public static final String DNET_DATA_CITE_RESOURCE = "dnet:dataCite_resource";
 	public static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
 	public static final String DNET_COUNTRY_TYPE = "dnet:countries";
@@ -104,6 +115,11 @@ public class ModelConstants {
 
 	public static final KeyValue UNKNOWN_REPOSITORY = keyValue(
 		"10|openaire____::55045bd2a65019fd8e6741a755395c8c", "Unknown Repository");
+
+	public static final Qualifier UNKNOWN_COUNTRY = qualifier(UNKNOWN, "Unknown", DNET_COUNTRY_TYPE, DNET_COUNTRY_TYPE);
+
+	public static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
+		"main title", "main title", DNET_DATACITE_TITLE, DNET_DATACITE_TITLE);
 
 	private static Qualifier qualifier(
 		final String classid,

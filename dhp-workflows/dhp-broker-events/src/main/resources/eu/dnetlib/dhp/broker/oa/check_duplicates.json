@@ -1,0 +1,9 @@
+[
+
+	{
+		"paramName": "o",
+		"paramLongName": "outputDir",
+		"paramDescription": "the path where the data are stored",
+		"paramRequired": true
+	}
+]
