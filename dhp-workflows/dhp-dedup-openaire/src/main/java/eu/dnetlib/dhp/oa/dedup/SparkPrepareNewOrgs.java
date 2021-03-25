@@ -106,9 +106,8 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.mode(SaveMode.Append)
 			.jdbc(dbUrl, dbTable, connectionProperties);
 
-		// TODO de-comment once finished
-//		if (!apiUrl.isEmpty())
-//			updateSimRels(apiUrl);
+		if (!apiUrl.isEmpty())
+			updateSimRels(apiUrl);
 
 	}
 
