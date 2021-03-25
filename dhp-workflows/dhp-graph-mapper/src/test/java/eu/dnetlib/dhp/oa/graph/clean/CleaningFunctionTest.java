@@ -87,11 +87,67 @@ public class CleaningFunctionTest {
 				.map(p -> p.getQualifier())
 				.allMatch(q -> pidTerms.contains(q.getClassid())));
 
-		Publication p_defaults = CleaningFunctions.cleanup(p_out);
-		assertEquals("CLOSED", p_defaults.getBestaccessright().getClassid());
+		List<Instance> poi = p_out.getInstance();
+		assertNotNull(poi);
+		assertEquals(1, poi.size());
+
+		final Instance poii = poi.get(0);
+		assertNotNull(poii);
+		assertNotNull(poii.getPid());
+
+		assertEquals(2, poii.getPid().size());
+
+		assertTrue(
+			poii.getPid().stream().filter(s -> s.getValue().equals("10.1007/s109090161569x")).findFirst().isPresent());
+		assertTrue(poii.getPid().stream().filter(s -> s.getValue().equals("10.1008/abcd")).findFirst().isPresent());
+
+		assertNotNull(poii.getAlternateIdentifier());
+		assertEquals(2, poii.getAlternateIdentifier().size());
+
+		assertTrue(
+			poii
+				.getAlternateIdentifier()
+				.stream()
+				.filter(s -> s.getValue().equals("10.1007/s109090161569x"))
+				.findFirst()
+				.isPresent());
+		assertTrue(
+			poii
+				.getAlternateIdentifier()
+				.stream()
+				.filter(s -> s.getValue().equals("10.1009/qwerty"))
+				.findFirst()
+				.isPresent());
+
+		Publication p_cleaned = CleaningFunctions.cleanup(p_out);
+		assertEquals("CLOSED", p_cleaned.getBestaccessright().getClassid());
 		assertNull(p_out.getPublisher());
 
-		getAuthorPids(p_defaults).forEach(pid -> {
+		final List<Instance> pci = p_cleaned.getInstance();
+		assertNotNull(pci);
+		assertEquals(1, pci.size());
+
+		final Instance pcii = pci.get(0);
+		assertNotNull(pcii);
+		assertNotNull(pcii.getPid());
+
+		assertEquals(2, pcii.getPid().size());
+
+		assertTrue(
+			pcii.getPid().stream().filter(s -> s.getValue().equals("10.1007/s109090161569x")).findFirst().isPresent());
+		assertTrue(pcii.getPid().stream().filter(s -> s.getValue().equals("10.1008/abcd")).findFirst().isPresent());
+
+		assertNotNull(pcii.getAlternateIdentifier());
+		assertEquals(1, pcii.getAlternateIdentifier().size());
+		assertTrue(
+			pcii
+				.getAlternateIdentifier()
+				.stream()
+				.filter(s -> s.getValue().equals("10.1009/qwerty"))
+				.findFirst()
+				.isPresent());
+
+		getAuthorPids(p_cleaned).forEach(pid -> {
 			System.out
 				.println(
 					String
@@ -101,7 +157,7 @@ public class CleaningFunctionTest {
 		});
 
 		// TODO add more assertions to verity the cleaned values
-		System.out.println(MAPPER.writeValueAsString(p_out));
+		System.out.println(MAPPER.writeValueAsString(p_cleaned));
 
 		/*
 		 * assertTrue( p_out .getPid() .stream() .allMatch(sp -> StringUtils.isNotBlank(sp.getValue())));
