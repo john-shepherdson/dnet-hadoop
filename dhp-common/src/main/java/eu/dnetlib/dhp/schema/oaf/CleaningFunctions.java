@@ -152,7 +152,12 @@ public class CleaningFunctions {
 					Optional
 						.ofNullable(i.getPid())
 						.ifPresent(pid -> {
-							final Set<StructuredProperty> pids = Sets.newHashSet(pid);
+							final Set<StructuredProperty> pids = Sets
+								.newHashSet(
+									pid
+										.stream()
+										.filter(p -> StringUtils.isBlank(p.getValue()))
+										.collect(Collectors.toList()));
 							final Set<StructuredProperty> altIds = Sets.newHashSet(i.getAlternateIdentifier());
 							i.setAlternateIdentifier(Lists.newArrayList(Sets.difference(altIds, pids)));
 						});
