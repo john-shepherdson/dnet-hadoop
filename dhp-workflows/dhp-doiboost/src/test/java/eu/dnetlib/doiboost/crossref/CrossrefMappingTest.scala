@@ -60,6 +60,17 @@ class CrossrefMappingTest {
 
 
   @Test
+  def testSum() :Unit = {
+    val from:Long = 1613135645000L
+    val delta:Long = 1000000L
+
+
+    println(s"updating from value: $from  -> ${from+delta}")
+
+
+  }
+
+  @Test
   def testOrcidID() :Unit = {
     val json = Source.fromInputStream(getClass.getResourceAsStream("orcid_data.json")).mkString
 

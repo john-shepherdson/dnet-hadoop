@@ -164,9 +164,8 @@ object DataciteToOAFTransformation {
         case _: Throwable => try {
           return Some(LocalDate.parse(a_date, df_it).toString)
         } catch {
-          case _: Throwable => try {
+          case _: Throwable =>
             return None
-          }
         }
       }
     }

@@ -57,7 +57,7 @@ object SparkGenerateDOIBoostActionSet {
 
 
     val asCRelation = spark.read.load(crossRefRelation).as[Relation]
-      .filter(r => r!= null || (r.getSource != null && r.getTarget != null))
+      .filter(r => r!= null && r.getSource != null && r.getTarget != null)
       .map(d=>DoiBoostMappingUtil.toActionSet(d))(Encoders.tuple(Encoders.STRING, Encoders.STRING))
 
 

@@ -13,6 +13,11 @@
             <name>nativeInputPath</name>
             <description>the path of the input MDStore</description>
         </property>
+        <property>
+            <name>skipimport</name>
+            <value>false</value>
+            <description>the path of the input MDStore</description>
+        </property>
 
 
     </parameters>
@@ -51,6 +56,7 @@
             <arg>-t</arg><arg>${nativeInputPath}</arg>
             <arg>-d</arg><arg>${mdstoreInputPath}</arg>
             <arg>-n</arg><arg>${nameNode}</arg>
+            <arg>-s</arg><arg>${skipimport}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="TransformJob"/>
@@ -81,7 +87,7 @@
             <arg>-tr</arg><arg>${isLookupUrl}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
-        <ok to="DeletePathIfExists"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 

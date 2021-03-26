@@ -57,10 +57,13 @@ abstract class AbstractRestClient extends Iterator[String]{
 
   private def doHTTPRequest[A <: HttpUriRequest](r: A) :String ={
     val client = HttpClients.createDefault
+    var tries = 4
     try {
-      var tries = 4
       while (tries > 0) {
+
+        println(s"requesting ${r.getURI}")
         val response = client.execute(r)
+        println(s"get response with status${response.getStatusLine.getStatusCode}")
         if (response.getStatusLine.getStatusCode > 400) {
           tries -= 1
         }
