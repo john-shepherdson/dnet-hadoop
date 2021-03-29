@@ -110,6 +110,7 @@ public class SparkOpenorgsTest implements Serializable {
 								"/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
 	}
 
+	@Disabled
 	@Test
 	public void copyOpenorgsTest() throws Exception {
 
@@ -162,7 +163,7 @@ public class SparkOpenorgsTest implements Serializable {
 			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
 			.count();
 
-		assertEquals(6, orgs_mergerel);
+		assertEquals(384, orgs_mergerel);
 
 	}
 
@@ -191,7 +192,7 @@ public class SparkOpenorgsTest implements Serializable {
 			.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
 			.count();
 
-		assertEquals(96, orgs_simrel);
+		assertEquals(73, orgs_simrel);
 	}
 
 	@Test

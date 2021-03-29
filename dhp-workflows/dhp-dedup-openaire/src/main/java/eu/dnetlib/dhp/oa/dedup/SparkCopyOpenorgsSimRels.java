@@ -82,7 +82,7 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.filter(this::filterOpenorgsRels);
 
-		save(rawRels, outputPath, SaveMode.Append);
+		saveParquet(rawRels, outputPath, SaveMode.Append);
 
 		log.info("Copied " + rawRels.count() + " Similarity Relations");
 	}

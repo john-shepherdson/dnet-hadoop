@@ -23,7 +23,7 @@ SELECT
 	false                                                 AS deletedbyinference,
 	0.99                                                  AS trust,
 	''                                                    AS inferenceprovenance,
-	'isSimilarTo'                                          AS relclass
+	'isSimilarTo'                                         AS relclass
 FROM other_names n
 	LEFT OUTER JOIN organizations o ON (n.id = o.id)
 
@@ -41,7 +41,3 @@ SELECT
 	''                                                    AS inferenceprovenance,
 	'isDifferentFrom'                                     AS relclass
 FROM oa_duplicates WHERE reltype = 'is_different'
-
-
---TODO ???
---Creare relazioni isDifferentFrom anche tra i suggerimenti: (A is_similar B) and (A is_different C) => (B is_different C)

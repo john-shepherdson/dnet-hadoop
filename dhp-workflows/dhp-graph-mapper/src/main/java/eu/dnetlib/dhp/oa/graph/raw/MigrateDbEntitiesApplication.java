@@ -163,14 +163,25 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 						.execute(
 							"queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
 					break;
-				case openorgs:
+				case openorgs_dedup:
 					log.info("Processing Openorgs...");
 					smdbe
 						.execute(
-							"queryOrganizationsFromOpenOrgsDB.sql", smdbe::processOrganization, verifyNamespacePrefix);
+							"queryOpenOrgsForOrgsDedup.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
 					log.info("Processing Openorgs Merge Rels...");
-					smdbe.execute("querySimilarityFromOpenOrgsDB.sql", smdbe::processOrgOrgSimRels);
+					smdbe.execute("queryOpenOrgsSimilarityForOrgsDedup.sql", smdbe::processOrgOrgSimRels);
+
+					break;
+
+				case openorgs:
+					log.info("Processing Openorgs For Provision...");
+					smdbe
+						.execute(
+							"queryOpenOrgsForProvision.sql", smdbe::processOrganization, verifyNamespacePrefix);
+
+					log.info("Processing Openorgs Merge Rels...");
+					smdbe.execute("queryOpenOrgsSimilarityForProvision.sql", smdbe::processOrgOrgSimRels);
 
 					break;
 
@@ -647,17 +658,19 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			r1.setDataInfo(info);
 			r1.setLastupdatetimestamp(lastUpdateTimestamp);
 
-			final Relation r2 = new Relation();
-			r2.setRelType(ORG_ORG_RELTYPE);
-			r2.setSubRelType(ORG_ORG_SUBRELTYPE);
-			r2.setRelClass(relClass);
-			r2.setSource(orgId2);
-			r2.setTarget(orgId1);
-			r2.setCollectedfrom(collectedFrom);
-			r2.setDataInfo(info);
-			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+			// removed because there's no difference between two sides //TODO
+//			final Relation r2 = new Relation();
+//			r2.setRelType(ORG_ORG_RELTYPE);
+//			r2.setSubRelType(ORG_ORG_SUBRELTYPE);
+//			r2.setRelClass(relClass);
+//			r2.setSource(orgId2);
+//			r2.setTarget(orgId1);
+//			r2.setCollectedfrom(collectedFrom);
+//			r2.setDataInfo(info);
+//			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+//			return Arrays.asList(r1, r2);
 
-			return Arrays.asList(r1, r2);
+			return Arrays.asList(r1);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}

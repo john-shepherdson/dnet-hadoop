@@ -109,7 +109,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 						.rdd(),
 					Encoders.bean(Relation.class));
 
-			save(simRels, outputPath, SaveMode.Append);
+			saveParquet(simRels, outputPath, SaveMode.Append);
 
 			log.info("Generated " + simRels.count() + " Similarity Relations");
 

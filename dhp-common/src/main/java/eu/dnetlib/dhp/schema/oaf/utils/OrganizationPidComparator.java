@@ -13,6 +13,11 @@ public class OrganizationPidComparator implements Comparator<StructuredProperty>
 		PidType lClass = PidType.tryValueOf(left.getQualifier().getClassid());
 		PidType rClass = PidType.tryValueOf(right.getQualifier().getClassid());
 
+		if (lClass.equals(PidType.openorgs))
+			return -1;
+		if (rClass.equals(PidType.openorgs))
+			return 1;
+
 		if (lClass.equals(PidType.GRID))
 			return -1;
 		if (rClass.equals(PidType.GRID))

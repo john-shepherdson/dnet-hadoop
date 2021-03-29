@@ -23,12 +23,13 @@ import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
+import net.sf.saxon.ma.trie.Tuple2;
 
-//copy simrels (verified) from relation to the workdir in order to make them available for the deduplication
 public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 	private static final Logger log = LoggerFactory.getLogger(SparkCopyOpenorgsMergeRels.class);
 	public static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
@@ -84,24 +85,32 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
 			.filter(this::isOpenorgs)
-			.filter(this::filterOpenorgsRels)
-			.filter(this::excludeOpenorgsMesh)
-			.filter(this::excludeNonOpenorgs); // excludes relations with no openorgs id involved
+			.filter(this::filterOpenorgsRels);
+
+		JavaRDD<Relation> selfRawRels = rawRels
+			.map(r -> r.getSource())
+			.distinct()
+			.map(s -> rel(s, s, "isSimilarTo", dedupConf));
 
 		log.info("Number of raw Openorgs Relations collected: {}", rawRels.count());
 
 		// turn openorgs isSimilarTo relations into mergerels
-		JavaRDD<Relation> mergeRelsRDD = rawRels.flatMap(rel -> {
-			List<Relation> mergerels = new ArrayList<>();
+		JavaRDD<Relation> mergeRelsRDD = rawRels
+			.union(selfRawRels)
+			.map(r -> {
+				r.setSource(createDedupID(r.getSource())); // create the dedup_id to align it to the openaire dedup
+															// format
+				return r;
+			})
+			.flatMap(rel -> {
 
-			String openorgsId = rel.getSource().contains("openorgs____") ? rel.getSource() : rel.getTarget();
-			String mergedId = rel.getSource().contains("openorgs____") ? rel.getTarget() : rel.getSource();
+				List<Relation> mergerels = new ArrayList<>();
 
-			mergerels.add(rel(openorgsId, mergedId, "merges", dedupConf));
-			mergerels.add(rel(mergedId, openorgsId, "isMergedIn", dedupConf));
+				mergerels.add(rel(rel.getSource(), rel.getTarget(), "merges", dedupConf));
+				mergerels.add(rel(rel.getTarget(), rel.getSource(), "isMergedIn", dedupConf));
 
-			return mergerels.iterator();
-		});
+				return mergerels.iterator();
+			});
 
 		log.info("Number of Openorgs Merge Relations created: {}", mergeRelsRDD.count());
 
@@ -144,22 +153,6 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 		return false;
 	}
 
-	private boolean excludeOpenorgsMesh(Relation rel) {
-
-		if (rel.getSource().contains("openorgsmesh") || rel.getTarget().contains("openorgsmesh")) {
-			return false;
-		}
-		return true;
-	}
-
-	private boolean excludeNonOpenorgs(Relation rel) {
-
-		if (rel.getSource().contains("openorgs____") || rel.getTarget().contains("openorgs____")) {
-			return true;
-		}
-		return false;
-	}
-
 	private Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
 
 		String entityType = dedupConf.getWf().getEntityType();
@@ -188,5 +181,11 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 		r.setDataInfo(info);
 		return r;
+	}
+
+	public String createDedupID(String id) {
+
+		String prefix = id.split("\\|")[0];
+		return prefix + "|dedup_wf_001::" + DHPUtils.md5(id);
 	}
 }

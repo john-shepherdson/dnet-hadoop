@@ -9,7 +9,7 @@ public enum PidType {
 	doi, pmid, pmc, handle, arXiv, nct, pdb,
 
 	// Organization
-	GRID, mag_id, urn,
+	openorgs, corda, corda_h2020, GRID, mag_id, urn,
 
 	// Used by dedup
 	undefined, original;

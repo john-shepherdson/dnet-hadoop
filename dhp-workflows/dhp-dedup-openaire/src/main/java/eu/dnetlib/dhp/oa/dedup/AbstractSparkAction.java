@@ -99,6 +99,10 @@ abstract class AbstractSparkAction implements Serializable {
 		dataset.write().option("compression", "gzip").mode(mode).json(outPath);
 	}
 
+	protected static <T> void saveParquet(Dataset<T> dataset, String outPath, SaveMode mode) {
+		dataset.write().option("compression", "gzip").mode(mode).parquet(outPath);
+	}
+
 	protected static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}

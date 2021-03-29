@@ -156,7 +156,7 @@
             <arg>--postgresUser</arg><arg>${postgresOpenOrgsUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresOpenOrgsPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--action</arg><arg>openorgs</arg>
+            <arg>--action</arg><arg>openorgs_dedup</arg>
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>

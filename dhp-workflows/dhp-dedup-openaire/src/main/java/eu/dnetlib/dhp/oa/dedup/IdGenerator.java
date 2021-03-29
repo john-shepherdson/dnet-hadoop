@@ -36,7 +36,14 @@ public class IdGenerator implements Serializable {
 	}
 
 	private static String dedupify(String ns) {
-		StringBuilder prefix = new StringBuilder(substringBefore(ns, "_")).append("_dedup");
+
+		StringBuilder prefix;
+		if (PidType.valueOf(substringBefore(ns, "_")) == PidType.openorgs) {
+			prefix = new StringBuilder(substringBefore(ns, "_"));
+		} else {
+			prefix = new StringBuilder(substringBefore(ns, "_")).append("_dedup");
+		}
+
 		while (prefix.length() < 12) {
 			prefix.append("_");
 		}

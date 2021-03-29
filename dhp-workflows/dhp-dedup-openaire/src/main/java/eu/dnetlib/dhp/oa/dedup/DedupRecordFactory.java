@@ -89,7 +89,7 @@ public class DedupRecordFactory {
 				t -> {
 					T duplicate = t._2();
 
-					// prepare the list of pids to use for the id generation
+					// prepare the list of pids to be used for the id generation
 					bestPids.add(Identifier.newInstance(duplicate));
 
 					entity.mergeFrom(duplicate);
