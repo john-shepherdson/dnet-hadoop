@@ -39,9 +39,9 @@ GROUP BY
 	o.creation_date,
 	o.modification_date,
 	o.country
-	
+
 UNION ALL
-	
+
 SELECT
 	'openorgsmesh'||substring(o.id, 13)||'-'||md5(n.name)                                                                         AS organizationid,
 	n.name                                                                                                                        AS legalshortname,

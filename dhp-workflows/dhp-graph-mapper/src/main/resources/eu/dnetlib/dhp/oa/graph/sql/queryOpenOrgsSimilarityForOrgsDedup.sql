@@ -40,4 +40,4 @@ SELECT
 	0.99                                                  AS trust,
 	''                                                    AS inferenceprovenance,
 	'isDifferentFrom'                                     AS relclass
-FROM oa_duplicates WHERE reltype = 'is_different'
+FROM oa_duplicates WHERE reltype = 'is_different';

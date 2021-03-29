@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.graphx.Edge;
 import org.apache.spark.rdd.RDD;
