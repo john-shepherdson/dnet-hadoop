@@ -3,6 +3,7 @@ package eu.dnetlib.data.mdstore.manager.common.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,15 +39,22 @@ public class MDStoreVersion implements Serializable {
 	@Column(name = "size")
 	private long size = 0;
 
-	public static MDStoreVersion newInstance(final String mdId, final boolean writing) {
-		final MDStoreVersion t = new MDStoreVersion();
-		t.setId(mdId + "-" + new Date().getTime());
-		t.setMdstore(mdId);
-		t.setLastUpdate(null);
-		t.setWriting(writing);
-		t.setReadCount(0);
-		t.setSize(0);
-		return t;
+	@Column(name = "hdfs_path")
+	private String hdfsPath;
+
+	public static MDStoreVersion newInstance(final String mdId, final boolean writing, final String hdfsBasePath) {
+		final MDStoreVersion v = new MDStoreVersion();
+
+		final String versionId = mdId + "-" + new Date().getTime();
+		v.setId(versionId);
+		v.setMdstore(mdId);
+		v.setLastUpdate(null);
+		v.setWriting(writing);
+		v.setReadCount(0);
+		v.setSize(0);
+		v.setHdfsPath(String.format("%s/%s/%s", hdfsBasePath, mdId, versionId));
+
+		return v;
 	}
 
 	public String getId() {
@@ -95,5 +103,38 @@ public class MDStoreVersion implements Serializable {
 
 	public void setSize(final long size) {
 		this.size = size;
+	}
+
+	public String getHdfsPath() {
+		return hdfsPath;
+	}
+
+	public void setHdfsPath(final String hdfsPath) {
+		this.hdfsPath = hdfsPath;
+	}
+
+	@Override
+	public String toString() {
+		return String
+			.format(
+				"MDStoreVersion [id=%s, mdstore=%s, writing=%s, readCount=%s, lastUpdate=%s, size=%s, hdfsPath=%s]", id,
+				mdstore, writing, readCount, lastUpdate, size, hdfsPath);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof MDStoreVersion)) {
+			return false;
+		}
+		final MDStoreVersion other = (MDStoreVersion) obj;
+		return Objects.equals(id, other.id);
 	}
 }

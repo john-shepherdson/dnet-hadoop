@@ -21,8 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -32,6 +32,7 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
@@ -396,11 +397,10 @@ public class MappersTest {
 		assertEquals(1, d.getAuthor().size());
 		assertEquals(1, d.getSubject().size());
 		assertEquals(1, d.getInstance().size());
-		assertTrue(d.getPid().isEmpty());
-
-		assertTrue(d.getInstance().get(0).getPid().isEmpty());
-		assertEquals(1, d.getInstance().get(0).getAlternateIdentifier().size());
-		assertEquals("handle", d.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertNotNull(d.getPid());
+		assertEquals(1, d.getPid().size());
+		assertTrue(PidType.isValid(d.getPid().get(0).getQualifier().getClassid()));
+		assertEquals(PidType.handle, PidType.valueOf(d.getPid().get(0).getQualifier().getClassid()));
 
 		assertNotNull(d.getInstance().get(0).getUrl());
 	}
@@ -451,7 +451,10 @@ public class MappersTest {
 		assertEquals(1, p.getAuthor().size());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
 
-		assertTrue(p.getPid().isEmpty());
+		assertTrue(p.getPid().size() == 1);
+		assertTrue(PidType.isValid(p.getPid().get(0).getQualifier().getClassid()));
+		assertTrue(PidType.handle.equals(PidType.valueOf(p.getPid().get(0).getQualifier().getClassid())));
+		assertEquals("hdl:11858/00-1734-0000-0003-EE73-2", p.getPid().get(0).getValue());
 		assertEquals("dataset", p.getResulttype().getClassname());
 		assertEquals(1, p.getInstance().size());
 		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
@@ -461,11 +464,8 @@ public class MappersTest {
 			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
 
 		assertEquals(1, p.getInstance().size());
-		assertEquals(1, p.getInstance().get(0).getAlternateIdentifier().size());
-		assertEquals("handle", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
-		assertEquals(
-			"hdl:11858/00-1734-0000-0003-EE73-2", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
-
+		assertNotNull(p.getInstance().get(0).getAlternateIdentifier());
+		assertEquals(0, p.getInstance().get(0).getAlternateIdentifier().size());
 		assertEquals(1, p.getInstance().get(0).getUrl().size());
 	}
 

@@ -318,6 +318,50 @@
   "id": "50|CSC_________::2250a70c903c6ac6e4c01438259e9375",
   "instance": [
     {
+      "pid": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1008/abcd"
+        }
+      ],
+      "alternateIdentifier": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1009/qwerty"
+        }
+      ],
       "accessright": {
         "classid": "CLOSED",
         "classname": "CLOSED",

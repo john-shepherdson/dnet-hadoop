@@ -28,6 +28,9 @@
         <module>dhp-graph-provision-scholexplorer</module>
         <module>dhp-blacklist</module>
         <module>dhp-stats-update</module>
+        <module>dhp-stats-promote</module>
+        <module>dhp-usage-stats-build</module>
+        <module>dhp-usage-raw-data-update</module>
         <module>dhp-broker-events</module>
         <module>dhp-doiboost</module>
     </modules>

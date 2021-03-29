@@ -6,7 +6,15 @@
         </property>
         <property>
             <name>stats_db_production_name</name>
-            <description>the name of the production schema</description>
+            <description>the name of the public production schema</description>
+        </property>
+        <property>
+            <name>monitor_db_name</name>
+            <description>the monitor database name</description>
+        </property>
+        <property>
+            <name>monitor_db_production_name</name>
+            <description>the name of the monitor public database</description>
         </property>
         <property>
             <name>stats_tool_api_url</name>
@@ -48,25 +56,26 @@
     </kill>
 
     <action name="updateProductionViews">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hive_jdbc_url}</jdbc-url>
-            <script>scripts/updateProductionViews.sql</script>
-			<param>stats_db_name=${stats_db_name}</param>
-			<param>stats_db_production_name=${stats_db_production_name}</param>
-        </hive2>
-        <ok to="computeProductionStats"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="computeProductionStats">
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <exec>impala-shell.sh</exec>
+            <exec>updateProductionViews.sh</exec>
+            <argument>${stats_db_name}</argument>
             <argument>${stats_db_production_name}</argument>
-            <argument>computeProductionStats.sql</argument>
-            <argument>${wf:appPath()}/scripts/computeProductionStats.sql</argument>
-            <file>impala-shell.sh</file>
+            <file>updateProductionViews.sh</file>
+        </shell>
+        <ok to="updateMonitorViews"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="updateMonitorViews">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateProductionViews.sh</exec>
+            <argument>${monitor_db_name}</argument>
+            <argument>${monitor_db_production_name}</argument>
+            <file>updateProductionViews.sh</file>
         </shell>
         <ok to="promoteCache"/>
         <error to="Kill"/>

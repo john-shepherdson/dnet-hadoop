@@ -15,7 +15,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
 
-import eu.dnetlib.dhp.schema.scholexplorer.OafUtils;
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
 
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
@@ -182,7 +182,7 @@ case object Crossref2Oaf {
     // Ticket #6281 added pid to Instance
     instance.setPid(result.getPid)
 
-    val has_review = (json \ "relation" \"has-review" \ "id")
+    val has_review = json \ "relation" \"has-review" \ "id"
 
     if(has_review != JNothing) {
       instance.setRefereed(
@@ -208,8 +208,9 @@ case object Crossref2Oaf {
       instance.setUrl(links.asJava)
     result.setId(IdentifierFactory.createDOIBoostIdentifier(result))
     if (result.getId== null)
-      return null
-    result
+      null
+    else
+      result
   }
 
 
@@ -241,9 +242,9 @@ case object Crossref2Oaf {
     val result = generateItemFromType(objectType, objectSubType)
     if (result == null)
       return List()
-    val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"));
+    val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"))
     mappingResult(result, json, cOBJCategory)
-    if (result == null)
+    if (result == null || result.getId == null)
       return List()
 
 

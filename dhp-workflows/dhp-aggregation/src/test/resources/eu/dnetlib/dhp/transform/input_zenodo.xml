@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oai:record xmlns="http://namespace.openaire.eu/"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:oaf="http://namespace.openaire.eu/oaf"
+            xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+            xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <oai:header>
+        <dri:objIdentifier>r37b0ad08687::000374d100a9db469bd42b69dbb40b36</dri:objIdentifier>
+        <dri:recordIdentifier>10.5281/zenodo.3234526</dri:recordIdentifier>
+        <dri:dateOfCollection>2020-03-23T03:03:50.72Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>r37b0ad08687</oaf:datasourceprefix>
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">oai:zenodo.org:3234526</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2020-03-19T10:58:08Z</datestamp>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">openaire_data</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">user-epfl</setSpec>
+    </oai:header>
+    <metadata xmlns="http://www.openarchives.org/OAI/2.0/">
+        <oai_datacite xmlns="http://schema.datacite.org/oai/oai-1.0/" xsi:schemaLocation="http://schema.datacite.org/oai/oai-1.0/oai_datacite.xsd">
+            <isReferenceQuality>true</isReferenceQuality>
+            <schemaVersion>3.1</schemaVersion>
+            <datacentreSymbol>CERN.ZENODO</datacentreSymbol>
+            <payload>
+                <resource xmlns="http://datacite.org/schema/kernel-3" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+                    <identifier identifierType="DOI">10.5281/zenodo.3234526</identifier>
+                    <creators>
+                        <creator>
+                            <creatorName>Nouchi, Vincent</creatorName>
+                            <affiliation>Physics of Aquatic Systems Laboratory (APHYS) – Margaretha Kamprad Chair, ENAC, EPFL, Lausanne, 1015, Switzerland</affiliation>
+                        </creator>
+                        <creator>
+                            <creatorName>Lavanchy, Sébastien</creatorName>
+                            <affiliation>Physics of Aquatic Systems Laboratory (APHYS) – Margaretha Kamprad Chair, ENAC, EPFL, Lausanne, 1015, Switzerland</affiliation>
+                        </creator>
+                        <creator>
+                            <creatorName>Baracchini, Theo</creatorName>
+                            <affiliation>Physics of Aquatic Systems Laboratory (APHYS) – Margaretha Kamprad Chair, ENAC, EPFL, Lausanne, 1015, Switzerland</affiliation>
+                        </creator>
+                        <creator>
+                            <creatorName>Wüest, Alfred</creatorName>
+                            <affiliation>Physics of Aquatic Systems Laboratory (APHYS) – Margaretha Kamprad Chair, ENAC, EPFL, Lausanne, 1015, Switzerland</affiliation>
+                        </creator>
+                        <creator>
+                            <creatorName>Bouffard, Damien</creatorName>
+                            <affiliation>Eawag, Swiss Federal Institute of Aquatic Science and Technology, Surface Waters – Research and Management, Kastanienbaum, 6047, Switzerland</affiliation>
+                        </creator>
+                    </creators>
+                    <titles>
+                        <title>Temperature and ADCP data collected on Lake Geneva between 2015 and 2017</title>
+                    </titles>
+                    <publisher>Zenodo</publisher>
+                    <publicationYear>2019</publicationYear>
+                    <subjects>
+                        <subject>Lake Geneva</subject>
+                        <subject>temperature</subject>
+                        <subject>ADCP</subject>
+                    </subjects>
+                    <dates>
+                        <date dateType="Available">2019</date>
+                    </dates>
+                    <resourceType resourceTypeGeneral="Dataset"/>
+                    <relatedIdentifiers>
+                        <relatedIdentifier relatedIdentifierType="DOI" relationType="IsPartOf">10.5281/zenodo.3234525</relatedIdentifier>
+                        <relatedIdentifier relatedIdentifierType="URL" relationType="IsPartOf">https://zenodo.org/communities/epfl</relatedIdentifier>
+                    </relatedIdentifiers>
+                    <version>1.0.0</version>
+                    <rightsList>
+                        <rights rightsURI="http://creativecommons.org/licenses/by/4.0/legalcode">Creative Commons Attribution 4.0 International</rights>
+                        <rights rightsURI="info:eu-repo/semantics/openAccess">Open Access</rights>
+                    </rightsList>
+                    <descriptions>
+                        <description descriptionType="Abstract"><p>Data collected between 2015 and 2017 on Lake Geneva by Acoustic Doppler Current Profiler (ADCP) and CTDs. One file includes all the temperature profiles, the two others are the ADCP data (up- and down-looking) at the SHL2 station (centre of the main basin). Coordinates of the SHL2 station are 534700 and 144950 in the Swiss CH1903 coordinate system. The file with the CTD data contains the coordinates of the sample location (lat, lon), times (in MATLAB time), depths (in meters) and temperatures (in &amp;deg;C).</p>
+
+                            <p>All files are in MATLAB .mat format.</p></description>
+                    </descriptions>
+                </resource>
+            </payload>
+        </oai_datacite>
+    </metadata>
+    <about xmlns="">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2020-03-23T03:03:50.72Z">
+                <baseURL>https%3A%2F%2Fzenodo.org%2Foai2d</baseURL>
+                <identifier>oai:zenodo.org:3234526</identifier>
+                <datestamp>2020-03-19T10:58:08Z</datestamp>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+                                  classname="sysimport:crosswalk:datasetarchive"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</oai:record>

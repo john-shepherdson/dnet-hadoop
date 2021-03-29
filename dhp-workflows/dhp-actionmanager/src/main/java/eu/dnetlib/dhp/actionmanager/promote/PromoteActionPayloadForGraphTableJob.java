@@ -5,12 +5,12 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -194,7 +194,7 @@ public class PromoteActionPayloadForGraphTableJob {
 		SerializableSupplier<BiFunction<G, A, G>> mergeRowWithActionPayloadAndGetFn = MergeAndGet.functionFor(strategy);
 		SerializableSupplier<BiFunction<G, G, G>> mergeRowsAndGetFn = MergeAndGet.functionFor(strategy);
 		SerializableSupplier<G> zeroFn = zeroFn(rowClazz);
-		SerializableSupplier<Function<G, Boolean>> isNotZeroFn = PromoteActionPayloadForGraphTableJob::isNotZeroFnUsingIdOrSource;
+		SerializableSupplier<Function<G, Boolean>> isNotZeroFn = PromoteActionPayloadForGraphTableJob::isNotZeroFnUsingIdOrSourceAndTarget;
 
 		Dataset<G> joinedAndMerged = PromoteActionPayloadFunctions
 			.joinGraphTableWithActionPayloadAndMerge(
@@ -238,12 +238,13 @@ public class PromoteActionPayloadForGraphTableJob {
 		}
 	}
 
-	private static <T extends Oaf> Function<T, Boolean> isNotZeroFnUsingIdOrSource() {
+	private static <T extends Oaf> Function<T, Boolean> isNotZeroFnUsingIdOrSourceAndTarget() {
 		return t -> {
 			if (isSubClass(t, Relation.class)) {
-				return Objects.nonNull(((Relation) t).getSource());
+				final Relation rel = (Relation) t;
+				return StringUtils.isNotBlank(rel.getSource()) && StringUtils.isNotBlank(rel.getTarget());
 			}
-			return Objects.nonNull(((OafEntity) t).getId());
+			return StringUtils.isNotBlank(((OafEntity) t).getId());
 		};
 	}
 

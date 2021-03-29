@@ -16,7 +16,7 @@
                     <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                                     xmlns:oai="http://www.openarchives.org/OAI/2.0/"
                                     xmlns:oaf="http://namespace.openaire.eu/oaf"
-                                    xmlns:eg="http://eu/dnetlib/trasform/extension"
+                                    xmlns:eg="http://eu/dnetlib/transform/extension"
                                     version="2.0"
                                     exclude-result-prefixes="xsl">
                         <xsl:template match="/">

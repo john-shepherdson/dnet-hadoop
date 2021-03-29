@@ -1,0 +1,50 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "e",
+    "paramLongName": "encoding",
+    "paramDescription": "the encoding of the input record should be JSON or XML",
+    "paramRequired": true
+  },
+  {
+    "paramName": "d",
+    "paramLongName": "dateOfCollection",
+    "paramDescription": "the date when the record has been stored",
+    "paramRequired": true
+  },
+  {
+    "paramName": "p",
+    "paramLongName": "provenance",
+    "paramDescription": "the infos about the provenance of the collected records",
+    "paramRequired": true
+  },
+  {
+    "paramName": "x",
+    "paramLongName": "xpath",
+    "paramDescription": "the xpath to identify the record identifier",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mv",
+    "paramLongName": "mdStoreVersion",
+    "paramDescription": "the Metadata Store Version Info",
+    "paramRequired": true
+  },
+  {
+    "paramName": "rmv",
+    "paramLongName": "readMdStoreVersion",
+    "paramDescription": "the Read Lock Metadata Store Version bean",
+    "paramRequired": false
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workflowId",
+    "paramDescription": "the identifier of the dnet Workflow",
+    "paramRequired": false
+  }
+]

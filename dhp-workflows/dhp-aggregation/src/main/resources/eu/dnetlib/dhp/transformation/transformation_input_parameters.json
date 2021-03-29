@@ -7,20 +7,39 @@
   },
   {
     "paramName": "d",
-    "paramLongName": "dateOfCollection",
+    "paramLongName": "dateOfTransformation",
     "paramDescription": "the date when the record has been stored",
     "paramRequired": true
   },
   {
     "paramName": "i",
-    "paramLongName": "input",
-    "paramDescription": "the path of the sequencial file to read",
+    "paramLongName": "mdstoreInputVersion",
+    "paramDescription": "the mdStore Version bean of the Input",
     "paramRequired": true
   },
   {
     "paramName": "o",
-    "paramLongName": "output",
-    "paramDescription": "the path of the result DataFrame on HDFS",
+    "paramLongName": "mdstoreOutputVersion",
+    "paramDescription": "the mdStore Version bean of the Output",
+    "paramRequired": true
+  },
+  {
+    "paramName": "tr",
+    "paramLongName": "transformationRuleId",
+    "paramDescription": "the transformation Rule to apply to the input MDStore",
+    "paramRequired": true
+  },
+
+  {
+    "paramName": "i",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "the Information System Service LookUp URL",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dm",
+    "paramLongName": "dnetMessageManagerURL",
+    "paramDescription": "the End point URL to send Messages",
     "paramRequired": true
   },
   {
@@ -30,45 +49,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "tr",
-    "paramLongName": "transformationRule",
-    "paramDescription": "the transformation Rule to apply to the input MDStore",
+    "paramName": "tp",
+    "paramLongName": "transformationPlugin",
+    "paramDescription": "the transformation plugin to apply",
     "paramRequired": true
-  },
-  {
-    "paramName": "ru",
-    "paramLongName": "rabbitUser",
-    "paramDescription": "the user to connect with RabbitMq for messaging",
-    "paramRequired": true
-  },
-  {
-    "paramName": "rp",
-    "paramLongName": "rabbitPassword",
-    "paramDescription": "the password to connect with RabbitMq for messaging",
-    "paramRequired": true
-  },
-  {
-    "paramName": "rh",
-    "paramLongName": "rabbitHost",
-    "paramDescription": "the host of the RabbitMq server",
-    "paramRequired": true
-  },
-  {
-    "paramName": "ro",
-    "paramLongName": "rabbitOngoingQueue",
-    "paramDescription": "the name of the ongoing queue",
-    "paramRequired": true
-  },
-  {
-    "paramName": "rr",
-    "paramLongName": "rabbitReportQueue",
-    "paramDescription": "the name of the report queue",
-    "paramRequired": true
-  },
-  {
-    "paramName": "t",
-    "paramLongName": "isTest",
-    "paramDescription": "the name of the report queue",
-    "paramRequired": false
   }
 ]

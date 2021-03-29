@@ -6,7 +6,8 @@
 		<groupId>eu.dnetlib.dhp</groupId>
 		<artifactId>dhp</artifactId>
 		<version>1.2.4-SNAPSHOT</version>
-		<relativePath>../</relativePath>
+		<relativePath>../pom.xml</relativePath>
+
 	</parent>
 
 	<artifactId>dhp-common</artifactId>
@@ -27,12 +28,6 @@
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-sql_2.11</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>eu.dnetlib.dhp</groupId>
-			<artifactId>dhp-schemas</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -58,11 +53,6 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.rabbitmq/amqp-client -->
-		<dependency>
-			<groupId>com.rabbitmq</groupId>
-			<artifactId>amqp-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
@@ -104,6 +94,21 @@
 			<artifactId>dnet-pace-core</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>eu.dnetlib.dhp</groupId>
+			<artifactId>dhp-schemas</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 </project>
