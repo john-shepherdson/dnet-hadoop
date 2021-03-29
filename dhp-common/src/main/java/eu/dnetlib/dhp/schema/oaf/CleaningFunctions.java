@@ -155,12 +155,14 @@ public class CleaningFunctions {
 							final Set<StructuredProperty> pids =
 									pid
 										.stream()
+										.filter(Objects::nonNull)
 										.filter(p -> StringUtils.isNotBlank(p.getValue()))
 										.collect(Collectors.toCollection(HashSet::new));
 
 							Optional.ofNullable(i.getAlternateIdentifier())
 									.ifPresent(altId -> {
 										final Set<StructuredProperty> altIds = altId.stream()
+												.filter(Objects::nonNull)
 												.filter(p -> StringUtils.isNotBlank(p.getValue()))
 												.collect(Collectors.toCollection(HashSet::new));
 
