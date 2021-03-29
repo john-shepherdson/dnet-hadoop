@@ -10,6 +10,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -99,18 +100,19 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 				.createSortedBlocks(mapDocuments, dedupConf)
 				.repartition(numPartitions);
 
-			// create relations by comparing only elements in the same group
-			spark
+			Dataset<Relation> simRels = spark
 				.createDataset(
 					Deduper
 						.computeRelations(sc, blocks, dedupConf)
 						.map(t -> createSimRel(t._1(), t._2(), entity))
 						.repartition(numPartitions)
 						.rdd(),
-					Encoders.bean(Relation.class))
-				.write()
-				.mode(SaveMode.Append)
-				.parquet(outputPath);
+					Encoders.bean(Relation.class));
+
+			saveParquet(simRels, outputPath, SaveMode.Append);
+
+			log.info("Generated " + simRels.count() + " Similarity Relations");
+
 		}
 	}
 

@@ -112,7 +112,7 @@ public class EntityMergerTest implements Serializable {
 		assertEquals("2018-09-30", pub_merged.getDateofacceptance().getValue());
 
 		// verify authors
-		assertEquals(9, pub_merged.getAuthor().size());
+		assertEquals(13, pub_merged.getAuthor().size());
 		assertEquals(4, AuthorMerger.countAuthorsPids(pub_merged.getAuthor()));
 
 		// verify title

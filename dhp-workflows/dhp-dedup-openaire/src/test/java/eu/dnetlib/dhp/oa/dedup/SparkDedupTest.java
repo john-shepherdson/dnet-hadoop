@@ -174,27 +174,27 @@ public class SparkDedupTest implements Serializable {
 
 		long orgs_simrel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
 		long pubs_simrel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "publication"))
 			.count();
 
 		long sw_simrel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/software_simrel")
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "software"))
 			.count();
 
 		long ds_simrel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/dataset_simrel")
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "dataset"))
 			.count();
 
 		long orp_simrel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "otherresearchproduct"))
 			.count();
 
 		assertEquals(3082, orgs_simrel);
@@ -206,67 +206,6 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(2)
-	public void collectSimRelsTest() throws Exception {
-		ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					SparkCollectSimRels.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/dedup/collectSimRels_parameters.json")));
-		parser
-			.parseArgument(
-				new String[] {
-					"-asi", testActionSetId,
-					"-la", "lookupurl",
-					"-w", testOutputBasePath,
-					"-np", "50",
-					"-purl", "jdbc:postgresql://localhost:5432/dnet_dedup",
-					"-pusr", "postgres_user",
-					"-ppwd", ""
-				});
-
-		new SparkCollectSimRels(
-			parser,
-			spark,
-			spark.read().load(testDedupAssertionsBasePath + "/similarity_groups"),
-			spark.read().load(testDedupAssertionsBasePath + "/groups"))
-				.run(isLookUpService);
-
-		long orgs_simrel = spark
-			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
-			.count();
-
-		long pubs_simrel = spark
-			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/publication_simrel")
-			.count();
-
-		long sw_simrel = spark
-			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/software_simrel")
-			.count();
-
-		long ds_simrel = spark
-			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/dataset_simrel")
-			.count();
-
-		long orp_simrel = spark
-			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_simrel")
-			.count();
-
-		assertEquals(3672, orgs_simrel);
-		assertEquals(10459, pubs_simrel);
-		assertEquals(3767, sw_simrel);
-		assertEquals(3865, ds_simrel);
-		assertEquals(10173, orp_simrel);
-
-	}
-
-	@Test
-	@Order(3)
 	public void cutMergeRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -362,7 +301,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(4)
+	@Order(3)
 	public void createMergeRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -417,7 +356,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(5)
+	@Order(4)
 	public void createDedupRecordTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -456,7 +395,7 @@ public class SparkDedupTest implements Serializable {
 				testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_deduprecord")
 			.count();
 
-		assertEquals(84, orgs_deduprecord);
+		assertEquals(85, orgs_deduprecord);
 		assertEquals(65, pubs_deduprecord);
 		assertEquals(51, sw_deduprecord);
 		assertEquals(97, ds_deduprecord);
@@ -464,7 +403,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(6)
+	@Order(5)
 	public void updateEntityTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -540,7 +479,7 @@ public class SparkDedupTest implements Serializable {
 			.count();
 
 		assertEquals(896, publications);
-		assertEquals(837, organizations);
+		assertEquals(838, organizations);
 		assertEquals(100, projects);
 		assertEquals(100, datasource);
 		assertEquals(200, softwares);
@@ -580,7 +519,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(7)
+	@Order(6)
 	public void propagateRelationTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -630,7 +569,7 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(8)
+	@Order(7)
 	public void testRelations() throws Exception {
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_1.json", 12, 10);
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_2.json", 10, 2);

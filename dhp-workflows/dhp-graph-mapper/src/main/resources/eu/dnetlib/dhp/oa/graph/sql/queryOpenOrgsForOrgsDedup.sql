@@ -4,6 +4,8 @@ SELECT
 	o.name                                                                                                                        AS legalname,
 	array_agg(DISTINCT n.name)                                                                                                    AS "alternativeNames",
 	(array_agg(u.url))[1]                                                                                                         AS websiteurl,
+	''                                                                                                                            AS logourl,
+	o.creation_date                                                                                                               AS dateofcollection,
 	o.modification_date                                                                                                           AS dateoftransformation,
 	false                                                                                                                         AS inferred,
 	false                                                                                                                         AS deletedbyinference,
@@ -13,26 +15,41 @@ SELECT
 	'OpenOrgs Database'                                                                                                           AS collectedfromname,
 	o.country || '@@@dnet:countries'                                                       AS country,
 	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
-	array_agg(DISTINCT i.otherid || '###' || i.type || '@@@dnet:pid_types')                                                       AS pid
+	array_agg(DISTINCT i.otherid || '###' || i.type || '@@@dnet:pid_types')                                                       AS pid,
+			null                                            AS eclegalbody,
+    		null                                          AS eclegalperson,
+    		null                                            AS ecnonprofit,
+    		null                                 AS ecresearchorganization,
+    		null                                     AS echighereducation,
+    		null                AS ecinternationalorganizationeurinterests,
+    		null                           AS ecinternationalorganization,
+    		null                                           AS ecenterprise,
+    		null                                        AS ecsmevalidated,
+    		null                                             AS ecnutscode
 FROM organizations o
 	LEFT OUTER JOIN acronyms a    ON (a.id = o.id)
 	LEFT OUTER JOIN urls u        ON (u.id = o.id)
 	LEFT OUTER JOIN other_ids i   ON (i.id = o.id)
 	LEFT OUTER JOIN other_names n ON (n.id = o.id)
+WHERE
+    o.status = 'approved'
 GROUP BY
 	o.id,
 	o.name,
+	o.creation_date,
 	o.modification_date,
 	o.country
-	
+
 UNION ALL
-	
+
 SELECT
 	'openorgsmesh'||substring(o.id, 13)||'-'||md5(n.name)                                                                         AS organizationid,
 	n.name                                                                                                                        AS legalshortname,
 	n.name                                                                                                                        AS legalname,
 	ARRAY[]::text[]                                                                                                               AS "alternativeNames",
 	(array_agg(u.url))[1]                                                                                                         AS websiteurl,
+	''                                                                                                                            AS logourl,
+	o.creation_date                                                                                                               AS dateofcollection,
 	o.modification_date                                                                                                           AS dateoftransformation,
 	false                                                                                                                         AS inferred,
 	false                                                                                                                         AS deletedbyinference,
@@ -42,12 +59,26 @@ SELECT
 	'OpenOrgs Database'                                                                                                           AS collectedfromname,
 	o.country || '@@@dnet:countries'                                                       AS country,
 	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
-	array_agg(DISTINCT i.otherid || '###' || i.type || '@@@dnet:pid_types')                                                       AS pid
+	array_agg(DISTINCT i.otherid || '###' || i.type || '@@@dnet:pid_types')                                                       AS pid,
+            null                                            AS eclegalbody,
+    		null                                          AS eclegalperson,
+    		null                                            AS ecnonprofit,
+    		null                                 AS ecresearchorganization,
+    		null                                     AS echighereducation,
+    		null                AS ecinternationalorganizationeurinterests,
+    		null                           AS ecinternationalorganization,
+    		null                                           AS ecenterprise,
+    		null                                        AS ecsmevalidated,
+    		null                                             AS ecnutscode
 FROM other_names n
 	LEFT OUTER JOIN organizations o ON (n.id = o.id)
 	LEFT OUTER JOIN urls u          ON (u.id = o.id)
 	LEFT OUTER JOIN other_ids i     ON (i.id = o.id)
+WHERE
+    o.status = 'approved'
 GROUP BY
-	o.id, o.modification_date, o.country, n.name
-
-
+	o.id,
+	o.creation_date,
+	o.modification_date,
+	o.country,
+	n.name;

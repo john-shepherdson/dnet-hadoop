@@ -13,6 +13,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -22,11 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.util.MapDocumentUtil;
@@ -103,12 +103,22 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 									MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
 						JavaRDD<String> map = entitiesWithId
 							.leftOuterJoin(mergedIds)
-							.map(
-								k -> k._2()._2().isPresent()
-									? updateDeletedByInference(k._2()._1(), clazz)
-									: k._2()._1());
+							.map(k -> {
+								if (k._2()._2().isPresent()) {
+									return updateDeletedByInference(k._2()._1(), clazz);
+								}
+								return k._2()._1();
+							});
+
+						if (type == EntityType.organization) // exclude openorgs with deletedbyinference=true
+							map = map.filter(it -> {
+								Organization org = OBJECT_MAPPER.readValue(it, Organization.class);
+								return !org.getId().contains("openorgs____") || (org.getId().contains("openorgs____")
+									&& !org.getDataInfo().getDeletedbyinference());
+							});
 
 						sourceEntity = map.union(sc.textFile(dedupRecordPath));
+
 					}
 
 					sourceEntity.saveAsTextFile(outputPath, GzipCodec.class);

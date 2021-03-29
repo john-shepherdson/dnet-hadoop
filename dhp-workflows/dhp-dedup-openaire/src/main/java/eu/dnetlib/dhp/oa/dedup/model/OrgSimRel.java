@@ -13,12 +13,13 @@ public class OrgSimRel implements Serializable {
 	String oa_url;
 	String oa_collectedfrom;
 	String group_id;
+	String pid_list; // separator for type-pid: "###"; separator for pids: "@@@"
 
 	public OrgSimRel() {
 	}
 
 	public OrgSimRel(String local_id, String oa_original_id, String oa_name, String oa_acronym, String oa_country,
-		String oa_url, String oa_collectedfrom, String group_id) {
+		String oa_url, String oa_collectedfrom, String group_id, String pid_list) {
 		this.local_id = local_id;
 		this.oa_original_id = oa_original_id;
 		this.oa_name = oa_name;
@@ -27,6 +28,7 @@ public class OrgSimRel implements Serializable {
 		this.oa_url = oa_url;
 		this.oa_collectedfrom = oa_collectedfrom;
 		this.group_id = group_id;
+		this.pid_list = pid_list;
 	}
 
 	public String getLocal_id() {
@@ -93,6 +95,14 @@ public class OrgSimRel implements Serializable {
 		this.group_id = group_id;
 	}
 
+	public String getPid_list() {
+		return pid_list;
+	}
+
+	public void setPid_list(String pid_list) {
+		this.pid_list = pid_list;
+	}
+
 	@Override
 	public String toString() {
 		return "OrgSimRel{" +
@@ -103,6 +113,8 @@ public class OrgSimRel implements Serializable {
 			", oa_country='" + oa_country + '\'' +
 			", oa_url='" + oa_url + '\'' +
 			", oa_collectedfrom='" + oa_collectedfrom + '\'' +
+			", group_id='" + group_id + '\'' +
+			", pid_list='" + pid_list + '\'' +
 			'}';
 	}
 }

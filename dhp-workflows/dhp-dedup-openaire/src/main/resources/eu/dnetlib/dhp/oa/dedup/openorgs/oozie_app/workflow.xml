@@ -1,4 +1,4 @@
-<workflow-app name="Organization Dedup" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Openorgs Dedup" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>graphBasePath</name>
@@ -23,22 +23,6 @@
         <property>
             <name>cutConnectedComponent</name>
             <description>max number of elements in a connected component</description>
-        </property>
-        <property>
-            <name>dbUrl</name>
-            <description>the url of the database</description>
-        </property>
-        <property>
-            <name>dbUser</name>
-            <description>the user of the database</description>
-        </property>
-        <property>
-            <name>dbTable</name>
-            <description>the name of the table in the database</description>
-        </property>
-        <property>
-            <name>dbPwd</name>
-            <description>the passowrd of the user of the database</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -95,31 +79,22 @@
         </configuration>
     </global>
 
-    <start to="resetWorkingPath"/>
+    <start to="resetOrgSimRels"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="resetWorkingPath">
+    <action name="resetOrgSimRels">
         <fs>
-            <delete path="${workingPath}"/>
+            <delete path="${workingPath}/${actionSetIdOpenorgs}/organization_simrel"/>
+            <delete path="${workingPath}/${actionSetIdOpenorgs}/organization_mergerel"/>
         </fs>
-        <ok to="copyRelations"/>
+        <ok to="CreateSimRels"/>
         <error to="Kill"/>
     </action>
 
-    <action name="copyRelations">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>-pb</arg>
-            <arg>${graphBasePath}/relation</arg>
-            <arg>${workingPath}/${actionSetId}/organization_simrel</arg>
-        </distcp>
-        <ok to="CreateSimRel"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="CreateSimRel">
+    <action name="CreateSimRels">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -138,15 +113,43 @@
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
-        <ok to="CreateMergeRel"/>
+        <ok to="CopyOpenorgsSimRels"/>
         <error to="Kill"/>
     </action>
 
-    <action name="CreateMergeRel">
+    <!-- copy simrels relations coming from openorgs -->
+    <action name="CopyOpenorgsSimRels">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Copy OpenOrgs Sim Rels</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkCopyOpenorgsSimRels</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
+            <arg>--numPartitions</arg><arg>8000</arg>
+        </spark>
+        <ok to="CreateMergeRels"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateMergeRels">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -166,8 +169,39 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--cutConnectedComponent</arg><arg>${cutConnectedComponent}</arg>
+        </spark>
+        <ok to="PrepareOrgRels"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="PrepareOrgRels">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Prepare Organization Relations</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkPrepareOrgRels</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
+            <arg>--dbUrl</arg><arg>${dbUrl}</arg>
+            <arg>--dbTable</arg><arg>${dbTable}</arg>
+            <arg>--dbUser</arg><arg>${dbUser}</arg>
+            <arg>--dbPwd</arg><arg>${dbPwd}</arg>
+            <arg>--numConnections</arg><arg>20</arg>
         </spark>
         <ok to="PrepareNewOrgs"/>
         <error to="Kill"/>
@@ -193,7 +227,8 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
+            <arg>--apiUrl</arg><arg>${apiUrl}</arg>
             <arg>--dbUrl</arg><arg>${dbUrl}</arg>
             <arg>--dbTable</arg><arg>${dbTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>

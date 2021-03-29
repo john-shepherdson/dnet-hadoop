@@ -3,14 +3,18 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +23,7 @@ import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -28,7 +33,7 @@ import scala.Tuple3;
 
 public class SparkPrepareOrgRels extends AbstractSparkAction {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkPrepareOrgRels.class);
 
 	public SparkPrepareOrgRels(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -80,8 +85,9 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 		final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, "organization");
 		final String entityPath = DedupUtility.createEntityPath(graphBasePath, "organization");
+		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
-		Dataset<OrgSimRel> relations = createRelations(spark, mergeRelPath, entityPath);
+		Dataset<OrgSimRel> relations = createRelations(spark, mergeRelPath, relationPath, entityPath);
 
 		final Properties connectionProperties = new Properties();
 		connectionProperties.put("user", dbUser);
@@ -95,11 +101,50 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	}
 
+	private static boolean filterRels(Relation rel, String entityType) {
+
+		switch (entityType) {
+			case "result":
+				if (rel.getRelClass().equals("isDifferentFrom") && rel.getRelType().equals("resultResult")
+					&& rel.getSubRelType().equals("dedup"))
+					return true;
+				break;
+			case "organization":
+				if (rel.getRelClass().equals("isDifferentFrom") && rel.getRelType().equals("organizationOrganization")
+					&& rel.getSubRelType().equals("dedup"))
+					return true;
+				break;
+			default:
+				return false;
+		}
+		return false;
+	}
+
+	// create openorgs simrels <best id, other id> starting from mergerels, remove the diffrels
 	public static Dataset<OrgSimRel> createRelations(
 		final SparkSession spark,
 		final String mergeRelsPath,
+		final String relationPath,
 		final String entitiesPath) {
 
+		// collect diffrels from the raw graph relations: <<best id, other id>, "diffRel">
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRels = spark
+			.read()
+			.textFile(relationPath)
+			.map(patchRelFn(), Encoders.bean(Relation.class))
+			.toJavaRDD()
+			.filter(r -> filterRels(r, "organization"))
+			// put the best id as source of the diffrel: <best id, other id>
+			.map(rel -> {
+				if (compareIds(rel.getSource(), rel.getTarget()) < 0)
+					return new Tuple2<>(new Tuple2<>(rel.getSource(), rel.getTarget()), "diffRel");
+				else
+					return new Tuple2<>(new Tuple2<>(rel.getTarget(), rel.getSource()), "diffRel");
+			})
+			.distinct();
+		log.info("Number of DiffRels collected: {}", diffRels.count());
+
+		// collect all the organizations
 		Dataset<Tuple2<String, Organization>> entities = spark
 			.read()
 			.textFile(entitiesPath)
@@ -110,47 +155,74 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 				},
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Organization.class)));
 
+		// relations with their group (connected component id)
+		JavaRDD<Tuple2<Tuple2<String, String>, String>> rawOpenorgsRels = spark
+			.read()
+			.load(mergeRelsPath)
+			.as(Encoders.bean(Relation.class))
+			.where("relClass == 'merges'")
+			.toJavaRDD()
+			.mapToPair(r -> new Tuple2<>(r.getSource(), r.getTarget()))
+			.filter(t -> !t._2().contains("openorgsmesh")) // remove openorgsmesh: they are only for dedup
+			.groupByKey()
+			.map(g -> Lists.newArrayList(g._2()))
+			.filter(l -> l.size() > 1)
+			.flatMap(l -> {
+				String groupId = "group::" + UUID.randomUUID();
+				List<String> ids = sortIds(l); // sort IDs by type
+				List<Tuple2<Tuple2<String, String>, String>> rels = new ArrayList<>();
+				String source = ids.get(0);
+				for (String target : ids) {
+					rels.add(new Tuple2<>(new Tuple2<>(source, target), groupId));
+				}
+
+				return rels.iterator();
+			});
+		log.info("Number of Raw Openorgs Relations created: {}", rawOpenorgsRels.count());
+
+		// filter out diffRels
+		JavaRDD<Tuple3<String, String, String>> openorgsRels = rawOpenorgsRels
+			.union(diffRels)
+			// concatenation of source and target: <source|||target, group id> or <source|||target, "diffRel">
+			.mapToPair(t -> new Tuple2<>(t._1()._1() + "@@@" + t._1()._2(), t._2()))
+			.groupByKey()
+			.map(
+				g -> new Tuple2<>(g._1(), StreamSupport
+					.stream(g._2().spliterator(), false)
+					.collect(Collectors.toList())))
+			// <source|||target, list(group_id, "diffRel")>: take only relations with only the group_id, it
+			// means they are correct. If the diffRel is present the relation has to be removed
+			.filter(g -> g._2().size() == 1 && g._2().get(0).contains("group::"))
+			.map(
+				t -> new Tuple3<>(
+					t._1().split("@@@")[0],
+					t._1().split("@@@")[1],
+					t._2().get(0)));
+		log.info("Number of Openorgs Relations created: '{}'", openorgsRels.count());
+
+		// <best ID basing on priority, ID, groupID>
 		Dataset<Tuple3<String, String, String>> relations = spark
 			.createDataset(
-				spark
-					.read()
-					.load(mergeRelsPath)
-					.as(Encoders.bean(Relation.class))
-					.where("relClass == 'merges'")
-					.toJavaRDD()
-					.mapToPair(r -> new Tuple2<>(r.getSource(), r.getTarget()))
-					.filter(t -> !t._2().contains("openorgsmesh"))
-					.groupByKey()
-					.map(g -> Lists.newArrayList(g._2()))
-					.filter(l -> l.size() > 1)
-					.flatMap(l -> {
-						String groupId = "group::" + UUID.randomUUID();
-						List<String> ids = sortIds(l);
-						List<Tuple3<String, String, String>> rels = new ArrayList<>();
-
-						for (String source : ids) {
-							if (source.contains("openorgs____") || ids.indexOf(source) == 0)
-								for (String target : ids) {
-									rels.add(new Tuple3<>(source, target, groupId));
-								}
-						}
-						return rels.iterator();
-					})
-					.rdd(),
+				openorgsRels.rdd(),
 				Encoders.tuple(Encoders.STRING(), Encoders.STRING(), Encoders.STRING()));
 
-		Dataset<Tuple2<String, OrgSimRel>> relations2 = relations // <openorgs, corda>
+		// create orgsimrels
+		Dataset<Tuple2<String, OrgSimRel>> relations2 = relations
 			.joinWith(entities, relations.col("_2").equalTo(entities.col("_1")), "inner")
 			.map(
-				(MapFunction<Tuple2<Tuple3<String, String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> new OrgSimRel(
-					r._1()._1(),
-					r._2()._2().getOriginalId().get(0),
-					r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
-					r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
-					r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
-					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
-					r._2()._2().getCollectedfrom().get(0).getValue(),
-					r._1()._3()),
+				(MapFunction<Tuple2<Tuple3<String, String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
+
+					return new OrgSimRel(
+						r._1()._1(),
+						r._2()._2().getOriginalId().get(0),
+						r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
+						r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
+						r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
+						r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
+						r._2()._2().getCollectedfrom().get(0).getValue(),
+						r._1()._3(),
+						structuredPropertyListToString(r._2()._2().getPid()));
+				},
 				Encoders.bean(OrgSimRel.class))
 			.map(
 				(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),
@@ -168,29 +240,28 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	}
 
-	// select best ids from the list. Priority: 1) openorgs, 2)corda, 3)alphabetic
-	public static List<String> sortIds(List<String> ids) {
-
-		ids.sort((o1, o2) -> {
-
-			if (o1.contains("openorgs____") && o2.contains("openorgs____"))
-				return o1.compareTo(o2);
-			if (o1.contains("corda") && o2.contains("corda"))
-				return o1.compareTo(o2);
-
-			if (o1.contains("openorgs____"))
-				return -1;
-			if (o2.contains("openorgs____"))
-				return 1;
-
-			if (o1.contains("corda"))
-				return -1;
-			if (o2.contains("corda"))
-				return 1;
-
+	public static int compareIds(String o1, String o2) {
+		if (o1.contains("openorgs____") && o2.contains("openorgs____"))
 			return o1.compareTo(o2);
-		});
+		if (o1.contains("corda") && o2.contains("corda"))
+			return o1.compareTo(o2);
 
+		if (o1.contains("openorgs____"))
+			return -1;
+		if (o2.contains("openorgs____"))
+			return 1;
+
+		if (o1.contains("corda"))
+			return -1;
+		if (o2.contains("corda"))
+			return 1;
+
+		return o1.compareTo(o2);
+	}
+
+	// Sort IDs basing on the type. Priority: 1) openorgs, 2)corda, 3)alphabetic
+	public static List<String> sortIds(List<String> ids) {
+		ids.sort((o1, o2) -> compareIds(o1, o2));
 		return ids;
 	}
 
@@ -245,7 +316,8 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 					r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
 					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
 					r._2()._2().getCollectedfrom().get(0).getValue(),
-					"group::" + r._1()._1()),
+					"group::" + r._1()._1(),
+					structuredPropertyListToString(r._2()._2().getPid())),
 				Encoders.bean(OrgSimRel.class))
 			.map(
 				(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),
@@ -263,4 +335,13 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	}
 
+	private static MapFunction<String, Relation> patchRelFn() {
+		return value -> {
+			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
+			if (rel.getDataInfo() == null) {
+				rel.setDataInfo(new DataInfo());
+			}
+			return rel;
+		};
+	}
 }
