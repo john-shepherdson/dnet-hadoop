@@ -11,6 +11,11 @@
             <description>should import content from the aggregator or reuse a previous version</description>
         </property>
         <property>
+            <name>importOpenorgs</name>
+            <value>true</value>
+            <description>should import content from the OpenOrgs database</description>
+        </property>
+        <property>
             <name>contentPath</name>
             <description>path location to store (or reuse) content from the aggregator</description>
         </property>
@@ -202,9 +207,17 @@
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
-        <ok to="ImportDB_openorgs"/>
+        <ok to="should_import_openorgs"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="should_import_openorgs">
+        <switch>
+            <case to="ImportDB_openorgs">${wf:conf('importOpenorgs') eq true}</case>
+            <case to="ImportODF">${wf:conf('importOpenorgs') eq false}</case>
+            <default to="ImportDB_openorgs"/>
+        </switch>
+    </decision>
 
     <action name="ImportDB_openorgs">
         <java>
