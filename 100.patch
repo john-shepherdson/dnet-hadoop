@@ -1,0 +1,757 @@
+From c5fbad8093ca27deebf1b5fd5ffd39e1877c533d Mon Sep 17 00:00:00 2001
+From: antleb <antleb@di.uoa.gr>
+Date: Thu, 4 Mar 2021 00:42:21 +0200
+Subject: [PATCH 1/8] Contexts are now downloaded instead of using the
+ stats_ext db
+
+---
+ .../dhp/oa/graph/stats/oozie_app/contexts.sh  | 33 +++++++++++++++++++
+ .../graph/stats/oozie_app/scripts/step10.sql  | 13 --------
+ .../dhp/oa/graph/stats/oozie_app/workflow.xml | 17 ++++++++++
+ 3 files changed, 50 insertions(+), 13 deletions(-)
+ create mode 100644 dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+new file mode 100644
+index 00000000..f06a43bb
+--- /dev/null
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+@@ -0,0 +1,33 @@
++#!/usr/bin/env bash
++
++CONTEXT_API=$1
++TARGET_DB=$2
++
++TMP=/tmp/stats-update-`tr -dc A-Za-z0-9 </dev/urandom | head -c 6`
++
++echo "Downloading context data"
++curl ${CONTEXT_API}/contexts?all=true -H "accept: application/json" | /usr/local/sbin/jq -r '.[] | "\(.id),\(.label)"' > contexts.csv
++cat contexts.csv | cut -d , -f1 | xargs -I {} curl ${CONTEXT_API}/context/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split(":")[0]),\(.id),\(.label)"' > categories.csv
++cat categories.csv | cut -d , -f2 | sed 's/:/%3A/g'| xargs -I {} curl ${CONTEXT_API}/context/category/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split("::")[0])::\(.id|split("::")[1]),\(.id),\(.label)"' > concepts.csv
++cat contexts.csv  | cut -f1 -d, | sed 's/\(.*\)/\1,\1::other,other/' >> categories.csv
++cat categories.csv | cut -d, -f2 | sed 's/\(.*\)/\1,\1::other,other/' >> concepts.csv
++
++echo "uploading context data to hdfs"
++hdfs dfs -mkdir ${TMP}
++hdfs dfs -copyFromLocal contexts.csv ${TMP}
++hdfs dfs -copyFromLocal categories.csv ${TMP}
++hdfs dfs -copyFromLocal concepts.csv ${TMP}
++hdfs dfs -chmod -R 777 ${TMP}
++
++echo "Creating and populating impala tables"
++impala-shell -c "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ',';"
++impala-shell -c "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ',';"
++impala-shell -c "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ',';"
++impala-shell -c "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context;"
++impala-shell -c "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category;"
++impala-shell -c "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept;"
++
++echo "Cleaning up"
++hdfs dfs -rm -f -r -skipTrash ${TMP}
++
++echo "Finito!"
+\ No newline at end of file
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step10.sql b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step10.sql
+index 6c96317e..77fbd3b1 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step10.sql
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step10.sql
+@@ -23,19 +23,6 @@ CREATE OR REPLACE VIEW ${stats_db_name}.rndexpediture AS
+ SELECT *
+ FROM ${external_stats_db_name}.rndexpediture;
+ 
+-CREATE OR REPLACE VIEW ${stats_db_name}.context AS
+-SELECT *
+-FROM ${external_stats_db_name}.context;
+-
+-CREATE OR REPLACE VIEW ${stats_db_name}.category AS
+-SELECT *
+-FROM ${external_stats_db_name}.category;
+-
+-CREATE OR REPLACE VIEW ${stats_db_name}.concept AS
+-SELECT *
+-FROM ${external_stats_db_name}.concept;
+-
+-
+ ------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------------
+ -- Creation date of the database
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
+index 9c16f149..afb10c41 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
+@@ -41,6 +41,10 @@
+             <name>hive_timeout</name>
+             <description>the time period, in seconds, after which Hive fails a transaction if a Hive client has not sent a hearbeat. The default value is 300 seconds.</description>
+         </property>
++        <property>
++            <name>context_api_url</name>
++            <description>the base url of the context api (https://services.openaire.eu/openaire)</description>
++        </property>
+     </parameters>
+ 
+     <global>
+@@ -263,6 +267,19 @@
+         <ok to="Step19"/>
+         <error to="Kill"/>
+     </action>
++
++    <action name="Step17">
++        <shell xmlns="uri:oozie:shell-action:0.1">
++            <job-tracker>${jobTracker}</job-tracker>
++            <name-node>${nameNode}</name-node>
++            <exec>contexts.sh</exec>
++            <argument>${context_api_url}</argument>
++            <argument>${stats_db_name}</argument>
++            <file>contexts.sh</file>
++        </shell>
++        <ok to="step20-createMonitorDB"/>
++        <error to="Kill"/>
++    </action>
+         
+     <action name="Step19">
+         <shell xmlns="uri:oozie:shell-action:0.1">
+-- 
+2.17.1
+
+
+From 6147ee495053634436abe822aaf9ba909813d8c4 Mon Sep 17 00:00:00 2001
+From: antleb <antleb@di.uoa.gr>
+Date: Fri, 5 Mar 2021 14:12:18 +0200
+Subject: [PATCH 2/8] assigning correctly hive contexts to concepts
+
+---
+ .../eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh    | 7 +++++--
+ .../dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step2.sql | 5 ++++-
+ .../dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step3.sql | 5 ++++-
+ .../dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step4.sql | 5 ++++-
+ .../dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step5.sql | 5 ++++-
+ 5 files changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+index f06a43bb..6788f88b 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+@@ -9,8 +9,8 @@ echo "Downloading context data"
+ curl ${CONTEXT_API}/contexts?all=true -H "accept: application/json" | /usr/local/sbin/jq -r '.[] | "\(.id),\(.label)"' > contexts.csv
+ cat contexts.csv | cut -d , -f1 | xargs -I {} curl ${CONTEXT_API}/context/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split(":")[0]),\(.id),\(.label)"' > categories.csv
+ cat categories.csv | cut -d , -f2 | sed 's/:/%3A/g'| xargs -I {} curl ${CONTEXT_API}/context/category/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split("::")[0])::\(.id|split("::")[1]),\(.id),\(.label)"' > concepts.csv
+-cat contexts.csv  | cut -f1 -d, | sed 's/\(.*\)/\1,\1::other,other/' >> categories.csv
+-cat categories.csv | cut -d, -f2 | sed 's/\(.*\)/\1,\1::other,other/' >> concepts.csv
++cat contexts.csv | sed 's/^\(.*\),\(.*\)/\1,\1::other,\2/' >> categories.csv
++cat categories.csv | grep -v ::other | sed 's/^.*,\(.*\),\(.*\)/\1,\1::other,\2/' >> concepts.csv
+ 
+ echo "uploading context data to hdfs"
+ hdfs dfs -mkdir ${TMP}
+@@ -29,5 +29,8 @@ impala-shell -c "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.
+ 
+ echo "Cleaning up"
+ hdfs dfs -rm -f -r -skipTrash ${TMP}
++rm concepts.csv
++rm categories.csv
++rm contexts.csv
+ 
+ echo "Finito!"
+\ No newline at end of file
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step2.sql b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step2.sql
+index 62a15856..75b24b18 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step2.sql
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step2.sql
+@@ -47,7 +47,10 @@ from ${openaire_db_name}.publication p
+ where p.datainfo.deletedbyinference = false;
+ 
+ CREATE TABLE ${stats_db_name}.publication_concepts AS
+-SELECT substr(p.id, 4) as id, contexts.context.id as concept
++SELECT substr(p.id, 4) as id, case
++    when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
++    when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
++    when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
+ from ${openaire_db_name}.publication p
+          LATERAL VIEW explode(p.context) contexts as context
+ where p.datainfo.deletedbyinference = false;
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step3.sql b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step3.sql
+index dcd5ad85..540cc03a 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step3.sql
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step3.sql
+@@ -54,7 +54,10 @@ FROM ${openaire_db_name}.dataset p
+ where p.datainfo.deletedbyinference = false;
+ 
+ CREATE TABLE ${stats_db_name}.dataset_concepts AS
+-SELECT substr(p.id, 4) as id, contexts.context.id as concept
++SELECT substr(p.id, 4) as id, case
++                                  when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
++                                  when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
++                                  when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
+ from ${openaire_db_name}.dataset p
+          LATERAL VIEW explode(p.context) contexts as context
+ where p.datainfo.deletedbyinference = false;
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step4.sql b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step4.sql
+index fd5390e6..54345e07 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step4.sql
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step4.sql
+@@ -54,7 +54,10 @@ FROM ${openaire_db_name}.software p
+ where p.datainfo.deletedbyinference = false;
+ 
+ CREATE TABLE ${stats_db_name}.software_concepts AS
+-SELECT substr(p.id, 4) AS id, contexts.context.id AS concept
++SELECT substr(p.id, 4) as id, case
++                                  when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
++                                  when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
++                                  when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
+ FROM ${openaire_db_name}.software p
+          LATERAL VIEW explode(p.context) contexts AS context
+ where p.datainfo.deletedbyinference = false;
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step5.sql b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step5.sql
+index b359b596..36ad5d92 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step5.sql
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step5.sql
+@@ -52,7 +52,10 @@ FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.
+ where p.datainfo.deletedbyinference = false;
+ 
+ CREATE TABLE ${stats_db_name}.otherresearchproduct_concepts AS
+-SELECT substr(p.id, 4) AS id, contexts.context.id AS concept
++SELECT substr(p.id, 4) as id, case
++                                  when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
++                                  when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
++                                  when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
+ FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.context) contexts AS context
+ where p.datainfo.deletedbyinference = false;
+ 
+-- 
+2.17.1
+
+
+From f40c150a0d549e2dbcfd42ecf81e17ad4b505391 Mon Sep 17 00:00:00 2001
+From: antleb <antleb@di.uoa.gr>
+Date: Sat, 6 Mar 2021 00:35:57 +0200
+Subject: [PATCH 3/8] fixed steps...
+
+---
+ .../eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml      | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
+index afb10c41..2184cb8a 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
+@@ -264,7 +264,7 @@
+             <param>stats_db_name=${stats_db_name}</param>
+             <param>openaire_db_name=${openaire_db_name}</param>
+         </hive2>
+-        <ok to="Step19"/>
++        <ok to="Step17"/>
+         <error to="Kill"/>
+     </action>
+ 
+@@ -277,7 +277,7 @@
+             <argument>${stats_db_name}</argument>
+             <file>contexts.sh</file>
+         </shell>
+-        <ok to="step20-createMonitorDB"/>
++        <ok to="step19"/>
+         <error to="Kill"/>
+     </action>
+         
+-- 
+2.17.1
+
+
+From fa1ec5b5e9b6038b3b565422af5c6406f21220d3 Mon Sep 17 00:00:00 2001
+From: antleb <antleb@di.uoa.gr>
+Date: Wed, 10 Mar 2021 14:05:58 +0200
+Subject: [PATCH 4/8] fixed typo...
+
+---
+ .../eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml        | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
+index 2184cb8a..321500e2 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
+@@ -277,7 +277,7 @@
+             <argument>${stats_db_name}</argument>
+             <file>contexts.sh</file>
+         </shell>
+-        <ok to="step19"/>
++        <ok to="Step19"/>
+         <error to="Kill"/>
+     </action>
+         
+-- 
+2.17.1
+
+
+From 3c75a050443942b632cf8469b5af16a8c61e7569 Mon Sep 17 00:00:00 2001
+From: antleb <antleb@di.uoa.gr>
+Date: Fri, 12 Mar 2021 13:47:04 +0200
+Subject: [PATCH 5/8] fixed a ton of typos
+
+---
+ .../scripts/computeProductionStats.sql        |  8 -------
+ .../stats/oozie_app/updateProductionViews.sh  | 18 ++++++++++++++++
+ .../dhp/oa/graph/stats/oozie_app/contexts.sh  | 21 ++++++++++++-------
+ 3 files changed, 32 insertions(+), 15 deletions(-)
+ delete mode 100644 dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/computeProductionStats.sql
+ create mode 100644 dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/updateProductionViews.sh
+
+diff --git a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/computeProductionStats.sql b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/computeProductionStats.sql
+deleted file mode 100644
+index 34e48a18..00000000
+--- a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/computeProductionStats.sql
++++ /dev/null
+@@ -1,8 +0,0 @@
+-------------------------------------------------------
+-------------------------------------------------------
+--- Impala table statistics - Needed to make the tables
+--- visible for impala
+-------------------------------------------------------
+-------------------------------------------------------
+-
+-INVALIDATE METADATA ${stats_db_name};
+diff --git a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/updateProductionViews.sh b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/updateProductionViews.sh
+new file mode 100644
+index 00000000..57acb2ee
+--- /dev/null
++++ b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/updateProductionViews.sh
+@@ -0,0 +1,18 @@
++export PYTHON_EGG_CACHE=/home/$(whoami)/.python-eggs
++export link_folder=/tmp/impala-shell-python-egg-cache-$(whoami)
++if ! [ -L $link_folder ]
++then
++    rm -Rf "$link_folder"
++    ln -sfn ${PYTHON_EGG_CACHE}${link_folder} ${link_folder}
++fi
++
++export SOURCE=$1
++export SHADOW=$2
++
++echo "Updating shadow database"
++impala-shell -d ${SOURCE} -q "invalidate metadata"
++impala-shell -d ${SOURCE} -q "show tables" --delimited | sed "s/^\(.*\)/compute stats ${SOURCE}.\1;/" | impala-shell -c -f -
++impala-shell -q "create database if not exists ${SHADOW}"
++impala-shell -d ${SHADOW} -q "show tables" --delimited | sed "s/^/drop view if exists ${SHADOW}./" | sed "s/$/;/" | impala-shell -c -f -
++impala-shell -d ${SOURCE} -q "show tables" --delimited | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${SOURCE}.\1;/" | impala-shell -c -f -
++echo "Shadow db ready!"
+\ No newline at end of file
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+index 6788f88b..c28be50d 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+@@ -1,4 +1,10 @@
+-#!/usr/bin/env bash
++export PYTHON_EGG_CACHE=/home/$(whoami)/.python-eggs
++export link_folder=/tmp/impala-shell-python-egg-cache-$(whoami)
++if ! [ -L $link_folder ]
++then
++    rm -Rf "$link_folder"
++    ln -sfn ${PYTHON_EGG_CACHE}${link_folder} ${link_folder}
++fi
+ 
+ CONTEXT_API=$1
+ TARGET_DB=$2
+@@ -20,12 +26,13 @@ hdfs dfs -copyFromLocal concepts.csv ${TMP}
+ hdfs dfs -chmod -R 777 ${TMP}
+ 
+ echo "Creating and populating impala tables"
+-impala-shell -c "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ',';"
+-impala-shell -c "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ',';"
+-impala-shell -c "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ',';"
+-impala-shell -c "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context;"
+-impala-shell -c "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category;"
+-impala-shell -c "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept;"
++impala-shell -q "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"
++impala-shell -q "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ','"
++impala-shell -q "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ','"
++impala-shell -d ${TARGET_DB} -q "invalidate metadata"
++impala-shell -q "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context"
++impala-shell -q "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category"
++impala-shell -q "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept"
+ 
+ echo "Cleaning up"
+ hdfs dfs -rm -f -r -skipTrash ${TMP}
+-- 
+2.17.1
+
+
+From 236435b47010ea1ab94c3f018dcf278f5d2c44aa Mon Sep 17 00:00:00 2001
+From: antleb <antleb@di.uoa.gr>
+Date: Fri, 12 Mar 2021 14:11:21 +0200
+Subject: [PATCH 6/8] following redirects
+
+---
+ .../eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh     | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+index c28be50d..29b225e3 100644
+--- a/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
++++ b/dhp-workflows/dhp-stats-update/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/contexts.sh
+@@ -12,9 +12,9 @@ TARGET_DB=$2
+ TMP=/tmp/stats-update-`tr -dc A-Za-z0-9 </dev/urandom | head -c 6`
+ 
+ echo "Downloading context data"
+-curl ${CONTEXT_API}/contexts?all=true -H "accept: application/json" | /usr/local/sbin/jq -r '.[] | "\(.id),\(.label)"' > contexts.csv
+-cat contexts.csv | cut -d , -f1 | xargs -I {} curl ${CONTEXT_API}/context/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split(":")[0]),\(.id),\(.label)"' > categories.csv
+-cat categories.csv | cut -d , -f2 | sed 's/:/%3A/g'| xargs -I {} curl ${CONTEXT_API}/context/category/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split("::")[0])::\(.id|split("::")[1]),\(.id),\(.label)"' > concepts.csv
++curl -L ${CONTEXT_API}/contexts?all=true -H "accept: application/json" | /usr/local/sbin/jq -r '.[] | "\(.id),\(.label)"' > contexts.csv
++cat contexts.csv | cut -d , -f1 | xargs -I {} curl -L ${CONTEXT_API}/context/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split(":")[0]),\(.id),\(.label)"' > categories.csv
++cat categories.csv | cut -d , -f2 | sed 's/:/%3A/g'| xargs -I {} curl -L ${CONTEXT_API}/context/category/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split("::")[0])::\(.id|split("::")[1]),\(.id),\(.label)"' > concepts.csv
+ cat contexts.csv | sed 's/^\(.*\),\(.*\)/\1,\1::other,\2/' >> categories.csv
+ cat categories.csv | grep -v ::other | sed 's/^.*,\(.*\),\(.*\)/\1,\1::other,\2/' >> concepts.csv
+ 
+-- 
+2.17.1
+
+
+From 60ebdf2dbe704733809f401df70bffcf49cede29 Mon Sep 17 00:00:00 2001
+From: antleb <antleb@di.uoa.gr>
+Date: Fri, 12 Mar 2021 16:34:53 +0200
+Subject: [PATCH 7/8] update promote wf to support monitor&production
+
+---
+ .../oa/graph/stats/oozie_app/impala-shell.sh  |  18 --
+ .../scripts/updateProductionViews.sql         | 207 ------------------
+ 2 files changed, 225 deletions(-)
+ delete mode 100644 dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/impala-shell.sh
+ delete mode 100644 dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/updateProductionViews.sql
+
+diff --git a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/impala-shell.sh b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/impala-shell.sh
+deleted file mode 100644
+index 70112dc7..00000000
+--- a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/impala-shell.sh
++++ /dev/null
+@@ -1,18 +0,0 @@
+-export PYTHON_EGG_CACHE=/home/$(whoami)/.python-eggs
+-export link_folder=/tmp/impala-shell-python-egg-cache-$(whoami)
+-if ! [ -L $link_folder ]
+-then
+-    rm -Rf "$link_folder"
+-    ln -sfn ${PYTHON_EGG_CACHE}${link_folder} ${link_folder}
+-fi
+-
+-echo "Getting file from " $3
+-hdfs dfs -copyToLocal $3
+-
+-echo "Running impala shell make the new database visible"
+-impala-shell -q "INVALIDATE METADATA;"
+-
+-echo "Running impala shell to compute new table stats"
+-impala-shell -d $1 -f $2
+-echo "Impala shell finished"
+-rm $2
+diff --git a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/updateProductionViews.sql b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/updateProductionViews.sql
+deleted file mode 100644
+index 48f8d58f..00000000
+--- a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/updateProductionViews.sql
++++ /dev/null
+@@ -1,207 +0,0 @@
+-------------------------------------------------------
+-------------------------------------------------------
+--- Shadow schema table exchange
+-------------------------------------------------------
+-------------------------------------------------------
+-
+--- Dropping old views
+-DROP VIEW IF EXISTS ${stats_db_production_name}.category;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.concept;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.context;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.country;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.countrygdp;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.creation_date;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_citations;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_classifications;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_concepts;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_datasources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_languages;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_licenses;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_oids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_pids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_refereed;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_sources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.dataset_topics;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.datasource;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.datasource_languages;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.datasource_oids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.datasource_organizations;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.datasource_results;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.datasource_sources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.funder;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.fundref;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.numbers_country;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.organization;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.organization_datasources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.organization_pids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.organization_projects;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.organization_sources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_citations;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_classifications;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_concepts;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_datasources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_languages;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_licenses;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_oids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_pids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_refereed;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_sources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.otherresearchproduct_topics;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.project;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.project_oids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.project_organizations;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.project_results;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.project_resultcount;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.project_results_publication;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_citations;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_classifications;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_concepts;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_datasources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_languages;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_licenses;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_oids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_pids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_refereed;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_sources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.publication_topics;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_affiliated_country;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_citations;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_classifications;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_concepts;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_datasources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_deposited_country;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_fundercount;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_gold;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_greenoa;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_languages;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_licenses;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_oids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_organization;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_peerreviewed;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_pids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_projectcount;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_projects;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_refereed;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_sources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.result_topics;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.rndexpediture;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.roarmap;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_citations;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_classifications;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_concepts;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_datasources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_languages;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_licenses;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_oids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_pids;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_refereed;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_sources;
+-DROP VIEW IF EXISTS ${stats_db_production_name}.software_topics;
+-
+-
+--- Creating the shadow database, in case it doesn't exist
+-CREATE database IF NOT EXISTS ${stats_db_production_name};
+-
+--- Creating new views
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.category AS SELECT * FROM ${stats_db_name}.category;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.concept AS SELECT * FROM ${stats_db_name}.concept;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.context AS SELECT * FROM ${stats_db_name}.context;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.country AS SELECT * FROM ${stats_db_name}.country;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.countrygdp AS SELECT * FROM ${stats_db_name}.countrygdp;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.creation_date AS SELECT * FROM ${stats_db_name}.creation_date;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset AS SELECT * FROM ${stats_db_name}.dataset;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_citations AS SELECT * FROM ${stats_db_name}.dataset_citations;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_classifications AS SELECT * FROM ${stats_db_name}.dataset_classifications;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_concepts AS SELECT * FROM ${stats_db_name}.dataset_concepts;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_datasources AS SELECT * FROM ${stats_db_name}.dataset_datasources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_languages AS SELECT * FROM ${stats_db_name}.dataset_languages;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_licenses AS SELECT * FROM ${stats_db_name}.dataset_licenses;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_oids AS SELECT * FROM ${stats_db_name}.dataset_oids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_pids AS SELECT * FROM ${stats_db_name}.dataset_pids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_refereed AS SELECT * FROM ${stats_db_name}.dataset_refereed;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_sources AS SELECT * FROM ${stats_db_name}.dataset_sources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.dataset_topics AS SELECT * FROM ${stats_db_name}.dataset_topics;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.datasource AS SELECT * FROM ${stats_db_name}.datasource;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.datasource_languages AS SELECT * FROM ${stats_db_name}.datasource_languages;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.datasource_oids AS SELECT * FROM ${stats_db_name}.datasource_oids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.datasource_organizations AS SELECT * FROM ${stats_db_name}.datasource_organizations;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.datasource_results AS SELECT * FROM ${stats_db_name}.datasource_results;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.datasource_sources AS SELECT * FROM ${stats_db_name}.datasource_sources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.funder AS SELECT * FROM ${stats_db_name}.funder;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.fundref AS SELECT * FROM ${stats_db_name}.fundref;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.numbers_country AS SELECT * FROM ${stats_db_name}.numbers_country;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.organization AS SELECT * FROM ${stats_db_name}.organization;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.organization_datasources AS SELECT * FROM ${stats_db_name}.organization_datasources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.organization_pids AS SELECT * FROM ${stats_db_name}.organization_pids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.organization_projects AS SELECT * FROM ${stats_db_name}.organization_projects;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.organization_sources AS SELECT * FROM ${stats_db_name}.organization_sources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct AS SELECT * FROM ${stats_db_name}.otherresearchproduct;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_citations AS SELECT * FROM ${stats_db_name}.otherresearchproduct_citations;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_classifications AS SELECT * FROM ${stats_db_name}.otherresearchproduct_classifications;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_concepts AS SELECT * FROM ${stats_db_name}.otherresearchproduct_concepts;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_datasources AS SELECT * FROM ${stats_db_name}.otherresearchproduct_datasources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_languages AS SELECT * FROM ${stats_db_name}.otherresearchproduct_languages;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_licenses AS SELECT * FROM ${stats_db_name}.otherresearchproduct_licenses;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_oids AS SELECT * FROM ${stats_db_name}.otherresearchproduct_oids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_pids AS SELECT * FROM ${stats_db_name}.otherresearchproduct_pids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_refereed AS SELECT * FROM ${stats_db_name}.otherresearchproduct_refereed;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_sources AS SELECT * FROM ${stats_db_name}.otherresearchproduct_sources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.otherresearchproduct_topics AS SELECT * FROM ${stats_db_name}.otherresearchproduct_topics;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.project AS SELECT * FROM ${stats_db_name}.project;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.project_oids AS SELECT * FROM ${stats_db_name}.project_oids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.project_organizations AS SELECT * FROM ${stats_db_name}.project_organizations;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.project_results AS SELECT * FROM ${stats_db_name}.project_results;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.project_resultcount AS SELECT * FROM ${stats_db_name}.project_resultcount;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.project_results_publication AS SELECT * FROM ${stats_db_name}.project_results_publication;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication AS SELECT * FROM ${stats_db_name}.publication;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_citations AS SELECT * FROM ${stats_db_name}.publication_citations;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_classifications AS SELECT * FROM ${stats_db_name}.publication_classifications;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_concepts AS SELECT * FROM ${stats_db_name}.publication_concepts;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_datasources AS SELECT * FROM ${stats_db_name}.publication_datasources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_languages AS SELECT * FROM ${stats_db_name}.publication_languages;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_licenses AS SELECT * FROM ${stats_db_name}.publication_licenses;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_oids AS SELECT * FROM ${stats_db_name}.publication_oids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_pids AS SELECT * FROM ${stats_db_name}.publication_pids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_refereed AS SELECT * FROM ${stats_db_name}.publication_refereed;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_sources AS SELECT * FROM ${stats_db_name}.publication_sources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.publication_topics AS SELECT * FROM ${stats_db_name}.publication_topics;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result AS SELECT * FROM ${stats_db_name}.result;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_affiliated_country AS SELECT * FROM ${stats_db_name}.result_affiliated_country;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_citations AS SELECT * FROM ${stats_db_name}.result_citations;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_classifications AS SELECT * FROM ${stats_db_name}.result_classifications;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_concepts AS SELECT * FROM ${stats_db_name}.result_concepts;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_datasources AS SELECT * FROM ${stats_db_name}.result_datasources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_deposited_country AS SELECT * FROM ${stats_db_name}.result_deposited_country;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_fundercount AS SELECT * FROM ${stats_db_name}.result_fundercount;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_gold AS SELECT * FROM ${stats_db_name}.result_gold;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_greenoa AS SELECT * FROM ${stats_db_name}.result_greenoa;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_languages AS SELECT * FROM ${stats_db_name}.result_languages;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_licenses AS SELECT * FROM ${stats_db_name}.result_licenses;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_oids AS SELECT * FROM ${stats_db_name}.result_oids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_organization AS SELECT * FROM ${stats_db_name}.result_organization;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_peerreviewed AS SELECT * FROM ${stats_db_name}.result_peerreviewed;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_pids AS SELECT * FROM ${stats_db_name}.result_pids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_projectcount AS SELECT * FROM ${stats_db_name}.result_projectcount;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_projects AS SELECT * FROM ${stats_db_name}.result_projects;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_refereed AS SELECT * FROM ${stats_db_name}.result_refereed;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_sources AS SELECT * FROM ${stats_db_name}.result_sources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.result_topics AS SELECT * FROM ${stats_db_name}.result_topics;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.rndexpediture AS SELECT * FROM ${stats_db_name}.rndexpediture;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.roarmap AS SELECT * FROM ${stats_db_name}.roarmap;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software AS SELECT * FROM ${stats_db_name}.software;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_citations AS SELECT * FROM ${stats_db_name}.software_citations;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_classifications AS SELECT * FROM ${stats_db_name}.software_classifications;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_concepts AS SELECT * FROM ${stats_db_name}.software_concepts;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_datasources AS SELECT * FROM ${stats_db_name}.software_datasources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_languages AS SELECT * FROM ${stats_db_name}.software_languages;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_licenses AS SELECT * FROM ${stats_db_name}.software_licenses;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_oids AS SELECT * FROM ${stats_db_name}.software_oids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_pids AS SELECT * FROM ${stats_db_name}.software_pids;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_refereed AS SELECT * FROM ${stats_db_name}.software_refereed;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_sources AS SELECT * FROM ${stats_db_name}.software_sources;
+-CREATE VIEW IF NOT EXISTS ${stats_db_production_name}.software_topics AS SELECT * FROM ${stats_db_name}.software_topics;
+-- 
+2.17.1
+
+
+From 0ba0a6b9dac25f5ec73e8eafefbf7f91442ad1c5 Mon Sep 17 00:00:00 2001
+From: antleb <antleb@di.uoa.gr>
+Date: Fri, 12 Mar 2021 16:42:59 +0200
+Subject: [PATCH 8/8] update promote wf to support monitor&production
+
+---
+ .../stats/oozie_app/updateProductionViews.sh  | 14 +++----
+ .../dhp/oa/graph/stats/oozie_app/workflow.xml | 37 ++++++++++++-------
+ 2 files changed, 29 insertions(+), 22 deletions(-)
+
+diff --git a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/updateProductionViews.sh b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/updateProductionViews.sh
+index 57acb2ee..3e510e87 100644
+--- a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/updateProductionViews.sh
++++ b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/updateProductionViews.sh
+@@ -7,12 +7,10 @@ then
+ fi
+ 
+ export SOURCE=$1
+-export SHADOW=$2
++export PRODUCTION=$2
+ 
+-echo "Updating shadow database"
+-impala-shell -d ${SOURCE} -q "invalidate metadata"
+-impala-shell -d ${SOURCE} -q "show tables" --delimited | sed "s/^\(.*\)/compute stats ${SOURCE}.\1;/" | impala-shell -c -f -
+-impala-shell -q "create database if not exists ${SHADOW}"
+-impala-shell -d ${SHADOW} -q "show tables" --delimited | sed "s/^/drop view if exists ${SHADOW}./" | sed "s/$/;/" | impala-shell -c -f -
+-impala-shell -d ${SOURCE} -q "show tables" --delimited | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${SOURCE}.\1;/" | impala-shell -c -f -
+-echo "Shadow db ready!"
+\ No newline at end of file
++echo "Updating ${PRODUCTION} database"
++impala-shell -q "create database if not exists ${PRODUCTION}"
++impala-shell -d ${PRODUCTION} -q "show tables" --delimited | sed "s/^/drop view if exists ${PRODUCTION}./" | sed "s/$/;/" | impala-shell -c -f -
++impala-shell -d ${SOURCE} -q "show tables" --delimited | sed "s/\(.*\)/create view ${PRODUCTION}.\1 as select * from ${SOURCE}.\1;/" | impala-shell -c -f -
++echo "Production db ready!"
+\ No newline at end of file
+diff --git a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
+index d744f18d..0d8ff7ee 100644
+--- a/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
++++ b/dhp-workflows/dhp-stats-promote/src/main/resources/eu/dnetlib/dhp/oa/graph/stats/oozie_app/workflow.xml
+@@ -6,7 +6,15 @@
+         </property>
+         <property>
+             <name>stats_db_production_name</name>
+-            <description>the name of the production schema</description>
++            <description>the name of the public production schema</description>
++        </property>
++        <property>
++            <name>monitor_db_name</name>
++            <description>the monitor database name</description>
++        </property>
++        <property>
++            <name>monitor_db_production_name</name>
++            <description>the name of the monitor public database</description>
+         </property>
+         <property>
+             <name>stats_tool_api_url</name>
+@@ -48,25 +56,26 @@
+     </kill>
+ 
+     <action name="updateProductionViews">
+-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+-            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+-            <script>scripts/updateProductionViews.sql</script>
+-			<param>stats_db_name=${stats_db_name}</param>
+-			<param>stats_db_production_name=${stats_db_production_name}</param>
+-        </hive2>
+-        <ok to="computeProductionStats"/>
++        <shell xmlns="uri:oozie:shell-action:0.1">
++            <job-tracker>${jobTracker}</job-tracker>
++            <name-node>${nameNode}</name-node>
++            <exec>updateProductionViews.sh</exec>
++            <argument>${stats_db_name}</argument>
++            <argument>${stats_db_production_name}</argument>
++            <file>updateProductionViews.sh</file>
++        </shell>
++        <ok to="updateMonitorViews"/>
+         <error to="Kill"/>
+     </action>
+ 
+-    <action name="computeProductionStats">
++    <action name="updateMonitorViews">
+         <shell xmlns="uri:oozie:shell-action:0.1">
+             <job-tracker>${jobTracker}</job-tracker>
+             <name-node>${nameNode}</name-node>
+-            <exec>impala-shell.sh</exec>
+-            <argument>${stats_db_production_name}</argument>
+-            <argument>computeProductionStats.sql</argument>
+-            <argument>${wf:appPath()}/scripts/computeProductionStats.sql</argument>
+-            <file>impala-shell.sh</file>
++            <exec>updateProductionViews.sh</exec>
++            <argument>${monitor_db_name}</argument>
++            <argument>${monitor_db_production_name}</argument>
++            <file>updateProductionViews.sh</file>
+         </shell>
+         <ok to="promoteCache"/>
+         <error to="Kill"/>
+-- 
+2.17.1
+
