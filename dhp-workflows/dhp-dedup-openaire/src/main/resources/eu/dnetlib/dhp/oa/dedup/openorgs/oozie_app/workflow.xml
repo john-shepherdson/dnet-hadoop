@@ -17,10 +17,6 @@
             <description>path for the working directory</description>
         </property>
         <property>
-            <name>dedupGraphPath</name>
-            <description>path for the output graph</description>
-        </property>
-        <property>
             <name>cutConnectedComponent</name>
             <description>max number of elements in a connected component</description>
         </property>
