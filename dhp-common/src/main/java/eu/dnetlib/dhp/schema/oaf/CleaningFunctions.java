@@ -152,22 +152,23 @@ public class CleaningFunctions {
 					Optional
 						.ofNullable(i.getPid())
 						.ifPresent(pid -> {
-							final Set<StructuredProperty> pids =
-									pid
+							final Set<StructuredProperty> pids = pid
+								.stream()
+								.filter(Objects::nonNull)
+								.filter(p -> StringUtils.isNotBlank(p.getValue()))
+								.collect(Collectors.toCollection(HashSet::new));
+
+							Optional
+								.ofNullable(i.getAlternateIdentifier())
+								.ifPresent(altId -> {
+									final Set<StructuredProperty> altIds = altId
 										.stream()
 										.filter(Objects::nonNull)
 										.filter(p -> StringUtils.isNotBlank(p.getValue()))
 										.collect(Collectors.toCollection(HashSet::new));
 
-							Optional.ofNullable(i.getAlternateIdentifier())
-									.ifPresent(altId -> {
-										final Set<StructuredProperty> altIds = altId.stream()
-												.filter(Objects::nonNull)
-												.filter(p -> StringUtils.isNotBlank(p.getValue()))
-												.collect(Collectors.toCollection(HashSet::new));
-
-										i.setAlternateIdentifier(Lists.newArrayList(Sets.difference(altIds, pids)));
-									});
+									i.setAlternateIdentifier(Lists.newArrayList(Sets.difference(altIds, pids)));
+								});
 						});
 
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
