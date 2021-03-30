@@ -85,6 +85,11 @@ public class MergeTest {
 		b = createRel(true, "2016-04-05T12:41:19.202Z");
 		a.mergeFrom(b);
 		assertEquals("2016-04-05T12:41:19.202Z", a.getValidationDate());
+
+		a = createRel(true, "2016-05-07T12:41:19.202Z");
+		b = createRel(true, "2016-04-05T12:41:19.202Z");
+		a.mergeFrom(b);
+		assertEquals("2016-04-05T12:41:19.202Z", a.getValidationDate());
 	}
 
 	@Test
