@@ -12,9 +12,11 @@ import java.util.List;
  * type of type String to store the type of the instance as defined in the corresponding dnet vocabulary
  * (dnet:pubication_resource). It corresponds to the instancetype.classname of the instance to be mapped - url of type
  * List<String> list of locations where the instance is accessible. It corresponds to url of the instance to be dumped -
- * publicationdate of type String to store the publication date of the instance ;// dateofacceptance; - refereed of type
- * String to store information abour tthe review status of the instance. Possible values are 'Unknown',
+ * publicationdate of type String to store the publication date of the instance ;// dateofacceptance;
+ * - refereed of type
+ * String to store information abour the review status of the instance. Possible values are 'Unknown',
  * 'nonPeerReviewed', 'peerReviewed'. It corresponds to refereed.classname of the instance to be dumped
+ * - articleprocessingcharge of type APC to store the article processing charges possibly associated to the instance
  */
 public class Instance implements Serializable {
 
@@ -27,6 +29,8 @@ public class Instance implements Serializable {
 	private List<String> url;
 
 	private String publicationdate;// dateofacceptance;
+
+	private APC articleprocessingcharge;
 
 	private String refereed; // peer-review status
 
@@ -78,4 +82,11 @@ public class Instance implements Serializable {
 		this.refereed = refereed;
 	}
 
+	public APC getArticleprocessingcharge() {
+		return articleprocessingcharge;
+	}
+
+	public void setArticleprocessingcharge(APC articleprocessingcharge) {
+		this.articleprocessingcharge = articleprocessingcharge;
+	}
 }

@@ -57,16 +57,12 @@ public class CommunitySplit implements Serializable {
 		Dataset<CommunityResult> community_products = result
 			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, c));
 
-		try {
-			community_products.first();
-			community_products
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Overwrite)
-				.json(outputPath + "/" + c);
-		} catch (Exception e) {
 
-		}
+		community_products
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath + "/" + c);
 
 	}
 
@@ -75,9 +71,9 @@ public class CommunitySplit implements Serializable {
 			return r
 				.getContext()
 				.stream()
-				.filter(con -> con.getCode().equals(c))
+				.map(con -> con.getCode())
 				.collect(Collectors.toList())
-				.size() > 0;
+				.contains(c);
 		}
 		return false;
 	}
