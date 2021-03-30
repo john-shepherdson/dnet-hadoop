@@ -5,6 +5,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -477,8 +480,6 @@ public class ModelSupport {
 		return ((OafEntity) t).getId();
 	}
 
-	public static final String ISO8601FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-
 	public static String oldest(String dateA, String dateB) throws ParseException {
 
 		if (StringUtils.isBlank(dateA)) {
@@ -489,8 +490,8 @@ public class ModelSupport {
 		}
 		if (StringUtils.isNotBlank(dateA) && StringUtils.isNotBlank(dateB)) {
 
-			final Date a = new SimpleDateFormat(ISO8601FORMAT).parse(dateA);
-			final Date b = new SimpleDateFormat(ISO8601FORMAT).parse(dateB);
+			final Date a = Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse(dateA)));
+			final Date b = Date.from(Instant.from(DateTimeFormatter.ISO_INSTANT.parse(dateB)));
 
 			return a.before(b) ? dateA : dateB;
 		} else {
