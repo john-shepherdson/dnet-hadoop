@@ -436,16 +436,18 @@ public class DumpJobTest {
 			.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
 
 		Assertions.assertEquals(23, verificationDataset.count());
-		//verificationDataset.show(false);
+		// verificationDataset.show(false);
 
 		Assertions.assertEquals(23, verificationDataset.filter("type = 'publication'").count());
 
 		verificationDataset.createOrReplaceTempView("check");
 
-		org.apache.spark.sql.Dataset<Row> temp = spark.sql("select id " +
-				"from check " +
-				"lateral view explode (instance) i as inst " +
-				"where inst.articleprocessingcharge is not null");
+		org.apache.spark.sql.Dataset<Row> temp = spark
+			.sql(
+				"select id " +
+					"from check " +
+					"lateral view explode (instance) i as inst " +
+					"where inst.articleprocessingcharge is not null");
 
 		Assertions.assertTrue(temp.count() == 2);
 
@@ -453,11 +455,6 @@ public class DumpJobTest {
 
 		Assertions.assertTrue(temp.filter("id = '50|dedup_wf_001::01e6a28565ca01376b7548e530c6f6e8'").count() == 1);
 
-
-
-//		verificationDataset.filter("bestAccessright.code = 'c_abf2'").count() == verificationDataset
-//				.filter("bestAccessright.code = 'c_abf2' and bestAccessright.label = 'OPEN'")
-//				.count()
 
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
 	}
