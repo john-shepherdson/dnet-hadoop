@@ -138,6 +138,11 @@ public class SparkGenEnrichedOrcidWorks {
 					.longAccumulator("errorsNotFoundAuthors");
 				final LongAccumulator errorsInvalidType = spark.sparkContext().longAccumulator("errorsInvalidType");
 				final LongAccumulator otherTypeFound = spark.sparkContext().longAccumulator("otherTypeFound");
+				final LongAccumulator deactivatedAcc = spark.sparkContext().longAccumulator("deactivated_found");
+				final LongAccumulator titleNotProvidedAcc = spark
+					.sparkContext()
+					.longAccumulator("Title_not_provided_found");
+				final LongAccumulator noUrlAcc = spark.sparkContext().longAccumulator("no_url_found");
 
 				final PublicationToOaf publicationToOaf = new PublicationToOaf(
 					parsedPublications,
@@ -147,6 +152,9 @@ public class SparkGenEnrichedOrcidWorks {
 					errorsNotFoundAuthors,
 					errorsInvalidType,
 					otherTypeFound,
+					deactivatedAcc,
+					titleNotProvidedAcc,
+					noUrlAcc,
 					dateOfCollection);
 				JavaRDD<Publication> oafPublicationRDD = enrichedWorksRDD
 					.map(
@@ -177,6 +185,9 @@ public class SparkGenEnrichedOrcidWorks {
 				logger.info("errorsNotFoundAuthors: " + errorsNotFoundAuthors.value().toString());
 				logger.info("errorsInvalidType: " + errorsInvalidType.value().toString());
 				logger.info("otherTypeFound: " + otherTypeFound.value().toString());
+				logger.info("deactivatedAcc: " + deactivatedAcc.value().toString());
+				logger.info("titleNotProvidedAcc: " + titleNotProvidedAcc.value().toString());
+				logger.info("noUrlAcc: " + noUrlAcc.value().toString());
 			});
 	}
 }
