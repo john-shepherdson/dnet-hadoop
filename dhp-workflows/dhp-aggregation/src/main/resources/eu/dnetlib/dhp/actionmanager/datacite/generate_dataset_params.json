@@ -13,12 +13,6 @@
     "paramRequired": true
   },
   {
-    "paramName": "tr",
-    "paramLongName": "transformationRule",
-    "paramDescription": "the transformation Rule",
-    "paramRequired": true
-  },
-  {
     "paramName": "m",
     "paramLongName": "master",
     "paramDescription": "the master name",

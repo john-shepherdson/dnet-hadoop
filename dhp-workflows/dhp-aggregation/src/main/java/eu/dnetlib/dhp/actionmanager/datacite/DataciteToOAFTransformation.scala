@@ -3,7 +3,9 @@ package eu.dnetlib.dhp.actionmanager.datacite
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Instance, KeyValue, Oaf, OafMapperUtils, OtherResearchProduct, Publication, Qualifier, Relation, Result, Software, StructuredProperty, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.common.ModelConstants
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
+import eu.dnetlib.dhp.schema.oaf.{AccessRight, Author, DataInfo, Instance, KeyValue, Oaf, OafMapperUtils, OtherResearchProduct, Publication, Qualifier, Relation, Result, Software, StructuredProperty, Dataset => OafDataset}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import org.json4s.DefaultFormats
@@ -45,17 +47,11 @@ object DataciteToOAFTransformation {
   codec.onMalformedInput(CodingErrorAction.REPLACE)
   codec.onUnmappableCharacter(CodingErrorAction.REPLACE)
 
-
-
-  private val PID_VOCABULARY = "dnet:pid_types"
-  val COBJ_VOCABULARY = "dnet:publication_resource"
-  val RESULT_VOCABULARY = "dnet:result_typologies"
-  val ACCESS_MODE_VOCABULARY = "dnet:access_modes"
   val DOI_CLASS = "doi"
 
-  val TITLE_SCHEME = "dnet:dataCite_title"
+
   val SUBJ_CLASS = "keywords"
-  val SUBJ_SCHEME = "dnet:subject_classification_typologies"
+
 
   val j_filter:List[String] = {
     val s = Source.fromInputStream(getClass.getResourceAsStream("datacite_filter")).mkString
@@ -66,7 +62,7 @@ object DataciteToOAFTransformation {
   val unknown_repository: HostedByMapType = HostedByMapType("openaire____::1256f046-bf1f-4afc-8b47-d0b147148b18", "Unknown Repository", "Unknown Repository", Some(1.0F))
 
   val dataInfo: DataInfo = generateDataInfo("0.9")
-  val DATACITE_COLLECTED_FROM: KeyValue = OafMapperUtils.keyValue("openaire____::9e3be59865b2c1c335d32dae2fe7b254", "Datacite")
+  val DATACITE_COLLECTED_FROM: KeyValue = OafMapperUtils.keyValue(ModelConstants.DATACITE_ID, "Datacite")
 
   val hostedByMap: Map[String, HostedByMapType] = {
     val s = Source.fromInputStream(getClass.getResourceAsStream("hostedBy_map.json")).mkString
@@ -174,20 +170,20 @@ object DataciteToOAFTransformation {
 
   def getTypeQualifier(resourceType: String, resourceTypeGeneral: String, schemaOrg: String, vocabularies:VocabularyGroup): (Qualifier, Qualifier) = {
     if (resourceType != null && resourceType.nonEmpty) {
-      val typeQualifier = vocabularies.getSynonymAsQualifier(COBJ_VOCABULARY, resourceType)
+      val typeQualifier = vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceType)
       if (typeQualifier != null)
-        return (typeQualifier, vocabularies.getSynonymAsQualifier(RESULT_VOCABULARY, typeQualifier.getClassid))
+        return (typeQualifier, vocabularies.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, typeQualifier.getClassid))
     }
     if (schemaOrg != null && schemaOrg.nonEmpty) {
-      val typeQualifier = vocabularies.getSynonymAsQualifier(COBJ_VOCABULARY, schemaOrg)
+      val typeQualifier = vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, schemaOrg)
       if (typeQualifier != null)
-        return (typeQualifier, vocabularies.getSynonymAsQualifier(RESULT_VOCABULARY, typeQualifier.getClassid))
+        return (typeQualifier, vocabularies.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, typeQualifier.getClassid))
 
     }
     if (resourceTypeGeneral != null && resourceTypeGeneral.nonEmpty) {
-      val typeQualifier = vocabularies.getSynonymAsQualifier(COBJ_VOCABULARY, resourceTypeGeneral)
+      val typeQualifier = vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceTypeGeneral)
       if (typeQualifier != null)
-        return (typeQualifier, vocabularies.getSynonymAsQualifier(RESULT_VOCABULARY, typeQualifier.getClassid))
+        return (typeQualifier, vocabularies.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, typeQualifier.getClassid))
 
     }
     null
@@ -295,7 +291,7 @@ object DataciteToOAFTransformation {
       return List()
 
 
-    val doi_q = vocabularies.getSynonymAsQualifier(PID_VOCABULARY, "doi")
+    val doi_q = OafMapperUtils.qualifier("doi", "doi", ModelConstants.DNET_PID_TYPES,ModelConstants.DNET_PID_TYPES)
     val pid = OafMapperUtils.structuredProperty(doi, doi_q, dataInfo)
     result.setPid(List(pid).asJava)
     result.setId(OafMapperUtils.createOpenaireId(50, s"datacite____::$doi", true))
@@ -319,7 +315,7 @@ object DataciteToOAFTransformation {
       a.setSurname(c.familyName.orNull)
       if (c.nameIdentifiers!= null&& c.nameIdentifiers.isDefined  && c.nameIdentifiers.get != null) {
         a.setPid(c.nameIdentifiers.get.map(ni => {
-          val q = if (ni.nameIdentifierScheme.isDefined) vocabularies.getTermAsQualifier(PID_VOCABULARY, ni.nameIdentifierScheme.get.toLowerCase()) else null
+          val q = if (ni.nameIdentifierScheme.isDefined) vocabularies.getTermAsQualifier(ModelConstants.DNET_PID_TYPES, ni.nameIdentifierScheme.get.toLowerCase()) else null
           if (ni.nameIdentifier!= null && ni.nameIdentifier.isDefined) {
             OafMapperUtils.structuredProperty(ni.nameIdentifier.get, q, dataInfo)
           }
@@ -343,9 +339,9 @@ object DataciteToOAFTransformation {
 
     result.setTitle(titles.filter(t => t.title.nonEmpty).map(t => {
       if (t.titleType.isEmpty) {
-        OafMapperUtils.structuredProperty(t.title.get, "main title", "main title", TITLE_SCHEME, TITLE_SCHEME, null)
+        OafMapperUtils.structuredProperty(t.title.get, ModelConstants.MAIN_TITLE_QUALIFIER, null)
       } else {
-        OafMapperUtils.structuredProperty(t.title.get, t.titleType.get, t.titleType.get, TITLE_SCHEME, TITLE_SCHEME, null)
+        OafMapperUtils.structuredProperty(t.title.get, t.titleType.get, t.titleType.get, ModelConstants.DNET_DATACITE_TITLE, ModelConstants.DNET_DATACITE_TITLE, null)
       }
     }).asJava)
 
@@ -390,7 +386,7 @@ object DataciteToOAFTransformation {
 
     result.setSubject(subjects.filter(s => s.subject.nonEmpty)
       .map(s =>
-        OafMapperUtils.structuredProperty(s.subject.get, SUBJ_CLASS, SUBJ_CLASS, SUBJ_SCHEME, SUBJ_SCHEME, null)
+        OafMapperUtils.structuredProperty(s.subject.get, SUBJ_CLASS, SUBJ_CLASS, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES, null)
       ).asJava)
 
 
@@ -426,27 +422,32 @@ object DataciteToOAFTransformation {
       JField("rightsUri", JString(rightsUri)) <- rightsList
     } yield rightsUri
 
-    val aRights: Option[Qualifier] = accessRights.map(r => {
-      vocabularies.getSynonymAsQualifier(ACCESS_MODE_VOCABULARY, r)
-    }).find(q => q != null)
+    val aRights: Option[AccessRight] = accessRights.map(r => {
+      vocabularies.getSynonymAsQualifier(ModelConstants.DNET_ACCESS_MODES, r)
+    }).find(q => q != null).map(q => {
+      val a = new AccessRight
+      a.setClassid(q.getClassid)
+      a.setClassname(q.getClassname)
+      a.setSchemeid(q.getSchemeid)
+      a.setSchemename(q.getSchemename)
+      a
+    })
 
 
-    val access_rights_qualifier = if (aRights.isDefined) aRights.get else OafMapperUtils.qualifier("UNKNOWN", "not available", ACCESS_MODE_VOCABULARY, ACCESS_MODE_VOCABULARY)
+    val access_rights_qualifier = if (aRights.isDefined) aRights.get else OafMapperUtils.accessRight("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
 
     if (client.isDefined) {
       val hb = hostedByMap.getOrElse(client.get.toUpperCase(), unknown_repository)
       instance.setHostedby(OafMapperUtils.keyValue(generateDSId(hb.openaire_id), hb.official_name))
       instance.setCollectedfrom(DATACITE_COLLECTED_FROM)
       instance.setUrl(List(s"https://dx.doi.org/$doi").asJava)
-//      instance.setAccessright(access_rights_qualifier)
-
-      //'http') and matches(., '.*(/licenses|/publicdomain|unlicense.org/|/legal-and-data-protection-notices|/download/license|/open-government-licence).*')]">
+      instance.setAccessright(access_rights_qualifier)
+      instance.setPid(result.getPid)
       val license = accessRights
         .find(r => r.startsWith("http") && r.matches(".*(/licenses|/publicdomain|unlicense\\.org/|/legal-and-data-protection-notices|/download/license|/open-government-licence).*"))
       if (license.isDefined)
         instance.setLicense(OafMapperUtils.field(license.get, null))
     }
-
 
     val awardUris:List[String] =  for {
       JObject(fundingReferences) <- json \\ "fundingReferences"
@@ -455,6 +456,9 @@ object DataciteToOAFTransformation {
 
     val relations:List[Relation] =awardUris.flatMap(a=> get_projectRelation(a, result.getId)).filter(r => r!= null)
 
+    result.setId(IdentifierFactory.createIdentifier(result))
+    if(result.getId == null)
+      return List()
     if (relations!= null && relations.nonEmpty) {
       List(result):::relations
     }
@@ -468,7 +472,7 @@ object DataciteToOAFTransformation {
     di.setInferred(false)
     di.setInvisible(false)
     di.setTrust(trust)
-    di.setProvenanceaction(OafMapperUtils.qualifier("sysimport:actionset", "sysimport:actionset", "dnet:provenanceActions", "dnet:provenanceActions"))
+    di.setProvenanceaction(ModelConstants.ACTION_SET_PROVENANCE_QUALIFIER)
     di
   }
 

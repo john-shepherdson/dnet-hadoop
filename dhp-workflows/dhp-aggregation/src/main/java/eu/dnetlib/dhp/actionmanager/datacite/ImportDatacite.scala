@@ -148,7 +148,7 @@ object ImportDatacite {
       try {
         var start: Long = System.currentTimeMillis
         while (from < now) {
-          client = new DataciteAPIImporter(from, 1000, from + delta)
+          client = new DataciteAPIImporter(from, 100, from + delta)
           var end: Long = 0
           val key: IntWritable = new IntWritable(i)
           val value: Text = new Text

@@ -89,6 +89,13 @@ public class ModelConstants {
 	public static final String UNKNOWN = "UNKNOWN";
 	public static final String NOT_AVAILABLE = "not available";
 
+	public static final String ACTION_SET_SCHEME = "sysimport:actionset";
+
+	public static final String PROVENANCE_VOCABULARY = "dnet:provenanceActions";
+
+	public static final Qualifier ACTION_SET_PROVENANCE_QUALIFIER = qualifier(
+		ACTION_SET_SCHEME, ACTION_SET_SCHEME, PROVENANCE_VOCABULARY, PROVENANCE_VOCABULARY);
+
 	public static final Qualifier PUBLICATION_DEFAULT_RESULTTYPE = qualifier(
 		PUBLICATION_RESULTTYPE_CLASSID, PUBLICATION_RESULTTYPE_CLASSID,
 		DNET_RESULT_TYPOLOGIES, DNET_RESULT_TYPOLOGIES);
