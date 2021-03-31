@@ -28,6 +28,7 @@ import com.google.common.hash.Hashing;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.graph.ConnectedComponent;
 import eu.dnetlib.dhp.oa.dedup.graph.GraphProcessor;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
@@ -135,8 +136,8 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 				id -> {
 					List<Relation> tmp = new ArrayList<>();
 
-					tmp.add(rel(cc.getCcId(), id, "merges", dedupConf));
-					tmp.add(rel(id, cc.getCcId(), "isMergedIn", dedupConf));
+					tmp.add(rel(cc.getCcId(), id, ModelConstants.MERGES, dedupConf));
+					tmp.add(rel(id, cc.getCcId(), ModelConstants.IS_MERGED_IN, dedupConf));
 
 					return tmp.stream();
 				})
@@ -152,7 +153,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		r.setTarget(target);
 		r.setRelClass(relClass);
 		r.setRelType(entityType + entityType.substring(0, 1).toUpperCase() + entityType.substring(1));
-		r.setSubRelType("dedup");
+		r.setSubRelType(ModelConstants.DEDUP);
 
 		DataInfo info = new DataInfo();
 		info.setDeletedbyinference(false);

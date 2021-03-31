@@ -2,17 +2,11 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.graphx.Edge;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -22,14 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.config.DedupConfig;
 
 //copy simrels (verified) from relation to the workdir in order to make them available for the deduplication
 public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
@@ -100,8 +93,9 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 
 	private boolean filterOpenorgsRels(Relation rel) {
 
-		if (rel.getRelClass().equals("isSimilarTo") && rel.getRelType().equals("organizationOrganization")
-			&& rel.getSubRelType().equals("dedup") && isOpenorgs(rel))
+		if (rel.getRelClass().equals(ModelConstants.IS_SIMILAR_TO)
+			&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
+			&& rel.getSubRelType().equals(ModelConstants.DEDUP) && isOpenorgs(rel))
 			return true;
 		return false;
 	}
@@ -110,7 +104,7 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 
 		if (rel.getCollectedfrom() != null) {
 			for (KeyValue k : rel.getCollectedfrom()) {
-				if (k.getValue() != null && k.getValue().equals("OpenOrgs Database")) {
+				if (k.getValue() != null && k.getValue().equals(ModelConstants.OPENORGS_NAME)) {
 					return true;
 				}
 			}

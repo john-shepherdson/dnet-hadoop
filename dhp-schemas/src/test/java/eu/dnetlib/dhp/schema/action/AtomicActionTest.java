@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 /** @author claudio.atzori */
@@ -21,9 +22,9 @@ public class AtomicActionTest {
 		Relation rel = new Relation();
 		rel.setSource("1");
 		rel.setTarget("2");
-		rel.setRelType("resultResult");
-		rel.setSubRelType("dedup");
-		rel.setRelClass("merges");
+		rel.setRelType(ModelConstants.RESULT_RESULT);
+		rel.setSubRelType(ModelConstants.DEDUP);
+		rel.setRelClass(ModelConstants.MERGES);
 
 		AtomicAction aa1 = new AtomicAction(Relation.class, rel);
 

@@ -8,6 +8,7 @@ import java.util.Optional;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Maps;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class RelationComparator implements Comparator<Relation> {
@@ -15,18 +16,18 @@ public class RelationComparator implements Comparator<Relation> {
 	private static final Map<String, Integer> weights = Maps.newHashMap();
 
 	static {
-		weights.put("outcome", 0);
-		weights.put("supplement", 1);
-		weights.put("review", 2);
-		weights.put("citation", 3);
-		weights.put("affiliation", 4);
-		weights.put("relationship", 5);
-		weights.put("publicationDataset", 6);
-		weights.put("similarity", 7);
+		weights.put(ModelConstants.OUTCOME, 0);
+		weights.put(ModelConstants.SUPPLEMENT, 1);
+		weights.put(ModelConstants.REVIEWS, 2);
+		weights.put(ModelConstants.CITATION, 3);
+		weights.put(ModelConstants.AFFILIATION, 4);
+		weights.put(ModelConstants.RELATIONSHIP, 5);
+		weights.put(ModelConstants.PUBLICATION_DATASET, 6);
+		weights.put(ModelConstants.SIMILARITY, 7);
 
-		weights.put("provision", 8);
-		weights.put("participation", 9);
-		weights.put("dedup", 10);
+		weights.put(ModelConstants.PROVISION, 8);
+		weights.put(ModelConstants.PARTICIPATION, 9);
+		weights.put(ModelConstants.DEDUP, 10);
 	}
 
 	private Integer getWeight(Relation o) {

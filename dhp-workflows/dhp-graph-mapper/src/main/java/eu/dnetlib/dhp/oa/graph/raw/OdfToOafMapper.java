@@ -5,7 +5,6 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.*;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -352,7 +351,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					res
 						.add(
 							getRelation(
-								otherId, docId, RESULT_RESULT, PART, HAS_PARTS, entity));
+								otherId, docId, RESULT_RESULT, PART, HAS_PART, entity));
 				} else {
 					// TODO catch more semantics
 				}

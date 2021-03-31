@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Organization;
@@ -232,13 +233,15 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 
 		switch (entityType) {
 			case "result":
-				if (rel.getRelClass().equals("isDifferentFrom") && rel.getRelType().equals("resultResult")
-					&& rel.getSubRelType().equals("dedup"))
+				if (rel.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM)
+					&& rel.getRelType().equals(ModelConstants.RESULT_RESULT)
+					&& rel.getSubRelType().equals(ModelConstants.DEDUP))
 					return true;
 				break;
 			case "organization":
-				if (rel.getRelClass().equals("isDifferentFrom") && rel.getRelType().equals("organizationOrganization")
-					&& rel.getSubRelType().equals("dedup"))
+				if (rel.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM)
+					&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
+					&& rel.getSubRelType().equals(ModelConstants.DEDUP))
 					return true;
 				break;
 			default:

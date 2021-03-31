@@ -174,7 +174,9 @@ public class CleaningFunctions {
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
 						i
 							.setAccessright(
-								accessRight(ModelConstants.UNKNOWN, "not available", ModelConstants.DNET_ACCESS_MODES));
+								accessRight(
+									ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,
+									ModelConstants.DNET_ACCESS_MODES));
 					}
 					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
 						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
@@ -189,7 +191,9 @@ public class CleaningFunctions {
 				if (Objects.isNull(bestaccessrights)) {
 					r
 						.setBestaccessright(
-							qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
+							qualifier(
+								ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,
+								ModelConstants.DNET_ACCESS_MODES));
 				} else {
 					r.setBestaccessright(bestaccessrights);
 				}

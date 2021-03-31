@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Organization;
@@ -34,6 +35,8 @@ import scala.Tuple3;
 public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkPrepareOrgRels.class);
+	public static final String OPENORGS_ID_PREFIX = "openorgs____";
+	public static final String CORDA_ID_PREFIX = "corda";
 
 	public SparkPrepareOrgRels(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -105,13 +108,15 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 		switch (entityType) {
 			case "result":
-				if (rel.getRelClass().equals("isDifferentFrom") && rel.getRelType().equals("resultResult")
-					&& rel.getSubRelType().equals("dedup"))
+				if (rel.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM)
+					&& rel.getRelType().equals(ModelConstants.RESULT_RESULT)
+					&& rel.getSubRelType().equals(ModelConstants.DEDUP))
 					return true;
 				break;
 			case "organization":
-				if (rel.getRelClass().equals("isDifferentFrom") && rel.getRelType().equals("organizationOrganization")
-					&& rel.getSubRelType().equals("dedup"))
+				if (rel.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM)
+					&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
+					&& rel.getSubRelType().equals(ModelConstants.DEDUP))
 					return true;
 				break;
 			default:
@@ -241,19 +246,19 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 	}
 
 	public static int compareIds(String o1, String o2) {
-		if (o1.contains("openorgs____") && o2.contains("openorgs____"))
+		if (o1.contains(OPENORGS_ID_PREFIX) && o2.contains(OPENORGS_ID_PREFIX))
 			return o1.compareTo(o2);
-		if (o1.contains("corda") && o2.contains("corda"))
+		if (o1.contains(CORDA_ID_PREFIX) && o2.contains(CORDA_ID_PREFIX))
 			return o1.compareTo(o2);
 
-		if (o1.contains("openorgs____"))
+		if (o1.contains(OPENORGS_ID_PREFIX))
 			return -1;
-		if (o2.contains("openorgs____"))
+		if (o2.contains(OPENORGS_ID_PREFIX))
 			return 1;
 
-		if (o1.contains("corda"))
+		if (o1.contains(CORDA_ID_PREFIX))
 			return -1;
-		if (o2.contains("corda"))
+		if (o2.contains(CORDA_ID_PREFIX))
 			return 1;
 
 		return o1.compareTo(o2);
@@ -296,7 +301,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 						for (String id1 : g._2()) {
 							for (String id2 : g._2()) {
 								if (!id1.equals(id2))
-									if (id1.contains("openorgs____") && !id2.contains("openorgsmesh"))
+									if (id1.contains(OPENORGS_ID_PREFIX) && !id2.contains("openorgsmesh"))
 										rels.add(new Tuple2<>(id1, id2));
 							}
 						}

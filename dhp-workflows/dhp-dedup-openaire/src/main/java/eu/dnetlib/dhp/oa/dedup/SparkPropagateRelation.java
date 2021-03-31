@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -72,7 +73,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			.as(Encoders.bean(Relation.class));
 
 		Dataset<Tuple2<String, String>> mergedIds = mergeRels
-			.where(col("relClass").equalTo("merges"))
+			.where(col("relClass").equalTo(ModelConstants.MERGES))
 			.select(col("source"), col("target"))
 			.distinct()
 			.map(
@@ -202,7 +203,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 	}
 
 	private static boolean containsDedup(final Relation r) {
-		return r.getSource().toLowerCase().contains("dedup")
-			|| r.getTarget().toLowerCase().contains("dedup");
+		return r.getSource().toLowerCase().contains(ModelConstants.DEDUP)
+			|| r.getTarget().toLowerCase().contains(ModelConstants.DEDUP);
 	}
 }

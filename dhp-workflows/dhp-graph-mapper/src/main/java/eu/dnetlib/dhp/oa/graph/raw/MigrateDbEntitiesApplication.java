@@ -59,6 +59,7 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import eu.dnetlib.dhp.oa.graph.raw.common.MigrateAction;
 import eu.dnetlib.dhp.oa.graph.raw.common.VerifyNsPrefixPredicate;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -84,9 +85,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	public static final String SOURCE_TYPE = "source_type";
 	public static final String TARGET_TYPE = "target_type";
-
-	private static final String ORG_ORG_RELTYPE = "organizationOrganization";
-	private static final String ORG_ORG_SUBRELTYPE = "dedup";
 
 	private final DbClient dbClient;
 
@@ -649,8 +647,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
-			r1.setRelType(ORG_ORG_RELTYPE);
-			r1.setSubRelType(ORG_ORG_SUBRELTYPE);
+			r1.setRelType(ModelConstants.ORG_ORG_RELTYPE);
+			r1.setSubRelType(ModelConstants.DEDUP);
 			r1.setRelClass(relClass);
 			r1.setSource(orgId1);
 			r1.setTarget(orgId2);

@@ -38,6 +38,7 @@ import com.mycila.xmltool.XMLTag;
 import eu.dnetlib.dhp.oa.provision.model.*;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.MainEntityType;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -1226,7 +1227,7 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	private boolean isDuplicate(RelatedEntityWrapper link) {
-		return REL_SUBTYPE_DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
+		return ModelConstants.DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
 	}
 
 	private List<String> listExtraInfo(OafEntity entity) {

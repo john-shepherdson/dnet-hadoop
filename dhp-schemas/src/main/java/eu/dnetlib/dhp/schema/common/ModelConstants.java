@@ -18,6 +18,8 @@ public class ModelConstants {
 	public static final String PUBMED_CENTRAL_ID = "10|opendoar____::eda80a3d5b344bc40f3bc04f65b7a357";
 	public static final String ARXIV_ID = "10|opendoar____::6f4922f45568161a8cdf4ad2299f6d23";
 
+	public static final String OPENORGS_NAME = "OpenOrgs Database";
+
 	// VOCABULARY VALUE
 	public static final String ACCESS_RIGHT_OPEN = "OPEN";
 
@@ -55,12 +57,12 @@ public class ModelConstants {
 	public static final String IS_SUPPLEMENTED_BY = "isSupplementedBy";
 	public static final String PART = "part";
 	public static final String IS_PART_OF = "isPartOf";
-	public static final String HAS_PARTS = "hasParts";
+	public static final String HAS_PART = "hasPart";
 	public static final String RELATIONSHIP = "relationship";
 	public static final String CITATION = "citation";
 	public static final String CITES = "cites";
 	public static final String IS_CITED_BY = "isCitedBy";
-	public static final String REVIEW = "review";
+	public static final String REVIEW = "review"; // subreltype
 	public static final String REVIEWS = "reviews";
 	public static final String IS_REVIEWED_BY = "isReviewedBy";
 
@@ -84,7 +86,16 @@ public class ModelConstants {
 	public static final String IS_AUTHOR_INSTITUTION_OF = "isAuthorInstitutionOf";
 	public static final String HAS_AUTHOR_INSTITUTION = "hasAuthorInstitution";
 
+	public static final String ORG_ORG_RELTYPE = "organizationOrganization";
+
+	public static final String DEDUP = "dedup";
 	public static final String MERGES = "merges";
+	public static final String IS_MERGED_IN = "isMergedIn";
+
+	public static final String SIMILARITY = "similarity";
+	public static final String IS_SIMILAR_TO = "isSimilarTo";
+
+	public static final String IS_DIFFERENT_FROM = "isDifferentFrom";
 
 	public static final String UNKNOWN = "UNKNOWN";
 	public static final String NOT_AVAILABLE = "not available";
