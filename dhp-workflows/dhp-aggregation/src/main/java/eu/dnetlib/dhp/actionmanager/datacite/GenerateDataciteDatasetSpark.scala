@@ -27,7 +27,6 @@ object GenerateDataciteDatasetSpark {
 
     val isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl)
     val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
-    log.info(s"vocabulary size is ${vocabularies.getTerms("dnet:languages").size()}")
     val spark: SparkSession = SparkSession.builder().config(conf)
       .appName(GenerateDataciteDatasetSpark.getClass.getSimpleName)
       .master(master)
