@@ -13,6 +13,7 @@ import org.dom4j.Node;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
@@ -169,7 +170,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						structuredProperty(
-							((Node) o).getText(), "UNKNOWN", "UNKNOWN", DNET_DATACITE_DATE, DNET_DATACITE_DATE,
+							((Node) o).getText(), UNKNOWN, UNKNOWN, DNET_DATACITE_DATE, DNET_DATACITE_DATE,
 							info));
 			} else {
 				res
@@ -242,7 +243,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
-		return prepareQualifier(doc, "//datacite:format", "dnet:programming_languages");
+		return prepareQualifier(doc, "//datacite:format", DNET_PROGRAMMING_LANGUAGES);
 	}
 
 	@Override

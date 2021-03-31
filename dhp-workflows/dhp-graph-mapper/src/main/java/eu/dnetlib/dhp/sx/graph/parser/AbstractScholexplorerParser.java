@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIUnknown;
 import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
@@ -76,8 +77,8 @@ public abstract class AbstractScholexplorerParser {
 			final Qualifier pidType = new Qualifier();
 			pidType.setClassname(result.getAttributes().get(fieldName));
 			pidType.setClassid(result.getAttributes().get(fieldName));
-			pidType.setSchemename("dnet:pid_types");
-			pidType.setSchemeid("dnet:pid_types");
+			pidType.setSchemename(ModelConstants.DNET_PID_TYPES);
+			pidType.setSchemeid(ModelConstants.DNET_PID_TYPES);
 			pid.setQualifier(pidType);
 			return pid;
 		}
@@ -90,8 +91,8 @@ public abstract class AbstractScholexplorerParser {
 			input.setValue(matcher.group());
 			if (input.getQualifier() == null) {
 				input.setQualifier(new Qualifier());
-				input.getQualifier().setSchemename("dnet:pid_types");
-				input.getQualifier().setSchemeid("dnet:pid_types");
+				input.getQualifier().setSchemename(ModelConstants.DNET_PID_TYPES);
+				input.getQualifier().setSchemeid(ModelConstants.DNET_PID_TYPES);
 			}
 			input.getQualifier().setClassid("doi");
 			input.getQualifier().setClassname("doi");
@@ -141,8 +142,8 @@ public abstract class AbstractScholexplorerParser {
 		final Qualifier pt = new Qualifier();
 		pt.setClassname(pidType);
 		pt.setClassid(pidType);
-		pt.setSchemename("dnet:pid_types");
-		pt.setSchemeid("dnet:pid_types");
+		pt.setSchemename(ModelConstants.DNET_PID_TYPES);
+		pt.setSchemeid(ModelConstants.DNET_PID_TYPES);
 		sourcePid.setQualifier(pt);
 		uk.setPid(Collections.singletonList(sourcePid));
 		uk.setDateofcollection(dateOfCollection);

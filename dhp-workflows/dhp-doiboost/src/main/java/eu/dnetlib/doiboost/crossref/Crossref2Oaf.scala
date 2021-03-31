@@ -1,5 +1,6 @@
 package eu.dnetlib.doiboost.crossref
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.utils.DHPUtils
@@ -14,7 +15,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
-
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
 
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
@@ -88,7 +88,7 @@ case object Crossref2Oaf {
 
     //MAPPING Crossref DOI into PID
     val doi: String = (json \ "DOI").extract[String]
-    result.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+    result.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
 
     //MAPPING Crossref DOI into OriginalId
     //and Other Original Identifier of dataset like clinical-trial-number
@@ -186,13 +186,13 @@ case object Crossref2Oaf {
 
     if(has_review != JNothing) {
       instance.setRefereed(
-        OafUtils.createQualifier("0001", "peerReviewed", "dnet:review_levels", "dnet:review_levels"))
+        OafUtils.createQualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS, ModelConstants.DNET_REVIEW_LEVELS))
     }
 
 
     instance.setAccessright(getRestrictedQualifier())
     result.setInstance(List(instance).asJava)
-    instance.setInstancetype(OafUtils.createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
+    instance.setInstancetype(OafUtils.createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
     result.setResourcetype(OafUtils.createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
@@ -221,7 +221,7 @@ case object Crossref2Oaf {
     a.setFullname(s"$given $family")
     a.setRank(index+1)
     if (StringUtils.isNotBlank(orcid))
-      a.setPid(List(createSP(orcid, ORCID_PENDING, PID_TYPES, generateDataInfo())).asJava)
+      a.setPid(List(createSP(orcid, ModelConstants.ORCID_PENDING, ModelConstants.DNET_PID_TYPES, generateDataInfo())).asJava)
 
     a
   }

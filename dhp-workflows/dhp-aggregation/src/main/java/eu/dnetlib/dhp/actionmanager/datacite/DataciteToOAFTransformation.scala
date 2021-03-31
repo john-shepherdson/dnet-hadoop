@@ -23,8 +23,6 @@ import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 import scala.io.{Codec, Source}
 
-
-
 case class DataciteType(doi:String,timestamp:Long,isActive:Boolean, json:String ){}
 
 case class NameIdentifiersType(nameIdentifierScheme: Option[String], schemeUri: Option[String], nameIdentifier: Option[String]) {}
@@ -49,10 +47,7 @@ object DataciteToOAFTransformation {
   codec.onMalformedInput(CodingErrorAction.REPLACE)
   codec.onUnmappableCharacter(CodingErrorAction.REPLACE)
 
-  val ACCESS_MODE_VOCABULARY = "dnet:access_modes"
   val DOI_CLASS = "doi"
-
-
   val SUBJ_CLASS = "keywords"
 
 
@@ -62,7 +57,7 @@ object DataciteToOAFTransformation {
   }
 
   val mapper = new ObjectMapper()
-  val unknown_repository: HostedByMapType = HostedByMapType("openaire____::1256f046-bf1f-4afc-8b47-d0b147148b18", "Unknown Repository", "Unknown Repository", Some(1.0F))
+  val unknown_repository: HostedByMapType = HostedByMapType(ModelConstants.UNKNOWN_REPOSITORY_ORIGINALID, ModelConstants.UNKNOWN_REPOSITORY.getValue, ModelConstants.UNKNOWN_REPOSITORY.getValue, Some(1.0F))
 
   val dataInfo: DataInfo = generateDataInfo("0.9")
   val DATACITE_COLLECTED_FROM: KeyValue = OafMapperUtils.keyValue(ModelConstants.DATACITE_ID, "Datacite")
@@ -244,9 +239,9 @@ object DataciteToOAFTransformation {
     val r = new Relation
     r.setSource(sourceId)
     r.setTarget(targetId)
-    r.setRelType("resultProject")
+    r.setRelType(ModelConstants.RESULT_PROJECT)
     r.setRelClass(relClass)
-    r.setSubRelType("outcome")
+    r.setSubRelType(ModelConstants.OUTCOME)
     r.setCollectedfrom(List(cf).asJava)
     r.setDataInfo(di)
     r
@@ -381,7 +376,7 @@ object DataciteToOAFTransformation {
     result.setRelevantdate(dates.filter(d => d.date.isDefined && d.dateType.isDefined)
       .map(d => (extract_date(d.date.get), d.dateType.get))
       .filter(d => d._1.isDefined)
-      .map(d => (d._1.get, vocabularies.getTermAsQualifier("dnet:dataCite_date", d._2.toLowerCase())))
+      .map(d => (d._1.get, vocabularies.getTermAsQualifier(ModelConstants.DNET_DATACITE_DATE, d._2.toLowerCase())))
       .filter(d => d._2 != null)
       .map(d => generateOAFDate(d._1, d._2)).asJava)
 
@@ -413,7 +408,7 @@ object DataciteToOAFTransformation {
     val language: String = (json \\ "language").extractOrElse[String](null)
 
     if (language != null)
-      result.setLanguage(vocabularies.getSynonymAsQualifier("dnet:languages", language))
+      result.setLanguage(vocabularies.getSynonymAsQualifier(ModelConstants.DNET_LANGUAGES, language))
 
 
     val instance = result.getInstance().get(0)
@@ -437,7 +432,7 @@ object DataciteToOAFTransformation {
     })
 
 
-    val access_rights_qualifier = if (aRights.isDefined) aRights.get else OafMapperUtils.accessRight("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+    val access_rights_qualifier = if (aRights.isDefined) aRights.get else OafMapperUtils.accessRight(ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE, ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
 
     if (client.isDefined) {
       val hb = hostedByMap.getOrElse(client.get.toUpperCase(), unknown_repository)
@@ -475,7 +470,7 @@ object DataciteToOAFTransformation {
     di.setInferred(false)
     di.setInvisible(false)
     di.setTrust(trust)
-    di.setProvenanceaction(ModelConstants.ACTION_SET_PROVENANCE_QUALIFIER)
+    di.setProvenanceaction(ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER)
     di
   }
 

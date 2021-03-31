@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.googlecode.protobuf.format.JsonFormat;
 
 import eu.dnetlib.data.proto.*;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class ProtoConverter implements Serializable {
@@ -106,8 +107,8 @@ public class ProtoConverter implements Serializable {
 		Qualifier q = new Qualifier();
 		q.setClassid(refereed.getValue());
 		q.setSchemename(refereed.getValue());
-		q.setSchemeid("dnet:review_levels");
-		q.setSchemename("dnet:review_levels");
+		q.setSchemeid(DNET_REVIEW_LEVELS);
+		q.setSchemename(DNET_REVIEW_LEVELS);
 		return q;
 	}
 

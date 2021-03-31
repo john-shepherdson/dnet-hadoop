@@ -30,8 +30,6 @@ object DoiBoostMappingUtil {
   //STATIC STRING
   val MAG = "microsoft"
   val MAG_NAME = "Microsoft Academic Graph"
-  val ORCID = "orcid"
-  val ORCID_PENDING = "orcid_pending"
   val CROSSREF = "Crossref"
   val UNPAYWALL = "UnpayWall"
   val GRID_AC = "grid.ac"
@@ -39,8 +37,6 @@ object DoiBoostMappingUtil {
   val doiBoostNSPREFIX = "doiboost____"
   val OPENAIRE_PREFIX = "openaire____"
   val SEPARATOR = "::"
-  val DNET_LANGUAGES = "dnet:languages"
-  val PID_TYPES = "dnet:pid_types"
 
   val invalidName = List(",", "none none", "none, none", "none &na;", "(:null)", "test test test", "test test", "test", "&na; &na;")
 
@@ -122,12 +118,11 @@ object DoiBoostMappingUtil {
 
 
   def getOpenAccessQualifier():AccessRight = {
-    OafUtils.createAccessRight("OPEN","Open Access","dnet:access_modes", "dnet:access_modes")
+    OafUtils.createAccessRight("OPEN","Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
   def getRestrictedQualifier():AccessRight = {
-    OafUtils.createAccessRight("RESTRICTED","Restricted","dnet:access_modes", "dnet:access_modes")
-
+    OafUtils.createAccessRight("RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
 
@@ -141,13 +136,11 @@ object DoiBoostMappingUtil {
 
     val item = if (input._2 != null) input._2._2 else null
 
-
     val instanceType:Option[Instance] = extractInstance(publication)
 
     if (instanceType.isDefined) {
       publication.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
     }
-
 
     publication.getInstance().asScala.foreach(i => {
       var hb = new KeyValue
@@ -179,7 +172,6 @@ object DoiBoostMappingUtil {
     publication
   }
 
-
   def generateDSId(input: String): String = {
 
     val b = StringUtils.substringBefore(input, "::")
@@ -187,11 +179,9 @@ object DoiBoostMappingUtil {
     s"10|${b}::${DHPUtils.md5(a)}"
   }
 
-
   def generateDataInfo(): DataInfo = {
     generateDataInfo("0.9")
   }
-
 
   def filterPublication(publication: Publication): Boolean = {
 
@@ -264,7 +254,7 @@ object DoiBoostMappingUtil {
     di.setInferred(false)
     di.setInvisible(false)
     di.setTrust(trust)
-    di.setProvenanceaction(OafUtils.createQualifier("sysimport:actionset", "dnet:provenanceActions"))
+    di.setProvenanceaction(OafUtils.createQualifier(ModelConstants.SYSIMPORT_ACTIONSET, ModelConstants.DNET_PROVENANCE_ACTIONS))
     di
   }
 
@@ -330,8 +320,8 @@ object DoiBoostMappingUtil {
   def createORIDCollectedFrom(): KeyValue = {
 
     val cf = new KeyValue
-    cf.setValue(ORCID)
-    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(ORCID.toLowerCase))
+    cf.setValue(StringUtils.upperCase(ModelConstants.ORCID))
+    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(ModelConstants.ORCID.toLowerCase))
     cf
 
   }

@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.sx.ebi
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Author, Instance, Journal, KeyValue, Oaf, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils.createQualifier
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, OafUtils, ProvenaceInfo}
@@ -50,7 +51,7 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
     val p = new DLIPublication
     p.setId(dnetPublicationId)
     p.setDataInfo(OafUtils.generateDataInfo())
-    p.setPid(List(OafUtils.createSP(input.getPmid.toLowerCase.trim, "pmid", "dnet:pid_types")).asJava)
+    p.setPid(List(OafUtils.createSP(input.getPmid.toLowerCase.trim, "pmid", ModelConstants.DNET_PID_TYPES)).asJava)
     p.setCompletionStatus("complete")
     val pi = new ProvenaceInfo
     pi.setId("dli_________::europe_pmc__")
@@ -76,13 +77,13 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
 
     if (input.getJournal != null)
       p.setJournal(journalToOAF(input.getJournal))
-    p.setTitle(List(OafUtils.createSP(input.getTitle, "main title", "dnet:dataCite_title")).asJava)
+    p.setTitle(List(OafUtils.createSP(input.getTitle, "main title", ModelConstants.DNET_DATACITE_TITLE)).asJava)
     p.setDateofacceptance(OafUtils.asField(input.getDate))
     val i = new Instance
     i.setCollectedfrom(generatePubmedDLICollectedFrom())
     i.setDateofacceptance(p.getDateofacceptance)
     i.setUrl(List(s"https://pubmed.ncbi.nlm.nih.gov/${input.getPmid}").asJava)
-    i.setInstancetype(createQualifier("0001", "Article", "dnet:publication_resource", "dnet:publication_resource"))
+    i.setInstancetype(createQualifier("0001", "Article", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
     p.setInstance(List(i).asJava)
     p
   }
@@ -139,7 +140,7 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
       val d = new DLIDataset
       d.setId(targetDnetId)
       d.setDataInfo(OafUtils.generateDataInfo())
-      d.setPid(List(OafUtils.createSP(l.tpid.toLowerCase.trim, l.tpidType.toLowerCase.trim, "dnet:pid_types")).asJava)
+      d.setPid(List(OafUtils.createSP(l.tpid.toLowerCase.trim, l.tpidType.toLowerCase.trim, ModelConstants.DNET_PID_TYPES)).asJava)
       d.setCompletionStatus("complete")
       val pi = new ProvenaceInfo
       pi.setId("dli_________::europe_pmc__")
@@ -149,13 +150,13 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
       d.setDlicollectedfrom(List(pi).asJava)
       d.setCollectedfrom(List(generatePubmedDLICollectedFrom()).asJava)
       d.setPublisher(OafUtils.asField(l.publisher))
-      d.setTitle(List(OafUtils.createSP(l.title, "main title", "dnet:dataCite_title")).asJava)
+      d.setTitle(List(OafUtils.createSP(l.title, "main title", ModelConstants.DNET_DATACITE_TITLE)).asJava)
       d.setDateofacceptance(OafUtils.asField(l.pubdate))
       val i = new Instance
       i.setCollectedfrom(generatePubmedDLICollectedFrom())
       i.setDateofacceptance(d.getDateofacceptance)
       i.setUrl(List(l.turl).asJava)
-      i.setInstancetype(createQualifier("0021", "Dataset", "dnet:publication_resource", "dnet:publication_resource"))
+      i.setInstancetype(createQualifier("0021", "Dataset", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
       d.setInstance(List(i).asJava)
       List(relation, inverseRelation, d)
     })

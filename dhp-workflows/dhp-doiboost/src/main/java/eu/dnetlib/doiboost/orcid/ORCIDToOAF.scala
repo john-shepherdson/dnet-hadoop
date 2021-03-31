@@ -1,11 +1,12 @@
 package eu.dnetlib.doiboost.orcid
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
 import eu.dnetlib.dhp.schema.orcid.OrcidDOI
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
-import eu.dnetlib.doiboost.DoiBoostMappingUtil.{ORCID, PID_TYPES, createSP, generateDataInfo, generateIdentifier}
+import eu.dnetlib.doiboost.DoiBoostMappingUtil.{createSP, generateDataInfo}
 import org.apache.commons.lang.StringUtils
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -48,7 +49,7 @@ object ORCIDToOAF {
   def convertTOOAF(input:OrcidDOI) :Publication = {
     val doi = input.getDoi
     val pub:Publication = new Publication
-    pub.setPid(List(createSP(doi.toLowerCase, "doi", PID_TYPES)).asJava)
+    pub.setPid(List(createSP(doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
 
     pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
@@ -74,8 +75,8 @@ object ORCIDToOAF {
 
   def generateOricPIDDatainfo():DataInfo = {
     val di =DoiBoostMappingUtil.generateDataInfo("0.91")
-    di.getProvenanceaction.setClassid("sysimport:crosswalk:entityregistry")
-    di.getProvenanceaction.setClassname("Harvested")
+    di.getProvenanceaction.setClassid(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)
+    di.getProvenanceaction.setClassname(ModelConstants.HARVESTED)
     di
   }
 
@@ -88,7 +89,7 @@ object ORCIDToOAF {
     else
       a.setFullname(s"$given $family")
     if (StringUtils.isNotBlank(orcid))
-      a.setPid(List(createSP(orcid, ORCID, PID_TYPES, generateOricPIDDatainfo())).asJava)
+      a.setPid(List(createSP(orcid, ModelConstants.ORCID, ModelConstants.DNET_PID_TYPES, generateOricPIDDatainfo())).asJava)
 
     a
   }

@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.schema.scholexplorer
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{AccessRight, DataInfo, Field, KeyValue, Qualifier, StructuredProperty}
 
 object OafUtils {
@@ -21,7 +22,7 @@ object OafUtils {
     di.setInferred(false)
     di.setInvisible(invisible)
     di.setTrust(trust)
-    di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
+    di.setProvenanceaction(createQualifier(ModelConstants.SYSIMPORT_ACTIONSET, ModelConstants.DNET_PROVENANCE_ACTIONS))
     di
   }
 

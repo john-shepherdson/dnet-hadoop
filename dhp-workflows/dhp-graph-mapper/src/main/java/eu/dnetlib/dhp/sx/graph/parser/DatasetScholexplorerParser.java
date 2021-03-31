@@ -15,6 +15,7 @@ import com.ximpleware.VTDNav;
 
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser.Node;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.scholexplorer.DLIDataset;
 import eu.dnetlib.dhp.schema.scholexplorer.ProvenaceInfo;
@@ -281,11 +282,7 @@ public class DatasetScholexplorerParser extends AbstractScholexplorerParser {
 								t -> {
 									final StructuredProperty st = new StructuredProperty();
 									st.setValue(t);
-									st
-										.setQualifier(
-											generateQualifier(
-												"main title", "main title", "dnet:dataCite_title",
-												"dnet:dataCite_title"));
+									st.setQualifier(ModelConstants.MAIN_TITLE_QUALIFIER);
 									return st;
 								})
 							.collect(Collectors.toList()));

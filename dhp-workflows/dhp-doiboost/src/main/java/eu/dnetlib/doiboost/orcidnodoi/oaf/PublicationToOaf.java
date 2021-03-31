@@ -26,12 +26,11 @@ import eu.dnetlib.doiboost.orcidnodoi.util.Pair;
 /**
  * This class converts an orcid publication from json format to oaf
  */
-
 public class PublicationToOaf implements Serializable {
 
 	static Logger logger = LoggerFactory.getLogger(PublicationToOaf.class);
 
-	public static final String ORCID = "ORCID";
+	public static final String ORCID = StringUtils.upperCase(ModelConstants.ORCID);
 	public final static String orcidPREFIX = "orcid_______";
 	public static final String OPENAIRE_PREFIX = "openaire____";
 	public static final String SEPARATOR = "::";
@@ -70,7 +69,7 @@ public class PublicationToOaf implements Serializable {
 	private static Map<String, Pair<String, String>> datasources = new HashMap<String, Pair<String, String>>() {
 
 		{
-			put(ORCID.toLowerCase(), new Pair<>(ORCID, OPENAIRE_PREFIX + SEPARATOR + "orcid"));
+			put(ORCID.toLowerCase(), new Pair<>(ORCID, OPENAIRE_PREFIX + SEPARATOR + ModelConstants.ORCID));
 
 		}
 	};
@@ -135,8 +134,8 @@ public class PublicationToOaf implements Serializable {
 		dataInfo
 			.setProvenanceaction(
 				mapQualifier(
-					"sysimport:actionset:orcidworks-no-doi",
-					"sysimport:actionset:orcidworks-no-doi",
+					ModelConstants.SYSIMPORT_ORCID_NO_DOI,
+					ModelConstants.SYSIMPORT_ORCID_NO_DOI,
 					ModelConstants.DNET_PROVENANCE_ACTIONS,
 					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		publication.setDataInfo(dataInfo);
@@ -183,15 +182,11 @@ public class PublicationToOaf implements Serializable {
 			}
 			return null;
 		}
-		Qualifier q = mapQualifier(
-			"main title", "main title", ModelConstants.DNET_DATACITE_TITLE, ModelConstants.DNET_DATACITE_TITLE);
 		publication
 			.setTitle(
 				titles
 					.stream()
-					.map(t -> {
-						return mapStructuredProperty(t, q, null);
-					})
+					.map(t -> mapStructuredProperty(t, ModelConstants.MAIN_TITLE_QUALIFIER, null))
 					.filter(s -> s != null)
 					.collect(Collectors.toList()));
 		// Adding identifier

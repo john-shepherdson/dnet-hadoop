@@ -79,7 +79,7 @@ object UnpayWallToOAF {
 
     if (oaLocation.license.isDefined)
       i.setLicense(asField(oaLocation.license.get))
-    pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+    pub.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
 
     // Ticket #6282 Adding open Access Colour
     if (colour.isDefined) {
@@ -90,7 +90,7 @@ object UnpayWallToOAF {
       a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
       a.setOpenAccessRoute(colour.get)
       i.setAccessright(a)
-      i.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+      i.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     }
     pub.setInstance(List(i).asJava)
 

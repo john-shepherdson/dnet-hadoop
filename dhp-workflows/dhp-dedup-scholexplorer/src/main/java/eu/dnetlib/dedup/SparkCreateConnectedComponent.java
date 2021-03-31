@@ -22,6 +22,7 @@ import com.google.common.hash.Hashing;
 import eu.dnetlib.dedup.graph.ConnectedComponent;
 import eu.dnetlib.dedup.graph.GraphProcessor;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.pace.config.DedupConfig;
@@ -47,8 +48,7 @@ public class SparkCreateConnectedComponent {
 		final String inputPath = parser.get("sourcePath");
 		final String entity = parser.get("entity");
 		final String targetPath = parser.get("targetPath");
-		// final DedupConfig dedupConf =
-		// DedupConfig.load(IOUtils.toString(SparkCreateConnectedComponent.class.getResourceAsStream("/eu/dnetlib/dhp/dedup/conf/org.curr.conf2.json")));
+
 		final DedupConfig dedupConf = DedupConfig.load(parser.get("dedupConf"));
 
 		final JavaPairRDD<Object, String> vertexes = spark
@@ -88,12 +88,12 @@ public class SparkCreateConnectedComponent {
 									Relation r = new Relation();
 									r.setSource(c.getCcId());
 									r.setTarget(id);
-									r.setRelClass("merges");
+									r.setRelClass(ModelConstants.MERGES);
 									tmp.add(r);
 									r = new Relation();
 									r.setTarget(c.getCcId());
 									r.setSource(id);
-									r.setRelClass("isMergedIn");
+									r.setRelClass(ModelConstants.IS_MERGED_IN);
 									tmp.add(r);
 									return tmp.stream();
 								})

@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.mag
 
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
@@ -191,7 +192,7 @@ case object ConversionUtil {
     val authors = inputParams._2
 
     val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
+    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
     //IMPORTANT
@@ -200,8 +201,8 @@ case object ConversionUtil {
 
     pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
 
-    val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
-    val originalTitles = createSP(paper.OriginalTitle, "alternative title", "dnet:dataCite_title")
+    val mainTitles = createSP(paper.PaperTitle, "main title", ModelConstants.DNET_DATACITE_TITLE)
+    val originalTitles = createSP(paper.OriginalTitle, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
     pub.setTitle(List(mainTitles, originalTitles).asJava)
 
     pub.setSource(List(asField(paper.BookTitle)).asJava)
@@ -214,7 +215,7 @@ case object ConversionUtil {
         a.setFullname(f.author.DisplayName.get)
       if(f.affiliation!= null)
         a.setAffiliation(List(asField(f.affiliation)).asJava)
-      a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", PID_TYPES)).asJava)
+      a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", ModelConstants.DNET_PID_TYPES)).asJava)
       a
     }
     pub.setAuthor(authorsOAF.asJava)
@@ -253,14 +254,14 @@ case object ConversionUtil {
     val description = inputParams._2
 
     val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
+    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
     //Set identifier as 50 | doiboost____::md5(DOI)
     pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
 
-    val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
-    val originalTitles = createSP(paper.OriginalTitle, "alternative title", "dnet:dataCite_title")
+    val mainTitles = createSP(paper.PaperTitle, "main title", ModelConstants.DNET_DATACITE_TITLE)
+    val originalTitles = createSP(paper.OriginalTitle, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
     pub.setTitle(List(mainTitles, originalTitles).asJava)
 
     pub.setSource(List(asField(paper.BookTitle)).asJava)
@@ -281,7 +282,7 @@ case object ConversionUtil {
         a.setAffiliation(List(asField(f.affiliation)).asJava)
 
 
-      a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", PID_TYPES)).asJava)
+      a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", ModelConstants.DNET_PID_TYPES)).asJava)
 
       a
 

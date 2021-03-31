@@ -35,8 +35,6 @@ import net.sf.saxon.ma.trie.Tuple2;
 
 public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 	private static final Logger log = LoggerFactory.getLogger(SparkCopyOpenorgsMergeRels.class);
-	public static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
-	public static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
 
 	public SparkCopyOpenorgsMergeRels(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -93,7 +91,7 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 		JavaRDD<Relation> selfRawRels = rawRels
 			.map(r -> r.getSource())
 			.distinct()
-			.map(s -> rel(s, s, "isSimilarTo", dedupConf));
+			.map(s -> rel(s, s, ModelConstants.IS_SIMILAR_TO, dedupConf));
 
 		log.info("Number of raw Openorgs Relations collected: {}", rawRels.count());
 
@@ -109,8 +107,8 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 				List<Relation> mergerels = new ArrayList<>();
 
-				mergerels.add(rel(rel.getSource(), rel.getTarget(), "merges", dedupConf));
-				mergerels.add(rel(rel.getTarget(), rel.getSource(), "isMergedIn", dedupConf));
+				mergerels.add(rel(rel.getSource(), rel.getTarget(), ModelConstants.MERGES, dedupConf));
+				mergerels.add(rel(rel.getTarget(), rel.getSource(), ModelConstants.IS_MERGED_IN, dedupConf));
 
 				return mergerels.iterator();
 			});
@@ -174,10 +172,10 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 		info.setInvisible(false);
 		info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
 		Qualifier provenanceAction = new Qualifier();
-		provenanceAction.setClassid(PROVENANCE_ACTION_CLASS);
-		provenanceAction.setClassname(PROVENANCE_ACTION_CLASS);
-		provenanceAction.setSchemeid(DNET_PROVENANCE_ACTIONS);
-		provenanceAction.setSchemename(DNET_PROVENANCE_ACTIONS);
+		provenanceAction.setClassid(ModelConstants.PROVENANCE_DEDUP);
+		provenanceAction.setClassname(ModelConstants.PROVENANCE_DEDUP);
+		provenanceAction.setSchemeid(ModelConstants.DNET_PROVENANCE_ACTIONS);
+		provenanceAction.setSchemename(ModelConstants.DNET_PROVENANCE_ACTIONS);
 		info.setProvenanceaction(provenanceAction);
 
 		// TODO calculate the trust value based on the similarity score of the elements in the CC

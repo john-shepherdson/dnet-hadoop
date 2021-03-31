@@ -158,10 +158,10 @@ public class ModelSupport {
 		relationInverseMap
 			.put(
 				"organizationOrganization_dedupSimilarity_isSimilarTo", new RelationInverse()
-					.setInverse("isSimilarTo")
-					.setRelation("isSimilarTo")
-					.setRelType("organizationOrganization")
-					.setSubReltype("dedupSimilarity"));
+					.setInverse(ModelConstants.IS_SIMILAR_TO)
+					.setRelation(ModelConstants.IS_SIMILAR_TO)
+					.setRelType(ModelConstants.ORG_ORG_RELTYPE)
+					.setSubReltype(ModelConstants.DEDUP));
 
 		relationInverseMap
 			.put(
@@ -215,10 +215,10 @@ public class ModelSupport {
 		relationInverseMap
 			.put(
 				"personPerson_dedupSimilarity_isSimilarTo", new RelationInverse()
-					.setInverse("isSimilarTo")
-					.setRelation("isSimilarTo")
+					.setInverse(ModelConstants.IS_SIMILAR_TO)
+					.setRelation(ModelConstants.IS_SIMILAR_TO)
 					.setRelType("personPerson")
-					.setSubReltype("dedupSimilarity"));
+					.setSubReltype(ModelConstants.DEDUP));
 		relationInverseMap
 			.put(
 				"datasourceOrganization_provision_isProvidedBy", new RelationInverse()
@@ -239,14 +239,14 @@ public class ModelSupport {
 					.setInverse("isAmongTopNSimilarDocuments")
 					.setRelation("hasAmongTopNSimilarDocuments")
 					.setRelType(ModelConstants.RESULT_RESULT)
-					.setSubReltype("similarity"));
+					.setSubReltype(ModelConstants.SIMILARITY));
 		relationInverseMap
 			.put(
 				"resultResult_similarity_isAmongTopNSimilarDocuments", new RelationInverse()
 					.setInverse("hasAmongTopNSimilarDocuments")
 					.setRelation("isAmongTopNSimilarDocuments")
 					.setRelType(ModelConstants.RESULT_RESULT)
-					.setSubReltype("similarity"));
+					.setSubReltype(ModelConstants.SIMILARITY));
 		relationInverseMap
 			.put(
 				"resultResult_relationship_isRelatedTo", new RelationInverse()
@@ -299,10 +299,10 @@ public class ModelSupport {
 		relationInverseMap
 			.put(
 				"resultResult_dedupSimilarity_isSimilarTo", new RelationInverse()
-					.setInverse("isSimilarTo")
-					.setRelation("isSimilarTo")
+					.setInverse(ModelConstants.IS_SIMILAR_TO)
+					.setRelation(ModelConstants.IS_SIMILAR_TO)
 					.setRelType(ModelConstants.RESULT_RESULT)
-					.setSubReltype("dedupSimilarity"));
+					.setSubReltype(ModelConstants.DEDUP));
 
 	}
 

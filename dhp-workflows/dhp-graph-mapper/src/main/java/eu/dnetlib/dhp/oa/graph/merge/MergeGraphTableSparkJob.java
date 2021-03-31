@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -46,7 +47,7 @@ public class MergeGraphTableSparkJob {
 
 	static {
 		Qualifier compatibility = new Qualifier();
-		compatibility.setClassid("UNKNOWN");
+		compatibility.setClassid(ModelConstants.UNKNOWN);
 		DATASOURCE.setOpenairecompatibility(compatibility);
 	}
 

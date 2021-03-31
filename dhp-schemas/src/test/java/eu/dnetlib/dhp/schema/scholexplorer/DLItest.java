@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
@@ -20,7 +21,7 @@ public class DLItest {
 	@Test
 	public void testMergePublication() throws JsonProcessingException {
 		DLIPublication a1 = new DLIPublication();
-		a1.setPid(Arrays.asList(createSP("123456", "pdb", "dnet:pid_types")));
+		a1.setPid(Arrays.asList(createSP("123456", "pdb", ModelConstants.DNET_PID_TYPES)));
 		a1.setTitle(Collections.singletonList(createSP("Un Titolo", "title", "dnetTitle")));
 		a1.setDlicollectedfrom(Arrays.asList(createCollectedFrom("znd", "Zenodo", "complete")));
 		a1.setCompletionStatus("complete");
@@ -30,8 +31,8 @@ public class DLItest {
 			.setPid(
 				Arrays
 					.asList(
-						createSP("10.11", "doi", "dnet:pid_types"),
-						createSP("123456", "pdb", "dnet:pid_types")));
+						createSP("10.11", "doi", ModelConstants.DNET_PID_TYPES),
+						createSP("123456", "pdb", ModelConstants.DNET_PID_TYPES)));
 		a.setTitle(Collections.singletonList(createSP("A Title", "title", "dnetTitle")));
 		a
 			.setDlicollectedfrom(

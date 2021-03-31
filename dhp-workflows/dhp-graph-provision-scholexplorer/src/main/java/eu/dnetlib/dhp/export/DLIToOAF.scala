@@ -159,7 +159,7 @@ object DLIToOAF {
       result.setUrl(e.url)
       result.setRefidentifier(e.pid)
       result.setDataInfo(generateDataInfo())
-      result.setQualifier(createQualifier(e.classId, "dnet:externalReference_typologies"))
+      result.setQualifier(createQualifier(e.classId, ModelConstants.DNET_EXTERNAL_REF_TYPES))
       result
     })
     publication.setExternalReference(eRefs.asJava)
@@ -238,7 +238,7 @@ object DLIToOAF {
     if (inputPublication.getAuthor == null || inputPublication.getAuthor.isEmpty)
       return null
     result.setAuthor(inputPublication.getAuthor.asScala.map(convertAuthor).asJava)
-    result.setResulttype(createQualifier(inputPublication.getResulttype.getClassid, inputPublication.getResulttype.getClassname, "dnet:result_typologies", "dnet:result_typologies"))
+    result.setResulttype(createQualifier(inputPublication.getResulttype.getClassid, inputPublication.getResulttype.getClassname, ModelConstants.DNET_RESULT_TYPOLOGIES, ModelConstants.DNET_RESULT_TYPOLOGIES))
 
     if (inputPublication.getSubject != null)
       result.setSubject(inputPublication.getSubject.asScala.map(convertSubject).asJava)
@@ -259,7 +259,7 @@ object DLIToOAF {
     result.setDateofacceptance(asField(inputPublication.getRelevantdate.get(0).getValue))
     result.setPublisher(inputPublication.getPublisher)
     result.setSource(inputPublication.getSource)
-    result.setBestaccessright(createAccessRight("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    result.setBestaccessright(createAccessRight(ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE, ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES))
 
     val dois = result.getPid.asScala.filter(p => "doi".equalsIgnoreCase(p.getQualifier.getClassname)).map(p => p.getValue)
     if (dois.isEmpty)
@@ -390,7 +390,7 @@ object DLIToOAF {
   }
 
   def patchTitle(t: StructuredProperty): StructuredProperty = {
-    t.setQualifier(createQualifier("main title", ModelConstants.DNET_DATACITE_TITLE))
+    t.setQualifier(ModelConstants.MAIN_TITLE_QUALIFIER)
     t
   }
 

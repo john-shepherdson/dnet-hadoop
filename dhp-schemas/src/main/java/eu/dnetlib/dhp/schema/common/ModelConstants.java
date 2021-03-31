@@ -35,10 +35,22 @@ public class ModelConstants {
 	public static final String DNET_PROVENANCE_ACTIONS = "dnet:provenanceActions";
 	public static final String DNET_COUNTRY_TYPE = "dnet:countries";
 	public static final String DNET_REVIEW_LEVELS = "dnet:review_levels";
+	public static final String DNET_PROGRAMMING_LANGUAGES = "dnet:programming_languages";
+	public static final String DNET_PROVENANCEACTIONS = "dnet:provenanceActions";
+	public static final String DNET_EXTERNAL_REF_TYPES = "dnet:externalReference_typologies";
 
 	public static final String SYSIMPORT_CROSSWALK_REPOSITORY = "sysimport:crosswalk:repository";
 	public static final String SYSIMPORT_CROSSWALK_ENTITYREGISTRY = "sysimport:crosswalk:entityregistry";
+	public static final String SYSIMPORT_ACTIONSET = "sysimport:actionset";
+	public static final String SYSIMPORT_ORCID_NO_DOI = "sysimport:actionset:orcidworks-no-doi";
+
 	public static final String USER_CLAIM = "user:claim";
+	public static final String HARVESTED = "Harvested";
+
+	public static final String PROVENANCE_DEDUP = "sysimport:dedup";
+
+	public static final Qualifier PROVENANCE_ACTION_SET_QUALIFIER = qualifier(
+		SYSIMPORT_ACTIONSET, SYSIMPORT_ACTIONSET, DNET_PROVENANCEACTIONS, DNET_PROVENANCEACTIONS);
 
 	public static final String DATASET_RESULTTYPE_CLASSID = "dataset";
 	public static final String PUBLICATION_RESULTTYPE_CLASSID = "publication";
@@ -100,13 +112,6 @@ public class ModelConstants {
 	public static final String UNKNOWN = "UNKNOWN";
 	public static final String NOT_AVAILABLE = "not available";
 
-	public static final String ACTION_SET_SCHEME = "sysimport:actionset";
-
-	public static final String PROVENANCE_VOCABULARY = "dnet:provenanceActions";
-
-	public static final Qualifier ACTION_SET_PROVENANCE_QUALIFIER = qualifier(
-		ACTION_SET_SCHEME, ACTION_SET_SCHEME, PROVENANCE_VOCABULARY, PROVENANCE_VOCABULARY);
-
 	public static final Qualifier PUBLICATION_DEFAULT_RESULTTYPE = qualifier(
 		PUBLICATION_RESULTTYPE_CLASSID, PUBLICATION_RESULTTYPE_CLASSID,
 		DNET_RESULT_TYPOLOGIES, DNET_RESULT_TYPOLOGIES);
@@ -131,6 +136,7 @@ public class ModelConstants {
 		SYSIMPORT_CROSSWALK_ENTITYREGISTRY, SYSIMPORT_CROSSWALK_ENTITYREGISTRY,
 		DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS);
 
+	public static final String UNKNOWN_REPOSITORY_ORIGINALID = "openaire____::1256f046-bf1f-4afc-8b47-d0b147148b18";
 	public static final KeyValue UNKNOWN_REPOSITORY = keyValue(
 		"10|openaire____::55045bd2a65019fd8e6741a755395c8c", "Unknown Repository");
 

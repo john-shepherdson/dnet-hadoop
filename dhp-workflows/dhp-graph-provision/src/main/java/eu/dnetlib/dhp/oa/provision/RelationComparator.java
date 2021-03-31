@@ -18,7 +18,7 @@ public class RelationComparator implements Comparator<Relation> {
 	static {
 		weights.put(ModelConstants.OUTCOME, 0);
 		weights.put(ModelConstants.SUPPLEMENT, 1);
-		weights.put(ModelConstants.REVIEWS, 2);
+		weights.put(ModelConstants.REVIEW, 2);
 		weights.put(ModelConstants.CITATION, 3);
 		weights.put(ModelConstants.AFFILIATION, 4);
 		weights.put(ModelConstants.RELATIONSHIP, 5);
