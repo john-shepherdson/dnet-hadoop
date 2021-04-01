@@ -57,7 +57,6 @@ public class CommunitySplit implements Serializable {
 		Dataset<CommunityResult> community_products = result
 			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, c));
 
-
 		community_products
 			.write()
 			.option("compression", "gzip")
