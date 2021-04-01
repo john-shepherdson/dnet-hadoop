@@ -142,16 +142,6 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			StringUtils.isNotBlank(r.getRelClass());
 	}
 
-	private static MapFunction<String, Relation> patchRelFn() {
-		return value -> {
-			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			if (rel.getDataInfo() == null) {
-				rel.setDataInfo(new DataInfo());
-			}
-			return rel;
-		};
-	}
-
 	private static String getId(Relation r, FieldType type) {
 		switch (type) {
 			case SOURCE:

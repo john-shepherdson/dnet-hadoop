@@ -81,34 +81,10 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 		log.info("Copied " + rawRels.count() + " Similarity Relations");
 	}
 
-	private static MapFunction<String, Relation> patchRelFn() {
-		return value -> {
-			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			if (rel.getDataInfo() == null) {
-				rel.setDataInfo(new DataInfo());
-			}
-			return rel;
-		};
-	}
-
 	private boolean filterOpenorgsRels(Relation rel) {
-
-		if (rel.getRelClass().equals(ModelConstants.IS_SIMILAR_TO)
+		return rel.getRelClass().equals(ModelConstants.IS_SIMILAR_TO)
 			&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
-			&& rel.getSubRelType().equals(ModelConstants.DEDUP) && isOpenorgs(rel))
-			return true;
-		return false;
+			&& rel.getSubRelType().equals(ModelConstants.DEDUP) && isOpenorgs(rel);
 	}
 
-	private boolean isOpenorgs(Relation rel) {
-
-		if (rel.getCollectedfrom() != null) {
-			for (KeyValue k : rel.getCollectedfrom()) {
-				if (k.getValue() != null && k.getValue().equals(ModelConstants.OPENORGS_NAME)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 }

@@ -86,25 +86,4 @@ public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 
 	}
 
-	private static MapFunction<String, Relation> patchRelFn() {
-		return value -> {
-			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			if (rel.getDataInfo() == null) {
-				rel.setDataInfo(new DataInfo());
-			}
-			return rel;
-		};
-	}
-
-	private boolean isOpenorgs(Relation rel) {
-
-		if (rel.getCollectedfrom() != null) {
-			for (KeyValue k : rel.getCollectedfrom()) {
-				if (k.getValue() != null && k.getValue().equals("OpenOrgs Database")) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 }

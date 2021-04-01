@@ -14,7 +14,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +23,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
@@ -35,8 +32,6 @@ import scala.Tuple3;
 public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkPrepareOrgRels.class);
-	public static final String OPENORGS_ID_PREFIX = "openorgs____";
-	public static final String CORDA_ID_PREFIX = "corda";
 
 	public SparkPrepareOrgRels(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -141,7 +136,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 			.filter(r -> filterRels(r, "organization"))
 			// put the best id as source of the diffrel: <best id, other id>
 			.map(rel -> {
-				if (compareIds(rel.getSource(), rel.getTarget()) < 0)
+				if (DedupUtility.compareOpenOrgIds(rel.getSource(), rel.getTarget()) < 0)
 					return new Tuple2<>(new Tuple2<>(rel.getSource(), rel.getTarget()), "diffRel");
 				else
 					return new Tuple2<>(new Tuple2<>(rel.getTarget(), rel.getSource()), "diffRel");
@@ -216,17 +211,20 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 			.joinWith(entities, relations.col("_2").equalTo(entities.col("_1")), "inner")
 			.map(
 				(MapFunction<Tuple2<Tuple3<String, String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
-
+					final Organization o = r._2()._2();
 					return new OrgSimRel(
 						r._1()._1(),
-						r._2()._2().getOriginalId().get(0),
-						r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
-						r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
-						r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
-						r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
-						r._2()._2().getCollectedfrom().get(0).getValue(),
+						o.getOriginalId().get(0),
+						Optional.ofNullable(o.getLegalname()).map(Field::getValue).orElse(""),
+						Optional.ofNullable(o.getLegalshortname()).map(Field::getValue).orElse(""),
+						Optional.ofNullable(o.getCountry()).map(Qualifier::getClassid).orElse(""),
+						Optional.ofNullable(o.getWebsiteurl()).map(Field::getValue).orElse(""),
+						Optional
+							.ofNullable(o.getCollectedfrom())
+							.map(c -> Optional.ofNullable(c.get(0)).map(KeyValue::getValue).orElse(""))
+							.orElse(""),
 						r._1()._3(),
-						structuredPropertyListToString(r._2()._2().getPid()));
+						structuredPropertyListToString(o.getPid()));
 				},
 				Encoders.bean(OrgSimRel.class))
 			.map(
@@ -245,28 +243,9 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	}
 
-	public static int compareIds(String o1, String o2) {
-		if (o1.contains(OPENORGS_ID_PREFIX) && o2.contains(OPENORGS_ID_PREFIX))
-			return o1.compareTo(o2);
-		if (o1.contains(CORDA_ID_PREFIX) && o2.contains(CORDA_ID_PREFIX))
-			return o1.compareTo(o2);
-
-		if (o1.contains(OPENORGS_ID_PREFIX))
-			return -1;
-		if (o2.contains(OPENORGS_ID_PREFIX))
-			return 1;
-
-		if (o1.contains(CORDA_ID_PREFIX))
-			return -1;
-		if (o2.contains(CORDA_ID_PREFIX))
-			return 1;
-
-		return o1.compareTo(o2);
-	}
-
 	// Sort IDs basing on the type. Priority: 1) openorgs, 2)corda, 3)alphabetic
 	public static List<String> sortIds(List<String> ids) {
-		ids.sort((o1, o2) -> compareIds(o1, o2));
+		ids.sort((o1, o2) -> DedupUtility.compareOpenOrgIds(o1, o2));
 		return ids;
 	}
 
@@ -301,7 +280,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 						for (String id1 : g._2()) {
 							for (String id2 : g._2()) {
 								if (!id1.equals(id2))
-									if (id1.contains(OPENORGS_ID_PREFIX) && !id2.contains("openorgsmesh"))
+									if (id1.contains(DedupUtility.OPENORGS_ID_PREFIX) && !id2.contains("openorgsmesh"))
 										rels.add(new Tuple2<>(id1, id2));
 							}
 						}
@@ -340,13 +319,4 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	}
 
-	private static MapFunction<String, Relation> patchRelFn() {
-		return value -> {
-			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			if (rel.getDataInfo() == null) {
-				rel.setDataInfo(new DataInfo());
-			}
-			return rel;
-		};
-	}
 }

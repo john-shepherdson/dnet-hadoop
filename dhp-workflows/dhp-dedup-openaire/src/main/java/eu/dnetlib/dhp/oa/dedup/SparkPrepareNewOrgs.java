@@ -127,7 +127,7 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.filter(r -> filterRels(r, "organization"))
 			// take the worst id of the diffrel: <other id, "diffRel">
 			.mapToPair(rel -> {
-				if (compareIds(rel.getSource(), rel.getTarget()) > 0)
+				if (DedupUtility.compareOpenOrgIds(rel.getSource(), rel.getTarget()) > 0)
 					return new Tuple2<>(rel.getSource(), "diffRel");
 				else
 					return new Tuple2<>(rel.getTarget(), "diffRel");
@@ -198,35 +198,6 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 				return IOUtils.toString(response.getEntity().getContent());
 			}
 		}
-	}
-
-	private static MapFunction<String, Relation> patchRelFn() {
-		return value -> {
-			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			if (rel.getDataInfo() == null) {
-				rel.setDataInfo(new DataInfo());
-			}
-			return rel;
-		};
-	}
-
-	public static int compareIds(String o1, String o2) {
-		if (o1.contains("openorgs____") && o2.contains("openorgs____"))
-			return o1.compareTo(o2);
-		if (o1.contains("corda") && o2.contains("corda"))
-			return o1.compareTo(o2);
-
-		if (o1.contains("openorgs____"))
-			return -1;
-		if (o2.contains("openorgs____"))
-			return 1;
-
-		if (o1.contains("corda"))
-			return -1;
-		if (o2.contains("corda"))
-			return 1;
-
-		return o1.compareTo(o2);
 	}
 
 	private static boolean filterRels(Relation rel, String entityType) {

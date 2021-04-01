@@ -94,7 +94,7 @@ public class SparkCopyOpenorgs extends AbstractSparkAction {
 
 		log.info("Number of organization entities processed: {}", entities.count());
 
-		entities = entities.filter(entities.col("id").contains("openorgs____"));
+		entities = entities.filter(entities.col("id").contains(DedupUtility.OPENORGS_ID_PREFIX));
 
 		log.info("Number of Openorgs organization entities: {}", entities.count());
 

@@ -111,7 +111,7 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="CopyOpenorgsSimRels"/>
         <error to="Kill"/>
@@ -139,7 +139,7 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="CreateMergeRels"/>
         <error to="Kill"/>
