@@ -19,6 +19,13 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.oaf.*;
 
+/**
+ * It selects the valid relations among those present in the graph. One relation is valid if it is not deletedbyinference
+ * and if both the source and the target node are present in the graph and are not deleted by inference nor invisible.
+ * To check this I made a view of the ids of all the entities in the graph, and select the relations for which a join exists
+ * with this view for both the source and the target
+ */
+
 public class SparkSelectValidRelationsJob implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkSelectValidRelationsJob.class);
