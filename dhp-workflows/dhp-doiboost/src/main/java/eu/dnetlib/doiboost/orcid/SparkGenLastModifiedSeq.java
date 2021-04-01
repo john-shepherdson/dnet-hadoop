@@ -3,9 +3,7 @@ package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +15,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
@@ -26,6 +25,7 @@ import org.apache.spark.SparkConf;
 import org.mortbay.log.Log;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 
 public class SparkGenLastModifiedSeq {
 	private static String hdfsServerUri;
@@ -50,6 +50,7 @@ public class SparkGenLastModifiedSeq {
 		outputPath = parser.get("outputPath");
 		lambdaFileName = parser.get("lambdaFileName");
 		String lambdaFileUri = hdfsServerUri.concat(workingPath).concat(lambdaFileName);
+		String lastModifiedDateFromLambdaFileUri = "last_modified_date_from_lambda_file.txt";
 
 		SparkConf sparkConf = new SparkConf();
 		runWithSparkSession(
@@ -57,6 +58,7 @@ public class SparkGenLastModifiedSeq {
 			isSparkSessionManaged,
 			spark -> {
 				int rowsNum = 0;
+				String lastModifiedAuthorDate = "";
 				Path output = new Path(
 					hdfsServerUri
 						.concat(workingPath)
@@ -89,10 +91,17 @@ public class SparkGenLastModifiedSeq {
 								final Text value = new Text(recordInfo.get(3));
 								writer.append(key, value);
 								rowsNum++;
+								if (rowsNum == 2) {
+									lastModifiedAuthorDate = value.toString();
+								}
 							}
+
 						}
 					}
 				}
+				HDFSUtil
+					.writeToTextFile(
+						hdfsServerUri, workingPath, lastModifiedDateFromLambdaFileUri, lastModifiedAuthorDate);
 				Log.info("Saved rows from lamda csv tar file: " + rowsNum);
 			});
 	}

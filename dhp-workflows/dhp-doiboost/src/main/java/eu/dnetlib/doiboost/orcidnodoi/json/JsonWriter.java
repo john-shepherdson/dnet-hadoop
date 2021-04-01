@@ -22,6 +22,10 @@ public class JsonWriter {
 		return OBJECT_MAPPER.writeValueAsString(authorData);
 	}
 
+	public static String create(Object obj) throws JsonProcessingException {
+		return OBJECT_MAPPER.writeValueAsString(obj);
+	}
+
 	public static String create(WorkData workData) {
 		JsonObject work = new JsonObject();
 		work.addProperty("oid", workData.getOid());

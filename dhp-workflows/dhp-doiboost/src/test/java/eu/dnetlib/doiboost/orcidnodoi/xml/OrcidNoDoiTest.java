@@ -21,8 +21,8 @@ import com.ximpleware.XPathParseException;
 
 import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
-import eu.dnetlib.doiboost.orcidnodoi.model.Contributor;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.dhp.schema.orcid.Contributor;
+import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 
 public class OrcidNoDoiTest {
@@ -48,7 +48,7 @@ public class OrcidNoDoiTest {
 		if (p == null) {
 			logger.info("XMLRecordParserNoDoi null");
 		}
-		WorkDataNoDoi workData = null;
+		WorkDetail workData = null;
 		try {
 			workData = p.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
@@ -105,7 +105,7 @@ public class OrcidNoDoiTest {
 		if (p == null) {
 			logger.info("XMLRecordParserNoDoi null");
 		}
-		WorkDataNoDoi workData = null;
+		WorkDetail workData = null;
 		try {
 			workData = p.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
@@ -136,7 +136,7 @@ public class OrcidNoDoiTest {
 		if (p == null) {
 			logger.info("XMLRecordParserNoDoi null");
 		}
-		WorkDataNoDoi workData = null;
+		WorkDetail workData = null;
 		try {
 			workData = p.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
@@ -179,7 +179,7 @@ public class OrcidNoDoiTest {
 		if (p == null) {
 			logger.info("XMLRecordParserNoDoi null");
 		}
-		WorkDataNoDoi workData = null;
+		WorkDetail workData = null;
 		try {
 			workData = p.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
@@ -308,7 +308,7 @@ public class OrcidNoDoiTest {
 		if (p == null) {
 			logger.info("XMLRecordParserNoDoi null");
 		}
-		WorkDataNoDoi workData = null;
+		WorkDetail workData = null;
 		try {
 			workData = p.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {

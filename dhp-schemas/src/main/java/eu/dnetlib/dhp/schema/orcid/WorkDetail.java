@@ -1,14 +1,19 @@
 
-package eu.dnetlib.doiboost.orcidnodoi.model;
+package eu.dnetlib.dhp.schema.orcid;
 
 import java.io.Serializable;
 import java.util.List;
+
+import eu.dnetlib.dhp.schema.orcid.Contributor;
+import eu.dnetlib.dhp.schema.orcid.ExternalId;
+import eu.dnetlib.dhp.schema.orcid.OrcidData;
+import eu.dnetlib.dhp.schema.orcid.PublicationDate;
 
 /**
  * This class models the data that are retrieved from orcid publication
  */
 
-public class WorkDataNoDoi implements Serializable {
+public class WorkDetail implements Serializable {
 
 	private String oid;
 	private String id;

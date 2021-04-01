@@ -12,10 +12,10 @@ import com.ximpleware.*;
 
 import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.parser.utility.VtdUtilityParser;
-import eu.dnetlib.doiboost.orcidnodoi.model.Contributor;
-import eu.dnetlib.doiboost.orcidnodoi.model.ExternalId;
-import eu.dnetlib.doiboost.orcidnodoi.model.PublicationDate;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.dhp.schema.orcid.Contributor;
+import eu.dnetlib.dhp.schema.orcid.ExternalId;
+import eu.dnetlib.dhp.schema.orcid.PublicationDate;
+import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 
 /**
  * This class is used for parsing xml data with vtd parser
@@ -42,7 +42,7 @@ public class XMLRecordParserNoDoi {
 
 	private static final String NS_ERROR = "error";
 
-	public static WorkDataNoDoi VTDParseWorkData(byte[] bytes)
+	public static WorkDetail VTDParseWorkData(byte[] bytes)
 		throws VtdException, EncodingException, EOFException, EntityException, ParseException, XPathParseException,
 		NavException, XPathEvalException {
 		final VTDGen vg = new VTDGen();
@@ -54,7 +54,7 @@ public class XMLRecordParserNoDoi {
 		ap.declareXPathNameSpace(NS_WORK, NS_WORK_URL);
 		ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
 
-		WorkDataNoDoi workData = new WorkDataNoDoi();
+		WorkDetail workData = new WorkDetail();
 		final List<String> errors = VtdUtilityParser.getTextValue(ap, vn, "//error:response-code");
 		if (!errors.isEmpty()) {
 			workData.setErrorCode(errors.get(0));

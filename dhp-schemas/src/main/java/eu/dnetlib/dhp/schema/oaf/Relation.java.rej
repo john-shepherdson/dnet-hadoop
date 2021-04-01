@@ -1,0 +1,31 @@
+diff a/dhp-schemas/src/main/java/eu/dnetlib/dhp/schema/oaf/Relation.java b/dhp-schemas/src/main/java/eu/dnetlib/dhp/schema/oaf/Relation.java	(rejected hunks)
+@@ -1,8 +1,6 @@
+ 
+ package eu.dnetlib.dhp.schema.oaf;
+ 
+-import eu.dnetlib.dhp.schema.common.ModelSupport;
+-
+ import static com.google.common.base.Preconditions.checkArgument;
+ 
+ import java.text.ParseException;
+@@ -10,6 +8,8 @@ import java.util.*;
+ import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ 
++import eu.dnetlib.dhp.schema.common.ModelSupport;
++
+ /**
+  * Relation models any edge between two nodes in the OpenAIRE graph. It has a source id and a target id pointing to
+  * graph node identifiers and it is further characterised by the semantic of the link through the fields relType,
+@@ -137,7 +137,10 @@ public class Relation extends Oaf {
+ 		try {
+ 			setValidationDate(ModelSupport.oldest(getValidationDate(), r.getValidationDate()));
+ 		} catch (ParseException e) {
+-			throw new IllegalArgumentException(String.format("invalid validation date format in relation [s:%s, t:%s]: %s", getSource(), getTarget(), getValidationDate()));
++			throw new IllegalArgumentException(String
++				.format(
++					"invalid validation date format in relation [s:%s, t:%s]: %s", getSource(), getTarget(),
++					getValidationDate()));
+ 		}
+ 
+ 		super.mergeFrom(r);

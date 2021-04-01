@@ -4,10 +4,12 @@ package eu.dnetlib.doiboost.orcidnodoi;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
@@ -18,6 +20,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +33,17 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.AuthorSummary;
+import eu.dnetlib.dhp.schema.orcid.Work;
+import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcid.json.JsonHelper;
-import eu.dnetlib.doiboost.orcidnodoi.model.WorkDataNoDoi;
+import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 import scala.Tuple2;
 
 /**
- * This spark job generates one parquet file, containing orcid publications dataset
+ * This spark job generates orcid publications no doi dataset
  */
 
 public class SparkGenEnrichedOrcidWorks {
@@ -53,47 +59,65 @@ public class SparkGenEnrichedOrcidWorks {
 				.toString(
 					SparkGenEnrichedOrcidWorks.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/doiboost/gen_enriched_orcid_works_parameters.json")));
+							"/eu/dnetlib/dhp/doiboost/gen_orcid-no-doi_params.json")));
 		parser.parseArgument(args);
 		Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
+		final String hdfsServerUri = parser.get("hdfsServerUri");
 		final String workingPath = parser.get("workingPath");
 		final String outputEnrichedWorksPath = parser.get("outputEnrichedWorksPath");
-		final String outputWorksPath = parser.get("outputWorksPath");
-		final String hdfsServerUri = parser.get("hdfsServerUri");
+		final String orcidDataFolder = parser.get("orcidDataFolder");
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				String lastUpdate = HDFSUtil.readFromTextFile(hdfsServerUri, workingPath, "last_update.txt");
+				if (StringUtils.isBlank(lastUpdate)) {
+					throw new RuntimeException("last update info not found");
+				}
+				final String dateOfCollection = lastUpdate.substring(0, 10);
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-				JavaPairRDD<Text, Text> summariesRDD = sc
-					.sequenceFile(workingPath + "authors/authors.seq", Text.class, Text.class);
-				Dataset<AuthorData> summariesDataset = spark
+				Dataset<AuthorData> authorDataset = spark
 					.createDataset(
-						summariesRDD.map(seq -> loadAuthorFromJson(seq._1(), seq._2())).rdd(),
+						sc
+							.textFile(workingPath.concat(orcidDataFolder).concat("/authors/*"))
+							.map(item -> OBJECT_MAPPER.readValue(item, AuthorSummary.class))
+							.filter(authorSummary -> authorSummary.getAuthorData() != null)
+							.map(authorSummary -> authorSummary.getAuthorData())
+							.rdd(),
 						Encoders.bean(AuthorData.class));
-				logger.info("Authors data loaded: " + summariesDataset.count());
+				logger.info("Authors data loaded: " + authorDataset.count());
 
-				JavaPairRDD<Text, Text> activitiesRDD = sc
-					.sequenceFile(workingPath + outputWorksPath + "*.seq", Text.class, Text.class);
-				Dataset<WorkDataNoDoi> activitiesDataset = spark
+				Dataset<WorkDetail> workDataset = spark
 					.createDataset(
-						activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(),
-						Encoders.bean(WorkDataNoDoi.class));
-				logger.info("Works data loaded: " + activitiesDataset.count());
+						sc
+							.textFile(workingPath.concat(orcidDataFolder).concat("/works/*"))
+							.map(item -> OBJECT_MAPPER.readValue(item, Work.class))
+							.filter(work -> work.getWorkDetail() != null)
+							.map(work -> work.getWorkDetail())
+							.filter(work -> work.getErrorCode() == null)
+							.filter(
+								work -> work
+									.getExtIds()
+									.stream()
+									.filter(e -> e.getType() != null)
+									.noneMatch(e -> e.getType().equalsIgnoreCase("doi")))
+							.rdd(),
+						Encoders.bean(WorkDetail.class));
+				logger.info("Works data loaded: " + workDataset.count());
 
-				JavaRDD<Tuple2<String, String>> enrichedWorksRDD = activitiesDataset
+				JavaRDD<Tuple2<String, String>> enrichedWorksRDD = workDataset
 					.joinWith(
-						summariesDataset,
-						activitiesDataset.col("oid").equalTo(summariesDataset.col("oid")), "inner")
+						authorDataset,
+						workDataset.col("oid").equalTo(authorDataset.col("oid")), "inner")
 					.map(
-						(MapFunction<Tuple2<WorkDataNoDoi, AuthorData>, Tuple2<String, String>>) value -> {
-							WorkDataNoDoi w = value._1;
+						(MapFunction<Tuple2<WorkDetail, AuthorData>, Tuple2<String, String>>) value -> {
+							WorkDetail w = value._1;
 							AuthorData a = value._2;
 							AuthorMatcher.match(a, w.getContributors());
 							return new Tuple2<>(a.getOid(), JsonHelper.createOidWork(w));
@@ -113,13 +137,25 @@ public class SparkGenEnrichedOrcidWorks {
 					.sparkContext()
 					.longAccumulator("errorsNotFoundAuthors");
 				final LongAccumulator errorsInvalidType = spark.sparkContext().longAccumulator("errorsInvalidType");
+				final LongAccumulator otherTypeFound = spark.sparkContext().longAccumulator("otherTypeFound");
+				final LongAccumulator deactivatedAcc = spark.sparkContext().longAccumulator("deactivated_found");
+				final LongAccumulator titleNotProvidedAcc = spark
+					.sparkContext()
+					.longAccumulator("Title_not_provided_found");
+				final LongAccumulator noUrlAcc = spark.sparkContext().longAccumulator("no_url_found");
+
 				final PublicationToOaf publicationToOaf = new PublicationToOaf(
 					parsedPublications,
 					enrichedPublications,
 					errorsGeneric,
 					errorsInvalidTitle,
 					errorsNotFoundAuthors,
-					errorsInvalidType);
+					errorsInvalidType,
+					otherTypeFound,
+					deactivatedAcc,
+					titleNotProvidedAcc,
+					noUrlAcc,
+					dateOfCollection);
 				JavaRDD<Publication> oafPublicationRDD = enrichedWorksRDD
 					.map(
 						e -> {
@@ -148,33 +184,10 @@ public class SparkGenEnrichedOrcidWorks {
 				logger.info("errorsInvalidTitle: " + errorsInvalidTitle.value().toString());
 				logger.info("errorsNotFoundAuthors: " + errorsNotFoundAuthors.value().toString());
 				logger.info("errorsInvalidType: " + errorsInvalidType.value().toString());
+				logger.info("otherTypeFound: " + otherTypeFound.value().toString());
+				logger.info("deactivatedAcc: " + deactivatedAcc.value().toString());
+				logger.info("titleNotProvidedAcc: " + titleNotProvidedAcc.value().toString());
+				logger.info("noUrlAcc: " + noUrlAcc.value().toString());
 			});
-	}
-
-	private static AuthorData loadAuthorFromJson(Text orcidId, Text json) {
-		AuthorData authorData = new AuthorData();
-		authorData.setOid(orcidId.toString());
-		JsonElement jElement = new JsonParser().parse(json.toString());
-		authorData.setName(getJsonValue(jElement, "name"));
-		authorData.setSurname(getJsonValue(jElement, "surname"));
-		authorData.setCreditName(getJsonValue(jElement, "creditname"));
-		return authorData;
-	}
-
-	private static WorkDataNoDoi loadWorkFromJson(Text orcidId, Text json) {
-
-		WorkDataNoDoi workData = new Gson().fromJson(json.toString(), WorkDataNoDoi.class);
-		return workData;
-	}
-
-	private static String getJsonValue(JsonElement jElement, String property) {
-		if (jElement.getAsJsonObject().has(property)) {
-			JsonElement name = null;
-			name = jElement.getAsJsonObject().get(property);
-			if (name != null && !name.isJsonNull()) {
-				return name.getAsString();
-			}
-		}
-		return new String("");
 	}
 }

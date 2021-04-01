@@ -4,15 +4,13 @@ package eu.dnetlib.doiboost.orcid;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -25,13 +23,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.minlog.Log;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.dhp.schema.orcid.OrcidDOI;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
+import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
+import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 import scala.Tuple2;
 
 public class SparkGenerateDoiAuthorList {
@@ -56,6 +56,10 @@ public class SparkGenerateDoiAuthorList {
 		logger.info("workingPath: ", workingPath);
 		final String outputDoiAuthorListPath = parser.get("outputDoiAuthorListPath");
 		logger.info("outputDoiAuthorListPath: ", outputDoiAuthorListPath);
+		final String authorsPath = parser.get("authorsPath");
+		logger.info("authorsPath: ", authorsPath);
+		final String xmlWorksPath = parser.get("xmlWorksPath");
+		logger.info("xmlWorksPath: ", xmlWorksPath);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -65,17 +69,21 @@ public class SparkGenerateDoiAuthorList {
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 				JavaPairRDD<Text, Text> summariesRDD = sc
-					.sequenceFile(workingPath + "../orcid_summaries/output/authors.seq", Text.class, Text.class);
+					.sequenceFile(workingPath.concat(authorsPath), Text.class, Text.class);
 				Dataset<AuthorData> summariesDataset = spark
 					.createDataset(
 						summariesRDD.map(seq -> loadAuthorFromJson(seq._1(), seq._2())).rdd(),
 						Encoders.bean(AuthorData.class));
 
-				JavaPairRDD<Text, Text> activitiesRDD = sc
-					.sequenceFile(workingPath + "/output/*.seq", Text.class, Text.class);
+				JavaPairRDD<Text, Text> xmlWorksRDD = sc
+					.sequenceFile(workingPath.concat(xmlWorksPath), Text.class, Text.class);
+
 				Dataset<WorkData> activitiesDataset = spark
 					.createDataset(
-						activitiesRDD.map(seq -> loadWorkFromJson(seq._1(), seq._2())).rdd(),
+						xmlWorksRDD
+							.map(seq -> XMLRecordParser.VTDParseWorkData(seq._2().toString().getBytes()))
+							.filter(work -> work != null && work.getErrorCode() == null && work.isDoiFound())
+							.rdd(),
 						Encoders.bean(WorkData.class));
 
 				Function<Tuple2<String, AuthorData>, Tuple2<String, List<AuthorData>>> toAuthorListFunction = data -> {
@@ -135,13 +143,19 @@ public class SparkGenerateDoiAuthorList {
 						}
 						return null;
 					})
-					.mapToPair(
-						s -> {
-							ObjectMapper mapper = new ObjectMapper();
-							return new Tuple2<>(s._1(), mapper.writeValueAsString(s._2()));
-						})
-					.repartition(10)
-					.saveAsTextFile(workingPath + outputDoiAuthorListPath);
+					.mapToPair(s -> {
+						List<AuthorData> authorList = s._2();
+						Set<String> oidsAlreadySeen = new HashSet<>();
+						authorList.removeIf(a -> !oidsAlreadySeen.add(a.getOid()));
+						return new Tuple2<>(s._1(), authorList);
+					})
+					.map(s -> {
+						OrcidDOI orcidDOI = new OrcidDOI();
+						orcidDOI.setDoi(s._1());
+						orcidDOI.setAuthors(s._2());
+						return JsonWriter.create(orcidDOI);
+					})
+					.saveAsTextFile(workingPath + outputDoiAuthorListPath, GzipCodec.class);
 			});
 
 	}
