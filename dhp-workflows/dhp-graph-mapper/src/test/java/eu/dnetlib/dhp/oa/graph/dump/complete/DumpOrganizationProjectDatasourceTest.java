@@ -88,7 +88,7 @@ public class DumpOrganizationProjectDatasourceTest {
 		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.graph.Organization> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Organization.class));
 
-		Assertions.assertEquals(34, verificationDataset.count());
+		Assertions.assertEquals(15, verificationDataset.count());
 
 		verificationDataset
 			.foreach(
