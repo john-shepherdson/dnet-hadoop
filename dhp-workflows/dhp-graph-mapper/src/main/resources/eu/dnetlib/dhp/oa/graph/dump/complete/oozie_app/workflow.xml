@@ -148,7 +148,7 @@
         <path start="dump_organization"/>
         <path start="dump_project"/>
         <path start="dump_datasource"/>
-        <path start="dump_relation"/>
+        <path start="select_relation"/>
     </fork>
 
     <action name="dump_publication">
@@ -333,6 +333,30 @@
         <error to="Kill"/>
     </action>
 
+    <action name="select_relation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Select valid table relation </name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.complete.SparkSelectValidRelationsJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/validrelation</arg>
+        </spark>
+        <ok to="dump_relation"/>
+        <error to="Kill"/>
+    </action>
+
     <action name="dump_relation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -350,7 +374,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/validrelation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/relation</arg>
         </spark>
         <ok to="join_dump"/>
