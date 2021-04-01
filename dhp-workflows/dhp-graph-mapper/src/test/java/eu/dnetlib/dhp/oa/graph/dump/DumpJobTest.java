@@ -455,7 +455,6 @@ public class DumpJobTest {
 
 		Assertions.assertTrue(temp.filter("id = '50|dedup_wf_001::01e6a28565ca01376b7548e530c6f6e8'").count() == 1);
 
-
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
 	}
 
