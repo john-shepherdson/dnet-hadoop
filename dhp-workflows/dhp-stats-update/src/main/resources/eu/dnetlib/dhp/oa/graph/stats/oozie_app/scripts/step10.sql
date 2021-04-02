@@ -23,19 +23,6 @@ CREATE OR REPLACE VIEW ${stats_db_name}.rndexpediture AS
 SELECT *
 FROM ${external_stats_db_name}.rndexpediture;
 
-CREATE OR REPLACE VIEW ${stats_db_name}.context AS
-SELECT *
-FROM ${external_stats_db_name}.context;
-
-CREATE OR REPLACE VIEW ${stats_db_name}.category AS
-SELECT *
-FROM ${external_stats_db_name}.category;
-
-CREATE OR REPLACE VIEW ${stats_db_name}.concept AS
-SELECT *
-FROM ${external_stats_db_name}.concept;
-
-
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 -- Creation date of the database
