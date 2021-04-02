@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.schema.oaf;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 public class ExternalReference implements Serializable {
@@ -11,11 +12,11 @@ public class ExternalReference implements Serializable {
 	// title
 	private String label;
 
+	// alternative labels
+	private List<String> alternateLabel;
+
 	// text()
 	private String url;
-
-	// ?? not mapped yet ??
-	private String description;
 
 	// type
 	private Qualifier qualifier;
@@ -45,20 +46,20 @@ public class ExternalReference implements Serializable {
 		this.label = label;
 	}
 
+	public List<String> getAlternateLabel() {
+		return alternateLabel;
+	}
+
+	public void setAlternateLabel(List<String> alternateLabel) {
+		this.alternateLabel = alternateLabel;
+	}
+
 	public String getUrl() {
 		return url;
 	}
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public Qualifier getQualifier() {
@@ -103,7 +104,6 @@ public class ExternalReference implements Serializable {
 		return Objects.equals(sitename, that.sitename)
 			&& Objects.equals(label, that.label)
 			&& Objects.equals(url, that.url)
-			&& Objects.equals(description, that.description)
 			&& Objects.equals(qualifier, that.qualifier)
 			&& Objects.equals(refidentifier, that.refidentifier)
 			&& Objects.equals(query, that.query)
@@ -114,6 +114,7 @@ public class ExternalReference implements Serializable {
 	public int hashCode() {
 		return Objects
 			.hash(
-				sitename, label, url, description, qualifier, refidentifier, query, dataInfo);
+				sitename, label, url, qualifier, refidentifier, query, dataInfo);
 	}
+
 }

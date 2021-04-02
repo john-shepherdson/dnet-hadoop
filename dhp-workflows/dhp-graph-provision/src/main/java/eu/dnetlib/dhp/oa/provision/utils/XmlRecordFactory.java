@@ -45,7 +45,6 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class XmlRecordFactory implements Serializable {
 
-	private static final String REL_SUBTYPE_DEDUP = "dedup";
 	private final Map<String, LongAccumulator> accumulators;
 
 	private final Set<String> specialDatasourceTypes;
@@ -1202,11 +1201,17 @@ public class XmlRecordFactory implements Serializable {
 					if (isNotBlank(er.getLabel())) {
 						fields.add(XmlSerializationUtils.asXmlElement("label", er.getLabel()));
 					}
+					Optional
+						.ofNullable(er.getAlternateLabel())
+						.map(
+							altLabel -> altLabel
+								.stream()
+								.filter(StringUtils::isNotBlank)
+								.collect(Collectors.toList()))
+						.orElse(Lists.newArrayList())
+						.forEach(alt -> fields.add(XmlSerializationUtils.asXmlElement("alternatelabel", alt)));
 					if (isNotBlank(er.getUrl())) {
 						fields.add(XmlSerializationUtils.asXmlElement("url", er.getUrl()));
-					}
-					if (isNotBlank(er.getDescription())) {
-						fields.add(XmlSerializationUtils.asXmlElement("description", er.getDescription()));
 					}
 					if (isNotBlank(er.getUrl())) {
 						fields.add(XmlSerializationUtils.mapQualifier("qualifier", er.getQualifier()));

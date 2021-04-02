@@ -132,7 +132,6 @@ public class ProtoConverter implements Serializable {
 		ex.setQuery(e.getQuery());
 		ex.setQualifier(mapQualifier(e.getQualifier()));
 		ex.setLabel(e.getLabel());
-		ex.setDescription(e.getDescription());
 		ex.setDataInfo(ex.getDataInfo());
 		return ex;
 	}
