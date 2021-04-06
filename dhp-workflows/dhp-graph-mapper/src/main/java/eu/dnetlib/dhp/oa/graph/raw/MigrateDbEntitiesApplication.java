@@ -161,7 +161,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 						.execute(
 							"queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
 					break;
-				case openorgs_dedup:
+				case openorgs_dedup:	//generates organization entities and relations for openorgs dedup
 					log.info("Processing Openorgs...");
 					smdbe
 						.execute(
@@ -172,7 +172,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 					break;
 
-				case openorgs:
+				case openorgs:  //generates organization entities and relations for provision
 					log.info("Processing Openorgs For Provision...");
 					smdbe
 						.execute(

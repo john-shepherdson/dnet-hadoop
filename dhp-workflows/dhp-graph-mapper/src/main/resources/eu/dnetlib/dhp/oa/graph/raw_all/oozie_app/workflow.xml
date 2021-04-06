@@ -6,14 +6,39 @@
             <description>the target path to store raw graph</description>
         </property>
         <property>
-            <name>reuseContent</name>
+            <name>reuseDBClaims</name>
             <value>false</value>
             <description>should import content from the aggregator or reuse a previous version</description>
         </property>
         <property>
-            <name>importOpenorgs</name>
-            <value>true</value>
-            <description>should import content from the OpenOrgs database</description>
+            <name>reuseODFClaims</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseOAFClaims</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseDB</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseDBOpenorgs</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseODF</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseOAF</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
         </property>
         <property>
             <name>contentPath</name>
@@ -120,24 +145,25 @@
         </configuration>
     </global>
 
-    <start to="reuse_aggregator_content"/>
+    <start to="start_import"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <decision name="reuse_aggregator_content">
+    <fork name="start_import">
+        <path start="reuse_db"/>
+        <path start="reuse_db_claims"/>
+        <path start="reuse_db_openorgs"/>
+    </fork>
+
+    <decision name="reuse_db_claims">
         <switch>
-            <case to="start_import">${wf:conf('reuseContent') eq false}</case>
-            <case to="fork_generate_entities">${wf:conf('reuseContent') eq true}</case>
-            <default to="start_import"/>
+            <case to="ImportDB_claims">${wf:conf('reuseDBClaims') eq false}</case>
+            <case to="reuse_odf_claims">${wf:conf('reuseDBClaims') eq true}</case>
+            <default to="ImportDB_claims"/>
         </switch>
     </decision>
-
-    <fork name="start_import">
-        <path start="ImportDB"/>
-        <path start="ImportDB_claims"/>
-    </fork>
 
     <action name="ImportDB_claims">
         <java>
@@ -154,9 +180,17 @@
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
-        <ok to="ImportODF_claims"/>
+        <ok to="reuse_odf_claims"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="reuse_odf_claims">
+        <switch>
+            <case to="ImportODF_claims">${wf:conf('reuseODFClaims') eq false}</case>
+            <case to="reuse_oaf_claims">${wf:conf('reuseODFClaims') eq true}</case>
+            <default to="ImportODF_claims"/>
+        </switch>
+    </decision>
 
     <action name="ImportODF_claims">
         <java>
@@ -171,9 +205,17 @@
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>claim</arg>
         </java>
-        <ok to="ImportOAF_claims"/>
+        <ok to="reuse_oaf_claims"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="reuse_oaf_claims">
+        <switch>
+            <case to="ImportOAF_claims">${wf:conf('reuseOAFClaims') eq false}</case>
+            <case to="wait_import">${wf:conf('reuseOAFClaims') eq true}</case>
+            <default to="ImportOAF_claims"/>
+        </switch>
+    </decision>
 
     <action name="ImportOAF_claims">
         <java>
@@ -192,6 +234,14 @@
         <error to="Kill"/>
     </action>
 
+    <decision name="reuse_db">
+        <switch>
+            <case to="ImportDB">${wf:conf('reuseDB') eq false}</case>
+            <case to="reuse_odf">${wf:conf('reuseDB') eq true}</case>
+            <default to="ImportDB_claims"/>
+        </switch>
+    </decision>
+
     <action name="ImportDB">
         <java>
             <prepare>
@@ -207,36 +257,17 @@
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
-        <ok to="should_import_openorgs"/>
+        <ok to="reuse_odf"/>
         <error to="Kill"/>
     </action>
 
-    <decision name="should_import_openorgs">
+    <decision name="reuse_odf">
         <switch>
-            <case to="ImportDB_openorgs">${wf:conf('importOpenorgs') eq true}</case>
-            <case to="ImportODF">${wf:conf('importOpenorgs') eq false}</case>
-            <default to="ImportDB_openorgs"/>
+            <case to="ImportODF">${wf:conf('reuseODF') eq false}</case>
+            <case to="reuse_oaf">${wf:conf('reuseODF') eq true}</case>
+            <default to="ImportODF"/>
         </switch>
     </decision>
-
-    <action name="ImportDB_openorgs">
-        <java>
-            <prepare>
-                <delete path="${contentPath}/db_openorgs"/>
-            </prepare>
-            <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/db_openorgs</arg>
-            <arg>--postgresUrl</arg><arg>${postgresOpenOrgsURL}</arg>
-            <arg>--postgresUser</arg><arg>${postgresOpenOrgsUser}</arg>
-            <arg>--postgresPassword</arg><arg>${postgresOpenOrgsPassword}</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--action</arg><arg>openorgs</arg>
-            <arg>--dbschema</arg><arg>${dbSchema}</arg>
-            <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
-        </java>
-        <ok to="ImportODF"/>
-        <error to="Kill"/>
-    </action>
 
     <action name="ImportODF">
         <java>
@@ -251,9 +282,17 @@
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
         </java>
-        <ok to="ImportOAF"/>
+        <ok to="reuse_oaf"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="reuse_oaf">
+        <switch>
+            <case to="ImportOAF">${wf:conf('reuseOAF') eq false}</case>
+            <case to="wait_import">${wf:conf('reuseOAF') eq true}</case>
+            <default to="ImportOAF"/>
+        </switch>
+    </decision>
 
     <action name="ImportOAF">
         <java>
@@ -284,6 +323,33 @@
             <arg>--mdFormat</arg><arg>OAF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>intersection</arg>
+        </java>
+        <ok to="wait_import"/>
+        <error to="Kill"/>
+    </action>
+
+    <decision name="reuse_db_openorgs">
+        <switch>
+            <case to="ImportDB_openorgs">${wf:conf('reuseDBOpenorgs') eq false}</case>
+            <case to="wait_import">${wf:conf('reuseDBOpenorgs') eq true}</case>
+            <default to="ImportDB_openorgs"/>
+        </switch>
+    </decision>
+
+    <action name="ImportDB_openorgs">
+        <java>
+            <prepare>
+                <delete path="${contentPath}/db_openorgs"/>
+            </prepare>
+            <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
+            <arg>--hdfsPath</arg><arg>${contentPath}/db_openorgs</arg>
+            <arg>--postgresUrl</arg><arg>${postgresOpenOrgsURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresOpenOrgsUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresOpenOrgsPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--action</arg><arg>openorgs</arg>
+            <arg>--dbschema</arg><arg>${dbSchema}</arg>
+            <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
         <ok to="wait_import"/>
         <error to="Kill"/>
