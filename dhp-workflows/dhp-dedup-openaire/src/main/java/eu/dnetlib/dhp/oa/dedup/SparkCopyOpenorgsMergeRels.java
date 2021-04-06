@@ -78,42 +78,16 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
-		DedupConfig dedupConf = getConfigurations(isLookUpService, actionSetId).get(0);
-
-		JavaRDD<Relation> rawRels = spark
+		//collect organization merge relations from openorgs database
+		JavaRDD<Relation> mergeRelsRDD = spark
 			.read()
 			.textFile(relationPath)
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
-			.filter(this::isOpenorgs)
-			.filter(this::filterOpenorgsRels);
+			.filter(this::isOpenorgs) //take only openorgs relations
+			.filter(this::isMergeRel);  //take merges and isMergedIn relations
 
-		JavaRDD<Relation> selfRawRels = rawRels
-			.map(r -> r.getSource())
-			.distinct()
-			.map(s -> rel(s, s, ModelConstants.IS_SIMILAR_TO, dedupConf));
-
-		log.info("Number of raw Openorgs Relations collected: {}", rawRels.count());
-
-		// turn openorgs isSimilarTo relations into mergerels
-		JavaRDD<Relation> mergeRelsRDD = rawRels
-			.union(selfRawRels)
-			.map(r -> {
-				r.setSource(createDedupID(r.getSource())); // create the dedup_id to align it to the openaire dedup
-															// format
-				return r;
-			})
-			.flatMap(rel -> {
-
-				List<Relation> mergerels = new ArrayList<>();
-
-				mergerels.add(rel(rel.getSource(), rel.getTarget(), ModelConstants.MERGES, dedupConf));
-				mergerels.add(rel(rel.getTarget(), rel.getSource(), ModelConstants.IS_MERGED_IN, dedupConf));
-
-				return mergerels.iterator();
-			});
-
-		log.info("Number of Openorgs Merge Relations created: {}", mergeRelsRDD.count());
+		log.info("Number of Openorgs Merge Relations collected: {}", mergeRelsRDD.count());
 
 		spark
 			.createDataset(
@@ -124,45 +98,9 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 			.parquet(outputPath);
 	}
 
-	private boolean filterOpenorgsRels(Relation rel) {
-		return rel.getRelClass().equals(ModelConstants.IS_SIMILAR_TO)
+	private boolean isMergeRel(Relation rel) {
+		return (rel.getRelClass().equals(ModelConstants.MERGES) || rel.getRelClass().equals(ModelConstants.IS_MERGED_IN))
 			&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
 			&& rel.getSubRelType().equals(ModelConstants.DEDUP);
-	}
-
-	private Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
-
-		String entityType = dedupConf.getWf().getEntityType();
-
-		Relation r = new Relation();
-		r.setSource(source);
-		r.setTarget(target);
-		r.setRelClass(relClass);
-		r.setRelType(entityType + entityType.substring(0, 1).toUpperCase() + entityType.substring(1));
-		r.setSubRelType(ModelConstants.DEDUP);
-
-		DataInfo info = new DataInfo();
-		info.setDeletedbyinference(false);
-		info.setInferred(true);
-		info.setInvisible(false);
-		info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
-		Qualifier provenanceAction = new Qualifier();
-		provenanceAction.setClassid(ModelConstants.PROVENANCE_DEDUP);
-		provenanceAction.setClassname(ModelConstants.PROVENANCE_DEDUP);
-		provenanceAction.setSchemeid(ModelConstants.DNET_PROVENANCE_ACTIONS);
-		provenanceAction.setSchemename(ModelConstants.DNET_PROVENANCE_ACTIONS);
-		info.setProvenanceaction(provenanceAction);
-
-		// TODO calculate the trust value based on the similarity score of the elements in the CC
-		// info.setTrust();
-
-		r.setDataInfo(info);
-		return r;
-	}
-
-	public String createDedupID(String id) {
-
-		String prefix = id.split("\\|")[0];
-		return prefix + "|dedup_wf_001::" + DHPUtils.md5(id);
 	}
 }

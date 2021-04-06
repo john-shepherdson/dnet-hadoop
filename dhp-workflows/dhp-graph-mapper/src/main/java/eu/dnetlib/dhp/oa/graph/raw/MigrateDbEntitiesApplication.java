@@ -180,14 +180,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 					log.info("Processing Openorgs Merge Rels...");
 					smdbe.execute("queryOpenOrgsSimilarityForProvision.sql", smdbe::processOrgOrgSimRels);
-
+					//TODO cambiare il mapping delle relazioni in modo che crei merges e isMergedIn
+					// TODO (specifico per questo caso, questa funzione di mapping verrà usata così com'è nel caso di openorgs dedup
 					break;
 
 				case openaire_organizations:
 
 					log.info("Processing Organizations...");
 					smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
-
 					break;
 			}
 			log.info("All done.");

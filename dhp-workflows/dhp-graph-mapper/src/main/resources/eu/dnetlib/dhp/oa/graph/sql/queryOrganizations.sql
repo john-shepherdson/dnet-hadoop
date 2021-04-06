@@ -51,3 +51,6 @@ GROUP BY
 	d.id,
 	d.officialname,
 	o.country;
+
+-- TODO modificare in modo da fare il merge dei pid di tutti i record mergiati (per gli openorgs, approvati)
+-- TODO invece per tutti gli altri con dei duplicati non fare questa cosa

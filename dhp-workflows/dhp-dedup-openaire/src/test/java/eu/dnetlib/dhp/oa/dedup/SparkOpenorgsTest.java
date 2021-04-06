@@ -12,10 +12,14 @@ import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -148,8 +152,13 @@ public class SparkOpenorgsTest implements Serializable {
 
 		long orgs_mergerel = spark
 			.read()
-			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
+			.load(DedupUtility.createMergeRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
+
+		Dataset<Relation> orgrels = spark.read().load(DedupUtility.createMergeRelPath(testOutputBasePath, testActionSetId, "organization")).as(Encoders.bean(Relation.class));
+
+		for (Relation r: orgrels.toJavaRDD().collect())
+			System.out.println("r = " + r.getSource() + "---" + r.getTarget() + "---" + r.getRelClass());
 
 		assertEquals(384, orgs_mergerel);
 

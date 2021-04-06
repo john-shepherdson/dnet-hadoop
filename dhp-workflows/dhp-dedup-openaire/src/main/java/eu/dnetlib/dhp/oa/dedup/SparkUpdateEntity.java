@@ -101,6 +101,9 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 							.mapToPair(
 								(PairFunction<String, String, String>) s -> new Tuple2<>(
 									MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
+						if (type == EntityType.organization)	//exclude root records from organizations
+							entitiesWithId = excludeRootOrgs(entitiesWithId, rel);
+
 						JavaRDD<String> map = entitiesWithId
 							.leftOuterJoin(mergedIds)
 							.map(k -> {
@@ -108,13 +111,6 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 									return updateDeletedByInference(k._2()._1(), clazz);
 								}
 								return k._2()._1();
-							});
-
-						if (type == EntityType.organization) // exclude openorgs with deletedbyinference=true
-							map = map.filter(it -> {
-								Organization org = OBJECT_MAPPER.readValue(it, Organization.class);
-								return !org.getId().contains("openorgs____") || (org.getId().contains("openorgs____")
-									&& !org.getDataInfo().getDeletedbyinference());
 							});
 
 						sourceEntity = map.union(sc.textFile(dedupRecordPath));
@@ -158,5 +154,21 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to convert json", e);
 		}
+	}
+
+	private static JavaPairRDD<String, String> excludeRootOrgs(JavaPairRDD<String, String> entitiesWithId, Dataset<Relation> rel) {
+
+		JavaPairRDD<String, String> roots = rel
+				.where("relClass == 'merges'")
+				.select(rel.col("source"))
+				.distinct()
+				.toJavaRDD()
+				.mapToPair(
+						(PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "root"));
+
+		return entitiesWithId
+				.leftOuterJoin(roots)
+				.filter(e -> !e._2()._2().isPresent())
+				.mapToPair(e -> new Tuple2<>(e._1(), e._2()._1()));
 	}
 }
