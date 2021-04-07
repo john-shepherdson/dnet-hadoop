@@ -52,7 +52,10 @@ FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.
 where p.datainfo.deletedbyinference = false;
 
 CREATE TABLE ${stats_db_name}.otherresearchproduct_concepts AS
-SELECT substr(p.id, 4) AS id, contexts.context.id AS concept
+SELECT substr(p.id, 4) as id, case
+                                  when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
+                                  when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
+                                  when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.context) contexts AS context
 where p.datainfo.deletedbyinference = false;
 
