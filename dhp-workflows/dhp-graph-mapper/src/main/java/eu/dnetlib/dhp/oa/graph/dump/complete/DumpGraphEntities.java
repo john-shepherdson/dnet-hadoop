@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -453,7 +454,7 @@ public class DumpGraphEntities implements Serializable {
 			.map(
 				(MapFunction<E, Organization>) o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o),
 				Encoders.bean(Organization.class))
-				.filter(Objects::nonNull)
+			.filter((FilterFunction<Organization>) o -> o != null)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -461,10 +462,9 @@ public class DumpGraphEntities implements Serializable {
 	}
 
 	private static Organization mapOrganization(eu.dnetlib.dhp.schema.oaf.Organization org) {
+		Organization organization = new Organization();
 		if (org.getDataInfo().getDeletedbyinference())
 			return null;
-
-		Organization organization = new Organization();
 
 		Optional
 			.ofNullable(org.getLegalshortname())
