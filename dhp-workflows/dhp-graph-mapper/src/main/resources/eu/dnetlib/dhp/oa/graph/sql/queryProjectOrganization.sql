@@ -16,4 +16,4 @@ SELECT
 
 FROM project_organization po
 	LEFT OUTER JOIN projects p ON (p.id = po.project)
-	LEFT OUTER JOIN dsm_datasources dc ON (dc.id = p.collectedfrom)
+	LEFT OUTER JOIN dsm_datasources dc ON (dc.id = p.collectedfrom);

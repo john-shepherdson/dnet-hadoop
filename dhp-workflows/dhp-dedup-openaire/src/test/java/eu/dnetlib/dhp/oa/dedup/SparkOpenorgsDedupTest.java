@@ -82,7 +82,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 	public static void cleanUp() throws IOException, URISyntaxException {
 
 		testGraphBasePath = Paths
-			.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/openorgs_dedup").toURI())
+			.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/openorgs/dedup").toURI())
 			.toFile()
 			.getAbsolutePath();
 		testOutputBasePath = createTempDirectory(SparkDedupTest.class.getSimpleName() + "-")

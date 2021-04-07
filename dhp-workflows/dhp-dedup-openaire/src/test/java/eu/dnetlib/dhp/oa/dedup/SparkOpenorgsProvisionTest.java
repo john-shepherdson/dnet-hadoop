@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.dedup;
 import static java.nio.file.Files.createTempDirectory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.lenient;
 
 import java.io.File;
@@ -11,11 +12,16 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -33,9 +39,12 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.util.MapDocumentUtil;
+import scala.Tuple2;
 
 @ExtendWith(MockitoExtension.class)
-public class SparkOpenorgsTest implements Serializable {
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class SparkOpenorgsProvisionTest implements Serializable {
 
 	@Mock(serializable = true)
 	ISLookUpService isLookUpService;
@@ -55,13 +64,13 @@ public class SparkOpenorgsTest implements Serializable {
 	public static void cleanUp() throws IOException, URISyntaxException {
 
 		testGraphBasePath = Paths
-			.get(SparkOpenorgsTest.class.getResource("/eu/dnetlib/dhp/dedup/openorgs").toURI())
+			.get(SparkOpenorgsProvisionTest.class.getResource("/eu/dnetlib/dhp/dedup/openorgs/provision").toURI())
 			.toFile()
 			.getAbsolutePath();
-		testOutputBasePath = createTempDirectory(SparkOpenorgsTest.class.getSimpleName() + "-")
+		testOutputBasePath = createTempDirectory(SparkOpenorgsProvisionTest.class.getSimpleName() + "-")
 			.toAbsolutePath()
 			.toString();
-		testDedupGraphBasePath = createTempDirectory(SparkOpenorgsTest.class.getSimpleName() + "-")
+		testDedupGraphBasePath = createTempDirectory(SparkOpenorgsProvisionTest.class.getSimpleName() + "-")
 			.toAbsolutePath()
 			.toString();
 
@@ -103,7 +112,9 @@ public class SparkOpenorgsTest implements Serializable {
 	}
 
 	@Test
-	public void copyOpenorgsMergeRels() throws Exception {
+	@Order(1)
+	public void copyOpenorgsMergeRelTest() throws Exception {
+
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
@@ -113,11 +124,14 @@ public class SparkOpenorgsTest implements Serializable {
 		parser
 			.parseArgument(
 				new String[] {
-					"-i", testGraphBasePath,
-					"-asi", testActionSetId,
-					"-w", testOutputBasePath,
-					"-la", "lookupurl",
-					"-np", "50"
+					"-i",
+					testGraphBasePath,
+					"-asi",
+					testActionSetId,
+					"-la",
+					"lookupurl",
+					"-w",
+					testOutputBasePath
 				});
 
 		new SparkCopyOpenorgsMergeRels(parser, spark).run(isLookUpService);
@@ -127,48 +141,84 @@ public class SparkOpenorgsTest implements Serializable {
 			.load(DedupUtility.createMergeRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		Dataset<Relation> orgrels = spark
-			.read()
-			.load(DedupUtility.createMergeRelPath(testOutputBasePath, testActionSetId, "organization"))
-			.as(Encoders.bean(Relation.class));
-
-		for (Relation r : orgrels.toJavaRDD().collect())
-			System.out.println("r = " + r.getSource() + "---" + r.getTarget() + "---" + r.getRelClass());
-
-		assertEquals(384, orgs_mergerel);
-
+		assertEquals(140, orgs_mergerel);
 	}
 
 	@Test
-	public void copyOpenorgsSimRels() throws Exception {
+	@Order(2)
+	public void createOrgsDedupRecordTest() throws Exception {
+
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCopyOpenorgsSimRels.class
+					SparkCopyOpenorgsMergeRels.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/dedup/copyOpenorgsMergeRels_parameters.json")));
+							"/eu/dnetlib/dhp/oa/dedup/copyOpenorgs_parameters.json")));
 		parser
 			.parseArgument(
 				new String[] {
-					"-i", testGraphBasePath,
-					"-asi", testActionSetId,
-					"-w", testOutputBasePath,
-					"-la", "lookupurl",
-					"-np", "50"
+					"-i",
+					testGraphBasePath,
+					"-asi",
+					testActionSetId,
+					"-w",
+					testOutputBasePath
 				});
 
-		new SparkCopyOpenorgsSimRels(parser, spark).run(isLookUpService);
+		new SparkCreateOrgsDedupRecord(parser, spark).run(isLookUpService);
 
-		long orgs_simrel = spark
+		long orgs_deduprecord = spark
 			.read()
-			.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_simrel")
+			.json(DedupUtility.createDedupRecordPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(73, orgs_simrel);
+		assertEquals(10, orgs_deduprecord);
 	}
 
 	@Test
+	@Order(3)
+	public void updateEntityTest() throws Exception {
+
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkUpdateEntity.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/dedup/updateEntity_parameters.json")));
+		parser
+			.parseArgument(
+				new String[] {
+					"-i", testGraphBasePath, "-w", testOutputBasePath, "-o", testDedupGraphBasePath
+				});
+
+		new SparkUpdateEntity(parser, spark).run(isLookUpService);
+
+		long organizations = jsc.textFile(testDedupGraphBasePath + "/organization").count();
+
+		long mergedOrgs = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
+			.as(Encoders.bean(Relation.class))
+			.where("relClass=='merges'")
+			.javaRDD()
+			.map(Relation::getTarget)
+			.distinct()
+			.count();
+
+		assertEquals(80, organizations);
+
+		long deletedOrgs = jsc
+			.textFile(testDedupGraphBasePath + "/organization")
+			.filter(this::isDeletedByInference)
+			.count();
+
+		assertEquals(mergedOrgs, deletedOrgs);
+	}
+
+	@Test
+	@Order(4)
 	public void copyRelationsNoOpenorgsTest() throws Exception {
+
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
@@ -178,22 +228,73 @@ public class SparkOpenorgsTest implements Serializable {
 		parser
 			.parseArgument(
 				new String[] {
-					"-i", testGraphBasePath,
-					"-w", testOutputBasePath,
-					"-o", testDedupGraphBasePath
+					"-i", testGraphBasePath, "-w", testOutputBasePath, "-o", testDedupGraphBasePath
 				});
 
 		new SparkCopyRelationsNoOpenorgs(parser, spark).run(isLookUpService);
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(400, relations);
+		assertEquals(2380, relations);
+	}
+
+	@Test
+	@Order(5)
+	public void propagateRelationsTest() throws Exception {
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkPropagateRelation.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json")));
+		parser
+			.parseArgument(
+				new String[] {
+					"-i", testGraphBasePath, "-w", testOutputBasePath, "-o", testDedupGraphBasePath
+				});
+
+		new SparkPropagateRelation(parser, spark).run(isLookUpService);
+
+		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
+
+		assertEquals(2520, relations);
+
+		// check deletedbyinference
+		final Dataset<Relation> mergeRels = spark
+			.read()
+			.load(DedupUtility.createMergeRelPath(testOutputBasePath, "*", "*"))
+			.as(Encoders.bean(Relation.class));
+		final JavaPairRDD<String, String> mergedIds = mergeRels
+			.where("relClass == 'merges'")
+			.select(mergeRels.col("target"))
+			.distinct()
+			.toJavaRDD()
+			.mapToPair(
+				(PairFunction<Row, String, String>) r -> new Tuple2<String, String>(r.getString(0), "d"));
+
+		JavaRDD<String> toCheck = jsc
+			.textFile(testDedupGraphBasePath + "/relation")
+			.mapToPair(json -> new Tuple2<>(MapDocumentUtil.getJPathString("$.source", json), json))
+			.join(mergedIds)
+			.map(t -> t._2()._1())
+			.mapToPair(json -> new Tuple2<>(MapDocumentUtil.getJPathString("$.target", json), json))
+			.join(mergedIds)
+			.map(t -> t._2()._1());
+
+		long deletedbyinference = toCheck.filter(this::isDeletedByInference).count();
+		long updated = toCheck.count();
+
+		assertEquals(updated, deletedbyinference);
 	}
 
 	@AfterAll
 	public static void finalCleanUp() throws IOException {
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
+	}
+
+	public boolean isDeletedByInference(String s) {
+		return s.contains("\"deletedbyinference\":true");
 	}
 
 }

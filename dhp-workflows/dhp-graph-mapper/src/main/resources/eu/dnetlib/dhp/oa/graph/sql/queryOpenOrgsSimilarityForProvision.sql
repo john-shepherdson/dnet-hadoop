@@ -8,4 +8,7 @@ SELECT
 	false                                                 AS deletedbyinference,
 	0.99                                                  AS trust,
 	''                                                    AS inferenceprovenance
-FROM oa_duplicates WHERE reltype = 'is_similar' OR reltype = 'suggested';
+FROM
+    oa_duplicates
+WHERE
+    reltype = 'is_similar' OR reltype = 'suggested';
