@@ -54,7 +54,10 @@ FROM ${openaire_db_name}.dataset p
 where p.datainfo.deletedbyinference = false;
 
 CREATE TABLE ${stats_db_name}.dataset_concepts AS
-SELECT substr(p.id, 4) as id, contexts.context.id as concept
+SELECT substr(p.id, 4) as id, case
+                                  when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
+                                  when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
+                                  when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
 from ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.context) contexts as context
 where p.datainfo.deletedbyinference = false;
