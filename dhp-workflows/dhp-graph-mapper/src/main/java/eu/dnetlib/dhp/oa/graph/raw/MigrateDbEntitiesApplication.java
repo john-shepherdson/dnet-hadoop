@@ -1,28 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASOURCE_ORGANIZATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTICIPANT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PARTICIPANT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PROVIDED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_RELATED_TO;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PARTICIPATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROJECT_ORGANIZATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVIDES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVISION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RELATIONSHIP;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.asString;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.dataInfo;
@@ -161,27 +140,24 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 						.execute(
 							"queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
 					break;
-				case openorgs_dedup:	//generates organization entities and relations for openorgs dedup
+				case openorgs_dedup: // generates organization entities and relations for openorgs dedup
 					log.info("Processing Openorgs...");
 					smdbe
 						.execute(
 							"queryOpenOrgsForOrgsDedup.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
-					log.info("Processing Openorgs Merge Rels...");
+					log.info("Processing Openorgs Sim Rels...");
 					smdbe.execute("queryOpenOrgsSimilarityForOrgsDedup.sql", smdbe::processOrgOrgSimRels);
-
 					break;
 
-				case openorgs:  //generates organization entities and relations for provision
+				case openorgs: // generates organization entities and relations for provision
 					log.info("Processing Openorgs For Provision...");
 					smdbe
 						.execute(
 							"queryOpenOrgsForProvision.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
 					log.info("Processing Openorgs Merge Rels...");
-					smdbe.execute("queryOpenOrgsSimilarityForProvision.sql", smdbe::processOrgOrgSimRels);
-					//TODO cambiare il mapping delle relazioni in modo che crei merges e isMergedIn
-					// TODO (specifico per questo caso, questa funzione di mapping verrà usata così com'è nel caso di openorgs dedup
+					smdbe.execute("queryOpenOrgsSimilarityForProvision.sql", smdbe::processOrgOrgMergeRels);
 					break;
 
 				case openaire_organizations:
@@ -635,6 +611,41 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		}
 	}
 
+	public List<Oaf> processOrgOrgMergeRels(final ResultSet rs) {
+		try {
+			final DataInfo info = prepareDataInfo(rs); // TODO
+
+			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
+			final String orgId2 = createOpenaireId(20, rs.getString("id2"), true);
+
+			final List<KeyValue> collectedFrom = listKeyValues(
+				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
+
+			final Relation r1 = new Relation();
+			r1.setRelType(ORG_ORG_RELTYPE);
+			r1.setSubRelType(ModelConstants.DEDUP);
+			r1.setRelClass(MERGES);
+			r1.setSource(orgId1);
+			r1.setTarget(orgId2);
+			r1.setCollectedfrom(collectedFrom);
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+
+			final Relation r2 = new Relation();
+			r2.setRelType(ORG_ORG_RELTYPE);
+			r2.setSubRelType(ModelConstants.DEDUP);
+			r2.setRelClass(IS_MERGED_IN);
+			r2.setSource(orgId2);
+			r2.setTarget(orgId1);
+			r2.setCollectedfrom(collectedFrom);
+			r2.setDataInfo(info);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+			return Arrays.asList(r1, r2);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public List<Oaf> processOrgOrgSimRels(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs); // TODO
@@ -647,7 +658,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final Relation r1 = new Relation();
-			r1.setRelType(ModelConstants.ORG_ORG_RELTYPE);
+			r1.setRelType(ORG_ORG_RELTYPE);
 			r1.setSubRelType(ModelConstants.DEDUP);
 			r1.setRelClass(relClass);
 			r1.setSource(orgId1);

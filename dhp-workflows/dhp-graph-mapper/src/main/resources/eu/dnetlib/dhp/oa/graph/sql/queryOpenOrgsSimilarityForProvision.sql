@@ -7,6 +7,5 @@ SELECT
 	false                                                 AS inferred,
 	false                                                 AS deletedbyinference,
 	0.99                                                  AS trust,
-	''                                                    AS inferenceprovenance,
-	'isSimilarTo'                                         AS relclass
+	''                                                    AS inferenceprovenance
 FROM oa_duplicates WHERE reltype = 'is_similar' OR reltype = 'suggested';

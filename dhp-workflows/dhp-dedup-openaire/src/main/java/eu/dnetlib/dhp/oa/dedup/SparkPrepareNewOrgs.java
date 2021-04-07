@@ -183,7 +183,17 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 					r._1()._2().getWebsiteurl() != null ? r._1()._2().getWebsiteurl().getValue() : "",
 					r._1()._2().getCollectedfrom().get(0).getValue(),
 					"",
-					structuredPropertyListToString(r._1()._2().getPid())),
+					structuredPropertyListToString(r._1()._2().getPid()),
+					parseECField(r._1()._2().getEclegalbody()),
+					parseECField(r._1()._2().getEclegalperson()),
+					parseECField(r._1()._2().getEcnonprofit()),
+					parseECField(r._1()._2().getEcresearchorganization()),
+					parseECField(r._1()._2().getEchighereducation()),
+					parseECField(r._1()._2().getEcinternationalorganizationeurinterests()),
+					parseECField(r._1()._2().getEcinternationalorganization()),
+					parseECField(r._1()._2().getEcenterprise()),
+					parseECField(r._1()._2().getEcsmevalidated()),
+					parseECField(r._1()._2().getEcnutscode())),
 				Encoders.bean(OrgSimRel.class));
 
 	}

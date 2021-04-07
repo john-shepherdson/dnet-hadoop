@@ -224,7 +224,17 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 							.map(c -> Optional.ofNullable(c.get(0)).map(KeyValue::getValue).orElse(""))
 							.orElse(""),
 						r._1()._3(),
-						structuredPropertyListToString(o.getPid()));
+						structuredPropertyListToString(o.getPid()),
+						parseECField(o.getEclegalbody()),
+						parseECField(o.getEclegalperson()),
+						parseECField(o.getEcnonprofit()),
+						parseECField(o.getEcresearchorganization()),
+						parseECField(o.getEchighereducation()),
+						parseECField(o.getEcinternationalorganizationeurinterests()),
+						parseECField(o.getEcinternationalorganization()),
+						parseECField(o.getEcenterprise()),
+						parseECField(o.getEcsmevalidated()),
+						parseECField(o.getEcnutscode()));
 				},
 				Encoders.bean(OrgSimRel.class))
 			.map(
@@ -301,7 +311,17 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
 					r._2()._2().getCollectedfrom().get(0).getValue(),
 					"group::" + r._1()._1(),
-					structuredPropertyListToString(r._2()._2().getPid())),
+					structuredPropertyListToString(r._2()._2().getPid()),
+					parseECField(r._2()._2().getEclegalbody()),
+					parseECField(r._2()._2().getEclegalperson()),
+					parseECField(r._2()._2().getEcnonprofit()),
+					parseECField(r._2()._2().getEcresearchorganization()),
+					parseECField(r._2()._2().getEchighereducation()),
+					parseECField(r._2()._2().getEcinternationalorganizationeurinterests()),
+					parseECField(r._2()._2().getEcinternationalorganization()),
+					parseECField(r._2()._2().getEcenterprise()),
+					parseECField(r._2()._2().getEcsmevalidated()),
+					parseECField(r._2()._2().getEcnutscode())),
 				Encoders.bean(OrgSimRel.class))
 			.map(
 				(MapFunction<OrgSimRel, Tuple2<String, OrgSimRel>>) o -> new Tuple2<>(o.getLocal_id(), o),

@@ -101,7 +101,7 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 							.mapToPair(
 								(PairFunction<String, String, String>) s -> new Tuple2<>(
 									MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
-						if (type == EntityType.organization)	//exclude root records from organizations
+						if (type == EntityType.organization) // exclude root records from organizations
 							entitiesWithId = excludeRootOrgs(entitiesWithId, rel);
 
 						JavaRDD<String> map = entitiesWithId
@@ -156,19 +156,20 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 		}
 	}
 
-	private static JavaPairRDD<String, String> excludeRootOrgs(JavaPairRDD<String, String> entitiesWithId, Dataset<Relation> rel) {
+	private static JavaPairRDD<String, String> excludeRootOrgs(JavaPairRDD<String, String> entitiesWithId,
+		Dataset<Relation> rel) {
 
 		JavaPairRDD<String, String> roots = rel
-				.where("relClass == 'merges'")
-				.select(rel.col("source"))
-				.distinct()
-				.toJavaRDD()
-				.mapToPair(
-						(PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "root"));
+			.where("relClass == 'merges'")
+			.select(rel.col("source"))
+			.distinct()
+			.toJavaRDD()
+			.mapToPair(
+				(PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "root"));
 
 		return entitiesWithId
-				.leftOuterJoin(roots)
-				.filter(e -> !e._2()._2().isPresent())
-				.mapToPair(e -> new Tuple2<>(e._1(), e._2()._1()));
+			.leftOuterJoin(roots)
+			.filter(e -> !e._2()._2().isPresent())
+			.mapToPair(e -> new Tuple2<>(e._1(), e._2()._1()));
 	}
 }

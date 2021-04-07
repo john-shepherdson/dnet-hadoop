@@ -142,4 +142,12 @@ abstract class AbstractSparkAction implements Serializable {
 					.isPresent())
 			.orElse(false);
 	}
+
+	protected static Boolean parseECField(Field<String> field) {
+		if (field == null)
+			return null;
+		if (StringUtils.isBlank(field.getValue()) || field.getValue().equalsIgnoreCase("null"))
+			return null;
+		return field.getValue().equalsIgnoreCase("true");
+	}
 }

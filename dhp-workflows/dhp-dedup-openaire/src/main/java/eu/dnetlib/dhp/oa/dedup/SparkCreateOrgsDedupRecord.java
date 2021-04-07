@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.dedup;
 import java.io.IOException;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -23,6 +22,7 @@ import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -90,31 +90,33 @@ public class SparkCreateOrgsDedupRecord extends AbstractSparkAction {
 
 		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaPairRDD<String, Organization> entities = sc.textFile(entitiesInputPath)
-				.map(it -> OBJECT_MAPPER.readValue(it, Organization.class))
-				.mapToPair(o -> new Tuple2<>(o.getId(), o));
+		JavaPairRDD<String, Organization> entities = sc
+			.textFile(entitiesInputPath)
+			.map(it -> OBJECT_MAPPER.readValue(it, Organization.class))
+			.mapToPair(o -> new Tuple2<>(o.getId(), o));
 
 		log.info("Number of organization entities processed: {}", entities.count());
 
-		//collect root ids (ids in the source of 'merges' relations
+		// collect root ids (ids in the source of 'merges' relations
 		JavaPairRDD<String, String> roots = spark
-				.read()
-				.load(mergeRelsPath)
-				.as(Encoders.bean(Relation.class))
-				.where("relClass == 'merges'")
-				.map(
-						(MapFunction<Relation, Tuple2<String, String>>) r -> new Tuple2<>(r.getSource(), "root"),
-						Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
-				.toJavaRDD()
-				.mapToPair(t -> t)
-				.distinct();
+			.read()
+			.load(mergeRelsPath)
+			.as(Encoders.bean(Relation.class))
+			.where("relClass == 'merges'")
+			.map(
+				(MapFunction<Relation, Tuple2<String, String>>) r -> new Tuple2<>(r.getSource(), "root"),
+				Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
+			.toJavaRDD()
+			.mapToPair(t -> t)
+			.distinct();
 
-		Dataset<Organization> rootOrgs = spark.createDataset(
+		Dataset<Organization> rootOrgs = spark
+			.createDataset(
 				entities
-						.leftOuterJoin(roots)
-						.filter(e -> e._2()._2().isPresent()) //if it has been joined with 'root' then it's a root record
-						.map(e -> e._2()._1())
-						.rdd(),
+					.leftOuterJoin(roots)
+					.filter(e -> e._2()._2().isPresent()) // if it has been joined with 'root' then it's a root record
+					.map(e -> e._2()._1())
+					.rdd(),
 				Encoders.bean(Organization.class));
 
 		log.info("Number of Root organization: {}", entities.count());

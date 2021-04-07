@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -31,6 +30,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -102,34 +102,6 @@ public class SparkOpenorgsTest implements Serializable {
 								"/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
 	}
 
-	@Disabled
-	@Test
-	public void copyOpenorgsTest() throws Exception {
-
-		ArgumentApplicationParser parser = new ArgumentApplicationParser(
-			IOUtils
-				.toString(
-					SparkCopyOpenorgs.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/dedup/copyOpenorgs_parameters.json")));
-		parser
-			.parseArgument(
-				new String[] {
-					"-i", testGraphBasePath,
-					"-asi", testActionSetId,
-					"-w", testOutputBasePath,
-					"-np", "50"
-				});
-
-		new SparkCopyOpenorgs(parser, spark).run(isLookUpService);
-
-		long orgs_deduprecord = jsc
-			.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_deduprecord")
-			.count();
-
-		assertEquals(100, orgs_deduprecord);
-	}
-
 	@Test
 	public void copyOpenorgsMergeRels() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -155,9 +127,12 @@ public class SparkOpenorgsTest implements Serializable {
 			.load(DedupUtility.createMergeRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		Dataset<Relation> orgrels = spark.read().load(DedupUtility.createMergeRelPath(testOutputBasePath, testActionSetId, "organization")).as(Encoders.bean(Relation.class));
+		Dataset<Relation> orgrels = spark
+			.read()
+			.load(DedupUtility.createMergeRelPath(testOutputBasePath, testActionSetId, "organization"))
+			.as(Encoders.bean(Relation.class));
 
-		for (Relation r: orgrels.toJavaRDD().collect())
+		for (Relation r : orgrels.toJavaRDD().collect())
 			System.out.println("r = " + r.getSource() + "---" + r.getTarget() + "---" + r.getRelClass());
 
 		assertEquals(384, orgs_mergerel);

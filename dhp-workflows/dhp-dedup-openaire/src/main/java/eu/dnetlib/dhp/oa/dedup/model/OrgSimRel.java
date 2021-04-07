@@ -14,12 +14,25 @@ public class OrgSimRel implements Serializable {
 	String oa_collectedfrom;
 	String group_id;
 	String pid_list; // separator for type-pid: "###"; separator for pids: "@@@"
+	Boolean ec_legalbody;
+	Boolean ec_legalperson;
+	Boolean ec_nonprofit;
+	Boolean ec_researchorganization;
+	Boolean ec_highereducation;
+	Boolean ec_internationalorganizationeurinterests;
+	Boolean ec_internationalorganization;
+	Boolean ec_enterprise;
+	Boolean ec_smevalidated;
+	Boolean ec_nutscode;
 
 	public OrgSimRel() {
 	}
 
 	public OrgSimRel(String local_id, String oa_original_id, String oa_name, String oa_acronym, String oa_country,
-		String oa_url, String oa_collectedfrom, String group_id, String pid_list) {
+		String oa_url, String oa_collectedfrom, String group_id, String pid_list, Boolean ec_legalbody,
+		Boolean ec_legalperson, Boolean ec_nonprofit, Boolean ec_researchorganization, Boolean ec_highereducation,
+		Boolean ec_internationalorganizationeurinterests, Boolean ec_internationalorganization, Boolean ec_enterprise,
+		Boolean ec_smevalidated, Boolean ec_nutscode) {
 		this.local_id = local_id;
 		this.oa_original_id = oa_original_id;
 		this.oa_name = oa_name;
@@ -29,6 +42,16 @@ public class OrgSimRel implements Serializable {
 		this.oa_collectedfrom = oa_collectedfrom;
 		this.group_id = group_id;
 		this.pid_list = pid_list;
+		this.ec_legalbody = ec_legalbody;
+		this.ec_legalperson = ec_legalperson;
+		this.ec_nonprofit = ec_nonprofit;
+		this.ec_researchorganization = ec_researchorganization;
+		this.ec_highereducation = ec_highereducation;
+		this.ec_internationalorganizationeurinterests = ec_internationalorganizationeurinterests;
+		this.ec_internationalorganization = ec_internationalorganization;
+		this.ec_enterprise = ec_enterprise;
+		this.ec_smevalidated = ec_smevalidated;
+		this.ec_nutscode = ec_nutscode;
 	}
 
 	public String getLocal_id() {
@@ -103,6 +126,86 @@ public class OrgSimRel implements Serializable {
 		this.pid_list = pid_list;
 	}
 
+	public Boolean getEc_legalbody() {
+		return ec_legalbody;
+	}
+
+	public void setEc_legalbody(Boolean ec_legalbody) {
+		this.ec_legalbody = ec_legalbody;
+	}
+
+	public Boolean getEc_legalperson() {
+		return ec_legalperson;
+	}
+
+	public void setEc_legalperson(Boolean ec_legalperson) {
+		this.ec_legalperson = ec_legalperson;
+	}
+
+	public Boolean getEc_nonprofit() {
+		return ec_nonprofit;
+	}
+
+	public void setEc_nonprofit(Boolean ec_nonprofit) {
+		this.ec_nonprofit = ec_nonprofit;
+	}
+
+	public Boolean getEc_researchorganization() {
+		return ec_researchorganization;
+	}
+
+	public void setEc_researchorganization(Boolean ec_researchorganization) {
+		this.ec_researchorganization = ec_researchorganization;
+	}
+
+	public Boolean getEc_highereducation() {
+		return ec_highereducation;
+	}
+
+	public void setEc_highereducation(Boolean ec_highereducation) {
+		this.ec_highereducation = ec_highereducation;
+	}
+
+	public Boolean getEc_internationalorganizationeurinterests() {
+		return ec_internationalorganizationeurinterests;
+	}
+
+	public void setEc_internationalorganizationeurinterests(Boolean ec_internationalorganizationeurinterests) {
+		this.ec_internationalorganizationeurinterests = ec_internationalorganizationeurinterests;
+	}
+
+	public Boolean getEc_internationalorganization() {
+		return ec_internationalorganization;
+	}
+
+	public void setEc_internationalorganization(Boolean ec_internationalorganization) {
+		this.ec_internationalorganization = ec_internationalorganization;
+	}
+
+	public Boolean getEc_enterprise() {
+		return ec_enterprise;
+	}
+
+	public void setEc_enterprise(Boolean ec_enterprise) {
+		this.ec_enterprise = ec_enterprise;
+	}
+
+	public Boolean getEc_smevalidated() {
+		return ec_smevalidated;
+	}
+
+	public void setEc_smevalidated(Boolean ec_smevalidated) {
+		this.ec_smevalidated = ec_smevalidated;
+	}
+
+	public Boolean getEc_nutscode() {
+		return ec_nutscode;
+	}
+
+	public void setEc_nutscode(Boolean ec_nutscode) {
+		this.ec_nutscode = ec_nutscode;
+	}
+
 	@Override
 	public String toString() {
 		return "OrgSimRel{" +
@@ -115,6 +218,17 @@ public class OrgSimRel implements Serializable {
 			", oa_collectedfrom='" + oa_collectedfrom + '\'' +
 			", group_id='" + group_id + '\'' +
 			", pid_list='" + pid_list + '\'' +
+			", ec_legalbody=" + ec_legalbody +
+			", ec_legalperson=" + ec_legalperson +
+			", ec_nonprofit=" + ec_nonprofit +
+			", ec_researchorganization=" + ec_researchorganization +
+			", ec_highereducation=" + ec_highereducation +
+			", ec_internationalorganizationeurinterests=" + ec_internationalorganizationeurinterests +
+			", ec_internationalorganization=" + ec_internationalorganization +
+			", ec_enterprise=" + ec_enterprise +
+			", ec_smevalidated=" + ec_smevalidated +
+			", ec_nutscode=" + ec_nutscode +
 			'}';
 	}
+
 }
