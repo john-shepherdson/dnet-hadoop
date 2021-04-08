@@ -1,7 +1,7 @@
 -- relations approved by the user and suggested by the dedup
 SELECT
-	local_id                                              AS id1,
-	oa_original_id                                        AS id2,
+	d.local_id                                              AS id1,
+	d.oa_original_id                                        AS id2,
 	'openaire____::openorgs'                              AS collectedfromid,
 	'OpenOrgs Database'                                   AS collectedfromname,
 	false                                                 AS inferred,
@@ -9,6 +9,10 @@ SELECT
 	0.99                                                  AS trust,
 	''                                                    AS inferenceprovenance
 FROM
-    oa_duplicates
+    oa_duplicates d
+
+LEFT OUTER JOIN
+    organizations o ON (d.local_id = o.id)
+
 WHERE
-    reltype = 'is_similar' OR reltype = 'suggested';
+    (d.reltype = 'is_similar' OR d.reltype = 'suggested') AND (o.status != 'hidden');
