@@ -19,7 +19,7 @@ import java.io.Serializable;
  */
 public class ResearchInitiative implements Serializable {
 	private String id; // openaireId
-	private String originalId; // context id
+	private String acronym; // context id
 	private String name; // context name
 	private String type; // context type: research initiative or research community
 	private String description;
@@ -57,12 +57,12 @@ public class ResearchInitiative implements Serializable {
 		this.name = label;
 	}
 
-	public String getOriginalId() {
-		return originalId;
+	public String getAcronym() {
+		return acronym;
 	}
 
-	public void setOriginalId(String originalId) {
-		this.originalId = originalId;
+	public void setAcronym(String acronym) {
+		this.acronym = acronym;
 	}
 
 	public String getDescription() {
