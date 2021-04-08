@@ -35,7 +35,7 @@ public class Process implements Serializable {
 				ri.setType(Constants.RESEARCH_INFRASTRUCTURE);
 			}
 			ri.setId(Utils.getContextId(ci.getId()));
-			ri.setOriginalId(ci.getId());
+			ri.setAcronym(ci.getId());
 
 			ri.setDescription(ci.getDescription());
 			ri.setName(ci.getName());
