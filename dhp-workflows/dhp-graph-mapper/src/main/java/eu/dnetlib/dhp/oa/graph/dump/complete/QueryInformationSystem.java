@@ -12,6 +12,7 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -113,14 +114,72 @@ public class QueryInformationSystem {
 	@NotNull
 	private List<String> getCategoryList(Element el, String prefix) {
 		List<String> datasourceList = new ArrayList<>();
-		for (Object node : el.selectNodes(".//param")) {
-			Node n = (Node) node;
-			if (n.valueOf("./@name").equals("openaireId")) {
-				datasourceList.add(prefix + "|" + n.getText());
-			}
+		for (Object node : el.selectNodes(".//concept")) {
+			String oid = getOpenaireId((Node) node, prefix);
+			if (oid != null)
+				datasourceList.add(oid);
 		}
 
 		return datasourceList;
+	}
+
+	private String getOpenaireId(Node el, String prefix) {
+
+		for (Object node : el.selectNodes(".//param")) {
+			Node n = (Node) node;
+			if (n.valueOf("./@name").equals("openaireId")) {
+				return prefix + "|" + n.getText();
+			}
+		}
+		return makeOpenaireId(el, prefix);
+
+	}
+
+	private String makeOpenaireId(Node el, String prefix) {
+		String funder = null;
+		String grantId = null;
+		String funding = null;
+		for (Object node : el.selectNodes(".//param")) {
+			Node n = (Node) node;
+			switch (n.valueOf("./@name")) {
+				case "funding":
+					funding = n.getText();
+					break;
+				case "funder":
+					funder = n.getText();
+					break;
+				case "CD_PROJECT_NUMBER":
+					grantId = n.getText();
+					break;
+			}
+		}
+		String nsp = null;
+		switch (funder.toLowerCase()) {
+			case "ec":
+				if (funding == null) {
+					return null;
+				}
+				if (funding.toLowerCase().startsWith("h2020")) {
+					nsp = "corda__h2020::";
+				} else {
+					nsp = "corda_______::";
+				}
+				break;
+			case "tubitak":
+				nsp = "tubitakf____::";
+				break;
+			case "dfg":
+				nsp = "dfgf________::";
+				break;
+			default:
+				nsp = funder.toLowerCase();
+				for (int i = funder.length(); i < 12; i++)
+					nsp += "_";
+				nsp += "::";
+		}
+
+		return prefix + "|" + nsp + DHPUtils.md5(grantId);
+
 	}
 
 }
