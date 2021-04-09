@@ -70,10 +70,10 @@ public class CreateContextRelation implements Serializable {
 		cce.execute(Process::getRelation, CONTEX_RELATION_DATASOURCE, ModelSupport.getIdPrefix(Datasource.class));
 
 		log.info("Creating relations for projects... ");
-//		cce
-//			.execute(
-//				Process::getRelation, CONTEX_RELATION_PROJECT,
-//				ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
+		cce
+			.execute(
+				Process::getRelation, CONTEX_RELATION_PROJECT,
+				ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
 
 		cce.close();
 
