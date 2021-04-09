@@ -147,7 +147,7 @@ public class Extractor implements Serializable {
 					.map(
 						paction -> Provenance
 							.newInstance(
-								paction.getClassid(),
+								paction.getClassname(),
 								dinfo.getTrust()))
 					.orElse(
 						Provenance
