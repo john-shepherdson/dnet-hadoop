@@ -46,6 +46,7 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 			Processor processor = new Processor(false);
 			processor.registerExtensionFunction(cleanFunction);
 			processor.registerExtensionFunction(new DateCleaner());
+			processor.registerExtensionFunction(new PersonCleaner());
 
 			final XsltCompiler comp = processor.newXsltCompiler();
 			XsltExecutable xslt = comp
