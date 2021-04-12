@@ -91,6 +91,7 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 
 						final JavaPairRDD<String, String> mergedIds = rel
 							.where("relClass == 'merges'")
+							.where("source != target")
 							.select(rel.col("target"))
 							.distinct()
 							.toJavaRDD()
