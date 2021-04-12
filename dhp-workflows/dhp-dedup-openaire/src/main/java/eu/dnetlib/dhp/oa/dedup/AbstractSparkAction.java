@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -137,7 +138,8 @@ abstract class AbstractSparkAction implements Serializable {
 			.map(
 				c -> c
 					.stream()
-					.filter(kv -> kv.getValue().equals(ModelConstants.OPENORGS_NAME))
+					.filter(Objects::nonNull)
+					.filter(kv -> ModelConstants.OPENORGS_NAME.equals(kv.getValue()))
 					.findFirst()
 					.isPresent())
 			.orElse(false);
