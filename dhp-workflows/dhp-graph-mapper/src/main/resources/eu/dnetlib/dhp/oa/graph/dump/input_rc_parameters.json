@@ -2,8 +2,8 @@
 [
 
 	{
-		"paramName":"is",
-		"paramLongName":"isLookUpUrl",
+		"paramName":"ci",
+		"paramLongName":"communityId",
 		"paramDescription": "URL of the isLookUp Service",
 		"paramRequired": true
 	},
@@ -14,8 +14,8 @@
 		"paramRequired": true
 	},
 	{
-		"paramName": "out",
-		"paramLongName": "outputPath",
+		"paramName": "p",
+		"paramLongName": "path",
 		"paramDescription": "the path used to store temporary output files",
 		"paramRequired": true
 	}

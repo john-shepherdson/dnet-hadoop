@@ -25,6 +25,12 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
+	},
+	{
+		"paramName": "cid",
+		"paramLongName": "communityId",
+		"paramDescription": "true if the spark session is managed, false otherwise",
+		"paramRequired": false
 	}
 ]
 
