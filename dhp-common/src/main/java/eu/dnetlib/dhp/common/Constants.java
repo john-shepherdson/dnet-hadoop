@@ -42,6 +42,8 @@ public class Constants {
 	public static final String RETRY_DELAY = "retryDelay";
 	public static final String CONNECT_TIMEOUT = "connectTimeOut";
 	public static final String READ_TIMEOUT = "readTimeOut";
+	public static final String FROM_DATE_OVERRIDE = "fromDateOverride";
+	public static final String UNTIL_DATE_OVERRIDE = "untilDateOverride";
 
 	public static final String CONTENT_TOTALITEMS = "TotalItems";
 	public static final String CONTENT_INVALIDRECORDS = "InvalidRecords";
