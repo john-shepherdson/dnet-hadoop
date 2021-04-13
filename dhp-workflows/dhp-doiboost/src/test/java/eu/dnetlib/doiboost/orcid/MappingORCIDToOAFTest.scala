@@ -2,12 +2,13 @@ package eu.dnetlib.doiboost.orcid
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.oaf.Publication
-import eu.dnetlib.doiboost.orcid.SparkConvertORCIDToOAF.getClass
-import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
+import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.nio.file.Path
 import scala.io.Source
 
 class MappingORCIDToOAFTest {
@@ -24,27 +25,37 @@ class MappingORCIDToOAFTest {
     })
   }
 
-//  @Test
-//  def testOAFConvert():Unit ={
-//
-//    val spark: SparkSession =
-//      SparkSession
-//        .builder()
-//        .appName(getClass.getSimpleName)
-//        .master("local[*]").getOrCreate()
-//
-//
-//    SparkConvertORCIDToOAF.run( spark,"/Users/sandro/Downloads/orcid", "/Users/sandro/Downloads/orcid_oaf")
-//    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
-//
-//    val df = spark.read.load("/Users/sandro/Downloads/orcid_oaf").as[Publication]
-//    println(df.first.getId)
-//    println(mapper.writeValueAsString(df.first()))
-//
-//
-//
-//
-//  }
+  @Test
+  def testOAFConvert(@TempDir testDir: Path):Unit ={
+    val sourcePath:String = getClass.getResource("/eu/dnetlib/doiboost/orcid/datasets").getPath
+    val targetPath: String =s"${testDir.toString}/output/orcidPublication"
+    val workingPath =s"${testDir.toString}/wp/"
+
+    val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName(getClass.getSimpleName)
+        .master("local[*]").getOrCreate()
+    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
+    import spark.implicits._
+
+    SparkConvertORCIDToOAF.run( spark,sourcePath, workingPath, targetPath)
+
+    val mapper = new ObjectMapper()
+
+
+
+    val oA = spark.read.load(s"$workingPath/orcidworksWithAuthor").as[ORCIDItem].count()
+
+
+
+    val p: Dataset[Publication] = spark.read.load(targetPath).as[Publication]
+
+    assertTrue(oA == p.count())
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p.first()))
+
+
+  }
 
 
 
