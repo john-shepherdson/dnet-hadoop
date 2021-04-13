@@ -67,6 +67,7 @@ public class CleaningFunctionTest {
 
 		assertNotNull(p_out.getPublisher());
 		assertNull(p_out.getPublisher().getValue());
+
 		assertEquals("und", p_out.getLanguage().getClassid());
 		assertEquals("Undetermined", p_out.getLanguage().getClassname());
 
@@ -120,6 +121,9 @@ public class CleaningFunctionTest {
 				.isPresent());
 
 		Publication p_cleaned = CleaningFunctions.cleanup(p_out);
+
+		assertEquals(1, p_cleaned.getTitle().size());
+
 		assertEquals("CLOSED", p_cleaned.getBestaccessright().getClassid());
 		assertNull(p_out.getPublisher());
 
