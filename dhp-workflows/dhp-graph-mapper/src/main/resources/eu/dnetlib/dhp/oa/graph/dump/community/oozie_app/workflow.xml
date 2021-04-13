@@ -2,6 +2,15 @@
 
     <parameters>
         <property>
+            <name>singleDeposition</name>
+            <value>true</value>
+            <description>Indicates if each file in the directory should be uploaded in a own deposition</description>
+        </property>
+        <property>
+            <name>communityId</name>
+            <description>the id of the community to be dumped if a dump for a single community should be done</description>
+        </property>
+        <property>
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
@@ -122,6 +131,24 @@
             <arg>--outputPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+        </java>
+        <ok to="single_deposition"/>
+        <error to="Kill"/>
+    </action>
+
+    <decision name="single_deposition">
+        <switch>
+            <case to="remove_communities">${wf:conf('singleDeposition') eq true}</case>
+            <default to="fork_dump"/>
+        </switch>
+    </decision>
+
+    <action name="remove_communities">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.dump.community.RemoveCommunities</main-class>
+            <arg>--path</arg><arg>${workingDir}/communityMap</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--communityId</arg><arg>${communityId}</arg>
         </java>
         <ok to="fork_dump"/>
         <error to="Kill"/>
@@ -417,7 +444,6 @@
             <arg>--accessToken</arg><arg>${accessToken}</arg>
             <arg>--connectionUrl</arg><arg>${connectionUrl}</arg>
             <arg>--metadata</arg><arg>${metadata}</arg>
-            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--conceptRecordId</arg><arg>${conceptRecordId}</arg>
             <arg>--depositionId</arg><arg>${depositionId}</arg>
             <arg>--depositionType</arg><arg>${depositionType}</arg>
