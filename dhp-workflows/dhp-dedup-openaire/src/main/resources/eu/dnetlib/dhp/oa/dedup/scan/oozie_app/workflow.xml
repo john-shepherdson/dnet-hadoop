@@ -83,7 +83,7 @@
         </configuration>
     </global>
 
-    <start to="testOpenorgs"/>
+    <start to="resetWorkingPath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
