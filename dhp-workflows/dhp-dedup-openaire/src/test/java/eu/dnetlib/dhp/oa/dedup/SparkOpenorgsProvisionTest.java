@@ -161,6 +161,8 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 					testGraphBasePath,
 					"-asi",
 					testActionSetId,
+					"-la",
+					"lookupurl",
 					"-w",
 					testOutputBasePath
 				});
