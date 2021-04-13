@@ -90,6 +90,7 @@ public class CleanGraphSparkJob {
 			.map((MapFunction<T, T>) value -> fixVocabularyNames(value), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> cleanup(value), Encoders.bean(clazz))
+			.filter((FilterFunction<T>) value -> filter(value))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

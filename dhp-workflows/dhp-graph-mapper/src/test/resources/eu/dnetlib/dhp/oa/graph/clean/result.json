@@ -865,6 +865,28 @@
         "schemename": "dnet:dataCite_title"
       },
       "value": "Optical response of strained- and unstrained-silicon cold-electron bolometers"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "test test 123 test"
     }
   ]
 }

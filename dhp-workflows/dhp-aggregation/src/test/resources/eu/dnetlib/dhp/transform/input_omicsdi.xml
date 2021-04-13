@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oai:record xmlns="http://namespace.openaire.eu/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+  xmlns:oaf="http://namespace.openaire.eu/oaf"
+  xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+  xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <oai:header>
+    <dri:objIdentifier>_____OmicsDI::0000337c02d1b51030675d69407655da</dri:objIdentifier>
+    <dri:recordIdentifier>PRJNA78295</dri:recordIdentifier>
+    <dri:dateOfCollection>2020-10-31T15:31:30.725Z</dri:dateOfCollection>
+    <oaf:datasourceprefix>_____OmicsDI</oaf:datasourceprefix>
+  </oai:header>
+  <oai:metadata>
+    <datasets xmlns="">
+      <connectionsCountScaled>0.235294117647059</connectionsCountScaled>
+      <reanalysisCount>0</reanalysisCount>
+      <keywords>null</keywords>
+      <citationsCountScaled>0.0</citationsCountScaled>
+      <viewsCount>0</viewsCount>
+      <description>Sedimentitalea nanhaiensis DSM 24252 Genome sequencing and assembly</description>
+      <downloadCountScaled>8.20101314054644E-5</downloadCountScaled>
+      <source>omics_ena_project</source>
+      <title>Sedimentitalea nanhaiensis DSM 24252</title>
+      <connectionsCount>14</connectionsCount>
+      <citationsCount>0</citationsCount>
+      <score>null</score>
+      <omicsType>Genomics</omicsType>
+      <reanalysisCountScaled>0.0</reanalysisCountScaled>
+      <organisms>
+        <acc>571166</acc>
+        <name>Sedimentitalea nanhaiensis DSM 24252</name>
+      </organisms>
+      <viewsCountScaled>0.0</viewsCountScaled>
+      <claimable>false</claimable>
+      <id>PRJNA78295</id>
+      <publicationDate>null</publicationDate>
+      <downloadCount>13</downloadCount>
+    </datasets>
+  </oai:metadata>
+  <about xmlns="">
+    <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+      <originDescription altered="true" harvestDate="2020-10-31T15:31:30.725Z">
+        <baseURL>https%3A%2F%2Fwww.omicsdi.org%2Fws%2Fdataset%2Fsearch</baseURL>
+        <identifier/>
+        <datestamp/>
+        <metadataNamespace/>
+      </originDescription>
+    </provenance>
+    <oaf:datainfo>
+      <oaf:inferred>false</oaf:inferred>
+      <oaf:deletedbyinference>false</oaf:deletedbyinference>
+      <oaf:trust>0.9</oaf:trust>
+      <oaf:inferenceprovenance/>
+      <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+        classname="sysimport:crosswalk:datasetarchive"
+        schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+    </oaf:datainfo>
+  </about>
+</oai:record>
