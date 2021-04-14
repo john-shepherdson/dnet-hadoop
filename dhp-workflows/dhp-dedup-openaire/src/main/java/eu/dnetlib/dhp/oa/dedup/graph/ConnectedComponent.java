@@ -3,10 +3,23 @@ package eu.dnetlib.dhp.oa.dedup.graph;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.google.common.collect.Lists;
+import eu.dnetlib.dhp.oa.dedup.IdGenerator;
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.spark.api.java.function.MapFunction;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,30 +30,48 @@ import eu.dnetlib.pace.util.PaceException;
 
 public class ConnectedComponent implements Serializable {
 
-	private Set<String> docIds;
 	private String ccId;
+	private Set<String> entities;
 
-	public ConnectedComponent(Set<String> docIds, final int cut) {
-		this.docIds = docIds;
-		createID();
-		if (cut > 0 && docIds.size() > cut) {
-			this.docIds = docIds
-				.stream()
-				.filter(s -> !ccId.equalsIgnoreCase(s))
-				.limit(cut - 1)
-				.collect(Collectors.toSet());
-			this.docIds.add(ccId);
+	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	public <T extends OafEntity> ConnectedComponent(Set<String> entities, String subEntity, final int cut) {
+		this.entities = entities;
+		final Class<T> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
+
+		List<Identifier<T>> identifiers = Lists.newArrayList();
+
+		entities.forEach(e -> {
+			try {
+				T entity = OBJECT_MAPPER.readValue(e, clazz);
+				identifiers.add(Identifier.newInstance(entity));
+			} catch (IOException e1) {
+			}
+		});
+
+		this.ccId = IdGenerator.generate(
+				identifiers,
+				createDefaultID()
+		);
+
+		if (cut > 0 && entities.size() > cut) {
+			this.entities = entities
+					.stream()
+					.filter(e -> !ccId.equalsIgnoreCase(MapDocumentUtil.getJPathString("$.id", e)))
+					.limit(cut - 1)
+					.collect(Collectors.toSet());
 		}
 	}
 
-	public String createID() {
-		if (docIds.size() > 1) {
+	public String createDefaultID() {
+		if (entities.size() > 1) {
 			final String s = getMin();
 			String prefix = s.split("\\|")[0];
 			ccId = prefix + "|dedup_wf_001::" + DHPUtils.md5(s);
 			return ccId;
 		} else {
-			return docIds.iterator().next();
+			return MapDocumentUtil.getJPathString("$.id", entities.iterator().next());
 		}
 	}
 
@@ -49,15 +80,15 @@ public class ConnectedComponent implements Serializable {
 
 		final StringBuilder min = new StringBuilder();
 
-		docIds
+		entities
 			.forEach(
-				i -> {
+				e -> {
 					if (StringUtils.isBlank(min.toString())) {
-						min.append(i);
+						min.append(MapDocumentUtil.getJPathString("$.id", e));
 					} else {
-						if (min.toString().compareTo(i) > 0) {
+						if (min.toString().compareTo(MapDocumentUtil.getJPathString("$.id", e)) > 0) {
 							min.setLength(0);
-							min.append(i);
+							min.append(MapDocumentUtil.getJPathString("$.id", e));
 						}
 					}
 				});
@@ -74,12 +105,12 @@ public class ConnectedComponent implements Serializable {
 		}
 	}
 
-	public Set<String> getDocIds() {
-		return docIds;
+	public Set<String> getEntities() {
+		return entities;
 	}
 
-	public void setDocIds(Set<String> docIds) {
-		this.docIds = docIds;
+	public void setEntities(Set<String> docIds) {
+		this.entities = entities;
 	}
 
 	public String getCcId() {

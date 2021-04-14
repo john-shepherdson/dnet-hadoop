@@ -353,6 +353,7 @@ public class SparkDedupTest implements Serializable {
 		assertEquals(288, sw_mergerel);
 		assertEquals(472, ds_mergerel);
 		assertEquals(718, orp_mergerel);
+
 	}
 
 	@Test
@@ -538,7 +539,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4858, relations);
+		assertEquals(4862, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark

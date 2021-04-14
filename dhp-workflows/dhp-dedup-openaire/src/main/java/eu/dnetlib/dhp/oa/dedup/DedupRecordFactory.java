@@ -82,7 +82,7 @@ public class DedupRecordFactory {
 
 		final Collection<String> dates = Lists.newArrayList();
 		final List<List<Author>> authors = Lists.newArrayList();
-		final List<Identifier<T>> bestPids = Lists.newArrayList(); // best pids list
+//		final List<Identifier<T>> bestPids = Lists.newArrayList(); // best pids list
 
 		entities
 			.forEachRemaining(
@@ -90,7 +90,7 @@ public class DedupRecordFactory {
 					T duplicate = t._2();
 
 					// prepare the list of pids to be used for the id generation
-					bestPids.add(Identifier.newInstance(duplicate));
+//					bestPids.add(Identifier.newInstance(duplicate));
 
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
@@ -109,7 +109,8 @@ public class DedupRecordFactory {
 			((Result) entity).setAuthor(AuthorMerger.merge(authors));
 		}
 
-		entity.setId(IdGenerator.generate(bestPids, id));
+//		entity.setId(IdGenerator.generate(bestPids, id));
+		entity.setId(id);
 
 		entity.setLastupdatetimestamp(ts);
 		entity.setDataInfo(dataInfo);

@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -100,10 +102,8 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 			final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
 
-			final JavaPairRDD<Object, String> vertexes = sc
-				.textFile(graphBasePath + "/" + subEntity)
-				.map(s -> MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), s))
-				.mapToPair((PairFunction<String, Object, String>) s -> new Tuple2<>(hash(s), s));
+			//<hash(id), json>
+			JavaPairRDD<Object, String> vertexes = createVertexes(sc, graphBasePath, subEntity, dedupConf);
 
 			final RDD<Edge<String>> edgeRdd = spark
 				.read()
@@ -116,9 +116,9 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			final Dataset<Relation> mergeRels = spark
 				.createDataset(
 					GraphProcessor
-						.findCCs(vertexes.rdd(), edgeRdd, maxIterations, cut)
+						.findCCs(vertexes.rdd(), edgeRdd, subEntity, maxIterations, cut)
 						.toJavaRDD()
-						.filter(k -> k.getDocIds().size() > 1)
+						.filter(k -> k.getEntities().size() > 1)
 						.flatMap(cc -> ccToMergeRel(cc, dedupConf))
 						.rdd(),
 					Encoders.bean(Relation.class));
@@ -128,16 +128,26 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		}
 	}
 
-	public Iterator<Relation> ccToMergeRel(ConnectedComponent cc, DedupConfig dedupConf) {
+	private JavaPairRDD<Object, String> createVertexes(JavaSparkContext sc, String graphBasePath, String subEntity, DedupConfig dedupConf) throws IOException {
+
+		return sc
+				.textFile(graphBasePath + "/" + subEntity)
+				.mapToPair(json -> {
+					String id = MapDocumentUtil.getJPathString(dedupConf.getWf().getIdPath(), json);
+					return new Tuple2<>(hash(id), json);
+				});
+	}
+
+	private Iterator<Relation> ccToMergeRel(ConnectedComponent cc, DedupConfig dedupConf) {
 		return cc
-			.getDocIds()
+			.getEntities()
 			.stream()
 			.flatMap(
-				id -> {
+				e -> {
 					List<Relation> tmp = new ArrayList<>();
 
-					tmp.add(rel(cc.getCcId(), id, ModelConstants.MERGES, dedupConf));
-					tmp.add(rel(id, cc.getCcId(), ModelConstants.IS_MERGED_IN, dedupConf));
+					tmp.add(rel(cc.getCcId(), MapDocumentUtil.getJPathString("$.id", e), ModelConstants.MERGES, dedupConf));
+					tmp.add(rel( MapDocumentUtil.getJPathString("$.id", e), cc.getCcId(), ModelConstants.IS_MERGED_IN, dedupConf));
 
 					return tmp.stream();
 				})
