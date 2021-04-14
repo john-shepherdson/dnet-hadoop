@@ -2,6 +2,7 @@ package eu.dnetlib.doiboost.orcid
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.oaf.Publication
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
@@ -31,11 +32,15 @@ class MappingORCIDToOAFTest {
     val targetPath: String =s"${testDir.toString}/output/orcidPublication"
     val workingPath =s"${testDir.toString}/wp/"
 
+    val conf = new SparkConf()
+    conf.setMaster("local[*]")
+    conf.set("spark.driver.host", "localhost")
     val spark: SparkSession =
       SparkSession
         .builder()
         .appName(getClass.getSimpleName)
-        .master("local[*]").getOrCreate()
+        .config(conf)
+        .getOrCreate()
     implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
     import spark.implicits._
 
