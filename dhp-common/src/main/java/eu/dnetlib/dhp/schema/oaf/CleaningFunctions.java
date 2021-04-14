@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.schema.oaf;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,6 +23,9 @@ public class CleaningFunctions {
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 
 	public static final Set<String> PID_BLACKLIST = new HashSet<>();
+	public static final String INVALID_AUTHOR_REGEX = ".*deactivated.*";
+	public static final String TITLE_FILTER_REGEX = "[.*test.*\\W\\d]";
+	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 10;
 
 	static {
 		PID_BLACKLIST.add("none");
@@ -80,6 +84,36 @@ public class CleaningFunctions {
 		return value;
 	}
 
+	public static <T extends Oaf> boolean filter(T value) {
+		if (value instanceof Datasource) {
+			// nothing to evaluate here
+		} else if (value instanceof Project) {
+			// nothing to evaluate here
+		} else if (value instanceof Organization) {
+			// nothing to evaluate here
+		} else if (value instanceof Relation) {
+			// nothing to clean here
+		} else if (value instanceof Result) {
+
+			Result r = (Result) value;
+
+			if (Objects.nonNull(r.getTitle()) && r.getTitle().isEmpty()) {
+				return false;
+			}
+
+			if (value instanceof Publication) {
+
+			} else if (value instanceof eu.dnetlib.dhp.schema.oaf.Dataset) {
+
+			} else if (value instanceof OtherResearchProduct) {
+
+			} else if (value instanceof Software) {
+
+			}
+		}
+		return true;
+	}
+
 	public static <T extends Oaf> T cleanup(T value) {
 		if (value instanceof Datasource) {
 			// nothing to clean here
@@ -124,6 +158,12 @@ public class CleaningFunctions {
 							.stream()
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+							.filter(
+								sp -> sp
+									.getValue()
+									.toLowerCase()
+									.replaceAll(TITLE_FILTER_REGEX, "")
+									.length() > TITLE_FILTER_RESIDUAL_LENGTH)
 							.map(CleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}
@@ -199,16 +239,7 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
-				boolean nullRank = r
-					.getAuthor()
-					.stream()
-					.anyMatch(a -> Objects.isNull(a.getRank()));
-				if (nullRank) {
-					int i = 1;
-					for (Author author : r.getAuthor()) {
-						author.setRank(i++);
-					}
-				}
+				final List<Author> authors = Lists.newArrayList();
 				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
 						a.setPid(Lists.newArrayList());
@@ -235,7 +266,26 @@ public class CleaningFunctions {
 									.stream()
 									.collect(Collectors.toList()));
 					}
+					if (StringUtils.isBlank(a.getFullname())) {
+						if (StringUtils.isNotBlank(a.getName()) && StringUtils.isNotBlank(a.getSurname())) {
+							a.setFullname(a.getSurname() + ", " + a.getName());
+						}
+					}
+					if (StringUtils.isNotBlank(a.getFullname()) && isValidAuthorName(a)) {
+						authors.add(a);
+					}
 				}
+
+				boolean nullRank = authors
+					.stream()
+					.anyMatch(a -> Objects.isNull(a.getRank()));
+				if (nullRank) {
+					int i = 1;
+					for (Author author : authors) {
+						author.setRank(i++);
+					}
+				}
+				r.setAuthor(authors);
 
 			}
 			if (value instanceof Publication) {
@@ -250,6 +300,15 @@ public class CleaningFunctions {
 		}
 
 		return value;
+	}
+
+	private static boolean isValidAuthorName(Author a) {
+		return !Stream
+			.of(a.getFullname(), a.getName(), a.getSurname())
+			.filter(s -> s != null && !s.isEmpty())
+			.collect(Collectors.joining(""))
+			.toLowerCase()
+			.matches(INVALID_AUTHOR_REGEX);
 	}
 
 	private static List<StructuredProperty> processPidCleaning(List<StructuredProperty> pids) {

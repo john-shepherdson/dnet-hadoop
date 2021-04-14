@@ -5,68 +5,48 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.oa.merge.AuthorMerger
 import eu.dnetlib.dhp.schema.oaf.Publication
 import eu.dnetlib.dhp.schema.orcid.OrcidDOI
-import eu.dnetlib.doiboost.mag.ConversionUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.expressions.Aggregator
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 
 object SparkConvertORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(SparkConvertORCIDToOAF.getClass)
 
-  def getPublicationAggregator(): Aggregator[(String, Publication), Publication, Publication] = new Aggregator[(String, Publication), Publication, Publication]{
-
-    override def zero: Publication = new Publication()
-
-    override def reduce(b: Publication, a: (String, Publication)): Publication = {
-      b.mergeFrom(a._2)
-      b.setAuthor(AuthorMerger.mergeAuthor(a._2.getAuthor, b.getAuthor))
-      if (b.getId == null)
-        b.setId(a._2.getId)
-      b
-    }
-
-
-    override def merge(wx: Publication, wy: Publication): Publication = {
-      wx.mergeFrom(wy)
-      wx.setAuthor(AuthorMerger.mergeAuthor(wy.getAuthor, wx.getAuthor))
-      if(wx.getId == null && wy.getId.nonEmpty)
-        wx.setId(wy.getId)
-      wx
-    }
-    override def finish(reduction: Publication): Publication = reduction
-
-    override def bufferEncoder: Encoder[Publication] =
-      Encoders.kryo(classOf[Publication])
-
-    override def outputEncoder: Encoder[Publication] =
-      Encoders.kryo(classOf[Publication])
-  }
-
-  def run(spark:SparkSession,sourcePath:String, targetPath:String):Unit = {
+  def run(spark:SparkSession,sourcePath:String,workingPath:String, targetPath:String):Unit = {
+    import spark.implicits._
     implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
-    implicit val mapOrcid: Encoder[OrcidDOI] = Encoders.kryo[OrcidDOI]
-    implicit val tupleForJoinEncoder: Encoder[(String, Publication)] = Encoders.tuple(Encoders.STRING, mapEncoderPubs)
 
-    val mapper = new ObjectMapper()
-    mapper.getDeserializationConfig.withFeatures(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+    val inputRDD:RDD[OrcidAuthor]  = spark.sparkContext.textFile(s"$sourcePath/authors").map(s => ORCIDToOAF.convertORCIDAuthor(s)).filter(s => s!= null).filter(s => ORCIDToOAF.authorValid(s))
 
-    val dataset:Dataset[OrcidDOI] = spark.createDataset(spark.sparkContext.textFile(sourcePath).map(s => mapper.readValue(s,classOf[OrcidDOI])))
+    spark.createDataset(inputRDD).as[OrcidAuthor].write.mode(SaveMode.Overwrite).save(s"$workingPath/author")
+
+    val res = spark.sparkContext.textFile(s"$sourcePath/works").flatMap(s => ORCIDToOAF.extractDOIWorks(s)).filter(s => s!= null)
+
+    spark.createDataset(res).as[OrcidWork].write.mode(SaveMode.Overwrite).save(s"$workingPath/works")
+
+    val authors :Dataset[OrcidAuthor] = spark.read.load(s"$workingPath/author").as[OrcidAuthor]
+
+    val works :Dataset[OrcidWork] = spark.read.load(s"$workingPath/works").as[OrcidWork]
+
+    works.joinWith(authors, authors("oid").equalTo(works("oid")))
+      .map(i =>{
+      val doi = i._1.doi
+      val author = i._2
+      (doi, author)
+    }).groupBy(col("_1").alias("doi"))
+      .agg(collect_list(col("_2")).alias("authors"))
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/orcidworksWithAuthor")
+
+    val dataset: Dataset[ORCIDItem] =spark.read.load(s"$workingPath/orcidworksWithAuthor").as[ORCIDItem]
 
     logger.info("Converting ORCID to OAF")
-    dataset.map(o => ORCIDToOAF.convertTOOAF(o)).filter(p=>p!=null)
-      .map(d => (d.getId, d))
-      .groupByKey(_._1)(Encoders.STRING)
-      .agg(getPublicationAggregator().toColumn)
-      .map(p => p._2)
-      .write.mode(SaveMode.Overwrite).save(targetPath)
+    dataset.map(o => ORCIDToOAF.convertTOOAF(o)).write.mode(SaveMode.Overwrite).save(targetPath)
   }
 
   def main(args: Array[String]): Unit = {
-
-
     val conf: SparkConf = new SparkConf()
     val parser = new ArgumentApplicationParser(IOUtils.toString(SparkConvertORCIDToOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_map_to_oaf_params.json")))
     parser.parseArgument(args)
@@ -78,10 +58,10 @@ object SparkConvertORCIDToOAF {
         .master(parser.get("master")).getOrCreate()
 
 
-
     val sourcePath = parser.get("sourcePath")
+    val workingPath = parser.get("workingPath")
     val targetPath = parser.get("targetPath")
-    run(spark, sourcePath, targetPath)
+    run(spark, sourcePath, workingPath, targetPath)
 
   }
 

@@ -74,6 +74,11 @@
         <!--    ORCID Parameters    -->
         <property>
             <name>inputPathOrcid</name>
+            <description>the ORCID input path</description>
+        </property>
+
+        <property>
+            <name>workingPathOrcid</name>
             <description>the ORCID working path</description>
         </property>
 
@@ -295,6 +300,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${inputPathOrcid}</arg>
+            <arg>--workingPath</arg><arg>${workingPathOrcid}</arg>
             <arg>--targetPath</arg><arg>${workingPath}/orcidPublication</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>

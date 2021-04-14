@@ -4,16 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
-import eu.dnetlib.dhp.schema.orcid.OrcidDOI
+import eu.dnetlib.dhp.schema.orcid.{AuthorData, OrcidDOI}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil.{createSP, generateDataInfo}
 import org.apache.commons.lang.StringUtils
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
+import org.json4s
+import org.json4s.DefaultFormats
+import org.json4s.JsonAST._
+import org.json4s.jackson.JsonMethods._
 
 
-case class ORCIDItem(oid:String,name:String,surname:String,creditName:String,errorCode:String){}
+case class ORCIDItem(doi:String, authors:List[OrcidAuthor]){}
+case class OrcidAuthor(oid:String, name:Option[String], surname:Option[String], creditName:Option[String], otherNames:Option[List[String]], errorCode:Option[String]){}
+case class OrcidWork(oid:String, doi:String)
+
 
 
 
@@ -46,8 +53,52 @@ object ORCIDToOAF {
   }
 
 
-  def convertTOOAF(input:OrcidDOI) :Publication = {
-    val doi = input.getDoi
+  def strValid(s:Option[String]) : Boolean = {
+    s.isDefined && s.get.nonEmpty
+  }
+
+  def authorValid(author:OrcidAuthor): Boolean ={
+    if (strValid(author.name) && strValid(author.surname)) {
+      return true
+    }
+    if (strValid(author.surname)) {
+      return  true
+    }
+    if (strValid(author.creditName)) {
+      return true
+
+    }
+    false
+  }
+
+
+  def extractDOIWorks(input:String): List[OrcidWork] = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = parse(input)
+
+    val oid = (json \ "workDetail" \"oid").extract[String]
+    val doi:List[(String, String)] = for {
+      JObject(extIds) <-  json \ "workDetail" \"extIds"
+      JField("type", JString(typeValue)) <- extIds
+      JField("value", JString(value)) <- extIds
+      if "doi".equalsIgnoreCase(typeValue)
+    } yield (typeValue, value)
+    if (doi.nonEmpty) {
+      return doi.map(l =>OrcidWork(oid, l._2))
+    }
+    List()
+  }
+
+  def convertORCIDAuthor(input:String): OrcidAuthor = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = parse(input)
+
+    (json \"authorData" ).extractOrElse[OrcidAuthor](null)
+   }
+
+
+  def convertTOOAF(input:ORCIDItem) :Publication = {
+    val doi = input.doi
     val pub:Publication = new Publication
     pub.setPid(List(createSP(doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
@@ -58,8 +109,8 @@ object ORCIDToOAF {
 
     try{
 
-      val l:List[Author]= input.getAuthors.asScala.map(a=> {
-        generateAuthor(a.getName, a.getSurname, a.getCreditName, a.getOid)
+      val l:List[Author]= input.authors.map(a=> {
+        generateAuthor(a)
       })(collection.breakOut)
 
       pub.setAuthor(l.asJava)
@@ -80,16 +131,20 @@ object ORCIDToOAF {
     di
   }
 
-  def generateAuthor(given: String, family: String, fullName:String, orcid: String): Author = {
+  def generateAuthor(o : OrcidAuthor): Author = {
     val a = new Author
-    a.setName(given)
-    a.setSurname(family)
-    if (fullName!= null && fullName.nonEmpty)
-      a.setFullname(fullName)
-    else
-      a.setFullname(s"$given $family")
-    if (StringUtils.isNotBlank(orcid))
-      a.setPid(List(createSP(orcid, ModelConstants.ORCID, ModelConstants.DNET_PID_TYPES, generateOricPIDDatainfo())).asJava)
+    if (strValid(o.name)) {
+    a.setName(o.name.get.capitalize)
+    }
+    if (strValid(o.surname)) {
+      a.setSurname(o.surname.get.capitalize)
+    }
+    if(strValid(o.name) && strValid(o.surname))
+      a.setFullname(s"${o.name.get.capitalize} ${o.surname.get.capitalize}")
+    else if (strValid(o.creditName))
+      a.setFullname(o.creditName.get)
+    if (StringUtils.isNotBlank(o.oid))
+      a.setPid(List(createSP(o.oid, ModelConstants.ORCID, ModelConstants.DNET_PID_TYPES, generateOricPIDDatainfo())).asJava)
 
     a
   }
