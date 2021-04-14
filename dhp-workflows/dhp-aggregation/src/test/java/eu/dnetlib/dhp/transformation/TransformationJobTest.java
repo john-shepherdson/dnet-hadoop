@@ -97,8 +97,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 		String xslTransformationScript = "";
 		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_datarepo_datacite.xsl";
-        xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl";
-
+		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl";
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
@@ -119,7 +118,6 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 		String xslTransformationScript = "";
 		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_REST_OmicsDI.xsl";
-
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
