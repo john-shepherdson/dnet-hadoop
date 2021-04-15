@@ -36,7 +36,6 @@ public class ModelConstants {
 	public static final String DNET_COUNTRY_TYPE = "dnet:countries";
 	public static final String DNET_REVIEW_LEVELS = "dnet:review_levels";
 	public static final String DNET_PROGRAMMING_LANGUAGES = "dnet:programming_languages";
-	public static final String DNET_PROVENANCEACTIONS = "dnet:provenanceActions";
 	public static final String DNET_EXTERNAL_REF_TYPES = "dnet:externalReference_typologies";
 
 	public static final String SYSIMPORT_CROSSWALK_REPOSITORY = "sysimport:crosswalk:repository";
@@ -50,7 +49,7 @@ public class ModelConstants {
 	public static final String PROVENANCE_DEDUP = "sysimport:dedup";
 
 	public static final Qualifier PROVENANCE_ACTION_SET_QUALIFIER = qualifier(
-		SYSIMPORT_ACTIONSET, SYSIMPORT_ACTIONSET, DNET_PROVENANCEACTIONS, DNET_PROVENANCEACTIONS);
+		SYSIMPORT_ACTIONSET, SYSIMPORT_ACTIONSET, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS);
 
 	public static final String DATASET_RESULTTYPE_CLASSID = "dataset";
 	public static final String PUBLICATION_RESULTTYPE_CLASSID = "publication";

@@ -9,69 +9,60 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.spark.api.java.function.MapFunction;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+
+import eu.dnetlib.dhp.oa.dedup.DedupUtility;
 import eu.dnetlib.dhp.oa.dedup.IdGenerator;
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.util.MapDocumentUtil;
-import org.apache.commons.lang.StringUtils;
-import org.apache.spark.api.java.function.MapFunction;
-import org.codehaus.jackson.annotate.JsonIgnore;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.oa.dedup.DedupUtility;
-import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.pace.util.PaceException;
 
 public class ConnectedComponent implements Serializable {
 
 	private String ccId;
-	private Set<String> entities;
+	private Set<String> ids;
 
-	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	private static final String CONNECTED_COMPONENT_ID_PREFIX = "connect_comp";
 
-	public <T extends OafEntity> ConnectedComponent(Set<String> entities, String subEntity, final int cut) {
-		this.entities = entities;
-		final Class<T> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
+	public ConnectedComponent(Set<String> ids, final int cut) {
+		this.ids = ids;
 
-		List<Identifier<T>> identifiers = Lists.newArrayList();
+		this.ccId = createDefaultID();
 
-		entities.forEach(e -> {
-			try {
-				T entity = OBJECT_MAPPER.readValue(e, clazz);
-				identifiers.add(Identifier.newInstance(entity));
-			} catch (IOException e1) {
-			}
-		});
-
-		this.ccId = IdGenerator.generate(
-				identifiers,
-				createDefaultID()
-		);
-
-		if (cut > 0 && entities.size() > cut) {
-			this.entities = entities
-					.stream()
-					.filter(e -> !ccId.equalsIgnoreCase(MapDocumentUtil.getJPathString("$.id", e)))
-					.limit(cut - 1)
-					.collect(Collectors.toSet());
+		if (cut > 0 && ids.size() > cut) {
+			this.ids = ids
+				.stream()
+				.filter(id -> !ccId.equalsIgnoreCase(id))
+				.limit(cut - 1)
+				.collect(Collectors.toSet());
+//			this.ids.add(ccId); ??
 		}
 	}
 
+	public ConnectedComponent(String ccId, Set<String> ids) {
+		this.ccId = ccId;
+		this.ids = ids;
+	}
+
 	public String createDefaultID() {
-		if (entities.size() > 1) {
+		if (ids.size() > 1) {
 			final String s = getMin();
 			String prefix = s.split("\\|")[0];
-			ccId = prefix + "|dedup_wf_001::" + DHPUtils.md5(s);
+			ccId = prefix + "|" + CONNECTED_COMPONENT_ID_PREFIX + "::" + DHPUtils.md5(s);
 			return ccId;
 		} else {
-			return MapDocumentUtil.getJPathString("$.id", entities.iterator().next());
+			return ids.iterator().next();
 		}
 	}
 
@@ -80,15 +71,15 @@ public class ConnectedComponent implements Serializable {
 
 		final StringBuilder min = new StringBuilder();
 
-		entities
+		ids
 			.forEach(
-				e -> {
+				id -> {
 					if (StringUtils.isBlank(min.toString())) {
-						min.append(MapDocumentUtil.getJPathString("$.id", e));
+						min.append(id);
 					} else {
-						if (min.toString().compareTo(MapDocumentUtil.getJPathString("$.id", e)) > 0) {
+						if (min.toString().compareTo(id) > 0) {
 							min.setLength(0);
-							min.append(MapDocumentUtil.getJPathString("$.id", e));
+							min.append(id);
 						}
 					}
 				});
@@ -105,12 +96,12 @@ public class ConnectedComponent implements Serializable {
 		}
 	}
 
-	public Set<String> getEntities() {
-		return entities;
+	public Set<String> getIds() {
+		return ids;
 	}
 
-	public void setEntities(Set<String> docIds) {
-		this.entities = entities;
+	public void setIds(Set<String> ids) {
+		this.ids = ids;
 	}
 
 	public String getCcId() {

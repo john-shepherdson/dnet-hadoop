@@ -1,6 +1,9 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
+
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
@@ -27,8 +30,6 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 	private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
 
 	public static final String ROOT_TRUST = "0.8";
-	public static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
-	public static final String PROVENANCE_ACTIONS = "dnet:provenanceActions";
 
 	public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -94,10 +95,10 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 		info.setTrust(ROOT_TRUST);
 		info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
 		Qualifier provenance = new Qualifier();
-		provenance.setClassid(PROVENANCE_ACTION_CLASS);
-		provenance.setClassname(PROVENANCE_ACTION_CLASS);
-		provenance.setSchemeid(PROVENANCE_ACTIONS);
-		provenance.setSchemename(PROVENANCE_ACTIONS);
+		provenance.setClassid(PROVENANCE_DEDUP);
+		provenance.setClassname(PROVENANCE_DEDUP);
+		provenance.setSchemeid(DNET_PROVENANCE_ACTIONS);
+		provenance.setSchemename(DNET_PROVENANCE_ACTIONS);
 		info.setProvenanceaction(provenance);
 		return info;
 	}

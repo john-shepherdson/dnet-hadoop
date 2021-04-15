@@ -1,7 +1,15 @@
 
 package eu.dnetlib.dhp.oa.dedup.model;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Sets;
+
 import eu.dnetlib.dhp.oa.dedup.DatePicker;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -9,12 +17,6 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.PidComparator;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier> {
 
