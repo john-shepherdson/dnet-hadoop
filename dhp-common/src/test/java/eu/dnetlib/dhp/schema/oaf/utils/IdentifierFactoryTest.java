@@ -32,6 +32,9 @@ public class IdentifierFactoryTest {
 			"publication_doi3.json", "50|pmc_________::94e4cb08c93f8733b48e2445d04002ac", true);
 
 		verifyIdentifier(
+			"publication_doi4.json", "50|od______2852::38861c44e6052a8d49f59a4c39ba5e66", true);
+
+		verifyIdentifier(
 			"publication_pmc1.json", "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f", true);
 
 		verifyIdentifier(
