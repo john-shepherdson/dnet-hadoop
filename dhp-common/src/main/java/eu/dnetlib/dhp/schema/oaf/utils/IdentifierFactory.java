@@ -158,7 +158,8 @@ public class IdentifierFactory implements Serializable {
 						Collectors.mapping(p -> p, Collectors.toCollection(HashSet::new))));
 	}
 
-	private static Stream<StructuredProperty> pidFromInstance(List<StructuredProperty> pid, KeyValue collectedFrom, boolean mapHandles) {
+	private static Stream<StructuredProperty> pidFromInstance(List<StructuredProperty> pid, KeyValue collectedFrom,
+		boolean mapHandles) {
 		return Optional
 			.ofNullable(pid)
 			.map(
