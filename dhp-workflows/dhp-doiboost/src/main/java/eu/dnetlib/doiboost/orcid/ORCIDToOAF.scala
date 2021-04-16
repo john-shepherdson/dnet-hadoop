@@ -76,7 +76,9 @@ object ORCIDToOAF {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
-    val oid = (json \ "workDetail" \"oid").extract[String]
+    val oid = (json \ "workDetail" \"oid").extractOrElse[String](null)
+    if (oid == null)
+      return List()
     val doi:List[(String, String)] = for {
       JObject(extIds) <-  json \ "workDetail" \"extIds"
       JField("type", JString(typeValue)) <- extIds
