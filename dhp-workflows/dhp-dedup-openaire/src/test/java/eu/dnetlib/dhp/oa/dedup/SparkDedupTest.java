@@ -55,7 +55,6 @@ public class SparkDedupTest implements Serializable {
 	private static String testOutputBasePath;
 	private static String testDedupGraphBasePath;
 	private static final String testActionSetId = "test-orchestrator";
-	private static String testDedupAssertionsBasePath;
 
 	@BeforeAll
 	public static void cleanUp() throws IOException, URISyntaxException {
@@ -70,10 +69,6 @@ public class SparkDedupTest implements Serializable {
 		testDedupGraphBasePath = createTempDirectory(SparkDedupTest.class.getSimpleName() + "-")
 			.toAbsolutePath()
 			.toString();
-		testDedupAssertionsBasePath = Paths
-			.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/assertions").toURI())
-			.toFile()
-			.getAbsolutePath();
 
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
@@ -353,6 +348,7 @@ public class SparkDedupTest implements Serializable {
 		assertEquals(288, sw_mergerel);
 		assertEquals(472, ds_mergerel);
 		assertEquals(718, orp_mergerel);
+
 	}
 
 	@Test
@@ -538,7 +534,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4858, relations);
+		assertEquals(4862, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark

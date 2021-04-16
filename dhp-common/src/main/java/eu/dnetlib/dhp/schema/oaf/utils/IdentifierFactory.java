@@ -57,7 +57,7 @@ public class IdentifierFactory implements Serializable {
 	}
 
 	public static List<StructuredProperty> getPids(List<StructuredProperty> pid, KeyValue collectedFrom) {
-		return pidFromInstance(pid, collectedFrom).distinct().collect(Collectors.toList());
+		return pidFromInstance(pid, collectedFrom, true).distinct().collect(Collectors.toList());
 	}
 
 	public static <T extends Result> String createDOIBoostIdentifier(T entity) {
@@ -104,7 +104,7 @@ public class IdentifierFactory implements Serializable {
 
 		checkArgument(StringUtils.isNoneBlank(entity.getId()), "missing entity identifier");
 
-		final Map<String, List<StructuredProperty>> pids = extractPids(entity);
+		final Map<String, Set<StructuredProperty>> pids = extractPids(entity);
 
 		return pids
 			.values()
@@ -125,7 +125,7 @@ public class IdentifierFactory implements Serializable {
 			.orElseGet(entity::getId);
 	}
 
-	private static <T extends OafEntity> Map<String, List<StructuredProperty>> extractPids(T entity) {
+	private static <T extends OafEntity> Map<String, Set<StructuredProperty>> extractPids(T entity) {
 		if (entity instanceof Result) {
 			return Optional
 				.ofNullable(((Result) entity).getInstance())
@@ -142,23 +142,24 @@ public class IdentifierFactory implements Serializable {
 					Collectors
 						.groupingBy(
 							p -> p.getQualifier().getClassid(),
-							Collectors.mapping(p -> p, Collectors.toList())));
+							Collectors.mapping(p -> p, Collectors.toCollection(HashSet::new))));
 		}
 	}
 
-	private static Map<String, List<StructuredProperty>> mapPids(List<Instance> instance) {
+	private static Map<String, Set<StructuredProperty>> mapPids(List<Instance> instance) {
 		return instance
 			.stream()
-			.map(i -> pidFromInstance(i.getPid(), i.getCollectedfrom()))
+			.map(i -> pidFromInstance(i.getPid(), i.getCollectedfrom(), false))
 			.flatMap(Function.identity())
 			.collect(
 				Collectors
 					.groupingBy(
 						p -> p.getQualifier().getClassid(),
-						Collectors.mapping(p -> p, Collectors.toList())));
+						Collectors.mapping(p -> p, Collectors.toCollection(HashSet::new))));
 	}
 
-	private static Stream<StructuredProperty> pidFromInstance(List<StructuredProperty> pid, KeyValue collectedFrom) {
+	private static Stream<StructuredProperty> pidFromInstance(List<StructuredProperty> pid, KeyValue collectedFrom,
+		boolean mapHandles) {
 		return Optional
 			.ofNullable(pid)
 			.map(
@@ -167,16 +168,16 @@ public class IdentifierFactory implements Serializable {
 					// filter away PIDs provided by a DS that is not considered an authority for the
 					// given PID Type
 					.filter(p -> {
-						return shouldFilterPid(collectedFrom, p);
+						return shouldFilterPid(collectedFrom, p, mapHandles);
 					})
 					.map(CleaningFunctions::normalizePidValue)
 					.filter(CleaningFunctions::pidFilter))
 			.orElse(Stream.empty());
 	}
 
-	private static boolean shouldFilterPid(KeyValue collectedFrom, StructuredProperty p) {
+	private static boolean shouldFilterPid(KeyValue collectedFrom, StructuredProperty p, boolean mapHandles) {
 		final PidType pType = PidType.tryValueOf(p.getQualifier().getClassid());
-		return pType.equals(PidType.handle) || Optional.ofNullable(collectedFrom).isPresent() &&
+		return (mapHandles && pType.equals(PidType.handle)) || Optional.ofNullable(collectedFrom).isPresent() &&
 			Optional
 				.ofNullable(PID_AUTHORITY.get(pType))
 				.map(authorities -> {
