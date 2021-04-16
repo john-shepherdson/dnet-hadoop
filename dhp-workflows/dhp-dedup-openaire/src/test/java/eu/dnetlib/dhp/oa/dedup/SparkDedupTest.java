@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -66,6 +67,7 @@ public class SparkDedupTest implements Serializable {
 		testOutputBasePath = createTempDirectory(SparkDedupTest.class.getSimpleName() + "-")
 			.toAbsolutePath()
 			.toString();
+
 		testDedupGraphBasePath = createTempDirectory(SparkDedupTest.class.getSimpleName() + "-")
 			.toAbsolutePath()
 			.toString();
@@ -534,7 +536,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4862, relations);
+		assertEquals(4718, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
