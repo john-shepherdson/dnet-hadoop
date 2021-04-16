@@ -9,6 +9,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 object SparkImportMagIntoDataset {
   val datatypedict = Map(
+    "bool" -> BooleanType,
     "int" -> IntegerType,
     "uint" -> IntegerType,
     "long" -> LongType,
