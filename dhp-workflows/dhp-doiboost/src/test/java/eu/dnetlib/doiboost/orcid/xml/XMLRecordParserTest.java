@@ -1,13 +1,14 @@
 
 package eu.dnetlib.doiboost.orcid.xml;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +19,6 @@ import eu.dnetlib.dhp.schema.orcid.AuthorSummary;
 import eu.dnetlib.dhp.schema.orcid.Work;
 import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcid.OrcidClientTest;
-import eu.dnetlib.doiboost.orcid.SparkDownloadOrcidWorks;
 import eu.dnetlib.doiboost.orcid.model.WorkData;
 import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
@@ -30,8 +30,15 @@ public class XMLRecordParserTest {
 	private static final String NS_COMMON = "common";
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+	private static Path testPath;
+
+	@BeforeAll
+	private static void setUp() throws IOException {
+		testPath = Files.createTempDirectory(XMLRecordParserTest.class.getName());
+	}
+
 	@Test
-	private void testOrcidAuthorDataXMLParser() throws Exception {
+	public void testOrcidAuthorDataXMLParser() throws Exception {
 
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("summary_0000-0001-6828-479X.xml"));
 
@@ -43,11 +50,11 @@ public class XMLRecordParserTest {
 		System.out.println("name: " + authorData.getName());
 		assertNotNull(authorData.getSurname());
 		System.out.println("surname: " + authorData.getSurname());
-		OrcidClientTest.logToFile(OBJECT_MAPPER.writeValueAsString(authorData));
+		OrcidClientTest.logToFile(testPath, OBJECT_MAPPER.writeValueAsString(authorData));
 	}
 
 	@Test
-	private void testOrcidXMLErrorRecordParser() throws Exception {
+	public void testOrcidXMLErrorRecordParser() throws Exception {
 
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("summary_error.xml"));
 
@@ -60,7 +67,7 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	private void testOrcidWorkDataXMLParser() throws Exception {
+	public void testOrcidWorkDataXMLParser() throws Exception {
 
 		String xml = IOUtils
 			.toString(
@@ -72,12 +79,11 @@ public class XMLRecordParserTest {
 		assertNotNull(workData);
 		assertNotNull(workData.getOid());
 		System.out.println("oid: " + workData.getOid());
-		assertNotNull(workData.getDoi());
-		System.out.println("doi: " + workData.getDoi());
+		assertNull(workData.getDoi());
 	}
 
 	@Test
-	private void testOrcidOtherNamesXMLParser() throws Exception {
+	public void testOrcidOtherNamesXMLParser() throws Exception {
 
 		String xml = IOUtils
 			.toString(
@@ -114,7 +120,7 @@ public class XMLRecordParserTest {
 				this.getClass().getResourceAsStream("record_0000-0001-5004-5918.xml"));
 		AuthorSummary authorSummary = XMLRecordParser.VTDParseAuthorSummary(xml.getBytes());
 		authorSummary.setBase64CompressData(ArgumentApplicationParser.compressArgument(xml));
-		OrcidClientTest.logToFile(JsonWriter.create(authorSummary));
+		OrcidClientTest.logToFile(testPath, JsonWriter.create(authorSummary));
 	}
 
 	@Test
@@ -126,6 +132,6 @@ public class XMLRecordParserTest {
 		Work work = new Work();
 		work.setWorkDetail(workDetail);
 		work.setBase64CompressData(ArgumentApplicationParser.compressArgument(xml));
-		OrcidClientTest.logToFile(JsonWriter.create(work));
+		OrcidClientTest.logToFile(testPath, JsonWriter.create(work));
 	}
 }

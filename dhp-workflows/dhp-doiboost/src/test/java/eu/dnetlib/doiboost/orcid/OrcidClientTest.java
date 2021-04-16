@@ -16,19 +16,22 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
+import eu.dnetlib.doiboost.orcid.xml.XMLRecordParserTest;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class OrcidClientTest {
-	final String orcidId = "0000-0001-7291-3210";
 	final int REQ_LIMIT = 24;
 	final int REQ_MAX_TEST = 100;
 	final int RECORD_DOWNLOADED_COUNTER_LOG_INTERVAL = 10;
@@ -41,14 +44,23 @@ public class OrcidClientTest {
 	final String REQUEST_TYPE_WORK = "work/47652866";
 	final String REQUEST_TYPE_WORKS = "works";
 
+	private static Path testPath;
+
+	@BeforeAll
+	private static void setUp() throws IOException {
+		testPath = Files.createTempDirectory(XMLRecordParserTest.class.getName());
+		System.out.println("using test path: " + testPath);
+	}
+
 //	curl -i -H "Accept: application/vnd.orcid+xml"
 //	-H 'Authorization: Bearer 78fdb232-7105-4086-8570-e153f4198e3d'
 //	'https://api.orcid.org/v3.0/0000-0001-7291-3210/record'
 
 	@Test
-	private void downloadTest(String orcid) throws Exception {
+	public void downloadTest() throws Exception {
+		final String orcid = "0000-0001-7291-3210";
 		String record = testDownloadRecord(orcid, REQUEST_TYPE_RECORD);
-		String filename = "/tmp/downloaded_record_".concat(orcid).concat(".xml");
+		String filename = testPath + "/downloaded_record_".concat(orcid).concat(".xml");
 		File f = new File(filename);
 		OutputStream outStream = new FileOutputStream(f);
 		IOUtils.write(record.getBytes(), outStream);
@@ -63,9 +75,10 @@ public class OrcidClientTest {
 			CloseableHttpResponse response = client.execute(httpGet);
 			long end = System.currentTimeMillis();
 			if (response.getStatusLine().getStatusCode() != 200) {
-				logToFile("Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
+				logToFile(
+					testPath, "Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
 			}
-			logToFile(orcidId + " " + dataType + " " + (end - start) / 1000 + " seconds");
+			logToFile(testPath, orcidId + " " + dataType + " " + (end - start) / 1000 + " seconds");
 			return IOUtils.toString(response.getEntity().getContent());
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -150,12 +163,13 @@ public class OrcidClientTest {
 		final String base64CompressedRecord = IOUtils
 			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));
 		final String recordFromSeqFile = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
-		logToFile("\n\ndownloaded \n\n" + recordFromSeqFile);
+		logToFile(testPath, "\n\ndownloaded \n\n" + recordFromSeqFile);
 		final String downloadedRecord = testDownloadRecord("0000-0003-3028-6161", REQUEST_TYPE_RECORD);
 		assertTrue(recordFromSeqFile.equals(downloadedRecord));
 	}
 
 	@Test
+	@Disabled
 	public void lambdaFileReaderTest() throws Exception {
 		String last_update = "2021-01-12 00:00:06.685137";
 		TarArchiveInputStream input = new TarArchiveInputStream(
@@ -198,17 +212,20 @@ public class OrcidClientTest {
 			entry = input.getNextTarEntry();
 
 		}
-		logToFile("modifiedNum : " + modifiedNum + " / " + rowNum);
+		logToFile(testPath, "modifiedNum : " + modifiedNum + " / " + rowNum);
 	}
 
-	public static void logToFile(String log)
-		throws IOException {
+	public static void logToFile(Path basePath, String log) throws IOException {
 		log = log.concat("\n");
-		Path path = Paths.get("/tmp/orcid_log.txt");
+		Path path = basePath.resolve("orcid_log.txt");
+		if (!Files.exists(path)) {
+			Files.createFile(path);
+		}
 		Files.write(path, log.getBytes(), StandardOpenOption.APPEND);
 	}
 
 	@Test
+	@Disabled
 	private void slowedDownDownloadTest() throws Exception {
 		String orcid = "0000-0001-5496-1243";
 		String record = slowedDownDownload(orcid);
@@ -227,16 +244,17 @@ public class OrcidClientTest {
 			CloseableHttpResponse response = client.execute(httpGet);
 			long endReq = System.currentTimeMillis();
 			long reqSessionDuration = endReq - start;
-			logToFile("req time (millisec): " + reqSessionDuration);
+			logToFile(testPath, "req time (millisec): " + reqSessionDuration);
 			if (reqSessionDuration < 1000) {
-				logToFile("wait ....");
+				logToFile(testPath, "wait ....");
 				Thread.sleep(1000 - reqSessionDuration);
 			}
 			long end = System.currentTimeMillis();
 			long total = end - start;
-			logToFile("total time (millisec): " + total);
+			logToFile(testPath, "total time (millisec): " + total);
 			if (response.getStatusLine().getStatusCode() != 200) {
-				logToFile("Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
+				logToFile(
+					testPath, "Downloading " + orcidId + " status code: " + response.getStatusLine().getStatusCode());
 			}
 			return IOUtils.toString(response.getEntity().getContent());
 		} catch (Throwable e) {
@@ -246,7 +264,7 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	private void downloadWorkTest() throws Exception {
+	public void downloadWorkTest() throws Exception {
 		String orcid = "0000-0003-0015-1952";
 		String record = testDownloadRecord(orcid, REQUEST_TYPE_WORK);
 		String filename = "/tmp/downloaded_work_".concat(orcid).concat(".xml");
@@ -256,7 +274,7 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	private void downloadRecordTest() throws Exception {
+	public void downloadRecordTest() throws Exception {
 		String orcid = "0000-0001-5004-5918";
 		String record = testDownloadRecord(orcid, REQUEST_TYPE_RECORD);
 		String filename = "/tmp/downloaded_record_".concat(orcid).concat(".xml");
@@ -266,7 +284,7 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	private void downloadWorksTest() throws Exception {
+	public void downloadWorksTest() throws Exception {
 		String orcid = "0000-0001-5004-5918";
 		String record = testDownloadRecord(orcid, REQUEST_TYPE_WORKS);
 		String filename = "/tmp/downloaded_works_".concat(orcid).concat(".xml");
@@ -276,7 +294,7 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	private void downloadSingleWorkTest() throws Exception {
+	public void downloadSingleWorkTest() throws Exception {
 		String orcid = "0000-0001-5004-5918";
 		String record = testDownloadRecord(orcid, REQUEST_TYPE_WORK);
 		String filename = "/tmp/downloaded_work_47652866_".concat(orcid).concat(".xml");
@@ -286,7 +304,7 @@ public class OrcidClientTest {
 	}
 
 	@Test
-	private void cleanAuthorListTest() throws Exception {
+	public void cleanAuthorListTest() throws Exception {
 		AuthorData a1 = new AuthorData();
 		a1.setOid("1");
 		a1.setName("n1");
@@ -315,11 +333,11 @@ public class OrcidClientTest {
 
 	@Test
 	@Ignore
-	private void testUpdatedRecord() throws Exception {
+	public void testUpdatedRecord() throws Exception {
 		final String base64CompressedRecord = IOUtils
 			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));
 		final String record = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
-		logToFile("\n\nrecord updated \n\n" + record);
+		logToFile(testPath, "\n\nrecord updated \n\n" + record);
 	}
 
 	@Test
@@ -327,6 +345,6 @@ public class OrcidClientTest {
 	private void testUpdatedWork() throws Exception {
 		final String base64CompressedWork = "H4sIAAAAAAAAAM1XS2/jNhC+51cQOuxJsiXZSR03Vmq0G6Bo013E6R56oyXaZiOJWpKy4y783zvUg5Ksh5uiCJogisX5Zjj85sHx3f1rFKI94YKyeGE4I9tAJPZZQOPtwvj9+cGaGUhIHAc4ZDFZGEcijHvv6u7A+MtcPVCSSgsUQObYzuzaccBEguVuYYxt+LHgbwKP6a11M3WnY6UzrpB7KuiahlQeF0aSrkPqGwhcisWcxpLwGIcLYydlMh+PD4fDiHGfBvDcjmMxLhGlBglSH8vsIH0qGlLqBFRIGvvDWjWQ1iMJJ2CKBANqGlNqMbkj3IpxRPq1KkypFZFoDRHa0aRfq8JoNjhnfIAJJS6xPouiIQJyeYmGQzE+cO5cXqITcItBlKyASExD0a93jiwtvJDjYXDDAqBPHoH2wMmVWGNf8xyyaEBiSTeUDHHWBpd2Nmmc10yfbgHQrHCyIRxKjQwRUoFKPRwEnIgBnQJQVdGeQgJaCRN0OMnPkaUFVbD9WkpaIndQJowf+8EFoIpTErJjBFQOBavElFpfUxwC9ZcqvQErdQXhe+oPFF8BaObupYzVsYEOARzSoZBWmKqaBMHcV0Wf8oG0beIqD+Gdkz0lhyE3NajUW6fhQFSV9Nw/MCBYyofYa0EN7wrBz13eP+Y+J6obWgE8Pdd2JpYD94P77Ezmjj13b0bu5PqPu3EXumEnxEJaEVxSUIHammsra+53z44zt2/m1/bItaeVtQ6dhs3c4XytvW75IYUchMKvEHVUyqmnWBFAS0VJrqSvQde6vp251ux2NtFuKcVOi+oK9YY0M0Cn6o4J6WkvtEK2XJ1vfPGAZxSoK8lb+SxJBbLQx1CohOLndjJUywQWUFmqEi3G6Zaqf/7buOyYJd5IYpfmf0XipfP18pDR9cQCeEuJQI/Lx36bFbVnpBeL2UwmqQw7ApAvf4GeGGQdEbENgolui/wdpjHaYCmPCIPPAmGBIsxfoLUhyRCB0SeCakEBJRKBtfJ+UBbI15TG4PaGBAhWthx8DmFYtHZQujv1CWbLLdzmmUKmHEOWCe1/zdu78bn/+YH+hCOqOzcXfFwuP6OVT/P710crwqGXFrpNaM2GT3MXarw01i15TIi3pmtJXgtbTVGf3h6HKfF+wBAnPyTfdCChudlm5gZaoG//F9pPZsGQcqqbyZN5hBau5OoIJ3PPwjTKDuG4s5MZp2rMzF5PZoK34IT6PIFOPrk+mTiVO5aJH2C+JJRjE/06eoRfpJxa4VgyYaLlaJUv/EhCfATMU/76gEOfmehL/qbJNNHjaFna+CQYB8wvo9PpPFJ5MOrJ1Ix7USBZqBl7KRNOx1d3jex7SG6zuijqCMWRusBsncjZSrM2u82UJmqzpGhvUJN2t6caIM9QQgO9c0t40UROnWsJd2Rbs+nsxpna9u30ttNkjechmzHjEST+X5CkkuNY0GzQkzyFseAf7lSZuLwdh1xSXKvvQJ4g4abTYgPV7uMt3rskohlJmMa82kQkshtyBEIYqQ+YB8X3oRHg7iFKi/bZP+Ao+T6BJhIT/vNPi8ffZs+flk+r2v0WNroZiyWn6xRmadHqTJXsjLJczElAZX6TnJdoWTM1SI2gfutv3rjeBt5t06rVvNuWup29246tlvluO+u2/G92bK9DXheL6uFd/Q3EaRDZqBIAAA==";
 		final String work = ArgumentApplicationParser.decompressValue(base64CompressedWork);
-		logToFile("\n\nwork updated \n\n" + work);
+		logToFile(testPath, "\n\nwork updated \n\n" + work);
 	}
 }
