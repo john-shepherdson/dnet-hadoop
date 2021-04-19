@@ -149,4 +149,14 @@ public class TransformSparkJobNode {
 		}
 	}
 
+	/**
+	 * Calculates the number of partitions allocating at most @rpt records for a single transformation task.
+	 * @param totalInput
+	 * @param rpt
+	 * @return
+	 */
+	private static int getRepartitionNumber(long totalInput, Integer rpt) {
+		return (int) (totalInput / rpt);
+	}
+
 }
