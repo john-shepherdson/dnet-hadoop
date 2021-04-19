@@ -167,7 +167,8 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 			}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
-			TransformSparkJobNode.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output);
+			TransformSparkJobNode
+				.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output, 200);
 
 			// TODO introduce useful assertions
 
@@ -221,7 +222,8 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 			}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
-			TransformSparkJobNode.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output);
+			TransformSparkJobNode
+				.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output, 200);
 
 			// TODO introduce useful assertions
 

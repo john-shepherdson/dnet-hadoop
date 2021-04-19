@@ -180,7 +180,7 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 		TransformSparkJobNode
 			.transformRecords(
 				parameters, isLookUpService, spark, mdStoreV2.getHdfsPath() + MDSTORE_DATA_PATH,
-				mdStoreCleanedVersion.getHdfsPath());
+				mdStoreCleanedVersion.getHdfsPath(), 200);
 
 		final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
 		final Dataset<MetadataRecord> mOutput = spark

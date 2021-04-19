@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.transformation.xslt;
 
 import java.io.ByteArrayInputStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
@@ -15,7 +16,7 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import net.sf.saxon.s9api.*;
 
-public class XSLTTransformationFunction implements MapFunction<MetadataRecord, MetadataRecord> {
+public class XSLTTransformationFunction implements MapFunction<MetadataRecord, MetadataRecord>, Serializable {
 
 	public final static String QNAME_BASE_URI = "http://eu/dnetlib/transform";
 
@@ -27,6 +28,8 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 
 	private final long dateOfTransformation;
 
+	private final VocabularyGroup vocabularies;
+
 	public XSLTTransformationFunction(
 		final AggregationCounter aggregationCounter,
 		final String transformationRule,
@@ -35,6 +38,7 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 		throws Exception {
 		this.aggregationCounter = aggregationCounter;
 		this.transformationRule = transformationRule;
+		this.vocabularies = vocabularies;
 		this.dateOfTransformation = dateOfTransformation;
 		cleanFunction = new Cleaner(vocabularies);
 	}
@@ -72,5 +76,25 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 			aggregationCounter.getErrorItems().add(1);
 			throw new RuntimeException(e);
 		}
+	}
+
+	public AggregationCounter getAggregationCounter() {
+		return aggregationCounter;
+	}
+
+	public String getTransformationRule() {
+		return transformationRule;
+	}
+
+	public Cleaner getCleanFunction() {
+		return cleanFunction;
+	}
+
+	public long getDateOfTransformation() {
+		return dateOfTransformation;
+	}
+
+	public VocabularyGroup getVocabularies() {
+		return vocabularies;
 	}
 }

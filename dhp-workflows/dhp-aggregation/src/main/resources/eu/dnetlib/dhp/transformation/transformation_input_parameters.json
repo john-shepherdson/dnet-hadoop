@@ -49,6 +49,12 @@
     "paramRequired": true
   },
   {
+    "paramName": "rpt",
+    "paramLongName": "recordsPerTask",
+    "paramDescription": "the number of records transformed by a single Task",
+    "paramRequired": false
+  },
+  {
     "paramName": "tp",
     "paramLongName": "transformationPlugin",
     "paramDescription": "the transformation plugin to apply",

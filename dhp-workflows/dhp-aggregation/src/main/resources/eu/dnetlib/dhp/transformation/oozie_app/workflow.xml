@@ -37,6 +37,12 @@
             <name>dnetMessageManagerURL</name>
             <description>The URI of the Dnet Message Manager</description>
         </property>
+        <property>
+            <name>recordsPerTask</name>
+            <value>200</value>
+            <description>The URI of the Dnet Message Manager</description>
+        </property>
+
     </parameters>
 
     <start to="BeginRead"/>
@@ -103,6 +109,7 @@
             <arg>--transformationPlugin</arg><arg>${transformationPlugin}</arg>
             <arg>--transformationRuleId</arg><arg>${transformationRuleId}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--recordsPerTask</arg><arg>${recordsPerTask}</arg>
             <arg>--workflowId</arg><arg>${workflowId}</arg>
             <arg>--dnetMessageManagerURL</arg><arg>${dnetMessageManagerURL}</arg>
         </spark>
