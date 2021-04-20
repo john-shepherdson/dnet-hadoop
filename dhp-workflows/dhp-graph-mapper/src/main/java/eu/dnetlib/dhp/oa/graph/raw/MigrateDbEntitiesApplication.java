@@ -354,7 +354,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			o.setOaiprovenance(null); // Values not present in the DB
 			o.setLegalshortname(field(rs.getString("legalshortname"), info));
 			o.setLegalname(field(rs.getString("legalname"), info));
-			o.setAlternativeNames(new ArrayList<>()); // Values not returned by the SQL query
+			o.setAlternativeNames(prepareListFields(rs.getArray("alternativenames"), info));
 			o.setWebsiteurl(field(rs.getString("websiteurl"), info));
 			o.setLogourl(field(rs.getString("logourl"), info));
 			o.setEclegalbody(field(Boolean.toString(rs.getBoolean("eclegalbody")), info));

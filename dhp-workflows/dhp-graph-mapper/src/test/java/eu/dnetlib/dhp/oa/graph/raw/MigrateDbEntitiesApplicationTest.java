@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -118,6 +119,10 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemeid());
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemename());
 		assertEquals(getValueAsString("collectedfromname", fields), o.getCollectedfrom().get(0).getValue());
+		List<String> alternativenames = getValueAsList("alternativenames", fields);
+		assertEquals(2, alternativenames.size());
+		assertTrue(alternativenames.contains("Pippo"));
+		assertTrue(alternativenames.contains("Foo"));
 	}
 
 	@Test
@@ -338,6 +343,10 @@ public class MigrateDbEntitiesApplicationTest {
 			.map(o -> (T) o)
 			.findFirst()
 			.get();
+	}
+
+	private List<String> getValueAsList(final String name, final List<TypedField> fields) {
+		return (List<String>) getValueAs(name, fields);
 	}
 }
 

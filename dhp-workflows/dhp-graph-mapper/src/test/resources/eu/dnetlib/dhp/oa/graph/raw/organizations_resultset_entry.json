@@ -123,5 +123,12 @@
 		"field": "provenanceaction",
 		"type": "not_used",
 		"value": "sysimport:crosswalk:entityregistry@@@dnet:provenance_actions"
+	},
+	{
+		"field": "alternativenames",
+		"type": "array",
+		"value": [
+			"Pippo", "Foo"
+		]
 	}
 ]

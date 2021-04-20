@@ -2,7 +2,7 @@ SELECT
 	o.id                                                                                                                          AS organizationid,
 	coalesce((array_agg(a.acronym))[1], o.name)                                                                                   AS legalshortname,
 	o.name                                                                                                                        AS legalname,
-	array_agg(DISTINCT n.name)                                                                                                    AS "alternativeNames",
+	array_remove(array_cat(array_agg(DISTINCT n.name), array_agg(DISTINCT a.acronym)), NULL)                                      AS alternativenames,
 	(array_agg(u.url))[1]                                                                                                         AS websiteurl,
 	''                                                                                                                            AS logourl,
 	o.creation_date                                                                                                               AS dateofcollection,
