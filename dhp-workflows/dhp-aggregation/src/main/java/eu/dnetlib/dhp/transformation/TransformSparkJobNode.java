@@ -111,7 +111,7 @@ public class TransformSparkJobNode {
 		log.info("workflowId is {}", workflowId);
 
 		MapFunction<MetadataRecord, MetadataRecord> x = TransformationFactory
-				.getTransformationPlugin(args, ct, isLookUpService);
+			.getTransformationPlugin(args, ct, isLookUpService);
 
 		final Dataset<MetadataRecord> inputMDStore = spark
 			.read()

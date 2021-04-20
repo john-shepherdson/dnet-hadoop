@@ -142,15 +142,14 @@ public class ModelConstants {
 	public static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
 		"main title", "main title", DNET_DATACITE_TITLE, DNET_DATACITE_TITLE);
 
-
-	public static final AccessRight OPEN_ACCESS_RIGHT () {
+	public static final AccessRight OPEN_ACCESS_RIGHT() {
 
 		final AccessRight result = new AccessRight();
 		result.setClassid(ACCESS_RIGHT_OPEN);
 		result.setClassid(ACCESS_RIGHT_OPEN);
 		result.setSchemeid(ModelConstants.DNET_ACCESS_MODES);
 		result.setSchemename(ModelConstants.DNET_ACCESS_MODES);
-		return  result;
+		return result;
 	}
 
 	private static Qualifier qualifier(

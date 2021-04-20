@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
