@@ -13,6 +13,22 @@
             <description>id of the actionSet</description>
         </property>
         <property>
+            <name>apiUrl</name>
+            <description>OpenOrgs API to finalise the suggestions import procedure</description>
+        </property>
+        <property>
+            <name>dbUrl</name>
+            <description>jdbc URL of the OpenOrgs database</description>
+        </property>
+        <property>
+            <name>dbUser</name>
+            <description>username to access the OpenOrgs database</description>
+        </property>
+        <property>
+            <name>dbPwd</name>
+            <description>password to access the OpenOrgs database</description>
+        </property>
+        <property>
             <name>workingPath</name>
             <description>path for the working directory</description>
         </property>
@@ -75,7 +91,17 @@
         </configuration>
     </global>
 
-    <start to="resetOrgSimRels"/>
+    <start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="CreateSimRels">${wf:conf('resumeFrom') eq 'CreateSimRels'}</case>
+            <case to="CreateMergeRels">${wf:conf('resumeFrom') eq 'CreateMergeRels'}</case>
+            <case to="PrepareOrgRels">${wf:conf('resumeFrom') eq 'PrepareOrgRels'}</case>
+            <case to="update_openorgs">${wf:conf('resumeFrom') eq 'update_openorgs'}</case>
+            <default to="resetOrgSimRels"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -83,8 +109,8 @@
 
     <action name="resetOrgSimRels">
         <fs>
-            <delete path="${workingPath}/${actionSetIdOpenorgs}/organization_simrel"/>
-            <delete path="${workingPath}/${actionSetIdOpenorgs}/organization_mergerel"/>
+            <delete path="${workingPath}/${actionSetId}/organization_simrel"/>
+            <delete path="${workingPath}/${actionSetId}/organization_mergerel"/>
         </fs>
         <ok to="CreateSimRels"/>
         <error to="Kill"/>
@@ -109,7 +135,7 @@
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
@@ -138,7 +164,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="CreateMergeRels"/>
@@ -165,7 +191,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--cutConnectedComponent</arg><arg>${cutConnectedComponent}</arg>
         </spark>
         <ok to="PrepareOrgRels"/>
@@ -192,7 +218,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--dbUrl</arg><arg>${dbUrl}</arg>
             <arg>--dbTable</arg><arg>${dbTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
@@ -223,14 +249,24 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-            <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
-            <arg>--apiUrl</arg><arg>${apiUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--dbUrl</arg><arg>${dbUrl}</arg>
             <arg>--dbTable</arg><arg>${dbTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
             <arg>--dbPwd</arg><arg>${dbPwd}</arg>
             <arg>--numConnections</arg><arg>20</arg>
         </spark>
+        <ok to="update_openorgs"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="update_openorgs">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>/usr/bin/curl</exec>
+            <argument>${apiUrl}</argument>
+        </shell>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

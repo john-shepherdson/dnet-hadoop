@@ -69,10 +69,6 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.map(Integer::valueOf)
 			.orElse(NUM_CONNECTIONS);
 
-		final String apiUrl = Optional
-			.ofNullable(parser.get("apiUrl"))
-			.orElse("");
-
 		final String dbUrl = parser.get("dbUrl");
 		final String dbTable = parser.get("dbTable");
 		final String dbUser = parser.get("dbUser");
@@ -83,7 +79,6 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		log.info("actionSetId:   '{}'", actionSetId);
 		log.info("workingPath:   '{}'", workingPath);
 		log.info("numPartitions: '{}'", numConnections);
-		log.info("apiUrl:        '{}'", apiUrl);
 		log.info("dbUrl:         '{}'", dbUrl);
 		log.info("dbUser:        '{}'", dbUser);
 		log.info("table:         '{}'", dbTable);
@@ -106,10 +101,6 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.write()
 			.mode(SaveMode.Append)
 			.jdbc(dbUrl, dbTable, connectionProperties);
-
-		if (!apiUrl.isEmpty())
-			updateSimRels(apiUrl);
-
 	}
 
 	public static Dataset<OrgSimRel> createNewOrgs(
@@ -196,18 +187,6 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 					parseECField(r._1()._2().getEcnutscode())),
 				Encoders.bean(OrgSimRel.class));
 
-	}
-
-	private static String updateSimRels(final String apiUrl) throws IOException {
-
-		log.info("Updating simrels on the portal");
-
-		final HttpGet req = new HttpGet(apiUrl);
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				return IOUtils.toString(response.getEntity().getContent());
-			}
-		}
 	}
 
 	private static boolean filterRels(Relation rel, String entityType) {

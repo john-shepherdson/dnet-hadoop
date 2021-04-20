@@ -154,7 +154,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 					(FlatMapFunction<ConnectedComponent, Relation>) cc -> ccToMergeRel(cc, dedupConf),
 					Encoders.bean(Relation.class));
 
-			mergeRels.write().mode(SaveMode.Append).parquet(mergeRelPath);
+			mergeRels.write().mode(SaveMode.Overwrite).parquet(mergeRelPath);
 
 		}
 	}
