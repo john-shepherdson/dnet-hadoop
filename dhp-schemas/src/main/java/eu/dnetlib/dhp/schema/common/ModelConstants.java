@@ -1,9 +1,7 @@
 
 package eu.dnetlib.dhp.schema.common;
 
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class ModelConstants {
 
@@ -143,6 +141,17 @@ public class ModelConstants {
 
 	public static final Qualifier MAIN_TITLE_QUALIFIER = qualifier(
 		"main title", "main title", DNET_DATACITE_TITLE, DNET_DATACITE_TITLE);
+
+
+	public static final AccessRight OPEN_ACCESS_RIGHT () {
+
+		final AccessRight result = new AccessRight();
+		result.setClassid(ACCESS_RIGHT_OPEN);
+		result.setClassid(ACCESS_RIGHT_OPEN);
+		result.setSchemeid(ModelConstants.DNET_ACCESS_MODES);
+		result.setSchemename(ModelConstants.DNET_ACCESS_MODES);
+		return  result;
+	}
 
 	private static Qualifier qualifier(
 		final String classid,

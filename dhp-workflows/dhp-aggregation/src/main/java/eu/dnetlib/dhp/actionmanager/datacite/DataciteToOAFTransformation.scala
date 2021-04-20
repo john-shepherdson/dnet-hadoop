@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 import scala.io.{Codec, Source}
 
-case class DataciteType(doi:String,timestamp:Long,isActive:Boolean, json:String ){}
+case class DataciteType(doi: String, timestamp: Long, isActive: Boolean, json: String) {}
 
 case class NameIdentifiersType(nameIdentifierScheme: Option[String], schemeUri: Option[String], nameIdentifier: Option[String]) {}
 
@@ -51,7 +51,7 @@ object DataciteToOAFTransformation {
   val SUBJ_CLASS = "keywords"
 
 
-  val j_filter:List[String] = {
+  val j_filter: List[String] = {
     val s = Source.fromInputStream(getClass.getResourceAsStream("datacite_filter")).mkString
     s.lines.toList
   }
@@ -72,9 +72,9 @@ object DataciteToOAFTransformation {
   val df_en: DateTimeFormatter = DateTimeFormatter.ofPattern("[MM-dd-yyyy][MM/dd/yyyy][dd-MM-yy][dd-MMM-yyyy][dd/MMM/yyyy][dd-MMM-yy][dd/MMM/yy][dd-MM-yy][dd/MM/yy][dd-MM-yyyy][dd/MM/yyyy][yyyy-MM-dd][yyyy/MM/dd]", Locale.ENGLISH)
   val df_it: DateTimeFormatter = DateTimeFormatter.ofPattern("[dd-MM-yyyy][dd/MM/yyyy]", Locale.ITALIAN)
 
-  val funder_regex:List[(Pattern, String)] = List(
-    (Pattern.compile("(info:eu-repo/grantagreement/ec/h2020/)(\\d\\d\\d\\d\\d\\d)(.*)",  Pattern.MULTILINE | Pattern.CASE_INSENSITIVE),"40|corda__h2020::"),
-    (Pattern.compile("(info:eu-repo/grantagreement/ec/fp7/)(\\d\\d\\d\\d\\d\\d)(.*)",  Pattern.MULTILINE | Pattern.CASE_INSENSITIVE),"40|corda_______::")
+  val funder_regex: List[(Pattern, String)] = List(
+    (Pattern.compile("(info:eu-repo/grantagreement/ec/h2020/)(\\d\\d\\d\\d\\d\\d)(.*)", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE), "40|corda__h2020::"),
+    (Pattern.compile("(info:eu-repo/grantagreement/ec/fp7/)(\\d\\d\\d\\d\\d\\d)(.*)", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE), "40|corda_______::")
 
   )
 
@@ -90,11 +90,11 @@ object DataciteToOAFTransformation {
   )
 
 
-  def filter_json(json:String):Boolean = {
+  def filter_json(json: String): Boolean = {
     j_filter.exists(f => json.contains(f))
   }
 
-  def toActionSet(item:Oaf) :(String, String) = {
+  def toActionSet(item: Oaf): (String, String) = {
     val mapper = new ObjectMapper()
 
     item match {
@@ -131,8 +131,6 @@ object DataciteToOAFTransformation {
   }
 
 
-
-
   def embargo_end(embargo_end_date: String): Boolean = {
     val dt = LocalDate.parse(embargo_end_date, DateTimeFormatter.ofPattern("[yyyy-MM-dd]"))
     val td = LocalDate.now()
@@ -166,7 +164,7 @@ object DataciteToOAFTransformation {
     d
   }
 
-  def getTypeQualifier(resourceType: String, resourceTypeGeneral: String, schemaOrg: String, vocabularies:VocabularyGroup): (Qualifier, Qualifier) = {
+  def getTypeQualifier(resourceType: String, resourceTypeGeneral: String, schemaOrg: String, vocabularies: VocabularyGroup): (Qualifier, Qualifier) = {
     if (resourceType != null && resourceType.nonEmpty) {
       val typeQualifier = vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceType)
       if (typeQualifier != null)
@@ -188,7 +186,7 @@ object DataciteToOAFTransformation {
   }
 
 
-  def getResult(resourceType: String, resourceTypeGeneral: String, schemaOrg: String, vocabularies:VocabularyGroup): Result = {
+  def getResult(resourceType: String, resourceTypeGeneral: String, schemaOrg: String, vocabularies: VocabularyGroup): Result = {
     val typeQualifiers: (Qualifier, Qualifier) = getTypeQualifier(resourceType, resourceTypeGeneral, schemaOrg, vocabularies)
     if (typeQualifiers == null)
       return null
@@ -230,11 +228,31 @@ object DataciteToOAFTransformation {
   }
 
 
+  /**
+   * As describe in ticket #6377
+   * when the result come from figshare we need to remove subject
+   * and set Access rights OPEN.
+   * @param r
+   */
+  def fix_figshare(r: Result): Unit = {
+
+    if (r.getInstance() != null) {
+      val hosted_by_figshare = r.getInstance().asScala.exists(i => i.getHostedby != null && "figshare".equalsIgnoreCase(i.getHostedby.getValue))
+      if (hosted_by_figshare) {
+        r.getInstance().asScala.foreach(i => i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT()))
+        val l: List[StructuredProperty] = List()
+        r.setSubject(l.asJava)
+      }
+    }
+
+
+  }
+
   def generateOAFDate(dt: String, q: Qualifier): StructuredProperty = {
     OafMapperUtils.structuredProperty(dt, q, null)
   }
 
-  def generateRelation(sourceId:String, targetId:String, relClass:String, cf:KeyValue, di:DataInfo) :Relation = {
+  def generateRelation(sourceId: String, targetId: String, relClass: String, cf: KeyValue, di: DataInfo): Relation = {
 
     val r = new Relation
     r.setSource(sourceId)
@@ -249,17 +267,17 @@ object DataciteToOAFTransformation {
 
   }
 
-  def get_projectRelation(awardUri:String, sourceId:String):List[Relation] = {
-    val match_pattern = funder_regex.find(s =>s._1.matcher(awardUri).find())
+  def get_projectRelation(awardUri: String, sourceId: String): List[Relation] = {
+    val match_pattern = funder_regex.find(s => s._1.matcher(awardUri).find())
 
     if (match_pattern.isDefined) {
-      val m =match_pattern.get._1
+      val m = match_pattern.get._1
       val p = match_pattern.get._2
       val grantId = m.matcher(awardUri).replaceAll("$2")
       val targetId = s"$p${DHPUtils.md5(grantId)}"
       List(
-        generateRelation(sourceId, targetId,"isProducedBy", DATACITE_COLLECTED_FROM, dataInfo),
-        generateRelation(targetId, sourceId,"produces", DATACITE_COLLECTED_FROM, dataInfo)
+        generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, dataInfo),
+        generateRelation(targetId, sourceId, "produces", DATACITE_COLLECTED_FROM, dataInfo)
       )
     }
     else
@@ -268,9 +286,9 @@ object DataciteToOAFTransformation {
   }
 
 
-  def generateOAF(input:String,ts:Long, dateOfCollection:Long, vocabularies: VocabularyGroup):List[Oaf] = {
+  def generateOAF(input: String, ts: Long, dateOfCollection: Long, vocabularies: VocabularyGroup): List[Oaf] = {
     if (filter_json(input))
-      return  List()
+      return List()
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
@@ -289,13 +307,13 @@ object DataciteToOAFTransformation {
       return List()
 
 
-    val doi_q = OafMapperUtils.qualifier("doi", "doi", ModelConstants.DNET_PID_TYPES,ModelConstants.DNET_PID_TYPES)
+    val doi_q = OafMapperUtils.qualifier("doi", "doi", ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES)
     val pid = OafMapperUtils.structuredProperty(doi, doi_q, dataInfo)
     result.setPid(List(pid).asJava)
     result.setId(OafMapperUtils.createOpenaireId(50, s"datacite____::$doi", true))
     result.setOriginalId(List(doi).asJava)
 
-    val d = new Date(dateOfCollection*1000)
+    val d = new Date(dateOfCollection * 1000)
     val ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
 
 
@@ -311,10 +329,10 @@ object DataciteToOAFTransformation {
       a.setFullname(c.name.orNull)
       a.setName(c.givenName.orNull)
       a.setSurname(c.familyName.orNull)
-      if (c.nameIdentifiers!= null&& c.nameIdentifiers.isDefined  && c.nameIdentifiers.get != null) {
+      if (c.nameIdentifiers != null && c.nameIdentifiers.isDefined && c.nameIdentifiers.get != null) {
         a.setPid(c.nameIdentifiers.get.map(ni => {
           val q = if (ni.nameIdentifierScheme.isDefined) vocabularies.getTermAsQualifier(ModelConstants.DNET_PID_TYPES, ni.nameIdentifierScheme.get.toLowerCase()) else null
-          if (ni.nameIdentifier!= null && ni.nameIdentifier.isDefined) {
+          if (ni.nameIdentifier != null && ni.nameIdentifier.isDefined) {
             OafMapperUtils.structuredProperty(ni.nameIdentifier.get, q, dataInfo)
           }
           else
@@ -331,9 +349,7 @@ object DataciteToOAFTransformation {
     }
 
 
-
-
-    val titles:List[TitleType] = (json \\ "titles").extractOrElse[List[TitleType]](List())
+    val titles: List[TitleType] = (json \\ "titles").extractOrElse[List[TitleType]](List())
 
     result.setTitle(titles.filter(t => t.title.nonEmpty).map(t => {
       if (t.titleType.isEmpty) {
@@ -343,7 +359,7 @@ object DataciteToOAFTransformation {
       }
     }).asJava)
 
-    if(authors==null || authors.isEmpty || !authors.exists(a => a !=null))
+    if (authors == null || authors.isEmpty || !authors.exists(a => a != null))
       return List()
     result.setAuthor(authors.asJava)
 
@@ -357,7 +373,7 @@ object DataciteToOAFTransformation {
     val a_date: Option[String] = dates
       .filter(d => d.date.isDefined && d.dateType.isDefined && d.dateType.get.equalsIgnoreCase("available"))
       .map(d => extract_date(d.date.get))
-      .find(d => d != null  && d.isDefined)
+      .find(d => d != null && d.isDefined)
       .map(d => d.get)
 
     if (a_date.isDefined) {
@@ -397,7 +413,7 @@ object DataciteToOAFTransformation {
         .filter(d => d.description.isDefined).
         map(d =>
           OafMapperUtils.field(d.description.get, null)
-        ).filter(s => s!=null).asJava)
+        ).filter(s => s != null).asJava)
 
 
     val publisher = (json \\ "publisher").extractOrElse[String](null)
@@ -415,7 +431,7 @@ object DataciteToOAFTransformation {
 
     val client = (json \ "relationships" \ "client" \\ "id").extractOpt[String]
 
-    val accessRights:List[String] =  for {
+    val accessRights: List[String] = for {
       JObject(rightsList) <- json \\ "rightsList"
       JField("rightsUri", JString(rightsUri)) <- rightsList
     } yield rightsUri
@@ -447,18 +463,18 @@ object DataciteToOAFTransformation {
         instance.setLicense(OafMapperUtils.field(license.get, null))
     }
 
-    val awardUris:List[String] =  for {
+    val awardUris: List[String] = for {
       JObject(fundingReferences) <- json \\ "fundingReferences"
       JField("awardUri", JString(awardUri)) <- fundingReferences
     } yield awardUri
 
-    val relations:List[Relation] =awardUris.flatMap(a=> get_projectRelation(a, result.getId)).filter(r => r!= null)
-
+    val relations: List[Relation] = awardUris.flatMap(a => get_projectRelation(a, result.getId)).filter(r => r != null)
+    fix_figshare(result)
     result.setId(IdentifierFactory.createIdentifier(result))
-    if(result.getId == null)
+    if (result.getId == null)
       return List()
-    if (relations!= null && relations.nonEmpty) {
-      List(result):::relations
+    if (relations != null && relations.nonEmpty) {
+      List(result) ::: relations
     }
     else
       List(result)
