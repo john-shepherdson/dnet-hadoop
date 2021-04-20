@@ -1,7 +1,7 @@
 -- relations approved by the user
 SELECT
-	local_id                                              AS id1,
-	oa_original_id                                        AS id2,
+	d.local_id                                              AS id1,
+	d.oa_original_id                                        AS id2,
 	'openaire____::openorgs'                              AS collectedfromid,
 	'OpenOrgs Database'                                   AS collectedfromname,
 	false                                                 AS inferred,
@@ -9,7 +9,9 @@ SELECT
 	0.99                                                  AS trust,
 	''                                                    AS inferenceprovenance,
 	'isSimilarTo'                                         AS relclass
-FROM oa_duplicates WHERE reltype = 'is_similar'
+FROM oa_duplicates d
+LEFT OUTER JOIN organizations o ON (d.local_id=o.id)
+WHERE d.reltype = 'is_similar' AND o.status = 'approved'
 
 UNION ALL
 
@@ -25,14 +27,15 @@ SELECT
 	''                                                    AS inferenceprovenance,
 	'isSimilarTo'                                         AS relclass
 FROM other_names n
-	LEFT OUTER JOIN organizations o ON (n.id = o.id)
+LEFT OUTER JOIN organizations o ON (n.id = o.id)
+WHERE o.status = 'approved'
 
 UNION ALL
 
 -- diff relations approved by the user
 SELECT
-	local_id                                              AS id1,
-	oa_original_id                                        AS id2,
+	d.local_id                                              AS id1,
+	d.oa_original_id                                        AS id2,
 	'openaire____::openorgs'                              AS collectedfromid,
 	'OpenOrgs Database'                                   AS collectedfromname,
 	false                                                 AS inferred,
@@ -40,4 +43,6 @@ SELECT
 	0.99                                                  AS trust,
 	''                                                    AS inferenceprovenance,
 	'isDifferentFrom'                                     AS relclass
-FROM oa_duplicates WHERE reltype = 'is_different';
+FROM oa_duplicates d
+LEFT OUTER JOIN organizations o ON (d.local_id=o.id)
+WHERE d.reltype = 'is_different' AND o.status = 'approved';

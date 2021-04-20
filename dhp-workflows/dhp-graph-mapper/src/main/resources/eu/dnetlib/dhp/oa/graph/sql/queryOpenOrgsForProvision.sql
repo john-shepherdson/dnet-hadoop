@@ -35,7 +35,7 @@ FROM organizations o
     LEFT OUTER JOIN organizations od ON (d.oa_original_id = od.id)
     LEFT OUTER JOIN other_ids idup  ON (od.id = idup.id)
 WHERE
-    o.status = 'approved'
+    o.status = 'approved' OR o.status = 'suggested'
 GROUP BY
 	o.id,
 	o.name,
