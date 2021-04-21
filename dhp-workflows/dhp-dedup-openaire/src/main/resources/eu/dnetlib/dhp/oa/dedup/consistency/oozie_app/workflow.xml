@@ -78,7 +78,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Update Relations</name>
+            <name>Propagate Relations</name>
             <class>eu.dnetlib.dhp.oa.dedup.SparkPropagateRelation</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
