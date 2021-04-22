@@ -57,9 +57,6 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 	private static String testDedupGraphBasePath;
 	private static final String testActionSetId = "test-orchestrator";
 
-	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
 	@BeforeAll
 	public static void cleanUp() throws IOException, URISyntaxException {
 
@@ -259,7 +256,7 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(2520, relations);
+		assertEquals(4894, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
