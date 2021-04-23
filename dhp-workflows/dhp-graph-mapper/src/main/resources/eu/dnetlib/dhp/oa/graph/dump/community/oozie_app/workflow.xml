@@ -134,28 +134,30 @@
             <arg>--outputPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
-        </java>
-        <ok to="single_deposition"/>
-        <error to="Kill"/>
-    </action>
-
-    <decision name="single_deposition">
-        <switch>
-            <case to="remove_communities">${wf:conf('singleDeposition') eq true}</case>
-            <default to="fork_dump"/>
-        </switch>
-    </decision>
-
-    <action name="remove_communities">
-        <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.dump.community.RemoveCommunities</main-class>
-            <arg>--path</arg><arg>${workingDir}/communityMap</arg>
-            <arg>--nameNode</arg><arg>${nameNode}</arg>
-            <arg>--communityId</arg><arg>${communityId}</arg>
+            <arg>--singleDeposition</arg><arg>${singleDeposition}</arg>
+            <arg>--communityId></arg><arg>${communityId}</arg>
         </java>
         <ok to="fork_dump"/>
         <error to="Kill"/>
     </action>
+
+<!--    <decision name="single_deposition">-->
+<!--        <switch>-->
+<!--            <case to="remove_communities">${wf:conf('singleDeposition') eq true}</case>-->
+<!--            <default to="fork_dump"/>-->
+<!--        </switch>-->
+<!--    </decision>-->
+
+<!--    <action name="remove_communities">-->
+<!--        <java>-->
+<!--            <main-class>eu.dnetlib.dhp.oa.graph.dump.community.RemoveCommunities</main-class>-->
+<!--            <arg>&#45;&#45;path</arg><arg>${workingDir}/communityMap</arg>-->
+<!--            <arg>&#45;&#45;nameNode</arg><arg>${nameNode}</arg>-->
+<!--            <arg>&#45;&#45;communityId</arg><arg>${communityId}</arg>-->
+<!--        </java>-->
+<!--        <ok to="fork_dump"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
 
     <fork name="fork_dump">
         <path start="dump_publication"/>

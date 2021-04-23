@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -71,14 +72,19 @@ public class SaveCommunityMap implements Serializable {
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
 
+		final Boolean singleCommunity = Optional.ofNullable(parser.get("singleDeposition"))
+				.map(Boolean::valueOf).orElse(false);
+
+		final String community_id = Optional.ofNullable(parser.get("communityId")).orElse(null);
+
 		final SaveCommunityMap scm = new SaveCommunityMap(outputPath, nameNode, isLookUpUrl);
 
-		scm.saveCommunityMap();
+		scm.saveCommunityMap(singleCommunity, community_id);
 
 	}
 
-	private void saveCommunityMap() throws ISLookUpException, IOException, DocumentException {
-		writer.write(Utils.OBJECT_MAPPER.writeValueAsString(queryInformationSystem.getCommunityMap()));
+	private void saveCommunityMap(boolean singleCommunity, String community_id) throws ISLookUpException, IOException, DocumentException {
+		writer.write(Utils.OBJECT_MAPPER.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, community_id)));
 		writer.close();
 	}
 }
