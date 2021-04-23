@@ -19,7 +19,6 @@
 
 	<modules>
 		<module>dhp-build</module>
-		<module>dhp-schemas</module>
 		<module>dhp-common</module>
 		<module>dhp-workflows</module>
 	</modules>
@@ -121,6 +120,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>eu.dnetlib.dhp</groupId>
+				<artifactId>dhp-schemas</artifactId>
+				<version>${dhp.schemas.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
 				<artifactId>hadoop-hdfs</artifactId>
@@ -692,6 +696,7 @@
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
 		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
+		<dhp.schemas.version>2.2.4</dhp.schemas.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
 		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
