@@ -380,7 +380,7 @@ public class CreateRelationTest {
 				"            <param name=\"rule\"/>\n" +
 				"            <param name=\"CD_PROJECT_NUMBER\">675858</param>\n" +
 				"            <param name=\"url\"/>\n" +
-				"            <param name=\"funding\">H2020-EINFRA-2015-1</param>\n" +
+				"            <param name=\"funding\">EC | H2020 | RIA</param>\n" +
 				"            <param name=\"funder\">EC</param>\n" +
 				"            <param name=\"acronym\">West-Life</param>\n" +
 				"        </concept>\n" +
