@@ -13,6 +13,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -91,6 +92,7 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 
 						final JavaPairRDD<String, String> mergedIds = rel
 							.where("relClass == 'merges'")
+							.where("source != target")
 							.select(rel.col("target"))
 							.distinct()
 							.toJavaRDD()
