@@ -1,14 +1,14 @@
 
 package eu.dnetlib.dhp.schema.oaf;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 
 /**
  * Relation models any edge between two nodes in the OpenAIRE graph. It has a source id and a target id pointing to
@@ -137,7 +137,10 @@ public class Relation extends Oaf {
 		try {
 			setValidationDate(ModelSupport.oldest(getValidationDate(), r.getValidationDate()));
 		} catch (ParseException e) {
-			throw new IllegalArgumentException(String.format("invalid validation date format in relation [s:%s, t:%s]: %s", getSource(), getTarget(), getValidationDate()));
+			throw new IllegalArgumentException(String
+				.format(
+					"invalid validation date format in relation [s:%s, t:%s]: %s", getSource(), getTarget(),
+					getValidationDate()));
 		}
 
 		super.mergeFrom(r);
