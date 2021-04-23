@@ -3,8 +3,11 @@
     <parameters>
         <property>
             <name>singleDeposition</name>
-            <value>true</value>
             <description>Indicates if each file in the directory should be uploaded in a own deposition</description>
+        </property>
+        <property>
+            <name>upload</name>
+            <description>true if the dump should be upload in zenodo</description>
         </property>
         <property>
             <name>communityId</name>
@@ -432,10 +435,16 @@
             <arg>--nameNode</arg><arg>${nameNode}</arg>
             <arg>--sourcePath</arg><arg>${workingDir}/split</arg>
         </java>
-        <ok to="send_zenodo"/>
+        <ok to="should_upload"/>
         <error to="Kill"/>
     </action>
 
+    <decision name="should_upload">
+        <switch>
+            <case to="send_zenodo">${wf:conf('upload') eq true}</case>
+            <default to="End"/>
+        </switch>
+    </decision>
     <action name="send_zenodo">
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.dump.SendToZenodoHDFS</main-class>
