@@ -13,12 +13,6 @@
     "paramRequired": false
   },
   {
-    "paramName":"cmp",
-    "paramLongName":"communityMapPath",
-    "paramDescription": "the path to the serialization of the community map",
-    "paramRequired": false
-  },
-  {
     "paramName":"di",
     "paramLongName":"depositionId",
     "paramDescription": "the id of an open deposition which has not been published",

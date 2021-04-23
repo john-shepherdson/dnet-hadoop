@@ -35,7 +35,12 @@
 		"paramLongName":"dumpType",
 		"paramDescription": "the type of the dump (complete for the whole graph, community for the products related to communities, funder for the results with at least a link to project",
 		"paramRequired": false
-	}
+	},	{
+	"paramName":"cid",
+	"paramLongName":"communityId",
+	"paramDescription": "the id of the community to be dumped",
+	"paramRequired": false
+}
 ]
 
 

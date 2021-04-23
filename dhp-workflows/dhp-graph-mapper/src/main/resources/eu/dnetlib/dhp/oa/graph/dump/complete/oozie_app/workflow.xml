@@ -596,7 +596,6 @@
             <arg>--accessToken</arg><arg>${accessToken}</arg>
             <arg>--connectionUrl</arg><arg>${connectionUrl}</arg>
             <arg>--metadata</arg><arg>${metadata}</arg>
-            <arg>--communityMapPath</arg><arg>${workingDir}/communityMap</arg>
             <arg>--conceptRecordId</arg><arg>${conceptRecordId}</arg>
             <arg>--depositionType</arg><arg>${depositionType}</arg>
             <arg>--depositionId</arg><arg>${depositionId}</arg>

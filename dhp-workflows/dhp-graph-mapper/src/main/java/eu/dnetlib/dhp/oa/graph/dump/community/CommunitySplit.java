@@ -34,12 +34,14 @@ public class CommunitySplit implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				execSplit(spark, inputPath, outputPath, Utils.getCommunityMap(spark, communityMapPath).keySet());
+				CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
+
+				execSplit(spark, inputPath, outputPath, communityMap);
 			});
 	}
 
 	private static void execSplit(SparkSession spark, String inputPath, String outputPath,
-		Set<String> communities) {
+		CommunityMap communities) {
 
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
@@ -48,8 +50,9 @@ public class CommunitySplit implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		communities
+			.keySet()
 			.stream()
-			.forEach(c -> printResult(c, result, outputPath));
+			.forEach(c -> printResult(c, result, outputPath + "/" + communities.get(c).replace(" ", "_")));
 
 	}
 
@@ -61,7 +64,7 @@ public class CommunitySplit implements Serializable {
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
-			.json(outputPath + "/" + c);
+			.json(outputPath);
 
 	}
 
