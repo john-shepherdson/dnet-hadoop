@@ -20,7 +20,7 @@ public class QueryInformationSystem {
 	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
 		+
 		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-		" and ($x//context/param[./@name = 'status']/text() = 'manager'  or $x//context/param[./@name = 'status']/text() = 'all') "
+		" and ($x//context/param[./@name = 'status']/text() = 'all') "
 		+
 		"  return " +
 		"<community> " +
