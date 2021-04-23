@@ -72,8 +72,10 @@ public class SaveCommunityMap implements Serializable {
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
 
-		final Boolean singleCommunity = Optional.ofNullable(parser.get("singleDeposition"))
-				.map(Boolean::valueOf).orElse(false);
+		final Boolean singleCommunity = Optional
+			.ofNullable(parser.get("singleDeposition"))
+			.map(Boolean::valueOf)
+			.orElse(false);
 
 		final String community_id = Optional.ofNullable(parser.get("communityId")).orElse(null);
 
@@ -83,8 +85,12 @@ public class SaveCommunityMap implements Serializable {
 
 	}
 
-	private void saveCommunityMap(boolean singleCommunity, String community_id) throws ISLookUpException, IOException, DocumentException {
-		writer.write(Utils.OBJECT_MAPPER.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, community_id)));
+	private void saveCommunityMap(boolean singleCommunity, String community_id)
+		throws ISLookUpException, IOException, DocumentException {
+		writer
+			.write(
+				Utils.OBJECT_MAPPER
+					.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, community_id)));
 		writer.close();
 	}
 }
