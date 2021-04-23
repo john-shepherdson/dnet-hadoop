@@ -27,19 +27,20 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//datacite:title", MAIN_TITLE_QUALIFIER, info);
+		return prepareListStructProps(
+			doc, "//*[local-name()='titles']/*[local-name()='title']", MAIN_TITLE_QUALIFIER, info);
 	}
 
 	@Override
 	protected List<Author> prepareAuthors(final Document doc, final DataInfo info) {
 		final List<Author> res = new ArrayList<>();
 		int pos = 1;
-		for (final Object o : doc.selectNodes("//datacite:creator")) {
+		for (final Object o : doc.selectNodes("//*[local-name()='creator']")) {
 			final Node n = (Node) o;
 			final Author author = new Author();
-			final String fullname = n.valueOf("./datacite:creatorName");
-			final String name = n.valueOf("./datacite:givenName");
-			final String surname = n.valueOf("./datacite:familyName");
+			final String fullname = n.valueOf("./*[local-name()='creatorName']");
+			final String name = n.valueOf("./*[local-name()='givenName']");
+			final String surname = n.valueOf("./*[local-name()='familyName']");
 			if (StringUtils.isNotBlank(fullname) || StringUtils.isNotBlank(name) || StringUtils.isNotBlank(surname)) {
 				author.setFullname(fullname);
 
@@ -61,7 +62,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
 				}
 
-				author.setAffiliation(prepareListFields(n, "./datacite:affiliation", info));
+				author.setAffiliation(prepareListFields(n, "./*[local-name()='affiliation']", info));
 				author.setPid(preparePids(n, info));
 				author.setRank(pos++);
 				res.add(author);
@@ -72,7 +73,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	private List<StructuredProperty> preparePids(final Node n, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : n.selectNodes("./datacite:nameIdentifier")) {
+		for (final Object o : n.selectNodes("./*[local-name()='nameIdentifier']")) {
 
 			final String id = ((Node) o).getText();
 			final String type = ((Node) o)
@@ -126,23 +127,25 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
 		final Set<String> url = new HashSet<>();
-		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='URL']")) {
+		for (final Object o : doc
+			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='URL']")) {
 			url.add(((Node) o).getText().trim());
 		}
 		for (final Object o : doc
-			.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='landingPage']")) {
+			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='landingPage']")) {
 			url.add(((Node) o).getText().trim());
 		}
-		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='URL']")) {
+		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='URL']")) {
 			url.add(((Node) o).getText().trim());
 		}
-		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='landingPage']")) {
+		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='landingPage']")) {
 			url.add(((Node) o).getText().trim());
 		}
-		for (final Object o : doc.selectNodes("//datacite:alternateIdentifier[@alternateIdentifierType='DOI']")) {
+		for (final Object o : doc
+			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
 			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
 		}
-		for (final Object o : doc.selectNodes("//datacite:identifier[@identifierType='DOI']")) {
+		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='DOI']")) {
 			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
 		}
 		if (!url.isEmpty()) {
@@ -160,7 +163,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<StructuredProperty> prepareRelevantDates(final Document doc, final DataInfo info) {
 		final List<StructuredProperty> res = new ArrayList<>();
-		for (final Object o : doc.selectNodes("//datacite:date")) {
+		for (final Object o : doc.selectNodes("//*[local-name()='date']")) {
 			final String dateType = ((Node) o).valueOf("@dateType");
 			if (StringUtils.isBlank(dateType)
 				|| (!dateType.equalsIgnoreCase("Accepted")
@@ -190,32 +193,32 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareContributors(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//datacite:contributorName", info);
+		return prepareListFields(doc, "//*[local-name()='contributorName']", info);
 	}
 
 	@Override
 	protected List<Field<String>> prepareFormats(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//datacite:format", info);
+		return prepareListFields(doc, "//*[local-name()=':format']", info);
 	}
 
 	@Override
 	protected Field<String> preparePublisher(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//datacite:publisher", info);
+		return prepareField(doc, "//*[local-name()=':publisher']", info);
 	}
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//datacite:description[@descriptionType='Abstract']", info);
+		return prepareListFields(doc, "//*[local-name()='description' and ./@descriptionType='Abstract']", info);
 	}
 
 	@Override
 	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//datacite:subject", info);
+		return prepareListStructProps(doc, "//*[local-name()='subject']", info);
 	}
 
 	@Override
 	protected Qualifier prepareLanguages(final Document doc) {
-		return prepareQualifier(doc, "//datacite:language", DNET_LANGUAGES);
+		return prepareQualifier(doc, "//*[local-name()=':language']", DNET_LANGUAGES);
 	}
 
 	@Override
@@ -230,7 +233,9 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final Document doc,
 		final DataInfo info) {
 		return prepareListFields(
-			doc, "//datacite:contributor[@contributorType='ContactGroup']/datacite:contributorName", info);
+			doc,
+			"//*[local-name()='contributor' and ./@contributorType='ContactGroup']/*[local-name()='contributorName']",
+			info);
 	}
 
 	@Override
@@ -238,12 +243,14 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final Document doc,
 		final DataInfo info) {
 		return prepareListFields(
-			doc, "//datacite:contributor[@contributorType='ContactPerson']/datacite:contributorName", info);
+			doc,
+			"//*[local-name()='contributor' and ./@contributorType='ContactPerson']/*[local-name()='contributorName']",
+			info);
 	}
 
 	@Override
 	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
-		return prepareQualifier(doc, "//datacite:format", DNET_PROGRAMMING_LANGUAGES);
+		return prepareQualifier(doc, "//*[local-name()='format']", DNET_PROGRAMMING_LANGUAGES);
 	}
 
 	@Override
@@ -265,7 +272,9 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final Document doc,
 		final DataInfo info) {
 		return prepareListFields(
-			doc, "//datacite:relatedIdentifier[@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']", info);
+			doc,
+			"//*[local-name()='relatedIdentifier' and ./@relatedIdentifierType='URL' and @relationType='IsDocumentedBy']",
+			info);
 	}
 
 	// DATASETS
@@ -274,11 +283,11 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	protected List<GeoLocation> prepareDatasetGeoLocations(final Document doc, final DataInfo info) {
 		final List<GeoLocation> res = new ArrayList<>();
 
-		for (final Object o : doc.selectNodes("//datacite:geoLocation")) {
+		for (final Object o : doc.selectNodes("//*[local-name()='geoLocation']")) {
 			final GeoLocation loc = new GeoLocation();
-			loc.setBox(((Node) o).valueOf("./datacite:geoLocationBox"));
-			loc.setPlace(((Node) o).valueOf("./datacite:geoLocationPlace"));
-			loc.setPoint(((Node) o).valueOf("./datacite:geoLocationPoint"));
+			loc.setBox(((Node) o).valueOf("./*[local-name()=':geoLocationBox']"));
+			loc.setPlace(((Node) o).valueOf("./*[local-name()=':geoLocationPlace']"));
+			loc.setPoint(((Node) o).valueOf("./*[local-name()=':geoLocationPoint']"));
 			res.add(loc);
 		}
 		return res;
@@ -295,17 +304,17 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	protected Field<String> prepareDatasetLastMetadataUpdate(
 		final Document doc,
 		final DataInfo info) {
-		return prepareField(doc, "//datacite:date[@dateType='Updated']", info);
+		return prepareField(doc, "//*[local-name()='date' and ./@dateType='Updated']", info);
 	}
 
 	@Override
 	protected Field<String> prepareDatasetVersion(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//datacite:version", info);
+		return prepareField(doc, "//*[local-name()='version']", info);
 	}
 
 	@Override
 	protected Field<String> prepareDatasetSize(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//datacite:size", info);
+		return prepareField(doc, "//*[local-name()='size']", info);
 	}
 
 	@Override
@@ -315,7 +324,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Field<String> prepareDatasetStorageDate(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//datacite:date[@dateType='Issued']", info);
+		return prepareField(doc, "//*[local-name()='date' and ./@dateType='Issued']", info);
 	}
 
 	@Override
@@ -327,7 +336,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 		final List<Oaf> res = new ArrayList<>();
 
-		for (final Object o : doc.selectNodes("//datacite:relatedIdentifier[@relatedIdentifierType='OPENAIRE']")) {
+		for (final Object o : doc
+			.selectNodes("//*[local-name()='relatedIdentifier' and ./@relatedIdentifierType='OPENAIRE']")) {
 
 			final String originalId = ((Node) o).getText();
 
@@ -377,13 +387,14 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
-					doc, "//datacite:identifier[@identifierType != 'URL' and @identifierType != 'landingPage']",
+					doc,
+					"//*[local-name()='identifier' and ./@identifierType != 'URL' and ./@identifierType != 'landingPage']",
 					"@identifierType", DNET_PID_TYPES, info));
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
 					doc,
-					"//datacite:alternateIdentifier[@alternateIdentifierType != 'URL' and @alternateIdentifierType != 'landingPage']",
+					"//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType != 'URL' and ./@alternateIdentifierType != 'landingPage']",
 					"@alternateIdentifierType", DNET_PID_TYPES, info));
 
 		return res
