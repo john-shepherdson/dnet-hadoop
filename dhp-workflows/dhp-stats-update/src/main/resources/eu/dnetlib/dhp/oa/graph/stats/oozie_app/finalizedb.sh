@@ -10,6 +10,7 @@ export SOURCE=$1
 export SHADOW=$2
 
 echo "Updating shadow database"
+impala-shell -q "invalidate metadata"
 impala-shell -d ${SOURCE} -q "invalidate metadata"
 impala-shell -d ${SOURCE} -q "show tables" --delimited | sed "s/^\(.*\)/compute stats ${SOURCE}.\1;/" | impala-shell -c -f -
 impala-shell -q "create database if not exists ${SHADOW}"
