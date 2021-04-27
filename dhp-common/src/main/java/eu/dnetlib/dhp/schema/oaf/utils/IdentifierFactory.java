@@ -27,11 +27,6 @@ public class IdentifierFactory implements Serializable {
 	public static final String ID_SEPARATOR = "::";
 	public static final String ID_PREFIX_SEPARATOR = "|";
 
-	public final static String DOI_REGEX = "(^10\\.[0-9]{4,9}\\/[-._;()\\/:a-zA-Z0-9]+$)|" +
-		"(^10\\.1002\\/[^\\s]+$)|" +
-		"(^10\\.1021\\/[a-zA-Z0-9_][a-zA-Z0-9_][0-9]++$)|" +
-		"(^10\\.1207\\/[a-zA-Z0-9_]+\\&[0-9]+_[0-9]+$)";
-
 	public static final int ID_PREFIX_LEN = 12;
 
 	/**
