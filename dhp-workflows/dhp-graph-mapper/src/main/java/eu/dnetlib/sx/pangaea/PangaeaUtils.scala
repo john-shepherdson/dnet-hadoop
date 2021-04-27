@@ -26,7 +26,7 @@ object PangaeaUtils {
     val s:String =  s"${new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")format(d)}Z"
 
     val ds = (json \ "internal-datestamp").extractOrElse[String](s)
-    val identifier= (json \ "metadatalink").extractOrElse[String]()
+    val identifier= (json \ "metadatalink").extractOrElse[String]("")
     val xml= (json \ "xml").extract[String]
     PangaeaDataModel(ds, identifier,xml)
   }
