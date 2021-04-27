@@ -56,11 +56,6 @@
             <artifactId>dhp-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-schemas</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>eu.dnetlib</groupId>

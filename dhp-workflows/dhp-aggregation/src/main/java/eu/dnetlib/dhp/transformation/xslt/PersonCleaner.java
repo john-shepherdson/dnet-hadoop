@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.transformation.xslt;
 import static eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction.QNAME_BASE_URI;
 
 import java.io.Serializable;
-// import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.List;
@@ -18,22 +17,10 @@ import com.google.common.hash.Hashing;
 
 import eu.dnetlib.dhp.transformation.xslt.utils.Capitalize;
 import eu.dnetlib.dhp.transformation.xslt.utils.DotAbbreviations;
-import net.sf.saxon.s9api.ExtensionFunction;
-import net.sf.saxon.s9api.ItemType;
-import net.sf.saxon.s9api.OccurrenceIndicator;
-import net.sf.saxon.s9api.QName;
-import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.SequenceType;
-import net.sf.saxon.s9api.XdmValue;
-
-//import eu.dnetlib.pace.clustering.NGramUtils;
-//import eu.dnetlib.pace.util.Capitalise;
-//import eu.dnetlib.pace.util.DotAbbreviations;
+import net.sf.saxon.s9api.*;
 
 public class PersonCleaner implements ExtensionFunction, Serializable {
-	/**
-	 *
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private List<String> firstname = Lists.newArrayList();
 	private List<String> surname = Lists.newArrayList();
@@ -45,7 +32,7 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 
 	}
 
-	public String normalize(String s) {
+	private String normalize(String s) {
 		s = Normalizer.normalize(s, Normalizer.Form.NFD); // was NFD
 		s = s.replaceAll("\\(.+\\)", "");
 		s = s.replaceAll("\\[.+\\]", "");
@@ -184,7 +171,7 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 
 	@Override
 	public QName getName() {
-		return new QName(QNAME_BASE_URI + "/person", "person");
+		return new QName(QNAME_BASE_URI + "/person", "normalize");
 	}
 
 	@Override
@@ -194,13 +181,18 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 
 	@Override
 	public SequenceType[] getArgumentTypes() {
-		// TODO Auto-generated method stub
-		return null;
+		return new SequenceType[] {
+			SequenceType.makeSequenceType(ItemType.STRING, OccurrenceIndicator.ZERO_OR_ONE)
+		};
 	}
 
 	@Override
-	public XdmValue call(XdmValue[] arguments) throws SaxonApiException {
-		// TODO Auto-generated method stub
-		return null;
+	public XdmValue call(XdmValue[] xdmValues) throws SaxonApiException {
+		XdmValue r = xdmValues[0];
+		if (r.size() == 0) {
+			return new XdmAtomicValue("");
+		}
+		final String currentValue = xdmValues[0].itemAt(0).getStringValue();
+		return new XdmAtomicValue(normalize(currentValue));
 	}
 }

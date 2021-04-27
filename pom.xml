@@ -19,7 +19,6 @@
 
 	<modules>
 		<module>dhp-build</module>
-		<module>dhp-schemas</module>
 		<module>dhp-common</module>
 		<module>dhp-workflows</module>
 	</modules>
@@ -60,31 +59,23 @@
 			</releases>
 		</repository>
 		<repository>
+			<id>dnet45-snapshots</id>
+			<name>D-Net 45 snapshots</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
 			<id>cloudera</id>
 			<name>Cloudera Repository</name>
 			<url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
 			<releases>
 				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>dnet45-releases-old</id>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>dnet45-snapshots-old</id>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-snapshots</url>
-			<releases>
-				<enabled>false</enabled>
 			</releases>
 			<snapshots>
 				<enabled>false</enabled>
@@ -118,6 +109,12 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>eu.dnetlib.dhp</groupId>
+				<artifactId>dhp-schemas</artifactId>
+				<version>2.2.5-SNAPSHOT</version>
+				<classifier>stable_ids</classifier>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
 				<artifactId>hadoop-hdfs</artifactId>
