@@ -156,7 +156,7 @@ public class TransformSparkJobNode {
 	 * @return
 	 */
 	private static int getRepartitionNumber(long totalInput, Integer rpt) {
-		return (int) (totalInput / rpt);
+		return Math.max(1, (int) (totalInput / rpt));
 	}
 
 }

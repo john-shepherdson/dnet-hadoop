@@ -68,12 +68,6 @@
         <xsl:call-template name="validRecord" />
     </xsl:template>
 
-    <xsl:template name="terminate">
-        <xsl:message terminate="yes">
-            record is not compliant, transformation is interrupted.
-        </xsl:message>
-    </xsl:template>
-
     <xsl:template name="validRecord">
         <record>
             <xsl:apply-templates select="//*[local-name() = 'header']" />
@@ -282,9 +276,6 @@
                                 <xsl:value-of select="$varEmbargoEndDate"/>
                             </oaf:embargoenddate>
                         </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:call-template name="terminate"/>
-                        </xsl:otherwise>
                     </xsl:choose>
                 </xsl:if>
 
@@ -310,9 +301,6 @@
                           </dr:CobjCategory>
                          -->
                     </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="terminate"/>
-                    </xsl:otherwise>
                 </xsl:choose>
 
                 <!-- review status -->
