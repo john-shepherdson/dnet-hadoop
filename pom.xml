@@ -71,6 +71,30 @@
 			</releases>
 		</repository>
 		<repository>
+			<id>dnet45-bootstrap-snapshot</id>
+			<name>D-Net 45 Bootstrap Snapshot</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-snapshot/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>dnet45-bootstrap-release</id>
+			<name>D-Net 45 Bootstrap Release</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-release/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<layout>default</layout>
+		</repository>
+		<repository>
 			<id>cloudera</id>
 			<name>Cloudera Repository</name>
 			<url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
