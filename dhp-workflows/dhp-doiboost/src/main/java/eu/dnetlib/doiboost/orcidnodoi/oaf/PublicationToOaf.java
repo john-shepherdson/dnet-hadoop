@@ -18,6 +18,7 @@ import com.google.gson.*;
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.doiboost.orcidnodoi.util.DumpToActionsUtility;
 import eu.dnetlib.doiboost.orcidnodoi.util.Pair;

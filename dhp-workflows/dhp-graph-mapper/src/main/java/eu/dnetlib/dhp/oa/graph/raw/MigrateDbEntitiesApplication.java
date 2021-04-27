@@ -2,15 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.asString;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.io.Closeable;
 import java.io.IOException;

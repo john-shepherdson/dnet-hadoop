@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class MigrateDbEntitiesApplicationTest {

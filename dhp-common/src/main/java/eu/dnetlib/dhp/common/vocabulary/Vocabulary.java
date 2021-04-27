@@ -10,8 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
-import eu.dnetlib.dhp.schema.oaf.OafMapperUtils;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class Vocabulary implements Serializable {
 

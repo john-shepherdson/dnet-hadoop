@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
 
