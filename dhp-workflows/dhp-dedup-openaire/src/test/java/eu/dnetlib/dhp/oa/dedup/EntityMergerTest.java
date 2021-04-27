@@ -64,7 +64,7 @@ public class EntityMergerTest implements Serializable {
 
 		assertEquals("OPEN SOURCE", merged.getBestaccessright().getClassid());
 
-		assertEquals("50|doi_dedup___::0968af610a356656706657e4f234b340", merged.getId());
+		assertEquals(dedupId, merged.getId());
 
 	}
 
@@ -75,7 +75,7 @@ public class EntityMergerTest implements Serializable {
 			.entityMerger(dedupId, publications.iterator(), 0, dataInfo, Publication.class);
 
 		// verify id
-		assertEquals("50|doi_dedup___::0968af610a356656706657e4f234b340", pub_merged.getId());
+		assertEquals(dedupId, pub_merged.getId());
 
 		assertEquals(pub_top.getJournal(), pub_merged.getJournal());
 		assertEquals("OPEN", pub_merged.getBestaccessright().getClassid());
@@ -131,7 +131,7 @@ public class EntityMergerTest implements Serializable {
 			.entityMerger(dedupId, publications2.iterator(), 0, dataInfo, Publication.class);
 
 		// verify id
-		assertEquals("50|doi_dedup___::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
+		assertEquals(dedupId, pub_merged.getId());
 
 		assertEquals(27, pub_merged.getAuthor().size());
 	}
@@ -143,7 +143,7 @@ public class EntityMergerTest implements Serializable {
 			.entityMerger(dedupId, publications3.iterator(), 0, dataInfo, Publication.class);
 
 		// verify id
-		assertEquals("50|doi_dedup___::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
+		assertEquals(dedupId, pub_merged.getId());
 	}
 
 	@Test
@@ -153,7 +153,7 @@ public class EntityMergerTest implements Serializable {
 			.entityMerger(dedupId, publications4.iterator(), 0, dataInfo, Publication.class);
 
 		// verify id
-		assertEquals("50|dedup_wf_001::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
+		assertEquals(dedupId, pub_merged.getId());
 	}
 
 	@Test
@@ -170,7 +170,7 @@ public class EntityMergerTest implements Serializable {
 			.entityMerger(dedupId, publications5.iterator(), 0, dataInfo, Publication.class);
 
 		// verify id
-		assertEquals("50|dedup_wf_001::0ca46ff10b2b4c756191719d85302b14", pub_merged.getId());
+		assertEquals(dedupId, pub_merged.getId());
 	}
 
 	public DataInfo setDI() {
