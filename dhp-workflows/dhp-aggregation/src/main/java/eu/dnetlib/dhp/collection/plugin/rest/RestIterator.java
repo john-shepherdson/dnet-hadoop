@@ -1,26 +1,9 @@
 
 package eu.dnetlib.dhp.collection.plugin.rest;
 
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.*;
-
-import org.apache.avro.test.http.Http;
+import eu.dnetlib.dhp.collection.CollectorException;
+import eu.dnetlib.dhp.collection.HttpClientParams;
+import eu.dnetlib.dhp.collection.JsonUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -31,9 +14,23 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpClientParams;
-import eu.dnetlib.dhp.collection.JsonUtils;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.*;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * log.info(...) equal to  log.trace(...) in the application-logs

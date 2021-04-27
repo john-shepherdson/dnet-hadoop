@@ -175,6 +175,10 @@ object ImportDatacite {
           println("Error", e)
       } finally if (writer != null) writer.close()
     }
+    catch {
+      case e: Throwable =>
+        log.error("Error", e)
+    }
     i
   }
 
