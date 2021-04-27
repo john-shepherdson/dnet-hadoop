@@ -59,31 +59,47 @@
 			</releases>
 		</repository>
 		<repository>
-			<id>cloudera</id>
-			<name>Cloudera Repository</name>
-			<url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
+			<id>dnet45-snapshots</id>
+			<name>D-Net 45 snapshots</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>dnet45-bootstrap-snapshot</id>
+			<name>D-Net 45 Bootstrap Snapshot</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-snapshot/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>dnet45-bootstrap-release</id>
+			<name>D-Net 45 Bootstrap Release</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-release/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
+			<layout>default</layout>
 		</repository>
 		<repository>
-			<id>dnet45-releases-old</id>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
+			<id>cloudera</id>
+			<name>Cloudera Repository</name>
+			<url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
 			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>dnet45-snapshots-old</id>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-snapshots</url>
-			<releases>
-				<enabled>false</enabled>
+				<enabled>true</enabled>
 			</releases>
 			<snapshots>
 				<enabled>false</enabled>
