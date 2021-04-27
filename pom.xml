@@ -64,7 +64,7 @@
 			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
 			<layout>default</layout>
 			<snapshots>
-				<enabled>false</enabled>
+				<enabled>true</enabled>
 			</snapshots>
 			<releases>
 				<enabled>false</enabled>
