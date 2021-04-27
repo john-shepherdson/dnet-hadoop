@@ -57,11 +57,6 @@
         </dependency>
 
         <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-schemas</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>eu.dnetlib</groupId>
             <artifactId>dnet-actionmanager-api</artifactId>
         </dependency>

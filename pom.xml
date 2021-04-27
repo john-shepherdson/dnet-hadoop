@@ -59,31 +59,23 @@
 			</releases>
 		</repository>
 		<repository>
+			<id>dnet45-snapshots</id>
+			<name>D-Net 45 snapshots</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
 			<id>cloudera</id>
 			<name>Cloudera Repository</name>
 			<url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
 			<releases>
 				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>dnet45-releases-old</id>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>dnet45-snapshots-old</id>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-snapshots</url>
-			<releases>
-				<enabled>false</enabled>
 			</releases>
 			<snapshots>
 				<enabled>false</enabled>
@@ -120,7 +112,8 @@
 			<dependency>
 				<groupId>eu.dnetlib.dhp</groupId>
 				<artifactId>dhp-schemas</artifactId>
-				<version>${dhp.schemas.version}</version>
+				<version>2.2.5-SNAPSHOT</version>
+				<classifier>stable_ids</classifier>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
@@ -696,7 +689,6 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
 		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
-		<dhp.schemas.version>2.2.4</dhp.schemas.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
 		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
