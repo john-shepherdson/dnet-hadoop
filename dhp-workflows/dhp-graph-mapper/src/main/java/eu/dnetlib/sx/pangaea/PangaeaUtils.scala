@@ -1,6 +1,5 @@
 package eu.dnetlib.sx.pangaea
 
-
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.{Encoder, Encoders}
 import org.json4s
@@ -9,11 +8,13 @@ import org.json4s.jackson.JsonMethods.parse
 
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.regex.Pattern
+import scala.language.postfixOps
+import scala.xml.{Elem, Node, XML}
 
-
-case class PangaeaDataModel(datestamp:String, identifier:String, xml:String) {}
-
-
+case class PangaeaDataModel(identifier:String, title:List[String], objectType:List[String], creator:List[String],
+                            publisher:List[String], dataCenter :List[String],subject :List[String], language:String,
+                            rights:String, parent:String,relation :List[String],linkage:List[(String,String)] ) {}
 
 object PangaeaUtils {
 
@@ -21,14 +22,46 @@ object PangaeaUtils {
   def toDataset(input:String):PangaeaDataModel = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
-
-    val  d = new Date()
-    val s:String =  s"${new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")format(d)}Z"
-
-    val ds = (json \ "internal-datestamp").extractOrElse[String](s)
-    val identifier= (json \ "metadatalink").extractOrElse[String]("")
     val xml= (json \ "xml").extract[String]
-    PangaeaDataModel(ds, identifier,xml)
+    parseXml(xml)
+  }
+
+  def findDOIInRelation( input:List[String]):List[String] = {
+    val pattern = Pattern.compile("\\b(10[.][0-9]{4,}(?:[.][0-9]+)*\\/(?:(?![\"&\\'<>])\\S)+)\\b")
+    input.map(i => {
+      val matcher = pattern.matcher(i)
+      if (matcher.find())
+        matcher.group(0)
+      else
+        null
+    }).filter(i => i!= null)
+  }
+
+  def attributeOpt(attribute: String, node:Node): Option[String] =
+    node.attribute(attribute) flatMap (_.headOption) map (_.text)
+
+  def extractLinkage(node:Elem):List[(String, String)] = {
+    (node \ "linkage").map(n =>(attributeOpt("type",n), n.text)).filter(t => t._1.isDefined).map(t=> (t._1.get, t._2))(collection.breakOut)
+  }
+
+  def parseXml(input:String):PangaeaDataModel = {
+    val xml = XML.loadString(input)
+
+    val identifier = (xml \ "identifier").text
+    val title :List[String] = (xml \ "title").map(n => n.text)(collection.breakOut)
+    val pType :List[String] = (xml \ "type").map(n => n.text)(collection.breakOut)
+    val creators:List[String] = (xml \ "creator").map(n => n.text)(collection.breakOut)
+    val publisher :List[String] = (xml \ "publisher").map(n => n.text)(collection.breakOut)
+    val dataCenter :List[String] = (xml \ "dataCenter").map(n => n.text)(collection.breakOut)
+    val subject :List[String] = (xml \ "subject").map(n => n.text)(collection.breakOut)
+    val language= (xml \ "language").text
+    val rights= (xml \ "rights").text
+    val parentIdentifier= (xml \ "parentIdentifier").text
+    val relation :List[String] = (xml \ "relation").map(n => n.text)(collection.breakOut)
+    val relationFiltered = findDOIInRelation(relation)
+    val linkage:List[(String,String)] = extractLinkage(xml)
+
+    PangaeaDataModel(identifier,title, pType, creators,publisher, dataCenter, subject, language, rights, parentIdentifier, relationFiltered, linkage)
   }
 
 
@@ -44,11 +77,9 @@ object PangaeaUtils {
           if (a == null)
             b
           else {
-            val ts1 = b.datestamp
-            val ts2 = a._2.datestamp
-            if (ts1 > ts2)
+            if (b.title != null && b.title.nonEmpty)
               b
-            else
+              else
               a._2
 
           }
@@ -62,9 +93,7 @@ object PangaeaUtils {
           if (b2 == null)
             b1
           else {
-            val ts1 = b1.datestamp
-            val ts2 = b2.datestamp
-            if (ts1 > ts2)
+            if (b1.title != null && b1.title.nonEmpty)
               b1
             else
               b2

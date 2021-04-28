@@ -42,7 +42,7 @@ object SparkGeneratePanagaeaDataset {
        .groupByKey(_._1)(Encoders.STRING)
       .agg(PangaeaUtils.getDatasetAggregator().toColumn)
       .map(s => s._2)
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/dataset_updated")
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/dataset")
 
   }
 
