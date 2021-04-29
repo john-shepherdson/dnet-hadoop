@@ -1,0 +1,91 @@
+<dataset xmlns="urn:pangaea.de:dataportals" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dc:title>The inorganic carbon system measured and calculated on Cibicidoides cf. wuellerstorfi of sediment core PS75/100-1</dc:title>
+    <dc:creator>Kersten, Franziska</dc:creator>
+    <dc:creator>Tiedemann, Ralf</dc:creator>
+    <dc:creator>Fietzke, Jan</dc:creator>
+    <dc:creator>Frische, Matthias</dc:creator>
+    <principalInvestigator>Tiedemann, Ralf</principalInvestigator>
+    <dc:publisher>PANGAEA</dc:publisher>
+    <dataCenter>PANGAEA: Data Publisher for Earth &amp; Environmental Science</dataCenter>
+    <dc:date>2013-10-21</dc:date>
+    <dc:type>Dataset</dc:type>
+    <dc:format>text/tab-separated-values, 8 data points</dc:format>
+    <dc:identifier>https://doi.org/10.1594/PANGAEA.820647</dc:identifier>
+    <parentIdentifier>https://doi.org/10.1594/PANGAEA.821013</parentIdentifier>
+    <dc:language>en</dc:language>
+    <dc:rights>CC-BY-3.0: Creative Commons Attribution 3.0 Unported</dc:rights>
+    <dc:relation>Kersten, Franziska (2013): Last Glacial to Holocene changes of deep and intermediate water carbonate ion concentrations in the Southern Ocean: constraints from foraminiferal Boron/Calcium ratios. PhD Thesis, Alfred Wegener Institute, Helmholtz Centre for Polar and Marine Research, Bremerhaven</dc:relation>
+    <dc:relation>Kersten, Franziska; Tiedemann, Ralf; Fietzke, Jan; Frische, Matthias (2013): The B/Ca proxy for past seawater carbonate chemistry reconstructions-laser ablation based calibrations for C. mundulus, C. wuellerstorfi and its morphotype C. cf. wuellerstorfi. Climate of the Past Discussions, 9(4), 4425-4448, https://doi.org/10.5194/cpd-9-4425-2013</dc:relation>
+    <dc:relation>Kersten, Franziska (2013): CO2sys Input variables estimated from nearby GLODAP sites. hdl:10013/epic.42543.d001</dc:relation>
+    <dc:subject type="parameter" xsi:type="SubjectType">DEPTH, sediment/rock</dc:subject>
+    <dc:subject type="parameter" xsi:type="SubjectType">Cibicidoides cf. wuellerstorfi, Boron/Calcium ratio</dc:subject>
+    <dc:subject type="parameter" xsi:type="SubjectType">Cibicidoides cf. wuellerstorfi, Boron/Calcium standard deviation</dc:subject>
+    <dc:subject type="parameter" xsi:type="SubjectType">Δ carbonate ion content</dc:subject>
+    <dc:subject type="parameter" xsi:type="SubjectType">Carbonate ion</dc:subject>
+    <dc:subject type="method" xsi:type="SubjectType">LA-ICP-MS, Laser-ablation inductively coupled plasma mass spectrometer</dc:subject>
+    <dc:subject type="method" xsi:type="SubjectType">Calculated</dc:subject>
+    <dc:subject type="project" xsi:type="SubjectType">AWI_Paleo: Paleoenvironmental Reconstructions from Marine Sediments @ AWI</dc:subject>
+    <dc:subject type="platform" xsi:type="SubjectType">Polarstern</dc:subject>
+    <dc:subject type="sensor" xsi:type="SubjectType">MultiCorer</dc:subject>
+    <dc:subject type="sensor" xsi:type="SubjectType">MUC</dc:subject>
+    <dc:subject type="feature" xsi:type="SubjectType">PS75/100-1</dc:subject>
+    <dc:subject type="feature" xsi:type="SubjectType">ANT-XXVI/2</dc:subject>
+    <dc:subject type="feature" xsi:type="SubjectType">PS75 BIPOMAC</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">citable</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">deNBIchemical</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">author20400</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">author32978</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">author49036</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">author49445</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">basis1</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">campaign33969</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">event2584362</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">geocode1</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">geocode1599</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">geocode1600</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">geocode1601</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">geocode8128</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">inst32</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">journal16751</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">license101</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">method10668</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">method4872</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">method50</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">param131203</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">param131204</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">param7034</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">param82364</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">pi20400</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">project1</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">ref60902</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">ref60959</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">ref61047</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term1045260</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term1073131</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term19836</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term21005</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term2663825</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term33871</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term37764</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term38263</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term38520</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term41056</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term43863</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">term44030</dc:subject>
+    <dc:subject type="pangaea-tech-keyword" xsi:type="SubjectType">topotype3</dc:subject>
+    <dc:coverage xsi:type="CoverageType">
+        <northBoundLatitude>-45.75757</northBoundLatitude>
+        <westBoundLongitude>177.14887</westBoundLongitude>
+        <southBoundLatitude>-45.75757</southBoundLatitude>
+        <eastBoundLongitude>177.14887</eastBoundLongitude>
+        <location>South Pacific Ocean</location>
+        <minElevation>0.0 m (DEPTH, sediment/rock)</minElevation>
+        <maxElevation>0.01 m (DEPTH, sediment/rock)</maxElevation>
+        <startDate>2010-01-22</startDate>
+        <endDate>2010-01-22</endDate>
+    </dc:coverage>
+    <linkage type="metadata">https://doi.pangaea.de/10.1594/PANGAEA.820647</linkage>
+    <linkage type="data">https://doi.pangaea.de/10.1594/PANGAEA.820647?format=textfile</linkage>
+    <additionalContent>7x(14-22)</additionalContent>
+    <additionalContent>Reconstruction equation: B/Ca = 2.27(D[CO32-]) + 152.5 (R2= 0.76)</additionalContent>
+</dataset>

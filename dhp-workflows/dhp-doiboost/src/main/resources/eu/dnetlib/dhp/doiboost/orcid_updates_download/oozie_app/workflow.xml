@@ -31,7 +31,7 @@
         </property>
         <property>
             <name>sparkExecutorMemory</name>
-            <value>2G</value>
+            <value>4G</value>
             <description>memory for individual executor</description>
         </property>
         <property>
@@ -190,6 +190,14 @@
             <arg>-o</arg><arg>downloads/updated_works</arg>
             <arg>-t</arg><arg>${token}</arg>
         </spark>
+        <ok to="ResetNewAuthors"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ResetNewAuthors">
+        <fs>
+            <delete path='${workingPath}/orcid_dataset/new_authors'/>
+        </fs>
         <ok to="UpdateOrcidAuthors"/>
         <error to="Kill"/>
     </action>
@@ -217,6 +225,14 @@
             <arg>-o</arg><arg>-</arg>
             <arg>-t</arg><arg>-</arg>
         </spark>
+        <ok to="ResetNewWorks"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ResetNewWorks">
+        <fs>
+            <delete path='${workingPath}/orcid_dataset/new_works'/>
+        </fs>
         <ok to="UpdateOrcidWorks"/>
         <error to="Kill"/>
     </action>
@@ -270,15 +286,6 @@
             <arg>${workingPath}/orcid_dataset/new_works/*</arg>
             <arg>${workingPath}/orcid_dataset/works</arg>
         </distcp>
-        <ok to="CleanWorkingPath"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="CleanWorkingPath">
-        <fs>
-            <delete path='${workingPath}/orcid_dataset/new_authors'/>
-            <delete path='${workingPath}/orcid_dataset/new_works'/>
-        </fs>
         <ok to="updateLastOrcidAuthorsDataset"/>
         <error to="Kill"/>
     </action>
@@ -309,5 +316,5 @@
         <error to="Kill"/>
     </action>
 
-   <end name="End"/>
+    <end name="End"/>
 </workflow-app>
