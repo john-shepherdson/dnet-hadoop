@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.actionmanager.ror.model.RorOrganization;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 
+@Disabled
 class GenerateRorActionSetJobTest {
 
 	private static final ObjectMapper mapper = new ObjectMapper();

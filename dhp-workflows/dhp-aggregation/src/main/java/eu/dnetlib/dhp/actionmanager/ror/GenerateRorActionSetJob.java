@@ -11,9 +11,11 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.project.SparkAtomicActionJob;
+import eu.dnetlib.dhp.actionmanager.ror.model.ExternalIdType;
 import eu.dnetlib.dhp.actionmanager.ror.model.RorOrganization;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
@@ -59,11 +62,6 @@ public class GenerateRorActionSetJob {
 	private static final DataInfo ROR_DATA_INFO = dataInfo(false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
 
 	private static final Qualifier ROR_PID_TYPE = qualifier("ROR", "ROR", "dnet:pid_types", "dnet:pid_types");
-	private static final Qualifier GRID_PID_TYPE = qualifier("GRID", "GRID", "dnet:pid_types", "dnet:pid_types");
-	private static final Qualifier WIKIDATA_PID_TYPE = qualifier("Wikidata", "Wikidata", "dnet:pid_types", "dnet:pid_types");
-	private static final Qualifier ORGREF_PID_TYPE = qualifier("OrgRef", "OrgRef", "dnet:pid_types", "dnet:pid_types");
-	private static final Qualifier ISNI_PID_TYPE = qualifier("ISNI", "ISNI", "dnet:pid_types", "dnet:pid_types");
-	private static final Qualifier FUNDREF_PID_TYPE = qualifier("FundRef", "FundRef", "dnet:pid_types", "dnet:pid_types");
 
 	public static void main(final String[] args) throws Exception {
 
@@ -157,21 +155,28 @@ public class GenerateRorActionSetJob {
 	private static List<StructuredProperty> pids(final RorOrganization r) {
 		final List<StructuredProperty> pids = new ArrayList<>();
 		pids.add(structuredProperty(r.getId(), ROR_PID_TYPE, ROR_DATA_INFO));
-		pids.add(structuredProperty(r.getExternalIds().getGrid().getAll(), GRID_PID_TYPE, ROR_DATA_INFO));
-		pids.addAll(pids(r.getExternalIds().getFundRef().getAll(), FUNDREF_PID_TYPE));
-		pids.addAll(pids(r.getExternalIds().getIsni().getAll(), ISNI_PID_TYPE));
-		pids.addAll(pids(r.getExternalIds().getOrgRef().getAll(), ORGREF_PID_TYPE));
-		pids.addAll(pids(r.getExternalIds().getWikidata().getAll(), WIKIDATA_PID_TYPE));
-		return pids;
-	}
 
-	private static List<StructuredProperty> pids(final List<String> list, final Qualifier pidType) {
-		if (list == null) { return new ArrayList<>(); }
-		return list.stream()
-			.filter(StringUtils::isNotBlank)
-			.distinct()
-			.map(s -> structuredProperty(s, pidType, ROR_DATA_INFO))
-			.collect(Collectors.toList());
+		for (final Map.Entry<String, ExternalIdType> e : r.getExternalIds().entrySet()) {
+			final String type = e.getKey();
+			final Object all = e.getValue().getAll();
+			if (all == null) {
+				// skip
+			} else if (all instanceof String) {
+				pids.add(structuredProperty(all.toString(), qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
+			} else if (all instanceof Collection) {
+				for (final Object pid : (Collection<?>) all) {
+					pids.add(structuredProperty(pid.toString(), qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
+				}
+			} else if (all instanceof String[]) {
+				for (final String pid : (String[]) all) {
+					pids.add(structuredProperty(pid, qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
+				}
+			} else {
+				log.warn("Invalid type for pid list: " + all.getClass());
+			}
+		}
+
+		return pids;
 	}
 
 	private static List<Field<String>> alternativeNames(final RorOrganization r) {

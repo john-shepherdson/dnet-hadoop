@@ -3,7 +3,9 @@ package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -46,7 +48,7 @@ public class RorOrganization implements Serializable {
 	private String emailAddress;
 
 	@JsonProperty("external_ids")
-	private ExternalIds externalIds;
+	private Map<String, ExternalIdType> externalIds = new LinkedHashMap<>();
 
 	@JsonProperty("id")
 	private String id;
@@ -155,11 +157,11 @@ public class RorOrganization implements Serializable {
 		this.emailAddress = emailAddress;
 	}
 
-	public ExternalIds getExternalIds() {
+	public Map<String, ExternalIdType> getExternalIds() {
 		return externalIds;
 	}
 
-	public void setExternalIds(final ExternalIds externalIds) {
+	public void setExternalIds(final Map<String, ExternalIdType> externalIds) {
 		this.externalIds = externalIds;
 	}
 
