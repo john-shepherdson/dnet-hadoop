@@ -136,8 +136,7 @@
 			<dependency>
 				<groupId>eu.dnetlib.dhp</groupId>
 				<artifactId>dhp-schemas</artifactId>
-				<version>2.2.5-SNAPSHOT</version>
-				<classifier>stable_ids</classifier>
+				<version>${dhp-schemas.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
@@ -344,7 +343,7 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-actionmanager-common</artifactId>
-				<version>6.0.5</version>
+				<version>${dnet-actionmanager-common.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.apache.hadoop</groupId>
@@ -355,29 +354,30 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-actionmanager-api</artifactId>
-				<version>[4.0.1,5.0.0)</version>
+				<version>${dnet-actionmanager-api.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>eu.dnetlib</groupId>
+						<artifactId>cnr-misc-utils</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
-				<artifactId>dnet-openaire-data-protos</artifactId>
-				<version>3.9.8-proto250</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-pace-core</artifactId>
-				<version>4.0.5</version>
+				<version>${dnet-pace-core.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>cnr-rmi-api</artifactId>
-				<version>[2.0.0,3.0.0)</version>
+				<version>${cnr-rmi-api.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>eu.dnetlib.dhp</groupId>
 				<artifactId>dnet-openaire-broker-common</artifactId>
-				<version>${dnet.openaire.broker.common}</version>
+				<version>${dnet-openaire-broker-common.version}</version>
 			</dependency>
 
 			<dependency>
@@ -725,7 +725,12 @@
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dnet.openaire.broker.common>3.1.6</dnet.openaire.broker.common>
+		<dhp-schemas.version>[2.2.5]</dhp-schemas.version>
+		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
+		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
+		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
+		<dnet-pace-core.version>[4.0.5]</dnet-pace-core.version>
+		<cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
 		<solr.version>7.5.0</solr.version>
 		<okhttp.version>4.7.2</okhttp.version>
 		<common.compress.version>1.20</common.compress.version>
