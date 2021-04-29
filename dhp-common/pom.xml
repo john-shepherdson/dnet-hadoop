@@ -107,7 +107,6 @@
 		<dependency>
 			<groupId>eu.dnetlib.dhp</groupId>
 			<artifactId>dhp-schemas</artifactId>
-			<classifier>stable_ids</classifier>
 		</dependency>
 	</dependencies>
 
