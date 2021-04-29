@@ -5,10 +5,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ExternalIdType implements Serializable {
 
+	@JsonProperty("all")
 	private List<String> all = new ArrayList<>();
+
+	@JsonProperty("preferred")
 	private String preferred;
+
 	private final static long serialVersionUID = 2616688352998387611L;
 
 	public List<String> getAll() {

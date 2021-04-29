@@ -3,11 +3,19 @@ package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Relationship implements Serializable {
 
+	@JsonProperty("type")
 	private String type;
+
+	@JsonProperty("id")
 	private String id;
+
+	@JsonProperty("label")
 	private String label;
+
 	private final static long serialVersionUID = 7847399503395576960L;
 
 	public String getType() {

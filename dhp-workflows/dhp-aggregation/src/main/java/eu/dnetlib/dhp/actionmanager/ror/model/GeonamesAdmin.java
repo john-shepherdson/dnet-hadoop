@@ -3,12 +3,22 @@ package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class GeonamesAdmin implements Serializable {
 
+	@JsonProperty("ascii_name")
 	private String asciiName;
+
+	@JsonProperty("id")
 	private Integer id;
+
+	@JsonProperty("name")
 	private String name;
+
+	@JsonProperty("code")
 	private String code;
+
 	private final static long serialVersionUID = 7294958526269195673L;
 
 	public String getAsciiName() {

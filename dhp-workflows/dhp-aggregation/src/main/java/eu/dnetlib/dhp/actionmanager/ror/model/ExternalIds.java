@@ -3,13 +3,25 @@ package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ExternalIds implements Serializable {
 
+	@JsonProperty("Wikidata")
 	private ExternalIdType wikidata;
+
+	@JsonProperty("OrgRef")
 	private ExternalIdType orgRef;
+
+	@JsonProperty("ISNI")
 	private ExternalIdType isni;
+
+	@JsonProperty("FundRef")
 	private ExternalIdType fundRef;
+
+	@JsonProperty("GRID")
 	private GridType grid;
+
 	private final static long serialVersionUID = 686536347353680869L;
 
 	public ExternalIdType getWikidata() {

@@ -3,10 +3,16 @@ package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class NameAndCode implements Serializable {
 
+	@JsonProperty("name")
 	private String name;
+
+	@JsonProperty("code")
 	private String code;
+
 	private final static long serialVersionUID = 5459836979206140843L;
 
 	public String getName() {

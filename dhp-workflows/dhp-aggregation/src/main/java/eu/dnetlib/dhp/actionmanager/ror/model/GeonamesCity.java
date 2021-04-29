@@ -3,16 +3,34 @@ package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class GeonamesCity implements Serializable {
 
+	@JsonProperty("geonames_admin1")
 	private GeonamesAdmin geonamesAdmin1;
+
+	@JsonProperty("geonames_admin2")
 	private GeonamesAdmin geonamesAdmin2;
+
+	@JsonProperty("city")
 	private String city;
+
+	@JsonProperty("id")
 	private Integer id;
+
+	@JsonProperty("nuts_level1")
 	private NameAndCode nutsLevel1;
+
+	@JsonProperty("nuts_level2")
 	private NameAndCode nutsLevel2;
+
+	@JsonProperty("nuts_level3")
 	private NameAndCode nutsLevel3;
+
+	@JsonProperty("")
 	private License license;
+
 	private final static long serialVersionUID = -8389480201526252955L;
 
 	public NameAndCode getNutsLevel2() {

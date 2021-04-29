@@ -114,7 +114,7 @@ public class GenerateRorActionSetJob {
 
 	}
 
-	private static Organization convertRorOrg(final RorOrganization r) {
+	protected static Organization convertRorOrg(final RorOrganization r) {
 
 		final Date now = new Date();
 
@@ -178,6 +178,7 @@ public class GenerateRorActionSetJob {
 		final Set<String> names = new LinkedHashSet<>();
 		names.addAll(r.getAliases());
 		names.addAll(r.getAcronyms());
+		r.getLabels().forEach(l -> names.add(l.getLabel()));
 
 		return names.stream().filter(StringUtils::isNotBlank).map(s -> field(s, ROR_DATA_INFO)).collect(Collectors.toList());
 	}

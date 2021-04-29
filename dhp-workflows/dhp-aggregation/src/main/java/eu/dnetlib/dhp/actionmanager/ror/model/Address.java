@@ -3,18 +3,40 @@ package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Address implements Serializable {
 
+	@JsonProperty("lat")
 	private Float lat;
+
+	@JsonProperty("state_code")
 	private String stateCode;
+
+	@JsonProperty("country_geonames_id")
 	private Integer countryGeonamesId;
+
+	@JsonProperty("lng")
 	private Float lng;
+
+	@JsonProperty("state")
 	private String state;
+
+	@JsonProperty("city")
 	private String city;
+
+	@JsonProperty("geonames_city")
 	private GeonamesCity geonamesCity;
+
+	@JsonProperty("postcode")
 	private String postcode;
+
+	@JsonProperty("primary")
 	private Boolean primary;
+
+	@JsonProperty("line")
 	private String line;
+
 	private final static long serialVersionUID = 2444635485253443195L;
 
 	public Float getLat() {

@@ -5,24 +5,58 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class RorOrganization implements Serializable {
 
+	@JsonProperty("ip_addresses")
 	private List<String> ipAddresses = new ArrayList<>();
+
+	@JsonProperty("aliases")
 	private List<String> aliases = new ArrayList<>();
+
+	@JsonProperty("acronyms")
 	private List<String> acronyms = new ArrayList<>();
+
+	@JsonProperty("links")
 	private List<String> links = new ArrayList<>();
+
+	@JsonProperty("country")
 	private Country country;
+
+	@JsonProperty("name")
 	private String name;
+
+	@JsonProperty("wikipedia_url")
 	private String wikipediaUrl;
+
+	@JsonProperty("addresses")
 	private List<Address> addresses = new ArrayList<>();
+
+	@JsonProperty("types")
 	private List<String> types = new ArrayList<>();
+
+	@JsonProperty("established")
 	private Integer established;
+
+	@JsonProperty("relationships")
 	private List<Relationship> relationships = new ArrayList<>();
+
+	@JsonProperty("email_address")
 	private String emailAddress;
+
+	@JsonProperty("external_ids")
 	private ExternalIds externalIds;
+
+	@JsonProperty("id")
 	private String id;
+
+	@JsonProperty("labels")
 	private List<Label> labels = new ArrayList<>();
+
+	@JsonProperty("status")
 	private String status;
+
 	private final static long serialVersionUID = -2658312087616043225L;
 
 	public List<String> getIpAddresses() {

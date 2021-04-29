@@ -3,10 +3,16 @@ package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Country implements Serializable {
 
+	@JsonProperty("country_code")
 	private String countryCode;
+
+	@JsonProperty("country_name")
 	private String countryName;
+
 	private final static long serialVersionUID = 4357848706229493627L;
 
 	public String getCountryCode() {
