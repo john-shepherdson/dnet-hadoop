@@ -1,11 +1,11 @@
 <workflow-app name="Update_ROR_action_set" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>inputPath</name>
+            <name>rorJsonInputPath</name>
             <description>the path of the json</description>
         </property>
         <property>
-            <name>outputPath</name>
+            <name>rorActionSetPath</name>
             <description>path where to store the action set</description>
         </property>
     </parameters>
@@ -18,8 +18,8 @@
     
     <action name="deleteoutputpath">
         <fs>
-            <delete path='${outputPath}'/>
-            <mkdir path='${outputPath}'/>
+            <delete path='${rorActionSetPath}'/>
+            <mkdir path='${rorActionSetPath}'/>
             <delete path='${workingDir}'/>
             <mkdir path='${workingDir}'/>
         </fs>
@@ -44,8 +44,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--inputPath</arg><arg>${inputPath}</arg>
-            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--inputPath</arg><arg>${rorJsonInputPath}</arg>
+            <arg>--outputPath</arg><arg>${rorActionSetPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

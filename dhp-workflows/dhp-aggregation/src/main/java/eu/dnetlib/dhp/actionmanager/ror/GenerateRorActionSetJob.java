@@ -9,6 +9,7 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listKeyValues;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,10 +23,12 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -57,17 +60,20 @@ public class GenerateRorActionSetJob {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues("10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
+	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues(
+		"10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
 
-	private static final DataInfo ROR_DATA_INFO = dataInfo(false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
+	private static final DataInfo ROR_DATA_INFO = dataInfo(
+		false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
 
 	private static final Qualifier ROR_PID_TYPE = qualifier("ROR", "ROR", "dnet:pid_types", "dnet:pid_types");
 
 	public static void main(final String[] args) throws Exception {
 
 		final String jsonConfiguration = IOUtils
-			.toString(SparkAtomicActionJob.class
-				.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/ror/action_set_parameters.json"));
+			.toString(
+				SparkAtomicActionJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/ror/action_set_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -100,16 +106,16 @@ public class GenerateRorActionSetJob {
 
 	private static void processRorOrganizations(final SparkSession spark,
 		final String inputPath,
-		final String outputPath) {
+		final String outputPath) throws Exception {
 
 		readInputPath(spark, inputPath)
 			.map(GenerateRorActionSetJob::convertRorOrg, Encoders.bean(Organization.class))
 			.toJavaRDD()
 			.map(o -> new AtomicAction<>(Organization.class, o))
-			.mapToPair(aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-				new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
-
 	}
 
 	protected static Organization convertRorOrg(final RorOrganization r) {
@@ -142,7 +148,11 @@ public class GenerateRorActionSetJob {
 		o.setEcsmevalidated(null);
 		o.setEcnutscode(null);
 		if (r.getCountry() != null) {
-			o.setCountry(qualifier(r.getCountry().getCountryCode(), r.getCountry().getCountryName(), COUNTRIES_VOC, COUNTRIES_VOC));
+			o
+				.setCountry(
+					qualifier(
+						r.getCountry().getCountryCode(), r.getCountry().getCountryName(), COUNTRIES_VOC,
+						COUNTRIES_VOC));
 		} else {
 			o.setCountry(null);
 		}
@@ -162,14 +172,24 @@ public class GenerateRorActionSetJob {
 			if (all == null) {
 				// skip
 			} else if (all instanceof String) {
-				pids.add(structuredProperty(all.toString(), qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
+				pids
+					.add(
+						structuredProperty(
+							all.toString(), qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
 			} else if (all instanceof Collection) {
 				for (final Object pid : (Collection<?>) all) {
-					pids.add(structuredProperty(pid.toString(), qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
+					pids
+						.add(
+							structuredProperty(
+								pid.toString(), qualifier(type, type, "dnet:pid_types", "dnet:pid_types"),
+								ROR_DATA_INFO));
 				}
 			} else if (all instanceof String[]) {
 				for (final String pid : (String[]) all) {
-					pids.add(structuredProperty(pid, qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
+					pids
+						.add(
+							structuredProperty(
+								pid, qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
 				}
 			} else {
 				log.warn("Invalid type for pid list: " + all.getClass());
@@ -185,16 +205,22 @@ public class GenerateRorActionSetJob {
 		names.addAll(r.getAcronyms());
 		r.getLabels().forEach(l -> names.add(l.getLabel()));
 
-		return names.stream().filter(StringUtils::isNotBlank).map(s -> field(s, ROR_DATA_INFO)).collect(Collectors.toList());
+		return names
+			.stream()
+			.filter(StringUtils::isNotBlank)
+			.map(s -> field(s, ROR_DATA_INFO))
+			.collect(Collectors.toList());
 	}
 
 	private static Dataset<RorOrganization> readInputPath(
 		final SparkSession spark,
-		final String inputPath) {
-		return spark
-			.read()
-			.textFile(inputPath)
-			.map((MapFunction<String, RorOrganization>) value -> OBJECT_MAPPER.readValue(value, RorOrganization.class), Encoders.bean(RorOrganization.class));
+		final String path) throws Exception {
+
+		try (final FileSystem fileSystem = FileSystem.get(new Configuration());
+			final InputStream is = fileSystem.open(new Path(path))) {
+			final RorOrganization[] arr = OBJECT_MAPPER.readValue(is, RorOrganization[].class);
+			return spark.createDataset(Arrays.asList(arr), Encoders.bean(RorOrganization.class));
+		}
 	}
 
 }

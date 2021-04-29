@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.actionmanager.ror;
 
 import java.io.FileInputStream;
@@ -20,11 +21,13 @@ class GenerateRorActionSetJobTest {
 	private static final String local_file_path = "/Users/michele/Downloads/ror-data-2021-04-06.json";
 
 	@BeforeEach
-	void setUp() throws Exception {}
+	void setUp() throws Exception {
+	}
 
 	@Test
 	void testConvertRorOrg() throws Exception {
-		final RorOrganization r = mapper.readValue(IOUtils.toString(getClass().getResourceAsStream("ror_org.json")), RorOrganization.class);
+		final RorOrganization r = mapper
+			.readValue(IOUtils.toString(getClass().getResourceAsStream("ror_org.json")), RorOrganization.class);
 		final Organization org = GenerateRorActionSetJob.convertRorOrg(r);
 
 		System.out.println(mapper.writeValueAsString(org));
@@ -32,7 +35,8 @@ class GenerateRorActionSetJobTest {
 
 	@Test
 	void testConvertAllRorOrg() throws Exception {
-		final RorOrganization[] arr = mapper.readValue(IOUtils.toString(new FileInputStream(local_file_path)), RorOrganization[].class);
+		final RorOrganization[] arr = mapper
+			.readValue(IOUtils.toString(new FileInputStream(local_file_path)), RorOrganization[].class);
 
 		for (final RorOrganization r : arr) {
 			GenerateRorActionSetJob.convertRorOrg(r);
