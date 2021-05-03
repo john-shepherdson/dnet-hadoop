@@ -1,19 +1,26 @@
 
 package eu.dnetlib.dhp.transformation.xslt;
 
-import java.util.List;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.hamcrest.CoreMatchers;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class PersonCleanerTest {
 
 	private PersonCleaner personCleaner;
 
-	@BeforeEach
+	@Before
 	public void setup() {
 		this.personCleaner = new PersonCleaner();
 	}
@@ -70,6 +77,37 @@ public class PersonCleanerTest {
 	@Test
 	public void shouldIsAccurate() {
 		boolean actualValue = personCleaner.isAccurate();
+
+		// TODO: assert scenario
+	}
+
+	@Test
+	public void shouldGetName() {
+		QName actualValue = personCleaner.getName();
+
+		// TODO: assert scenario
+	}
+
+	@Test
+	public void shouldGetResultType() {
+		SequenceType actualValue = personCleaner.getResultType();
+
+		// TODO: assert scenario
+	}
+
+	@Test
+	public void shouldGetArgumentTypes() {
+		SequenceType[] actualValue = personCleaner.getArgumentTypes();
+
+		// TODO: assert scenario
+	}
+
+	@Test
+	public void shouldCall() {
+		// TODO: initialize args
+		XdmValue[] xdmValues;
+
+		XdmValue actualValue = personCleaner.call(xdmValues);
 
 		// TODO: assert scenario
 	}
