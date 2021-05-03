@@ -15,7 +15,7 @@
                 exclude-result-prefixes="xsl vocabulary dateCleaner">
 
     <xsl:param name="varOfficialName" />
-    <xsl:param name="varDsType" />
+ <!-- deprecated , marked to remove  <xsl:param name="varDsType" /> -->
     <xsl:param name="varDataSourceId" />
 
     <xsl:param name="varFP7" select = "'corda_______::'"/>
@@ -66,6 +66,12 @@
         <xsl:variable name="datasourcePrefix"
                       select="normalize-space(//oaf:datasourceprefix)" />
         <xsl:call-template name="validRecord" />
+    </xsl:template>
+
+    <xsl:template name="terminate">
+        <xsl:message terminate="yes">
+            record is not compliant, transformation is interrupted.
+        </xsl:message>
     </xsl:template>
 
     <xsl:template name="validRecord">
@@ -276,6 +282,9 @@
                                 <xsl:value-of select="$varEmbargoEndDate"/>
                             </oaf:embargoenddate>
                         </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:call-template name="terminate"/>
+                        </xsl:otherwise>
                     </xsl:choose>
                 </xsl:if>
 
@@ -301,6 +310,9 @@
                           </dr:CobjCategory>
                          -->
                     </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="terminate"/>
+                    </xsl:otherwise>                    
                 </xsl:choose>
 
                 <!-- review status -->
