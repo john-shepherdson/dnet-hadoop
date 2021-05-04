@@ -413,6 +413,11 @@
 				<version>${mongodb.driver.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>io.fares.junit.mongodb</groupId>
+				<artifactId>mongodb-junit-test</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>42.2.10</version>

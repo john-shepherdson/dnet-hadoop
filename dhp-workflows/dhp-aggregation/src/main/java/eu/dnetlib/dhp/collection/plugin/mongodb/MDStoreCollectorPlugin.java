@@ -11,6 +11,8 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 
 import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
@@ -46,7 +48,8 @@ public class MDStoreCollectorPlugin implements CollectorPlugin {
 			.orElseThrow(() -> new CollectorException(String.format("missing parameter '%s'", MDSTORE_ID)));
 		log.info("mdId: {}", mdId);
 
-		final MdstoreClient client = new MdstoreClient(mongoBaseUrl, dbName);
+		final MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoBaseUrl));
+		final MdstoreClient client = new MdstoreClient(mongoClient, dbName);
 		final MongoCollection<Document> mdstore = client.mdStore(mdId);
 		long size = mdstore.count();
 
