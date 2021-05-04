@@ -729,7 +729,7 @@
 		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
 		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
 		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
-		<dnet-pace-core.version>[4.0.5]</dnet-pace-core.version>
+		<dnet-pace-core.version>[4.1.7]</dnet-pace-core.version>
 		<cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
 		<solr.version>7.5.0</solr.version>
 		<okhttp.version>4.7.2</okhttp.version>
