@@ -33,7 +33,6 @@ object SparkCreateBaselineDataFrame {
     implicit  val PMJEncoder: Encoder[PMJournal] = Encoders.kryo(classOf[PMJournal])
     implicit  val PMAEncoder: Encoder[PMAuthor] = Encoders.kryo(classOf[PMAuthor])
     val k: RDD[(String, String)] = sc.wholeTextFiles(s"$workingPath/baseline",2000)
-
     val ds:Dataset[PMArticle] = spark.createDataset(k.filter(i => i._1.endsWith(".gz")).flatMap(i =>{
       val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
       new PMParser(xml)

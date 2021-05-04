@@ -24,7 +24,7 @@ object SparkGeneratePanagaeaDataset {
       SparkSession
         .builder()
         .config(conf)
-        .appName(SparkCreateEBIDataFrame.getClass.getSimpleName)
+        .appName(SparkGeneratePanagaeaDataset.getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
 
     parser.getObjectMap.asScala.foreach(s => logger.info(s"${s._1} -> ${s._2}"))

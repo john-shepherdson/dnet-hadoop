@@ -5,9 +5,6 @@ import org.apache.spark.sql.{Encoder, Encoders}
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
-
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.regex.Pattern
 import scala.language.postfixOps
 import scala.xml.{Elem, Node, XML}
