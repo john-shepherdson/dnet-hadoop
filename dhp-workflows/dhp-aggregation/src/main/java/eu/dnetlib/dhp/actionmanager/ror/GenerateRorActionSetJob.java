@@ -29,6 +29,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -43,6 +44,7 @@ import eu.dnetlib.dhp.actionmanager.ror.model.RorOrganization;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
@@ -54,8 +56,6 @@ import scala.Tuple2;
 
 public class GenerateRorActionSetJob {
 
-	private static final String COUNTRIES_VOC = "dnet:countries";
-
 	private static final Logger log = LoggerFactory.getLogger(GenerateRorActionSetJob.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -66,7 +66,8 @@ public class GenerateRorActionSetJob {
 	private static final DataInfo ROR_DATA_INFO = dataInfo(
 		false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
 
-	private static final Qualifier ROR_PID_TYPE = qualifier("ROR", "ROR", "dnet:pid_types", "dnet:pid_types");
+	private static final Qualifier ROR_PID_TYPE = qualifier(
+		"ROR", "ROR", ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
 
 	public static void main(final String[] args) throws Exception {
 
@@ -109,7 +110,9 @@ public class GenerateRorActionSetJob {
 		final String outputPath) throws Exception {
 
 		readInputPath(spark, inputPath)
-			.map(GenerateRorActionSetJob::convertRorOrg, Encoders.bean(Organization.class))
+			.map(
+				(MapFunction<RorOrganization, Organization>) GenerateRorActionSetJob::convertRorOrg,
+				Encoders.bean(Organization.class))
 			.toJavaRDD()
 			.map(o -> new AtomicAction<>(Organization.class, o))
 			.mapToPair(
@@ -151,8 +154,9 @@ public class GenerateRorActionSetJob {
 			o
 				.setCountry(
 					qualifier(
-						r.getCountry().getCountryCode(), r.getCountry().getCountryName(), COUNTRIES_VOC,
-						COUNTRIES_VOC));
+						r.getCountry().getCountryCode(), r.getCountry().getCountryName(),
+						ModelConstants.DNET_COUNTRY_TYPE,
+						ModelConstants.DNET_COUNTRY_TYPE));
 		} else {
 			o.setCountry(null);
 		}
@@ -171,28 +175,32 @@ public class GenerateRorActionSetJob {
 			final Object all = e.getValue().getAll();
 			if (all == null) {
 				// skip
-			} else if (all instanceof String) {
-				pids
-					.add(
-						structuredProperty(
-							all.toString(), qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
-			} else if (all instanceof Collection) {
-				for (final Object pid : (Collection<?>) all) {
-					pids
-						.add(
-							structuredProperty(
-								pid.toString(), qualifier(type, type, "dnet:pid_types", "dnet:pid_types"),
-								ROR_DATA_INFO));
-				}
-			} else if (all instanceof String[]) {
-				for (final String pid : (String[]) all) {
-					pids
-						.add(
-							structuredProperty(
-								pid, qualifier(type, type, "dnet:pid_types", "dnet:pid_types"), ROR_DATA_INFO));
-				}
 			} else {
-				log.warn("Invalid type for pid list: " + all.getClass());
+				final Qualifier qualifier = qualifier(
+					type, type,
+					ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
+				if (all instanceof String) {
+					pids
+						.add(
+							structuredProperty(
+								all.toString(), qualifier, ROR_DATA_INFO));
+				} else if (all instanceof Collection) {
+					for (final Object pid : (Collection<?>) all) {
+						pids
+							.add(
+								structuredProperty(
+									pid.toString(), qualifier, ROR_DATA_INFO));
+					}
+				} else if (all instanceof String[]) {
+					for (final String pid : (String[]) all) {
+						pids
+							.add(
+								structuredProperty(
+									pid, qualifier, ROR_DATA_INFO));
+					}
+				} else {
+					log.warn("Invalid type for pid list: " + all.getClass());
+				}
 			}
 		}
 
