@@ -8,10 +8,33 @@ import java.util.List;
 public class PMArticle implements Serializable {
 
 	private String pmid;
+	private String doi;
 	private String date;
 	private PMJournal journal;
 	private String title;
 	private String description;
+	private String language;
+	private final List<PMSubject> subjects = new ArrayList<>();
+	private final List<PMSubject> publicationTypes = new ArrayList<>();
+
+	public List<PMSubject> getPublicationTypes() {
+		return publicationTypes;
+	}
+
+	private final List<PMGrant> grants = new ArrayList<>();
+
+	public List<PMGrant> getGrants() {
+		return grants;
+	}
+
+	public String getDoi() {
+		return doi;
+	}
+
+	public void setDoi(String doi) {
+		this.doi = doi;
+	}
+
 	private List<PMAuthor> authors = new ArrayList<>();
 
 	public String getPmid() {
@@ -60,5 +83,17 @@ public class PMArticle implements Serializable {
 
 	public void setAuthors(List<PMAuthor> authors) {
 		this.authors = authors;
+	}
+
+	public List<PMSubject> getSubjects() {
+		return subjects;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 }
