@@ -41,15 +41,6 @@ public class MigrateMongoMdstoresApplicationTest {
 	}
 
 	@Test
-	public void test_MdstoreClient() throws IOException {
-		try (MdstoreClient client = new MdstoreClient(mongo.getMongoClient(), MongoExtension.UNIT_TEST_DB)) {
-			for (String xml : client.listRecords(COLL_NAME)) {
-				Assertions.assertTrue(StringUtils.isNotBlank(xml));
-			}
-		}
-	}
-
-	@Test
 	public void test_MigrateMongoMdstoresApplication(@TempDir Path tmpPath) throws Exception {
 
 		final String seqFile = "test_records.seq";
