@@ -119,7 +119,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
-		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
+		final String distributionlocation = doc.valueOf("//oaf:distributionlocation");
+		instance.setDistributionlocation(StringUtils.isNotBlank(distributionlocation) ? distributionlocation : null);
 		instance
 			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
@@ -200,12 +201,12 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareFormats(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//*[local-name()=':format']", info);
+		return prepareListFields(doc, "//*[local-name()='format']", info);
 	}
 
 	@Override
 	protected Field<String> preparePublisher(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//*[local-name()=':publisher']", info);
+		return prepareField(doc, "//*[local-name()='publisher']", info);
 	}
 
 	@Override
@@ -220,7 +221,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected Qualifier prepareLanguages(final Document doc) {
-		return prepareQualifier(doc, "//*[local-name()=':language']", DNET_LANGUAGES);
+		return prepareQualifier(doc, "//*[local-name()='language']", DNET_LANGUAGES);
 	}
 
 	@Override
@@ -287,9 +288,9 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 		for (final Object o : doc.selectNodes("//*[local-name()='geoLocation']")) {
 			final GeoLocation loc = new GeoLocation();
-			loc.setBox(((Node) o).valueOf("./*[local-name()=':geoLocationBox']"));
-			loc.setPlace(((Node) o).valueOf("./*[local-name()=':geoLocationPlace']"));
-			loc.setPoint(((Node) o).valueOf("./*[local-name()=':geoLocationPoint']"));
+			loc.setBox(((Node) o).valueOf("./*[local-name()='geoLocationBox']"));
+			loc.setPlace(((Node) o).valueOf("./*[local-name()='geoLocationPlace']"));
+			loc.setPoint(((Node) o).valueOf("./*[local-name()='geoLocationPoint']"));
 			res.add(loc);
 		}
 		return res;
