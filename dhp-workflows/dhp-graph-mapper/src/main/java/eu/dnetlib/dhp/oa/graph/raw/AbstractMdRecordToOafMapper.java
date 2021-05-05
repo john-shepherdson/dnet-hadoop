@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
@@ -271,7 +272,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setDataInfo(info);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
-		r.setOriginalId(Lists.newArrayList(findOriginalId(doc)));
+		r.setOriginalId(findOriginalId(doc));
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
 		r.setPid(IdentifierFactory.getPids(prepareResultPids(doc, info), collectedFrom));
 		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection/text()|//dri:dateOfCollection/text()"));
@@ -402,16 +403,23 @@ public abstract class AbstractMdRecordToOafMapper {
 		return null;
 	}
 
-	private String findOriginalId(final Document doc) {
+	private List<String> findOriginalId(final Document doc) {
 		final Node n = doc.selectSingleNode("//*[local-name()='provenance']/*[local-name()='originDescription']");
 		if (n != null) {
 			final String id = n.valueOf("./*[local-name()='identifier']");
 			if (StringUtils.isNotBlank(id)) {
-				return id;
+				return Lists.newArrayList(id);
 			}
 		}
-		return doc.valueOf("//*[local-name()='header']/*[local-name()='identifier']");
+		List<String> idList = doc
+				.selectNodes(
+						"normalize-space(//*[local-name()='header']/*[local-name()='identifier' or local-name()='recordIdentifier']/text())");
+		Set<String> originalIds = Sets.newHashSet(idList);
 
+		if (originalIds.isEmpty()) {
+			throw new IllegalStateException("missing originalID on " + doc.asXML());
+		}
+		return Lists.newArrayList(originalIds);
 	}
 
 	protected AccessRight prepareAccessRight(final Node node, final String xpath, final String schemeId) {
