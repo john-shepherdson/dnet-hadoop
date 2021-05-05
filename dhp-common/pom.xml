@@ -6,7 +6,7 @@
 		<groupId>eu.dnetlib.dhp</groupId>
 		<artifactId>dhp</artifactId>
 		<version>1.2.4-SNAPSHOT</version>
-		<relativePath>../</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>dhp-common</artifactId>
