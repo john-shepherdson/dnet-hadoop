@@ -1,10 +1,10 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import com.mongodb.client.MongoDatabase;
-import eu.dnetlib.dhp.common.MdstoreClient;
-import io.fares.junit.mongodb.MongoExtension;
-import io.fares.junit.mongodb.MongoForAllExtension;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -16,9 +16,11 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.mongodb.client.MongoDatabase;
+
+import eu.dnetlib.dhp.common.MdstoreClient;
+import io.fares.junit.mongodb.MongoExtension;
+import io.fares.junit.mongodb.MongoForAllExtension;
 
 public class MigrateMongoMdstoresApplicationTest {
 
@@ -38,10 +40,9 @@ public class MigrateMongoMdstoresApplicationTest {
 		db.getCollection("metadataManager").insertOne(Document.parse(read("mdstore_metadataManager.json")));
 	}
 
-
 	@Test
 	public void test_MdstoreClient() throws IOException {
-		try(MdstoreClient client = new MdstoreClient(mongo.getMongoClient(), MongoExtension.UNIT_TEST_DB)) {
+		try (MdstoreClient client = new MdstoreClient(mongo.getMongoClient(), MongoExtension.UNIT_TEST_DB)) {
 			for (String xml : client.listRecords(COLL_NAME)) {
 				Assertions.assertTrue(StringUtils.isNotBlank(xml));
 			}
@@ -55,17 +56,19 @@ public class MigrateMongoMdstoresApplicationTest {
 		Path outputPath = tmpPath.resolve(seqFile);
 
 		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(
-				outputPath.toString(),
-				mongo.getMongoClient(),
-				MongoExtension.UNIT_TEST_DB)) {
+			outputPath.toString(),
+			mongo.getMongoClient(),
+			MongoExtension.UNIT_TEST_DB)) {
 			app.execute("oai_dc", "store", "native");
 		}
 
-		Assertions.assertTrue(
-				Files.list(tmpPath)
-				.filter(f -> seqFile.contains(f.getFileName().toString()))
-				.findFirst()
-				.isPresent());
+		Assertions
+			.assertTrue(
+				Files
+					.list(tmpPath)
+					.filter(f -> seqFile.contains(f.getFileName().toString()))
+					.findFirst()
+					.isPresent());
 	}
 
 	private static String read(String filename) throws IOException {
