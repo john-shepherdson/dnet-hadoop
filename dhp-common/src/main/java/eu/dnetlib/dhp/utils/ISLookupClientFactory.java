@@ -1,11 +1,11 @@
 
 package eu.dnetlib.dhp.utils;
 
-import java.util.Map;
-
-import javax.xml.ws.BindingProvider;
-
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,20 +31,23 @@ public class ISLookupClientFactory {
 
 		final T service = (T) jaxWsProxyFactory.create();
 
-		if (service instanceof BindingProvider) {
+		Client client = ClientProxy.getClient(service);
+		if (client != null) {
+			HTTPConduit conduit = (HTTPConduit) client.getConduit();
+			HTTPClientPolicy policy = new HTTPClientPolicy();
+
 			log
 				.info(
-					"setting timeouts for {} to requestTimeout: {}, connectTimeout: {}",
-					BindingProvider.class.getName(), requestTimeout, connectTimeout);
+					String
+						.format(
+							"setting connectTimeout to %s, requestTimeout to %s for service %s",
+							connectTimeout,
+							requestTimeout,
+							clazz.getCanonicalName()));
 
-			Map<String, Object> requestContext = ((BindingProvider) service).getRequestContext();
-
-			requestContext.put("com.sun.xml.internal.ws.request.timeout", requestTimeout);
-			requestContext.put("com.sun.xml.internal.ws.connect.timeout", connectTimeout);
-			requestContext.put("com.sun.xml.ws.request.timeout", requestTimeout);
-			requestContext.put("com.sun.xml.ws.connect.timeout", connectTimeout);
-			requestContext.put("javax.xml.ws.client.receiveTimeout", requestTimeout);
-			requestContext.put("javax.xml.ws.client.connectionTimeout", connectTimeout);
+			policy.setConnectionTimeout(connectTimeout);
+			policy.setReceiveTimeout(requestTimeout);
+			conduit.setClient(policy);
 		}
 
 		return service;
