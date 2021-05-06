@@ -60,6 +60,8 @@ public class GenerateRorActionSetJob {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+	private static final String ROR_NS_PREFIX = "ror_________";
+
 	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues(
 		"10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
 
@@ -127,8 +129,8 @@ public class GenerateRorActionSetJob {
 
 		final Organization o = new Organization();
 
-		o.setId(String.format("20|ror_________::%s", DHPUtils.md5(r.getId())));
-		o.setOriginalId(Arrays.asList(r.getId()));
+		o.setId(String.format("20|%s::%s", ROR_NS_PREFIX, DHPUtils.md5(r.getId())));
+		o.setOriginalId(Arrays.asList(String.format("%s::%s", ROR_NS_PREFIX, r.getId())));
 		o.setCollectedfrom(ROR_COLLECTED_FROM);
 		o.setPid(pids(r));
 		o.setDateofcollection(now.toString());
@@ -154,9 +156,10 @@ public class GenerateRorActionSetJob {
 			o
 				.setCountry(
 					qualifier(
-						r.getCountry().getCountryCode(), r.getCountry().getCountryName(),
-						ModelConstants.DNET_COUNTRY_TYPE,
-						ModelConstants.DNET_COUNTRY_TYPE));
+						r.getCountry().getCountryCode(), r
+							.getCountry()
+							.getCountryName(),
+						ModelConstants.DNET_COUNTRY_TYPE, ModelConstants.DNET_COUNTRY_TYPE));
 		} else {
 			o.setCountry(null);
 		}
@@ -177,26 +180,19 @@ public class GenerateRorActionSetJob {
 				// skip
 			} else {
 				final Qualifier qualifier = qualifier(
-					type, type,
-					ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
+					type, type, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
 				if (all instanceof String) {
 					pids
-						.add(
-							structuredProperty(
-								all.toString(), qualifier, ROR_DATA_INFO));
+						.add(structuredProperty(all.toString(), qualifier, ROR_DATA_INFO));
 				} else if (all instanceof Collection) {
 					for (final Object pid : (Collection<?>) all) {
 						pids
-							.add(
-								structuredProperty(
-									pid.toString(), qualifier, ROR_DATA_INFO));
+							.add(structuredProperty(pid.toString(), qualifier, ROR_DATA_INFO));
 					}
 				} else if (all instanceof String[]) {
 					for (final String pid : (String[]) all) {
 						pids
-							.add(
-								structuredProperty(
-									pid, qualifier, ROR_DATA_INFO));
+							.add(structuredProperty(pid, qualifier, ROR_DATA_INFO));
 					}
 				} else {
 					log.warn("Invalid type for pid list: " + all.getClass());
