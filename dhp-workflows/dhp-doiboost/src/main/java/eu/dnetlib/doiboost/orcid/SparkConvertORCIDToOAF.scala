@@ -12,30 +12,9 @@ import org.slf4j.{Logger, LoggerFactory}
 object SparkConvertORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(SparkConvertORCIDToOAF.getClass)
 
-  def run(spark:SparkSession,sourcePath:String,workingPath:String, targetPath:String):Unit = {
+  def run(spark:SparkSession,workingPath:String, targetPath:String):Unit = {
     import spark.implicits._
     implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
-
-    val inputRDD:RDD[OrcidAuthor]  = spark.sparkContext.textFile(s"$sourcePath/authors").map(s => ORCIDToOAF.convertORCIDAuthor(s)).filter(s => s!= null).filter(s => ORCIDToOAF.authorValid(s))
-
-    spark.createDataset(inputRDD).as[OrcidAuthor].write.mode(SaveMode.Overwrite).save(s"$workingPath/author")
-
-    val res = spark.sparkContext.textFile(s"$sourcePath/works").flatMap(s => ORCIDToOAF.extractDOIWorks(s)).filter(s => s!= null)
-
-    spark.createDataset(res).as[OrcidWork].write.mode(SaveMode.Overwrite).save(s"$workingPath/works")
-
-    val authors :Dataset[OrcidAuthor] = spark.read.load(s"$workingPath/author").as[OrcidAuthor]
-
-    val works :Dataset[OrcidWork] = spark.read.load(s"$workingPath/works").as[OrcidWork]
-
-    works.joinWith(authors, authors("oid").equalTo(works("oid")))
-      .map(i =>{
-        val doi = i._1.doi
-        val author = i._2
-        (doi, author)
-      }).groupBy(col("_1").alias("doi"))
-      .agg(collect_list(col("_2")).alias("authors"))
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/orcidworksWithAuthor")
 
     val dataset: Dataset[ORCIDItem] =spark.read.load(s"$workingPath/orcidworksWithAuthor").as[ORCIDItem]
 
@@ -55,10 +34,10 @@ object SparkConvertORCIDToOAF {
         .master(parser.get("master")).getOrCreate()
 
 
-    val sourcePath = parser.get("sourcePath")
+
     val workingPath = parser.get("workingPath")
     val targetPath = parser.get("targetPath")
-    run(spark, sourcePath, workingPath, targetPath)
+    run(spark, workingPath, targetPath)
 
   }
 
