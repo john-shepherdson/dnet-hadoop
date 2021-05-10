@@ -68,6 +68,7 @@
         <xsl:call-template name="validRecord" />
     </xsl:template>
 
+    <!-- skip/terminate not compliant record -->
     <xsl:template name="terminate">
         <xsl:message terminate="yes">
             record is not compliant, transformation is interrupted.
