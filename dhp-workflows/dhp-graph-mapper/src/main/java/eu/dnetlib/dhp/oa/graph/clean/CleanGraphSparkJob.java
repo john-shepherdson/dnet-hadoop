@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.oa.graph.clean;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions.*;
 
 import java.util.Optional;
 
@@ -24,6 +23,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -86,10 +86,10 @@ public class CleanGraphSparkJob {
 		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
 
 		readTableFromPath(spark, inputPath, clazz)
-			.map((MapFunction<T, T>) value -> fixVocabularyNames(value), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) GraphCleaningFunctions::fixVocabularyNames, Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
-			.map((MapFunction<T, T>) value -> cleanup(value), Encoders.bean(clazz))
-			.filter((FilterFunction<T>) value -> filter(value))
+			.map((MapFunction<T, T>) GraphCleaningFunctions::cleanup, Encoders.bean(clazz))
+			.filter((FilterFunction<T>) GraphCleaningFunctions::filter)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

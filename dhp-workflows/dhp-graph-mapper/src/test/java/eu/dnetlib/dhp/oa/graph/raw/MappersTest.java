@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,8 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
+import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -363,8 +363,8 @@ public class MappersTest {
 		assertNotNull(d.getTitle());
 		assertEquals(1, d.getTitle().size());
 		assertEquals(
-				"Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia",
-				d.getTitle().get(0).getValue());
+			"Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia",
+			d.getTitle().get(0).getValue());
 
 		assertNotNull(d.getDescription());
 		assertEquals(1, d.getDescription().size());
@@ -430,7 +430,6 @@ public class MappersTest {
 		assertEquals("ClinicalTrials.gov Identifier", i.getAlternateIdentifier().get(0).getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, i.getAlternateIdentifier().get(0).getQualifier().getSchemeid());
 		assertEquals(ModelConstants.DNET_PID_TYPES, i.getAlternateIdentifier().get(0).getQualifier().getSchemename());
-
 
 		assertNotNull(i.getUrl());
 		assertEquals(2, i.getUrl().size());
@@ -598,12 +597,14 @@ public class MappersTest {
 
 	private List<String> vocs() throws IOException {
 		return IOUtils
-			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+			.readLines(
+				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
-			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+			.readLines(
+				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 
 }

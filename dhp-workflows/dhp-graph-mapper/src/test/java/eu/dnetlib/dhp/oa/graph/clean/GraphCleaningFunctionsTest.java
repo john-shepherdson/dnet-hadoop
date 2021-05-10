@@ -22,11 +22,12 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
-public class CleaningFunctionTest {
+public class GraphCleaningFunctionsTest {
 
 	public static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -62,7 +63,7 @@ public class CleaningFunctionTest {
 		assertTrue(p_in instanceof Result);
 		assertTrue(p_in instanceof Publication);
 
-		Publication p_out = OafCleaner.apply(CleaningFunctions.fixVocabularyNames(p_in), mapping);
+		Publication p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
 
 		assertNotNull(p_out);
 
@@ -121,7 +122,7 @@ public class CleaningFunctionTest {
 				.findFirst()
 				.isPresent());
 
-		Publication p_cleaned = CleaningFunctions.cleanup(p_out);
+		Publication p_cleaned = GraphCleaningFunctions.cleanup(p_out);
 
 		assertEquals(1, p_cleaned.getTitle().size());
 
@@ -188,11 +189,13 @@ public class CleaningFunctionTest {
 
 	private List<String> vocs() throws IOException {
 		return IOUtils
-			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+			.readLines(
+				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
-			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+			.readLines(
+				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 }

@@ -7,7 +7,6 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
@@ -15,6 +14,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -412,8 +412,8 @@ public abstract class AbstractMdRecordToOafMapper {
 			}
 		}
 		List<String> idList = doc
-				.selectNodes(
-						"normalize-space(//*[local-name()='header']/*[local-name()='identifier' or local-name()='recordIdentifier']/text())");
+			.selectNodes(
+				"normalize-space(//*[local-name()='header']/*[local-name()='identifier' or local-name()='recordIdentifier']/text())");
 		Set<String> originalIds = Sets.newHashSet(idList);
 
 		if (originalIds.isEmpty()) {
