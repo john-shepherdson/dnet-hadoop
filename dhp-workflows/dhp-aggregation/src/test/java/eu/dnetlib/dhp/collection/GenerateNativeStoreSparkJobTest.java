@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.transformation.TransformSparkJobNode;

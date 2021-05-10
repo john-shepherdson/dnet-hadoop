@@ -14,9 +14,9 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.rest.DNetRestClient;
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 
 public class MDStoreActionNode {
 	private static final Logger log = LoggerFactory.getLogger(MDStoreActionNode.class);

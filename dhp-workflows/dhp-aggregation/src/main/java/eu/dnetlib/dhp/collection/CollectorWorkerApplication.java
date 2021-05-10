@@ -13,10 +13,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
 import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.message.MessageSender;
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 
 /**
  * CollectorWorkerApplication is the main class responsible to start the metadata collection process, storing the outcomes

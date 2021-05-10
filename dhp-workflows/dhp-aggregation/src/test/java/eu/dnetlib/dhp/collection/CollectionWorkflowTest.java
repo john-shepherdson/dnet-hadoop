@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.data.mdstore.manager.common.model.MDStoreVersion;
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(MockitoExtension.class)
