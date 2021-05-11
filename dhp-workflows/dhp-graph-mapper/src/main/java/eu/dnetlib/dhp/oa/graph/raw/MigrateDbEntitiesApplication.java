@@ -592,17 +592,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		return res;
 	}
 
-	private Journal prepareJournal(final ResultSet rs, final DataInfo info) throws SQLException {
-		if (Objects.isNull(rs)) {
-			return null;
-		} else {
-
-			return journal(
-				rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
-				rs.getString("issnLinking"), info);
-		}
-	}
-
 	public List<Oaf> processOrgOrgMergeRels(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs); // TODO
