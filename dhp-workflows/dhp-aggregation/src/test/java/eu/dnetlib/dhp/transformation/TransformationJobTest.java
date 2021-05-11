@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -28,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.transformation.xslt.DateCleaner;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;

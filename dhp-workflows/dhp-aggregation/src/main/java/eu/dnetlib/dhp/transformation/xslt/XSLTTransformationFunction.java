@@ -20,9 +20,9 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 
 	public final static String QNAME_BASE_URI = "http://eu/dnetlib/transform";
 
-	private final static  String DATASOURCE_ID_PARAM="varDataSourceId";
+	private final static String DATASOURCE_ID_PARAM = "varDataSourceId";
 
-	private final static  String DATASOURCE_NAME_PARAM="varOfficialName";
+	private final static String DATASOURCE_NAME_PARAM = "varOfficialName";
 
 	private final AggregationCounter aggregationCounter;
 
