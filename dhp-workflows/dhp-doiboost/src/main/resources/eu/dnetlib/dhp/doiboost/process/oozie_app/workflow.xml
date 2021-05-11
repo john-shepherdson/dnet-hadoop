@@ -54,11 +54,6 @@
 
         <!--    ORCID Parameters    -->
         <property>
-            <name>inputPathOrcid</name>
-            <description>the ORCID input path</description>
-        </property>
-
-        <property>
             <name>workingPathOrcid</name>
             <description>the ORCID working path</description>
         </property>
@@ -82,7 +77,7 @@
         <switch>
             <case to="ProcessMAG">${wf:conf('resumeFrom') eq 'PreprocessMag'}</case>
             <case to="ProcessUW">${wf:conf('resumeFrom') eq 'PreprocessUW'}</case>
-            <case to="ProcessORCID">${wf:conf('resumeFrom') eq 'PreprocessORCID'}</case>
+            <case to="ProcessORCID">${wf:conf('resumeFrom') eq 'ProcessORCID'}</case>
             <case to="CreateDOIBoost">${wf:conf('resumeFrom') eq 'CreateDOIBoost'}</case>
             <case to="GenerateActionSet">${wf:conf('resumeFrom') eq 'GenerateActionSet'}</case>
             <default to="ConvertCrossrefToOAF"/>
