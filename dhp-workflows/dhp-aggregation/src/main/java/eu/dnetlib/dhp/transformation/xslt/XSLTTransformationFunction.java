@@ -20,6 +20,10 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 
 	public final static String QNAME_BASE_URI = "http://eu/dnetlib/transform";
 
+	private final static  String DATASOURCE_ID_PARAM="varDataSourceId";
+
+	private final static  String DATASOURCE_NAME_PARAM="varOfficialName";
+
 	private final AggregationCounter aggregationCounter;
 
 	private final String transformationRule;
@@ -48,11 +52,16 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 		aggregationCounter.getTotalItems().add(1);
 		try {
 			Processor processor = new Processor(false);
+
 			processor.registerExtensionFunction(cleanFunction);
 			processor.registerExtensionFunction(new DateCleaner());
 			processor.registerExtensionFunction(new PersonCleaner());
 
 			final XsltCompiler comp = processor.newXsltCompiler();
+			QName datasourceIDParam = new QName(DATASOURCE_ID_PARAM);
+			comp.setParameter(datasourceIDParam, new XdmAtomicValue(value.getProvenance().getDatasourceId()));
+			QName datasourceNameParam = new QName(DATASOURCE_NAME_PARAM);
+			comp.setParameter(datasourceNameParam, new XdmAtomicValue(value.getProvenance().getDatasourceName()));
 			XsltExecutable xslt = comp
 				.compile(new StreamSource(IOUtils.toInputStream(transformationRule, StandardCharsets.UTF_8)));
 			XdmNode source = processor

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -63,6 +64,8 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
+
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_zenodo.xml")));
 		// We Load the XSLT transformation Rule from the classpath
 		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
@@ -80,6 +83,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
 		// We Load the XSLT transformation Rule from the classpath
 		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
@@ -101,6 +105,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
 		// We Load the XSLT transformation Rule from the classpath
 		XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
@@ -121,6 +126,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_omicsdi.xml")));
 		// We Load the XSLT transformation Rule from the classpath
 		XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
