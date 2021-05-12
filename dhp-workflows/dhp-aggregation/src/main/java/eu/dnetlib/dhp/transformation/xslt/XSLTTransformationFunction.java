@@ -59,7 +59,7 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 
 			final XsltCompiler comp = processor.newXsltCompiler();
 			QName datasourceIDParam = new QName(DATASOURCE_ID_PARAM);
-			comp.setParameter(datasourceIDParam, new XdmAtomicValue(value.getProvenance().getDatasourceId()));
+			comp.setParameter(datasourceIDParam, new XdmAtomicValue(value.getProvenance().getNsPrefix()));
 			QName datasourceNameParam = new QName(DATASOURCE_NAME_PARAM);
 			comp.setParameter(datasourceNameParam, new XdmAtomicValue(value.getProvenance().getDatasourceName()));
 			XsltExecutable xslt = comp
