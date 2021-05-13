@@ -30,6 +30,11 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 
+/**
+ * This test can be used to produce a record that can be manually fed to Solr in XML format.
+ *
+ * The input is a JoinedEntity, i.e. a json representation of an OpenAIRE entity that embeds all the linked entities.
+ */
 public class IndexRecordTransformerTest {
 
 	public static final String VERSION = "2021-04-15T10:05:53Z";
