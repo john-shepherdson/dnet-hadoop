@@ -29,9 +29,9 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class XmlRecordFactoryTest {
 
-	private static final String otherDsTypeId = "scholarcomminfra,infospace,pubsrepository::mock,entityregistry,entityregistry::projects,entityregistry::repositories,websource";
+	public static final String otherDsTypeId = "scholarcomminfra,infospace,pubsrepository::mock,entityregistry,entityregistry::projects,entityregistry::repositories,websource";
 
-	private static ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+	public static ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Test
