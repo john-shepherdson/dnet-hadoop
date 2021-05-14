@@ -102,9 +102,16 @@ case object Crossref2Oaf {
 
     //IMPORTANT
     //The old method result.setId(generateIdentifier(result, doi))
-    //will be replaced using IdentifierFactory
-    result.setId(generateIdentifier(result, doi))
-    result.setId(IdentifierFactory.createIdentifier(result))
+    //is replaced using IdentifierFactory, but the old identifier
+    //is preserved among the originalId(s)
+    val oldId = generateIdentifier(result, doi)
+    val newId = IdentifierFactory.createIdentifier(result)
+
+    if (!oldId.equalsIgnoreCase(newId)) {
+      result.getOriginalId.add(oldId)
+    }
+
+    result.setId(newId)
 
     // Add DataInfo
     result.setDataInfo(generateDataInfo())
