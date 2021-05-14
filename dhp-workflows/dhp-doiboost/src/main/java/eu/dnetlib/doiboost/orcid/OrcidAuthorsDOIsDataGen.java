@@ -16,7 +16,7 @@ public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
 	private String activitiesFileNameTarGz;
 	private String outputAuthorsDOIsPath;
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		OrcidAuthorsDOIsDataGen orcidAuthorsDOIsDataGen = new OrcidAuthorsDOIsDataGen();
 		orcidAuthorsDOIsDataGen.loadArgs(args);
 		orcidAuthorsDOIsDataGen.generateAuthorsDOIsData();
@@ -30,7 +30,7 @@ public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
 		ActivitiesDecompressor.parseGzActivities(conf, tarGzUri, outputPath);
 	}
 
-	private void loadArgs(String[] args) throws IOException, Exception {
+	private void loadArgs(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

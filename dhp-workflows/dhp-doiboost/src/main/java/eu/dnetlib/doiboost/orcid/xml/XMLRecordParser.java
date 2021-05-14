@@ -39,7 +39,7 @@ public class XMLRecordParser {
 	private static final String NS_ERROR = "error";
 
 	public static AuthorData VTDParseAuthorData(byte[] bytes)
-		throws VtdException, EncodingException, EOFException, EntityException, ParseException {
+		throws VtdException, ParseException {
 		final VTDGen vg = new VTDGen();
 		vg.setDoc(bytes);
 		vg.parse(true);
@@ -134,7 +134,7 @@ public class XMLRecordParser {
 	}
 
 	public static WorkData VTDParseWorkData(byte[] bytes)
-		throws VtdException, EncodingException, EOFException, EntityException, ParseException {
+		throws VtdException, ParseException {
 		final VTDGen vg = new VTDGen();
 		vg.setDoc(bytes);
 		vg.parse(true);

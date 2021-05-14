@@ -34,7 +34,7 @@ public class MessageSender {
 
 	private final String workflowId;
 
-	private ExecutorService executorService = Executors.newCachedThreadPool();
+	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	public MessageSender(final String dnetMessageEndpoint, final String workflowId) {
 		this.workflowId = workflowId;

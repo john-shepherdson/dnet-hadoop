@@ -105,7 +105,6 @@ public final class UpdateInfo<T> {
 			.map(OaBrokerInstance::getUrl)
 			.findFirst()
 			.orElse(null);
-		;
 
 		final OaBrokerProvenance provenance = new OaBrokerProvenance(provId, provRepo, provType, provUrl);
 

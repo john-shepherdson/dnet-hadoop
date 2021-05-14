@@ -11,7 +11,7 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class RelationAggregator extends Aggregator<Relation, Relation, Relation> {
 
-	private static Relation ZERO = new Relation();
+	private static final Relation ZERO = new Relation();
 
 	@Override
 	public Relation zero() {

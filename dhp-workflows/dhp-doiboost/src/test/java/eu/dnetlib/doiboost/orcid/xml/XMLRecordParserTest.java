@@ -44,7 +44,7 @@ public class XMLRecordParserTest {
 
 		XMLRecordParser p = new XMLRecordParser();
 
-		AuthorData authorData = p.VTDParseAuthorData(xml.getBytes());
+		AuthorData authorData = XMLRecordParser.VTDParseAuthorData(xml.getBytes());
 		assertNotNull(authorData);
 		assertNotNull(authorData.getName());
 		System.out.println("name: " + authorData.getName());
@@ -60,7 +60,7 @@ public class XMLRecordParserTest {
 
 		XMLRecordParser p = new XMLRecordParser();
 
-		AuthorData authorData = p.VTDParseAuthorData(xml.getBytes());
+		AuthorData authorData = XMLRecordParser.VTDParseAuthorData(xml.getBytes());
 		assertNotNull(authorData);
 		assertNotNull(authorData.getErrorCode());
 		System.out.println("error: " + authorData.getErrorCode());
@@ -75,7 +75,7 @@ public class XMLRecordParserTest {
 
 		XMLRecordParser p = new XMLRecordParser();
 
-		WorkData workData = p.VTDParseWorkData(xml.getBytes());
+		WorkData workData = XMLRecordParser.VTDParseWorkData(xml.getBytes());
 		assertNotNull(workData);
 		assertNotNull(workData.getOid());
 		System.out.println("oid: " + workData.getOid());

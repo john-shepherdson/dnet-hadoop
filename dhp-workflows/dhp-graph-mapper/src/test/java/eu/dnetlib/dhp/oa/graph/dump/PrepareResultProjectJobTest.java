@@ -37,7 +37,7 @@ public class PrepareResultProjectJobTest {
 	private static final Logger log = LoggerFactory
 		.getLogger(eu.dnetlib.dhp.oa.graph.dump.PrepareResultProjectJobTest.class);
 
-	private static HashMap<String, String> map = new HashMap<>();
+	private static final HashMap<String, String> map = new HashMap<>();
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {

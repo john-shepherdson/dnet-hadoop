@@ -105,7 +105,7 @@ public class SparkOrcidToResultFromSemRelJob {
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultOrcidList>, R> authorEnrichFn() {
-		return (MapFunction<Tuple2<R, ResultOrcidList>, R>) value -> {
+		return value -> {
 			R ret = value._1();
 			Optional<ResultOrcidList> rol = Optional.ofNullable(value._2());
 			if (rol.isPresent()) {
@@ -202,8 +202,8 @@ public class SparkOrcidToResultFromSemRelJob {
 			return false;
 		}
 		for (StructuredProperty pid : pids.get()) {
-			if (ModelConstants.ORCID_PENDING.equals(pid.getQualifier().getClassid().toLowerCase()) ||
-				ModelConstants.ORCID.equals(pid.getQualifier().getClassid().toLowerCase())) {
+			if (ModelConstants.ORCID_PENDING.equalsIgnoreCase(pid.getQualifier().getClassid()) ||
+				ModelConstants.ORCID.equalsIgnoreCase(pid.getQualifier().getClassid())) {
 				return true;
 			}
 		}

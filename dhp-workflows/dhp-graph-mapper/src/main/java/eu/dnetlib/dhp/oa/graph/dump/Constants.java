@@ -14,7 +14,7 @@ public class Constants {
 
 	public static final String HARVESTED = "Harvested";
 	public static final String DEFAULT_TRUST = "0.9";
-	public static final String USER_CLAIM = "Linked by user";;
+	public static final String USER_CLAIM = "Linked by user";
 
 	public static String COAR_ACCESS_RIGHT_SCHEMA = "http://vocabularies.coar-repositories.org/documentation/access_rights/";
 
@@ -44,7 +44,7 @@ public class Constants {
 	public enum DUMPTYPE {
 		COMPLETE("complete"), COMMUNITY("community"), FUNDER("funder");
 
-		private String type;
+		private final String type;
 
 		DUMPTYPE(String type) {
 			this.type = type;

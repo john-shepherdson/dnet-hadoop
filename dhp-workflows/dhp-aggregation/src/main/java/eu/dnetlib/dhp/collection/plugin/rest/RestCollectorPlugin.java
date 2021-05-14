@@ -26,7 +26,7 @@ public class RestCollectorPlugin implements CollectorPlugin {
 
 	public static final String RESULT_SIZE_VALUE_DEFAULT = "100";
 
-	private HttpClientParams clientParams;
+	private final HttpClientParams clientParams;
 
 	public RestCollectorPlugin(HttpClientParams clientParams) {
 		this.clientParams = clientParams;

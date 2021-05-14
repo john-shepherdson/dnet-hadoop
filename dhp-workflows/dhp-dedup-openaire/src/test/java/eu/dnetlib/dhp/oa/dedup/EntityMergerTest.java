@@ -30,7 +30,7 @@ public class EntityMergerTest implements Serializable {
 
 	private String testEntityBasePath;
 	private DataInfo dataInfo;
-	private String dedupId = "00|dedup_id::1";
+	private final String dedupId = "00|dedup_id::1";
 	private Publication pub_top;
 
 	@BeforeEach

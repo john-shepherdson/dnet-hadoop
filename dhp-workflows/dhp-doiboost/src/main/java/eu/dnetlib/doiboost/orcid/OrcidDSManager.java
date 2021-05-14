@@ -19,7 +19,7 @@ public class OrcidDSManager {
 	private String summariesFileNameTarGz;
 	private String outputAuthorsPath;
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		OrcidDSManager orcidDSManager = new OrcidDSManager();
 		orcidDSManager.loadArgs(args);
 		orcidDSManager.generateAuthors();
@@ -56,7 +56,7 @@ public class OrcidDSManager {
 		return fs;
 	}
 
-	private void loadArgs(String[] args) throws IOException, Exception {
+	private void loadArgs(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

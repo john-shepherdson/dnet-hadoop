@@ -16,7 +16,7 @@ import eu.dnetlib.doiboost.orcid.model.WorkData;
 public class JsonWriter {
 
 	public static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-		.setSerializationInclusion(JsonInclude.Include.NON_NULL);;
+		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 	public static String create(AuthorData authorData) throws JsonProcessingException {
 		return OBJECT_MAPPER.writeValueAsString(authorData);

@@ -51,17 +51,17 @@ public class XmlIndexingJob {
 
 	protected static final String DATE_FORMAT = "yyyy-MM-dd'T'hh:mm:ss'Z'";
 
-	private String inputPath;
+	private final String inputPath;
 
-	private String format;
+	private final String format;
 
-	private int batchSize;
+	private final int batchSize;
 
-	private OutputFormat outputFormat;
+	private final OutputFormat outputFormat;
 
-	private String outputPath;
+	private final String outputPath;
 
-	private SparkSession spark;
+	private final SparkSession spark;
 
 	public static void main(String[] args) throws Exception {
 

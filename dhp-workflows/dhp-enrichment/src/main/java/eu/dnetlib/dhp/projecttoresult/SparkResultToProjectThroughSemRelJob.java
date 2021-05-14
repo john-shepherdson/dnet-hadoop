@@ -94,7 +94,7 @@ public class SparkResultToProjectThroughSemRelJob {
 	}
 
 	private static FlatMapFunction<Tuple2<ResultProjectSet, ResultProjectSet>, Relation> mapRelationRn() {
-		return (FlatMapFunction<Tuple2<ResultProjectSet, ResultProjectSet>, Relation>) value -> {
+		return value -> {
 			List<Relation> new_relations = new ArrayList<>();
 			ResultProjectSet potential_update = value._1();
 			Optional<ResultProjectSet> already_linked = Optional.ofNullable(value._2());

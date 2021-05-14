@@ -160,9 +160,9 @@ public class PromoteActionPayloadForGraphTableJob {
 
 	private static String extractPayload(Row value) {
 		try {
-			return value.<String> getAs("payload");
+			return value.getAs("payload");
 		} catch (IllegalArgumentException | ClassCastException e) {
-			logger.error("cannot extract payload from action: {}", value.toString());
+			logger.error("cannot extract payload from action: {}", value);
 			throw e;
 		}
 	}

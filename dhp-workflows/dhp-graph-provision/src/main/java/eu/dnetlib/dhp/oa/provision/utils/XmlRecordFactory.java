@@ -1091,7 +1091,7 @@ public class XmlRecordFactory implements Serializable {
 
 		if (StringUtils.isBlank(scheme)) {
 			throw new IllegalArgumentException(
-				String.format("missing scheme for: <%s - %s>", type.toString(), targetType));
+				String.format("missing scheme for: <%s - %s>", type, targetType));
 		}
 		final HashSet<String> fields = Sets.newHashSet(mapFields(link, contexts));
 		if (rel.getValidated() == null)

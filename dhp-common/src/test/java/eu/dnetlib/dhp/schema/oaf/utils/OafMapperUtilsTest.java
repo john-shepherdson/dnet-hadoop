@@ -22,7 +22,7 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class OafMapperUtilsTest {
 
-	private static ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Test

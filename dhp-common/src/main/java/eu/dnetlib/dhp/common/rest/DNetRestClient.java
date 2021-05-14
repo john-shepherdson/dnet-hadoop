@@ -21,7 +21,7 @@ public class DNetRestClient {
 
 	private static final Logger log = LoggerFactory.getLogger(DNetRestClient.class);
 
-	private static ObjectMapper mapper = new ObjectMapper();
+	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public static <T> T doGET(final String url, Class<T> clazz) throws Exception {
 		final HttpGet httpGet = new HttpGet(url);

@@ -22,7 +22,7 @@ public class GenOrcidAuthorWork extends OrcidDSManager {
 	private String activitiesFileNameTarGz;
 	private String outputWorksPath;
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		GenOrcidAuthorWork genOrcidAuthorWork = new GenOrcidAuthorWork();
 		genOrcidAuthorWork.loadArgs(args);
 		genOrcidAuthorWork.generateAuthorsDOIsData();
@@ -36,7 +36,7 @@ public class GenOrcidAuthorWork extends OrcidDSManager {
 		ActivitiesDumpReader.parseGzActivities(conf, tarGzUri, outputPath);
 	}
 
-	private void loadArgs(String[] args) throws IOException, Exception {
+	private void loadArgs(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

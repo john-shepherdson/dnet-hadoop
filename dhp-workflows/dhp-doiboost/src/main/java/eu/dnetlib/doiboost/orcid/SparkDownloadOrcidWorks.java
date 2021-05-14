@@ -46,7 +46,7 @@ public class SparkDownloadOrcidWorks {
 	public static final DateTimeFormatter ORCID_XML_DATETIMEFORMATTER = DateTimeFormatter
 		.ofPattern(ORCID_XML_DATETIME_FORMAT);
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -246,6 +246,6 @@ public class SparkDownloadOrcidWorks {
 				return name.getAsString();
 			}
 		}
-		return new String("");
+		return "";
 	}
 }

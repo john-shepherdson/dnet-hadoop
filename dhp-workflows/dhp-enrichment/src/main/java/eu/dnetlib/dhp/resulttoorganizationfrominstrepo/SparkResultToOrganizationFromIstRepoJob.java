@@ -124,7 +124,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 	}
 
 	private static FlatMapFunction<Tuple2<ResultOrganizationSet, ResultOrganizationSet>, Relation> createRelationFn() {
-		return (FlatMapFunction<Tuple2<ResultOrganizationSet, ResultOrganizationSet>, Relation>) value -> {
+		return value -> {
 			List<Relation> new_relations = new ArrayList<>();
 			ResultOrganizationSet potential_update = value._1();
 			Optional<ResultOrganizationSet> already_linked = Optional.ofNullable(value._2());

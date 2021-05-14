@@ -26,7 +26,7 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 	private List<String> surname = Lists.newArrayList();
 	private List<String> fullname = Lists.newArrayList();
 
-	private static Set<String> particles = null;
+	private static final Set<String> particles = null;
 
 	public PersonCleaner() {
 

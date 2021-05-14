@@ -88,7 +88,7 @@ public class PublicationToOaf implements Serializable {
 		this.dateOfCollection = null;
 	}
 
-	private static Map<String, Pair<String, String>> datasources = new HashMap<String, Pair<String, String>>() {
+	private static final Map<String, Pair<String, String>> datasources = new HashMap<String, Pair<String, String>>() {
 
 		{
 			put(
@@ -99,7 +99,7 @@ public class PublicationToOaf implements Serializable {
 	};
 
 	// json external id will be mapped to oaf:pid/@classid Map to oaf:pid/@classname
-	private static Map<String, Pair<String, String>> externalIds = new HashMap<String, Pair<String, String>>() {
+	private static final Map<String, Pair<String, String>> externalIds = new HashMap<String, Pair<String, String>>() {
 
 		{
 			put("ark".toLowerCase(), new Pair<>("ark", "ark"));
@@ -529,9 +529,7 @@ public class PublicationToOaf implements Serializable {
 			if (jsonArray.isJsonNull()) {
 				return false;
 			}
-			if (jsonArray.get(0).isJsonNull()) {
-				return false;
-			}
+			return !jsonArray.get(0).isJsonNull();
 		}
 		return true;
 	}

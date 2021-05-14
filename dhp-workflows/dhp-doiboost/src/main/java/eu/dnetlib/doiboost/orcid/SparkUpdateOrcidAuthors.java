@@ -38,7 +38,7 @@ public class SparkUpdateOrcidAuthors {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidAuthors.class);
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -204,7 +204,7 @@ public class SparkUpdateOrcidAuthors {
 								a -> a._1().equals(authorSummary.getAuthorData().getOid()) &&
 									a._2().equals(authorSummary.getDownloadDate()))
 							.count() == 1;
-						return (oidFound && tsFound) || (!oidFound);
+						return !oidFound || tsFound;
 					});
 
 				Dataset<AuthorSummary> cleanedDS = spark

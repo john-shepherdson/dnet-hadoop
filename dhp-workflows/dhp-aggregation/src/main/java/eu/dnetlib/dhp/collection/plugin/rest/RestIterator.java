@@ -48,18 +48,18 @@ public class RestIterator implements Iterator<String> {
 	private static final Logger log = LoggerFactory.getLogger(RestIterator.class);
 	public static final String UTF_8 = "UTF-8";
 
-	private HttpClientParams clientParams;
+	private final HttpClientParams clientParams;
 
 	private final String BASIC = "basic";
 
-	private JsonUtils jsonUtils;
+	private final JsonUtils jsonUtils;
 
-	private String baseUrl;
-	private String resumptionType;
-	private String resumptionParam;
-	private String resultFormatValue;
+	private final String baseUrl;
+	private final String resumptionType;
+	private final String resumptionParam;
+	private final String resultFormatValue;
 	private String queryParams;
-	private int resultSizeValue;
+	private final int resultSizeValue;
 	private int resumptionInt = 0; // integer resumption token (first record to harvest)
 	private int resultTotal = -1;
 	private String resumptionStr = Integer.toString(resumptionInt); // string resumption token (first record to harvest
@@ -71,11 +71,11 @@ public class RestIterator implements Iterator<String> {
 	private XPathExpression xprResultTotalPath;
 	private XPathExpression xprResumptionPath;
 	private XPathExpression xprEntity;
-	private String queryFormat;
-	private String querySize;
-	private String authMethod;
-	private String authToken;
-	private Queue<String> recordQueue = new PriorityBlockingQueue<String>();
+	private final String queryFormat;
+	private final String querySize;
+	private final String authMethod;
+	private final String authToken;
+	private final Queue<String> recordQueue = new PriorityBlockingQueue<String>();
 	private int discoverResultSize = 0;
 	private int pagination = 1;
 	/*
@@ -83,7 +83,7 @@ public class RestIterator implements Iterator<String> {
 	 * json. useful for cases when the target API expects a resultFormatValue != json, but the results are returned in
 	 * json. An example is the EU Open Data Portal API: resultFormatValue=standard, results are in json format.
 	 */
-	private String resultOutputFormat;
+	private final String resultOutputFormat;
 
 	/** RestIterator class
 	 *  compatible to version 1.3.33
@@ -229,7 +229,7 @@ public class RestIterator implements Iterator<String> {
 
 			resultStream = theHttpInputStream;
 			if ("json".equals(resultOutputFormat)) {
-				resultJson = IOUtils.toString(resultStream, UTF_8);
+				resultJson = IOUtils.toString(resultStream, StandardCharsets.UTF_8);
 				resultXml = jsonUtils.convertToXML(resultJson);
 				resultStream = IOUtils.toInputStream(resultXml, UTF_8);
 			}

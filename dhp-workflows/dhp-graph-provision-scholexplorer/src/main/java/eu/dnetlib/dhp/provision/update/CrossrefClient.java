@@ -61,9 +61,8 @@ public class CrossrefClient {
 				int size = decompresser.inflate(buffer);
 				bos.write(buffer, 0, size);
 			}
-			byte[] unzippeddata = bos.toByteArray();
 			decompresser.end();
-			return new String(unzippeddata);
+			return bos.toString();
 		} catch (Throwable e) {
 			throw new RuntimeException("Wrong record:" + blob, e);
 		}

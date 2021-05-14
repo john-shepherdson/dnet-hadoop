@@ -34,7 +34,7 @@ public class ClusterUtils {
 	public static Dataset<Relation> loadRelations(final String graphPath, final SparkSession spark) {
 		return ClusterUtils
 			.readPath(spark, graphPath + "/relation", Relation.class)
-			.map(r -> {
+			.map((MapFunction<Relation, Relation>) r -> {
 				r.setSource(ConversionUtils.cleanOpenaireId(r.getSource()));
 				r.setTarget(ConversionUtils.cleanOpenaireId(r.getTarget()));
 				return r;
@@ -75,7 +75,7 @@ public class ClusterUtils {
 		final Class<T> clazz,
 		final LongAccumulator acc) {
 		dataset
-			.map(o -> ClusterUtils.incrementAccumulator(o, acc), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) o -> ClusterUtils.incrementAccumulator(o, acc), Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

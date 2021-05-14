@@ -35,8 +35,7 @@ public class RelationPartitioner extends Partitioner {
 	public boolean equals(Object obj) {
 		if (obj instanceof RelationPartitioner) {
 			RelationPartitioner p = (RelationPartitioner) obj;
-			if (p.numPartitions() == numPartitions())
-				return true;
+			return p.numPartitions() == numPartitions();
 		}
 		return false;
 	}

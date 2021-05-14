@@ -111,7 +111,7 @@ public class SparkCountryPropagationJob {
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCountrySet>, R> getCountryMergeFn() {
-		return (MapFunction<Tuple2<R, ResultCountrySet>, R>) t -> {
+		return t -> {
 			Optional.ofNullable(t._2()).ifPresent(r -> {
 				t._1().getCountry().addAll(merge(t._1().getCountry(), r.getCountrySet()));
 			});

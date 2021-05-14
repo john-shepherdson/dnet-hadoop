@@ -32,7 +32,7 @@ public class HttpConnector2 {
 
 	private String responseType = null;
 
-	private String userAgent = "Mozilla/5.0 (compatible; OAI; +http://www.openaire.eu)";
+	private final String userAgent = "Mozilla/5.0 (compatible; OAI; +http://www.openaire.eu)";
 
 	public HttpConnector2() {
 		this(new HttpClientParams());

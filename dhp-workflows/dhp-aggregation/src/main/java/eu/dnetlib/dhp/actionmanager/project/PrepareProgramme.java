@@ -249,7 +249,7 @@ public class PrepareProgramme {
 							parent = parent.substring(parent.lastIndexOf("|") + 1).trim();
 						}
 						if (current.trim().length() > parent.length()
-							&& current.toLowerCase().trim().substring(0, parent.length()).equals(parent)) {
+							&& current.toLowerCase().trim().startsWith(parent)) {
 							current = current.substring(parent.length() + 1);
 							if (current.trim().charAt(0) == '-' || current.trim().charAt(0) == '–') {
 								current = current.trim().substring(1).trim();

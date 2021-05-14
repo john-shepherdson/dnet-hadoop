@@ -28,7 +28,7 @@ public class ReadCSV implements Closeable {
 	private final Configuration conf;
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private String csvFile;
+	private final String csvFile;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -85,7 +85,6 @@ public class ReadCSV implements Closeable {
 
 		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
 		this.csvFile = httpConnector.getInputSource(fileURL);
-		;
 	}
 
 	protected void write(final Object p) {

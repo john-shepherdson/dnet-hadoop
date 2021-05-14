@@ -32,11 +32,11 @@ public class OafMapperUtils {
 		if (ModelSupport.isSubClass(left, Result.class)) {
 			return mergeResults((Result) left, (Result) right);
 		} else if (ModelSupport.isSubClass(left, Datasource.class)) {
-			((Datasource) left).mergeFrom((Datasource) right);
+			left.mergeFrom(right);
 		} else if (ModelSupport.isSubClass(left, Organization.class)) {
-			((Organization) left).mergeFrom((Organization) right);
+			left.mergeFrom(right);
 		} else if (ModelSupport.isSubClass(left, Project.class)) {
-			((Project) left).mergeFrom((Project) right);
+			left.mergeFrom(right);
 		} else {
 			throw new RuntimeException("invalid OafEntity subtype:" + left.getClass().getCanonicalName());
 		}

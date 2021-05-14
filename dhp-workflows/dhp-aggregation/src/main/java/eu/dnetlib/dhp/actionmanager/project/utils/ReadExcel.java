@@ -25,7 +25,7 @@ public class ReadExcel implements Closeable {
 	private final Configuration conf;
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private InputStream excelFile;
+	private final InputStream excelFile;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -82,7 +82,6 @@ public class ReadExcel implements Closeable {
 
 		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
 		this.excelFile = httpConnector.getInputSourceAsStream(fileURL);
-		;
 	}
 
 	protected void write(final Object p) {

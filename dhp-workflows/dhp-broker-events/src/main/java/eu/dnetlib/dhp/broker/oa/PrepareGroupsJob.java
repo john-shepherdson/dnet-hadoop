@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -64,7 +65,7 @@ public class PrepareGroupsJob {
 
 			final Dataset<Relation> mergedRels = ClusterUtils
 				.loadRelations(graphPath, spark)
-				.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+				.filter((FilterFunction<Relation>) r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, Relation>, ResultGroup> aggr = new ResultAggregator()
 				.toColumn();
@@ -75,8 +76,9 @@ public class PrepareGroupsJob {
 					(MapFunction<Tuple2<OaBrokerMainEntity, Relation>, String>) t -> t._2.getTarget(),
 					Encoders.STRING())
 				.agg(aggr)
-				.map(t -> t._2, Encoders.bean(ResultGroup.class))
-				.filter(rg -> rg.getData().size() > 1);
+				.map(
+					(MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.bean(ResultGroup.class))
+				.filter((FilterFunction<ResultGroup>) rg -> rg.getData().size() > 1);
 
 			ClusterUtils.save(dataset, groupsPath, ResultGroup.class, total);
 

@@ -4,6 +4,8 @@ package eu.dnetlib.dhp.broker.oa;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -47,26 +49,22 @@ public class CheckDuplictedIdsJob {
 
 		final LongAccumulator total = spark.sparkContext().longAccumulator("invaild_event_id");
 
-		final TypedColumn<Tuple2<String, Long>, Tuple2<String, Long>> agg = new CountAggregator().toColumn();
-
+		final Encoder<Tuple2<String, Long>> encoder = Encoders.tuple(Encoders.STRING(), Encoders.LONG());
 		ClusterUtils
 			.readPath(spark, eventsPath, Event.class)
-			.map(e -> new Tuple2<>(e.getEventId(), 1l), Encoders.tuple(Encoders.STRING(), Encoders.LONG()))
-			.groupByKey(t -> t._1, Encoders.STRING())
-			.agg(agg)
-			.map(t -> t._2, Encoders.tuple(Encoders.STRING(), Encoders.LONG()))
-			.filter(t -> t._2 > 1)
-			.map(o -> ClusterUtils.incrementAccumulator(o, total), Encoders.tuple(Encoders.STRING(), Encoders.LONG()))
+			.map((MapFunction<Event, Tuple2<String, Long>>) e -> new Tuple2<>(e.getEventId(), 1l), encoder)
+			.groupByKey((MapFunction<Tuple2<String, Long>, String>) t -> t._1, Encoders.STRING())
+			.agg(new CountAggregator().toColumn())
+			.map((MapFunction<Tuple2<String, Tuple2<String, Long>>, Tuple2<String, Long>>) t -> t._2, encoder)
+			.filter((FilterFunction<Tuple2<String, Long>>) t -> t._2 > 1)
+			.map(
+				(MapFunction<Tuple2<String, Long>, Tuple2<String, Long>>) o -> ClusterUtils
+					.incrementAccumulator(o, total),
+				encoder)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(countPath);
-		;
-
-	}
-
-	private static String eventAsJsonString(final Event f) throws JsonProcessingException {
-		return new ObjectMapper().writeValueAsString(f);
 	}
 
 }

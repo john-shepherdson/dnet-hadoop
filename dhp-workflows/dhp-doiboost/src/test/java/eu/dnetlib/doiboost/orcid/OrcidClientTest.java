@@ -83,7 +83,7 @@ public class OrcidClientTest {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		return new String("");
+		return "";
 	}
 
 	// @Test
@@ -142,7 +142,7 @@ public class OrcidClientTest {
 	}
 
 	private void testDate(String value) throws ParseException {
-		System.out.println(value.toString());
+		System.out.println(value);
 		if (value.length() != 19) {
 			value = value.substring(0, 19);
 		}
@@ -185,7 +185,7 @@ public class OrcidClientTest {
 			br = new BufferedReader(new InputStreamReader(input)); // Read directly from tarInput
 			String line;
 			while ((line = br.readLine()) != null) {
-				String[] values = line.toString().split(",");
+				String[] values = line.split(",");
 				List<String> recordInfo = Arrays.asList(values);
 				assertTrue(recordInfo.size() == 4);
 				String orcid = recordInfo.get(0);
@@ -260,7 +260,7 @@ public class OrcidClientTest {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		return new String("");
+		return "";
 	}
 
 	@Test

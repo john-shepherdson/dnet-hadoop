@@ -117,7 +117,7 @@ public class PrepareResultCommunitySet {
 
 	private static MapFunction<ResultOrganizations, ResultCommunityList> mapResultCommunityFn(
 		OrganizationMap organizationMap) {
-		return (MapFunction<ResultOrganizations, ResultCommunityList>) value -> {
+		return value -> {
 			String rId = value.getResultId();
 			Optional<List<String>> orgs = Optional.ofNullable(value.getMerges());
 			String oTarget = value.getOrgId();

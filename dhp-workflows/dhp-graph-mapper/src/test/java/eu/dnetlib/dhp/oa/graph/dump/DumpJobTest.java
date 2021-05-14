@@ -40,7 +40,7 @@ public class DumpJobTest {
 
 	private static final Logger log = LoggerFactory.getLogger(DumpJobTest.class);
 
-	private static CommunityMap map = new CommunityMap();
+	private static final CommunityMap map = new CommunityMap();
 
 	static {
 		map.put("egi", "EGI Federation");

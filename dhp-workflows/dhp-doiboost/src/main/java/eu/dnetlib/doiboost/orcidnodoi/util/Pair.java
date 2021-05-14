@@ -3,9 +3,9 @@ package eu.dnetlib.doiboost.orcidnodoi.util;
 
 public class Pair<K, V> {
 
-	private K k;
+	private final K k;
 
-	private V v;
+	private final V v;
 
 	public Pair(K k, V v) {
 		this.k = k;

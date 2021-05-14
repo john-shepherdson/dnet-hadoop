@@ -347,7 +347,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	private List<String> getValueAsList(final String name, final List<TypedField> fields) {
-		return (List<String>) getValueAs(name, fields);
+		return getValueAs(name, fields);
 	}
 }
 

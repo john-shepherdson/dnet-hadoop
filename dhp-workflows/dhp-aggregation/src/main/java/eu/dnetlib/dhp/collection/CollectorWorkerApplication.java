@@ -30,7 +30,7 @@ public class CollectorWorkerApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectorWorkerApplication.class);
 
-	private FileSystem fileSystem;
+	private final FileSystem fileSystem;
 
 	public CollectorWorkerApplication(FileSystem fileSystem) {
 		this.fileSystem = fileSystem;

@@ -161,7 +161,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 	}
 
 	private FilterFunction<Relation> getRelationFilterFunction() {
-		return (FilterFunction<Relation>) r -> StringUtils.isNotBlank(r.getSource()) ||
+		return r -> StringUtils.isNotBlank(r.getSource()) ||
 			StringUtils.isNotBlank(r.getTarget()) ||
 			StringUtils.isNotBlank(r.getRelClass()) ||
 			StringUtils.isNotBlank(r.getSubRelType()) ||

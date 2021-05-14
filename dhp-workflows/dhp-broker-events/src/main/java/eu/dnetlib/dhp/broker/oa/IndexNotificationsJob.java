@@ -18,7 +18,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
@@ -89,13 +92,17 @@ public class IndexNotificationsJob {
 		log.info("Number of subscriptions: " + subscriptions.size());
 
 		if (subscriptions.size() > 0) {
+			final Encoder<NotificationGroup> ngEncoder = Encoders.bean(NotificationGroup.class);
+			final Encoder<Notification> nEncoder = Encoders.bean(Notification.class);
 			final Dataset<Notification> notifications = ClusterUtils
 				.readPath(spark, eventsPath, Event.class)
-				.map(e -> generateNotifications(e, subscriptions, startTime), Encoders.bean(NotificationGroup.class))
-				.flatMap(g -> g.getData().iterator(), Encoders.bean(Notification.class));
+				.map(
+					(MapFunction<Event, NotificationGroup>) e -> generateNotifications(e, subscriptions, startTime),
+					ngEncoder)
+				.flatMap((FlatMapFunction<NotificationGroup, Notification>) g -> g.getData().iterator(), nEncoder);
 
 			final JavaRDD<String> inputRdd = notifications
-				.map(n -> prepareForIndexing(n, total), Encoders.STRING())
+				.map((MapFunction<Notification, String>) n -> prepareForIndexing(n, total), Encoders.STRING())
 				.javaRDD();
 
 			final Map<String, String> esCfg = new HashMap<>();
@@ -192,15 +199,11 @@ public class IndexNotificationsJob {
 			return false;
 		}
 
-		if (conditions.containsKey("targetSubjects")
-			&& !conditions
+		return !conditions.containsKey("targetSubjects")
+			|| conditions
 				.get("targetSubjects")
 				.stream()
-				.allMatch(c -> SubscriptionUtils.verifyListExact(map.getTargetSubjects(), c.getValue()))) {
-			return false;
-		}
-
-		return true;
+				.allMatch(c -> SubscriptionUtils.verifyListExact(map.getTargetSubjects(), c.getValue()));
 
 	}
 

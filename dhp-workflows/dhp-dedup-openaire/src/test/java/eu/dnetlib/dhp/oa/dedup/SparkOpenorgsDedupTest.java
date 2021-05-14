@@ -44,10 +44,10 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SparkOpenorgsDedupTest implements Serializable {
 
-	private static String dbUrl = "jdbc:h2:mem:openorgs_test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false";
-	private static String dbUser = "sa";
-	private static String dbTable = "tmp_dedup_events";
-	private static String dbPwd = "";
+	private static final String dbUrl = "jdbc:h2:mem:openorgs_test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false";
+	private static final String dbUser = "sa";
+	private static final String dbTable = "tmp_dedup_events";
+	private static final String dbPwd = "";
 
 	@Mock(serializable = true)
 	ISLookUpService isLookUpService;

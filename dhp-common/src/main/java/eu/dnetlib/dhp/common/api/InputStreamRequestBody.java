@@ -13,9 +13,9 @@ import okio.Source;
 
 public class InputStreamRequestBody extends RequestBody {
 
-	private InputStream inputStream;
-	private MediaType mediaType;
-	private long lenght;
+	private final InputStream inputStream;
+	private final MediaType mediaType;
+	private final long lenght;
 
 	public static RequestBody create(final MediaType mediaType, final InputStream inputStream, final long len) {
 

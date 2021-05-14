@@ -18,7 +18,7 @@ public abstract class ReportingJob {
 	 */
 	public static final int INITIAL_DELAY = 2;
 
-	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
 	protected final AggregatorReport report;
 

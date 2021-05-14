@@ -93,7 +93,7 @@ public class PrepareProjects {
 	}
 
 	private static FlatMapFunction<Tuple2<ProjectSubset, CSVProject>, CSVProject> getTuple2CSVProjectFlatMapFunction() {
-		return (FlatMapFunction<Tuple2<ProjectSubset, CSVProject>, CSVProject>) value -> {
+		return value -> {
 			Optional<CSVProject> csvProject = Optional.ofNullable(value._2());
 			List<CSVProject> csvProjectList = new ArrayList<>();
 			if (csvProject.isPresent()) {

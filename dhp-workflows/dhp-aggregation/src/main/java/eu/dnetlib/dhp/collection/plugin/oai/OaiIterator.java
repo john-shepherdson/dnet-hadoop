@@ -42,7 +42,7 @@ public class OaiIterator implements Iterator<String> {
 	private String token;
 	private boolean started;
 	private final HttpConnector2 httpConnector;
-	private AggregatorReport report;
+	private final AggregatorReport report;
 
 	public OaiIterator(
 		final String baseUrl,

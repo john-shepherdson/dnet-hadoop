@@ -20,20 +20,20 @@ public class RestIteratorTest {
 
 	private static final Logger log = LoggerFactory.getLogger(RestIteratorTest.class);
 
-	private String baseUrl = "https://share.osf.io/api/v2/search/creativeworks/_search";
-	private String resumptionType = "count";
-	private String resumptionParam = "from";
-	private String resumptionXpath = "";
-	private String resultTotalXpath = "//hits/total";
-	private String entityXpath = "//hits/hits";
-	private String resultFormatParam = "format";
-	private String resultFormatValue = "Json"; // Change from lowerCase to one UpperCase
-	private String resultSizeParam = "size";
-	private String resultSizeValue = "10";
-	private String authMethod = "";
-	private String authToken = "";
-	private String resultOffsetParam = "cursor";
-	private String query = "q=%28sources%3ASocArXiv+AND+type%3Apreprint%29";
+	private final String baseUrl = "https://share.osf.io/api/v2/search/creativeworks/_search";
+	private final String resumptionType = "count";
+	private final String resumptionParam = "from";
+	private final String resumptionXpath = "";
+	private final String resultTotalXpath = "//hits/total";
+	private final String entityXpath = "//hits/hits";
+	private final String resultFormatParam = "format";
+	private final String resultFormatValue = "Json"; // Change from lowerCase to one UpperCase
+	private final String resultSizeParam = "size";
+	private final String resultSizeValue = "10";
+	private final String authMethod = "";
+	private final String authToken = "";
+	private final String resultOffsetParam = "cursor";
+	private final String query = "q=%28sources%3ASocArXiv+AND+type%3Apreprint%29";
 
 	@Disabled
 	@Test

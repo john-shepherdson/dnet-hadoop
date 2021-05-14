@@ -25,22 +25,22 @@ public class RestCollectorPluginTest {
 
 	private static final Logger log = LoggerFactory.getLogger(RestCollectorPluginTest.class);
 
-	private String baseUrl = "https://share.osf.io/api/v2/search/creativeworks/_search";
-	private String resumptionType = "count";
-	private String resumptionParam = "from";
-	private String entityXpath = "//hits/hits";
-	private String resumptionXpath = "//hits";
-	private String resultTotalXpath = "//hits/total";
-	private String resultFormatParam = "format";
-	private String resultFormatValue = "json";
-	private String resultSizeParam = "size";
-	private String resultSizeValue = "10";
+	private final String baseUrl = "https://share.osf.io/api/v2/search/creativeworks/_search";
+	private final String resumptionType = "count";
+	private final String resumptionParam = "from";
+	private final String entityXpath = "//hits/hits";
+	private final String resumptionXpath = "//hits";
+	private final String resultTotalXpath = "//hits/total";
+	private final String resultFormatParam = "format";
+	private final String resultFormatValue = "json";
+	private final String resultSizeParam = "size";
+	private final String resultSizeValue = "10";
 	// private String query = "q=%28sources%3ASocArXiv+AND+type%3Apreprint%29";
-	private String query = "q=%28sources%3AengrXiv+AND+type%3Apreprint%29";
+	private final String query = "q=%28sources%3AengrXiv+AND+type%3Apreprint%29";
 	// private String query = "=(sources:engrXiv AND type:preprint)";
 
-	private String protocolDescriptor = "rest_json2xml";
-	private ApiDescriptor api = new ApiDescriptor();
+	private final String protocolDescriptor = "rest_json2xml";
+	private final ApiDescriptor api = new ApiDescriptor();
 	private RestCollectorPlugin rcp;
 
 	@BeforeEach

@@ -36,7 +36,7 @@ public class TransformSparkJobNode {
 
 	private static final Logger log = LoggerFactory.getLogger(TransformSparkJobNode.class);
 
-	private static int RECORDS_PER_TASK = 200;
+	private static final int RECORDS_PER_TASK = 200;
 
 	public static void main(String[] args) throws Exception {
 
