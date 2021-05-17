@@ -130,17 +130,21 @@ case object ConversionUtil {
     val publication = item._1._2
     val fieldOfStudy = item._2
     if (fieldOfStudy != null && fieldOfStudy.subjects != null && fieldOfStudy.subjects.nonEmpty) {
+
+      val className = "Microsoft Academic Graph classification"
+      val classid = "MAG"
+
       val p: List[StructuredProperty] = fieldOfStudy.subjects.flatMap(s => {
-        val s1 = createSP(s.DisplayName, "MAG","Microsoft Academic Graph classification", "dnet:subject_classification_typologies", "dnet:subject_classification_typologies")
+        val s1 = createSP(s.DisplayName, classid,className, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES)
         val di = DoiBoostMappingUtil.generateDataInfo(s.Score.toString)
         var resList: List[StructuredProperty] = List(s1)
         if (s.MainType.isDefined) {
           val maintp = s.MainType.get
-          val s2 = createSP(s.MainType.get, "MAG","Microsoft Academic Graph classification", "dnet:subject_classification_typologies", "dnet:subject_classification_typologies")
+          val s2 = createSP(s.MainType.get, classid,className, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES)
           s2.setDataInfo(di)
           resList = resList ::: List(s2)
           if (maintp.contains(".")) {
-            val s3 = createSP(maintp.split("\\.").head, "MAG","Microsoft Academic Graph classification", "dnet:subject_classification_typologies", "dnet:subject_classification_typologies")
+            val s3 = createSP(maintp.split("\\.").head, classid,className, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES)
             s3.setDataInfo(di)
             resList = resList ::: List(s3)
           }
