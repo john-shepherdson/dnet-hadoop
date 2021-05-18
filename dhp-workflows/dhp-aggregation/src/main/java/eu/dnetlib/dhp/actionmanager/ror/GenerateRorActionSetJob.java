@@ -12,7 +12,6 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -175,27 +174,13 @@ public class GenerateRorActionSetJob {
 
 		for (final Map.Entry<String, ExternalIdType> e : r.getExternalIds().entrySet()) {
 			final String type = e.getKey();
-			final Object all = e.getValue().getAll();
-			if (all == null) {
-				// skip
-			} else {
+			final List<String> all = e.getValue().getAll();
+			if (all != null) {
 				final Qualifier qualifier = qualifier(
 					type, type, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
-				if (all instanceof String) {
+				for (final String pid : all) {
 					pids
-						.add(structuredProperty(all.toString(), qualifier, ROR_DATA_INFO));
-				} else if (all instanceof Collection) {
-					for (final Object pid : (Collection<?>) all) {
-						pids
-							.add(structuredProperty(pid.toString(), qualifier, ROR_DATA_INFO));
-					}
-				} else if (all instanceof String[]) {
-					for (final String pid : (String[]) all) {
-						pids
-							.add(structuredProperty(pid, qualifier, ROR_DATA_INFO));
-					}
-				} else {
-					log.warn("Invalid type for pid list: " + all.getClass());
+						.add(structuredProperty(pid, qualifier, ROR_DATA_INFO));
 				}
 			}
 		}

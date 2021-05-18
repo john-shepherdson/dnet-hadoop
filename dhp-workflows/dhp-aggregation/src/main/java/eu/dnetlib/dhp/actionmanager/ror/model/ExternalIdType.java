@@ -2,24 +2,32 @@
 package eu.dnetlib.dhp.actionmanager.ror.model;
 
 import java.io.Serializable;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+@JsonDeserialize(using = ExternalIdTypeDeserializer.class)
 public class ExternalIdType implements Serializable {
 
-	@JsonProperty("all")
-	private Object all;
+	private List<String> all;
 
-	@JsonProperty("preferred")
 	private String preferred;
 
 	private final static long serialVersionUID = 2616688352998387611L;
 
-	public Object getAll() {
+	public ExternalIdType() {
+	}
+
+	public ExternalIdType(final List<String> all, final String preferred) {
+		this.all = all;
+		this.preferred = preferred;
+	}
+
+	public List<String> getAll() {
 		return all;
 	}
 
-	public void setAll(final Object all) {
+	public void setAll(final List<String> all) {
 		this.all = all;
 	}
 
