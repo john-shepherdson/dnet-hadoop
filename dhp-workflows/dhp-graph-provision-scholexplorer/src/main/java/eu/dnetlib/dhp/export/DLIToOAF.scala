@@ -84,11 +84,11 @@ object DLIToOAF {
 
 
   val rel_inverse: Map[String, String] = Map(
-    "isRelatedTo" -> "isRelatedTo",
-    "isSupplementedBy" -> "isSupplementTo",
-    "cites" -> "IsCitedBy",
-    "IsCitedBy" -> "cites",
-    "reviews" -> "IsReviewedBy"
+    ModelConstants.IS_RELATED_TO -> ModelConstants.IS_RELATED_TO,
+    ModelConstants.IS_SUPPLEMENTED_BY -> ModelConstants.IS_SUPPLEMENT_TO,
+    ModelConstants.CITES -> ModelConstants.IS_CITED_BY,
+    ModelConstants.IS_CITED_BY -> ModelConstants.CITES,
+    ModelConstants.REVIEWS -> ModelConstants.IS_REVIEWED_BY
   )
 
 
