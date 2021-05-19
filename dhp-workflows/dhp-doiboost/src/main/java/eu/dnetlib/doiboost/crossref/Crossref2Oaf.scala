@@ -17,6 +17,8 @@ import scala.collection.mutable
 import scala.util.matching.Regex
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
 
+import java.util
+
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
 case class mappingAffiliation(name: String) {}
@@ -96,7 +98,8 @@ case object Crossref2Oaf {
     val alternativeIds = for (JString(ids) <- json \ "alternative-id") yield ids
     val tmp = clinicalTrialNumbers ::: alternativeIds ::: List(doi)
 
-    result.setOriginalId(tmp.filter(id => id != null).asJava)
+    val originalIds = new util.ArrayList(tmp.filter(id => id != null).asJava)
+    result.setOriginalId(originalIds)
 
     // Add DataInfo
     result.setDataInfo(generateDataInfo())
@@ -212,7 +215,7 @@ case object Crossref2Oaf {
     }
     result.setId(newId)
 
-    if (result.getId== null)
+    if (result.getId == null)
       null
     else
       result
