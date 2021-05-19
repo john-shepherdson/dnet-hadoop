@@ -98,20 +98,6 @@ case object Crossref2Oaf {
 
     result.setOriginalId(tmp.filter(id => id != null).asJava)
 
-    //Set identifier as 50 | doiboost____::md5(DOI)
-
-    //IMPORTANT
-    //The old method result.setId(generateIdentifier(result, doi))
-    //is replaced using IdentifierFactory, but the old identifier
-    //is preserved among the originalId(s)
-    val oldId = generateIdentifier(result, doi)
-    result.setId(oldId)
-    val newId = IdentifierFactory.createIdentifier(result)
-    if (!oldId.equalsIgnoreCase(newId)) {
-      result.getOriginalId.add(oldId)
-    }
-    result.setId(newId)
-
     // Add DataInfo
     result.setDataInfo(generateDataInfo())
 
@@ -195,9 +181,7 @@ case object Crossref2Oaf {
         OafUtils.createQualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS, ModelConstants.DNET_REVIEW_LEVELS))
     }
 
-
     instance.setAccessright(getRestrictedQualifier())
-    result.setInstance(List(instance).asJava)
     instance.setInstancetype(OafUtils.createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
     result.setResourcetype(OafUtils.createQualifier(cobjCategory.substring(0, 4),ModelConstants.DNET_DATA_CITE_RESOURCE))
 
@@ -210,9 +194,24 @@ case object Crossref2Oaf {
     }
     val s: String = (json \ "URL").extract[String]
     val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
-    if (links.nonEmpty)
+    if (links.nonEmpty) {
       instance.setUrl(links.asJava)
-    result.setId(IdentifierFactory.createDOIBoostIdentifier(result))
+    }
+    result.setInstance(List(instance).asJava)
+
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //is replaced using IdentifierFactory, but the old identifier
+    //is preserved among the originalId(s)
+    val oldId = generateIdentifier(result, doi)
+    result.setId(oldId)
+
+    val newId = IdentifierFactory.createDOIBoostIdentifier(result)
+    if (!oldId.equalsIgnoreCase(newId)) {
+      result.getOriginalId.add(oldId)
+    }
+    result.setId(newId)
+
     if (result.getId== null)
       null
     else
