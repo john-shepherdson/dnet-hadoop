@@ -328,6 +328,51 @@ public class MappersTest {
 	}
 
 	@Test
+	void testOdfBielefeld() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_bielefeld.xml"));
+
+		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Publication);
+
+		final Publication p = (Publication) list.get(0);
+
+		assertValidId(p.getId());
+		assertTrue(p.getOriginalId().size() == 1);
+		assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(p.getAuthor().size() > 0);
+
+		final Optional<Author> author = p
+				.getAuthor()
+				.stream()
+				.findFirst();
+		assertTrue(author.isPresent());
+
+		assertEquals("Potwarka, Luke R.", author.get().getFullname());
+		assertEquals("Potwarka", author.get().getSurname());
+		assertEquals("Luke R.", author.get().getName());
+
+		assertTrue(p.getSubject().size() > 0);
+		assertTrue(p.getInstance().size() > 0);
+
+		assertNotNull(p.getTitle());
+		assertFalse(p.getTitle().isEmpty());
+
+		assertNotNull(p.getInstance());
+		assertTrue(p.getInstance().size() > 0);
+		p
+				.getInstance()
+				.stream()
+				.forEach(i -> {
+					assertNotNull(i.getAccessright());
+					assertEquals("OPEN", i.getAccessright().getClassid());
+				});
+		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+	}
+
+	@Test
 	void testOpentrial() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_opentrial.xml"));
 
