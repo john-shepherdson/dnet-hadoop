@@ -24,9 +24,9 @@
 		"paramRequired": true
 	},
 	{
-		"paramName":"rp",
-		"paramLongName":"relationPath",
-		"paramDescription": "the path to the relations",
+		"paramName":"gp",
+		"paramLongName":"graphPath",
+		"paramDescription": "the path to the graph",
 		"paramRequired": true
 	}
 ]

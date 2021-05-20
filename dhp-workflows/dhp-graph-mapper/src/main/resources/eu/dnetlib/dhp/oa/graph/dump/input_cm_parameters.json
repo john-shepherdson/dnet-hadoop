@@ -23,13 +23,13 @@
 		"paramName": "sd",
 		"paramLongName": "singleDeposition",
 		"paramDescription": "true if the dump should be created for a single community",
-		"paramRequired": true
+		"paramRequired": false
 	},
 	{
 		"paramName": "ci",
 		"paramLongName": "communityId",
 		"paramDescription": "the id of the community for which to create the dump",
-		"paramRequired": true
+		"paramRequired": false
 	}
 ]
 
