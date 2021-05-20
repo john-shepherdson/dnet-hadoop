@@ -159,7 +159,7 @@ object DLIToOAF {
       result.setUrl(e.url)
       result.setRefidentifier(e.pid)
       result.setDataInfo(generateDataInfo())
-      result.setQualifier(createQualifier(e.classId, ModelConstants.DNET_EXTERNAL_REF_TYPES))
+      result.setQualifier(createQualifier(e.classId, ModelConstants.DNET_EXTERNAL_REFERENCE_TYPE))
       result
     })
     publication.setExternalReference(eRefs.asJava)
