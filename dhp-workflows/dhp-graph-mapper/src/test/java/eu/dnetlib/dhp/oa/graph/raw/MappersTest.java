@@ -264,9 +264,9 @@ public class MappersTest {
 		assertTrue(p.getAuthor().size() > 0);
 
 		final Optional<Author> author = p
-				.getAuthor()
-				.stream()
-				.findFirst();
+			.getAuthor()
+			.stream()
+			.findFirst();
 		assertTrue(author.isPresent());
 
 		assertEquals("Potwarka, Luke R.", author.get().getFullname());
@@ -282,12 +282,12 @@ public class MappersTest {
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
 		p
-				.getInstance()
-				.stream()
-				.forEach(i -> {
-					assertNotNull(i.getAccessright());
-					assertEquals("OPEN", i.getAccessright().getClassid());
-				});
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
 		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
 	}
 
