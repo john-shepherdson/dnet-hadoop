@@ -35,8 +35,9 @@ public class EXCELParserTest {
 
 		EXCELParser excelParser = new EXCELParser();
 
-		List<Object> pl = excelParser
-			.parse(httpConnector.getInputSourceAsStream(URL), "eu.dnetlib.dhp.actionmanager.project.utils.ExcelTopic");
+		final String classForName = "eu.dnetlib.dhp.actionmanager.project.utils.ExcelTopic";
+		final String sheetName = "Topics";
+		List<Object> pl = excelParser.parse(httpConnector.getInputSourceAsStream(URL), classForName, sheetName);
 
 		Assertions.assertEquals(3837, pl.size());
 
