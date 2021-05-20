@@ -21,7 +21,7 @@ public class EXCELParserTest {
 
 	private static Path workingDir;
 	private HttpConnector httpConnector = new HttpConnector();
-	private static final String URL = "http://cordis.europa.eu/data/reference/cordisref-H2020topics.xlsx";
+	private static final String URL = "https://cordis.europa.eu/data/reference/cordisref-h2020topics.xlsx";
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -36,9 +36,11 @@ public class EXCELParserTest {
 		EXCELParser excelParser = new EXCELParser();
 
 		List<Object> pl = excelParser
-			.parse(httpConnector.getInputSourceAsStream(URL), "eu.dnetlib.dhp.actionmanager.project.utils.ExcelTopic");
+			.parse(
+				httpConnector.getInputSourceAsStream(URL), "eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic",
+				"Topics");
 
-		Assertions.assertEquals(3837, pl.size());
+		Assertions.assertEquals(3878, pl.size());
 
 	}
 }
