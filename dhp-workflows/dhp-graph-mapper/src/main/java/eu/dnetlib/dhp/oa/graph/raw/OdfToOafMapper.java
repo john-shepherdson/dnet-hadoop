@@ -41,7 +41,9 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
 		return prepareListStructProps(
-			doc, "//*[local-name()='titles']/*[local-name()='title']", MAIN_TITLE_QUALIFIER, info);
+			doc,
+			"//*[local-name()='titles']/*[local-name()='title']|//*[local-name()='resource']/*[local-name()='title']",
+			MAIN_TITLE_QUALIFIER, info);
 	}
 
 	@Override
