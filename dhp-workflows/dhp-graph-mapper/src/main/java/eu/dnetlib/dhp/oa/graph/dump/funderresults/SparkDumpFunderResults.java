@@ -54,8 +54,8 @@ public class SparkDumpFunderResults implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String relationPath = parser.get("relationPath");
-		log.info("relationPath: {}", relationPath);
+		final String graphPath = parser.get("graphPath");
+		log.info("relationPath: {}", graphPath);
 
 		SparkConf conf = new SparkConf();
 
@@ -64,18 +64,18 @@ public class SparkDumpFunderResults implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				writeResultProjectList(spark, inputPath, outputPath, relationPath);
+				writeResultProjectList(spark, inputPath, outputPath, graphPath);
 			});
 	}
 
 	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath,
-		String relationPath) {
+		String graphPath) {
 
-		Dataset<Relation> relation = Utils
-			.readPath(spark, relationPath + "/relation", Relation.class)
-			.filter(
-				"dataInfo.deletedbyinference = false and lower(relClass) = '"
-					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
+		Dataset<eu.dnetlib.dhp.schema.oaf.Project> project = Utils
+			.readPath(spark, graphPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
+//			.filter(
+//				"dataInfo.deletedbyinference = false and lower(relClass) = '"
+//					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
 
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
@@ -83,8 +83,14 @@ public class SparkDumpFunderResults implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/orp", CommunityResult.class))
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
-		List<String> funderList = relation
-			.select("target")
+//		List<String> funderList = relation
+//			.select("target")
+//			.map((MapFunction<Row, String>) value -> value.getString(0).substring(0, 15), Encoders.STRING())
+//			.distinct()
+//			.collectAsList();
+
+		List<String> funderList = project
+			.select("id")
 			.map((MapFunction<Row, String>) value -> value.getString(0).substring(0, 15), Encoders.STRING())
 			.distinct()
 			.collectAsList();
