@@ -65,6 +65,7 @@
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${topicFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/topic</arg>
+            <arg>--sheetName</arg><arg>${sheetName}</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic</arg>
         </java>
         <ok to="read_projects"/>
