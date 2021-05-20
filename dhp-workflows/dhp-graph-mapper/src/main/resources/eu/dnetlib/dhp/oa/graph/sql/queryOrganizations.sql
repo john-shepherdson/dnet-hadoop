@@ -24,7 +24,7 @@ SELECT
 		d.officialname                                            AS collectedfromname,
 		o.country || '@@@dnet:countries'                          AS country,
 		'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
-		 array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype), NULL) AS pid
+		 array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype || '@@@' || i.issuertype), NULL) AS pid
 FROM dsm_organizations o
 	LEFT OUTER JOIN dsm_datasources d ON (d.id = o.collectedfrom)
 	LEFT OUTER JOIN dsm_organizationpids p ON (p.organization = o.id)

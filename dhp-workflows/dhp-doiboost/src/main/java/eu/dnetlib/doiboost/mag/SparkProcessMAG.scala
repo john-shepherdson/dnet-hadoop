@@ -58,16 +58,16 @@ object SparkProcessMAG {
     val paperAuthorAffiliation = spark.read.load(s"$sourcePath/PaperAuthorAffiliations").as[MagPaperAuthorAffiliation]
 
     paperAuthorAffiliation.joinWith(authors, paperAuthorAffiliation("AuthorId").equalTo(authors("AuthorId")))
-      .map { case (a: MagPaperAuthorAffiliation, b: MagAuthor) => (a.AffiliationId, MagPaperAuthorDenormalized(a.PaperId, b, null)) }
+      .map { case (a: MagPaperAuthorAffiliation, b: MagAuthor) => (a.AffiliationId, MagPaperAuthorDenormalized(a.PaperId, b, null, a.AuthorSequenceNumber)) }
       .joinWith(affiliation, affiliation("AffiliationId").equalTo(col("_1")), "left")
       .map(s => {
         val mpa = s._1._2
         val af = s._2
         if (af != null) {
-          MagPaperAuthorDenormalized(mpa.PaperId, mpa.author, af.DisplayName)
+          MagPaperAuthorDenormalized(mpa.PaperId, mpa.author, af.DisplayName, mpa.sequenceNumber)
         } else
           mpa
-      }).groupBy("PaperId").agg(collect_list(struct($"author", $"affiliation")).as("authors"))
+      }).groupBy("PaperId").agg(collect_list(struct($"author", $"affiliation", $"sequenceNumber")).as("authors"))
       .write.mode(SaveMode.Overwrite).save(s"$workingPath/merge_step_1_paper_authors")
 
     logger.info("Phase 4) create First Version of publication Entity with Paper Journal and Authors")
@@ -86,7 +86,7 @@ object SparkProcessMAG {
 
     var magPubs: Dataset[(String, Publication)] =
       spark.read.load(s"$workingPath/merge_step_2").as[Publication]
-      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+        .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
 
 
     val conference = spark.read.load(s"$sourcePath/ConferenceInstances")
@@ -115,10 +115,9 @@ object SparkProcessMAG {
       .save(s"$workingPath/merge_step_3")
 
 
-//    logger.info("Phase 6) Enrich Publication with description")
-//    val pa = spark.read.load(s"${parser.get("sourcePath")}/PaperAbstractsInvertedIndex").as[MagPaperAbstract]
-//    pa.map(ConversionUtil.transformPaperAbstract).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/PaperAbstract")
-
+    //    logger.info("Phase 6) Enrich Publication with description")
+    //    val pa = spark.read.load(s"${parser.get("sourcePath")}/PaperAbstractsInvertedIndex").as[MagPaperAbstract]
+    //    pa.map(ConversionUtil.transformPaperAbstract).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/PaperAbstract")
     val paperAbstract = spark.read.load((s"$workingPath/PaperAbstract")).as[MagPaperAbstract]
 
 
@@ -127,7 +126,7 @@ object SparkProcessMAG {
 
     magPubs.joinWith(paperAbstract, col("_1").equalTo(paperAbstract("PaperId")), "left")
       .map(item => ConversionUtil.updatePubsWithDescription(item)
-    ).write.mode(SaveMode.Overwrite).save(s"$workingPath/merge_step_4")
+      ).write.mode(SaveMode.Overwrite).save(s"$workingPath/merge_step_4")
 
 
     logger.info("Phase 7) Enrich Publication with FieldOfStudy")
@@ -153,7 +152,7 @@ object SparkProcessMAG {
 
     val s:RDD[Publication] = spark.read.load(s"$workingPath/mag_publication").as[Publication]
       .map(p=>Tuple2(p.getId, p)).rdd.reduceByKey((a:Publication, b:Publication) => ConversionUtil.mergePublication(a,b))
-    .map(_._2)
+      .map(_._2)
 
     spark.createDataset(s).as[Publication].write.mode(SaveMode.Overwrite).save(s"$targetPath/magPublication")
 

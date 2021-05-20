@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import eu.dnetlib.dhp.common.PacePerson
 import eu.dnetlib.dhp.schema.action.AtomicAction
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Author, Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import eu.dnetlib.dhp.utils.DHPUtils
@@ -43,18 +44,18 @@ object DLIToOAF {
 
 
   val relationTypeMapping: Map[String, (String, String)] = Map(
-    "IsReferencedBy" -> ("isRelatedTo", "relationship"),
-    "References" -> ("isRelatedTo", "relationship"),
-    "IsRelatedTo" -> ("isRelatedTo", "relationship"),
-    "IsSupplementedBy" -> ("isSupplementedBy", "supplement"),
-    "Documents"-> ("isRelatedTo", "relationship"),
-    "Cites" -> ("cites", "citation"),
-    "Unknown" -> ("isRelatedTo", "relationship"),
-    "IsSourceOf" -> ("isRelatedTo", "relationship"),
-    "IsCitedBy" -> ("IsCitedBy", "citation"),
-    "Reviews" -> ("reviews", "review"),
-    "Describes" -> ("isRelatedTo", "relationship"),
-    "HasAssociationWith" -> ("isRelatedTo", "relationship")
+    "IsReferencedBy" -> (ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+    "References" -> (ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+    "IsRelatedTo" -> (ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+    "IsSupplementedBy" -> (ModelConstants.IS_SUPPLEMENTED_BY, ModelConstants.SUPPLEMENT),
+    "Documents"-> (ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+    "Cites" -> (ModelConstants.CITES, ModelConstants.CITATION),
+    "Unknown" -> (ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+    "IsSourceOf" -> (ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+    "IsCitedBy" -> (ModelConstants.IS_CITED_BY, ModelConstants.CITATION),
+    "Reviews" -> (ModelConstants.REVIEWS, ModelConstants.REVIEW),
+    "Describes" -> (ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP),
+    "HasAssociationWith" -> (ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP)
   )
 
   val expectecdPidType = List("uniprot", "ena", "chembl", "ncbi-n", "ncbi-p", "genbank", "pdb", "url")
@@ -83,11 +84,11 @@ object DLIToOAF {
 
 
   val rel_inverse: Map[String, String] = Map(
-    "isRelatedTo" -> "isRelatedTo",
-    "isSupplementedBy" -> "isSupplementTo",
-    "cites" -> "IsCitedBy",
-    "IsCitedBy" -> "cites",
-    "reviews" -> "IsReviewedBy"
+    ModelConstants.IS_RELATED_TO -> ModelConstants.IS_RELATED_TO,
+    ModelConstants.IS_SUPPLEMENTED_BY -> ModelConstants.IS_SUPPLEMENT_TO,
+    ModelConstants.CITES -> ModelConstants.IS_CITED_BY,
+    ModelConstants.IS_CITED_BY -> ModelConstants.CITES,
+    ModelConstants.REVIEWS -> ModelConstants.IS_REVIEWED_BY
   )
 
 
@@ -158,7 +159,7 @@ object DLIToOAF {
       result.setUrl(e.url)
       result.setRefidentifier(e.pid)
       result.setDataInfo(generateDataInfo())
-      result.setQualifier(createQualifier(e.classId, "dnet:externalReference_typologies"))
+      result.setQualifier(createQualifier(e.classId, ModelConstants.DNET_EXTERNAL_REFERENCE_TYPE))
       result
     })
     publication.setExternalReference(eRefs.asJava)
@@ -237,7 +238,7 @@ object DLIToOAF {
     if (inputPublication.getAuthor == null || inputPublication.getAuthor.isEmpty)
       return null
     result.setAuthor(inputPublication.getAuthor.asScala.map(convertAuthor).asJava)
-    result.setResulttype(createQualifier(inputPublication.getResulttype.getClassid, inputPublication.getResulttype.getClassname, "dnet:result_typologies", "dnet:result_typologies"))
+    result.setResulttype(createQualifier(inputPublication.getResulttype.getClassid, inputPublication.getResulttype.getClassname, ModelConstants.DNET_RESULT_TYPOLOGIES, ModelConstants.DNET_RESULT_TYPOLOGIES))
 
     if (inputPublication.getSubject != null)
       result.setSubject(inputPublication.getSubject.asScala.map(convertSubject).asJava)
@@ -258,7 +259,7 @@ object DLIToOAF {
     result.setDateofacceptance(asField(inputPublication.getRelevantdate.get(0).getValue))
     result.setPublisher(inputPublication.getPublisher)
     result.setSource(inputPublication.getSource)
-    result.setBestaccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    result.setBestaccessright(createQualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES))
 
     val dois = result.getPid.asScala.filter(p => "doi".equalsIgnoreCase(p.getQualifier.getClassname)).map(p => p.getValue)
     if (dois.isEmpty)
@@ -316,7 +317,7 @@ object DLIToOAF {
     if (d.getAuthor == null || d.getAuthor.isEmpty)
       return null
     result.setAuthor(d.getAuthor.asScala.map(convertAuthor).asJava)
-    result.setResulttype(createQualifier(d.getResulttype.getClassid, d.getResulttype.getClassname, "dnet:result_typologies", "dnet:result_typologies"))
+    result.setResulttype(createQualifier(d.getResulttype.getClassid, d.getResulttype.getClassname, ModelConstants.DNET_RESULT_TYPOLOGIES, ModelConstants.DNET_RESULT_TYPOLOGIES))
 
     if (d.getSubject != null)
       result.setSubject(d.getSubject.asScala.map(convertSubject).asJava)
@@ -337,7 +338,7 @@ object DLIToOAF {
     result.setDateofacceptance(asField(d.getRelevantdate.get(0).getValue))
     result.setPublisher(d.getPublisher)
     result.setSource(d.getSource)
-    result.setBestaccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    result.setBestaccessright(createQualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES))
 
 
     val instance_urls = if (fpids.head.length < 5) s"https://www.rcsb.org/structure/${fpids.head}" else s"https://dx.doi.org/${fpids.head}"
@@ -364,13 +365,13 @@ object DLIToOAF {
     val i = new Instance
     i.setUrl(List(url).asJava)
     if (dataset)
-      i.setInstancetype(createQualifier("0021", "Dataset", "dnet:publication_resource", "dnet:publication_resource"))
+      i.setInstancetype(createQualifier("0021", "Dataset", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
     else
-      i.setInstancetype(createQualifier("0000", "Unknown", "dnet:publication_resource", "dnet:publication_resource"))
+      i.setInstancetype(createQualifier("0000", "Unknown", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
     if (originalInstance != null && originalInstance.getHostedby != null)
       i.setHostedby(originalInstance.getHostedby)
 
-    i.setAccessright(createQualifier("UNKNOWN", "not available", "dnet:access_modes", "dnet:access_modes"))
+    i.setAccessright(createQualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES))
     i.setDateofacceptance(doa)
 
     i
@@ -380,19 +381,19 @@ object DLIToOAF {
 
 
   def patchRelevantDate(d: StructuredProperty): StructuredProperty = {
-    d.setQualifier(createQualifier("UNKNOWN", "dnet:dataCite_date"))
+    d.setQualifier(createQualifier("UNKNOWN", ModelConstants.DNET_DATA_CITE_DATE))
     d
 
   }
 
   def patchTitle(t: StructuredProperty): StructuredProperty = {
-    t.setQualifier(createQualifier("main title", "dnet:dataCite_title"))
+    t.setQualifier(createQualifier("main title","dnet:dataCite_title"))
     t
   }
 
 
   def convertSubject(s: StructuredProperty): StructuredProperty = {
-    s.setQualifier(createQualifier("keyword", "dnet:subject_classification_typologies"))
+    s.setQualifier(createQualifier("keyword", ModelConstants.DNET_SUBJECT_TYPOLOGIES))
     s
 
 
