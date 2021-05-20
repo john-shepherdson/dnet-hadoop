@@ -98,7 +98,13 @@ public class SparkResultLinkedToProject implements Serializable {
 					"join project p " +
 					"on rel.target = p.id " +
 						"")
-			.as(Encoders.bean(inputClazz));
+			.as(Encoders.bean(inputClazz))
+				;
+		tmp.groupByKey(
+				(MapFunction< R, String>) value -> value
+					.getId(),
+				Encoders.STRING())
+			.mapGroups((MapGroupsFunction<String, R, R>) (k, it) -> it.next(), Encoders.bean(inputClazz))
 
 //
 //		relations
@@ -113,7 +119,7 @@ public class SparkResultLinkedToProject implements Serializable {
 //			.mapGroups((MapGroupsFunction<String, Tuple2<Relation, R>, R>) (k, it) -> {
 //				return it.next()._2();
 //			}, Encoders.bean(inputClazz))
-		tmp
+		//tmp
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
