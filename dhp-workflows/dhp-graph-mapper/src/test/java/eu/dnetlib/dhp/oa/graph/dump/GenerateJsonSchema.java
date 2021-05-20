@@ -9,7 +9,7 @@ import com.github.victools.jsonschema.generator.*;
 
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 
-//@Disabled
+@Disabled
 public class GenerateJsonSchema {
 
 	@Test
