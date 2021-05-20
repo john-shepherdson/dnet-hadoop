@@ -28,5 +28,10 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "the path where prepared info have been stored",
     "paramRequired": false
-  }
+  },{
+  "paramName": "bl",
+  "paramLongName": "blacklist",
+  "paramDescription": "institutional repositories that should not be considered for the propagation",
+  "paramRequired": false
+}
 ]
