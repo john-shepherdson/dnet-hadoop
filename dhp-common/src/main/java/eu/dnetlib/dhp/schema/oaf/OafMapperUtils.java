@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.base.Joiner;
+
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -183,7 +185,8 @@ public class OafMapperUtils {
 		final String issnOnline,
 		final String issnLinking,
 		final DataInfo dataInfo) {
-		return journal(
+
+		return hasIssn(issnPrinted, issnOnline, issnLinking) ? journal(
 			name,
 			issnPrinted,
 			issnOnline,
@@ -195,7 +198,7 @@ public class OafMapperUtils {
 			null,
 			null,
 			null,
-			dataInfo);
+			dataInfo) : null;
 	}
 
 	public static Journal journal(
@@ -212,10 +215,7 @@ public class OafMapperUtils {
 		final String conferencedate,
 		final DataInfo dataInfo) {
 
-		if (StringUtils.isNotBlank(name)
-			|| StringUtils.isNotBlank(issnPrinted)
-			|| StringUtils.isNotBlank(issnOnline)
-			|| StringUtils.isNotBlank(issnLinking)) {
+		if (StringUtils.isNotBlank(name) || hasIssn(issnPrinted, issnOnline, issnLinking)) {
 			final Journal j = new Journal();
 			j.setName(name);
 			j.setIssnPrinted(issnPrinted);
@@ -233,6 +233,12 @@ public class OafMapperUtils {
 		} else {
 			return null;
 		}
+	}
+
+	private static boolean hasIssn(String issnPrinted, String issnOnline, String issnLinking) {
+		return StringUtils.isNotBlank(issnPrinted)
+			|| StringUtils.isNotBlank(issnOnline)
+			|| StringUtils.isNotBlank(issnLinking);
 	}
 
 	public static DataInfo dataInfo(

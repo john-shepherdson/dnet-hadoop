@@ -24,19 +24,16 @@ import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.oaiIProvenance;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.LicenseComparator;
@@ -330,7 +327,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setDataInfo(info);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
-		r.setOriginalId(Arrays.asList(findOriginalId(doc)));
+		r.setOriginalId(findOriginalId(doc));
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
 		r.setPid(prepareResultPids(doc, info));
 		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection|//dri:dateOfCollection"));
@@ -493,16 +490,23 @@ public abstract class AbstractMdRecordToOafMapper {
 		return null;
 	}
 
-	private String findOriginalId(final Document doc) {
+	private List<String> findOriginalId(final Document doc) {
 		final Node n = doc.selectSingleNode("//*[local-name()='provenance']/*[local-name()='originDescription']");
 		if (n != null) {
 			final String id = n.valueOf("./*[local-name()='identifier']");
 			if (StringUtils.isNotBlank(id)) {
-				return id;
+				return Lists.newArrayList(id);
 			}
 		}
-		return doc.valueOf("//*[local-name()='header']/*[local-name()='identifier']");
+		List<String> idList = doc
+			.selectNodes(
+				"normalize-space(//*[local-name()='header']/*[local-name()='identifier' or local-name()='recordIdentifier']/text())");
+		Set<String> originalIds = Sets.newHashSet(idList);
 
+		if (originalIds.isEmpty()) {
+			throw new IllegalStateException("missing originalID on " + doc.asXML());
+		}
+		return Lists.newArrayList(originalIds);
 	}
 
 	protected Qualifier prepareQualifier(final Node node, final String xpath, final String schemeId) {
