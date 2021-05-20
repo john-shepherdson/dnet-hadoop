@@ -48,8 +48,7 @@ public class MDStoreCollectorPlugin implements CollectorPlugin {
 			.orElseThrow(() -> new CollectorException(String.format("missing parameter '%s'", MDSTORE_ID)));
 		log.info("mdId: {}", mdId);
 
-		final MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoBaseUrl));
-		final MdstoreClient client = new MdstoreClient(mongoClient, dbName);
+		final MdstoreClient client = new MdstoreClient(mongoBaseUrl, dbName);
 		final MongoCollection<Document> mdstore = client.mdStore(mdId);
 		long size = mdstore.count();
 

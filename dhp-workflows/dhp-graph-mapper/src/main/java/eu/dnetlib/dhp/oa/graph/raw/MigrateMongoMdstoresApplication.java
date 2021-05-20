@@ -15,7 +15,6 @@ import com.mongodb.MongoClientURI;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.MdstoreClient;
-import eu.dnetlib.dhp.common.MdstoreTx;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 
 public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication implements Closeable {
@@ -41,35 +40,28 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 
 		final String hdfsPath = parser.get("hdfsPath");
 
-		final MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoBaseUrl));
-
-		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(hdfsPath, mongoClient,
+		try (MigrateMongoMdstoresApplication app = new MigrateMongoMdstoresApplication(hdfsPath, mongoBaseUrl,
 			mongoDb)) {
 			app.execute(mdFormat, mdLayout, mdInterpretation);
 		}
 	}
 
 	public MigrateMongoMdstoresApplication(
-		final String hdfsPath, final MongoClient mongoClient, final String mongoDb) throws Exception {
+		final String hdfsPath, final String mongoBaseUrl, final String mongoDb) throws Exception {
 		super(hdfsPath);
-		this.mdstoreClient = new MdstoreClient(mongoClient, mongoDb);
+		this.mdstoreClient = new MdstoreClient(mongoBaseUrl, mongoDb);
 	}
 
-	public void execute(final String format, final String layout, final String interpretation) throws IOException {
+	public void execute(final String format, final String layout, final String interpretation) {
 		final Map<String, String> colls = mdstoreClient.validCollections(format, layout, interpretation);
-		log.info("Found {} mdstores", colls.size());
+		log.info("Found " + colls.size() + " mdstores");
 
 		for (final Entry<String, String> entry : colls.entrySet()) {
-			log.info("Processing mdstore {}", entry.getKey());
+			log.info("Processing mdstore " + entry.getKey() + " (collection: " + entry.getValue() + ")");
+			final String currentColl = entry.getValue();
 
-			final String mdID = entry.getKey();
-			try (final MdstoreTx tx = mdstoreClient.readLock(mdID)) {
-
-				log.info("locked collection {}", tx.getCurrentId());
-
-				for (final String xml : tx) {
-					emit(xml, String.format("%s-%s-%s", format, layout, interpretation));
-				}
+			for (final String xml : mdstoreClient.listRecords(currentColl)) {
+				emit(xml, String.format("%s-%s-%s", format, layout, interpretation));
 			}
 		}
 	}
