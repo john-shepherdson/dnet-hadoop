@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <oai:header xmlns="http://namespace.openaire.eu/" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <dri:objIdentifier>od______2294::3319684c321620512ddebd65f0e44dcf</dri:objIdentifier>
+        <dri:recordIdentifier>oai:pub.uni-bielefeld.de:2949739</dri:recordIdentifier>
+        <dri:dateOfCollection>2021-05-12T23:41:23.636Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>od______2294</oaf:datasourceprefix>
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">oai:pub.uni-bielefeld.de:2949739</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2021-02-01T11:07:07Z</datestamp>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">journal_article</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">doc-type:article</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">ddc:796</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">journal_articleFtxt</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">open_access</setSpec>
+        <dr:dateOfTransformation>2021-05-12T23:51:25.559Z</dr:dateOfTransformation>
+    </oai:header>
+    <metadata>
+        <datacite:resource>
+            <datacite:identifier identifierType="DOI">10.3390/su13010069</datacite:identifier>
+            <datacite:alternateIdentifiers>
+                <datacite:alternateIdentifier alternateIdentifierType="URN">urn:nbn:de:0070-pub-29497390</datacite:alternateIdentifier>
+                <datacite:alternateIdentifier alternateIdentifierType="URL">https://pub.uni-bielefeld.de/record/2949739</datacite:alternateIdentifier>
+            </datacite:alternateIdentifiers>
+            <datacite:relatedIdentifiers>
+                <datacite:relatedIdentifier relatedIdentifierType="URL" relationType="HasMetadata">https://pub.uni-bielefeld.de/record/2949739.json</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="EISSN" relationType="isPartOf">2071-1050</datacite:relatedIdentifier>
+            </datacite:relatedIdentifiers>
+            <datacite:description descriptionType="Abstract">Policy makers often legitimize bids for major sport events and public funding of elite sports by trickle-down effects, suggesting that hosting events, sporting success, and athlete role models inspire the population to participate themselves in sport and physical activity. According to previous review articles, empirical evidence of trickle-down effects are mixed, with several studies citing marginal or no effect. The purpose of this study is to apply a realist synthesis approach to evaluate under which conditions trickle-down effects occur (i.e., what works for whom under which circumstances?). Using rapid evidence assessment methodology, 58 empirical articles were identified in the search process and critically analyzed through the lens of realist synthesis evaluation. The analysis identified six conditions under which trickle-down effects have occurred: Event leveraging initiatives, capacity of community sport to cater for new participants, live spectating experiences, consumption possibilities on television or other media, and communities housing event venues. The findings have implications for the sustainability of sport policy decisions and public finance, as the likelihood of trickle-down effects increases with integrated planning and sustainable spending related to the above six conditions.
+            </datacite:description>
+            <datacite:language>eng</datacite:language>
+            <datacite:publisher>MDPI </datacite:publisher>
+            <datacite:format>application/pdf</datacite:format>
+            <datacite:title xml:lang="eng">Conditions under Which Trickle-Down Effects Occur: A Realist Synthesis Approach</datacite:title>
+            <datacite:creators>
+                <datacite:creator>
+                    <datacite:creatorName nameType="Personal">Potwarka, Luke R.</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName nameType="Personal">Wicker, Pamela</datacite:creatorName>
+                </datacite:creator>
+            </datacite:creators>
+            <datacite:date dateType="Issued">2021</datacite:date>
+            <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+            <datacite:subjects>
+                <datacite:subject schemeURI="http://dewey.info/" subjectScheme="dewey">796</datacite:subject>
+                <datacite:subject>demonstration effect</datacite:subject>
+                <datacite:subject>sport participation legacy</datacite:subject>
+                <datacite:subject>sport event</datacite:subject>
+                <datacite:subject>evaluation</datacite:subject>
+            </datacite:subjects>
+            <datacite:sizes>
+                <datacite:size>11 B</datacite:size>
+            </datacite:sizes>
+        </datacite:resource>
+        <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+        <oaf:dateAccepted>2021-01-01</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:license>https://creativecommons.org/licenses/by/4.0/</oaf:license>
+        <oaf:language>eng</oaf:language>
+        <oaf:hostedBy id="opendoar____::2294" name="Publications at Bielefeld University"/>
+        <oaf:collectedFrom id="opendoar____::2294" name="Publications at Bielefeld University"/>
+        <oaf:fulltext>https://pub.uni-bielefeld.de/download/2949739/2949794</oaf:fulltext>
+    </metadata>
+    <about xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2021-05-12T23:41:23.636Z">
+                <baseURL>http%3A%2F%2Fpub.uni-bielefeld.de%2Foai</baseURL>
+                <identifier>oai:pub.uni-bielefeld.de:2949739</identifier>
+                <datestamp>2021-02-01T11:07:07Z</datestamp>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+                                  classname="sysimport:crosswalk:datasetarchive"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>
