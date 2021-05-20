@@ -1,6 +1,16 @@
 <workflow-app name="gen_orcid_no_doi_dataset" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
+            <name>workingPath</name>
+            <value>/data/orcid_activities_2020</value>
+            <description>path where the collection workflow stores the ORCID data</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>path where to store the action set</description>
+        </property>
+
+        <property>
             <name>spark2GenNoDoiDatasetMaxExecutors</name>
             <value>40</value>
         </property>
@@ -34,10 +44,6 @@
         <property>
             <name>spark2EventLogDir</name>
             <description>spark 2.* event log dir location</description>
-        </property>
-        <property>
-            <name>workingPath</name>
-            <description>the working dir base path</description>
         </property>
     </parameters>
 
@@ -83,11 +89,20 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
             </spark-opts>
-            <arg>-w</arg><arg>${workingPath}/</arg>
-            <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-i</arg><arg>last_orcid_dataset</arg>
-            <arg>-oew</arg><arg>no_doi_dataset</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/</arg>
+            <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
+            <arg>--orcidDataFolder</arg><arg>last_orcid_dataset</arg>
+            <arg>--outputEnrichedWorksPath</arg><arg>no_doi_dataset</arg>
         </spark>
+        <ok to="importOrcidNoDoi"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="importOrcidNoDoi">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${workingPath}/no_doi_dataset/*</arg>
+            <arg>${outputPath}</arg>
+        </distcp>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

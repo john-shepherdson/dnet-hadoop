@@ -174,7 +174,9 @@ public class PublicationToOaf implements Serializable {
 					publication
 						.getExternalReference()
 						.add(
-							convertExtRef(extId, classid, classname, "dnet:pid_types", "dnet:pid_types"));
+							convertExtRef(
+								extId, classid, classname, ModelConstants.DNET_PID_TYPES,
+								ModelConstants.DNET_PID_TYPES));
 				}
 			});
 

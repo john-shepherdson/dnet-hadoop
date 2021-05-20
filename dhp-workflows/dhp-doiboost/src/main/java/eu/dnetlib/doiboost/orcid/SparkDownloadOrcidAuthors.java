@@ -62,7 +62,7 @@ public class SparkDownloadOrcidAuthors {
 			isSparkSessionManaged,
 			spark -> {
 				String lastUpdate = HDFSUtil.readFromTextFile(hdfsServerUri, workingPath, "last_update.txt");
-				logger.info("lastUpdate: ", lastUpdate);
+				logger.info("lastUpdate: {}", lastUpdate);
 				if (StringUtils.isBlank(lastUpdate)) {
 					throw new RuntimeException("last update info not found");
 				}
