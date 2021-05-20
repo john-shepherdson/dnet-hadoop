@@ -70,7 +70,7 @@ public class QueryInformationSystemTest {
 		lenient().when(isLookUpService.quickSearchProfile(XQUERY)).thenReturn(communityMap);
 		queryInformationSystem = new QueryInformationSystem();
 		queryInformationSystem.setIsLookUp(isLookUpService);
-		map = queryInformationSystem.getCommunityMap();
+		map = queryInformationSystem.getCommunityMap(false, null);
 	}
 
 	@Test
