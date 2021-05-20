@@ -18,6 +18,10 @@
             <name>outputPath</name>
             <description>path where to store the action set</description>
         </property>
+        <property>
+            <name>sheetName</name>
+            <description>the name of the sheet to read</description>
+        </property>
     </parameters>
 
     <start to="deleteoutputpath"/>
