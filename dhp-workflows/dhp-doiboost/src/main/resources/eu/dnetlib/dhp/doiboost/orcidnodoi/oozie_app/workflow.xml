@@ -7,10 +7,12 @@
         </property>
         <property>
             <name>outputPath</name>
+            <value>/data/orcid_activities_2020/no_doi_dataset_prod/</value>
             <description>path where to store the action set</description>
         </property>
         <property>
             <name>processOutputFolder</name>
+            <value>process_no_doi_dataset_prod</value>
             <description>temporary path where to store the action set</description>
         </property>
         <property>
