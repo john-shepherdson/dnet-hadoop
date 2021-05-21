@@ -41,11 +41,17 @@
 
 
     <fork name="fork_get_info">
-        <path start="get_project_file"/>
+        <path start="fork_get_projects"/>
         <path start="get_programme_file"/>
         <path start="get_topic_file"/>
+
+    </fork>
+
+    <fork name="fork_get_projects">
+        <path start="get_project_file"/>
         <path start="read_projects"/>
     </fork>
+
     <action name="get_project_file">
         <java>
             <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
@@ -54,7 +60,7 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProject</arg>
         </java>
-        <ok to="wait"/>
+        <ok to="wait_projects"/>
         <error to="Kill"/>
     </action>
 
@@ -66,7 +72,7 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/programme</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme</arg>
         </java>
-        <ok to="wait"/>
+        <ok to="prepare_programme"/>
         <error to="Kill"/>
     </action>
 
@@ -92,11 +98,9 @@
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </java>
-        <ok to="wait"/>
+        <ok to="wait_projects"/>
         <error to="Kill"/>
     </action>
-
-    <join name="wait" to="prepare_programme"/>
 
     <action name="prepare_programme">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -118,9 +122,14 @@
             <arg>--programmePath</arg><arg>${workingDir}/programme</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedProgramme</arg>
         </spark>
-        <ok to="prepare_project"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
+    <join name="wait" to="create_updates"/>
+
+    <join name="wait_projects" to="prepare_project"/>
+
 
     <action name="prepare_project">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -143,7 +152,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/preparedProjects</arg>
             <arg>--dbProjectPath</arg><arg>${workingDir}/dbProjects</arg>
         </spark>
-        <ok to="create_updates"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
