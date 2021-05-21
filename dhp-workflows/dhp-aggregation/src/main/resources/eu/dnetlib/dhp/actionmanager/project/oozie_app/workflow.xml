@@ -1,4 +1,4 @@
-<workflow-app name="H2020Programme" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="H2020Classification" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>projectFileURL</name>
@@ -35,10 +35,17 @@
             <delete path='${workingDir}'/>
             <mkdir path='${workingDir}'/>
         </fs>
-        <ok to="get_project_file"/>
+        <ok to="fork_get_info"/>
         <error to="Kill"/>
     </action>
 
+
+    <fork name="fork_get_info">
+        <path start="get_project_file"/>
+        <path start="get_programme_file"/>
+        <path start="get_topic_file"/>
+        <path start="read_projects"/>
+    </fork>
     <action name="get_project_file">
         <java>
             <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
@@ -47,7 +54,7 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProject</arg>
         </java>
-        <ok to="get_programme_file"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
@@ -59,7 +66,7 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/programme</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme</arg>
         </java>
-        <ok to="get_topic_file"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
@@ -72,7 +79,7 @@
             <arg>--sheetName</arg><arg>${sheetName}</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic</arg>
         </java>
-        <ok to="read_projects"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
@@ -85,9 +92,11 @@
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </java>
-        <ok to="prepare_programme"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
+    <join name="wait" to="prepare_programme"/>
 
     <action name="prepare_programme">
         <spark xmlns="uri:oozie:spark-action:0.2">
