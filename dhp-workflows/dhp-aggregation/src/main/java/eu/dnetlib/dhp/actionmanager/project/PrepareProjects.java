@@ -32,7 +32,7 @@ public class PrepareProjects {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareProgramme.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private static final HashMap<String, CSVProgramme> programmeMap = new HashMap<>();
+	//private static final HashMap<String, CSVProgramme> programmeMap = new HashMap<>();
 
 	public static void main(String[] args) throws Exception {
 
