@@ -87,7 +87,7 @@ case object Crossref2Oaf {
 
     //MAPPING Crossref DOI into PID
     val doi: String = (json \ "DOI").extract[String]
-    result.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+    result.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
 
     //MAPPING Crossref DOI into OriginalId
     //and Other Original Identifier of dataset like clinical-trial-number

@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -61,7 +62,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			author.setPid(new ArrayList<>());
 
 			if (StringUtils.isNotBlank(pid)) {
-				if (type.startsWith("ORCID")) {
+				if (type.toLowerCase().startsWith(ORCID)) {
 					final String cleanedId = pid
 						.replaceAll("http://orcid.org/", "")
 						.replaceAll("https://orcid.org/", "");

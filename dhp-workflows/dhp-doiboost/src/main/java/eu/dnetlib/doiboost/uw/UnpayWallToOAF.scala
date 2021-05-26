@@ -1,5 +1,6 @@
 package eu.dnetlib.doiboost.uw
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Instance, Publication}
 import org.json4s
 import org.json4s.DefaultFormats
@@ -32,7 +33,7 @@ object UnpayWallToOAF {
     val is_oa = (json\ "is_oa").extract[Boolean]
 
     val oaLocation:OALocation = (json \ "best_oa_location").extractOrElse[OALocation](null)
-    pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+    pub.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setId(generateIdentifier(pub, doi.toLowerCase))
 
     pub.setCollectedfrom(List(createUnpayWallCollectedFrom()).asJava)

@@ -30,7 +30,6 @@ public class PublicationToOaf implements Serializable {
 
 	static Logger logger = LoggerFactory.getLogger(PublicationToOaf.class);
 
-	public static final String ORCID = "ORCID";
 	public final static String orcidPREFIX = "orcid_______";
 	public static final String OPENAIRE_PREFIX = "openaire____";
 	public static final String SEPARATOR = "::";
@@ -69,7 +68,9 @@ public class PublicationToOaf implements Serializable {
 	private static Map<String, Pair<String, String>> datasources = new HashMap<String, Pair<String, String>>() {
 
 		{
-			put(ORCID.toLowerCase(), new Pair<>(ORCID, OPENAIRE_PREFIX + SEPARATOR + "orcid"));
+			put(
+				ModelConstants.ORCID,
+				new Pair<>(ModelConstants.ORCID_DS, OPENAIRE_PREFIX + SEPARATOR + ModelConstants.ORCID));
 
 		}
 	};
@@ -101,8 +102,6 @@ public class PublicationToOaf implements Serializable {
 			throw new RuntimeException("loading typologies", e);
 		}
 	}
-
-	public static final String PID_TYPES = "dnet:pid_types";
 
 	public Oaf generatePublicationActionsFromJson(final String json) {
 		try {
@@ -138,8 +137,8 @@ public class PublicationToOaf implements Serializable {
 				mapQualifier(
 					"sysimport:actionset:orcidworks-no-doi",
 					"sysimport:actionset:orcidworks-no-doi",
-					"dnet:provenanceActions",
-					"dnet:provenanceActions"));
+					ModelConstants.DNET_PROVENANCE_ACTIONS,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		publication.setDataInfo(dataInfo);
 
 		publication.setLastupdatetimestamp(new Date().getTime());
@@ -159,7 +158,9 @@ public class PublicationToOaf implements Serializable {
 					publication
 						.getExternalReference()
 						.add(
-							convertExtRef(extId, classid, classname, "dnet:pid_types", "dnet:pid_types"));
+							convertExtRef(
+								extId, classid, classname, ModelConstants.DNET_PID_TYPES,
+								ModelConstants.DNET_PID_TYPES));
 				}
 			});
 
@@ -505,24 +506,21 @@ public class PublicationToOaf implements Serializable {
 
 	private KeyValue createCollectedFrom() {
 		KeyValue cf = new KeyValue();
-		cf.setValue(ORCID);
+		cf.setValue(ModelConstants.ORCID_DS);
 		cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + "806360c771262b4d6770e7cdf04b5c5a");
 		return cf;
 	}
 
 	private KeyValue createHostedBy() {
-		KeyValue hb = new KeyValue();
-		hb.setValue("Unknown Repository");
-		hb.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + "55045bd2a65019fd8e6741a755395c8c");
-		return hb;
+		return ModelConstants.UNKNOWN_REPOSITORY;
 	}
 
 	private StructuredProperty mapAuthorId(String orcidId) {
 		final StructuredProperty sp = new StructuredProperty();
 		sp.setValue(orcidId);
 		final Qualifier q = new Qualifier();
-		q.setClassid(ORCID.toLowerCase());
-		q.setClassname(ORCID.toLowerCase());
+		q.setClassid(ModelConstants.ORCID);
+		q.setClassname(ModelConstants.ORCID_CLASSNAME);
 		q.setSchemeid(ModelConstants.DNET_PID_TYPES);
 		q.setSchemename(ModelConstants.DNET_PID_TYPES);
 		sp.setQualifier(q);
@@ -535,8 +533,8 @@ public class PublicationToOaf implements Serializable {
 				mapQualifier(
 					"sysimport:crosswalk:entityregistry",
 					"Harvested",
-					"dnet:provenanceActions",
-					"dnet:provenanceActions"));
+					ModelConstants.DNET_PROVENANCE_ACTIONS,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		sp.setDataInfo(dataInfo);
 		return sp;
 	}

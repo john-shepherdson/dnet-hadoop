@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
@@ -98,7 +99,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				.replaceAll(" ", "")
 				.replaceAll("_", "");
 
-			if (type.startsWith("ORCID")) {
+			if (type.toLowerCase().startsWith(ModelConstants.ORCID)) {
 				final String cleanedId = id.replaceAll("http://orcid.org/", "").replaceAll("https://orcid.org/", "");
 				res.add(structuredProperty(cleanedId, ORCID_PID_TYPE, info));
 			} else if (type.startsWith("MAGID")) {
