@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns="http://www.openarchives.org/OAI/2.0/"> 
+  <header> 
+    <identifier>cb22585e-98fe-4661-973c-0e2c66647b2e</identifier>  
+    <datestamp>2021-03-15T15:55:39Z</datestamp>  
+    <setSpec>eudat-b2find</setSpec> 
+  </header>  
+  <metadata> 
+    <oai_datacite xmlns="http://schema.datacite.org/oai/oai-1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schema.datacite.org/oai/oai-1.0/ http://schema.datacite.org/oai/oai-1.0/oai.xsd">  
+      <isReferenceQuality>false</isReferenceQuality>  
+      <schemaVersion>4.3</schemaVersion>  
+      <datacentreSymbol>EUDAT B2FIND</datacentreSymbol>  
+      <payload> 
+        <resource xmlns="http://datacite.org/schema/kernel-4" xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.3/metadata.xsd">  
+          <creators> 
+            <creator> 
+              <creatorName>Viken fylkeskommune</creatorName> 
+            </creator> 
+          </creators>  
+          <titles> 
+            <title>Asgjerrud søndre</title> 
+          </titles>  
+          <descriptions> 
+            <description descriptionType="Abstract">Kleberforekomst. Lite markert. I stien og i en forsenkning i terrenget på S-sida er det en hel del kleberavfall. Ved besøket fantes ikke fast fjell med kleber i, men når en roter i jorda, finner en ubearbeidede klebersteinsstykker. Noen av dem har hakkespor. Det er mulig at hele forsenkningen i terrenget skyldes at man har hogd fram kleber. Det ser ikke ut som det kan ha vært særlig stor drift. Herfra skal det ha vært tatt kleber til Eidsberg middelalderkirke. Fortalt av Helge Enger. Ingen vet hvor lenge man har tatt kleber her. Forsenkningen er orientert NV-SØ ca 12m, br 7m, dybde 2,5m.</description> 
+          </descriptions>  
+          <geoLocations> 
+            <geoLocation> 
+              <geoLocationPlace>(11.702 LON, 59.494 LAT)</geoLocationPlace> 
+            </geoLocation> 
+          </geoLocations>  
+          <subjects> 
+            <subject>Arkeologisk minne</subject>  
+            <subject>Steinbrudd</subject>  
+            <subject>Archaeology</subject> 
+          </subjects>  
+          <alternateIdentifiers> 
+            <alternateIdentifier alternateIdentifierType="URL">http://kulturminnesok.no/ra/lokalitet/19916</alternateIdentifier> 
+          </alternateIdentifiers>  
+          <version>20180301</version>  
+          <publicationYear>2004</publicationYear>  
+          <publisher>Askeladden</publisher>  
+          <language>Norwegian</language>  
+          <rightsList> 
+            <rights>NLOD (https://data.norge.no/nlod/en/2.0/)</rights> 
+          </rightsList> 
+        </resource> 
+      </payload> 
+    </oai_datacite> 
+</metadata> 
+</record>

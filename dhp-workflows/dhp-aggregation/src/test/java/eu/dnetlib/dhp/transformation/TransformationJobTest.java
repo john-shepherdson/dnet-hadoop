@@ -118,6 +118,36 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 	}
 
 	@Test
+	@DisplayName("Test Transform record XML with xslt_cleaning_datarepo_datacite (B2FIND)")
+	public void testTransformMostlyB2FindScript() throws Exception {
+
+		String xslTransformationScript = "";
+		String xmlRecord = "";
+		String DATASOURCEID = "re3data_____::r3d100012377";
+		String DATASOURCENAME = "B2Find";
+
+		// B2FIND
+		xmlRecord = "/eu/dnetlib/dhp/transform/b2find_record.xml";
+		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_datarepo_datacite.xsl";
+
+//		xmlRecord = "/eu/dnetlib/dhp/transform/input_itgv4.xml";
+//		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl";
+
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance(DATASOURCEID, DATASOURCENAME, "PREFIX"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream(xmlRecord)));
+		// We Load the XSLT transformation Rule from the classpath
+		XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
+
+		MetadataRecord result = tr.call(mr);
+
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
+	}
+
+	@Test
 	@DisplayName("Test Transform record XML with xslt_cleaning_REST_OmicsDI")
 	public void testTransformRestScript() throws Exception {
 
