@@ -26,7 +26,6 @@ public class EXCELParser {
 		throws ClassNotFoundException, IOException, IllegalAccessException, InstantiationException,
 		InvalidFormatException {
 
-		// OPCPackage pkg = OPCPackage.open(httpConnector.getInputSourceAsStream(URL));
 		OPCPackage pkg = OPCPackage.open(file);
 		XSSFWorkbook wb = new XSSFWorkbook(pkg);
 
@@ -58,7 +57,6 @@ public class EXCELParser {
 
 				for (int i = 0; i < headers.size(); i++) {
 					Cell cell = row.getCell(i);
-					String value = dataFormatter.formatCellValue(cell);
 					FieldUtils.writeField(cc, headers.get(i), dataFormatter.formatCellValue(cell), true);
 
 				}
