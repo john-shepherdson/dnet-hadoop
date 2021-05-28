@@ -53,6 +53,3 @@ drop table if exists ${stats_db_name}.result;
 drop view if exists ${stats_db_name}.result;
 create table ${stats_db_name}.result stored as parquet as select * from ${stats_db_name}.result_tmp;
 drop table ${stats_db_name}.result_tmp;
---
--- ANALYZE TABLE ${stats_db_name}.result COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.result COMPUTE STATISTICS FOR COLUMNS;
