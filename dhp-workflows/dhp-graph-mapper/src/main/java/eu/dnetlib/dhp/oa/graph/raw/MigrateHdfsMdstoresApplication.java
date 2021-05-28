@@ -6,10 +6,14 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -29,24 +33,18 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
+import scala.Tuple2;
 
 public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(MigrateHdfsMdstoresApplication.class);
 
-	private final String mdstoreManagerUrl;
-
-	private final String format;
-
-	private final String layout;
-
-	private final String interpretation;
-
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(MigrateHdfsMdstoresApplication.class
-					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_hdfs_mstores_parameters.json")));
+				.toString(
+					MigrateHdfsMdstoresApplication.class
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_hdfs_mstores_parameters.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -62,39 +60,51 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 
 		final String hdfsPath = parser.get("hdfsPath");
 
+		final Set<String> paths = mdstorePaths(mdstoreManagerUrl, mdFormat, mdLayout, mdInterpretation);
+
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
-			try (final MigrateHdfsMdstoresApplication app =
-				new MigrateHdfsMdstoresApplication(hdfsPath, mdstoreManagerUrl, mdFormat, mdLayout, mdInterpretation)) {
-				app.execute(spark);
-			}
+			HdfsSupport.remove(hdfsPath, spark.sparkContext().hadoopConfiguration());
+			processPaths(spark, hdfsPath, paths, String.format("%s-%s-%s", mdFormat, mdLayout, mdInterpretation));
 		});
 	}
 
-	public MigrateHdfsMdstoresApplication(final String hdfsPath, final String mdstoreManagerUrl, final String format, final String layout,
-		final String interpretation) throws Exception {
-		super(hdfsPath);
-		this.mdstoreManagerUrl = mdstoreManagerUrl;
-		this.format = format;
-		this.layout = layout;
-		this.interpretation = interpretation;
-	}
-
-	public void execute(final SparkSession spark) throws Exception {
+	public static void processPaths(final SparkSession spark,
+		final String outputPath,
+		final Set<String> paths,
+		final String type) throws Exception {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		final Set<String> paths = mdstorePaths(sc);
 		log.info("Found " + paths.size() + " not empty mdstores");
+		paths.forEach(log::info);
 
-		spark.read()
-			.parquet(paths.toArray(new String[paths.size()]))
+		final String[] validPaths = paths
+			.stream()
+			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
+			.toArray(size -> new String[size]);
+
+		spark
+			.read()
+			.parquet(validPaths)
 			.map((MapFunction<Row, String>) r -> r.getAs("body"), Encoders.STRING())
-			.foreach(xml -> emit(xml, String.format("%s-%s-%s", format, layout, interpretation)));
+			.toJavaRDD()
+			.mapToPair(xml -> new Tuple2<>(new Text(UUID.randomUUID() + ":" + type), new Text(xml)))
+			.coalesce(1)
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+
+		/*
+		 * .foreach(xml -> { try { writer.append(new Text(UUID.randomUUID() + ":" + type), new Text(xml)); } catch
+		 * (final Exception e) { throw new RuntimeException(e); } });
+		 */
 	}
 
-	private Set<String> mdstorePaths(final JavaSparkContext sc) throws Exception {
-		final String url = mdstoreManagerUrl + "/mdstores";
+	private static Set<String> mdstorePaths(final String mdstoreManagerUrl,
+		final String format,
+		final String layout,
+		final String interpretation)
+		throws Exception {
+		final String url = mdstoreManagerUrl + "/mdstores/";
 		final ObjectMapper objectMapper = new ObjectMapper();
 
 		final HttpGet req = new HttpGet(url);
@@ -103,7 +113,8 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 			try (final CloseableHttpResponse response = client.execute(req)) {
 				final String json = IOUtils.toString(response.getEntity().getContent());
 				final MDStoreWithInfo[] mdstores = objectMapper.readValue(json, MDStoreWithInfo[].class);
-				return Arrays.stream(mdstores)
+				return Arrays
+					.stream(mdstores)
 					.filter(md -> md.getFormat().equalsIgnoreCase(format))
 					.filter(md -> md.getLayout().equalsIgnoreCase(layout))
 					.filter(md -> md.getInterpretation().equalsIgnoreCase(interpretation))
@@ -111,10 +122,8 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 					.filter(md -> StringUtils.isNotBlank(md.getCurrentVersion()))
 					.filter(md -> md.getSize() > 0)
 					.map(md -> md.getHdfsPath() + "/" + md.getCurrentVersion() + "/store")
-					.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
 					.collect(Collectors.toSet());
 			}
 		}
 	}
-
 }
