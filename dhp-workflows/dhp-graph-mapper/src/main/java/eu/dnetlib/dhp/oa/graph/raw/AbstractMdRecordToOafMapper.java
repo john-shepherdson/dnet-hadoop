@@ -1,24 +1,65 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.keyValue;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.oaiIProvenance;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.AccessRight;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Context;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.GeoLocation;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.Journal;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -43,6 +84,8 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected static final Map<String, String> nsContext = new HashMap<>();
 
+	private static final Logger log = LoggerFactory.getLogger(DispatchEntitiesApplication.class);
+
 	static {
 		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
 		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
@@ -61,6 +104,9 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	public List<Oaf> processMdRecord(final String xml) {
+
+		// log.info("Processing record: " + xml);
+
 		try {
 			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
@@ -100,10 +146,10 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	protected String getResultType(final Document doc, final List<Instance> instances) {
-		String type = doc.valueOf("//dr:CobjCategory/@type");
+		final String type = doc.valueOf("//dr:CobjCategory/@type");
 
 		if (StringUtils.isBlank(type) & vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
-			String instanceType = instances
+			final String instanceType = instances
 				.stream()
 				.map(i -> i.getInstancetype().getClassid())
 				.findFirst()
@@ -158,8 +204,12 @@ public abstract class AbstractMdRecordToOafMapper {
 		return oafs;
 	}
 
-	private OafEntity createEntity(Document doc, String type, List<Instance> instances, KeyValue collectedFrom,
-		DataInfo info, long lastUpdateTimestamp) {
+	private OafEntity createEntity(final Document doc,
+		final String type,
+		final List<Instance> instances,
+		final KeyValue collectedFrom,
+		final DataInfo info,
+		final long lastUpdateTimestamp) {
 		switch (type.toLowerCase()) {
 			case "publication":
 				final Publication p = new Publication();
@@ -219,9 +269,7 @@ public abstract class AbstractMdRecordToOafMapper {
 						getRelation(
 							docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, entity, validationdDate));
 				res
-					.add(
-						getRelation(
-							projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, entity, validationdDate));
+					.add(getRelation(projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, entity, validationdDate));
 			}
 		}
 
@@ -411,10 +459,10 @@ public abstract class AbstractMdRecordToOafMapper {
 				return Lists.newArrayList(id);
 			}
 		}
-		List<String> idList = doc
+		final List<String> idList = doc
 			.selectNodes(
 				"normalize-space(//*[local-name()='header']/*[local-name()='identifier' or local-name()='recordIdentifier']/text())");
-		Set<String> originalIds = Sets.newHashSet(idList);
+		final Set<String> originalIds = Sets.newHashSet(idList);
 
 		if (originalIds.isEmpty()) {
 			throw new IllegalStateException("missing originalID on " + doc.asXML());
@@ -423,8 +471,8 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	protected AccessRight prepareAccessRight(final Node node, final String xpath, final String schemeId) {
-		Qualifier qualifier = prepareQualifier(node.valueOf(xpath).trim(), schemeId);
-		AccessRight accessRight = new AccessRight();
+		final Qualifier qualifier = prepareQualifier(node.valueOf(xpath).trim(), schemeId);
+		final AccessRight accessRight = new AccessRight();
 		accessRight.setClassid(qualifier.getClassid());
 		accessRight.setClassname(qualifier.getClassname());
 		accessRight.setSchemeid(qualifier.getSchemeid());

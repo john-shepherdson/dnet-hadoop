@@ -3,7 +3,10 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -24,6 +27,11 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +46,8 @@ import scala.Tuple2;
 public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(MigrateHdfsMdstoresApplication.class);
+	private static final Namespace DRI_NS_PREFIX = new Namespace("dri",
+		"http://www.driver-repository.eu/namespace/dri");
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -87,7 +97,7 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 		spark
 			.read()
 			.parquet(validPaths)
-			.map((MapFunction<Row, String>) r -> r.getAs("body"), Encoders.STRING())
+			.map((MapFunction<Row, String>) r -> enrichRecord(r), Encoders.STRING())
 			.toJavaRDD()
 			.mapToPair(xml -> new Tuple2<>(new Text(UUID.randomUUID() + ":" + type), new Text(xml)))
 			.coalesce(1)
@@ -97,6 +107,26 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 		 * .foreach(xml -> { try { writer.append(new Text(UUID.randomUUID() + ":" + type), new Text(xml)); } catch
 		 * (final Exception e) { throw new RuntimeException(e); } });
 		 */
+	}
+
+	private static String enrichRecord(final Row r) {
+		final String xml = r.getAs("body");
+
+		final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		final String collDate = dateFormat.format(new Date((Long) r.getAs("dateOfCollection")));
+		final String tranDate = dateFormat.format(new Date((Long) r.getAs("dateOfTransformation")));
+
+		try {
+			final Document doc = new SAXReader().read(new StringReader(xml));
+			final Element head = (Element) doc.selectSingleNode("//*[local-name() = 'header']");
+			head.addElement(new QName("objIdentifier", DRI_NS_PREFIX)).addText(r.getAs("id"));
+			head.addElement(new QName("dateOfCollection", DRI_NS_PREFIX)).addText(collDate);
+			head.addElement(new QName("dateOfTransformation", DRI_NS_PREFIX)).addText(tranDate);
+			return doc.asXML();
+		} catch (final Exception e) {
+			log.error("Error patching record: " + xml);
+			throw new RuntimeException("Error patching record: " + xml, e);
+		}
 	}
 
 	private static Set<String> mdstorePaths(final String mdstoreManagerUrl,
