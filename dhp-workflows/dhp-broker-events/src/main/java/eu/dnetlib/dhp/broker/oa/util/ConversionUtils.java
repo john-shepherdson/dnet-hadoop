@@ -26,6 +26,7 @@ import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -144,7 +145,7 @@ public class ConversionUtils {
 			.filter(pid -> pid != null)
 			.filter(pid -> pid.getQualifier() != null)
 			.filter(pid -> pid.getQualifier().getClassid() != null)
-			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID))
 			.map(pid -> pid.getValue())
 			.map(pid -> cleanOrcid(pid))
 			.filter(StringUtils::isNotBlank)

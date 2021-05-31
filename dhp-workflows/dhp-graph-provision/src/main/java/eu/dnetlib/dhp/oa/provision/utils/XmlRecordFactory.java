@@ -1160,6 +1160,27 @@ public class XmlRecordFactory implements Serializable {
 									.asXmlElement(
 										"distributionlocation", instance.getDistributionlocation()));
 					}
+					if (instance.getPid() != null) {
+						fields
+							.addAll(
+								instance
+									.getPid()
+									.stream()
+									.filter(Objects::nonNull)
+									.map(p -> XmlSerializationUtils.mapStructuredProperty("pid", p))
+									.collect(Collectors.toList()));
+					}
+					if (instance.getAlternateIdentifier() != null) {
+						fields
+							.addAll(
+								instance
+									.getAlternateIdentifier()
+									.stream()
+									.filter(Objects::nonNull)
+									.map(p -> XmlSerializationUtils.mapStructuredProperty("alternateidentifier", p))
+									.collect(Collectors.toList()));
+					}
+
 					if (instance.getRefereed() != null && !instance.getRefereed().isBlank()) {
 						fields
 							.add(

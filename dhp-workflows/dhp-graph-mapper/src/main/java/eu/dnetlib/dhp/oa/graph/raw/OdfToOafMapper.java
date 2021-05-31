@@ -13,6 +13,7 @@ import org.dom4j.Node;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -85,7 +86,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				.replaceAll(" ", "")
 				.replaceAll("_", "");
 
-			if (type.startsWith("ORCID")) {
+			if (type.toLowerCase().startsWith(ORCID)) {
 				final String cleanedId = id.replaceAll("http://orcid.org/", "").replaceAll("https://orcid.org/", "");
 				res.add(structuredProperty(cleanedId, ORCID_PID_TYPE, info));
 			} else if (type.startsWith("MAGID")) {

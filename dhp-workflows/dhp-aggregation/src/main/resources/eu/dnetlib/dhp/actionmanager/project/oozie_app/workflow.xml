@@ -1,4 +1,4 @@
-<workflow-app name="H2020Programme" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="H2020Classification" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>projectFileURL</name>
@@ -18,6 +18,10 @@
             <name>outputPath</name>
             <description>path where to store the action set</description>
         </property>
+        <property>
+            <name>sheetName</name>
+            <description>the name of the sheet to read</description>
+        </property>
     </parameters>
 
     <start to="deleteoutputpath"/>
@@ -31,9 +35,22 @@
             <delete path='${workingDir}'/>
             <mkdir path='${workingDir}'/>
         </fs>
-        <ok to="get_project_file"/>
+        <ok to="fork_get_info"/>
         <error to="Kill"/>
     </action>
+
+
+    <fork name="fork_get_info">
+        <path start="fork_get_projects"/>
+        <path start="get_programme_file"/>
+        <path start="get_topic_file"/>
+
+    </fork>
+
+    <fork name="fork_get_projects">
+        <path start="get_project_file"/>
+        <path start="read_projects"/>
+    </fork>
 
     <action name="get_project_file">
         <java>
@@ -43,7 +60,7 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProject</arg>
         </java>
-        <ok to="get_programme_file"/>
+        <ok to="wait_projects"/>
         <error to="Kill"/>
     </action>
 
@@ -55,7 +72,7 @@
             <arg>--hdfsPath</arg><arg>${workingDir}/programme</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme</arg>
         </java>
-        <ok to="get_topic_file"/>
+        <ok to="prepare_programme"/>
         <error to="Kill"/>
     </action>
 
@@ -68,7 +85,7 @@
             <arg>--sheetName</arg><arg>${sheetName}</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic</arg>
         </java>
-        <ok to="read_projects"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
@@ -81,7 +98,7 @@
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </java>
-        <ok to="prepare_programme"/>
+        <ok to="wait_projects"/>
         <error to="Kill"/>
     </action>
 
@@ -105,9 +122,14 @@
             <arg>--programmePath</arg><arg>${workingDir}/programme</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedProgramme</arg>
         </spark>
-        <ok to="prepare_project"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
+
+    <join name="wait" to="create_updates"/>
+
+    <join name="wait_projects" to="prepare_project"/>
+
 
     <action name="prepare_project">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -130,7 +152,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/preparedProjects</arg>
             <arg>--dbProjectPath</arg><arg>${workingDir}/dbProjects</arg>
         </spark>
-        <ok to="create_updates"/>
+        <ok to="wait"/>
         <error to="Kill"/>
     </action>
 

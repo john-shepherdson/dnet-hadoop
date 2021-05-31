@@ -7,11 +7,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.GenericValidator;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
@@ -115,7 +117,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				o.setCountry(ModelConstants.UNKNOWN_COUNTRY);
 			}
 		} else if (value instanceof Relation) {
-			// nothing to clean here
+			Relation r = (Relation) value;
+
+			if (!isValidDate(r.getValidationDate())) {
+				r.setValidationDate(null);
+				r.setValidated(false);
+			}
+
 		} else if (value instanceof Result) {
 
 			Result r = (Result) value;
@@ -290,6 +298,12 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		}
 
 		return value;
+	}
+
+	protected static boolean isValidDate(String date) {
+		return Stream
+			.of(ModelSupport.DATE_TIME_FORMATS)
+			.anyMatch(format -> GenericValidator.isDate(date, format, false));
 	}
 
 	// HELPERS

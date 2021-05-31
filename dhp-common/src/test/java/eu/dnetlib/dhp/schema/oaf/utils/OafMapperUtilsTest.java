@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,15 +16,22 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafMapperUtilsTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	@Test
+	public void testDateValidation() {
+
+		assertTrue(GraphCleaningFunctions.isValidDate("2016-05-07T12:41:19.202Z"));
+		assertTrue(GraphCleaningFunctions.isValidDate("2020-09-10 11:08:52"));
+		assertTrue(GraphCleaningFunctions.isValidDate("2016-04-05"));
+		assertFalse(GraphCleaningFunctions.isValidDate("2016 April 05"));
+
+	}
 
 	@Test
 	public void testMergePubs() throws IOException {

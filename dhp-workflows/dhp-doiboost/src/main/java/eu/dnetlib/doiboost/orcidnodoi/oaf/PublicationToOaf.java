@@ -93,7 +93,7 @@ public class PublicationToOaf implements Serializable {
 		{
 			put(
 				ModelConstants.ORCID,
-				new Pair<>(ModelConstants.ORCID.toUpperCase(), OPENAIRE_PREFIX + SEPARATOR + "orcid"));
+				new Pair<>(ModelConstants.ORCID.toUpperCase(), OPENAIRE_PREFIX + SEPARATOR + ModelConstants.ORCID));
 
 		}
 	};
@@ -125,8 +125,6 @@ public class PublicationToOaf implements Serializable {
 			throw new RuntimeException("loading typologies", e);
 		}
 	}
-
-	public static final String PID_TYPES = "dnet:pid_types";
 
 	public Oaf generatePublicationActionsFromJson(final String json) {
 		if (parsedPublications != null) {

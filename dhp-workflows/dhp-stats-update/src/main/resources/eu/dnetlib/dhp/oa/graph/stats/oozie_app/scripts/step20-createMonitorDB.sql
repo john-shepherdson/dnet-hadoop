@@ -19,9 +19,6 @@ create table TARGET.result as
         select * from SOURCE.result r where exists (select 1 from SOURCE.result_concepts rc where rc.id=r.id) ) foo;
 compute stats TARGET.result;
 
-create table TARGET.result_affiliated_country as select * from SOURCE.result_affiliated_country rac where exists (select 1 from TARGET.result r where r.id=rac.id);
-compute stats TARGET.result_affiliated_country;
-
 create table TARGET.result_citations as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_citations;
 
@@ -33,9 +30,6 @@ compute stats TARGET.result_concepts;
 
 create table TARGET.result_datasources as select * from SOURCE.result_datasources orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_datasources;
-
-create table TARGET.result_deposited_country as select * from SOURCE.result_deposited_country orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.result_deposited_country;
 
 create table TARGET.result_fundercount as select * from SOURCE.result_fundercount orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_fundercount;
