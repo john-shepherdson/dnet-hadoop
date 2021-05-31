@@ -419,10 +419,12 @@ public class MappersTest {
 
 		assertNotNull(d.getTitle());
 		assertEquals(1, d.getTitle().size());
-		assertEquals("Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia", d
-			.getTitle()
-			.get(0)
-			.getValue());
+		assertEquals(
+			"Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia",
+			d
+				.getTitle()
+				.get(0)
+				.getValue());
 
 		assertNotNull(d.getDescription());
 		assertEquals(1, d.getDescription().size());
@@ -620,7 +622,8 @@ public class MappersTest {
 		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
 		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
 		assertValidId(p.getInstance().get(0).getHostedby().getKey());
-		assertEquals("http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+		assertEquals(
+			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
 
 		assertEquals(1, p.getInstance().size());
 		assertNotNull(p.getInstance().get(0).getAlternateIdentifier());
@@ -702,12 +705,14 @@ public class MappersTest {
 
 	private List<String> vocs() throws IOException {
 		return IOUtils
-			.readLines(GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+			.readLines(
+				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
-			.readLines(GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+			.readLines(
+				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 
 }
