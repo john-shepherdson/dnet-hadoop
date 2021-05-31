@@ -8,6 +8,12 @@
             <name>isLookupUrl</name>
             <description>The IS lookUp service endopoint</description>
         </property>
+        <property>
+            <name>blocksize</name>
+            <value>100</value>
+            <description>The request block size</description>
+        </property>
+
     </parameters>
 
     <start to="ImportDatacite"/>
@@ -37,6 +43,7 @@
             <arg>--dataciteDumpPath</arg><arg>${mainPath}/datacite_dump</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
+            <arg>--blocksize</arg><arg>${blocksize}</arg>
         </spark>
         <ok to="TransformJob"/>
         <error to="Kill"/>
