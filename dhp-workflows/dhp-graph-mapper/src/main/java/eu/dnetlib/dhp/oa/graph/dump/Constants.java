@@ -24,8 +24,6 @@ public class Constants {
 
 	public static String RESEARCH_INFRASTRUCTURE = "Research Infrastructure/Initiative";
 
-	public static String ORCID = "orcid";
-
 	static {
 		accessRightsCoarMap.put("OPEN", "c_abf2");
 		accessRightsCoarMap.put("RESTRICTED", "c_16ec");

@@ -60,32 +60,3 @@ union all
 select distinct r.id, false as gold
 from ${stats_db_name}.result r
 where r.id not in (select id from result_gold);
-
--- shortcut result-country through the organization affiliation
-create table ${stats_db_name}.result_affiliated_country as
-select r.id as id, o.country as country
-from ${stats_db_name}.result r
-join ${stats_db_name}.result_organization ro on ro.id=r.id
-join ${stats_db_name}.organization o on o.id=ro.organization
-where o.country is not null and o.country!='';
-
--- shortcut result-country through datasource of deposition
-create table ${stats_db_name}.result_deposited_country as
-select r.id as id, o.country as country
-from ${stats_db_name}.result r
-join ${stats_db_name}.result_datasources rd on rd.id=r.id
-join ${stats_db_name}.datasource d on d.id=rd.datasource
-join ${stats_db_name}.datasource_organizations dor on dor.id=d.id
-join ${stats_db_name}.organization o on o.id=dor.organization
-where o.country is not null and o.country!='';
-
--- ANALYZE TABLE ${stats_db_name}.result_peerreviewed COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.result_peerreviewed COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.result_greenoa COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.result_greenoa COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.result_gold COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.result_gold COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.result_affiliated_country COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.result_affiliated_country COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.result_deposited_country COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.result_deposited_country COMPUTE STATISTICS FOR COLUMNS;

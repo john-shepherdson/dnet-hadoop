@@ -20,8 +20,8 @@ import eu.dnetlib.dhp.collection.HttpConnector2;
 public class EXCELParserTest {
 
 	private static Path workingDir;
-	private final HttpConnector2 httpConnector = new HttpConnector2();
-	private static final String URL = "http://cordis.europa.eu/data/reference/cordisref-H2020topics.xlsx";
+	private HttpConnector2 httpConnector = new HttpConnector2();
+	private static final String URL = "https://cordis.europa.eu/data/reference/cordisref-h2020topics.xlsx";
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -35,11 +35,12 @@ public class EXCELParserTest {
 
 		EXCELParser excelParser = new EXCELParser();
 
-		final String classForName = "eu.dnetlib.dhp.actionmanager.project.utils.ExcelTopic";
-		final String sheetName = "Topics";
-		List<Object> pl = excelParser.parse(httpConnector.getInputSourceAsStream(URL), classForName, sheetName);
+		List<Object> pl = excelParser
+			.parse(
+				httpConnector.getInputSourceAsStream(URL), "eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic",
+				"Topics");
 
-		Assertions.assertEquals(3837, pl.size());
+		Assertions.assertEquals(3878, pl.size());
 
 	}
 }

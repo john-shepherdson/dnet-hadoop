@@ -284,6 +284,54 @@
   "id": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
   "instance": [
     {
+      "pid": [
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "",
+              "classname": "",
+              "schemeid": "",
+              "schemename": ""
+            },
+            "trust": ""
+          },
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1109/TED.2018.2853550"
+        }
+      ],
+      "alternateIdentifier": [
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "",
+              "classname": "",
+              "schemeid": "",
+              "schemename": ""
+            },
+            "trust": ""
+          },
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.5689/LIB.2018.2853550"
+        }
+      ],
       "accessright": {
         "classid": "OPEN",
         "classname": "Open Access",

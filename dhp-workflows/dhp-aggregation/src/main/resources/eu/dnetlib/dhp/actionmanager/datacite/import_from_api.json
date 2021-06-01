@@ -19,6 +19,12 @@
     "paramRequired": false
   },
   {
+    "paramName": "bs",
+    "paramLongName": "blocksize",
+    "paramDescription": "define the requests block size",
+    "paramRequired": false
+  },
+  {
     "paramName": "n",
     "paramLongName": "namenode",
     "paramDescription": "the hive metastore uris",
