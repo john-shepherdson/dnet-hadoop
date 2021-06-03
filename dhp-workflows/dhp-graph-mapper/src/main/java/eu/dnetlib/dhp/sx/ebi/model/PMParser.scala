@@ -115,7 +115,6 @@ class PMParser(xml:XMLEventReader) extends Iterator[PMArticle] {
               case "LastName" => {
                 if (currentAuthor != null)
                   currentAuthor.setLastName(text.trim)
-
               }
               case "ForeName" => if (currentAuthor != null)
                 currentAuthor.setForeName(text.trim)

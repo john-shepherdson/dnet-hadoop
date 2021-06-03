@@ -6,12 +6,32 @@ import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import eu.dnetlib.dhp.sx.ebi.model.{PMArticle, PMAuthor, PMJournal, PMParser}
-
+import org.apache.spark.sql.expressions.Aggregator
 
 import scala.io.Source
 import scala.xml.pull.XMLEventReader
 
 object SparkCreateBaselineDataFrame {
+
+
+  val pmArticleAggregator: Aggregator[(String, PMArticle), PMArticle, PMArticle] = new Aggregator[(String, PMArticle), PMArticle, PMArticle] with Serializable {
+    override def zero: PMArticle = new PMArticle
+
+    override def reduce(b: PMArticle, a: (String, PMArticle)): PMArticle = {
+      if (b != null && b.getPmid!= null)   b  else a._2
+    }
+
+    override def merge(b1: PMArticle, b2: PMArticle): PMArticle = {
+      if (b1 != null && b1.getPmid!= null)    b1   else     b2
+
+    }
+
+    override def finish(reduction: PMArticle): PMArticle = reduction
+
+    override def bufferEncoder: Encoder[PMArticle] = Encoders.kryo[PMArticle]
+
+    override def outputEncoder: Encoder[PMArticle] = Encoders.kryo[PMArticle]
+  }
 
 
   def main(args: Array[String]): Unit = {
@@ -24,6 +44,8 @@ object SparkCreateBaselineDataFrame {
         .config(conf)
         .appName(SparkCreateEBIDataFrame.getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
+    import spark.implicits._
+
 
     val sc = spark.sparkContext
 
@@ -39,10 +61,8 @@ object SparkCreateBaselineDataFrame {
 
     } ))
 
-    ds.write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_dataset")
-
-
-
-
+    ds.map(p => (p.getPmid,p))(Encoders.tuple(Encoders.STRING, PMEncoder)).groupByKey(_._1)
+      .agg(pmArticleAggregator.toColumn)
+      .map(p => p._2).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_dataset")
   }
 }
