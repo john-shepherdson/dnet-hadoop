@@ -21,6 +21,7 @@ public class ExecuteWorkflow {
 	static String dbHiveUrl;
 	static String dbImpalaUrl;
 	static String datasetUsageStatsDBSchema;
+	static String datasetsUsageStatsPermanentDBSchema;
 	static String statsDBSchema;
 	static boolean recreateDbAndTables;
 	static boolean datasetsEmptyDirs;
@@ -45,6 +46,7 @@ public class ExecuteWorkflow {
 		dbHiveUrl = parser.get("dbHiveUrl");
 		dbImpalaUrl = parser.get("dbImpalaUrl");
 		datasetUsageStatsDBSchema = parser.get("datasetUsageStatsDBSchema");
+		datasetsUsageStatsPermanentDBSchema = parser.get("datasetsUsageStatsPermanentDBSchema");
 		statsDBSchema = parser.get("statsDBSchema");
 
 		if (parser.get("recreateDbAndTables").toLowerCase().equals("true"))
@@ -57,11 +59,11 @@ public class ExecuteWorkflow {
 		else
 			datasetsEmptyDirs = false;
 
-//		if (parser.get("finalTablesVisibleToImpala").toLowerCase().equals("true"))
-//			finalTablesVisibleToImpala = true;
-//		else
-//			finalTablesVisibleToImpala = false;
-//
+		if (parser.get("finalTablesVisibleToImpala").toLowerCase().equals("true"))
+			finalTablesVisibleToImpala = true;
+		else
+			finalTablesVisibleToImpala = false;
+
 		UsageStatsExporter usagestatsExport = new UsageStatsExporter();
 		usagestatsExport.export();
 	}

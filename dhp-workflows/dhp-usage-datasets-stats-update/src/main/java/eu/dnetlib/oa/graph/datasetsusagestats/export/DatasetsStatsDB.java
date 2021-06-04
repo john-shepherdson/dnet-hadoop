@@ -1,8 +1,6 @@
 
 package eu.dnetlib.oa.graph.datasetsusagestats.export;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.slf4j.Logger;
@@ -47,9 +45,26 @@ public class DatasetsStatsDB {
 		try {
 			stmt = ConnectDB.getHiveConnection().createStatement();
 
-			logger.info("Creating usagestats DB: " + ConnectDB.getDataSetUsageStatsDBSchema());
+			logger.info("Creating datacite usagestats DB: " + ConnectDB.getDataSetUsageStatsDBSchema());
 			String createDatabase = "CREATE DATABASE IF NOT EXISTS " + ConnectDB.getDataSetUsageStatsDBSchema();
 			stmt.executeUpdate(createDatabase);
+
+		} catch (Exception e) {
+			logger.error("Failed to create database: " + e);
+			throw new Exception("Failed to create database: " + e.toString(), e);
+		}
+		try {
+			stmt = ConnectDB.getHiveConnection().createStatement();
+
+			logger
+				.info(
+					"Creating permanent datasets usagestats DB: " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema());
+			String createPermanentDatabase = "CREATE DATABASE IF NOT EXISTS "
+				+ ConnectDB.getDatasetsUsagestatsPermanentDBSchema();
+			stmt.executeUpdate(createPermanentDatabase);
+			logger
+				.info(
+					"Created permanent datasets usagestats DB: " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema());
 
 		} catch (Exception e) {
 			logger.error("Failed to create database: " + e);
@@ -62,10 +77,10 @@ public class DatasetsStatsDB {
 			stmt = ConnectDB.getHiveConnection().createStatement();
 
 			// Create Reports table - This table should exist
-			logger.info("Creating Reports Table");
+			logger.info("Creating Reports Tmp Table");
 			String sqlCreateTableDataciteReports = "CREATE TABLE IF NOT EXISTS "
 				+ ConnectDB.getDataSetUsageStatsDBSchema()
-				+ ".datacitereports(reportid STRING, \n"
+				+ ".datacitereports_tmp(reportid STRING, \n"
 				+ "	name STRING, \n"
 				+ "    source STRING,\n"
 				+ "    release STRING,\n"
@@ -79,10 +94,10 @@ public class DatasetsStatsDB {
 			logger.info("Reports Table Created");
 
 			// Create Datasets Performance Table
-			logger.info("Creating DataSetsPerformance Table");
+			logger.info("Creating DataSetsPerformance Tmp Table");
 			String sqlCreateTableDataSetsPerformance = "CREATE TABLE IF NOT EXISTS "
 				+ ConnectDB.getDataSetUsageStatsDBSchema()
-				+ ".datasetsperformance(ds_type STRING,\n"
+				+ ".datasetsperformance_tmp(ds_type STRING,\n"
 				+ " ds_title STRING,\n"
 				+ " yop STRING,\n"
 				+ " dataset_type STRING, \n"
@@ -100,7 +115,22 @@ public class DatasetsStatsDB {
 				+ " CLUSTERED BY (ds_type)\n"
 				+ " into 100 buckets stored as orc tblproperties('transactional'='true')";
 			stmt.executeUpdate(sqlCreateTableDataSetsPerformance);
-			logger.info("DataSetsPerformance Table Created");
+			logger.info("DataSetsPerformance Tmp Table Created");
+
+			logger.info("Creating Datacite Reports table");
+			String createDataciteReportsTable = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getDataSetUsageStatsDBSchema()
+				+ ".datacitereports LIKE " + ConnectDB.getDataSetUsageStatsDBSchema()
+				+ ".datacitereports_tmp STORED AS PARQUET";
+			stmt.executeUpdate(createDataciteReportsTable);
+			logger.info("Datacite Reports Table created");
+
+			logger.info("Creating Datasets Performance table");
+			String createDatasetPerformanceTable = "CREATE TABLE IF NOT EXISTS "
+				+ ConnectDB.getDataSetUsageStatsDBSchema()
+				+ ".datasetsperformance LIKE " + ConnectDB.getDataSetUsageStatsDBSchema()
+				+ ".datasetsperformance_tmp STORED AS PARQUET";
+			stmt.executeUpdate(createDatasetPerformanceTable);
+			logger.info("DatasetsPerformance Table created");
 
 			stmt.close();
 			ConnectDB.getHiveConnection().close();

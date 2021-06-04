@@ -9,6 +9,10 @@ package eu.dnetlib.oa.graph.datasetsusagestats.export;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 
@@ -28,6 +32,7 @@ public abstract class ConnectDB {
 	private static String dbHiveUrl;
 	private static String dbImpalaUrl;
 	private static String datasetUsageStatsDBSchema;
+	private static String datasetsUsageStatsPermanentDBSchema;
 	private static String statsDBSchema;
 	private final static Logger logger = Logger.getLogger(ConnectDB.class);
 	private Statement stmt = null;
@@ -37,6 +42,7 @@ public abstract class ConnectDB {
 		dbHiveUrl = ExecuteWorkflow.dbHiveUrl;
 		dbImpalaUrl = ExecuteWorkflow.dbImpalaUrl;
 		datasetUsageStatsDBSchema = ExecuteWorkflow.datasetUsageStatsDBSchema;
+		datasetsUsageStatsPermanentDBSchema = ExecuteWorkflow.datasetsUsageStatsPermanentDBSchema;
 		statsDBSchema = ExecuteWorkflow.statsDBSchema;
 
 		Class.forName("org.apache.hive.jdbc.HiveDriver");
@@ -63,14 +69,25 @@ public abstract class ConnectDB {
 	}
 
 	public static String getDataSetUsageStatsDBSchema() {
-		return ConnectDB.datasetUsageStatsDBSchema;
+		String datePattern = "YYYYMMdd";
+		DateFormat df = new SimpleDateFormat(datePattern);
+// Get the today date using Calendar object.
+		Date today = Calendar.getInstance().getTime();
+		String todayAsString = df.format(today);
+
+		return ConnectDB.datasetUsageStatsDBSchema + "_" + todayAsString;
 	}
 
 	public static String getStatsDBSchema() {
 		return ConnectDB.statsDBSchema;
 	}
 
+	public static String getDatasetsUsagestatsPermanentDBSchema() {
+		return ConnectDB.datasetsUsageStatsPermanentDBSchema;
+	}
+
 	private static Connection connectHive() throws SQLException {
+		logger.info("trying to open Hive connection...");
 
 		ComboPooledDataSource cpds = new ComboPooledDataSource();
 		cpds.setJdbcUrl(dbHiveUrl);
@@ -90,14 +107,18 @@ public abstract class ConnectDB {
 		cpds.setPreferredTestQuery("SELECT 1");
 		cpds.setIdleConnectionTestPeriod(60);
 
-		logger.info("Opened database successfully");
+		logger.info("Opened HIVE successfully");
 
 		return cpds.getConnection();
+//		Connection connection = DriverManager.getConnection(dbHiveUrl);
+//		logger.debug("Opened Hive successfully");
+//
+//		return connection;
 
 	}
 
 	private static Connection connectImpala() throws SQLException {
-
+		logger.info("trying to open Impala connection...");
 		ComboPooledDataSource cpds = new ComboPooledDataSource();
 		cpds.setJdbcUrl(dbImpalaUrl);
 		cpds.setUser("dimitris.pierrakos");
@@ -116,8 +137,12 @@ public abstract class ConnectDB {
 		cpds.setPreferredTestQuery("SELECT 1");
 		cpds.setIdleConnectionTestPeriod(60);
 
-		logger.info("Opened database successfully");
+		logger.info("Opened Impala successfully");
 		return cpds.getConnection();
+//		Connection connection = DriverManager.getConnection(dbHiveUrl);
+//		logger.debug("Opened Impala successfully");
+//
+//		return connection;
 
 	}
 }
