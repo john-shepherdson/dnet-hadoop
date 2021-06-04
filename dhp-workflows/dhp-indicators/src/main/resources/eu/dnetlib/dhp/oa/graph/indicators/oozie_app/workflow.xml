@@ -1,0 +1,101 @@
+<workflow-app name="Indicators" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>stats_db_name</name>
+            <description>the source stats database name</description>
+        </property>
+        <property>
+            <name>indicators_db_name</name>
+            <description>the target indicators database name</description>
+        </property>
+        <property>
+            <name>indicators_shadow_db_name</name>
+            <description>the name of the shadow schema</description>
+        </property>
+        <!--        <property>
+            <name>openaire_db_name</name>
+            <description>the original graph database name</description>
+        </property>
+        <property>
+            <name>external_stats_db_name</name>
+            <value>stats_ext</value>
+            <description>the external stats that should be added since they are not included in the graph database</description>
+        </property>
+        <property>
+            <name>stats_db_shadow_name</name>
+            <description>the name of the shadow schema</description>
+        </property>
+        <property>
+            <name>monitor_db_name</name>
+            <description>the target monitor db name</description>
+        </property>
+        <property>
+            <name>monitor_db_shadow_name</name>
+            <description>the name of the shadow monitor db</description>
+        </property>
+        <property>
+            <name>observatory_db_name</name>
+            <description>the target monitor db name</description>
+        </property>
+        <property>
+            <name>observatory_db_shadow_name</name>
+            <description>the name of the shadow monitor db</description>
+        </property>
+        <property>
+            <name>stats_tool_api_url</name>
+            <description>The url of the API of the stats tool. Is used to trigger the cache update.</description>
+        </property>-->
+        <property>
+            <name>hive_metastore_uris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hive_jdbc_url</name>
+            <description>hive server jdbc url</description>
+        </property>
+        <!--        <property>
+            <name>hive_timeout</name>
+            <description>the time period, in seconds, after which Hive fails a transaction if a Hive client has not sent a hearbeat. The default value is 300 seconds.</description>
+        </property>-->
+        <!--        <property>
+            <name>context_api_url</name>
+            <description>the base url of the context api (https://services.openaire.eu/openaire)</description>
+        </property>-->
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>${hive_metastore_uris}</value>
+            </property>
+            <!--            <property>
+                <name>hive.txn.timeout</name>
+                <value>${hive_timeout}</value>
+            </property>-->
+        </configuration>
+    </global>
+
+    <start to="Step1-createIndicatorsDB"/>
+    <action name="Step1-createIndicatorsDB">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>indicators.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${indicators_db_name}</argument>
+            <argument>${indicators_shadow_db_name}</argument>
+            <argument>${wf:appPath()}/scripts/createIndicatorsTables.sql</argument>
+            <file>scripts/indicators.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <end name="End"/>
+</workflow-app>
