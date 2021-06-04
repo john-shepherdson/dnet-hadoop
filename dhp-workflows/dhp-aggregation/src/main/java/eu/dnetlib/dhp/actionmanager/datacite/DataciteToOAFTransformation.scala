@@ -3,9 +3,8 @@ package eu.dnetlib.dhp.actionmanager.datacite
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.common.{ModelConstants, ModelSupport}
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidType}
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf.{AccessRight, Author, DataInfo, Instance, KeyValue, Oaf, OtherResearchProduct, Publication, Qualifier, Relation, Result, Software, StructuredProperty, Dataset => OafDataset}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
@@ -17,8 +16,9 @@ import java.nio.charset.CodingErrorAction
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.{Date, Locale}
+import java.util
 import java.util.regex.Pattern
+import java.util.{Date, Locale}
 import scala.collection.JavaConverters._
 import scala.io.{Codec, Source}
 
@@ -46,32 +46,32 @@ object DataciteToOAFTransformation {
 
 val REL_TYPE_VALUE:String = "resultResult"
 
-  val subRelTypeMapping: Map[String,String] = Map(
-    "References" ->"relationship",
-    "IsSupplementTo" ->"supplement",
-    "IsPartOf" ->"part",
-    "HasPart" ->"part",
-    "IsVersionOf" ->"version",
-    "HasVersion" ->"version",
-    "IsIdenticalTo" ->"relationship",
-    "IsPreviousVersionOf" ->"version",
-    "IsContinuedBy" ->"relationship",
-    "Continues" ->"relationship",
-    "IsNewVersionOf" ->"version",
-    "IsSupplementedBy" ->"supplement",
-    "IsDocumentedBy" ->"relationship",
-    "IsSourceOf" ->"relationship",
-    "Cites" ->"citation",
-    "IsCitedBy" ->"citation",
-    "IsDerivedFrom" ->"relationship",
-    "IsVariantFormOf" ->"version",
-    "IsReferencedBy" ->"relationship",
-    "IsObsoletedBy" ->"version",
-    "Reviews" ->"review",
-    "Documents" ->"relationship",
-    "IsCompiledBy" ->"relationship",
-    "Compiles" ->"relationship",
-    "IsReviewedBy" ->"review"
+  val subRelTypeMapping: Map[String,(String,String)] = Map(
+    "References" ->("IsReferencedBy","relationship"),
+    "IsSupplementTo" ->("IsSupplementedBy","supplement"),
+    "IsPartOf" ->("HasPart","part"),
+    "HasPart" ->("IsPartOf","part"),
+    "IsVersionOf" ->("HasVersion","version"),
+    "HasVersion" ->("IsVersionOf","version"),
+    "IsIdenticalTo" ->("IsIdenticalTo","relationship"),
+    "IsPreviousVersionOf" ->("IsNewVersionOf","version"),
+    "IsContinuedBy" ->("Continues","relationship"),
+    "Continues" ->("IsContinuedBy","relationship"),
+    "IsNewVersionOf" ->("IsPreviousVersionOf","version"),
+    "IsSupplementedBy" ->("IsSupplementTo","supplement"),
+    "IsDocumentedBy" ->("Documents","relationship"),
+    "IsSourceOf" ->("IsDerivedFrom","relationship"),
+    "Cites" ->("IsCitedBy","citation"),
+    "IsCitedBy" ->("Cites","citation"),
+    "IsDerivedFrom" ->("IsSourceOf","relationship"),
+    "IsVariantFormOf" ->("IsDerivedFrom","version"),
+    "IsReferencedBy" ->("References","relationship"),
+    "IsObsoletedBy" ->("IsNewVersionOf","version"),
+    "Reviews" ->("IsReviewedBy","review"),
+    "Documents" ->("IsDocumentedBy","relationship"),
+    "IsCompiledBy" ->("Compiles","relationship"),
+    "Compiles" ->("IsCompiledBy","relationship"),
+    "IsReviewedBy" ->("Reviews","review")
   )
 
   implicit val codec: Codec = Codec("UTF-8")
@@ -523,32 +523,54 @@ val REL_TYPE_VALUE:String = "resultResult"
       } yield RelatedIdentifierType(relationType, relatedIdentifier, relatedIdentifierType)
 
 
-      relations = relations ::: rels
-        .filter(r =>
-          subRelTypeMapping.contains(r.relationType) && (
-          r.relatedIdentifierType.equalsIgnoreCase("doi") ||
-            r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
-            r.relatedIdentifierType.equalsIgnoreCase("arxiv") )
-        )
-        .map(r => {
-          val rel = new Relation
-
-          val subRelType = subRelTypeMapping.get(r.relationType)
-          rel.setRelType(REL_TYPE_VALUE)
-          rel.setSubRelType(subRelType.get)
-          rel.setRelClass(r.relationType)
-          rel.setSource(result.getId)
-          rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
-          rel.setDataInfo(dataInfo)
-          rel.setTarget(createDNetTargetIdentifier(r.relatedIdentifier, r.relatedIdentifierType, "50|"))
-          rel
-        })
+      relations = relations ::: generateRelations(rels,result.getId)
     }
     if (relations != null && relations.nonEmpty) {
       List(result) ::: relations
     }
     else
       List(result)
+  }
+
+  private def generateRelations(rels: List[RelatedIdentifierType], id:String):List[Relation] = {
+    rels
+      .filter(r =>
+        subRelTypeMapping.contains(r.relationType) && (
+          r.relatedIdentifierType.equalsIgnoreCase("doi") ||
+            r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
+            r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
+      )
+      .flatMap(r => {
+        val rel = new Relation
+        val inverseRel = new Relation
+        rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+        rel.setDataInfo(dataInfo)
+
+        inverseRel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+        inverseRel.setDataInfo(dataInfo)
+
+        val subRelType = subRelTypeMapping(r.relationType)._2
+        val inverseRelSemantic = subRelTypeMapping(r.relationType)._1
+        val inversesubRelType = subRelTypeMapping(inverseRelSemantic)._2
+
+
+        rel.setRelType(REL_TYPE_VALUE)
+        rel.setSubRelType(subRelType)
+        rel.setRelClass(r.relationType)
+
+
+        inverseRel.setRelType(REL_TYPE_VALUE)
+        inverseRel.setSubRelType(inversesubRelType)
+        inverseRel.setRelClass(inverseRelSemantic)
+
+        rel.setSource(id)
+        rel.setTarget(createDNetTargetIdentifier(r.relatedIdentifier, r.relatedIdentifierType, "50|"))
+
+        inverseRel.setTarget(id)
+        inverseRel.setSource(createDNetTargetIdentifier(r.relatedIdentifier, r.relatedIdentifierType, "50|"))
+
+        List(rel, inverseRel)
+      })
   }
 
   def generateDataInfo(trust: String): DataInfo = {

@@ -23,5 +23,12 @@
     "paramLongName": "isLookupUrl",
     "paramDescription": "the isLookup URL",
     "paramRequired": true
+  },
+  {
+    "paramName": "l",
+    "paramLongName": "exportLinks",
+    "paramDescription": "should export also links",
+    "paramRequired": false
   }
+
 ]
