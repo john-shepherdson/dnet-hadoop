@@ -2,6 +2,7 @@
 package eu.dnetlib.oa.graph.datasetsusagestats.export;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.hadoop.conf.Configuration;
@@ -67,5 +68,50 @@ public class UsageStatsExporter {
 		readReportsListFromDatacite.readReports();
 		logger.info("Reports Stored To DB");
 		readReportsListFromDatacite.createUsageStatisticsTable();
+
+		// Make the tables available to Impala
+		if (ExecuteWorkflow.finalTablesVisibleToImpala) {
+			logger.info("Making tables visible to Impala");
+			invalidateMetadata();
+		}
+
+		logger.info("End");
+	}
+
+	private void invalidateMetadata() throws SQLException {
+		Statement stmt = null;
+
+		stmt = ConnectDB.getImpalaConnection().createStatement();
+
+		String sql = "INVALIDATE METADATA " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datacite_downloads";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datacite_views";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datacitereports";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getDataSetUsageStatsDBSchema() + ".datasetsperformance";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacite_downloads";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacite_views";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datacitereports";
+		stmt.executeUpdate(sql);
+
+		sql = "INVALIDATE METADATA " + ConnectDB.getDatasetsUsagestatsPermanentDBSchema() + ".datasetsperformance";
+		stmt.executeUpdate(sql);
+
+		stmt.close();
+		try {
+			ConnectDB.getHiveConnection().close();
+		} catch (Exception e) {
+			logger.info("Message at the end :" + e.getMessage());
+		}
 	}
 }

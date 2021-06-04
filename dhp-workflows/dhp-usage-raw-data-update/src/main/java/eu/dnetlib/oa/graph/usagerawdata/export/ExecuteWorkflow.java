@@ -65,6 +65,8 @@ public class ExecuteWorkflow {
 
 	static int numberOfDownloadThreads;
 
+	static int b2SSHAREID;
+
 	public static void main(String args[]) throws Exception {
 
 		// Sending the logs to the console
@@ -195,6 +197,8 @@ public class ExecuteWorkflow {
 		}
 
 		numberOfDownloadThreads = Integer.parseInt(parser.get("numberOfDownloadThreads"));
+
+		b2SSHAREID = Integer.parseInt(parser.get("b2shareID"));
 
 		UsageStatsExporter usagestatsExport = new UsageStatsExporter();
 		usagestatsExport.export();

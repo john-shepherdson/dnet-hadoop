@@ -82,7 +82,7 @@ public abstract class ConnectDB {
 		Date today = Calendar.getInstance().getTime();
 		String todayAsString = df.format(today);
 
-		return ConnectDB.usageStatsDBSchema + "_" + todayAsString;
+		return ConnectDB.usageStatsDBSchema + todayAsString;
 	}
 
 	public static String getStatsDBSchema() {

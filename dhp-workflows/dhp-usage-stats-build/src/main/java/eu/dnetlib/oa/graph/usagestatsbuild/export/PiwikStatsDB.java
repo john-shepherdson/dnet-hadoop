@@ -35,20 +35,20 @@ public class PiwikStatsDB {
 
 	private void createDatabase() throws Exception {
 
-//		try {
-//
-//			stmt = ConnectDB.getHiveConnection().createStatement();
-//
-//			logger.info("Dropping usagestats DB: " + ConnectDB.getUsageStatsDBSchema());
-//			String dropDatabase = "DROP DATABASE IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + " CASCADE";
-//			stmt.executeUpdate(dropDatabase);
-//		} catch (Exception e) {
-//			logger.error("Failed to drop database: " + e);
-//			throw new Exception("Failed to drop database: " + e.toString(), e);
-//		}
-//
 		try {
+
 			stmt = ConnectDB.getHiveConnection().createStatement();
+
+			logger.info("Dropping usagestats DB: " + ConnectDB.getUsageStatsDBSchema());
+			String dropDatabase = "DROP DATABASE IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + " CASCADE";
+			stmt.executeUpdate(dropDatabase);
+		} catch (Exception e) {
+			logger.error("Failed to drop database: " + e);
+			throw new Exception("Failed to drop database: " + e.toString(), e);
+		}
+
+		try {
+
 			logger.info("Creating usagestats DB: " + ConnectDB.getUsageStatsDBSchema());
 			String createDatabase = "CREATE DATABASE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema();
 			stmt.executeUpdate(createDatabase);
@@ -337,6 +337,96 @@ public class PiwikStatsDB {
 
 	}
 
+	public void uploadB2SHAREStats() throws Exception {
+		stmt = ConnectDB.getHiveConnection().createStatement();
+		ConnectDB.getHiveConnection().setAutoCommit(false);
+
+		// Dropping B2SHARE b2share_result_views_monthly_tmp view
+		logger.info("Dropping B2SHARE b2share_result_views_monthly_tmp view");
+		String sql = "DROP view IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".b2share_result_views_monthly_tmp";
+		logger.info("Dropped b2share_result_views_monthly_tmp view ");
+		stmt.executeUpdate(sql);
+
+		// Dropping B2SHARE b2share_result_views_monthly_tmp view
+		logger.info("Dropping b2SHARE b2share_result_downloads_monthly_tmp view");
+		sql = "DROP view IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".b2share_result_downloads_monthly_tmp";
+		logger.info("Dropped b2share_result_downloads_monthly_tmp view ");
+		stmt.executeUpdate(sql);
+
+		// Dropping B2SHARE b2share_views_stats_tmp table
+		logger.info("Dropping B2SHARE b2share_views_stats_tmp table");
+		sql = "DROP TABLE IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".b2share_views_stats_tmp";
+		logger.info("Dropped b2share_views_stats_tmp table ");
+		stmt.executeUpdate(sql);
+
+		// Dropping B2SHARE b2share_downloads_stats_tmp table
+		logger.info("Dropping B2SHARE b2share_downloads_stats_tmp table");
+		sql = "DROP TABLE IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".b2share_downloads_stats_tmp";
+		logger.info("Dropped b2share_downloads_stats_tmp table ");
+		stmt.executeUpdate(sql);
+
+		// Creating B2SHARE b2share_result_views_monthly_tmp view
+		logger.info("Creating B2SHARE b2share_result_views_monthly_tmp view");
+		sql = "CREATE OR REPLACE VIEW " + ConnectDB.getUsageStatsDBSchema() + ".b2share_result_views_monthly_tmp "
+			+ "AS SELECT entity_id, reflect('java.net.URLDecoder', 'decode', entity_id) AS id, "
+			+ "COUNT(entity_id) as views, SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer, "
+			+ "CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month, source "
+			+ "FROM " + ConnectDB.getUsageRawDataDBSchema() + ".piwiklog "
+			+ "WHERE action='action' and (source_item_type='oaItem' or source_item_type='repItem') and source=412 "
+			+ "GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source ORDER BY source, entity_id";
+		stmt.executeUpdate(sql);
+		logger.info("Created b2share_result_views_monthly_tmp view ");
+
+		// Creating B2SHARE b2share_views_stats_tmp table
+		logger.info("Creating B2SHARE b2share_views_stats_tmp table");
+		sql = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".b2share_views_stats_tmp AS "
+			+ "SELECT 'B2SHARE' as source, d.id as repository_id, ro.id as result_id, month as date, "
+			+ "max(views) AS count, max(openaire_referrer) AS openaire FROM " + ConnectDB.getUsageStatsDBSchema()
+			+ ".b2share_result_views_monthly_tmp p, "
+			+ ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro "
+			+ "WHERE p.id=ro.oid and d.id='re3data_____::ad3609c351bd520edf6f10f5e0d9b877' "
+			+ "GROUP BY d.id, ro.id, month ORDER BY d.id, ro.id";
+		stmt.executeUpdate(sql);
+		logger.info("Created B2SHARE b2share_views_stats_tmp table");
+
+		// Creating B2SHARE b2share_result_downloads_monthly_tmp view
+		logger.info("Creating B2SHARE b2share_result_downloads_monthly_tmp view");
+		sql = "CREATE OR REPLACE VIEW " + ConnectDB.getUsageStatsDBSchema() + ".b2share_result_downloads_monthly_tmp "
+			+ "AS SELECT entity_id, reflect('java.net.URLDecoder', 'decode', entity_id) AS id, "
+			+ "COUNT(entity_id) as views, SUM(CASE WHEN referrer_name LIKE '%openaire%' THEN 1 ELSE 0 END) AS openaire_referrer, "
+			+ "CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')) AS month, source "
+			+ "FROM " + ConnectDB.getUsageRawDataDBSchema() + ".piwiklog "
+			+ "WHERE action='download' and (source_item_type='oaItem' or source_item_type='repItem') and source=412 "
+			+ "GROUP BY entity_id, CONCAT(YEAR(timestamp), '/', LPAD(MONTH(timestamp), 2, '0')), source ORDER BY source, entity_id";
+		stmt.executeUpdate(sql);
+		logger.info("Created b2share_result_downloads_monthly_tmp view ");
+
+		// Creating B2SHARE b2share_downloads_stats_tmp table
+		logger.info("Creating B2SHARE b2share_downloads_stats_tmp table");
+		sql = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".b2share_downloads_stats_tmp AS "
+			+ "SELECT 'B2SHARE' as source, d.id as repository_id, ro.id as result_id, month as date, "
+			+ "max(views) AS count, max(openaire_referrer) AS openaire FROM " + ConnectDB.getUsageStatsDBSchema()
+			+ ".b2share_result_downloads_monthly_tmp p, "
+			+ ConnectDB.getStatsDBSchema() + ".datasource d, " + ConnectDB.getStatsDBSchema() + ".result_oids ro "
+			+ "WHERE p.id=ro.oid and d.id='re3data_____::ad3609c351bd520edf6f10f5e0d9b877' "
+			+ "GROUP BY d.id, ro.id, month ORDER BY d.id, ro.id";
+		stmt.executeUpdate(sql);
+		logger.info("Created B2SHARE b2share_downloads_stats_tmp table");
+
+		// Dropping B2SHARE b2share_result_views_monthly_tmp view
+		logger.info("Dropping B2SHARE b2share_result_views_monthly_tmp view");
+		sql = "DROP view IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".b2share_result_views_monthly_tmp";
+		logger.info("Dropped b2share_result_views_monthly_tmp view ");
+		stmt.executeUpdate(sql);
+
+		// Dropping B2SHARE b2share_result_views_monthly_tmp view
+		logger.info("Dropping B2SHARE b2share_result_downloads_monthly_tmp view");
+		sql = "DROP view IF EXISTS " + ConnectDB.getUsageStatsDBSchema() + ".b2share_result_downloads_monthly_tmp";
+		logger.info("Dropped b2share_result_downloads_monthly_tmp view ");
+		stmt.executeUpdate(sql);
+
+	}
+
 	public void finalizeStats() throws Exception {
 		stmt = ConnectDB.getHiveConnection().createStatement();
 		ConnectDB.getHiveConnection().setAutoCommit(false);
@@ -402,6 +492,13 @@ public class PiwikStatsDB {
 		stmt.executeUpdate(sql);
 		logger.info("LaReferencia views updated to views_stats");
 
+		// Inserting B2SHARE views stats
+		logger.info("Inserting B2SHARE data to views_stats");
+		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".views_stats "
+			+ "SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".b2share_views_stats_tmp";
+		stmt.executeUpdate(sql);
+		logger.info("B2SHARE views updated to views_stats");
+
 		logger.info("Creating downloads_stats table");
 		String createDownloadsStats = "CREATE TABLE IF NOT EXISTS "
 			+ ConnectDB.getUsageStatsDBSchema()
@@ -425,12 +522,18 @@ public class PiwikStatsDB {
 		logger.info("Inserted Pedocs data to downloads_stats");
 
 		// Inserting TUDELFT downloads stats
-		logger.info("Inserting TUDELFT old data to downloads_stats");
+		logger.info("Inserting TUDELFT data to downloads_stats");
 		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats "
 			+ "SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".tudelft_downloads_stats_tmp";
 		stmt.executeUpdate(sql);
 		logger.info("Inserted TUDELFT data to downloads_stats");
 
+		// Inserting B2SHARE downloads stats
+		logger.info("Inserting B2SHARE  data to downloads_stats");
+		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats "
+			+ "SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".b2share_downloads_stats_tmp";
+		stmt.executeUpdate(sql);
+		logger.info("Inserted B2SHARE data to downloads_stats");
 		// Inserting Lareferencia downloads stats
 		logger.info("Inserting LaReferencia data to downloads_stats");
 		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats "
@@ -451,6 +554,20 @@ public class PiwikStatsDB {
 			+ "SELECT * FROM " + ConnectDB.getUsageStatsDBSchema() + ".sarc_downloads_stats_tmp";
 		stmt.executeUpdate(sql);
 		logger.info("SARC-OJS downloads updated to downloads_stats");
+
+		// Inserting Datacite views stats
+		logger.info("Inserting Datacite views to views_stats");
+		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".views_stats "
+			+ "SELECT * FROM " + ConnectDB.getUsageRawDataDBSchema() + ".datacite_views";
+		stmt.executeUpdate(sql);
+		logger.info("Datacite views updated to views_stats");
+
+		// Inserting Datacite downloads stats
+		logger.info("Inserting Datacite downloads to downloads_stats");
+		sql = "INSERT INTO " + ConnectDB.getUsageStatsDBSchema() + ".downloads_stats "
+			+ "SELECT * FROM " + ConnectDB.getUsageRawDataDBSchema() + ".datacite_downloads";
+		stmt.executeUpdate(sql);
+		logger.info("Datacite downloads updated to downloads_stats");
 
 		logger.info("Creating pageviews_stats table");
 		String create_pageviews_stats = "CREATE TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()

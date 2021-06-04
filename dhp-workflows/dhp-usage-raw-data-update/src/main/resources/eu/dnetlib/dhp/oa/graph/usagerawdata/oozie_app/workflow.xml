@@ -1,4 +1,4 @@
-<workflow-app name="Usage Graph Stats" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Usage Activity Raw Data" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>hiveMetastoreUris</name>
@@ -78,6 +78,7 @@
             <arg>--sarcNumberOfIssnToDownload</arg><arg>${sarcNumberOfIssnToDownload}</arg>
             <arg>--finalizeStats</arg><arg>${finalizeStats}</arg>
             <arg>--numberOfDownloadThreads</arg><arg>${numberOfDownloadThreads}</arg>
+            <arg>--b2shareID</arg><arg>${b2shareID}</arg>
             <capture-output/>
         </java>
         <ok to="End" />

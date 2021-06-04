@@ -51,6 +51,9 @@ public class UsageStatsExporter {
 			logger.info("Processing TUDELFT Stats");
 			piwikstatsdb.uploadTUDELFTStats();
 			logger.info("Processing TUDELFT Stats Done");
+			logger.info("Processing B2SHARE Stats");
+			piwikstatsdb.uploadB2SHAREStats();
+			logger.info("Processing B2SHARE Stats Done");
 
 		}
 

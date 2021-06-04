@@ -191,7 +191,7 @@ public class PiwikDownloadLogs {
 		ResultSet rs = statement
 			.executeQuery(
 				"SELECT distinct piwik_id from " + ConnectDB.getStatsDBSchema()
-					+ ".datasource where piwik_id is not null and piwik_id <> 0 order by piwik_id");
+					+ ".datasource where piwik_id is not null and piwik_id <> 0 and piwik_id <> 196 order by piwik_id");
 
 		// Getting all the piwikids in a list for logging reasons & limitting the list
 		// to the max number of piwikids

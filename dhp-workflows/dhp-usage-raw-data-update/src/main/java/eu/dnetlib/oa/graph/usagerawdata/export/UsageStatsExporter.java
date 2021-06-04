@@ -142,8 +142,20 @@ public class UsageStatsExporter {
 			sarcStats.updateSarcLogs();
 		}
 		logger.info("Sarc done");
-		// finalize usagestats
 
+		PiwikDownloadLogs_B2SHARE b2sharePiwikID = new PiwikDownloadLogs_B2SHARE(ExecuteWorkflow.matomoBaseURL,
+			ExecuteWorkflow.matomoAuthToken);
+		b2sharePiwikID.GetOpenAIREB2SHARELogs(ExecuteWorkflow.repoLogPath);
+		logger.info("B2SHARE done");
+
+		PiwikStatsDB_B2SHARE piwikstatsB2SHAREdb = new PiwikStatsDB_B2SHARE(ExecuteWorkflow.repoLogPath,
+			ExecuteWorkflow.portalLogPath);
+		piwikstatsB2SHAREdb.setCounterRobotsURL(cRobotsUrl);
+
+		logger.info("Processing B2SHARE logs");
+		piwikstatsB2SHAREdb.processB2SHARELogs();
+
+		// finalize usagestats
 		logger.info("Dropping tmp tables");
 		if (ExecuteWorkflow.finalizeStats) {
 			piwikstatsdb.finalizeStats();
@@ -161,6 +173,7 @@ public class UsageStatsExporter {
 		piwikstatsdb.recreateDBAndTables();
 
 		piwikstatsdb.createPedocsOldUsageData();
+
 		Statement stmt = ConnectDB.getHiveConnection().createStatement();
 
 		logger.info("Creating LaReferencia tables");

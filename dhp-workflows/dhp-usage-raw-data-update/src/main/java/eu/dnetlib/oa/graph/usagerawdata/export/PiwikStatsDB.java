@@ -179,6 +179,10 @@ public class PiwikStatsDB {
 			createPedocsOldUsageData();
 			logger.info("Pedocs Tables Created");
 
+			logger.info("Create Datacite Tables");
+			createDatasetsUsageData();
+			logger.info("Datacite Tables Created");
+
 		} catch (Exception e) {
 			logger.error("Failed to process logs: " + e);
 			throw new Exception("Failed to process logs: " + e.toString(), e);
@@ -281,6 +285,7 @@ public class PiwikStatsDB {
 
 		// clean view double clicks
 		logger.info("Cleaning action double clicks");
+		ConnectDB.getHiveConnection().setAutoCommit(false);
 		sql = "DELETE from " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogtmp "
 			+ "WHERE EXISTS (\n"
 			+ "SELECT DISTINCT p1.source, p1.id_visit, p1.action, p1.entity_id, p1.timestamp \n"
@@ -750,6 +755,16 @@ public class PiwikStatsDB {
 		stmt.executeUpdate(sql);
 		logger.info("Dropped sarc_sushilogtmp_json_non_array");
 
+		logger.info("Dropping piwiklogb2sharetmp");
+		sql = "DROP TABLE " + ConnectDB.getUsageStatsDBSchema() + ".piwiklogb2sharetmp";
+		stmt.executeUpdate(sql);
+		logger.info("Dropped piwiklogb2sharetmp");
+
+		logger.info("Dropping piwiklog_b2share_tmp_json");
+		sql = "DROP TABLE " + ConnectDB.getUsageStatsDBSchema() + ".piwiklog_b2share_tmp_json";
+		stmt.executeUpdate(sql);
+		logger.info("Dropped piwiklog_b2share_tmp_json");
+
 		stmt.close();
 		ConnectDB.getHiveConnection().close();
 
@@ -830,6 +845,34 @@ public class PiwikStatsDB {
 			+ ".pedocsolddownloads as select * from default.pedocsdownloads";
 		stmt.executeUpdate(sql);
 		logger.info("PeDocs Old Downloads Table created");
+
+	}
+
+	public void createDatasetsUsageData() throws SQLException {
+		Statement stmt = ConnectDB.getHiveConnection().createStatement();
+		ConnectDB.getHiveConnection().setAutoCommit(false);
+
+		logger.info("Dropping datacite_views");
+		String sql = "DROP TABLE " + ConnectDB.getUsageStatsDBSchema() + ".datacite_views";
+		stmt.executeUpdate(sql);
+		logger.info("Dropped datacite_views");
+
+		logger.info("Dropping datacite_downloads");
+		sql = "DROP TABLE " + ConnectDB.getUsageStatsDBSchema() + ".datacite_downloads";
+		stmt.executeUpdate(sql);
+		logger.info("Dropped datacite_downloads");
+
+		logger.info("Creating Datasets Views Table");
+		sql = "Create TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
+			+ ".datacite_views as select * from openaire_prod_datacite_usage_stats.datacite_views";
+		stmt.executeUpdate(sql);
+		logger.info("Datasets Views Table created");
+
+		logger.info("Creating Datasets Downloads Table");
+		sql = "Create TABLE IF NOT EXISTS " + ConnectDB.getUsageStatsDBSchema()
+			+ ".datacite_downloads as select * from openaire_prod_datacite_usage_stats.datacite_downloads";
+		stmt.executeUpdate(sql);
+		logger.info("Datasets Downloads Table created");
 
 	}
 }

@@ -215,5 +215,11 @@
     "paramLongName": "numberOfDownloadThreads",
     "paramDescription": "Number of download threads",
     "paramRequired": true
+  },
+    {
+    "paramName": "b2shareID",
+    "paramLongName": "b2shareID",
+    "paramDescription": "B2SHARE Matomo ID",
+    "paramRequired": true
   }
 ]
