@@ -3,10 +3,9 @@ package eu.dnetlib.dhp.actionmanager.datacite
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.action.AtomicAction
+import eu.dnetlib.dhp.schema.common.{ModelConstants, ModelSupport}
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Instance, KeyValue, Oaf, OtherResearchProduct, Publication, Qualifier, Relation, Result, Software, StructuredProperty, Dataset => OafDataset}
-import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf.{AccessRight, Author, DataInfo, Instance, KeyValue, Oaf, OtherResearchProduct, Publication, Qualifier, Relation, Result, Software, StructuredProperty, Dataset => OafDataset}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
@@ -25,6 +24,8 @@ import scala.io.{Codec, Source}
 
 case class DataciteType(doi: String, timestamp: Long, isActive: Boolean, json: String) {}
 
+case class RelatedIdentifierType(relationType: String, relatedIdentifier: String, relatedIdentifierType: String) {}
+
 case class NameIdentifiersType(nameIdentifierScheme: Option[String], schemeUri: Option[String], nameIdentifier: Option[String]) {}
 
 case class CreatorType(nameType: Option[String], nameIdentifiers: Option[List[NameIdentifiersType]], name: Option[String], familyName: Option[String], givenName: Option[String], affiliation: Option[List[String]]) {}
@@ -42,6 +43,36 @@ case class DateType(date: Option[String], dateType: Option[String]) {}
 case class HostedByMapType(openaire_id: String, datacite_name: String, official_name: String, similarity: Option[Float]) {}
 
 object DataciteToOAFTransformation {
+
+val REL_TYPE_VALUE:String = "resultResult"
+
+  val subRelTypeMapping: Map[String,String] = Map(
+    "References" ->"relationship",
+    "IsSupplementTo" ->"supplement",
+    "IsPartOf" ->"part",
+    "HasPart" ->"part",
+    "IsVersionOf" ->"version",
+    "HasVersion" ->"version",
+    "IsIdenticalTo" ->"relationship",
+    "IsPreviousVersionOf" ->"version",
+    "IsContinuedBy" ->"relationship",
+    "Continues" ->"relationship",
+    "IsNewVersionOf" ->"version",
+    "IsSupplementedBy" ->"supplement",
+    "IsDocumentedBy" ->"relationship",
+    "IsSourceOf" ->"relationship",
+    "Cites" ->"citation",
+    "IsCitedBy" ->"citation",
+    "IsDerivedFrom" ->"relationship",
+    "IsVariantFormOf" ->"version",
+    "IsReferencedBy" ->"relationship",
+    "IsObsoletedBy" ->"version",
+    "Reviews" ->"review",
+    "Documents" ->"relationship",
+    "IsCompiledBy" ->"relationship",
+    "Compiles" ->"relationship",
+    "IsReviewedBy" ->"review"
+  )
 
   implicit val codec: Codec = Codec("UTF-8")
   codec.onMalformedInput(CodingErrorAction.REPLACE)
@@ -232,6 +263,7 @@ object DataciteToOAFTransformation {
    * As describe in ticket #6377
    * when the result come from figshare we need to remove subject
    * and set Access rights OPEN.
+   *
    * @param r
    */
   def fix_figshare(r: Result): Unit = {
@@ -246,6 +278,12 @@ object DataciteToOAFTransformation {
     }
 
 
+  }
+
+
+  def createDNetTargetIdentifier(pid: String, pidType: String, idPrefix: String): String = {
+    val f_part = s"$idPrefix|${pidType.toLowerCase}".padTo(15, '_')
+    s"$f_part::${IdentifierFactory.md5(pid.toLowerCase)}"
   }
 
   def generateOAFDate(dt: String, q: Qualifier): StructuredProperty = {
@@ -286,7 +324,7 @@ object DataciteToOAFTransformation {
   }
 
 
-  def generateOAF(input: String, ts: Long, dateOfCollection: Long, vocabularies: VocabularyGroup): List[Oaf] = {
+  def generateOAF(input: String, ts: Long, dateOfCollection: Long, vocabularies: VocabularyGroup, exportLinks: Boolean): List[Oaf] = {
     if (filter_json(input))
       return List()
 
@@ -468,11 +506,44 @@ object DataciteToOAFTransformation {
       JField("awardUri", JString(awardUri)) <- fundingReferences
     } yield awardUri
 
-    val relations: List[Relation] = awardUris.flatMap(a => get_projectRelation(a, result.getId)).filter(r => r != null)
+    var relations: List[Relation] = awardUris.flatMap(a => get_projectRelation(a, result.getId)).filter(r => r != null)
+
+
     fix_figshare(result)
     result.setId(IdentifierFactory.createIdentifier(result))
     if (result.getId == null)
       return List()
+
+    if (exportLinks) {
+      val rels: List[RelatedIdentifierType] = for {
+        JObject(relIdentifier) <- json \\ "relatedIdentifiers"
+        JField("relationType", JString(relationType)) <- relIdentifier
+        JField("relatedIdentifierType", JString(relatedIdentifierType)) <- relIdentifier
+        JField("relatedIdentifier", JString(relatedIdentifier)) <- relIdentifier
+      } yield RelatedIdentifierType(relationType, relatedIdentifier, relatedIdentifierType)
+
+
+      relations = relations ::: rels
+        .filter(r =>
+          subRelTypeMapping.contains(r.relationType) && (
+          r.relatedIdentifierType.equalsIgnoreCase("doi") ||
+            r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
+            r.relatedIdentifierType.equalsIgnoreCase("arxiv") )
+        )
+        .map(r => {
+          val rel = new Relation
+
+          val subRelType = subRelTypeMapping.get(r.relationType)
+          rel.setRelType(REL_TYPE_VALUE)
+          rel.setSubRelType(subRelType.get)
+          rel.setRelClass(r.relationType)
+          rel.setSource(result.getId)
+          rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+          rel.setDataInfo(dataInfo)
+          rel.setTarget(createDNetTargetIdentifier(r.relatedIdentifier, r.relatedIdentifierType, "50|"))
+          rel
+        })
+    }
     if (relations != null && relations.nonEmpty) {
       List(result) ::: relations
     }

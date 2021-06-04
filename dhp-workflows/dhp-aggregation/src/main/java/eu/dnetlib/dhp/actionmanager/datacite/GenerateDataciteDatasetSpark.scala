@@ -22,6 +22,7 @@ object GenerateDataciteDatasetSpark {
     val master = parser.get("master")
     val sourcePath = parser.get("sourcePath")
     val targetPath = parser.get("targetPath")
+    val exportLinks = "true".equalsIgnoreCase(parser.get("exportLinks"))
     val isLookupUrl: String = parser.get("isLookupUrl")
     log.info("isLookupUrl: {}", isLookupUrl)
 
@@ -40,7 +41,7 @@ object GenerateDataciteDatasetSpark {
 
     spark.read.load(sourcePath).as[DataciteType]
       .filter(d => d.isActive)
-      .flatMap(d => DataciteToOAFTransformation.generateOAF(d.json, d.timestamp, d.timestamp, vocabularies))
+      .flatMap(d => DataciteToOAFTransformation.generateOAF(d.json, d.timestamp, d.timestamp, vocabularies, exportLinks))
       .filter(d => d != null)
       .write.mode(SaveMode.Overwrite).save(targetPath)
   }
