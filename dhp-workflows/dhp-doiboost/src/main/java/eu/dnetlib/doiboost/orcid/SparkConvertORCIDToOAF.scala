@@ -16,8 +16,8 @@ object SparkConvertORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(SparkConvertORCIDToOAF.getClass)
 
     def fixORCIDItem(item :ORCIDItem):ORCIDItem = {
-    item.authors = item.authors.groupBy(_.oid).map(_._2.head)
-    item
+      new ORCIDItem(item.doi, item.authors.groupBy(_.oid).map(_._2.head).toList)
+
   }
 
 
