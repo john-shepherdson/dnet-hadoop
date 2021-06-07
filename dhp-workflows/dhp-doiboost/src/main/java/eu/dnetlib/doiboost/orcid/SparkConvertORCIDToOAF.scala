@@ -40,7 +40,7 @@ object SparkConvertORCIDToOAF {
     works.joinWith(authors, authors("oid").equalTo(works("oid")))
       .map(i =>{
       val doi = i._1.doi
-      val author = i._2
+      var author = i._2
       (doi, author)
     }).groupBy(col("_1").alias("doi"))
       .agg(collect_list(col("_2")).alias("authors")).as[ORCIDItem]
