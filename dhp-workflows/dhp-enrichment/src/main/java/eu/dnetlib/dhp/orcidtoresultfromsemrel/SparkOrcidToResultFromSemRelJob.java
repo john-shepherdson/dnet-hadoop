@@ -108,7 +108,7 @@ public class SparkOrcidToResultFromSemRelJob {
 		return value -> {
 			R ret = value._1();
 			Optional<ResultOrcidList> rol = Optional.ofNullable(value._2());
-			if (rol.isPresent()) {
+			if (rol.isPresent() && Optional.ofNullable(ret.getAuthor()).isPresent()) {
 				List<Author> toenrich_author = ret.getAuthor();
 				List<AutoritativeAuthor> autoritativeAuthors = rol.get().getAuthorList();
 				for (Author author : toenrich_author) {
