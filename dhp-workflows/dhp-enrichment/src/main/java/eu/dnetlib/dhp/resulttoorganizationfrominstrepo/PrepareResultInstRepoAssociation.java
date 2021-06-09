@@ -93,9 +93,9 @@ public class PrepareResultInstRepoAssociation {
 		SparkSession spark, String datasourceOrganizationPath, List<String> blacklist) {
 		String blacklisted = "";
 		if (blacklist.size() > 0) {
-			blacklisted = " AND  d.id != '" + blacklist.get(0) + "'";
+			blacklisted = " AND  id != '" + blacklist.get(0) + "'";
 			for (int i = 1; i < blacklist.size(); i++) {
-				blacklisted += " AND d.id != '" + blacklist.get(i) + "'";
+				blacklisted += " AND id != '" + blacklist.get(i) + "'";
 			}
 		}
 
