@@ -41,7 +41,8 @@ SELECT p.id,
        CASE WHEN prr2.id IS NULL THEN 0 ELSE prr2.daysForlastPub END AS daysforlastpub,
        CASE WHEN prr2.id IS NULL THEN 0 ELSE prr2.dp END             AS delayedpubs,
        p.callidentifier,
-       p.code
+       p.code,
+       p.totalcost
 FROM ${stats_db_name}.project_tmp p
          LEFT JOIN (SELECT pr.id, count(distinct pr.result) AS np
                     FROM ${stats_db_name}.project_results pr
