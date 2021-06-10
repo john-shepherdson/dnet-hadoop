@@ -34,7 +34,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${mainPath}/datacite_dump</arg>
-            <arg>--targetPath</arg><arg>${mainPath}/datacite_oaf_production</arg>
+            <arg>--targetPath</arg><arg>${mainPath}/production/datacite_oaf</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
