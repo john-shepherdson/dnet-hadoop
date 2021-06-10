@@ -37,6 +37,13 @@
             <artifactId>dhp-schemas</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-graph-mapper</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
 
         <dependency>
             <groupId>net.sf.saxon</groupId>
