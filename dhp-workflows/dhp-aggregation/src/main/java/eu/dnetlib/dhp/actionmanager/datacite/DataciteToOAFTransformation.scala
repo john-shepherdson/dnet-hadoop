@@ -17,6 +17,7 @@ import org.json4s.jackson.JsonMethods.parse
 import java.nio.charset.CodingErrorAction
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.chrono.ThaiBuddhistDate
 import java.time.format.DateTimeFormatter
 import java.util.{Date, Locale}
 import java.util.regex.Pattern
@@ -162,6 +163,16 @@ object DataciteToOAFTransformation {
       }
     }
     d
+  }
+
+  def fix_thai_date(input:String, format:String) :String = {
+    try {
+      val a_date = LocalDate.parse(input,DateTimeFormatter.ofPattern(format))
+      val d = ThaiBuddhistDate.of(a_date.getYear, a_date.getMonth.getValue, a_date.getDayOfMonth)
+      LocalDate.from(d).toString
+    } catch {
+      case _: Throwable => ""
+    }
   }
 
   def getTypeQualifier(resourceType: String, resourceTypeGeneral: String, schemaOrg: String, vocabularies: VocabularyGroup): (Qualifier, Qualifier) = {
@@ -377,17 +388,31 @@ object DataciteToOAFTransformation {
       .map(d => d.get)
 
     if (a_date.isDefined) {
-      result.setEmbargoenddate(OafMapperUtils.field(a_date.get, null))
+      if(doi.startsWith("10.14457"))
+        result.setEmbargoenddate(OafMapperUtils.field(fix_thai_date(a_date.get,"[yyyy-MM-dd]"), null))
+      else
+        result.setEmbargoenddate(OafMapperUtils.field(a_date.get, null))
     }
     if (i_date.isDefined && i_date.get.isDefined) {
-      result.setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
-      result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
+      if(doi.startsWith("10.14457")) {
+        result.setDateofacceptance(OafMapperUtils.field(fix_thai_date(i_date.get.get,"[yyyy-MM-dd]"), null))
+        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(fix_thai_date(i_date.get.get,"[yyyy-MM-dd]"), null))
+      }
+      else {
+        result.setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
+        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
+      }
     }
     else if (publication_year != null) {
-      result.setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
-      result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
-    }
+      if(doi.startsWith("10.14457")) {
+        result.setDateofacceptance(OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year","[dd-MM-yyyy]"), null))
+        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year","[dd-MM-yyyy]"), null))
 
+      } else {
+        result.setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
+        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
+      }
+    }
 
     result.setRelevantdate(dates.filter(d => d.date.isDefined && d.dateType.isDefined)
       .map(d => (extract_date(d.date.get), d.dateType.get))
@@ -468,11 +493,11 @@ object DataciteToOAFTransformation {
       JField("awardUri", JString(awardUri)) <- fundingReferences
     } yield awardUri
 
-    val relations: List[Relation] = awardUris.flatMap(a => get_projectRelation(a, result.getId)).filter(r => r != null)
-    fix_figshare(result)
     result.setId(IdentifierFactory.createIdentifier(result))
     if (result.getId == null)
       return List()
+    val relations: List[Relation] = awardUris.flatMap(a => get_projectRelation(a, result.getId)).filter(r => r != null)
+    fix_figshare(result)
     if (relations != null && relations.nonEmpty) {
       List(result) ::: relations
     }
