@@ -1,15 +1,23 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
+import org.jetbrains.annotations.NotNull;
 
+import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -119,14 +127,42 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		} else if (value instanceof Relation) {
 			Relation r = (Relation) value;
 
-			if (!isValidDate(r.getValidationDate())) {
+			Optional<String> validationDate = doCleanDate(r.getValidationDate());
+			if (validationDate.isPresent()) {
+				r.setValidationDate(validationDate.get());
+				r.setValidated(true);
+			} else {
 				r.setValidationDate(null);
 				r.setValidated(false);
 			}
-
 		} else if (value instanceof Result) {
 
 			Result r = (Result) value;
+
+			if (Objects.nonNull(r.getDateofacceptance())) {
+				Optional<String> date = cleanDateField(r.getDateofacceptance());
+				if (date.isPresent()) {
+					r.getDateofacceptance().setValue(date.get());
+				} else {
+					r.setDateofacceptance(null);
+				}
+			}
+			if (Objects.nonNull(r.getRelevantdate())) {
+				r
+					.setRelevantdate(
+						r
+							.getRelevantdate()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> Objects.nonNull(sp.getQualifier()))
+							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.map(sp -> {
+								sp.setValue(GraphCleaningFunctions.cleanDate(sp.getValue()));
+								return sp;
+							})
+							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+							.collect(Collectors.toList()));
+			}
 			if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getValue())) {
 				r.setPublisher(null);
 			}
@@ -222,6 +258,14 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 					if (Objects.isNull(i.getRefereed())) {
 						i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 					}
+					if (Objects.nonNull(i.getDateofacceptance())) {
+						Optional<String> date = cleanDateField(i.getDateofacceptance());
+						if (date.isPresent()) {
+							i.getDateofacceptance().setValue(date.get());
+						} else {
+							i.setDateofacceptance(null);
+						}
+					}
 				}
 			}
 			if (Objects.isNull(r.getBestaccessright()) || StringUtils.isBlank(r.getBestaccessright().getClassid())) {
@@ -300,10 +344,34 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return value;
 	}
 
-	protected static boolean isValidDate(String date) {
-		return Stream
-			.of(ModelSupport.DATE_TIME_FORMATS)
-			.anyMatch(format -> GenericValidator.isDate(date, format, false));
+	private static Optional<String> cleanDateField(Field<String> dateofacceptance) {
+		return Optional
+			.ofNullable(dateofacceptance)
+			.map(Field::getValue)
+			.map(GraphCleaningFunctions::cleanDate)
+			.filter(Objects::nonNull);
+	}
+
+	protected static Optional<String> doCleanDate(String date) {
+		return Optional.ofNullable(cleanDate(date));
+	}
+
+	public static String cleanDate(final String inputDate) {
+
+		if (StringUtils.isBlank(inputDate)) {
+			return null;
+		}
+
+		try {
+			final LocalDate date = DateParserUtils
+				.parseDate(inputDate.trim())
+				.toInstant()
+				.atZone(ZoneId.systemDefault())
+				.toLocalDate();
+			return DateTimeFormatter.ofPattern(ModelSupport.DATE_FORMAT).format(date);
+		} catch (DateTimeParseException e) {
+			return null;
+		}
 	}
 
 	// HELPERS

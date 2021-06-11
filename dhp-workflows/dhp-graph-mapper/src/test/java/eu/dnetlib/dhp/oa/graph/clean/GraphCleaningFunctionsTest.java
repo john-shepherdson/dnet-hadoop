@@ -129,6 +129,8 @@ public class GraphCleaningFunctionsTest {
 		assertEquals("CLOSED", p_cleaned.getBestaccessright().getClassid());
 		assertNull(p_out.getPublisher());
 
+		assertEquals("1970-10-07", p_cleaned.getDateofacceptance().getValue());
+
 		final List<Instance> pci = p_cleaned.getInstance();
 		assertNotNull(pci);
 		assertEquals(1, pci.size());
