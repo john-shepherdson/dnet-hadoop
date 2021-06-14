@@ -1,0 +1,77 @@
+<record xmlns:oaf="http://namespace.openaire.eu/oaf"
+	xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+	xmlns:datacite="http://datacite.org/schema/kernel-3"
+	xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+	xmlns:dri="http://www.driver-repository.eu/namespace/dri">
+	<header xmlns="http://www.openarchives.org/OAI/2.0/">
+		<identifier>df76e73f-0483-49a4-a9bb-63f2f985574a</identifier>
+		<datestamp>2020-09-30T08:17:54Z</datestamp>
+		<setSpec>eudat-b2find</setSpec>
+		<dr:dateOfTransformation>2021-05-20T13:43:52.888Z</dr:dateOfTransformation>
+		<dri:objIdentifier>test________::92fe3efa47883b2f3401e6a4bd92e9d7</dri:objIdentifier>
+		<dri:dateOfCollection>2020-05-21T05:26:15.93Z</dri:dateOfCollection>
+		<dri:dateOfTransformation>2020-08-01T11:06:26.977Z</dri:dateOfTransformation>
+	</header>
+	<metadata>
+		<resource xmlns="http://datacite.org/schema/kernel-4"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.3/metadata.xsd">
+			<creators>
+				<creator>
+					<creatorName>Museum Sønderjylland</creatorName>
+				</creator>
+			</creators>
+			<titles>
+				<title>200202-124 Hjelmvrå</title>
+			</titles>
+			<descriptions>
+				<description descriptionType="Abstract">This record describes
+					ancient sites and monuments as well archaeological excavations
+					undertaken by Danish museums. Excerpt of the Danish description of
+					events: 1995-04-26: Ved en besigtigelse ud for stedet fandt Nørgård
+					en større mængde skår i skovens udkant, liggende i nogle
+					drængrøfter1995-04-26: Leif Nørgård, der er leder af Sønderjyllands
+					Amatørarkæologer, havde ved en samtale med en tidligere ansat på
+					motorvejsprojektet gennem Sønderjylland fået at vide, at man på
+					dette sted havde fundet "urner".1995-04-26: Ved en besigtigelse ud
+					for stedet fandt Nørgård en større mængde skår i skovens udkant,
+					liggende i nogle drængrøfter1995-04-26: Leif Nørgård, der er leder
+					af Sønderjyllands Amatørarkæologer, havde ved en samtale med en
+					tidligere ansat på motorvejsprojektet gennem Sønderjylland fået at
+					vide, at man på dette sted havde fundet "urner".</description>
+			</descriptions>
+			<geoLocations>
+				<geoLocation>
+					<geoLocationPlace>(9.376 LON, 55.220 LAT)</geoLocationPlace>
+				</geoLocation>
+			</geoLocations>
+			<subjects>
+				<subject>Enkeltfund</subject>
+				<subject>Settlement</subject>
+				<subject>Single find</subject>
+				<subject>Archaeology</subject>
+			</subjects>
+			<alternateIdentifiers
+				xmlns="http://datacite.org/schema/kernel-3">
+				<alternateIdentifier
+					xmlns="http://datacite.org/schema/kernel-4"
+					alternateIdentifierType="URL">http://www.kulturarv.dk/fundogfortidsminder/Lokalitet/136540/</alternateIdentifier>
+			</alternateIdentifiers>
+			<publicationYear>2020</publicationYear>
+			<publisher>Slots- og Kulturstyrelsen (www.slks.dk)</publisher>
+			<language>Danish</language>
+			<rightsList>
+				<rights>Public</rights>
+			</rightsList>
+			<resourceType resourceTypeGeneral="Other">Dataset</resourceType>
+		</resource>
+		<dr:CobjCategory type="dataset">0021</dr:CobjCategory>
+		<oaf:dateAccepted>2020-01-01</oaf:dateAccepted>
+		<oaf:accessrights>UNKNOWN</oaf:accessrights>
+		<oaf:language>Danish</oaf:language>
+		<oaf:hostedBy name="B2FIND"
+			id="re3data_____::r3d100012377" />
+		<oaf:collectedFrom name="B2FIND"
+			id="re3data_____::r3d100012377" />
+	</metadata>
+</record>
