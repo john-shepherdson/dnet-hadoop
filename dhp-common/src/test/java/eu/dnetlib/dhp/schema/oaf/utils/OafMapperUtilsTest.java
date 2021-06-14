@@ -132,6 +132,11 @@ public class OafMapperUtilsTest {
 	}
 
 	@Test
+	public void testDate() {
+		System.out.println(GraphCleaningFunctions.cleanDate("23-FEB-1998"));
+	}
+
+	@Test
 	public void testMergePubs() throws IOException {
 		Publication p1 = read("publication_1.json", Publication.class);
 		Publication p2 = read("publication_2.json", Publication.class);

@@ -26,8 +26,9 @@ import eu.dnetlib.dhp.schema.oaf.*;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 
+	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
+	public static final int ORCID_LEN = 19;
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
-	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
 	public static final String INVALID_AUTHOR_REGEX = ".*deactivated.*";
 	public static final String TITLE_FILTER_REGEX = "[.*test.*\\W\\d]";
 	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 10;
@@ -281,7 +282,27 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
-				final List<Author> authors = Lists.newArrayList();
+				r
+					.setAuthor(
+						r
+							.getAuthor()
+							.stream()
+							.filter(a -> Objects.nonNull(a))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+							.collect(Collectors.toList()));
+
+				boolean nullRank = r
+					.getAuthor()
+					.stream()
+					.anyMatch(a -> Objects.isNull(a.getRank()));
+				if (nullRank) {
+					int i = 1;
+					for (Author author : r.getAuthor()) {
+						author.setRank(i++);
+					}
+				}
+
 				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
 						a.setPid(Lists.newArrayList());
@@ -295,40 +316,52 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.filter(p -> Objects.nonNull(p.getQualifier()))
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {
-										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
+										// hack to distinguish orcid from orcid_pending
+										String pidProvenance = Optional
+											.ofNullable(p.getDataInfo())
+											.map(
+												d -> Optional
+													.ofNullable(d.getProvenanceaction())
+													.map(Qualifier::getClassid)
+													.orElse(""))
+											.orElse("");
+										if (p
+											.getQualifier()
+											.getClassid()
+											.toLowerCase()
+											.contains(ModelConstants.ORCID)) {
+											if (pidProvenance
+												.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+												p.getQualifier().setClassid(ModelConstants.ORCID);
+											} else {
+												p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+											}
+											final String orcid = p
+												.getValue()
+												.trim()
+												.toLowerCase()
+												.replaceAll(ORCID_CLEANING_REGEX, "$1-$2-$3-$4");
+											if (orcid.length() == ORCID_LEN) {
+												p.setValue(orcid);
+											} else {
+												p.setValue("");
+											}
+										}
 										return p;
 									})
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.collect(
 										Collectors
 											.toMap(
-												StructuredProperty::getValue, Function.identity(), (p1, p2) -> p1,
+												p -> p.getQualifier().getClassid() + p.getValue(),
+												Function.identity(),
+												(p1, p2) -> p1,
 												LinkedHashMap::new))
 									.values()
 									.stream()
 									.collect(Collectors.toList()));
 					}
-					if (StringUtils.isBlank(a.getFullname())) {
-						if (StringUtils.isNotBlank(a.getName()) && StringUtils.isNotBlank(a.getSurname())) {
-							a.setFullname(a.getSurname() + ", " + a.getName());
-						}
-					}
-					if (StringUtils.isNotBlank(a.getFullname()) && isValidAuthorName(a)) {
-						authors.add(a);
-					}
 				}
-
-				boolean nullRank = authors
-					.stream()
-					.anyMatch(a -> Objects.isNull(a.getRank()));
-				if (nullRank) {
-					int i = 1;
-					for (Author author : authors) {
-						author.setRank(i++);
-					}
-				}
-				r.setAuthor(authors);
-
 			}
 			if (value instanceof Publication) {
 

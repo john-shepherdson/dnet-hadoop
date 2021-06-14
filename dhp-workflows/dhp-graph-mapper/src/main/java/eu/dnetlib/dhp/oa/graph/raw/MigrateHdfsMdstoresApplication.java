@@ -102,11 +102,6 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 			.mapToPair(xml -> new Tuple2<>(new Text(UUID.randomUUID() + ":" + type), new Text(xml)))
 			// .coalesce(1)
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
-
-		/*
-		 * .foreach(xml -> { try { writer.append(new Text(UUID.randomUUID() + ":" + type), new Text(xml)); } catch
-		 * (final Exception e) { throw new RuntimeException(e); } });
-		 */
 	}
 
 	private static String enrichRecord(final Row r) {
