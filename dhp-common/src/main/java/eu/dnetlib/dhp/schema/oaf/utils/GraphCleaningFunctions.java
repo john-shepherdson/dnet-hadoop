@@ -1,15 +1,23 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
+import org.jetbrains.annotations.NotNull;
 
+import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -18,8 +26,9 @@ import eu.dnetlib.dhp.schema.oaf.*;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 
+	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
+	public static final int ORCID_LEN = 19;
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
-	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
 	public static final String INVALID_AUTHOR_REGEX = ".*deactivated.*";
 	public static final String TITLE_FILTER_REGEX = "[.*test.*\\W\\d]";
 	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 10;
@@ -119,14 +128,42 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		} else if (value instanceof Relation) {
 			Relation r = (Relation) value;
 
-			if (!isValidDate(r.getValidationDate())) {
+			Optional<String> validationDate = doCleanDate(r.getValidationDate());
+			if (validationDate.isPresent()) {
+				r.setValidationDate(validationDate.get());
+				r.setValidated(true);
+			} else {
 				r.setValidationDate(null);
 				r.setValidated(false);
 			}
-
 		} else if (value instanceof Result) {
 
 			Result r = (Result) value;
+
+			if (Objects.nonNull(r.getDateofacceptance())) {
+				Optional<String> date = cleanDateField(r.getDateofacceptance());
+				if (date.isPresent()) {
+					r.getDateofacceptance().setValue(date.get());
+				} else {
+					r.setDateofacceptance(null);
+				}
+			}
+			if (Objects.nonNull(r.getRelevantdate())) {
+				r
+					.setRelevantdate(
+						r
+							.getRelevantdate()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> Objects.nonNull(sp.getQualifier()))
+							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.map(sp -> {
+								sp.setValue(GraphCleaningFunctions.cleanDate(sp.getValue()));
+								return sp;
+							})
+							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+							.collect(Collectors.toList()));
+			}
 			if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getValue())) {
 				r.setPublisher(null);
 			}
@@ -222,6 +259,14 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 					if (Objects.isNull(i.getRefereed())) {
 						i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 					}
+					if (Objects.nonNull(i.getDateofacceptance())) {
+						Optional<String> date = cleanDateField(i.getDateofacceptance());
+						if (date.isPresent()) {
+							i.getDateofacceptance().setValue(date.get());
+						} else {
+							i.setDateofacceptance(null);
+						}
+					}
 				}
 			}
 			if (Objects.isNull(r.getBestaccessright()) || StringUtils.isBlank(r.getBestaccessright().getClassid())) {
@@ -237,7 +282,27 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
-				final List<Author> authors = Lists.newArrayList();
+				r
+					.setAuthor(
+						r
+							.getAuthor()
+							.stream()
+							.filter(a -> Objects.nonNull(a))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+							.collect(Collectors.toList()));
+
+				boolean nullRank = r
+					.getAuthor()
+					.stream()
+					.anyMatch(a -> Objects.isNull(a.getRank()));
+				if (nullRank) {
+					int i = 1;
+					for (Author author : r.getAuthor()) {
+						author.setRank(i++);
+					}
+				}
+
 				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
 						a.setPid(Lists.newArrayList());
@@ -251,40 +316,52 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.filter(p -> Objects.nonNull(p.getQualifier()))
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {
-										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
+										// hack to distinguish orcid from orcid_pending
+										String pidProvenance = Optional
+											.ofNullable(p.getDataInfo())
+											.map(
+												d -> Optional
+													.ofNullable(d.getProvenanceaction())
+													.map(Qualifier::getClassid)
+													.orElse(""))
+											.orElse("");
+										if (p
+											.getQualifier()
+											.getClassid()
+											.toLowerCase()
+											.contains(ModelConstants.ORCID)) {
+											if (pidProvenance
+												.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+												p.getQualifier().setClassid(ModelConstants.ORCID);
+											} else {
+												p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+											}
+											final String orcid = p
+												.getValue()
+												.trim()
+												.toLowerCase()
+												.replaceAll(ORCID_CLEANING_REGEX, "$1-$2-$3-$4");
+											if (orcid.length() == ORCID_LEN) {
+												p.setValue(orcid);
+											} else {
+												p.setValue("");
+											}
+										}
 										return p;
 									})
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.collect(
 										Collectors
 											.toMap(
-												StructuredProperty::getValue, Function.identity(), (p1, p2) -> p1,
+												p -> p.getQualifier().getClassid() + p.getValue(),
+												Function.identity(),
+												(p1, p2) -> p1,
 												LinkedHashMap::new))
 									.values()
 									.stream()
 									.collect(Collectors.toList()));
 					}
-					if (StringUtils.isBlank(a.getFullname())) {
-						if (StringUtils.isNotBlank(a.getName()) && StringUtils.isNotBlank(a.getSurname())) {
-							a.setFullname(a.getSurname() + ", " + a.getName());
-						}
-					}
-					if (StringUtils.isNotBlank(a.getFullname()) && isValidAuthorName(a)) {
-						authors.add(a);
-					}
 				}
-
-				boolean nullRank = authors
-					.stream()
-					.anyMatch(a -> Objects.isNull(a.getRank()));
-				if (nullRank) {
-					int i = 1;
-					for (Author author : authors) {
-						author.setRank(i++);
-					}
-				}
-				r.setAuthor(authors);
-
 			}
 			if (value instanceof Publication) {
 
@@ -300,10 +377,34 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return value;
 	}
 
-	protected static boolean isValidDate(String date) {
-		return Stream
-			.of(ModelSupport.DATE_TIME_FORMATS)
-			.anyMatch(format -> GenericValidator.isDate(date, format, false));
+	private static Optional<String> cleanDateField(Field<String> dateofacceptance) {
+		return Optional
+			.ofNullable(dateofacceptance)
+			.map(Field::getValue)
+			.map(GraphCleaningFunctions::cleanDate)
+			.filter(Objects::nonNull);
+	}
+
+	protected static Optional<String> doCleanDate(String date) {
+		return Optional.ofNullable(cleanDate(date));
+	}
+
+	public static String cleanDate(final String inputDate) {
+
+		if (StringUtils.isBlank(inputDate)) {
+			return null;
+		}
+
+		try {
+			final LocalDate date = DateParserUtils
+				.parseDate(inputDate.trim())
+				.toInstant()
+				.atZone(ZoneId.systemDefault())
+				.toLocalDate();
+			return DateTimeFormatter.ofPattern(ModelSupport.DATE_FORMAT).format(date);
+		} catch (DateTimeParseException e) {
+			return null;
+		}
 	}
 
 	// HELPERS

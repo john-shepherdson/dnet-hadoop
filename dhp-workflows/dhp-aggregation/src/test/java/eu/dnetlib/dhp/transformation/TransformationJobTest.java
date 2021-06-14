@@ -51,11 +51,11 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 	@DisplayName("Test Date cleaner")
 	public void testDateCleaner() throws Exception {
 		DateCleaner dc = new DateCleaner();
-		assertEquals(dc.clean("20/09/1982"), "1982-09-20");
-		assertEquals(dc.clean("20-09-2002"), "2002-09-20");
-		assertEquals(dc.clean("2002-09-20"), "2002-09-20");
-		assertEquals(dc.clean("2002-9"), "2002-09-01");
-		assertEquals(dc.clean("2021"), "2021-01-01");
+		assertEquals("1982-09-20", dc.clean("20/09/1982"));
+		assertEquals("2002-09-20", dc.clean("20-09-2002"));
+		assertEquals("2002-09-20", dc.clean("2002-09-20"));
+		assertEquals("2002-09-01", dc.clean("2002-9"));
+		assertEquals("2021-01-01", dc.clean("2021"));
 	}
 
 	@Test

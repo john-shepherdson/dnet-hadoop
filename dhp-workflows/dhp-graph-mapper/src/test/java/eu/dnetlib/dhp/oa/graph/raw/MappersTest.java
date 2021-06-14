@@ -1,7 +1,11 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
@@ -21,7 +25,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -183,8 +195,8 @@ public class MappersTest {
 			.findFirst()
 			.get();
 		assertEquals("0000-0001-6651-1178", pid.getValue());
-		assertEquals("ORCID", pid.getQualifier().getClassid());
-		assertEquals("Open Researcher and Contributor ID", pid.getQualifier().getClassname());
+		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
+		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Votsi,Nefta", author.get().getFullname());
@@ -409,7 +421,10 @@ public class MappersTest {
 		assertEquals(1, d.getTitle().size());
 		assertEquals(
 			"Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia",
-			d.getTitle().get(0).getValue());
+			d
+				.getTitle()
+				.get(0)
+				.getValue());
 
 		assertNotNull(d.getDescription());
 		assertEquals(1, d.getDescription().size());
@@ -435,7 +450,7 @@ public class MappersTest {
 		assertNotNull(d.getInstance());
 		assertTrue(d.getInstance().size() == 1);
 
-		Instance i = d.getInstance().get(0);
+		final Instance i = d.getInstance().get(0);
 
 		assertNotNull(i.getAccessright());
 		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemeid());
@@ -633,7 +648,55 @@ public class MappersTest {
 		System.out.println(p.getTitle().get(0).getValue());
 	}
 
+	@Test
+	void testOdfFromHdfs() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_from_hdfs.xml"));
+
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		assertEquals(1, list.size());
+
+		System.out.println(list.get(0).getClass());
+
+		assertTrue(list.get(0) instanceof Dataset);
+
+		final Dataset p = (Dataset) list.get(0);
+
+		assertValidId(p.getId());
+		assertTrue(p.getOriginalId().size() == 1);
+		assertEquals("df76e73f-0483-49a4-a9bb-63f2f985574a", p.getOriginalId().get(0));
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(p.getAuthor().size() > 0);
+
+		final Optional<Author> author = p
+			.getAuthor()
+			.stream()
+			.findFirst();
+		assertTrue(author.isPresent());
+
+		assertEquals("Museum Sønderjylland", author.get().getFullname());
+
+		assertTrue(p.getSubject().size() > 0);
+		assertTrue(p.getInstance().size() > 0);
+
+		assertNotNull(p.getTitle());
+		assertFalse(p.getTitle().isEmpty());
+
+		assertNotNull(p.getInstance());
+		assertTrue(p.getInstance().size() > 0);
+		p
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("UNKNOWN", i.getAccessright().getClassid());
+			});
+		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+	}
+
 	private void assertValidId(final String id) {
+		System.out.println(id);
+
 		assertEquals(49, id.length());
 		assertEquals('|', id.charAt(2));
 		assertEquals(':', id.charAt(15));
