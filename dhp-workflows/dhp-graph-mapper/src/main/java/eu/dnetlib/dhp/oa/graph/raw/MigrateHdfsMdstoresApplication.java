@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -52,9 +54,8 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					MigrateHdfsMdstoresApplication.class
-						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_hdfs_mstores_parameters.json")));
+				.toString(MigrateHdfsMdstoresApplication.class
+					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_hdfs_mstores_parameters.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -94,14 +95,18 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
 			.toArray(size -> new String[size]);
 
-		spark
-			.read()
-			.parquet(validPaths)
-			.map((MapFunction<Row, String>) r -> enrichRecord(r), Encoders.STRING())
-			.toJavaRDD()
-			.mapToPair(xml -> new Tuple2<>(new Text(UUID.randomUUID() + ":" + type), new Text(xml)))
-			// .coalesce(1)
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+		if (validPaths.length > 0) {
+			spark
+				.read()
+				.parquet(validPaths)
+				.map((MapFunction<Row, String>) r -> enrichRecord(r), Encoders.STRING())
+				.toJavaRDD()
+				.mapToPair(xml -> new Tuple2<>(new Text(UUID.randomUUID() + ":" + type), new Text(xml)))
+				// .coalesce(1)
+				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+		} else {
+			FileSystem.get(sc.hadoopConfiguration()).createNewFile(new Path(outputPath));
+		}
 	}
 
 	private static String enrichRecord(final Row r) {
