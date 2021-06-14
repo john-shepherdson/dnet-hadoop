@@ -8,7 +8,7 @@ import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.lang.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
-import org.json4s.JsonAST._
+import org.json4s.JsonAST.{JValue, _}
 import org.json4s.jackson.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -408,6 +408,14 @@ case object Crossref2Oaf {
     // TODO check if there are other info to map into the Dataset
   }
 
+
+  def extractDump(input:String):List[String] = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = parse(input)
+
+    val a = (json \ "items").extract[JArray]
+    a.arr.map(s => compact(render(s)))
+  }
 
   def convertPublication(publication: Publication, json: JValue, cobjCategory: String): Unit = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
