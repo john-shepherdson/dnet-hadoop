@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -105,7 +103,10 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 				// .coalesce(1)
 				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 		} else {
-			FileSystem.get(sc.hadoopConfiguration()).createNewFile(new Path(outputPath));
+			spark.emptyDataFrame()
+				.toJavaRDD()
+				.mapToPair(xml -> new Tuple2<>(new Text(), new Text()))
+				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 		}
 	}
 
