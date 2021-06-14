@@ -1,13 +1,12 @@
 package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.doiboost.crossref.UnpackCrossrefDumpEntries.getClass
-import org.apache.hadoop.io.compress.GzipCodec
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.json4s
 import org.json4s.DefaultFormats
-import org.json4s.jackson.JsonMethods.parse
+import org.json4s.JsonAST.JArray
+import org.json4s.jackson.JsonMethods.{compact, parse, render}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.io.Source
@@ -18,6 +17,13 @@ object GenerateCrossrefDataset {
 
   implicit val mrEncoder: Encoder[CrossrefDT] = Encoders.kryo[CrossrefDT]
 
+  def extractDump(input:String):List[String] = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = parse(input)
+
+    val a = (json \ "items").extract[JArray]
+    a.arr.map(s => compact(render(s)))
+  }
 
 
   def crossrefElement(meta: String): CrossrefDT = {
@@ -25,7 +31,7 @@ object GenerateCrossrefDataset {
     lazy val json: json4s.JValue = parse(meta)
     val doi:String = (json \ "DOI").extract[String]
     val timestamp: Long = (json \ "indexed" \ "timestamp").extract[Long]
-    new CrossrefDT(doi, meta, timestamp)
+    CrossrefDT(doi, meta, timestamp)
 
   }
 
@@ -45,9 +51,20 @@ object GenerateCrossrefDataset {
 
     import spark.implicits._
 
-    sc.textFile(sourcePath,6000)
+
+    def extractDump(input:String):List[String] = {
+      implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+      lazy val json: json4s.JValue = parse(input)
+
+      val a = (json \ "items").extract[JArray]
+      a.arr.map(s => compact(render(s)))
+    }
+
+
+   // sc.textFile(sourcePath,6000)
+    sc.wholeTextFiles(sourcePath,6000).flatMap(d =>extractDump(d._2))
           .map(meta => crossrefElement(meta))
-          .toDS()
+          .toDS()//.as[CrossrefDT]
           .write.mode(SaveMode.Overwrite).save(targetPath)
 
   }
