@@ -44,7 +44,7 @@ object GenerateCrossrefDataset {
     val targetPath = parser.get("targetPath")
 
     val spark: SparkSession = SparkSession.builder().config(conf)
-      .appName(UnpackCrossrefDumpEntries.getClass.getSimpleName)
+      .appName(GenerateCrossrefDataset.getClass.getSimpleName)
       .master(master)
       .getOrCreate()
     val sc: SparkContext = spark.sparkContext
@@ -61,7 +61,6 @@ object GenerateCrossrefDataset {
     }
 
 
-   // sc.textFile(sourcePath,6000)
     sc.wholeTextFiles(sourcePath,6000).flatMap(d =>extractDump(d._2))
           .map(meta => crossrefElement(meta))
           .toDS()//.as[CrossrefDT]
