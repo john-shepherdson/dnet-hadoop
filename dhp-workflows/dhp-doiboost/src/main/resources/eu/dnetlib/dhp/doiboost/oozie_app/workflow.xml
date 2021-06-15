@@ -110,6 +110,7 @@
             <case to="ProcessORCID">${wf:conf('resumeFrom') eq 'PreprocessORCID'}</case>
             <case to="CreateDOIBoost">${wf:conf('resumeFrom') eq 'CreateDOIBoost'}</case>
             <case to="GenerateActionSet">${wf:conf('resumeFrom') eq 'GenerateActionSet'}</case>
+            <case to="GenerateCrossrefDataset">${wf:conf('resumeFrom') eq 'GenerateCrossrefDataset'}</case>
             <default to="ImportCrossRef"/>
         </switch>
     </decision>
@@ -139,13 +140,13 @@
             <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
             <arg>--crossrefFileNameTarGz</arg><arg>${crossrefDumpPath}/crossref.tar.gz</arg>
             <arg>--workingPath</arg><arg>${crossrefDumpPath}</arg>
-            <arg>--outputPath</arg><arg>${crossrefDumpPath}/files</arg>
+            <arg>--outputPath</arg><arg>${crossrefDumpPath}/files/</arg>
         </java>
-        <ok to="generateCrossrefDataset"/>
+        <ok to="GenerateCrossrefDataset"/>
         <error to="Kill"/>
     </action>
 
-    <action name="generateCrossrefDataset">
+    <action name="GenerateCrossrefDataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
