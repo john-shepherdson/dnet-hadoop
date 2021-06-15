@@ -31,7 +31,7 @@ group by rcount.pid;
 
 create view ${stats_db_name}.rndexpenditure as select * from stats_ext.rndexpediture;
 
-create table ${stats_db_name}.result_instance as
+create table ${stats_db_name}.result_instance stored as parquet as
 select distinct r.*
 from (
          select substr(r.id, 4) as id, inst.accessright.classname as accessright, substr(inst.collectedfrom.key, 4) as collectedfrom,
