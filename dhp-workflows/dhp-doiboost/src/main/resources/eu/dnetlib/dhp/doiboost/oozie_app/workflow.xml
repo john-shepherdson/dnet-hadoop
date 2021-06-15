@@ -139,7 +139,7 @@
             <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
             <arg>--crossrefFileNameTarGz</arg><arg>${crossrefDumpPath}/crossref.tar.gz</arg>
             <arg>--workingPath</arg><arg>${crossrefDumpPath}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/files</arg>
+            <arg>--outputPath</arg><arg>${crossrefDumpPath}/files</arg>
         </java>
         <ok to="generateCrossrefDataset"/>
         <error to="Kill"/>
@@ -163,7 +163,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--master</arg><arg>yarn-cluster</arg>
-            <arg>--sourcePath</arg><arg>${workingDir}/files/</arg>
+            <arg>--sourcePath</arg><arg>${crossrefDumpPath}/files/</arg>
             <arg>--targetPath</arg><arg>${inputPathCrossref}/crossref_ds</arg>
 
         </spark>
@@ -173,7 +173,7 @@
 
         <action name="removeFiles">
             <fs>
-                <delete path="${workingDir}/files"/>
+                <delete path="${crossrefDumpPath}/files"/>
             </fs>
             <ok to="ResetMagWorkingPath"/>
             <error to="Kill"/>
