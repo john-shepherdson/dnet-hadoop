@@ -155,7 +155,7 @@
             <jar>dhp-doiboost-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
+                --executor-cores=2
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.sql.shuffle.partitions=3840
                 --conf spark.extraListeners=${spark2ExtraListeners}
