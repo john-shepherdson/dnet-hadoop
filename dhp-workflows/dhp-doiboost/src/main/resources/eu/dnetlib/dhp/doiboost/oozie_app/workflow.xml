@@ -164,7 +164,7 @@
             </spark-opts>
             <arg>--master</arg><arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${workingDir}/files/</arg>
-            <arg>--targetPath</arg><arg>${inputPathCrossref}/crossref_ds_updated</arg>
+            <arg>--targetPath</arg><arg>${inputPathCrossref}/crossref_ds</arg>
 
         </spark>
         <ok to="removeFiles"/>
