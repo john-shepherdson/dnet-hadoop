@@ -20,9 +20,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 public class ExtractCrossrefRecords {
 	public static void main(String[] args) throws Exception {
-		String hdfsServerUri;
-		String workingPath;
-		String crossrefFileNameTarGz;
+
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
@@ -30,11 +28,12 @@ public class ExtractCrossrefRecords {
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/doiboost/crossref_dump_reader.json")));
 		parser.parseArgument(args);
-		hdfsServerUri = parser.get("hdfsServerUri");
-		workingPath = parser.get("workingPath");
-		crossrefFileNameTarGz = parser.get("crossrefFileNameTarGz");
+		final String hdfsServerUri = parser.get("hdfsServerUri");
+		final String workingPath = parser.get("workingPath");
+		final String outputPath = parser.get("outputPath");
+		final String crossrefFileNameTarGz = parser.get("crossrefFileNameTarGz");
 
-		Path hdfsreadpath = new Path(hdfsServerUri.concat(workingPath).concat(crossrefFileNameTarGz));
+		Path hdfsreadpath = new Path(hdfsServerUri.concat(crossrefFileNameTarGz));
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsServerUri.concat(workingPath));
 		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
@@ -45,11 +44,10 @@ public class ExtractCrossrefRecords {
 			new GzipCompressorInputStream(crossrefFileStream))) {
 			TarArchiveEntry entry = null;
 			while ((entry = tais.getNextTarEntry()) != null) {
-				if (entry.isDirectory()) {
-				} else {
+				if (!entry.isDirectory()) {
 					try (
 						FSDataOutputStream out = fs
-							.create(new Path(workingPath.concat("filess/").concat(entry.getName()).concat(".gz")));
+							.create(new Path(outputPath.concat(entry.getName()).concat(".gz")));
 						GZIPOutputStream gzipOs = new GZIPOutputStream(new BufferedOutputStream(out))) {
 
 						IOUtils.copy(tais, gzipOs);
