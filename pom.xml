@@ -19,7 +19,6 @@
 
 	<modules>
 		<module>dhp-build</module>
-		<module>dhp-schemas</module>
 		<module>dhp-common</module>
 		<module>dhp-workflows</module>
 	</modules>
@@ -50,7 +49,7 @@
 		<repository>
 			<id>dnet45-releases</id>
 			<name>D-Net 45 releases</name>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
 			<layout>default</layout>
 			<snapshots>
 				<enabled>false</enabled>
@@ -58,6 +57,42 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
+		</repository>
+		<repository>
+			<id>dnet45-snapshots</id>
+			<name>D-Net 45 snapshots</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>dnet45-bootstrap-snapshot</id>
+			<name>D-Net 45 Bootstrap Snapshot</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-snapshot/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>dnet45-bootstrap-release</id>
+			<name>D-Net 45 Bootstrap Release</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-release/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<layout>default</layout>
 		</repository>
 		<repository>
 			<id>cloudera</id>
@@ -101,6 +136,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>eu.dnetlib.dhp</groupId>
+				<artifactId>dhp-schemas</artifactId>
+				<version>${dhp.schemas.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
 				<artifactId>hadoop-hdfs</artifactId>
@@ -258,12 +298,12 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.5.3</version>
+				<version>${org.apache.httpcomponents.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.5.3</version>
+				<version>${org.apache.httpcomponents.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.noggit</groupId>
@@ -458,6 +498,12 @@
 				<version>${jsonschemagenerator.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-text</artifactId>
+				<version>${common.text.version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -639,12 +685,12 @@
 		<snapshotRepository>
 			<id>dnet45-snapshots</id>
 			<name>DNet45 Snapshots</name>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-snapshots</url>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
 			<layout>default</layout>
 		</snapshotRepository>
 		<repository>
 			<id>dnet45-releases</id>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
 		</repository>
 	</distributionManagement>
 	<reporting>
@@ -666,6 +712,7 @@
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
 		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
+		<dhp.schemas.version>2.2.4</dhp.schemas.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
 		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
@@ -678,7 +725,7 @@
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dnet.openaire.broker.common>3.1.1</dnet.openaire.broker.common>
+		<dnet.openaire.broker.common>3.1.6</dnet.openaire.broker.common>
 		<solr.version>7.5.0</solr.version>
 		<okhttp.version>4.7.2</okhttp.version>
 		<common.compress.version>1.20</common.compress.version>
@@ -686,5 +733,8 @@
 		<jsonschemagenerator.version>4.13.0</jsonschemagenerator.version>
 		<common.csv.version>1.8</common.csv.version>
 		<apache.poi.version>4.1.2</apache.poi.version>
+		<common.text.version>1.8</common.text.version>
+		<org.apache.httpcomponents.version>4.5.3</org.apache.httpcomponents.version>
+		<net.alchim31.maven.version>4.0.1</net.alchim31.maven.version>
 	</properties>
 </project>

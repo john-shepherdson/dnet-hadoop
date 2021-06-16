@@ -2,10 +2,12 @@ package eu.dnetlib.doiboost
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.oa.merge.AuthorMerger
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Organization, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.doiboost.mag.ConversionUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
+import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
@@ -13,6 +15,9 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 
 object SparkGenerateDoiBoost {
+
+
+
 
   def main(args: Array[String]): Unit = {
 
@@ -30,7 +35,55 @@ object SparkGenerateDoiBoost {
     import spark.implicits._
 
     val hostedByMapPath = parser.get("hostedByMapPath")
-    val workingDirPath = parser.get("workingDirPath")
+    val workingDirPath = parser.get("workingPath")
+
+    val crossrefAggregator = new Aggregator[(String, Publication), Publication, Publication] with Serializable {
+      override def zero: Publication = new Publication
+
+      override def reduce(b: Publication, a: (String, Publication)): Publication = {
+
+        if (b == null) {
+          if (a != null && a._2 != null) {
+            a._2.setId(a._1)
+            return a._2
+          }
+        }
+        else {
+          if (a != null && a._2 != null) {
+            b.mergeFrom(a._2)
+            b.setId(a._1)
+            val authors =AuthorMerger.mergeAuthor(b.getAuthor, a._2.getAuthor)
+            b.setAuthor(authors)
+            return b
+          }
+        }
+        new Publication
+      }
+
+      override def merge(b1: Publication, b2: Publication): Publication = {
+        if (b1 == null) {
+          if (b2 != null)
+            return b2
+        }
+        else {
+          if (b2 != null ) {
+            b1.mergeFrom(b2)
+            val authors =AuthorMerger.mergeAuthor(b1.getAuthor, b2.getAuthor)
+            b1.setAuthor(authors)
+            if (b2.getId!= null && b2.getId.nonEmpty)
+              b1.setId(b2.getId)
+            return b1
+          }
+        }
+        new Publication
+      }
+
+      override def finish(reduction: Publication): Publication = reduction
+
+      override def bufferEncoder: Encoder[Publication] = Encoders.kryo[Publication]
+
+      override def outputEncoder: Encoder[Publication] = Encoders.kryo[Publication]
+    }
 
 
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
@@ -62,7 +115,7 @@ object SparkGenerateDoiBoost {
     val orcidPublication: Dataset[(String, Publication)] = spark.read.load(s"$workingDirPath/orcidPublication").as[Publication].map(p => (p.getId, p))
     fj.joinWith(orcidPublication, fj("_1").equalTo(orcidPublication("_1")), "left").map(applyMerge).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/secondJoin")
 
-    logger.info("Phase 3) Join Result with MAG")
+    logger.info("Phase 4) Join Result with MAG")
     val sj: Dataset[(String, Publication)] = spark.read.load(s"$workingDirPath/secondJoin").as[Publication].map(p => (p.getId, p))
 
     val magPublication: Dataset[(String, Publication)] = spark.read.load(s"$workingDirPath/magPublication").as[Publication].map(p => (p.getId, p))
@@ -76,6 +129,10 @@ object SparkGenerateDoiBoost {
 
     doiBoostPublication.joinWith(hostedByDataset, doiBoostPublication("_1").equalTo(hostedByDataset("_1")), "left")
       .map(DoiBoostMappingUtil.fixPublication)
+      .map(p => (p.getId, p))
+      .groupByKey(_._1)
+      .agg(crossrefAggregator.toColumn)
+      .map(p => p._2)
       .write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostPublicationFiltered")
 
     val affiliationPath = parser.get("affiliationPath")
@@ -132,12 +189,12 @@ object SparkGenerateDoiBoost {
           o.setLegalname(DoiBoostMappingUtil.asField(affiliation.DisplayName.get))
         if (affiliation.OfficialPage.isDefined)
           o.setWebsiteurl(DoiBoostMappingUtil.asField(affiliation.OfficialPage.get))
-        o.setCountry(DoiBoostMappingUtil.getUnknownCountry())
+        o.setCountry(ModelConstants.UNKNOWN_COUNTRY)
         o
       }
       else
         null
     }).filter(o=> o!=null).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostOrganization")
-    }
+  }
 
 }

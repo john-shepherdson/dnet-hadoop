@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -15,8 +16,14 @@ import org.apache.commons.codec.binary.Hex;
 import com.jayway.jsonpath.JsonPath;
 
 import net.minidev.json.JSONArray;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
 public class DHPUtils {
+
+	public static Seq<String> toSeq(List<String> list) {
+		return JavaConverters.asScalaIteratorConverter(list.iterator()).asScala().toSeq();
+	}
 
 	public static String md5(final String s) {
 		try {

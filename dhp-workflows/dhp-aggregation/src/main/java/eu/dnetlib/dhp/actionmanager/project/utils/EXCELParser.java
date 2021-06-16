@@ -22,15 +22,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class EXCELParser {
 
-	public <R> List<R> parse(InputStream file, String classForName)
+	public <R> List<R> parse(InputStream file, String classForName, String sheetName)
 		throws ClassNotFoundException, IOException, IllegalAccessException, InstantiationException,
 		InvalidFormatException {
 
-		// OPCPackage pkg = OPCPackage.open(httpConnector.getInputSourceAsStream(URL));
 		OPCPackage pkg = OPCPackage.open(file);
 		XSSFWorkbook wb = new XSSFWorkbook(pkg);
 
-		XSSFSheet sheet = wb.getSheet("cordisref-H2020topics");
+		XSSFSheet sheet = wb.getSheet(sheetName);
+
+		if (sheetName == null) {
+			throw new RuntimeException("Sheet name " + sheetName + " not present in current file");
+		}
 
 		List<R> ret = new ArrayList<>();
 
@@ -49,12 +52,11 @@ public class EXCELParser {
 					headers.add(dataFormatter.formatCellValue(cell));
 				}
 			} else {
-				Class<?> clazz = Class.forName("eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic");
+				Class<?> clazz = Class.forName(classForName);
 				final Object cc = clazz.newInstance();
 
 				for (int i = 0; i < headers.size(); i++) {
 					Cell cell = row.getCell(i);
-					String value = dataFormatter.formatCellValue(cell);
 					FieldUtils.writeField(cc, headers.get(i), dataFormatter.formatCellValue(cell), true);
 
 				}

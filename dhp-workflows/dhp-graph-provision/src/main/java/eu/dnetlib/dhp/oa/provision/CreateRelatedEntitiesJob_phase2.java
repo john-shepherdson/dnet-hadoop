@@ -27,6 +27,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -105,7 +106,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 		TypedColumn<JoinedEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
 
 		entities
-			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left_outer")
+			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left")
 			.map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, RelatedEntityWrapper>>, JoinedEntity>) value -> {
 				JoinedEntity je = new JoinedEntity(value._1()._2());
 				Optional
@@ -114,7 +115,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.ifPresent(r -> je.getLinks().add(r));
 				return je;
 			}, Encoders.kryo(JoinedEntity.class))
-			.filter(filterEmptyEntityFn())
 			.groupByKey(
 				(MapFunction<JoinedEntity, String>) value -> value.getEntity().getId(),
 				Encoders.STRING())
@@ -122,7 +122,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.map(
 				(MapFunction<Tuple2<String, JoinedEntity>, JoinedEntity>) value -> value._2(),
 				Encoders.kryo(JoinedEntity.class))
-			.filter(filterEmptyEntityFn())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
@@ -274,11 +273,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.filter(Objects::nonNull)
 			.map(Qualifier::getClassid)
 			.filter(StringUtils::isNotBlank)
-			.anyMatch(c -> "orcid".equals(c.toLowerCase()));
-	}
-
-	private static FilterFunction<JoinedEntity> filterEmptyEntityFn() {
-		return (FilterFunction<JoinedEntity>) v -> Objects.nonNull(v.getEntity());
+			.anyMatch(c -> c.toLowerCase().contains(ModelConstants.ORCID));
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

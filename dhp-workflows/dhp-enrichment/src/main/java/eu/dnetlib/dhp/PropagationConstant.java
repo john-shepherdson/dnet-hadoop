@@ -44,8 +44,6 @@ public class PropagationConstant {
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID = "authorpid:result";
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME = "Propagation of authors pid to result through semantic relations";
 
-	public static final String PROPAGATION_AUTHOR_PID = "ORCID";
-
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private static final String cfHbforResultQuery = "select distinct r.id, inst.collectedfrom.key cf, inst.hostedby.key hb "

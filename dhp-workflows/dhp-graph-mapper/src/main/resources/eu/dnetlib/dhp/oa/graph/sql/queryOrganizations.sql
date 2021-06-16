@@ -24,12 +24,30 @@ SELECT
 		d.officialname                                            AS collectedfromname,
 		o.country || '@@@dnet:countries'                          AS country,
 		'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
-		ARRAY[]::text[]                                           AS pid
-
+		 array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype || '@@@' || i.issuertype), NULL) AS pid
 FROM dsm_organizations o
 	LEFT OUTER JOIN dsm_datasources d ON (d.id = o.collectedfrom)
-
-
-
-
-
+	LEFT OUTER JOIN dsm_organizationpids p ON (p.organization = o.id)
+	LEFT OUTER JOIN dsm_identities i ON (i.pid = p.pid)
+GROUP BY
+	o.id,
+	o.legalshortname,
+	o.legalname,
+	o.websiteurl,
+	o.logourl,
+	o.ec_legalbody,
+	o.ec_legalperson,
+	o.ec_nonprofit,
+	o.ec_researchorganization,
+	o.ec_highereducation,
+	o.ec_internationalorganizationeurinterests,
+	o.ec_internationalorganization,
+	o.ec_enterprise,
+	o.ec_smevalidated,
+	o.ec_nutscode,
+	o.dateofcollection,
+	o.lastupdate,
+	o.trust,
+	d.id,
+	d.officialname,
+	o.country

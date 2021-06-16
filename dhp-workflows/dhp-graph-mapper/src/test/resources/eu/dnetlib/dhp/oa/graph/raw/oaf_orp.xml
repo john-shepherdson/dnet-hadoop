@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+  xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+  xmlns:oaf="http://namespace.openaire.eu/oaf"
+  xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <header xmlns="http://namespace.openaire.eu/">
+    <dri:objIdentifier>pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2</dri:objIdentifier>
+    <dri:recordIdentifier>10.3897/oneeco.2.e13718</dri:recordIdentifier>
+    <dri:dateOfCollection/>
+    <dri:mdFormat/>
+    <dri:mdFormatInterpretation/>
+    <dri:repositoryId/>
+    <dr:objectIdentifier/>
+    <dr:dateOfCollection>2020-03-23T00:20:51.392Z</dr:dateOfCollection>
+    <dr:dateOfTransformation>2020-03-23T00:26:59.078Z</dr:dateOfTransformation>
+    <oaf:datasourceprefix>pensoft_____</oaf:datasourceprefix>
+  </header>
+  <metadata xmlns="http://namespace.openaire.eu/">
+    <dc:title>Ecosystem Service capacity is higher in areas of multiple designation types</dc:title>
+    <dc:creator>Nikolaidou,Charitini</dc:creator>
+    <dc:creator nameIdentifier="0000-0001-6651-1178" nameIdentifierScheme="ORCID">Votsi,Nefta</dc:creator>
+    <dc:creator>Sgardelis,Steanos</dc:creator>
+    <dc:creator>Halley,John</dc:creator>
+    <dc:creator>Pantis,John</dc:creator>
+    <dc:creator>Tsiafouli,Maria</dc:creator>
+    <dc:date>2017</dc:date>
+    <dc:description>The implementation of the Ecosystem Service (ES) concept into practice might be a challenging task as it has to take into account previous “traditional” policies and approaches that have evaluated nature and biodiversity differently. Among them the Habitat (92/43/EC) and Bird Directives (79/409/EC), the Water Framework Directive (2000/60/EC), and the Noise Directive (2002/49/EC) have led to the evaluation/designation of areas in Europe with different criteria. In this study our goal was to understand how the ES capacity of an area is related to its designation and if areas with multiple designations have higher capacity in providing ES. We selected four catchments in Greece with a great variety of characteristics covering over 25% of the national territory. Inside the catchments we assessed the ES capacity (following the methodology of Burkhard et al. 2009) of areas designated as Natura 2000 sites, Quiet areas and Wetlands or Water bodies and found those areas that have multiple designations. Data were analyzed by GLM to reveal differences regarding the ES capacity among the different types of areas. We also investigated by PCA synergies and trade-offs among different kinds of ES and tested for correlations among landscape properties, such as elevation, aspect and slope and the ES potential. Our results show that areas with different types or multiple designations have a different capacity in providing ES. Areas of one designation type (Protected or Quiet Areas) had in general intermediate scores in most ES but scores were higher compared to areas with no designation, which displayed stronger capacity in provisioning services. Among Protected Areas and Quiet Areas the latter scored better in general. Areas that combined both designation types (Protected and Quiet Areas) showed the highest capacity in 13 out of 29 ES, that were mostly linked with natural and forest ecosystems. We found significant synergies among most regulating, supporting and cultural ES which in turn display trade-offs with provisioning services. The different ES are spatially related and display strong correlation with landscape properties, such as elevation and slope.  We suggest that the designation status of an area can be used as an alternative tool for environmental policy, indicating the capacity for ES provision. Multiple designations of areas can be used as proxies for locating ES “hotspots”. This integration of “traditional” evaluation and designation and the “newer” ES concept forms a time- and cost-effective way to be adopted by stakeholders and policy-makers in order to start complying with new standards and demands for nature conservation and environmental management.</dc:description>
+    <dc:format>text/html</dc:format>
+    <dc:identifier>https://doi.org/10.3897/oneeco.2.e13718</dc:identifier>
+    <dc:identifier>https://oneecosystem.pensoft.net/article/13718/</dc:identifier>
+    <dc:language>eng</dc:language>
+    <dc:publisher>Pensoft Publishers</dc:publisher>
+    <dc:relation>info:eu-repo/semantics/altIdentifier/eissn/2367-8194</dc:relation>
+    <dc:relation>info:eu-repo/grantAgreement/EC/FP7/226852</dc:relation>
+    <dc:source>One Ecosystem 2: e13718</dc:source>
+    <dc:source>One Ecosystem 2: e13718</dc:source>
+    <dc:source>One Ecosystem 2: e13718</dc:source>
+    <dc:subject>Ecosystem Services hotspots</dc:subject>
+    <dc:subject>Natura 2000</dc:subject>
+    <dc:subject>Quiet Protected Areas</dc:subject>
+    <dc:subject>Biodiversity</dc:subject>
+    <dc:subject>Agriculture</dc:subject>
+    <dc:subject>Elevation</dc:subject>
+    <dc:subject>Slope</dc:subject>
+    <dc:subject>Ecosystem Service trade-offs and synergies</dc:subject>
+    <dc:subject> cultural services</dc:subject>
+    <dc:subject>provisioning services</dc:subject>
+    <dc:subject>regulating services</dc:subject>
+    <dc:subject>supporting services</dc:subject>
+    <dc:type>Research Article</dc:type>
+    <!--<dr:CobjCategory type="publication">0001</dr:CobjCategory>-->
+    <dr:CobjCategory>0020</dr:CobjCategory>
+    <oaf:dateAccepted>2017-01-01</oaf:dateAccepted>
+    <oaf:projectid>corda_______::226852</oaf:projectid>
+    <oaf:accessrights>OPEN</oaf:accessrights>
+    <oaf:hostedBy id="openaire____::issn226852" name="One Ecosystem"/>
+    <oaf:collectedFrom
+      id="openaire____::45e3c7b69bcee6cc5fa945c9e183deb9" name="Pensoft"/>
+    <oaf:identifier identifierType="doi">10.3897/oneeco.2.e13718</oaf:identifier>
+    <oaf:fulltext>https://oneecosystem.pensoft.net/article/13718/</oaf:fulltext>
+    <oaf:journal eissn="2367-8194" issn="">One Ecosystem</oaf:journal>
+    <oaf:refereed>0001</oaf:refereed>
+  </metadata>
+  <about xmlns:oai="http://www.openarchives.org/OAI/2.0/">
+    <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+      <originDescription altered="true" harvestDate="2020-03-23T00:20:51.392Z">
+        <baseURL>http%3A%2F%2Fzookeys.pensoft.net%2Foai.php</baseURL>
+        <identifier>10.3897/oneeco.2.e13718</identifier>
+        <datestamp>2017-09-08</datestamp>
+        <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+      </originDescription>
+    </provenance>
+    <oaf:datainfo>
+      <oaf:inferred>false</oaf:inferred>
+      <oaf:deletedbyinference>false</oaf:deletedbyinference>
+      <oaf:trust>0.9</oaf:trust>
+      <oaf:inferenceprovenance/>
+      <oaf:provenanceaction classid="sysimport:crosswalk:repository"
+        classname="sysimport:crosswalk:repository"
+        schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+    </oaf:datainfo>
+  </about>
+</record>

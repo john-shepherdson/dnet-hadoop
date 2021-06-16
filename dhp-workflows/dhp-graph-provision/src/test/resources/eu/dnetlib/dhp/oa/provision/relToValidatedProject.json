@@ -1,0 +1,31 @@
+{
+"collectedfrom": [
+{
+"key": "10|opendoar____::eccbc87e4b5ce2fe28308fd9f2a7baf3",
+"value": "AMS Acta",
+"dataInfo": null
+}
+],
+"dataInfo": {
+"invisible": false,
+"inferred": false,
+"deletedbyinference": false,
+"trust": "0.9",
+"inferenceprovenance": "",
+"provenanceaction": {
+"classid": "sysimport:crosswalk:repository",
+"classname": "sysimport:crosswalk:repository",
+"schemeid": "dnet:provenanceActions",
+"schemename": "dnet:provenanceActions"
+}
+},
+"lastupdatetimestamp": 1606898557407,
+"relType": "resultProject",
+"subRelType": "outcome",
+"relClass": "isProducedBy",
+"source": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
+"target": "40|corda__h2020::79a0e16c122c9a18eb60e4a5e64b620d",
+"validated": true,
+"validationDate": "2021-01-01",
+"properties": []
+}

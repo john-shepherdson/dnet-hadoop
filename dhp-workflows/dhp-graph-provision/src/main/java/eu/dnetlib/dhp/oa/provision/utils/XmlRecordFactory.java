@@ -254,6 +254,18 @@ public class XmlRecordFactory implements Serializable {
 														p -> p,
 														(p1, p2) -> p1))
 											.values()
+											.stream()
+											.collect(
+												Collectors
+													.groupingBy(
+														p -> p.getValue(),
+														Collectors
+															.mapping(
+																p -> p,
+																Collectors.minBy(new AuthorPidTypeComparator()))))
+											.values()
+											.stream()
+											.map(op -> op.get())
 											.forEach(
 												sp -> {
 													String pidType = getAuthorPidType(sp.getQualifier().getClassid());
@@ -901,28 +913,6 @@ public class XmlRecordFactory implements Serializable {
 				if (p.getEcsc39() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("ecsc39", p.getEcsc39().getValue()));
 				}
-				if (p.getContactfullname() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils
-								.asXmlElement(
-									"contactfullname", p.getContactfullname().getValue()));
-				}
-				if (p.getContactfax() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactfax", p.getContactfax().getValue()));
-				}
-				if (p.getContactphone() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactphone", p.getContactphone().getValue()));
-				}
-				if (p.getContactemail() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactemail", p.getContactemail().getValue()));
-				}
 				if (p.getSummary() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("summary", p.getSummary().getValue()));
 				}
@@ -1104,9 +1094,12 @@ public class XmlRecordFactory implements Serializable {
 				String.format("missing scheme for: <%s - %s>", type.toString(), targetType));
 		}
 		final HashSet<String> fields = Sets.newHashSet(mapFields(link, contexts));
+		if (rel.getValidated() == null)
+			rel.setValidated(false);
 		return templateFactory
 			.getRel(
-				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, rel.getDataInfo());
+				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, rel.getDataInfo(), rel.getValidated(),
+				rel.getValidationDate());
 	}
 
 	private List<String> listChildren(

@@ -24,8 +24,6 @@ public class Constants {
 
 	public static String RESEARCH_INFRASTRUCTURE = "Research Infrastructure/Initiative";
 
-	public static String ORCID = "orcid";
-
 	static {
 		accessRightsCoarMap.put("OPEN", "c_abf2");
 		accessRightsCoarMap.put("RESTRICTED", "c_16ec");
@@ -39,5 +37,19 @@ public class Constants {
 		coarCodeLabelMap.put("c_16ec", "RESTRICTED");
 		coarCodeLabelMap.put("c_14cb", "CLOSED");
 		coarCodeLabelMap.put("c_f1cf", "EMBARGO");
+	}
+
+	public enum DUMPTYPE {
+		COMPLETE("complete"), COMMUNITY("community"), FUNDER("funder");
+
+		private String type;
+
+		DUMPTYPE(String type) {
+			this.type = type;
+		}
+
+		public String getType() {
+			return type;
+		}
 	}
 }

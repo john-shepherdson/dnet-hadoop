@@ -26,6 +26,7 @@ import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -74,7 +75,7 @@ public class ConversionUtils {
 		}
 
 		final OaBrokerRelatedDataset res = new OaBrokerRelatedDataset();
-		res.setOpenaireId(d.getId());
+		res.setOpenaireId(cleanOpenaireId(d.getId()));
 		res.setOriginalId(first(d.getOriginalId()));
 		res.setTitle(structPropValue(d.getTitle()));
 		res.setPids(mappedList(d.getPid(), ConversionUtils::oafPidToBrokerPid));
@@ -89,7 +90,7 @@ public class ConversionUtils {
 		}
 
 		final OaBrokerRelatedPublication res = new OaBrokerRelatedPublication();
-		res.setOpenaireId(p.getId());
+		res.setOpenaireId(cleanOpenaireId(p.getId()));
 		res.setOriginalId(first(p.getOriginalId()));
 		res.setTitle(structPropValue(p.getTitle()));
 		res.setPids(mappedList(p.getPid(), ConversionUtils::oafPidToBrokerPid));
@@ -106,7 +107,7 @@ public class ConversionUtils {
 
 		final OaBrokerMainEntity res = new OaBrokerMainEntity();
 
-		res.setOpenaireId(result.getId());
+		res.setOpenaireId(cleanOpenaireId(result.getId()));
 		res.setOriginalId(first(result.getOriginalId()));
 		res.setTypology(classId(result.getResulttype()));
 		res.setTitles(structPropList(result.getTitle()));
@@ -129,6 +130,10 @@ public class ConversionUtils {
 		return res;
 	}
 
+	public static String cleanOpenaireId(final String id) {
+		return id.contains("|") ? StringUtils.substringAfter(id, "|") : id;
+	}
+
 	private static OaBrokerAuthor oafAuthorToBrokerAuthor(final Author author) {
 		if (author == null) {
 			return null;
@@ -140,7 +145,7 @@ public class ConversionUtils {
 			.filter(pid -> pid != null)
 			.filter(pid -> pid.getQualifier() != null)
 			.filter(pid -> pid.getQualifier().getClassid() != null)
-			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID))
 			.map(pid -> pid.getValue())
 			.map(pid -> cleanOrcid(pid))
 			.filter(StringUtils::isNotBlank)
@@ -188,7 +193,7 @@ public class ConversionUtils {
 		}
 
 		final OaBrokerProject res = new OaBrokerProject();
-		res.setOpenaireId(p.getId());
+		res.setOpenaireId(cleanOpenaireId(p.getId()));
 		res.setTitle(fieldValue(p.getTitle()));
 		res.setAcronym(fieldValue(p.getAcronym()));
 		res.setCode(fieldValue(p.getCode()));
@@ -214,7 +219,7 @@ public class ConversionUtils {
 		}
 
 		final OaBrokerRelatedSoftware res = new OaBrokerRelatedSoftware();
-		res.setOpenaireId(sw.getId());
+		res.setOpenaireId(cleanOpenaireId(sw.getId()));
 		res.setName(structPropValue(sw.getTitle()));
 		res.setDescription(fieldValue(sw.getDescription()));
 		res.setRepository(fieldValue(sw.getCodeRepositoryUrl()));
@@ -230,7 +235,7 @@ public class ConversionUtils {
 
 		final OaBrokerRelatedDatasource res = new OaBrokerRelatedDatasource();
 		res.setName(StringUtils.defaultIfBlank(fieldValue(ds.getOfficialname()), fieldValue(ds.getEnglishname())));
-		res.setOpenaireId(ds.getId());
+		res.setOpenaireId(cleanOpenaireId(ds.getId()));
 		res.setType(classId(ds.getDatasourcetype()));
 		return res;
 	}

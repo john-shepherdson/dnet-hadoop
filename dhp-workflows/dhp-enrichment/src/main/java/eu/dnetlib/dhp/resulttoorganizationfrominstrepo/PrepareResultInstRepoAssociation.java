@@ -4,6 +4,11 @@ package eu.dnetlib.dhp.resulttoorganizationfrominstrepo;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -51,6 +56,11 @@ public class PrepareResultInstRepoAssociation {
 		final String alreadyLinkedPath = parser.get("alreadyLinkedPath");
 		log.info("alreadyLinkedPath {}: ", alreadyLinkedPath);
 
+		List<String> blacklist = Optional
+			.ofNullable(parser.get("blacklist"))
+			.map(v -> Arrays.asList(v.split(";")))
+			.orElse(new ArrayList<>());
+
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
@@ -61,7 +71,7 @@ public class PrepareResultInstRepoAssociation {
 				readNeededResources(spark, inputPath);
 
 				removeOutputDir(spark, datasourceOrganizationPath);
-				prepareDatasourceOrganization(spark, datasourceOrganizationPath);
+				prepareDatasourceOrganization(spark, datasourceOrganizationPath, blacklist);
 
 				removeOutputDir(spark, alreadyLinkedPath);
 				prepareAlreadyLinkedAssociation(spark, alreadyLinkedPath);
@@ -80,7 +90,14 @@ public class PrepareResultInstRepoAssociation {
 	}
 
 	private static void prepareDatasourceOrganization(
-		SparkSession spark, String datasourceOrganizationPath) {
+		SparkSession spark, String datasourceOrganizationPath, List<String> blacklist) {
+		String blacklisted = "";
+		if (blacklist.size() > 0) {
+			blacklisted = " AND  d.id != '" + blacklist.get(0) + "'";
+			for (int i = 1; i < blacklist.size(); i++) {
+				blacklisted += " AND d.id != '" + blacklist.get(i) + "'";
+			}
+		}
 
 		String query = "SELECT source datasourceId, target organizationId "
 			+ "FROM ( SELECT id "
@@ -88,7 +105,7 @@ public class PrepareResultInstRepoAssociation {
 			+ "WHERE datasourcetype.classid = '"
 			+ INSTITUTIONAL_REPO_TYPE
 			+ "' "
-			+ "AND datainfo.deletedbyinference = false  ) d "
+			+ "AND datainfo.deletedbyinference = false  " + blacklisted + " ) d "
 			+ "JOIN ( SELECT source, target "
 			+ "FROM relation "
 			+ "WHERE lower(relclass) = '"

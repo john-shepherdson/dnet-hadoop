@@ -43,10 +43,10 @@ public class PrepareRelatedPublicationsJob {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String relsPath = workingPath + "/relatedPublications";
+		final String relsPath = workingDir + "/relatedPublications";
 		log.info("relsPath: {}", relsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -65,7 +65,7 @@ public class PrepareRelatedPublicationsJob {
 					Encoders.bean(OaBrokerRelatedPublication.class));
 
 			final Dataset<Relation> rels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
+				.loadRelations(graphPath, spark)
 				.filter(r -> r.getDataInfo().getDeletedbyinference())
 				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
 				.filter(r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
@@ -75,7 +75,8 @@ public class PrepareRelatedPublicationsJob {
 			final Dataset<RelatedPublication> dataset = rels
 				.joinWith(pubs, pubs.col("openaireId").equalTo(rels.col("target")), "inner")
 				.map(t -> {
-					final RelatedPublication rel = new RelatedPublication(t._1.getSource(), t._2);
+					final RelatedPublication rel = new RelatedPublication(
+						t._1.getSource(), t._2);
 					rel.getRelPublication().setRelType(t._1.getRelClass());
 					return rel;
 				}, Encoders.bean(RelatedPublication.class));

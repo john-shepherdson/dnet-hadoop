@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.mag
 
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.json4s
@@ -31,11 +32,11 @@ case class MagAffiliation(AffiliationId: Long, Rank: Int, NormalizedName: String
 case class MagPaperAuthorAffiliation(PaperId: Long, AuthorId: Long, AffiliationId: Option[Long], AuthorSequenceNumber: Int, OriginalAuthor: String, OriginalAffiliation: String) {}
 
 
-case class MagAuthorAffiliation(author: MagAuthor, affiliation:String)
+case class MagAuthorAffiliation(author: MagAuthor, affiliation:String, sequenceNumber:Int)
 
 case class MagPaperWithAuthorList(PaperId: Long, authors: List[MagAuthorAffiliation]) {}
 
-case class MagPaperAuthorDenormalized(PaperId: Long, author: MagAuthor, affiliation:String) {}
+case class MagPaperAuthorDenormalized(PaperId: Long, author: MagAuthor, affiliation:String, sequenceNumber:Int) {}
 
 case class MagPaperUrl(PaperId: Long, SourceType: Option[Int], SourceUrl: Option[String], LanguageCode: Option[String]) {}
 
@@ -187,7 +188,7 @@ case object ConversionUtil {
     val authors = inputParams._2
 
     val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
+    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
     //Set identifier as 50|doiboost____::md5(DOI)
@@ -202,12 +203,12 @@ case object ConversionUtil {
     val authorsOAF = authors.authors.map { f: MagAuthorAffiliation =>
 
       val a: eu.dnetlib.dhp.schema.oaf.Author = new eu.dnetlib.dhp.schema.oaf.Author
-
-      a.setFullname(f.author.DisplayName.get)
-
+      a.setRank(f.sequenceNumber)
+      if (f.author.DisplayName.isDefined)
+        a.setFullname(f.author.DisplayName.get)
       if(f.affiliation!= null)
         a.setAffiliation(List(asField(f.affiliation)).asJava)
-      a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", PID_TYPES)).asJava)
+      a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", ModelConstants.DNET_PID_TYPES)).asJava)
       a
     }
     pub.setAuthor(authorsOAF.asJava)
@@ -246,7 +247,7 @@ case object ConversionUtil {
     val description = inputParams._2
 
     val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
+    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
 
     //Set identifier as 50 | doiboost____::md5(DOI)
@@ -274,7 +275,7 @@ case object ConversionUtil {
         a.setAffiliation(List(asField(f.affiliation)).asJava)
 
 
-      a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", PID_TYPES)).asJava)
+      a.setPid(List(createSP(s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}", "URL", ModelConstants.DNET_PID_TYPES)).asJava)
 
       a
 
@@ -305,10 +306,10 @@ case object ConversionUtil {
       for {(k: String, v: List[Int]) <- iid} {
         v.foreach(item => res(item) = k)
       }
-     (0 until idl).foreach(i => {
-       if (res(i) == null)
-         res(i) = ""
-     })
+      (0 until idl).foreach(i => {
+        if (res(i) == null)
+          res(i) = ""
+      })
       return res.mkString(" ")
     }
     ""

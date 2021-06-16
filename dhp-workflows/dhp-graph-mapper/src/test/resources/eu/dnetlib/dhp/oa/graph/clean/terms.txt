@@ -1031,6 +1031,7 @@ dnet:pid_types @=@ dnet:pid_types @=@ jprn @=@ JPRN Identifier
 dnet:pid_types @=@ dnet:pid_types @=@ mag_id @=@ Microsoft Academic Graph Identifier
 dnet:pid_types @=@ dnet:pid_types @=@ oai @=@ Open Archives Initiative
 dnet:pid_types @=@ dnet:pid_types @=@ orcid @=@ Open Researcher and Contributor ID
+dnet:pid_types @=@ dnet:pid_types @=@ orcid_pending @=@ Open Researcher and Contributor ID
 dnet:pid_types @=@ dnet:pid_types @=@ PANGAEA @=@ PANGAEA
 dnet:pid_types @=@ dnet:pid_types @=@ epo_nr_epodoc @=@ Patent application number in EPODOC format
 dnet:pid_types @=@ dnet:pid_types @=@ UNKNOWN @=@ UNKNOWN
@@ -1046,6 +1047,7 @@ dnet:pid_types @=@ dnet:pid_types @=@ urn @=@ urn
 dnet:pid_types @=@ dnet:pid_types @=@ who @=@ WHO Identifier
 dnet:pid_types @=@ dnet:pid_types @=@ drks @=@ DRKS Identifier
 dnet:pid_types @=@ dnet:pid_types @=@ handle @=@ Handle
+dnet:pid_types @=@ dnet:pid_types @=@ data.europa.eu @=@ EU Persistent URL
 dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/ACM @=@ An ACM classification term that can be associated to your publications
 dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/ARXIV @=@ An ARXIV classification term that can be associated to your publications
 dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/DDC @=@ A Dewey Decimal classification term (DDC) that can be associated to your publications

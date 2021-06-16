@@ -1,5 +1,6 @@
 package eu.dnetlib.doiboost.crossref
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
@@ -13,12 +14,13 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
+import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
 
-case class CrossrefDT(doi: String, json:String) {}
+case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
 case class mappingAffiliation(name: String) {}
 
-case class mappingAuthor(given: Option[String], family: String, ORCID: Option[String], affiliation: Option[mappingAffiliation]) {}
+case class mappingAuthor(given: Option[String], family: String, sequence:Option[String], ORCID: Option[String], affiliation: Option[mappingAffiliation]) {}
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
@@ -85,7 +87,7 @@ case object Crossref2Oaf {
 
     //MAPPING Crossref DOI into PID
     val doi: String = (json \ "DOI").extract[String]
-    result.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+    result.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
 
     //MAPPING Crossref DOI into OriginalId
     //and Other Original Identifier of dataset like clinical-trial-number
@@ -154,7 +156,12 @@ case object Crossref2Oaf {
 
     //Mapping Author
     val authorList: List[mappingAuthor] = (json \ "author").extractOrElse[List[mappingAuthor]](List())
-    result.setAuthor(authorList.map(a => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull)).asJava)
+
+
+
+    val sorted_list = authorList.sortWith((a:mappingAuthor, b:mappingAuthor) => a.sequence.isDefined && a.sequence.get.equalsIgnoreCase("first"))
+
+    result.setAuthor(sorted_list.zipWithIndex.map{case (a, index) => generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull, index)}.asJava)
 
     // Mapping instance
     val instance = new Instance()
@@ -170,14 +177,14 @@ case object Crossref2Oaf {
 
     if(has_review != JNothing) {
       instance.setRefereed(
-        createQualifier("0001", "peerReviewed", "dnet:review_levels", "dnet:review_levels"))
+        OafUtils.createQualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS, ModelConstants.DNET_REVIEW_LEVELS))
     }
 
 
     instance.setAccessright(getRestrictedQualifier())
     result.setInstance(List(instance).asJava)
-    instance.setInstancetype(createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), "dnet:publication_resource", "dnet:publication_resource"))
-    result.setResourcetype(createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
+    instance.setInstancetype(OafUtils.createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
+    result.setResourcetype(OafUtils.createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
@@ -194,13 +201,14 @@ case object Crossref2Oaf {
   }
 
 
-  def generateAuhtor(given: String, family: String, orcid: String): Author = {
+  def generateAuhtor(given: String, family: String, orcid: String, index:Int): Author = {
     val a = new Author
     a.setName(given)
     a.setSurname(family)
     a.setFullname(s"$given $family")
+    a.setRank(index+1)
     if (StringUtils.isNotBlank(orcid))
-      a.setPid(List(createSP(orcid, ORCID, PID_TYPES)).asJava)
+      a.setPid(List(createSP(orcid, ModelConstants.ORCID_PENDING, ModelConstants.DNET_PID_TYPES, generateDataInfo())).asJava)
 
     a
   }
@@ -221,7 +229,7 @@ case object Crossref2Oaf {
     val result = generateItemFromType(objectType, objectSubType)
     if (result == null)
       return List()
-    val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"));
+    val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"))
     mappingResult(result, json, cOBJCategory)
 
 
@@ -248,7 +256,7 @@ case object Crossref2Oaf {
 
 
     def snsfRule(award:String): String = {
-      var tmp1 = StringUtils.substringAfter(award,"_")
+      val tmp1 = StringUtils.substringAfter(award,"_")
       val tmp2 = StringUtils.substringBefore(tmp1,"/")
       logger.debug(s"From $award to $tmp2")
       tmp2
@@ -265,18 +273,20 @@ case object Crossref2Oaf {
     }
 
 
-    def generateRelation(sourceId:String, targetId:String, nsPrefix:String) :Relation = {
+    def generateRelation(sourceId:String, targetId:String, relClass:String) :Relation = {
 
       val r = new Relation
       r.setSource(sourceId)
-      r.setTarget(s"40|$nsPrefix::$targetId")
+      r.setTarget(targetId)
       r.setRelType("resultProject")
-      r.setRelClass("isProducedBy")
+      r.setRelClass(relClass)
       r.setSubRelType("outcome")
       r.setCollectedfrom(List(cf).asJava)
       r.setDataInfo(di)
       r.setLastupdatetimestamp(ts)
       r
+
+
     }
 
 
@@ -284,71 +294,90 @@ case object Crossref2Oaf {
       if (funder.award.isDefined && funder.award.get.nonEmpty)
         funder.award.get.map(extractField).filter(a => a!= null &&  a.nonEmpty).foreach(
           award => {
-            val targetId = DHPUtils.md5(award)
-            queue += generateRelation(sourceId, targetId, nsPrefix)
+            val targetId = getProjectId(nsPrefix, DHPUtils.md5(award))
+            queue += generateRelation(sourceId, targetId , "isProducedBy")
+            queue += generateRelation(targetId , sourceId,  "produces")
           }
         )
     }
 
-    if (funders != null)
-    funders.foreach(funder => {
-      if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
-        funder.DOI.get match {
-          case "10.13039/100010663" |
-               "10.13039/100010661" |
-               "10.13039/501100007601" |
-               "10.13039/501100000780" |
-               "10.13039/100010665" =>      generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-          case "10.13039/100011199" |
-               "10.13039/100004431" |
-               "10.13039/501100004963" |
-               "10.13039/501100000780" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
-          case "10.13039/501100000781" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
-                                            generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-          case "10.13039/100000001" =>      generateSimpleRelationFromAward(funder, "nsf_________", a => a)
-          case "10.13039/501100001665" =>   generateSimpleRelationFromAward(funder, "anr_________", a => a)
-          case "10.13039/501100002341" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a)
-          case "10.13039/501100001602" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a.replace("SFI", ""))
-          case "10.13039/501100000923" =>   generateSimpleRelationFromAward(funder, "arc_________", a => a)
-          case "10.13039/501100000038"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "nserc_______" )
-          case "10.13039/501100000155"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "sshrc_______" )
-          case "10.13039/501100000024"=>    queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "cihr________" )
-          case "10.13039/501100002848" =>   generateSimpleRelationFromAward(funder, "conicytf____", a => a)
-          case "10.13039/501100003448" =>   generateSimpleRelationFromAward(funder, "gsrt________", extractECAward)
-          case "10.13039/501100010198" =>   generateSimpleRelationFromAward(funder, "sgov________", a=>a)
-          case "10.13039/501100004564" =>   generateSimpleRelationFromAward(funder, "mestd_______", extractECAward)
-          case "10.13039/501100003407" =>   generateSimpleRelationFromAward(funder, "miur________", a=>a)
-                                            queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "miur________" )
-          case "10.13039/501100006588" |
-                "10.13039/501100004488" =>  generateSimpleRelationFromAward(funder, "irb_hr______", a=>a.replaceAll("Project No.", "").replaceAll("HRZZ-","") )
-          case "10.13039/501100006769"=>    generateSimpleRelationFromAward(funder, "rsf_________", a=>a)
-          case "10.13039/501100001711"=>    generateSimpleRelationFromAward(funder, "snsf________", snsfRule)
-          case "10.13039/501100004410"=>    generateSimpleRelationFromAward(funder, "tubitakf____", a =>a)
-          case "10.10.13039/100004440"=>    generateSimpleRelationFromAward(funder, "wt__________", a =>a)
-          case "10.13039/100004440"=>       queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "wt__________" )
-          case _ =>                         logger.debug("no match for "+funder.DOI.get )
-
-
-        }
-
-
-      } else {
-        funder.name match {
-          case   "European Union’s Horizon 2020 research and innovation program" => generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-          case "European Union's" =>
-            generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-            generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
-          case "The French National Research Agency (ANR)" |
-               "The French National Research Agency" => generateSimpleRelationFromAward(funder, "anr_________", a => a)
-          case "CONICYT, Programa de Formación de Capital Humano Avanzado" => generateSimpleRelationFromAward(funder, "conicytf____", extractECAward)
-          case "Wellcome Trust Masters Fellowship" => queue += generateRelation(sourceId,"1e5e62235d094afd01cd56e65112fc63", "wt__________" )
-          case _ =>                         logger.debug("no match for "+funder.name )
-
-        }
-      }
-
+    def getProjectId (nsPrefix:String, targetId:String):String = {
+      s"40|$nsPrefix::$targetId"
     }
-    )
+
+
+    if (funders != null)
+      funders.foreach(funder => {
+        if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
+          funder.DOI.get match {
+            case "10.13039/100010663" |
+                 "10.13039/100010661" |
+                 "10.13039/501100007601" |
+                 "10.13039/501100000780" |
+                 "10.13039/100010665" =>      generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+            case "10.13039/100011199" |
+                 "10.13039/100004431" |
+                 "10.13039/501100004963" |
+                 "10.13039/501100000780" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+            case "10.13039/501100000781" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+              generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+            case "10.13039/100000001" =>      generateSimpleRelationFromAward(funder, "nsf_________", a => a)
+            case "10.13039/501100001665" =>   generateSimpleRelationFromAward(funder, "anr_________", a => a)
+            case "10.13039/501100002341" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a)
+            case "10.13039/501100001602" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a.replace("SFI", ""))
+            case "10.13039/501100000923" =>   generateSimpleRelationFromAward(funder, "arc_________", a => a)
+            case "10.13039/501100000038"=>    val targetId = getProjectId("nserc_______" , "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, "isProducedBy" )
+              queue += generateRelation(targetId, sourceId, "produces" )
+            case "10.13039/501100000155"=>    val targetId = getProjectId("sshrc_______" , "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId,targetId, "isProducedBy" )
+              queue += generateRelation(targetId,sourceId, "produces" )
+            case "10.13039/501100000024"=>    val targetId = getProjectId("cihr________" , "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId,targetId, "isProducedBy" )
+              queue += generateRelation(targetId,sourceId, "produces" )
+            case "10.13039/501100002848" =>   generateSimpleRelationFromAward(funder, "conicytf____", a => a)
+            case "10.13039/501100003448" =>   generateSimpleRelationFromAward(funder, "gsrt________", extractECAward)
+            case "10.13039/501100010198" =>   generateSimpleRelationFromAward(funder, "sgov________", a=>a)
+            case "10.13039/501100004564" =>   generateSimpleRelationFromAward(funder, "mestd_______", extractECAward)
+            case "10.13039/501100003407" =>   generateSimpleRelationFromAward(funder, "miur________", a=>a)
+              val targetId = getProjectId("miur________" , "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId,targetId, "isProducedBy" )
+              queue += generateRelation(targetId,sourceId, "produces" )
+            case "10.13039/501100006588" |
+                 "10.13039/501100004488" =>  generateSimpleRelationFromAward(funder, "irb_hr______", a=>a.replaceAll("Project No.", "").replaceAll("HRZZ-","") )
+            case "10.13039/501100006769"=>    generateSimpleRelationFromAward(funder, "rsf_________", a=>a)
+            case "10.13039/501100001711"=>    generateSimpleRelationFromAward(funder, "snsf________", snsfRule)
+            case "10.13039/501100004410"=>    generateSimpleRelationFromAward(funder, "tubitakf____", a =>a)
+            case "10.10.13039/100004440"=>    generateSimpleRelationFromAward(funder, "wt__________", a =>a)
+            case "10.13039/100004440"=>       val targetId = getProjectId("wt__________" , "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId,targetId, "isProducedBy" )
+              queue += generateRelation(targetId,sourceId, "produces" )
+
+            case _ =>                         logger.debug("no match for "+funder.DOI.get )
+
+
+          }
+
+
+        } else {
+          funder.name match {
+            case   "European Union’s Horizon 2020 research and innovation program" => generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+            case "European Union's" =>
+              generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+              generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+            case "The French National Research Agency (ANR)" |
+                 "The French National Research Agency" => generateSimpleRelationFromAward(funder, "anr_________", a => a)
+            case "CONICYT, Programa de Formación de Capital Humano Avanzado" => generateSimpleRelationFromAward(funder, "conicytf____", extractECAward)
+            case "Wellcome Trust Masters Fellowship" =>  val targetId = getProjectId("wt__________", "1e5e62235d094afd01cd56e65112fc63")
+              queue +=  generateRelation(sourceId, targetId, "isProducedBy" )
+              queue +=  generateRelation(targetId, sourceId, "produces" )
+            case _ =>                         logger.debug("no match for "+funder.name )
+
+          }
+        }
+
+      }
+      )
     queue.toList
   }
 

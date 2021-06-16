@@ -1,8 +1,28 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.*;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_ACCESS_MODES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.NOT_AVAILABLE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.keyValue;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.oaiIProvenance;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
 
 import java.util.*;
 
@@ -12,10 +32,30 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.LicenseComparator;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Context;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.GeoLocation;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.Journal;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public abstract class AbstractMdRecordToOafMapper {
 
@@ -28,9 +68,11 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
 	protected static final String DATACITE_SCHEMA_KERNEL_3_SLASH = "http://datacite.org/schema/kernel-3/";
 	protected static final Qualifier ORCID_PID_TYPE = qualifier(
-		"ORCID", "Open Researcher and Contributor ID", DNET_PID_TYPES, DNET_PID_TYPES);
+		ModelConstants.ORCID_PENDING, ModelConstants.ORCID_CLASSNAME, DNET_PID_TYPES, DNET_PID_TYPES);
 	protected static final Qualifier MAG_PID_TYPE = qualifier(
 		"MAGIdentifier", "Microsoft Academic Graph Identifier", DNET_PID_TYPES, DNET_PID_TYPES);
+
+	protected static final String DEFAULT_TRUST_FOR_VALIDATED_RELS = "0.999";
 
 	protected static final Map<String, String> nsContext = new HashMap<>();
 
@@ -92,10 +134,10 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	protected String getResultType(final Document doc, final List<Instance> instances) {
-		String type = doc.valueOf("//dr:CobjCategory/@type");
+		final String type = doc.valueOf("//dr:CobjCategory/@type");
 
 		if (StringUtils.isBlank(type) & vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
-			String instanceType = instances
+			final String instanceType = instances
 				.stream()
 				.map(i -> i.getInstancetype().getClassid())
 				.findFirst()
@@ -201,23 +243,52 @@ public abstract class AbstractMdRecordToOafMapper {
 
 			final String originalId = ((Node) o).getText();
 
+			final String validationdDate = ((Node) o).valueOf("@validationDate");
+
 			if (StringUtils.isNotBlank(originalId)) {
 				final String projectId = createOpenaireId(40, originalId, true);
 
 				res
 					.add(
-						getRelation(
+						getRelationWithValidationDate(
 							docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, collectedFrom, info,
-							lastUpdateTimestamp));
+							lastUpdateTimestamp, validationdDate));
 				res
 					.add(
-						getRelation(
+						getRelationWithValidationDate(
 							projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, collectedFrom, info,
-							lastUpdateTimestamp));
+							lastUpdateTimestamp, validationdDate));
 			}
 		}
 
 		return res;
+	}
+
+	protected Relation getRelationWithValidationDate(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final KeyValue collectedFrom,
+		final DataInfo info,
+		final long lastUpdateTimestamp,
+		final String validationDate) {
+
+		final Relation r = getRelation(
+			source, target, relType, subRelType, relClass, collectedFrom, info, lastUpdateTimestamp);
+		r.setValidated(StringUtils.isNotBlank(validationDate));
+		r.setValidationDate(StringUtils.isNotBlank(validationDate) ? validationDate : null);
+
+		if (StringUtils.isNotBlank(validationDate)) {
+			r.setValidated(true);
+			r.setValidationDate(validationDate);
+			r.getDataInfo().setTrust(DEFAULT_TRUST_FOR_VALIDATED_RELS);
+		} else {
+			r.setValidated(false);
+			r.setValidationDate(null);
+		}
+
+		return r;
 	}
 
 	protected Relation getRelation(final String source,
@@ -256,13 +327,11 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setDataInfo(info);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
-
-		r.setOriginalId(Arrays.asList(findOriginalId(doc)));
-
+		r.setOriginalId(findOriginalId(doc));
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
 		r.setPid(prepareResultPids(doc, info));
-		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection"));
-		r.setDateoftransformation(doc.valueOf("//dr:dateOfTransformation"));
+		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection|//dri:dateOfCollection"));
+		r.setDateoftransformation(doc.valueOf("//dr:dateOfTransformation|//dri:dateOfTransformation"));
 		r.setExtraInfo(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 		r.setOaiprovenance(prepareOAIprovenance(doc));
 		r.setAuthor(prepareAuthors(doc, info));
@@ -421,16 +490,23 @@ public abstract class AbstractMdRecordToOafMapper {
 		return null;
 	}
 
-	private String findOriginalId(final Document doc) {
+	private List<String> findOriginalId(final Document doc) {
 		final Node n = doc.selectSingleNode("//*[local-name()='provenance']/*[local-name()='originDescription']");
 		if (n != null) {
 			final String id = n.valueOf("./*[local-name()='identifier']");
 			if (StringUtils.isNotBlank(id)) {
-				return id;
+				return Lists.newArrayList(id);
 			}
 		}
-		return doc.valueOf("//*[local-name()='header']/*[local-name()='identifier']");
+		List<String> idList = doc
+			.selectNodes(
+				"normalize-space(//*[local-name()='header']/*[local-name()='identifier' or local-name()='recordIdentifier']/text())");
+		Set<String> originalIds = Sets.newHashSet(idList);
 
+		if (originalIds.isEmpty()) {
+			throw new IllegalStateException("missing originalID on " + doc.asXML());
+		}
+		return Lists.newArrayList(originalIds);
 	}
 
 	protected Qualifier prepareQualifier(final Node node, final String xpath, final String schemeId) {

@@ -92,7 +92,6 @@ public class CreateRelatedEntitiesJob_phase1 {
 		String outputPath) {
 
 		Dataset<Tuple2<String, Relation>> relsByTarget = readPathRelation(spark, inputRelationsPath)
-			.filter("dataInfo.deletedbyinference == false")
 			.map(
 				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(r.getTarget(),
 					r),

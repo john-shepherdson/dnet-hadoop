@@ -1,15 +1,6 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.asString;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.field;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils.structuredProperty;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASOURCE_ORGANIZATION;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
@@ -32,13 +23,26 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.asString;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.journal;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listFields;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listKeyValues;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -174,7 +178,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		execute(sqlFile, producer, oaf -> true);
 	}
 
-	public void execute(final String sqlFile, final Function<ResultSet, List<Oaf>> producer,
+	public void execute(final String sqlFile,
+		final Function<ResultSet, List<Oaf>> producer,
 		final Predicate<Oaf> predicate)
 		throws Exception {
 		final String sql = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/sql/" + sqlFile));
@@ -198,8 +203,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds
 				.setOriginalId(
 					Arrays
-						.asList(
-							(String[]) rs.getArray("identities").getArray())
+						.asList((String[]) rs.getArray("identities").getArray())
 						.stream()
 						.filter(StringUtils::isNotBlank)
 						.collect(Collectors.toList()));
@@ -250,11 +254,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds
 				.setJournal(
 					journal(
-						rs.getString("officialname"),
-						rs.getString("issnPrinted"),
-						rs.getString("issnOnline"),
-						rs.getString("issnLinking"),
-						info)); // Journal
+						rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
+						rs.getString("issnLinking"), info)); // Journal
 			ds.setDataInfo(info);
 			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -332,7 +333,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					listKeyValues(
 						createOpenaireId(10, rs.getString("collectedfromid"), true),
 						rs.getString("collectedfromname")));
-			o.setPid(new ArrayList<>());
+			o.setPid(prepareListOfStructProps(rs.getArray("pid"), info));
 			o.setDateofcollection(asString(rs.getDate("dateofcollection")));
 			o.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
 			o.setExtraInfo(new ArrayList<>()); // Values not present in the DB
@@ -469,43 +470,47 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 				return Arrays.asList(r);
 			} else {
+				final String validationDate = rs.getString("curation_date");
+
 				final String sourceId = createOpenaireId(rs.getString(SOURCE_TYPE), rs.getString("source_id"), false);
 				final String targetId = createOpenaireId(rs.getString(TARGET_TYPE), rs.getString("target_id"), false);
 
 				final Relation r1 = new Relation();
 				final Relation r2 = new Relation();
 
-				if (rs.getString(SOURCE_TYPE).equals("project")) {
-					r1.setCollectedfrom(collectedFrom);
-					r1.setRelType(RESULT_PROJECT);
-					r1.setSubRelType(OUTCOME);
-					r1.setRelClass(PRODUCES);
-
-					r2.setCollectedfrom(collectedFrom);
-					r2.setRelType(RESULT_PROJECT);
-					r2.setSubRelType(OUTCOME);
-					r2.setRelClass(IS_PRODUCED_BY);
-				} else {
-					r1.setCollectedfrom(collectedFrom);
-					r1.setRelType(RESULT_RESULT);
-					r1.setSubRelType(RELATIONSHIP);
-					r1.setRelClass(IS_RELATED_TO);
-
-					r2.setCollectedfrom(collectedFrom);
-					r2.setRelType(RESULT_RESULT);
-					r2.setSubRelType(RELATIONSHIP);
-					r2.setRelClass(IS_RELATED_TO);
-				}
-
+				r1.setValidated(true);
+				r1.setValidationDate(validationDate);
+				r1.setCollectedfrom(collectedFrom);
 				r1.setSource(sourceId);
 				r1.setTarget(targetId);
 				r1.setDataInfo(info);
 				r1.setLastupdatetimestamp(lastUpdateTimestamp);
 
+				r2.setValidationDate(validationDate);
+				r2.setValidated(true);
+				r2.setCollectedfrom(collectedFrom);
 				r2.setSource(targetId);
 				r2.setTarget(sourceId);
 				r2.setDataInfo(info);
 				r2.setLastupdatetimestamp(lastUpdateTimestamp);
+
+				if (rs.getString(SOURCE_TYPE).equals("project")) {
+					r1.setRelType(RESULT_PROJECT);
+					r1.setSubRelType(OUTCOME);
+					r1.setRelClass(PRODUCES);
+
+					r2.setRelType(RESULT_PROJECT);
+					r2.setSubRelType(OUTCOME);
+					r2.setRelClass(IS_PRODUCED_BY);
+				} else {
+					r1.setRelType(RESULT_RESULT);
+					r1.setSubRelType(RELATIONSHIP);
+					r1.setRelClass(IS_RELATED_TO);
+
+					r2.setRelType(RESULT_RESULT);
+					r2.setSubRelType(RELATIONSHIP);
+					r2.setRelClass(IS_RELATED_TO);
+				}
 
 				return Arrays.asList(r1, r2);
 			}
@@ -526,9 +531,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final Boolean deletedbyinference = rs.getBoolean("deletedbyinference");
 		final String inferenceprovenance = rs.getString("inferenceprovenance");
 		final Boolean inferred = rs.getBoolean("inferred");
-		final String trust = rs.getString("trust");
+
+		final double trust = rs.getDouble("trust");
+
 		return dataInfo(
-			deletedbyinference, inferenceprovenance, inferred, false, ENTITYREGISTRY_PROVENANCE_ACTION, trust);
+			deletedbyinference, inferenceprovenance, inferred, false, ENTITYREGISTRY_PROVENANCE_ACTION,
+			String.format("%.3f", trust));
 	}
 
 	private Qualifier prepareQualifierSplitting(final String s) {
@@ -576,17 +584,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		}
 
 		return res;
-	}
-
-	private Journal prepareJournal(final ResultSet rs, final DataInfo info) throws SQLException {
-		if (Objects.isNull(rs)) {
-			return null;
-		} else {
-
-			return journal(
-				rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
-				rs.getString("issnLinking"), info);
-		}
 	}
 
 	@Override

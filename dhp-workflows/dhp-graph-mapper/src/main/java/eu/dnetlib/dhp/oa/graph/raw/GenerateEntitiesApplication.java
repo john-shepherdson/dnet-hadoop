@@ -29,16 +29,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
@@ -78,7 +69,7 @@ public class GenerateEntitiesApplication {
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
-			removeOutputDir(spark, targetPath);
+			HdfsSupport.remove(targetPath, spark.sparkContext().hadoopConfiguration());
 			generateEntities(spark, vocs, sourcePaths, targetPath);
 		});
 	}
@@ -92,7 +83,7 @@ public class GenerateEntitiesApplication {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		final List<String> existingSourcePaths = Arrays
 			.stream(sourcePaths.split(","))
-			.filter(p -> exists(sc, p))
+			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
 			.collect(Collectors.toList());
 
 		log.info("Generate entities from files:");
@@ -113,24 +104,13 @@ public class GenerateEntitiesApplication {
 
 		inputRdd
 			.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
-			.reduceByKey((o1, o2) -> merge(o1, o2))
+			.reduceByKey((o1, o2) -> OafMapperUtils.merge(o1, o2))
 			.map(Tuple2::_2)
 			.map(
 				oaf -> oaf.getClass().getSimpleName().toLowerCase()
 					+ "|"
 					+ OBJECT_MAPPER.writeValueAsString(oaf))
 			.saveAsTextFile(targetPath, GzipCodec.class);
-	}
-
-	private static Oaf merge(final Oaf o1, final Oaf o2) {
-		if (ModelSupport.isSubClass(o1, OafEntity.class)) {
-			((OafEntity) o1).mergeFrom((OafEntity) o2);
-		} else if (ModelSupport.isSubClass(o1, Relation.class)) {
-			((Relation) o1).mergeFrom((Relation) o2);
-		} else {
-			throw new RuntimeException("invalid Oaf type:" + o1.getClass().getCanonicalName());
-		}
-		return o1;
 	}
 
 	private static List<Oaf> convertToListOaf(
@@ -181,17 +161,4 @@ public class GenerateEntitiesApplication {
 		}
 	}
 
-	private static boolean exists(final JavaSparkContext context, final String pathToFile) {
-		try {
-			final FileSystem hdfs = FileSystem.get(context.hadoopConfiguration());
-			final Path path = new Path(pathToFile);
-			return hdfs.exists(path);
-		} catch (final IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static void removeOutputDir(final SparkSession spark, final String path) {
-		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-	}
 }

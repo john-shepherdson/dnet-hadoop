@@ -1,8 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.clean;
 
-import java.util.LinkedHashMap;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -11,14 +10,24 @@ import org.apache.commons.lang3.StringUtils;
 import com.clearspring.analytics.util.Lists;
 
 import eu.dnetlib.dhp.oa.graph.raw.AbstractMdRecordToOafMapper;
-import eu.dnetlib.dhp.oa.graph.raw.common.OafMapperUtils;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningFunctions {
 
-	public static final String ORCID_PREFIX_REGEX = "^http(s?):\\/\\/orcid\\.org\\/";
-	public static final String NONE = "none";
+	public static final String DOI_PREFIX_REGEX = "^10\\.";
+
+	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
+	public static final int ORCID_LEN = 19;
+
+	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
+
+	public static final Set<String> PID_BLACKLIST = new HashSet<>();
+
+	static {
+		PID_BLACKLIST.add("none");
+		PID_BLACKLIST.add("na");
+	}
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
 		if (value instanceof Datasource) {
@@ -50,13 +59,19 @@ public class CleaningFunctions {
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
-				r.getAuthor().forEach(a -> {
-					if (Objects.nonNull(a.getPid())) {
-						a.getPid().forEach(p -> {
-							fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES);
-						});
-					}
-				});
+				r
+					.getAuthor()
+					.stream()
+					.filter(Objects::nonNull)
+					.forEach(a -> {
+						if (Objects.nonNull(a.getPid())) {
+							a
+								.getPid()
+								.stream()
+								.filter(Objects::nonNull)
+								.forEach(p -> fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES));
+						}
+					});
 			}
 			if (value instanceof Publication) {
 
@@ -72,7 +87,7 @@ public class CleaningFunctions {
 		return value;
 	}
 
-	protected static <T extends Oaf> T fixDefaults(T value) {
+	public static <T extends Oaf> T fixDefaults(T value) {
 		if (value instanceof Datasource) {
 			// nothing to clean here
 		} else if (value instanceof Project) {
@@ -80,7 +95,7 @@ public class CleaningFunctions {
 		} else if (value instanceof Organization) {
 			Organization o = (Organization) value;
 			if (Objects.isNull(o.getCountry()) || StringUtils.isBlank(o.getCountry().getClassid())) {
-				o.setCountry(qualifier("UNKNOWN", "Unknown", ModelConstants.DNET_COUNTRY_TYPE));
+				o.setCountry(ModelConstants.UNKNOWN_COUNTRY);
 			}
 		} else if (value instanceof Relation) {
 			// nothing to clean here
@@ -95,6 +110,16 @@ public class CleaningFunctions {
 					.setLanguage(
 						qualifier("und", "Undetermined", ModelConstants.DNET_LANGUAGES));
 			}
+			if (Objects.nonNull(r.getCountry())) {
+				r
+					.setCountry(
+						r
+							.getCountry()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(c -> StringUtils.isNotBlank(c.getClassid()))
+							.collect(Collectors.toList()));
+			}
 			if (Objects.nonNull(r.getSubject())) {
 				r
 					.setSubject(
@@ -105,6 +130,29 @@ public class CleaningFunctions {
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.map(CleaningFunctions::cleanValue)
+							.collect(Collectors.toList()));
+			}
+			if (Objects.nonNull(r.getTitle())) {
+				r
+					.setTitle(
+						r
+							.getTitle()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+							.map(CleaningFunctions::cleanValue)
+							.collect(Collectors.toList()));
+			}
+			if (Objects.nonNull(r.getDescription())) {
+				r
+					.setDescription(
+						r
+							.getDescription()
+							.stream()
+							.filter(Objects::nonNull)
+							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+							.map(CleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}
 			if (Objects.nonNull(r.getPid())) {
@@ -115,24 +163,23 @@ public class CleaningFunctions {
 							.stream()
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(StringUtils.trim(sp.getValue())))
-							.filter(sp -> NONE.equalsIgnoreCase(sp.getValue()))
+							.filter(sp -> !PID_BLACKLIST.contains(sp.getValue().trim().toLowerCase()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
-							.map(sp -> {
-								sp.setValue(StringUtils.trim(sp.getValue()));
-								return sp;
-							})
+							.map(CleaningFunctions::normalizePidValue)
 							.collect(Collectors.toList()));
 			}
 			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
 				r
 					.setResourcetype(
-						qualifier("UNKNOWN", "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
+						qualifier(ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
 			}
 			if (Objects.nonNull(r.getInstance())) {
 				for (Instance i : r.getInstance()) {
 					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
-						i.setAccessright(qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
+						i
+							.setAccessright(
+								qualifier(ModelConstants.UNKNOWN, "not available", ModelConstants.DNET_ACCESS_MODES));
 					}
 					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
 						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
@@ -147,12 +194,22 @@ public class CleaningFunctions {
 				if (Objects.isNull(bestaccessrights)) {
 					r
 						.setBestaccessright(
-							qualifier("UNKNOWN", "not available", ModelConstants.DNET_ACCESS_MODES));
+							qualifier(ModelConstants.UNKNOWN, "not available", ModelConstants.DNET_ACCESS_MODES));
 				} else {
 					r.setBestaccessright(bestaccessrights);
 				}
 			}
 			if (Objects.nonNull(r.getAuthor())) {
+				r
+					.setAuthor(
+						r
+							.getAuthor()
+							.stream()
+							.filter(a -> Objects.nonNull(a))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
+							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+							.collect(Collectors.toList()));
+
 				boolean nullRank = r
 					.getAuthor()
 					.stream()
@@ -163,6 +220,7 @@ public class CleaningFunctions {
 						author.setRank(i++);
 					}
 				}
+
 				for (Author a : r.getAuthor()) {
 					if (Objects.isNull(a.getPid())) {
 						a.setPid(Lists.newArrayList());
@@ -172,16 +230,50 @@ public class CleaningFunctions {
 								a
 									.getPid()
 									.stream()
+									.filter(Objects::nonNull)
 									.filter(p -> Objects.nonNull(p.getQualifier()))
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {
-										p.setValue(p.getValue().trim().replaceAll(ORCID_PREFIX_REGEX, ""));
+										// hack to distinguish orcid from orcid_pending
+										String pidProvenance = Optional
+											.ofNullable(p.getDataInfo())
+											.map(
+												d -> Optional
+													.ofNullable(d.getProvenanceaction())
+													.map(Qualifier::getClassid)
+													.orElse(""))
+											.orElse("");
+										if (p
+											.getQualifier()
+											.getClassid()
+											.toLowerCase()
+											.contains(ModelConstants.ORCID)) {
+											if (pidProvenance
+												.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+												p.getQualifier().setClassid(ModelConstants.ORCID);
+											} else {
+												p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+											}
+											final String orcid = p
+												.getValue()
+												.trim()
+												.toLowerCase()
+												.replaceAll(ORCID_CLEANING_REGEX, "$1-$2-$3-$4");
+											if (orcid.length() == ORCID_LEN) {
+												p.setValue(orcid);
+											} else {
+												p.setValue("");
+											}
+										}
 										return p;
 									})
+									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.collect(
 										Collectors
 											.toMap(
-												StructuredProperty::getValue, Function.identity(), (p1, p2) -> p1,
+												p -> p.getQualifier().getClassid() + p.getValue(),
+												Function.identity(),
+												(p1, p2) -> p1,
 												LinkedHashMap::new))
 									.values()
 									.stream()
@@ -204,6 +296,16 @@ public class CleaningFunctions {
 		return value;
 	}
 
+	protected static StructuredProperty cleanValue(StructuredProperty s) {
+		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
+		return s;
+	}
+
+	protected static Field<String> cleanValue(Field<String> s) {
+		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
+		return s;
+	}
+
 	// HELPERS
 
 	private static void fixVocabName(Qualifier q, String vocabularyName) {
@@ -217,6 +319,26 @@ public class CleaningFunctions {
 		return OafMapperUtils
 			.qualifier(
 				classid, classname, scheme, scheme);
+	}
+
+	/**
+	 * Utility method that normalises PID values on a per-type basis.
+	 * @param pid the PID whose value will be normalised.
+	 * @return the PID containing the normalised value.
+	 */
+	public static StructuredProperty normalizePidValue(StructuredProperty pid) {
+		String value = Optional
+			.ofNullable(pid.getValue())
+			.map(String::trim)
+			.orElseThrow(() -> new IllegalArgumentException("PID value cannot be empty"));
+		switch (pid.getQualifier().getClassid()) {
+
+			// TODO add cleaning for more PID types as needed
+			case "doi":
+				pid.setValue(value.toLowerCase().replaceAll(DOI_PREFIX_REGEX, "10."));
+				break;
+		}
+		return pid;
 	}
 
 }

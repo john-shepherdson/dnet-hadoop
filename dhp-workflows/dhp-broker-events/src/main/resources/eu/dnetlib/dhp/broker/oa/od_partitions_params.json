@@ -1,0 +1,14 @@
+[
+	{
+		"paramName": "o",
+		"paramLongName": "outputDir",
+		"paramDescription": "the path where the data will be stored",
+		"paramRequired": true
+	},
+	{
+		"paramName": "list",
+		"paramLongName": "opendoarIds",
+		"paramDescription": "the opendoar IDs whitelist (comma separated)",
+		"paramRequired": true
+	}
+]

@@ -21,10 +21,10 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 public class ResultMapper implements Serializable {
 
 	public static <E extends eu.dnetlib.dhp.schema.oaf.OafEntity> Result map(
-		E in, Map<String, String> communityMap, boolean graph) {
+		E in, Map<String, String> communityMap, String dumpType) {
 
 		Result out;
-		if (graph) {
+		if (Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
 			out = new GraphResult();
 		} else {
 			out = new CommunityResult();
@@ -217,7 +217,7 @@ public class ResultMapper implements Serializable {
 				.ofNullable(input.getInstance());
 
 			if (oInst.isPresent()) {
-				if (graph) {
+				if (Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
 					((GraphResult) out)
 						.setInstance(oInst.get().stream().map(i -> getGraphInstance(i)).collect(Collectors.toList()));
 				} else {
@@ -296,7 +296,7 @@ public class ResultMapper implements Serializable {
 			out.setType(input.getResulttype().getClassid());
 		}
 
-		if (!graph) {
+		if (!Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
 			((CommunityResult) out)
 				.setCollectedfrom(
 					input
@@ -503,7 +503,7 @@ public class ResultMapper implements Serializable {
 
 	private static Pid getOrcid(List<StructuredProperty> p) {
 		for (StructuredProperty pid : p) {
-			if (pid.getQualifier().getClassid().equals(Constants.ORCID)) {
+			if (pid.getQualifier().getClassid().equals(ModelConstants.ORCID)) {
 				Optional<DataInfo> di = Optional.ofNullable(pid.getDataInfo());
 				if (di.isPresent()) {
 					return Pid
