@@ -24,7 +24,7 @@
 
     </parameters>
 
-    <start to="ImportCrossRef"/>
+    <start to="generateCrossrefDataset"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -63,30 +63,30 @@
             </spark-opts>
             <arg>--master</arg><arg>yarn-cluster</arg>
             <arg>--sourcePath</arg><arg>${workingDir}/files</arg>
-            <arg>--targetPath</arg><arg>${inputPathCrossref}/crossref_ds_updated</arg>
+            <arg>--targetPath</arg><arg>${inputPathCrossref}/crossref_ds</arg>
 
         </spark>
-        <ok to="removeFiles"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="removeFiles">
-        <fs>
-        <delete path="${workingDir}/files"/>
-        </fs>
-        <ok to="renameDataset"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="renameDataset">
-        <fs>
-            <delete path="${inputPathCrossref}/crossref_ds"/>
-            <move source="${inputPathCrossref}/crossref_ds_updated"
-                  target="${inputPathCrossref}/crossref_ds"/>
-        </fs>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+<!--    <action name="removeFiles">-->
+<!--        <fs>-->
+<!--        <delete path="${workingDir}/files"/>-->
+<!--        </fs>-->
+<!--        <ok to="renameDataset"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
+
+<!--    <action name="renameDataset">-->
+<!--        <fs>-->
+<!--            <delete path="${inputPathCrossref}/crossref_ds"/>-->
+<!--            <move source="${inputPathCrossref}/crossref_ds_updated"-->
+<!--                  target="${inputPathCrossref}/crossref_ds"/>-->
+<!--        </fs>-->
+<!--        <ok to="End"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
 
     <end name="End"/>
 </workflow-app>
