@@ -4,6 +4,10 @@
             <name>baselineWorkingPath</name>
             <description>the Baseline Working Path</description>
         </property>
+        <property>
+            <name>isLookupUrl</name>
+            <description>The IS lookUp service endopoint</description>
+        </property>
     </parameters>
 
     <start to="ConvertDataset"/>
@@ -31,6 +35,7 @@
             </spark-opts>
             <arg>--workingPath</arg><arg>${baselineWorkingPath}</arg>
             <arg>--master</arg><arg>yarn</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

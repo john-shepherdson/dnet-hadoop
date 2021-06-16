@@ -16,6 +16,7 @@ public class PMArticle implements Serializable {
 	private String language;
 	private final List<PMSubject> subjects = new ArrayList<>();
 	private final List<PMSubject> publicationTypes = new ArrayList<>();
+	private List<PMAuthor> authors = new ArrayList<>();
 
 	public List<PMSubject> getPublicationTypes() {
 		return publicationTypes;
@@ -34,8 +35,6 @@ public class PMArticle implements Serializable {
 	public void setDoi(String doi) {
 		this.doi = doi;
 	}
-
-	private List<PMAuthor> authors = new ArrayList<>();
 
 	public String getPmid() {
 		return pmid;
