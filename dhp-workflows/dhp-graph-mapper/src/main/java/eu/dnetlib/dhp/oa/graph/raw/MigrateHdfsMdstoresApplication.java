@@ -94,14 +94,22 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
 			.toArray(size -> new String[size]);
 
-		spark
-			.read()
-			.parquet(validPaths)
-			.map((MapFunction<Row, String>) r -> enrichRecord(r), Encoders.STRING())
-			.toJavaRDD()
-			.mapToPair(xml -> new Tuple2<>(new Text(UUID.randomUUID() + ":" + type), new Text(xml)))
-			// .coalesce(1)
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+		if (validPaths.length > 0) {
+			spark
+				.read()
+				.parquet(validPaths)
+				.map((MapFunction<Row, String>) r -> enrichRecord(r), Encoders.STRING())
+				.toJavaRDD()
+				.mapToPair(xml -> new Tuple2<>(new Text(UUID.randomUUID() + ":" + type), new Text(xml)))
+				// .coalesce(1)
+				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+		} else {
+			spark
+				.emptyDataFrame()
+				.toJavaRDD()
+				.mapToPair(xml -> new Tuple2<>(new Text(), new Text()))
+				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+		}
 	}
 
 	private static String enrichRecord(final Row r) {
