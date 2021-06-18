@@ -16,11 +16,11 @@ import java.nio.charset.CodingErrorAction
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util
 import java.util.regex.Pattern
 import java.util.{Date, Locale}
 import scala.collection.JavaConverters._
 import scala.io.{Codec, Source}
+import scala.language.postfixOps
 
 case class DataciteType(doi: String, timestamp: Long, isActive: Boolean, json: String) {}
 
@@ -540,37 +540,20 @@ val REL_TYPE_VALUE:String = "resultResult"
             r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
             r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
       )
-      .flatMap(r => {
+      .map(r => {
         val rel = new Relation
-        val inverseRel = new Relation
         rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
         rel.setDataInfo(dataInfo)
 
-        inverseRel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
-        inverseRel.setDataInfo(dataInfo)
-
         val subRelType = subRelTypeMapping(r.relationType)._2
-        val inverseRelSemantic = subRelTypeMapping(r.relationType)._1
-        val inversesubRelType = subRelTypeMapping(inverseRelSemantic)._2
-
-
         rel.setRelType(REL_TYPE_VALUE)
         rel.setSubRelType(subRelType)
         rel.setRelClass(r.relationType)
 
-
-        inverseRel.setRelType(REL_TYPE_VALUE)
-        inverseRel.setSubRelType(inversesubRelType)
-        inverseRel.setRelClass(inverseRelSemantic)
-
         rel.setSource(id)
-        rel.setTarget(createDNetTargetIdentifier(r.relatedIdentifier, r.relatedIdentifierType, "50|"))
-
-        inverseRel.setTarget(id)
-        inverseRel.setSource(createDNetTargetIdentifier(r.relatedIdentifier, r.relatedIdentifierType, "50|"))
-
-        List(rel, inverseRel)
-      })
+        rel.setTarget(s"unresolved::${r.relatedIdentifier}::${r.relatedIdentifierType}")
+        rel
+      })(collection breakOut)
   }
 
   def generateDataInfo(trust: String): DataInfo = {
