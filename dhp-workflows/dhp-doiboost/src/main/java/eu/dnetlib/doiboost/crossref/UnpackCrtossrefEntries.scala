@@ -1,11 +1,7 @@
 package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.doiboost.crossref.CrossrefDataset.to_item
-import eu.dnetlib.doiboost.crossref.UnpackCrtossrefEntries.getClass
-import org.apache.hadoop.io.{IntWritable, Text}
 import org.apache.hadoop.io.compress.GzipCodec
-import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.json4s
@@ -16,22 +12,24 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.io.Source
 
-object GenerateCrossrefDataset {
+object UnpackCrtossrefEntries {
 
-  val log: Logger = LoggerFactory.getLogger(GenerateCrossrefDataset.getClass)
-
-  implicit val mrEncoder: Encoder[CrossrefDT] = Encoders.kryo[CrossrefDT]
+  val log: Logger = LoggerFactory.getLogger(UnpackCrtossrefEntries.getClass)
 
 
 
-  def crossrefElement(meta: String): CrossrefDT = {
+
+  def extractDump(input:String):List[String] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    lazy val json: json4s.JValue = parse(meta)
-    val doi:String = (json \ "DOI").extract[String]
-    val timestamp: Long = (json \ "indexed" \ "timestamp").extract[Long]
-    CrossrefDT(doi, meta, timestamp)
+    lazy val json: json4s.JValue = parse(input)
+
+    val a = (json \ "items").extract[JArray]
+    a.arr.map(s => compact(render(s)))
+
 
   }
+
+
 
   def main(args: Array[String]): Unit = {
     val conf = new SparkConf
@@ -47,17 +45,9 @@ object GenerateCrossrefDataset {
       .getOrCreate()
     val sc: SparkContext = spark.sparkContext
 
-    import spark.implicits._
+    sc.wholeTextFiles(sourcePath,6000).flatMap(d =>extractDump(d._2))
+      .saveAsTextFile(targetPath, classOf[GzipCodec])
 
-
-    val tmp : RDD[String] = sc.textFile(sourcePath,6000)
-
-    spark.createDataset(tmp)
-      .map(entry => crossrefElement(entry))
-      .write.mode(SaveMode.Overwrite).save(targetPath)
-//               .map(meta => crossrefElement(meta))
-//               .toDS.as[CrossrefDT]
-//              .write.mode(SaveMode.Overwrite).save(targetPath)
 
   }
 
