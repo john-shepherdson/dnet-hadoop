@@ -39,7 +39,8 @@ CREATE TABLE ${stats_db_name}.project_tmp
     daysforlastpub INT,
     delayedpubs    INT,
     callidentifier STRING,
-    code           STRING
+    code           STRING,
+    totalcost       FLOAT
 ) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true');
 
 INSERT INTO ${stats_db_name}.project_tmp
@@ -62,7 +63,8 @@ SELECT substr(p.id, 4)                                                 AS id,
        0                                                               AS daysforlastpub,
        0                                                               AS delayedpubs,
        p.callidentifier.value                                          AS callidentifier,
-       p.code.value                                                    AS code
+       p.code.value                                                    AS code,
+       p.totalcost                                                     AS totalcost
 FROM ${openaire_db_name}.project p
 WHERE p.datainfo.deletedbyinference = false;
 
@@ -71,14 +73,3 @@ select distinct xpath_string(fund, '//funder/id')        as id,
                 xpath_string(fund, '//funder/name')      as name,
                 xpath_string(fund, '//funder/shortname') as shortname
 from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fundingtree as fund;
-
--- ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.project_organizations COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.project_organizations COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.project_results COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.project_results COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.project_tmp COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.project_tmp COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.funder COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.funder COMPUTE STATISTICS FOR COLUMNS;

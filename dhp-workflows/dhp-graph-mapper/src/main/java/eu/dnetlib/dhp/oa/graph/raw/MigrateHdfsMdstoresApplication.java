@@ -52,8 +52,9 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(MigrateHdfsMdstoresApplication.class
-					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_hdfs_mstores_parameters.json")));
+				.toString(
+					MigrateHdfsMdstoresApplication.class
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_hdfs_mstores_parameters.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -103,7 +104,8 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 				// .coalesce(1)
 				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 		} else {
-			spark.emptyDataFrame()
+			spark
+				.emptyDataFrame()
 				.toJavaRDD()
 				.mapToPair(xml -> new Tuple2<>(new Text(), new Text()))
 				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
