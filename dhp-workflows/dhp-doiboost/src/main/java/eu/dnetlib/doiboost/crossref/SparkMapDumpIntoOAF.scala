@@ -33,9 +33,9 @@ object SparkMapDumpIntoOAF {
     implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
     implicit val mapEncoderRelatons: Encoder[Relation] = Encoders.kryo[Relation]
     implicit val mapEncoderDatasets: Encoder[oaf.Dataset] = Encoders.kryo[OafDataset]
+    implicit val mrEncoder: Encoder[CrossrefDT] = Encoders.kryo[CrossrefDT]
 
     val targetPath = parser.get("targetPath")
-    import spark.implicits._
 
     spark.read.load(parser.get("sourcePath")).as[CrossrefDT]
       .flatMap(k => Crossref2Oaf.convert(k.json))
