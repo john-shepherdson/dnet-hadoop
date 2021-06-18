@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.sx.ebi.model;
+package eu.dnetlib.dhp.sx.bio.pubmed;
 
 public class PMGrant {
 

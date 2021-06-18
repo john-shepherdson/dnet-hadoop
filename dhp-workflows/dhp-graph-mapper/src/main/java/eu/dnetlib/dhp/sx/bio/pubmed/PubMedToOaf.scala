@@ -1,12 +1,10 @@
-package eu.dnetlib.dhp.sx.ebi.model
+package eu.dnetlib.dhp.sx.bio.pubmed
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf._
-
 import scala.collection.JavaConverters._
-import scala.language.postfixOps
 
 object PubMedToOaf {
 
@@ -23,7 +21,7 @@ object PubMedToOaf {
       case "publication" => new Publication
       case "other" => new OtherResearchProduct
       case "software" => new Software
-      case _ =>null
+      case _ => null
 
     }
   }
@@ -44,7 +42,6 @@ object PubMedToOaf {
   }
 
 
-
   def getVocabularyTerm(vocabularyName: String, vocabularies: VocabularyGroup, term: String): Qualifier = {
     val a = vocabularies.getSynonymAsQualifier(vocabularyName, term)
     val b = vocabularies.getTermAsQualifier(vocabularyName, term)
@@ -60,7 +57,7 @@ object PubMedToOaf {
       return null
     val i = new Instance
     var pidList: List[StructuredProperty] = List(OafMapperUtils.structuredProperty(article.getPmid, PidType.pmid.toString, PidType.pmid.toString, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, dataInfo))
-    if (pidList ==null)
+    if (pidList == null)
       return null
     if (article.getDoi != null) {
       pidList = pidList ::: List(OafMapperUtils.structuredProperty(article.getDoi, PidType.doi.toString, PidType.doi.toString, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, dataInfo))
@@ -89,12 +86,12 @@ object PubMedToOaf {
     result.setInstance(List(i).asJava)
 
 
-    i.getPid.asScala.filter(p =>"pmid".equalsIgnoreCase(p.getQualifier.getClassid)).map(p => p.getValue)(collection breakOut)
+    i.getPid.asScala.filter(p => "pmid".equalsIgnoreCase(p.getQualifier.getClassid)).map(p => p.getValue)(collection breakOut)
     val urlLists: List[String] = pidList
       .map(s => (urlMap.getOrElse(s.getQualifier.getClassid, ""), s.getValue))
       .filter(t => t._1.nonEmpty)
       .map(t => t._1 + t._2)
-    if (urlLists!= null)
+    if (urlLists != null)
       i.setUrl(urlLists.asJava)
     i.setDateofacceptance(OafMapperUtils.field(article.getDate, dataInfo))
     i.setCollectedfrom(collectedFrom)
@@ -120,12 +117,12 @@ object PubMedToOaf {
     }
 
 
-    val subjects:List[StructuredProperty] = article.getSubjects.asScala.map(s => OafMapperUtils.structuredProperty(s.getValue, SUBJ_CLASS, SUBJ_CLASS, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES, dataInfo))(collection breakOut)
-    if (subjects!= null)
+    val subjects: List[StructuredProperty] = article.getSubjects.asScala.map(s => OafMapperUtils.structuredProperty(s.getValue, SUBJ_CLASS, SUBJ_CLASS, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES, dataInfo))(collection breakOut)
+    if (subjects != null)
       result.setSubject(subjects.asJava)
 
 
-    val authors:List[Author] = article.getAuthors.asScala.zipWithIndex.map { case (a, index) =>
+    val authors: List[Author] = article.getAuthors.asScala.zipWithIndex.map { case (a, index) =>
       val author = new Author()
       author.setName(a.getForeName)
       author.setSurname(a.getLastName)
@@ -135,7 +132,7 @@ object PubMedToOaf {
     }(collection breakOut)
 
 
-    if(authors != null && authors.nonEmpty)
+    if (authors != null && authors.nonEmpty)
       result.setAuthor(authors.asJava)
     result.setOriginalId(pidList.map(s => s.getValue).asJava)
 
@@ -150,9 +147,4 @@ object PubMedToOaf {
   }
 
 
-
-
 }
-
-
-

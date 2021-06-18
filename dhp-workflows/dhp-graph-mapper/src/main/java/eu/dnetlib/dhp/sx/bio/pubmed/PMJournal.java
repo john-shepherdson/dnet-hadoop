@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.sx.ebi.model;
+package eu.dnetlib.dhp.sx.bio.pubmed;
 
 import java.io.Serializable;
 

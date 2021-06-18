@@ -4,7 +4,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Author, Instance, Journal, KeyValue, Oaf, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils.createQualifier
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, OafUtils, ProvenaceInfo}
-import eu.dnetlib.dhp.sx.ebi.model.{PMArticle, PMAuthor, PMJournal}
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal}
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.scholexplorer.relation.RelationMapper
 import org.apache.commons.io.IOUtils
@@ -20,7 +20,7 @@ import scala.collection.JavaConverters._
 
 object SparkAddLinkUpdates {
 
-  val relationMapper = RelationMapper.load
+  val relationMapper: RelationMapper = RelationMapper.load
 
 
 case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:String, turl:String, title:String, publisher:String) {}

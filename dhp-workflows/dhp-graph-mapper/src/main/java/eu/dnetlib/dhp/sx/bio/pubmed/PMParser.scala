@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.sx.ebi.model
+package eu.dnetlib.dhp.sx.bio.pubmed
 
 import scala.xml.MetaData
 import scala.xml.pull.{EvElemEnd, EvElemStart, EvText, XMLEventReader}
