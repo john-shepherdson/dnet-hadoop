@@ -115,6 +115,8 @@ public class AuthorMerger {
 	}
 
 	public static String pidToComparableString(StructuredProperty pid) {
+		if (pid == null)
+			return "";
 		return (pid.getQualifier() != null
 			? pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase() : ""
 			: "")
