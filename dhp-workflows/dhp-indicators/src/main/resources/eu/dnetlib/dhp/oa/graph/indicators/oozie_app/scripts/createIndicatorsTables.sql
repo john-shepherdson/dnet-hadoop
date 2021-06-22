@@ -1,8 +1,3 @@
-create table TARGET.funders_publications stored as parquet as
-select f.id as id, count(pr.result) as total_pubs from SOURCE.funder f 
-join SOURCE.project p on f.name=p.funder 
-join SOURCE.project_results_publication pr on pr.project_results=p.id group by f.id, f.name;
-
 create table TARGET.indi_pub_green_oa stored as parquet as
 select distinct p.id, coalesce(green_oa, 0) as green_oa 
 from SOURCE.publication p 
@@ -47,4 +42,7 @@ join SOURCE.datasource on datasource.id = ri.hostedby
 where SOURCE.datasource.id like '%doajarticles%') tmp 
 on p.id= tmp.id;
 
-compute stats TARGET.funders_publications;
+compute stats TARGET.indi_pub_green_oa;
+compute stats TARGET.indi_pub_grey_lit;
+compute stats TARGET.indi_pub_doi_from_crossref;
+compute stats TARGET.indi_pub_gold_oa;
