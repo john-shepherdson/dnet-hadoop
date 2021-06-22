@@ -11,7 +11,6 @@ and (ri.accessright = 'Open Access'
 or ri.accessright = 'Embargo')) tmp 
 on p.id= tmp.id;
 
-
 create table TARGET.indi_pub_grey_lit stored as parquet as
 select distinct p.id, coalesce(grey_lit, 0) as grey_lit
 from SOURCE.publication p
