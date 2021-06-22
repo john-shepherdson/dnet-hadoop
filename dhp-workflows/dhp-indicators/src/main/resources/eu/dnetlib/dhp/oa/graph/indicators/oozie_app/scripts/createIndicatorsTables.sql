@@ -19,7 +19,7 @@ select p.id, 1 as grey_lit
 from SOURCE.publication p
 join SOURCE.result_classifications rt on rt.id = p.id
 where rt.type not in ('Article','Part of book or chapter of book','Book','Doctoral thesis','Master thesis','Data Paper', 'Thesis', 'Bachelor thesis', 'Conference object') and 
-not exists (select 1 from result_classifications rc where type ='Other literature type' and rc.id=p.id)) tmp on p.id=tmp.id;
+not exists (select 1 from SOURCE.result_classifications rc where type ='Other literature type' and rc.id=p.id)) tmp on p.id=tmp.id;
 
 create table TARGET.indi_pub_doi_from_crossref stored as parquet as
 select distinct p.id, coalesce(doi_from_crossref, 0) as doi_from_crossref 
