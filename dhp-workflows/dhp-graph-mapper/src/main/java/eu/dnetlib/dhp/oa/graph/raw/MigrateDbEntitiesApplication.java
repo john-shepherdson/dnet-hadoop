@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -36,7 +35,6 @@ import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
@@ -53,6 +51,13 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(MigrateDbEntitiesApplication.class);
+
+	private static final DataInfo DATA_INFO_CLAIM = dataInfo(
+		false, null, false, false,
+		qualifier(USER_CLAIM, USER_CLAIM, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), "0.9");
+
+	private static final List<KeyValue> COLLECTED_FROM_CLAIM = listKeyValues(
+		createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
 
 	public static final String SOURCE_TYPE = "source_type";
 	public static final String TARGET_TYPE = "target_type";
@@ -443,25 +448,19 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 	}
 
 	public List<Oaf> processClaims(final ResultSet rs) {
-
-		final DataInfo info = dataInfo(
-			false, null, false, false,
-			qualifier(USER_CLAIM, USER_CLAIM, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), "0.9");
-
-		final List<KeyValue> collectedFrom = listKeyValues(
-			createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
-
 		try {
-			if (rs.getString(SOURCE_TYPE).equals("context")) {
+			final String sourceType = rs.getString(SOURCE_TYPE);
+			final String targetType = rs.getString(TARGET_TYPE);
+			if (sourceType.equals("context")) {
 				final Result r;
 
-				if (rs.getString(TARGET_TYPE).equals("dataset")) {
+				if (targetType.equals("dataset")) {
 					r = new Dataset();
 					r.setResulttype(DATASET_DEFAULT_RESULTTYPE);
-				} else if (rs.getString(TARGET_TYPE).equals("software")) {
+				} else if (targetType.equals("software")) {
 					r = new Software();
 					r.setResulttype(SOFTWARE_DEFAULT_RESULTTYPE);
-				} else if (rs.getString(TARGET_TYPE).equals("other")) {
+				} else if (targetType.equals("other")) {
 					r = new OtherResearchProduct();
 					r.setResulttype(ORP_DEFAULT_RESULTTYPE);
 				} else {
@@ -470,57 +469,72 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				}
 				r.setId(createOpenaireId(50, rs.getString("target_id"), false));
 				r.setLastupdatetimestamp(lastUpdateTimestamp);
-				r.setContext(prepareContext(rs.getString("source_id"), info));
-				r.setDataInfo(info);
-				r.setCollectedfrom(collectedFrom);
+				r.setContext(prepareContext(rs.getString("source_id"), DATA_INFO_CLAIM));
+				r.setDataInfo(DATA_INFO_CLAIM);
+				r.setCollectedfrom(COLLECTED_FROM_CLAIM);
 
 				return Arrays.asList(r);
 			} else {
 				final String validationDate = rs.getString("curation_date");
 
-				final String sourceId = createOpenaireId(rs.getString(SOURCE_TYPE), rs.getString("source_id"), false);
-				final String targetId = createOpenaireId(rs.getString(TARGET_TYPE), rs.getString("target_id"), false);
+				final String sourceId = createOpenaireId(sourceType, rs.getString("source_id"), false);
+				final String targetId = createOpenaireId(targetType, rs.getString("target_id"), false);
 
 				final Relation r1 = new Relation();
 				final Relation r2 = new Relation();
 
-				r1.setValidated(true);
-				r1.setValidationDate(validationDate);
-				r1.setCollectedfrom(collectedFrom);
+				if (StringUtils.isNotBlank(validationDate)) {
+					r1.setValidated(true);
+					r1.setValidationDate(validationDate);
+					r2.setValidated(true);
+					r2.setValidationDate(validationDate);
+				}
+				r1.setCollectedfrom(COLLECTED_FROM_CLAIM);
 				r1.setSource(sourceId);
 				r1.setTarget(targetId);
-				r1.setDataInfo(info);
+				r1.setDataInfo(DATA_INFO_CLAIM);
 				r1.setLastupdatetimestamp(lastUpdateTimestamp);
 
-				r2.setValidationDate(validationDate);
-				r2.setValidated(true);
-				r2.setCollectedfrom(collectedFrom);
+				r2.setCollectedfrom(COLLECTED_FROM_CLAIM);
 				r2.setSource(targetId);
 				r2.setTarget(sourceId);
-				r2.setDataInfo(info);
+				r2.setDataInfo(DATA_INFO_CLAIM);
 				r2.setLastupdatetimestamp(lastUpdateTimestamp);
 
-				if (rs.getString(SOURCE_TYPE).equals("project")) {
-					r1.setRelType(RESULT_PROJECT);
-					r1.setSubRelType(OUTCOME);
-					r1.setRelClass(PRODUCES);
+				final String semantics = rs.getString("semantics");
 
-					r2.setRelType(RESULT_PROJECT);
-					r2.setSubRelType(OUTCOME);
-					r2.setRelClass(IS_PRODUCED_BY);
-				} else {
-					r1.setRelType(RESULT_RESULT);
-					r1.setSubRelType(RELATIONSHIP);
-					r1.setRelClass(IS_RELATED_TO);
+				switch (semantics) {
+					case "resultResult_relationship_isRelatedTo":
+						r1.setRelType(RESULT_RESULT);
+						r1.setSubRelType(RELATIONSHIP);
+						r1.setRelClass(IS_RELATED_TO);
 
-					r2.setRelType(RESULT_RESULT);
-					r2.setSubRelType(RELATIONSHIP);
-					r2.setRelClass(IS_RELATED_TO);
+						r2.setRelType(RESULT_RESULT);
+						r2.setSubRelType(RELATIONSHIP);
+						r2.setRelClass(IS_RELATED_TO);
+						break;
+					case "resultProject_outcome_produces":
+						if (!"project".equals(sourceType)) {
+							throw new IllegalStateException(
+								String
+									.format(
+										"invalid claim, sourceId: %s, targetId: %s, semantics: %s",
+										sourceId, targetId, semantics));
+						}
+						r1.setRelType(RESULT_PROJECT);
+						r1.setSubRelType(OUTCOME);
+						r1.setRelClass(PRODUCES);
+
+						r2.setRelType(RESULT_PROJECT);
+						r2.setSubRelType(OUTCOME);
+						r2.setRelClass(IS_PRODUCED_BY);
+						break;
+					default:
+						throw new IllegalArgumentException("claim semantics not managed: " + semantics);
 				}
 
 				return Arrays.asList(r1, r2);
 			}
-
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}

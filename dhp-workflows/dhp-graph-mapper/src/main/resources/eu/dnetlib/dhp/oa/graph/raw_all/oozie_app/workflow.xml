@@ -460,6 +460,7 @@
             <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
+            <arg>--mode</arg><arg>claim</arg>
         </spark>
         <ok to="GenerateGraph_claims"/>
         <error to="Kill"/>

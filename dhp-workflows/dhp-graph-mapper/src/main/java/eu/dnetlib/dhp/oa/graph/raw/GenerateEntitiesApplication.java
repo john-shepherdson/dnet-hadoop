@@ -27,6 +27,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
@@ -36,6 +37,22 @@ public class GenerateEntitiesApplication {
 	private static final Logger log = LoggerFactory.getLogger(GenerateEntitiesApplication.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	/**
+	 * Operation mode
+	 */
+	enum Mode {
+
+		/**
+		 * Groups all the objects by id to merge them
+		 */
+		claim,
+
+		/**
+		 * Default mode
+		 */
+		graph
+	}
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -67,13 +84,19 @@ public class GenerateEntitiesApplication {
 			.orElse(true);
 		log.info("shouldHashId: {}", shouldHashId);
 
+		final Mode mode = Optional
+			.ofNullable(parser.get("mode"))
+			.map(Mode::valueOf)
+			.orElse(Mode.graph);
+		log.info("mode: {}", mode);
+
 		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
 		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			HdfsSupport.remove(targetPath, spark.sparkContext().hadoopConfiguration());
-			generateEntities(spark, vocs, sourcePaths, targetPath, shouldHashId);
+			generateEntities(spark, vocs, sourcePaths, targetPath, shouldHashId, mode);
 		});
 	}
 
@@ -82,7 +105,8 @@ public class GenerateEntitiesApplication {
 		final VocabularyGroup vocs,
 		final String sourcePaths,
 		final String targetPath,
-		final boolean shouldHashId) {
+		final boolean shouldHashId,
+		final Mode mode) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		final List<String> existingSourcePaths = Arrays
@@ -106,7 +130,23 @@ public class GenerateEntitiesApplication {
 						.flatMap(list -> list.iterator()));
 		}
 
-		inputRdd
+		switch (mode) {
+			case claim:
+				save(
+					inputRdd
+						.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
+						.reduceByKey((o1, o2) -> OafMapperUtils.merge(o1, o2))
+						.map(Tuple2::_2),
+					targetPath);
+				break;
+			case graph:
+				save(inputRdd, targetPath);
+				break;
+		}
+	}
+
+	private static void save(final JavaRDD<Oaf> rdd, final String targetPath) {
+		rdd
 			.map(
 				oaf -> oaf.getClass().getSimpleName().toLowerCase()
 					+ "|"

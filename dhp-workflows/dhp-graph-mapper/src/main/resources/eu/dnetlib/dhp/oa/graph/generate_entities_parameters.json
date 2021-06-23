@@ -28,5 +28,11 @@
 		"paramLongName": "shouldHashId",
 		"paramDescription": "should ids be hashed?",
 		"paramRequired": false
+	},
+	{
+		"paramName": "m",
+		"paramLongName": "mode",
+		"paramDescription": "operation mode",
+		"paramRequired": false
 	}
 ]
