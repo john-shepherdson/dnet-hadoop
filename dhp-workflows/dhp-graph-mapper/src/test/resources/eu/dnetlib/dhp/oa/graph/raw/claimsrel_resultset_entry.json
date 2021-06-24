@@ -21,7 +21,7 @@
 	},
 	{
 		"field": "semantics",
-		"type": "not_used",
+		"type": "string",
 		"value": "resultProject_outcome_produces"
 	}
 ]

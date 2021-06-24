@@ -144,22 +144,7 @@ public class PrepareProgramme {
 		JavaRDD<CSVProgramme> h2020Programmes = programme
 			.toJavaRDD()
 			.mapToPair(csvProgramme -> new Tuple2<>(csvProgramme.getCode(), csvProgramme))
-			.reduceByKey((a, b) -> {
-				if (!a.getLanguage().equals("en")) {
-					if (b.getLanguage().equalsIgnoreCase("en")) {
-						a.setTitle(b.getTitle());
-						a.setLanguage(b.getLanguage());
-					}
-				}
-				if (StringUtils.isEmpty(a.getShortTitle())) {
-					if (!StringUtils.isEmpty(b.getShortTitle())) {
-						a.setShortTitle(b.getShortTitle());
-					}
-				}
-
-				return a;
-
-			})
+			.reduceByKey(PrepareProgramme::groupProgrammeByCode)
 			.map(p -> {
 				CSVProgramme csvProgramme = p._2();
 				String programmeTitle = csvProgramme.getTitle().trim();
@@ -176,18 +161,29 @@ public class PrepareProgramme {
 				return csvProgramme;
 			});
 
-		// prepareClassification(h2020Programmes);
-
-		JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<CSVProgramme> rdd = jsc.parallelize(prepareClassification(h2020Programmes), 1);
 		rdd
-			.map(csvProgramme -> {
-				String tmp = OBJECT_MAPPER.writeValueAsString(csvProgramme);
-				return tmp;
-			})
+			.map(OBJECT_MAPPER::writeValueAsString)
 			.saveAsTextFile(outputPath);
 
+	}
+
+	private static CSVProgramme groupProgrammeByCode(CSVProgramme a, CSVProgramme b) {
+		if (!a.getLanguage().equals("en")) {
+			if (b.getLanguage().equalsIgnoreCase("en")) {
+				a.setTitle(b.getTitle());
+				a.setLanguage(b.getLanguage());
+			}
+		}
+		if (StringUtils.isEmpty(a.getShortTitle())) {
+			if (!StringUtils.isEmpty(b.getShortTitle())) {
+				a.setShortTitle(b.getShortTitle());
+			}
+		}
+
+		return a;
 	}
 
 	private static List<CSVProgramme> prepareClassification(JavaRDD<CSVProgramme> h2020Programmes) {
@@ -240,10 +236,10 @@ public class PrepareProgramme {
 				if (!ent.contains("Euratom")) {
 
 					String parent;
-					String tmp_key = tmp[0] + ".";
+					String tmpKey = tmp[0] + ".";
 					for (int i = 1; i < tmp.length - 1; i++) {
-						tmp_key += tmp[i] + ".";
-						parent = map.get(tmp_key)._1().toLowerCase().trim();
+						tmpKey += tmp[i] + ".";
+						parent = map.get(tmpKey)._1().toLowerCase().trim();
 						if (parent.contains("|")) {
 							parent = parent.substring(parent.lastIndexOf("|") + 1).trim();
 						}
