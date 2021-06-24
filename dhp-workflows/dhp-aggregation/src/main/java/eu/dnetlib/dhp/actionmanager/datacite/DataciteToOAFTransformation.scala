@@ -577,6 +577,8 @@ val REL_TYPE_VALUE:String = "resultResult"
 
         rel.setSource(id)
         rel.setTarget(s"unresolved::${r.relatedIdentifier}::${r.relatedIdentifierType}")
+        rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+        rel.getCollectedfrom.asScala.map(c => c.getValue)(collection.breakOut)
         rel
       })(collection breakOut)
   }

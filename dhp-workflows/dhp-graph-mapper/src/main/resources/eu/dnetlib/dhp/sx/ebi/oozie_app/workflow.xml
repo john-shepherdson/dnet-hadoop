@@ -54,7 +54,7 @@
             <mode>cluster</mode>
             <name>Create EBI DataSet</name>
 
-            <class>eu.dnetlib.dhp.sx.ebi.SparkCreateEBIDataFrame</class>
+            <class>eu.dnetlib.dhp.sx.ebi.SparkEBILinksToOaf</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

@@ -165,13 +165,13 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
 
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkCreateEBIDataFrame.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/ebi/ebi_to_df_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/ebi/ebi_to_df_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
-        .appName(SparkCreateEBIDataFrame.getClass.getSimpleName)
+        .appName(SparkEBILinksToOaf.getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
 
 

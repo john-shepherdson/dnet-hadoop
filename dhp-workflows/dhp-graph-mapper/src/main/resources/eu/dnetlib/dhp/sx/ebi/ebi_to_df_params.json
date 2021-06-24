@@ -1,5 +1,5 @@
 [
   {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",                  "paramRequired": true},
-  {"paramName":"i",   "paramLongName":"isLookupUrl","paramDescription": "isLookupUrl",                              "paramRequired": true},
-  {"paramName":"w",   "paramLongName":"workingPath","paramDescription": "the path of the sequencial file to read",  "paramRequired": true}
+  {"paramName":"s",   "paramLongName":"sourcePath","paramDescription": "the source Path",                              "paramRequired": true},
+  {"paramName":"t",   "paramLongName":"targetPath","paramDescription": "the  oaf path ",  "paramRequired": true}
 ]

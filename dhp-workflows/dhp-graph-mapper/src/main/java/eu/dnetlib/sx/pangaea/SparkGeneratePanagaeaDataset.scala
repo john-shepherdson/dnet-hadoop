@@ -1,7 +1,7 @@
 package eu.dnetlib.sx.pangaea
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.sx.ebi.SparkCreateEBIDataFrame
+import eu.dnetlib.dhp.sx.ebi.SparkEBILinksToOaf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}

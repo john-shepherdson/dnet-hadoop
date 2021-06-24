@@ -142,6 +142,7 @@ case object Crossref2Oaf {
       result.setDateofacceptance(asField(issuedDate))
     }
     else {
+      // TODO: take the oldest date between publishedPrint and publishedOnline
       result.setDateofacceptance(asField(createdDate.getValue))
     }
     result.setRelevantdate(List(createdDate, postedDate, acceptedDate, publishedOnlineDate, publishedPrintDate).filter(p => p != null).asJava)
