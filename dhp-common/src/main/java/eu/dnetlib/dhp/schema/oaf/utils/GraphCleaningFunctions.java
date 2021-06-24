@@ -224,24 +224,20 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			if (Objects.nonNull(r.getInstance())) {
 
 				for (Instance i : r.getInstance()) {
+					if (Objects.nonNull(i.getPid())) {
+						i.setPid(processPidCleaning(i.getPid()));
+					}
+					if (Objects.nonNull(i.getAlternateIdentifier())) {
+						i.setAlternateIdentifier(processPidCleaning(i.getAlternateIdentifier()));
+					}
 					Optional
 						.ofNullable(i.getPid())
 						.ifPresent(pid -> {
-							final Set<StructuredProperty> pids = pid
-								.stream()
-								.filter(Objects::nonNull)
-								.filter(p -> StringUtils.isNotBlank(p.getValue()))
-								.collect(Collectors.toCollection(HashSet::new));
-
+							final Set<StructuredProperty> pids = Sets.newHashSet(pid);
 							Optional
 								.ofNullable(i.getAlternateIdentifier())
 								.ifPresent(altId -> {
-									final Set<StructuredProperty> altIds = altId
-										.stream()
-										.filter(Objects::nonNull)
-										.filter(p -> StringUtils.isNotBlank(p.getValue()))
-										.collect(Collectors.toCollection(HashSet::new));
-
+									final Set<StructuredProperty> altIds = Sets.newHashSet(altId);
 									i.setAlternateIdentifier(Lists.newArrayList(Sets.difference(altIds, pids)));
 								});
 						});
