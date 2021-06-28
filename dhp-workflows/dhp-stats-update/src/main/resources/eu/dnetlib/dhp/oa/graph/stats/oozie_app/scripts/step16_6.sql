@@ -30,10 +30,21 @@ from rcount
 group by rcount.pid;
 
 create view ${stats_db_name}.rndexpenditure as select * from stats_ext.rndexpediture;
---
--- ANALYZE TABLE ${stats_db_name}.result_projectcount COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.result_projectcount COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.result_fundercount COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.result_fundercount COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.project_resultcount COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.project_resultcount COMPUTE STATISTICS FOR COLUMNS;
+
+create table ${stats_db_name}.result_instance stored as parquet as
+select distinct r.*
+from (
+         select substr(r.id, 4) as id, inst.accessright.classname as accessright, substr(inst.collectedfrom.key, 4) as collectedfrom,
+                substr(inst.hostedby.key, 4) as hostedby, inst.dateofacceptance.value as dateofacceptance, inst.license.value as license, p.qualifier.classname as pidtype, p.value as pid
+         from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst lateral view explode(inst.pid) pids as p) r
+join ${stats_db_name}.result res on res.id=r.id;
+
+create table ${stats_db_name}.result_apc as
+select r.id, r.amount, r.currency
+from (
+         select substr(r.id, 4) as id, inst.processingchargeamount.value as amount, inst.processingchargecurrency.value as currency
+         from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst) r
+join ${stats_db_name}.result res on res.id=r.id
+where r.amount is not null;
+
+create view ${stats_db_name}.issn_gold_oa_dataset as select * from stats_ext.issn_gold_oa_dataset;

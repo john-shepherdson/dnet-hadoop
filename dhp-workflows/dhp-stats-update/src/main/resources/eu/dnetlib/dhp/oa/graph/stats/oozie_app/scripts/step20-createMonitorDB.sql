@@ -10,13 +10,18 @@ create view if not exists TARGET.creation_date as select * from SOURCE.creation_
 create view if not exists TARGET.funder as select * from SOURCE.funder;
 create view if not exists TARGET.fundref as select * from SOURCE.fundref;
 create view if not exists TARGET.rndexpenditure as select * from SOURCE.rndexpediture;
---create view if not exists TARGET.roarmap as select * from SOURCE.roarmap;
 
 create table TARGET.result as
     select distinct * from (
         select * from SOURCE.result r where exists (select 1 from SOURCE.result_projects rp join SOURCE.project p on rp.project=p.id where rp.id=r.id)
         union all
-        select * from SOURCE.result r where exists (select 1 from SOURCE.result_concepts rc where rc.id=r.id) ) foo;
+        select * from SOURCE.result r where exists (select 1 from SOURCE.result_concepts rc where rc.id=r.id)
+        union all
+        select * from SOURCE.result r where exists (select 1 from SOURCE.result_projects rp join SOURCE.project p on p.id=rp.project join SOURCE.project_organizations po on po.id=p.id join SOURCE.organization o on o.id=po.organization where rp.id=r.id and o.name in (
+            'GEORG-AUGUST-UNIVERSITAT GOTTINGEN STIFTUNG OFFENTLICHEN RECHTS',
+            'ATHINA-EREVNITIKO KENTRO KAINOTOMIAS STIS TECHNOLOGIES TIS PLIROFORIAS, TON EPIKOINONION KAI TIS GNOSIS',
+            'Consiglio Nazionale delle Ricerche',
+            'Universidade do Minho') )) foo;
 compute stats TARGET.result;
 
 create table TARGET.result_citations as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
@@ -97,6 +102,19 @@ create view if not exists TARGET.project_resultcount as select * from SOURCE.pro
 
 create table TARGET.project_results as select id as result, project as id from TARGET.result_projects;
 compute stats TARGET.project_results;
+
+-- indicators
+create table TARGET.indi_pub_green_oa as select * from SOURCE.indi_pub_green_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_green_oa;
+
+create table TARGET.indi_pub_grey_lit as select * from SOURCE.indi_pub_grey_lit orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_grey_lit;
+
+create table TARGET.indi_pub_doi_from_crossref as select * from SOURCE.indi_pub_doi_from_crossref orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_doi_from_crossref;
+
+create table TARGET.indi_pub_gold_oa as select * from SOURCE.indi_pub_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_gold_oa;
 
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;
