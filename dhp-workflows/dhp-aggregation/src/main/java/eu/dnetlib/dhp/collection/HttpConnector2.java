@@ -142,9 +142,10 @@ public class HttpConnector2 {
 				throw new CollectorException("4xx error: request will not be repeated. " + report);
 			}
 			if (is5xx(urlConn.getResponseCode())) {
-				// SERVER SIDE ERRORS RETRY ONLY on 503
 				switch (urlConn.getResponseCode()) {
+					case HttpURLConnection.HTTP_BAD_GATEWAY:
 					case HttpURLConnection.HTTP_UNAVAILABLE:
+					case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
 						if (retryAfter > 0) {
 							log
 								.warn(
