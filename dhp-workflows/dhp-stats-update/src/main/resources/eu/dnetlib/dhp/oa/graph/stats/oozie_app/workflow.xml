@@ -272,6 +272,19 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
+        <ok to="Step16_7-createIndicatorsTables"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step16_7-createIndicatorsTables">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>indicators.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${wf:appPath()}/scripts/step16_7-createIndicatorsTables.sql</argument>
+            <file>indicators.sh</file>
+        </shell>
         <ok to="Step17"/>
         <error to="Kill"/>
     </action>
