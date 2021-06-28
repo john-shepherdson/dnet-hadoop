@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.sx.bio.pubmed
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF
+import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
 import eu.dnetlib.dhp.sx.ebi.SparkEBILinksToOaf
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,6 +22,9 @@ import org.json4s.jackson.JsonMethods.parse
 @ExtendWith(Array(classOf[MockitoExtension]))
 class BioScholixTest extends AbstractVocabularyTest{
 
+
+  val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
 
   @BeforeEach
   def setUp() :Unit = {
@@ -46,8 +50,6 @@ class BioScholixTest extends AbstractVocabularyTest{
 
   @Test
   def testEBIData() = {
-
-    val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
     val inputXML = Source.fromInputStream(getClass.getResourceAsStream("pubmed.xml")).mkString
     val xml = new XMLEventReader(Source.fromBytes(inputXML.getBytes()))
     new PMParser(xml).foreach(s =>println(mapper.writeValueAsString(s)))
@@ -58,9 +60,6 @@ class BioScholixTest extends AbstractVocabularyTest{
   def testPubmedToOaf(): Unit = {
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
-    val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
     val records:String =Source.fromInputStream(getClass.getResourceAsStream("pubmed_dump")).mkString
     val r:List[Oaf] = records.lines.toList.map(s=>mapper.readValue(s, classOf[PMArticle])).map(a => PubMedToOaf.convert(a, vocabularies))
     assertEquals(10, r.size)
@@ -74,9 +73,6 @@ class BioScholixTest extends AbstractVocabularyTest{
 
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
-
-    val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
     val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/pdb_dump")).mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
@@ -99,8 +95,6 @@ class BioScholixTest extends AbstractVocabularyTest{
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
 
-    val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
     val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/uniprot_dump")).mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
@@ -142,11 +136,40 @@ class BioScholixTest extends AbstractVocabularyTest{
     val iterator = GzFileIterator(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi_links.gz"), "UTF-8")
     val data = iterator.next()
 
-    val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
-
     val res = BioDBToOAF.parse_ebi_links(BioDBToOAF.extractEBILinksFromDump(data).links).filter(BioDBToOAF.EBITargetLinksFilter).flatMap(BioDBToOAF.convertEBILinksToOaf)
     print(res.length)
+
+
+    println(mapper.writeValueAsString(res.head))
+
+  }
+
+
+
+
+  @Test
+  def scholixResolvedToOAF():Unit ={
+
+    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/scholix_resolved")).mkString
+    records.lines.foreach(s => assertTrue(s.nonEmpty))
+
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+
+    val l:List[ScholixResolved] = records.lines.map{input =>
+      lazy val json = parse(input)
+      json.extract[ScholixResolved]
+    }.toList
+
+
+    val result:List[Oaf] = l.map(s => BioDBToOAF.scholixResolvedToOAF(s))
+
+    assertTrue(result.nonEmpty)
+
+
+
+
+
+
 
   }
 
