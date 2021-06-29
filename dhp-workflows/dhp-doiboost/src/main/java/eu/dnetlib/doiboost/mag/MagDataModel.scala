@@ -196,8 +196,8 @@ case object ConversionUtil {
     val authors = inputParams._2
 
     val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
-    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
+    pub.setPid(List(createSP(paper.Doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi).asJava)
 
     //IMPORTANT
     //The old method result.setId(generateIdentifier(result, doi))
@@ -258,11 +258,14 @@ case object ConversionUtil {
     val description = inputParams._2
 
     val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
-    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
+    pub.setPid(List(createSP(paper.Doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi).asJava)
 
-    //Set identifier as 50 | doiboost____::md5(DOI)
-    pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //will be replaced using IdentifierFactory
+
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
 
     val mainTitles = createSP(paper.PaperTitle, "main title", ModelConstants.DNET_DATACITE_TITLE)
     val originalTitles = createSP(paper.OriginalTitle, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
