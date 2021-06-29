@@ -7,7 +7,8 @@ import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
-
+import java.io._
+import scala.collection.JavaConversions._
 import scala.io.Source
 
 class MappingORCIDToOAFTest {
@@ -45,6 +46,25 @@ class MappingORCIDToOAFTest {
 //
 //
 //  }
+
+  @Test
+  def testExtractDat1():Unit ={
+
+
+
+    val aList: List[OrcidAuthor] = List(OrcidAuthor("0000-0002-4335-5309", Some("Lucrecia"), Some("Curto"), null, null, null ),
+    OrcidAuthor("0000-0001-7501-3330", Some("Emilio"), Some("Malchiodi"), null, null, null ), OrcidAuthor("0000-0002-5490-9186", Some("Sofia"), Some("Noli Truant"), null, null, null ))
+
+    val orcid:ORCIDItem = ORCIDItem("10.1042/BCJ20160876", aList)
+
+    val oaf = ORCIDToOAF.convertTOOAF(orcid)
+    assert(oaf.getPid.size() == 1)
+    oaf.getPid.toList.foreach(pid => pid.getQualifier.getClassid.equals("doi"))
+    oaf.getPid.toList.foreach(pid => pid.getValue.equals("10.1042/BCJ20160876".toLowerCase()))
+      println(mapper.writeValueAsString(ORCIDToOAF.convertTOOAF(orcid)))
+
+
+  }
 
 
 
