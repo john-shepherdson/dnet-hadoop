@@ -4,20 +4,19 @@ import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, Ser
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
-import eu.dnetlib.dhp.sx.ebi.SparkEBILinksToOaf
+import org.json4s.DefaultFormats
+import org.json4s.JsonAST.{JField, JObject, JString}
+import org.json4s.jackson.JsonMethods.parse
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.{BeforeEach, Test}
 import org.mockito.junit.jupiter.MockitoExtension
 
-import java.io.{BufferedReader, FileInputStream, InputStream, InputStreamReader}
+import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.util.zip.GZIPInputStream
 import scala.collection.JavaConverters._
 import scala.io.Source
 import scala.xml.pull.XMLEventReader
-import org.json4s.DefaultFormats
-import org.json4s.JsonAST.{JField, JObject, JString}
-import org.json4s.jackson.JsonMethods.parse
 
 @ExtendWith(Array(classOf[MockitoExtension]))
 class BioScholixTest extends AbstractVocabularyTest{

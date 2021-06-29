@@ -77,7 +77,9 @@ object BioDBToOAF {
 
     val relation_semantic= (json \ "RelationshipType" \ "Name").extract[String]
 
-    createRelation(target_pid, target_pid_type, generate_unresolved_id(source_pid, source_pid_type),collectedFromMap("elsevier"),"relationship", relation_semantic)
+    val date = (json \ "LinkedPublicationDate").extract[String]
+
+    createRelation(target_pid, target_pid_type, generate_unresolved_id(source_pid, source_pid_type),collectedFromMap("elsevier"),"relationship", relation_semantic, date)
 
   }
 
@@ -186,10 +188,10 @@ object BioDBToOAF {
           OafMapperUtils.structuredProperty(s, SUBJ_CLASS, SUBJ_CLASS, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES, null)
         ).asJava)
     }
-
+    var i_date:Option[UniprotDate] = None
 
     if (dates.nonEmpty) {
-      val i_date = dates.find(d => d.date_info.contains("entry version"))
+      i_date = dates.find(d => d.date_info.contains("entry version"))
       if (i_date.isDefined) {
         i.setDateofacceptance(OafMapperUtils.field(i_date.get.date, DATA_INFO))
         d.setDateofacceptance(OafMapperUtils.field(i_date.get.date, DATA_INFO))
@@ -214,12 +216,12 @@ object BioDBToOAF {
 
 
     if (references_pmid != null && references_pmid.nonEmpty) {
-      val rel = createRelation(references_pmid.head, "pmid", d.getId, collectedFromMap("uniprot"), "relationship", "isRelatedTo")
+      val rel = createRelation(references_pmid.head, "pmid", d.getId, collectedFromMap("uniprot"), "relationship", "isRelatedTo", if  (i_date.isDefined) i_date.get.date else null)
       rel.getCollectedfrom
       List(d, rel)
     }
     else if (references_doi != null && references_doi.nonEmpty) {
-      val rel = createRelation(references_doi.head, "doi", d.getId, collectedFromMap("uniprot"), "relationship", "isRelatedTo")
+      val rel = createRelation(references_doi.head, "doi", d.getId, collectedFromMap("uniprot"), "relationship", "isRelatedTo", if  (i_date.isDefined) i_date.get.date else null)
       List(d, rel)
     }
     else
@@ -233,7 +235,7 @@ object BioDBToOAF {
   }
 
 
-  def createRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, subRelType:String, relClass:String):Relation = {
+  def createRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, subRelType:String, relClass:String, date:String):Relation = {
 
     val rel = new Relation
     rel.setCollectedfrom(List(collectedFromMap("pdb")).asJava)
@@ -246,6 +248,8 @@ object BioDBToOAF {
     rel.setSource(sourceId)
     rel.setTarget(s"unresolved::$pid::$pidType")
 
+    rel.setValidationDate(date)
+
     rel.getTarget.startsWith("unresolved")
     rel.setCollectedfrom(List(collectedFrom).asJava)
     rel
@@ -253,8 +257,8 @@ object BioDBToOAF {
   }
 
 
-  def createSupplementaryRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue): Relation = {
-    createRelation(pid,pidType,sourceId,collectedFrom, "supplement","IsSupplementTo")
+  def createSupplementaryRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, date:String): Relation = {
+    createRelation(pid,pidType,sourceId,collectedFrom, "supplement","IsSupplementTo", date)
   }
 
 
@@ -311,7 +315,7 @@ object BioDBToOAF {
     val pmid = (json \ "pmid").extractOrElse[String](null)
 
     if (pmid != null)
-      List(d, createSupplementaryRelation(pmid, "pmid", d.getId, collectedFromMap("pdb")))
+      List(d, createSupplementaryRelation(pmid, "pmid", d.getId, collectedFromMap("pdb"), null))
     else
       List(d)
   }
@@ -383,6 +387,6 @@ object BioDBToOAF {
     i.setDateofacceptance(OafMapperUtils.field(input.date, DATA_INFO))
     d.setDateofacceptance(OafMapperUtils.field(input.date, DATA_INFO))
 
-    List(d, createRelation(input.pmid, "pmid", d.getId, collectedFromMap("ebi"),"relationship", "isRelatedTo"))
+    List(d, createRelation(input.pmid, "pmid", d.getId, collectedFromMap("ebi"),"relationship", "isRelatedTo", input.date))
   }
 }
