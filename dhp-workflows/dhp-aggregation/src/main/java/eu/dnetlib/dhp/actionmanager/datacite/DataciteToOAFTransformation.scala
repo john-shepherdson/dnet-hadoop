@@ -45,7 +45,8 @@ case class HostedByMapType(openaire_id: String, datacite_name: String, official_
 
 object DataciteToOAFTransformation {
 
-val REL_TYPE_VALUE:String = "resultResult"
+  val REL_TYPE_VALUE:String = "resultResult"
+  val DATE_RELATION_KEY = "RelationDate"
 
   val subRelTypeMapping: Map[String,(String,String)] = Map(
     "References" ->("IsReferencedBy","relationship"),
@@ -547,8 +548,7 @@ val REL_TYPE_VALUE:String = "resultResult"
         JField("relatedIdentifier", JString(relatedIdentifier)) <- relIdentifier
       } yield RelatedIdentifierType(relationType, relatedIdentifier, relatedIdentifierType)
 
-
-      relations = relations ::: generateRelations(rels,result.getId)
+      relations = relations ::: generateRelations(rels,result.getId, if (i_date.isDefined && i_date.get.isDefined) i_date.get.get else null)
     }
     if (relations != null && relations.nonEmpty) {
       List(result) ::: relations
@@ -557,7 +557,7 @@ val REL_TYPE_VALUE:String = "resultResult"
       List(result)
   }
 
-  private def generateRelations(rels: List[RelatedIdentifierType], id:String):List[Relation] = {
+  private def generateRelations(rels: List[RelatedIdentifierType], id:String, date:String):List[Relation] = {
     rels
       .filter(r =>
         subRelTypeMapping.contains(r.relationType) && (
@@ -574,6 +574,10 @@ val REL_TYPE_VALUE:String = "resultResult"
         rel.setRelType(REL_TYPE_VALUE)
         rel.setSubRelType(subRelType)
         rel.setRelClass(r.relationType)
+
+        val dateProps:KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
+
+        rel.setProperties(List(dateProps).asJava)
 
         rel.setSource(id)
         rel.setTarget(s"unresolved::${r.relatedIdentifier}::${r.relatedIdentifierType}")

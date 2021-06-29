@@ -2,8 +2,9 @@ package eu.dnetlib.dhp.sx.bio.pubmed
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidType}
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf._
+
 import scala.collection.JavaConverters._
 
 object PubMedToOaf {
@@ -93,14 +94,14 @@ object PubMedToOaf {
       .map(t => t._1 + t._2)
     if (urlLists != null)
       i.setUrl(urlLists.asJava)
-    i.setDateofacceptance(OafMapperUtils.field(article.getDate, dataInfo))
+    i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(article.getDate), dataInfo))
     i.setCollectedfrom(collectedFrom)
     result.setPid(pidList.asJava)
     if (article.getJournal != null && result.isInstanceOf[Publication])
       result.asInstanceOf[Publication].setJournal(mapJournal(article.getJournal))
     result.setCollectedfrom(List(collectedFrom).asJava)
 
-    result.setDateofacceptance(OafMapperUtils.field(article.getDate, dataInfo))
+    result.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(article.getDate), dataInfo))
 
     if (article.getTitle == null || article.getTitle.isEmpty)
       return null

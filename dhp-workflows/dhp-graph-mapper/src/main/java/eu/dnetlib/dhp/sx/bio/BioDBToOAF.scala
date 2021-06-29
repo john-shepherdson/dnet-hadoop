@@ -1,7 +1,7 @@
 package eu.dnetlib.dhp.sx.bio
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Dataset, Instance, KeyValue, Oaf, Relation, StructuredProperty}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
@@ -21,6 +21,8 @@ object BioDBToOAF {
 
   val DATA_INFO: DataInfo = OafMapperUtils.dataInfo(false, null, false, false, ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER, "0.9")
   val SUBJ_CLASS = "Keywords"
+
+  val DATE_RELATION_KEY = "RelationDate"
 
   val resolvedURL:Map[String,String] = Map(
     "genbank"->             "https://www.ncbi.nlm.nih.gov/nuccore/",
@@ -77,7 +79,7 @@ object BioDBToOAF {
 
     val relation_semantic= (json \ "RelationshipType" \ "Name").extract[String]
 
-    val date = (json \ "LinkedPublicationDate").extract[String]
+    val date = GraphCleaningFunctions.cleanDate((json \ "LinkedPublicationDate").extract[String])
 
     createRelation(target_pid, target_pid_type, generate_unresolved_id(source_pid, source_pid_type),collectedFromMap("elsevier"),"relationship", relation_semantic, date)
 
@@ -134,8 +136,8 @@ object BioDBToOAF {
     }
     if (input.date!= null && input.date.nonEmpty) {
         val dt = input.date.head
-        i.setDateofacceptance(OafMapperUtils.field(dt, DATA_INFO))
-        d.setDateofacceptance(OafMapperUtils.field(dt, DATA_INFO))
+        i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
+        d.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
       }
     d
   }
@@ -177,7 +179,7 @@ object BioDBToOAF {
       JObject(dateOBJ) <- json \ "dates"
       JField("date", JString(date)) <- dateOBJ
       JField("date_info", JString(date_info)) <- dateOBJ
-    } yield UniprotDate(date, date_info)
+    } yield UniprotDate(GraphCleaningFunctions.cleanDate(date), date_info)
 
     val subjects: List[String] = (json \\ "subjects").extractOrElse[List[String]](null)
 
@@ -248,7 +250,10 @@ object BioDBToOAF {
     rel.setSource(sourceId)
     rel.setTarget(s"unresolved::$pid::$pidType")
 
-    rel.setValidationDate(date)
+
+    val dateProps:KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
+
+    rel.setProperties(List(dateProps).asJava)
 
     rel.getTarget.startsWith("unresolved")
     rel.setCollectedfrom(List(collectedFrom).asJava)
@@ -354,7 +359,7 @@ object BioDBToOAF {
       JField("IDURL", JString(idUrl)) <- identifier
       JField("ID", JString(id)) <- identifier
 
-    } yield EBILinks(relation, publicationDate, title, pmid, id, idScheme, idUrl)
+    } yield EBILinks(relation, GraphCleaningFunctions.cleanDate(publicationDate), title, pmid, id, idScheme, idUrl)
   }
 
 
@@ -384,9 +389,9 @@ object BioDBToOAF {
 
     i.setCollectedfrom(collectedFromMap("ebi"))
     d.setInstance(List(i).asJava)
-    i.setDateofacceptance(OafMapperUtils.field(input.date, DATA_INFO))
-    d.setDateofacceptance(OafMapperUtils.field(input.date, DATA_INFO))
+    i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(input.date), DATA_INFO))
+    d.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(input.date), DATA_INFO))
 
-    List(d, createRelation(input.pmid, "pmid", d.getId, collectedFromMap("ebi"),"relationship", "isRelatedTo", input.date))
+    List(d, createRelation(input.pmid, "pmid", d.getId, collectedFromMap("ebi"),"relationship", "isRelatedTo", GraphCleaningFunctions.cleanDate(input.date)))
   }
 }
