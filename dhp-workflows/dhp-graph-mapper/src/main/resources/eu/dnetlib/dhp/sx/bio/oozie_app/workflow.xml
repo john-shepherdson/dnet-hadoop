@@ -21,6 +21,10 @@
         </property>
 
         <property>
+            <name>CrossrefLinksPath</name>
+            <description>the CrossrefLinks Path</description>
+        </property>
+        <property>
             <name>targetPath</name>
             <description>the Target Working dir path</description>
         </property>
@@ -134,9 +138,40 @@
             <arg>--database</arg><arg>SCHOLIX</arg>
             <arg>--targetPath</arg><arg>${targetPath}/scholix_resolved_OAF</arg>
         </spark>
+        <ok to="ConvertCrossrefLinks"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="ConvertCrossrefLinks">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Convert Crossref Links to OAF Dataset</name>
+            <class>eu.dnetlib.dhp.sx.bio.SparkTransformBioDatabaseToOAF</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=2000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--dbPath</arg><arg>${CrossrefLinksPath}</arg>
+            <arg>--database</arg><arg>CROSSREF_LINKS</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/crossref_unresolved_relation_OAF</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+
+
+
     <end name="End"/>
 
 </workflow-app>

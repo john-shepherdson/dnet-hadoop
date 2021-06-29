@@ -132,6 +132,22 @@ class BioScholixTest extends AbstractVocabularyTest{
 
 
   @Test
+  def testCrossrefLinksToOAF():Unit = {
+
+    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/crossref_links")).mkString
+    records.lines.foreach(s => assertTrue(s.nonEmpty))
+
+
+    val result:List[Oaf] =records.lines.map(s => BioDBToOAF.crossrefLinksToOaf(s)).toList
+
+    assertNotNull(result)
+    assertTrue(result.nonEmpty)
+
+    println(mapper.writeValueAsString(result.head))
+
+  }
+
+  @Test
   def testEBILinksToOAF():Unit = {
     val iterator = GzFileIterator(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi_links.gz"), "UTF-8")
     val data = iterator.next()

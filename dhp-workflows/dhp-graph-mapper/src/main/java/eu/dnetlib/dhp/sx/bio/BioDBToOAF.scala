@@ -66,6 +66,21 @@ object BioDBToOAF {
     )
   }
 
+  def crossrefLinksToOaf(input:String):Oaf = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json = parse(input)
+    val source_pid = (json \ "Source" \ "Identifier" \ "ID").extract[String].toLowerCase
+    val source_pid_type = (json \ "Source" \ "Identifier" \ "IDScheme").extract[String].toLowerCase
+
+    val target_pid = (json \ "Target" \ "Identifier" \ "ID").extract[String].toLowerCase
+    val target_pid_type = (json \ "Target" \ "Identifier" \ "IDScheme").extract[String].toLowerCase
+
+    val relation_semantic= (json \ "RelationshipType" \ "Name").extract[String]
+
+    createRelation(target_pid, target_pid_type, generate_unresolved_id(source_pid, source_pid_type),collectedFromMap("elsevier"),"relationship", relation_semantic)
+
+  }
+
 
   def scholixResolvedToOAF(input:ScholixResolved):Oaf = {
 
@@ -213,10 +228,10 @@ object BioDBToOAF {
 
 
 
-
-  def crossrefLinkToRelation(input:String):Oaf = {
-    null
+  def generate_unresolved_id(pid:String, pidType:String) :String = {
+    s"unresolved::$pid::$pidType"
   }
+
 
   def createRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, subRelType:String, relClass:String):Relation = {
 
