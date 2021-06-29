@@ -87,7 +87,7 @@ class MAGMappingTest {
     assertTrue(ret.count == 10)
     ret.take(10).foreach(mp => assertTrue(mp.Doi.equals(mp.Doi.toLowerCase())))
 
-
+    spark.close()
   }
 
   @Test
@@ -113,8 +113,8 @@ class MAGMappingTest {
     val ret :Dataset[MagPapers] = SparkProcessMAG.getDistinctResults(magPapers)
     assertTrue(ret.count == 8)
     ret.take(8).foreach(mp => assertTrue(mp.Doi.equals(mp.Doi.toLowerCase())))
-
-    ret.take(8).foreach(mp => println(write(mp)))
+    spark.close()
+    //ret.take(8).foreach(mp => println(write(mp)))
   }
 
 
