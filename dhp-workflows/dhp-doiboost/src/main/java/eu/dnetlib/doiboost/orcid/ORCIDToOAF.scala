@@ -83,8 +83,9 @@ object ORCIDToOAF {
       JObject(extIds) <-  json \ "workDetail" \"extIds"
       JField("type", JString(typeValue)) <- extIds
       JField("value", JString(value)) <- extIds
-      if "doi".equalsIgnoreCase(typeValue)
-    } yield (typeValue, value)
+      normalized_value: String = DoiBoostMappingUtil.normalizeDoi(value)
+      if "doi".equalsIgnoreCase(typeValue) && normalized_value != null
+    } yield (typeValue, normalized_value)
     if (doi.nonEmpty) {
       return doi.map(l =>OrcidWork(oid, l._2))
     }
