@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 import eu.dnetlib.dhp.schema.oaf.Publication
 import org.apache.htrace.fasterxml.jackson.databind.SerializationFeature
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.api.java.function.MapFunction
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
@@ -61,6 +61,55 @@ class MAGMappingTest {
 
     logger.debug(description)
 
+  }
+  @Test
+  def normalizeDoiTest():Unit = {
+
+    import org.json4s.jackson.Serialization.write
+    import org.json4s.DefaultFormats
+
+    implicit val formats = DefaultFormats
+
+    val conf = new SparkConf().setAppName("test").setMaster("local[2]")
+    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val path = getClass.getResource("magPapers.json").getPath
+
+    import org.apache.spark.sql.Encoders
+    val schema = Encoders.product[MagPapers].schema
+
+    import spark.implicits._
+    val magPapers :Dataset[MagPapers] = spark.read.option("multiline",true).schema(schema).json(path).as[MagPapers]
+    val ret :Dataset[MagPapers] = SparkProcessMAG.getDistinctResults(magPapers)
+    assertTrue(ret.count == 10)
+    ret.take(10).foreach(mp => assertTrue(mp.Doi.equals(mp.Doi.toLowerCase())))
+
+    spark.close()
+  }
+
+  @Test
+  def normalizeDoiTest2():Unit = {
+
+    import org.json4s.jackson.Serialization.write
+    import org.json4s.DefaultFormats
+
+    implicit val formats = DefaultFormats
+
+    val conf = new SparkConf().setAppName("test").setMaster("local[2]")
+    val sc = new SparkContext(conf)
+    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val path = getClass.getResource("duplicatedMagPapers.json").getPath
+
+    import org.apache.spark.sql.Encoders
+    val schema = Encoders.product[MagPapers].schema
+
+    import spark.implicits._
+    val magPapers :Dataset[MagPapers] = spark.read.option("multiline",true).schema(schema).json(path).as[MagPapers]
+    val ret :Dataset[MagPapers] = SparkProcessMAG.getDistinctResults(magPapers)
+    assertTrue(ret.count == 8)
+    ret.take(8).foreach(mp => assertTrue(mp.Doi.equals(mp.Doi.toLowerCase())))
+    spark.close()
+    //ret.take(8).foreach(mp => println(write(mp)))
   }
 
 
