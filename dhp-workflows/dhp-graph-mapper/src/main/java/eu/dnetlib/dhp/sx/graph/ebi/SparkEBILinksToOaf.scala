@@ -11,9 +11,9 @@ import org.slf4j.{Logger, LoggerFactory}
 object SparkEBILinksToOaf {
 
   def main(args: Array[String]): Unit = {
-    val log: Logger = LoggerFactory.getLogger(SparkEBILinksToOaf.getClass)
+    val log: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/ebi/ebi_to_df_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/ebi/ebi_to_df_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
