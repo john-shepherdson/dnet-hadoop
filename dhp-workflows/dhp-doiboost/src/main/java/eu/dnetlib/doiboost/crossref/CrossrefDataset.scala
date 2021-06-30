@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.io.{IntWritable, Text}
 import org.apache.spark.SparkConf
@@ -21,7 +22,7 @@ object CrossrefDataset {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
     val ts:Long = (json \ "indexed" \ "timestamp").extract[Long]
-    val doi:String  = (json \ "DOI").extract[String]
+    val doi:String  = DoiBoostMappingUtil.normalizeDoi((json \ "DOI").extract[String])
     CrossrefDT(doi, input, ts)
 
   }
