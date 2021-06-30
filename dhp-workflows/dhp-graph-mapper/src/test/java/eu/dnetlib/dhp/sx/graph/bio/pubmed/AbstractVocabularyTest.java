@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.sx.bio.pubmed;
+package eu.dnetlib.dhp.sx.graph.bio.pubmed;
 
 import static org.mockito.Mockito.lenient;
 

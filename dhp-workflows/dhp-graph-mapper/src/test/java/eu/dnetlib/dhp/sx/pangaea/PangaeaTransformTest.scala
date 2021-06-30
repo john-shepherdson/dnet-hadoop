@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.sx.pangaea
 
-import eu.dnetlib.sx.pangaea.PangaeaUtils
+import eu.dnetlib.dhp.sx.graph.pangaea.PangaeaUtils
 import org.junit.jupiter.api.Test
 
 import java.util.TimeZone

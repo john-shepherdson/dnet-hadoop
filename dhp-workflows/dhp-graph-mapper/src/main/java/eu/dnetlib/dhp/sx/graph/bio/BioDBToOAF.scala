@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.sx.bio
+package eu.dnetlib.dhp.sx.graph.bio
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, OafMapperUtils}

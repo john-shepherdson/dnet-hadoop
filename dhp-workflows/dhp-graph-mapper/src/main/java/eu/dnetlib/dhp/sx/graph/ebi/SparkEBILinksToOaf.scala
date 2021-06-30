@@ -1,9 +1,9 @@
-package eu.dnetlib.dhp.sx.ebi
+package eu.dnetlib.dhp.sx.graph.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.Oaf
-import eu.dnetlib.dhp.sx.bio.BioDBToOAF
-import eu.dnetlib.dhp.sx.bio.BioDBToOAF.EBILinkItem
+import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF
+import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF.EBILinkItem
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
@@ -13,7 +13,7 @@ object SparkEBILinksToOaf {
   def main(args: Array[String]): Unit = {
     val log: Logger = LoggerFactory.getLogger(SparkEBILinksToOaf.getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/ebi/ebi_to_df_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/ebi/ebi_to_df_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession

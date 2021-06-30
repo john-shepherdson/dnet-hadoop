@@ -1,10 +1,11 @@
-package eu.dnetlib.dhp.sx.ebi
+package eu.dnetlib.dhp.sx.graph.ebi
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Author, Instance, Journal, KeyValue, Oaf, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils.createQualifier
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, OafUtils, ProvenaceInfo}
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal}
+import eu.dnetlib.dhp.sx.graph.bio.pubmed.{PMArticle, PMAuthor, PMJournal}
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.scholexplorer.relation.RelationMapper
 import org.apache.commons.io.IOUtils
@@ -165,7 +166,7 @@ case class EBILinks(relation:String, pubdate:String, tpid:String, tpidType:Strin
 
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/ebi/ebi_to_df_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/ebi/ebi_to_df_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession

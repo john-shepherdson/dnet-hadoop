@@ -1,8 +1,8 @@
-package eu.dnetlib.dhp.sx.bio
+package eu.dnetlib.dhp.sx.graph.bio
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
-import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
+import BioDBToOAF.ScholixResolved
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
@@ -13,7 +13,7 @@ object SparkTransformBioDatabaseToOAF {
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
     val log: Logger = LoggerFactory.getLogger(getClass)
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/bio_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/bio_to_oaf_params.json")))
     parser.parseArgument(args)
     val database: String = parser.get("database")
     log.info("database: {}", database)

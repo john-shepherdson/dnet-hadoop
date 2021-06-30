@@ -1,4 +1,4 @@
-package eu.dnetlib.sx.pangaea
+package eu.dnetlib.dhp.sx.graph.pangaea
 
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.{Encoder, Encoders}

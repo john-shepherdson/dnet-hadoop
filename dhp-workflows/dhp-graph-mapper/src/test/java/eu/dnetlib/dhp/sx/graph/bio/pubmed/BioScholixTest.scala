@@ -1,9 +1,9 @@
-package eu.dnetlib.dhp.sx.bio.pubmed
+package eu.dnetlib.dhp.sx.graph.bio.pubmed
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
-import eu.dnetlib.dhp.sx.bio.BioDBToOAF
-import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
+import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF.ScholixResolved
+import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -72,7 +72,7 @@ class BioScholixTest extends AbstractVocabularyTest{
 
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/pdb_dump")).mkString
+    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pdb_dump")).mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
     val result:List[Oaf]=  records.lines.toList.flatMap(o => BioDBToOAF.pdbTOOaf(o))
@@ -94,7 +94,7 @@ class BioScholixTest extends AbstractVocabularyTest{
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
 
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/uniprot_dump")).mkString
+    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/uniprot_dump")).mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
     val result:List[Oaf]=  records.lines.toList.flatMap(o => BioDBToOAF.uniprotToOAF(o))
@@ -133,7 +133,7 @@ class BioScholixTest extends AbstractVocabularyTest{
   @Test
   def testCrossrefLinksToOAF():Unit = {
 
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/crossref_links")).mkString
+    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/crossref_links")).mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
 
@@ -148,7 +148,7 @@ class BioScholixTest extends AbstractVocabularyTest{
 
   @Test
   def testEBILinksToOAF():Unit = {
-    val iterator = GzFileIterator(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi_links.gz"), "UTF-8")
+    val iterator = GzFileIterator(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/ebi_links.gz"), "UTF-8")
     val data = iterator.next()
 
     val res = BioDBToOAF.parse_ebi_links(BioDBToOAF.extractEBILinksFromDump(data).links).filter(BioDBToOAF.EBITargetLinksFilter).flatMap(BioDBToOAF.convertEBILinksToOaf)
@@ -165,7 +165,7 @@ class BioScholixTest extends AbstractVocabularyTest{
   @Test
   def scholixResolvedToOAF():Unit ={
 
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/scholix_resolved")).mkString
+    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/scholix_resolved")).mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats

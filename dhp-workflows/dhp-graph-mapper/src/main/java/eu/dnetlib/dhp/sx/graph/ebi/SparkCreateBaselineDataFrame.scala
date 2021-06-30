@@ -1,9 +1,9 @@
-package eu.dnetlib.dhp.sx.ebi
+package eu.dnetlib.dhp.sx.graph.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.oaf.Result
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal, PMParser, PubMedToOaf}
+import eu.dnetlib.dhp.sx.graph.bio.pubmed.{PMArticle, PMAuthor, PMJournal, PMParser, PubMedToOaf}
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
@@ -41,7 +41,7 @@ object SparkCreateBaselineDataFrame {
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
     val log: Logger = LoggerFactory.getLogger(getClass)
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/ebi/baseline_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/ebi/baseline_to_oaf_params.json")))
     parser.parseArgument(args)
     val isLookupUrl: String = parser.get("isLookupUrl")
     log.info("isLookupUrl: {}", isLookupUrl)
@@ -81,6 +81,6 @@ object SparkCreateBaselineDataFrame {
     exported_dataset
       .map(a => PubMedToOaf.convert(a, vocabularies)).as[Result]
       .filter(p => p!= null)
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_oaf")
+      .write.mode(SaveMode.Overwrite).save(s"$workingPath/oaf/baseline_oaf")
   }
 }

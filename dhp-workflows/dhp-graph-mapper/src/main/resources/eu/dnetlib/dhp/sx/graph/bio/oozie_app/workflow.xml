@@ -41,7 +41,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Convert PDB to OAF Dataset</name>
-            <class>eu.dnetlib.dhp.sx.bio.SparkTransformBioDatabaseToOAF</class>
+            <class>eu.dnetlib.dhp.sx.graph.bio.SparkTransformBioDatabaseToOAF</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -68,7 +68,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Convert UNIPROT to OAF Dataset</name>
-            <class>eu.dnetlib.dhp.sx.bio.SparkTransformBioDatabaseToOAF</class>
+            <class>eu.dnetlib.dhp.sx.graph.bio.SparkTransformBioDatabaseToOAF</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -95,7 +95,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Convert EBI Links to OAF Dataset</name>
-            <class>eu.dnetlib.dhp.sx.ebi.SparkEBILinksToOaf</class>
+            <class>eu.dnetlib.dhp.sx.graph.ebi.SparkEBILinksToOaf</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -121,7 +121,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Convert Scholix to OAF Dataset</name>
-            <class>eu.dnetlib.dhp.sx.bio.SparkTransformBioDatabaseToOAF</class>
+            <class>eu.dnetlib.dhp.sx.graph.bio.SparkTransformBioDatabaseToOAF</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -148,7 +148,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Convert Crossref Links to OAF Dataset</name>
-            <class>eu.dnetlib.dhp.sx.bio.SparkTransformBioDatabaseToOAF</class>
+            <class>eu.dnetlib.dhp.sx.graph.bio.SparkTransformBioDatabaseToOAF</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

@@ -21,7 +21,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Convert Baseline to Dataset</name>
-            <class>eu.dnetlib.dhp.sx.ebi.SparkCreateBaselineDataFrame</class>
+            <class>eu.dnetlib.dhp.sx.graph.ebi.SparkCreateBaselineDataFrame</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.sx.graph
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
 import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication, DLIUnknown}
-import eu.dnetlib.dhp.sx.ebi.EBIAggregator
+import eu.dnetlib.dhp.sx.graph.ebi.EBIAggregator
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}

@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.sx.graph
 
 import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.schema.scholexplorer.DLIPublication
-import eu.dnetlib.dhp.sx.ebi.EBIAggregator
+import eu.dnetlib.dhp.sx.graph.ebi.EBIAggregator
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
