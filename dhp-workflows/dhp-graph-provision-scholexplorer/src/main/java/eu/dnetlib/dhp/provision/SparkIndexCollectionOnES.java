@@ -15,7 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
-public class SparkIndexCollectionOnES {
+public class
+SparkIndexCollectionOnES {
 
 	public static void main(String[] args) throws Exception {
 

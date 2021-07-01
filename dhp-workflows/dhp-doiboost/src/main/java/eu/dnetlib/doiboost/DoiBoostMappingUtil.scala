@@ -6,7 +6,7 @@ import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -118,11 +118,11 @@ object DoiBoostMappingUtil {
 
 
   def getOpenAccessQualifier():AccessRight = {
-    OafUtils.createAccessRight("OPEN","Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+    OafMapperUtils.accessRight("OPEN","Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
   def getRestrictedQualifier():AccessRight = {
-    OafUtils.createAccessRight("RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+    OafMapperUtils.accessRight("RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
 
@@ -150,7 +150,7 @@ object DoiBoostMappingUtil {
         if (item.openAccess)
           i.setAccessright(getOpenAccessQualifier())
         val ar = getOpenAccessQualifier()
-        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
+        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
         hb = ModelConstants.UNKNOWN_REPOSITORY
@@ -162,11 +162,11 @@ object DoiBoostMappingUtil {
     if (ar.nonEmpty) {
       if(ar.contains(ModelConstants.ACCESS_RIGHT_OPEN)){
         val ar = getOpenAccessQualifier()
-        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
+        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
         val ar = getRestrictedQualifier()
-        publication.setBestaccessright(OafUtils.createQualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
+        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
     }
     publication
@@ -254,7 +254,7 @@ object DoiBoostMappingUtil {
     di.setInferred(false)
     di.setInvisible(false)
     di.setTrust(trust)
-    di.setProvenanceaction(OafUtils.createQualifier(ModelConstants.SYSIMPORT_ACTIONSET, ModelConstants.DNET_PROVENANCE_ACTIONS))
+    di.setProvenanceaction(OafMapperUtils.qualifier(ModelConstants.SYSIMPORT_ACTIONSET,ModelConstants.SYSIMPORT_ACTIONSET, ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS))
     di
   }
 
@@ -262,7 +262,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String,className:String, schemeId: String, schemeName:String): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(OafUtils.createQualifier(classId,className, schemeId, schemeName))
+    sp.setQualifier(OafMapperUtils.qualifier(classId,className, schemeId, schemeName))
     sp.setValue(value)
     sp
 
@@ -272,7 +272,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String,className:String, schemeId: String, schemeName:String, dataInfo: DataInfo): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(OafUtils.createQualifier(classId,className, schemeId, schemeName))
+    sp.setQualifier(OafMapperUtils.qualifier(classId,className, schemeId, schemeName))
     sp.setValue(value)
     sp.setDataInfo(dataInfo)
     sp
@@ -281,7 +281,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(OafUtils.createQualifier(classId, schemeId))
+    sp.setQualifier(OafMapperUtils.qualifier(classId,classId, schemeId, schemeId))
     sp.setValue(value)
     sp
 
@@ -291,7 +291,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String, schemeId: String, dataInfo: DataInfo): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(OafUtils.createQualifier(classId, schemeId))
+    sp.setQualifier(OafMapperUtils.qualifier(classId,classId, schemeId, schemeId))
     sp.setValue(value)
     sp.setDataInfo(dataInfo)
     sp

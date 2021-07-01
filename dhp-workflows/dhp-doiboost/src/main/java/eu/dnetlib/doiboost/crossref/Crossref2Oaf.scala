@@ -2,7 +2,7 @@ package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.lang.StringUtils
@@ -15,8 +15,6 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
-import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
-
 import java.util
 
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
@@ -182,12 +180,12 @@ case object Crossref2Oaf {
 
     if(has_review != JNothing) {
       instance.setRefereed(
-        OafUtils.createQualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS, ModelConstants.DNET_REVIEW_LEVELS))
+        OafMapperUtils.qualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS, ModelConstants.DNET_REVIEW_LEVELS))
     }
 
     instance.setAccessright(getRestrictedQualifier())
-    instance.setInstancetype(OafUtils.createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
-    result.setResourcetype(OafUtils.createQualifier(cobjCategory.substring(0, 4),ModelConstants.DNET_DATA_CITE_RESOURCE))
+    instance.setInstancetype(OafMapperUtils.qualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
+    result.setResourcetype(OafMapperUtils.qualifier(cobjCategory.substring(0, 4),   cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {

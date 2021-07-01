@@ -8,10 +8,9 @@ import eu.dnetlib.dhp.common.PacePerson
 import eu.dnetlib.dhp.schema.action.AtomicAction
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Author, Dataset, ExternalReference, Field, Instance, KeyValue, Oaf, Publication, Qualifier, Relation, Result, StructuredProperty}
-import eu.dnetlib.dhp.schema.scholexplorer.{DLIDataset, DLIPublication}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
-import eu.dnetlib.dhp.schema.scholexplorer.OafUtils._
+
 
 import scala.collection.JavaConverters._
 
