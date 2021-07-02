@@ -35,7 +35,7 @@ object SparkCreateSummaryObject {
 
     val ds:Dataset[Result] = spark.read.load(s"$sourcePath/*").as[Result]
 
-    ds.repartition(6000).map(r => ScholixUtils.resultToSummary(r)).write.mode(SaveMode.Overwrite).save(targetPath)
+    ds.repartition(6000).map(r => ScholixUtils.resultToSummary(r)).filter(s => s!= null).write.mode(SaveMode.Overwrite).save(targetPath)
 
   }
 
