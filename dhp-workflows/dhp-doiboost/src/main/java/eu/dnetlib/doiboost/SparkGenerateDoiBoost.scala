@@ -104,7 +104,7 @@ object SparkGenerateDoiBoost {
         val otherPub = item._2._2
         if (otherPub != null) {
           crossrefPub.mergeFrom(otherPub)
-          crossrefPub.setAuthor(AuthorMerger.mergeAuthor(crossrefPub.getAuthor, otherPub.getAuthor))
+          crossrefPub.setAuthor(DoiBoostAuthorMerger.mergeAuthor(crossrefPub.getAuthor, otherPub.getAuthor))
         }
       }
       crossrefPub
