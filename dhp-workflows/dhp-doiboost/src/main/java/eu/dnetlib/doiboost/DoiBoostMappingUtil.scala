@@ -358,6 +358,8 @@ object DoiBoostMappingUtil {
   def isEmpty(x: String) = x == null || x.trim.isEmpty
 
   def normalizeDoi(input : String) :String ={
+    if(input == null)
+      return null
     val replaced = input.replaceAll("(?:\\n|\\r|\\t|\\s)", "").toLowerCase.replaceFirst(DOI_PREFIX_REGEX, DOI_PREFIX)
     if  (isEmpty(replaced))
       return null
