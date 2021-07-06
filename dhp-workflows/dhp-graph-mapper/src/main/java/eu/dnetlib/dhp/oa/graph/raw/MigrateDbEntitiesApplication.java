@@ -529,6 +529,15 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 						r2.setSubRelType(OUTCOME);
 						r2.setRelClass(IS_PRODUCED_BY);
 						break;
+					case "resultResult_publicationDataset_isRelatedTo":
+						r1.setRelClass(RESULT_RESULT);
+						r1.setSubRelType(PUBLICATION_DATASET);
+						r1.setRelClass(IS_RELATED_TO);
+
+						r2.setRelClass(RESULT_RESULT);
+						r2.setSubRelType(PUBLICATION_DATASET);
+						r2.setRelClass(IS_RELATED_TO);
+						break;
 					default:
 						throw new IllegalArgumentException("claim semantics not managed: " + semantics);
 				}
