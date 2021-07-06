@@ -168,7 +168,7 @@ object ScholixUtils {
   }
 
 
-  def findURLforPID(pidValue:List[StructuredProperty], urls:List[String]):List[(StructuredProperty, String)] = {
+  def findURLForPID(pidValue:List[StructuredProperty], urls:List[String]):List[(StructuredProperty, String)] = {
     pidValue.map{
       p =>
         val pv = p.getValue
@@ -184,7 +184,7 @@ object ScholixUtils {
       return List()
     r.getInstance().asScala.filter(i => i.getUrl!= null && !i.getUrl.isEmpty)
 
-      .flatMap(i => findURLforPID(i.getPid.asScala.toList, i.getUrl.asScala.toList))
+      .flatMap(i => findURLForPID(i.getPid.asScala.toList, i.getUrl.asScala.toList))
       .map(i => new ScholixIdentifier(i._1.getValue, i._1.getQualifier.getClassid, i._2)).distinct.toList
   }
 
