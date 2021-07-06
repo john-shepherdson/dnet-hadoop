@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.sx.graph.scholix
 import eu.dnetlib.dhp.schema.oaf.{Dataset, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixCollectedFrom, ScholixEntityId, ScholixIdentifier, ScholixRelationship, ScholixResource}
 import eu.dnetlib.dhp.schema.sx.summary.{CollectedFromType, SchemeValue, ScholixSummary, Typology}
+import eu.dnetlib.dhp.utils.DHPUtils
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -45,11 +46,33 @@ object ScholixUtils {
 
   def extractRelationDate(summary: ScholixSummary):String = {
 
-    if(summary.getDate== null && !summary.getDate.isEmpty)
+    if(summary.getDate== null || summary.getDate.isEmpty)
       null
     else {
       summary.getDate.get(0)
     }
+
+
+  }
+
+  def inverseRelationShip(rel:ScholixRelationship):ScholixRelationship = {
+    new ScholixRelationship(rel.getInverse, rel.getSchema, rel.getName)
+
+
+  }
+
+
+  def createInverseScholixRelation(scholix: Scholix):Scholix = {
+    val s = new Scholix
+    s.setPublicationDate(scholix.getPublicationDate)
+    s.setPublisher(scholix.getPublisher)
+    s.setLinkprovider(scholix.getLinkprovider)
+    s.setRelationship(inverseRelationShip(scholix.getRelationship))
+    s.setSource(scholix.getTarget)
+    s.setTarget(scholix.getSource)
+    s.setIdentifier(DHPUtils.md5(s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"))
+    s
+
 
 
   }
@@ -75,6 +98,19 @@ object ScholixUtils {
       }(collection breakOut)
       l
     } else List()
+  }
+
+
+  def generateCompleteScholix(scholix: Scholix, target:ScholixSummary): Scholix = {
+    val s = new Scholix
+    s.setPublicationDate(scholix.getPublicationDate)
+    s.setPublisher(scholix.getPublisher)
+    s.setLinkprovider(scholix.getLinkprovider)
+    s.setRelationship(scholix.getRelationship)
+    s.setSource(scholix.getSource)
+    s.setTarget(generateScholixResourceFromSummary(target))
+    s.setIdentifier(DHPUtils.md5(s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"))
+    s
   }
 
 
