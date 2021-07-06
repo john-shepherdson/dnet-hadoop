@@ -43,6 +43,10 @@ object SparkCreateScholix {
                                                 .map(r => (r.getId, r))(Encoders.tuple(Encoders.STRING, summaryEncoder))
 
 
+    val res: Array[((String, Relation), (String, ScholixSummary))] =relationDS.joinWith(summaryDS, relationDS("_1").equalTo(summaryDS("_1")), "left").take(10)
+
+
+    res.foreach(r =>println(r._1._2))
 
 //    relationDS.joinWith(summaryDS, relationDS("_1").equalTo(summaryDS("_1")), "left")
 //      .map {input:((String,Relation), (String, ScholixSummary)) =>
