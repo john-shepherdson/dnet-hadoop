@@ -5,8 +5,10 @@ import eu.dnetlib.dhp.schema.oaf.Relation
 import eu.dnetlib.dhp.schema.sx.scholix.Scholix
 import eu.dnetlib.dhp.schema.sx.summary.ScholixSummary
 import eu.dnetlib.dhp.sx.graph.scholix.ScholixUtils
+import eu.dnetlib.dhp.sx.graph.scholix.ScholixUtils.RelatedEntities
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
+import org.apache.spark.sql.functions.count
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -58,19 +60,57 @@ object SparkCreateScholix {
 
     scholixSource.joinWith(summaryDS, scholixSource("_1").equalTo(summaryDS("_1")), "left")
       .map { input: ((String, Scholix), (String, ScholixSummary)) =>
-        val s: Scholix = input._1._2
-        val target: ScholixSummary = input._2._2
-        ScholixUtils.generateCompleteScholix(s, target)
-      }.write.mode(SaveMode.Overwrite).save(s"$targetPath/scholix_one_verse")
+        if (input._2== null) {
+          null
+        } else {
+          val s: Scholix = input._1._2
+          val target: ScholixSummary = input._2._2
+          ScholixUtils.generateCompleteScholix(s, target)
+        }
+      }.filter(s => s!= null).write.mode(SaveMode.Overwrite).save(s"$targetPath/scholix_one_verse")
 
 
     val scholix_o_v: Dataset[Scholix] = spark.read.load(s"$targetPath/scholix_one_verse").as[Scholix]
 
-    scholix_o_v.flatMap(s => List(s, ScholixUtils.createInverseScholixRelation(s))).groupByKey(_.getIdentifier).reduceGroups { (x, y) =>
-      if (x != null)
-        x
-      else
-        y
-    }.write.mode(SaveMode.Overwrite).save(s"$targetPath/scholix")
+    scholix_o_v.flatMap(s => List(s, ScholixUtils.createInverseScholixRelation(s))).as[Scholix]
+      .map(s=> (s.getIdentifier,s))(Encoders.tuple(Encoders.STRING, scholixEncoder))
+      .groupByKey(_._1)
+      .agg(ScholixUtils.scholixAggregator.toColumn)
+      .map(s => s._2)
+      .write.mode(SaveMode.Overwrite).save(s"$targetPath/scholix")
+
+    val scholix_final:Dataset[Scholix] = spark.read.load(s"$targetPath/scholix").as[Scholix]
+
+
+
+
+    val stats:Dataset[(String,String,Long)]= scholix_final.map(s => (s.getSource.getDnetIdentifier, s.getTarget.getObjectType)).groupBy("_1", "_2").agg(count("_1")).as[(String,String,Long)]
+
+
+    stats
+      .map(s => RelatedEntities(s._1, if ("dataset".equalsIgnoreCase(s._2)) s._3 else  0, if ("publication".equalsIgnoreCase(s._2)) s._3 else  0 ))
+      .groupByKey(_.id)
+      .reduceGroups((a, b) => RelatedEntities(a.id, a.relatedDataset+b.relatedDataset, a.relatedPublication+b.relatedPublication))
+      .map(_._2)
+      .write.mode(SaveMode.Overwrite).save(s"$targetPath/related_entities")
+
+
+
+  val relatedEntitiesDS:Dataset[RelatedEntities] = spark.read.load(s"$targetPath/related_entities").as[RelatedEntities].filter(r => r.relatedPublication>0 || r.relatedDataset > 0)
+
+
+    relatedEntitiesDS.joinWith(summaryDS, relatedEntitiesDS("id").equalTo(summaryDS("_1")), "inner").map{i =>
+      val re = i._1
+      val sum = i._2._2
+
+      sum.setRelatedDatasets(re.relatedDataset)
+      sum.setRelatedPublications(re.relatedPublication)
+      sum
+    }.write.mode(SaveMode.Overwrite).save(s"${summaryPath}_filtered")
+
   }
+
+
+
+
 }

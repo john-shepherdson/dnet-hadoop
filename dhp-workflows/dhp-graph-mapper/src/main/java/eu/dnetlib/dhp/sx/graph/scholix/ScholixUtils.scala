@@ -5,6 +5,9 @@ import eu.dnetlib.dhp.schema.oaf.{Dataset, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixCollectedFrom, ScholixEntityId, ScholixIdentifier, ScholixRelationship, ScholixResource}
 import eu.dnetlib.dhp.schema.sx.summary.{CollectedFromType, SchemeValue, ScholixSummary, Typology}
 import eu.dnetlib.dhp.utils.DHPUtils
+import org.apache.spark.sql.Encoders.bean
+import org.apache.spark.sql.expressions.Aggregator
+import org.apache.spark.sql.{Encoder, Encoders}
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -20,6 +23,8 @@ object ScholixUtils {
 
   val DATE_RELATION_KEY:String = "RelationDate"
   case class RelationVocabulary(original:String, inverse:String){}
+
+  case class RelatedEntities(id:String, relatedDataset:Long, relatedPublication:Long){}
 
   val relations:Map[String, RelationVocabulary] = {
     val input =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/relations.json")).mkString
@@ -59,6 +64,72 @@ object ScholixUtils {
     new ScholixRelationship(rel.getInverse, rel.getSchema, rel.getName)
 
 
+  }
+
+
+
+  val statsAggregator:Aggregator[(String,String, Long), RelatedEntities, RelatedEntities] = new Aggregator[(String,String, Long), RelatedEntities, RelatedEntities] with  Serializable {
+    override def zero: RelatedEntities = null
+
+    override def reduce(b: RelatedEntities, a: (String, String, Long)): RelatedEntities = {
+      val id = a._1
+      val relatedDataset = if ("dataset".equalsIgnoreCase(a._2)) a._3 else 0
+      val relatedPublication = if ("publication".equalsIgnoreCase(a._2)) a._3 else 0
+
+      if (b == null)
+        RelatedEntities(a._1, relatedDataset, relatedPublication)
+      else
+        RelatedEntities(a._1,b.relatedDataset+ relatedDataset, b.relatedPublication+ relatedPublication )
+    }
+
+    override def merge(b1: RelatedEntities, b2: RelatedEntities): RelatedEntities = {
+      if (b1!= null && b2!= null)
+        RelatedEntities(b1.id, b1.relatedDataset+ b2.relatedDataset, b1.relatedPublication+ b2.relatedPublication)
+
+      else
+        if (b1!= null)
+          b1
+        else
+        b2
+    }
+
+    override def finish(reduction: RelatedEntities): RelatedEntities = reduction
+
+    override def bufferEncoder: Encoder[RelatedEntities] = Encoders.bean(classOf[RelatedEntities])
+
+    override def outputEncoder: Encoder[RelatedEntities] = Encoders.bean(classOf[RelatedEntities])
+  }
+
+
+  val scholixAggregator: Aggregator[(String, Scholix), Scholix, Scholix] = new Aggregator[(String, Scholix), Scholix, Scholix] with Serializable {
+    override def zero: Scholix = null
+
+
+    def scholix_complete(s:Scholix):Boolean ={
+      if (s== null || s.getIdentifier==null) {
+        false
+      } else if (s.getSource == null || s.getTarget == null) {
+          false
+        }
+      else if (s.getLinkprovider == null || s.getLinkprovider.isEmpty)
+        false
+      else
+        true
+    }
+
+    override def reduce(b: Scholix, a: (String, Scholix)): Scholix = {
+      if (scholix_complete(b)) b else a._2
+    }
+
+    override def merge(b1: Scholix, b2: Scholix): Scholix = {
+      if (scholix_complete(b1)) b1 else  b2
+    }
+
+    override def finish(reduction: Scholix): Scholix = reduction
+
+    override def bufferEncoder: Encoder[Scholix] = Encoders.kryo[Scholix]
+
+    override def outputEncoder: Encoder[Scholix] = Encoders.kryo[Scholix]
   }
 
 
