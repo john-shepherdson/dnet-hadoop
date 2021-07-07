@@ -480,38 +480,15 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				final String sourceId = createOpenaireId(sourceType, rs.getString("source_id"), false);
 				final String targetId = createOpenaireId(targetType, rs.getString("target_id"), false);
 
-				final Relation r1 = new Relation();
-				final Relation r2 = new Relation();
-
-				if (StringUtils.isNotBlank(validationDate)) {
-					r1.setValidated(true);
-					r1.setValidationDate(validationDate);
-					r2.setValidated(true);
-					r2.setValidationDate(validationDate);
-				}
-				r1.setCollectedfrom(COLLECTED_FROM_CLAIM);
-				r1.setSource(sourceId);
-				r1.setTarget(targetId);
-				r1.setDataInfo(DATA_INFO_CLAIM);
-				r1.setLastupdatetimestamp(lastUpdateTimestamp);
-
-				r2.setCollectedfrom(COLLECTED_FROM_CLAIM);
-				r2.setSource(targetId);
-				r2.setTarget(sourceId);
-				r2.setDataInfo(DATA_INFO_CLAIM);
-				r2.setLastupdatetimestamp(lastUpdateTimestamp);
+				Relation r1 = prepareRelation(sourceId, targetId, validationDate);
+				Relation r2 = prepareRelation(targetId, sourceId, validationDate);
 
 				final String semantics = rs.getString("semantics");
 
 				switch (semantics) {
 					case "resultResult_relationship_isRelatedTo":
-						r1.setRelType(RESULT_RESULT);
-						r1.setSubRelType(RELATIONSHIP);
-						r1.setRelClass(IS_RELATED_TO);
-
-						r2.setRelType(RESULT_RESULT);
-						r2.setSubRelType(RELATIONSHIP);
-						r2.setRelClass(IS_RELATED_TO);
+						r1 = setRelationSemantic(r1, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO);
+						r2 = setRelationSemantic(r2, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO);
 						break;
 					case "resultProject_outcome_produces":
 						if (!"project".equals(sourceType)) {
@@ -521,22 +498,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 										"invalid claim, sourceId: %s, targetId: %s, semantics: %s",
 										sourceId, targetId, semantics));
 						}
-						r1.setRelType(RESULT_PROJECT);
-						r1.setSubRelType(OUTCOME);
-						r1.setRelClass(PRODUCES);
-
-						r2.setRelType(RESULT_PROJECT);
-						r2.setSubRelType(OUTCOME);
-						r2.setRelClass(IS_PRODUCED_BY);
+						r1 = setRelationSemantic(r1, RESULT_PROJECT, OUTCOME, PRODUCES);
+						r2 = setRelationSemantic(r2, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY);
 						break;
 					case "resultResult_publicationDataset_isRelatedTo":
-						r1.setRelClass(RESULT_RESULT);
-						r1.setSubRelType(PUBLICATION_DATASET);
-						r1.setRelClass(IS_RELATED_TO);
-
-						r2.setRelClass(RESULT_RESULT);
-						r2.setSubRelType(PUBLICATION_DATASET);
-						r2.setRelClass(IS_RELATED_TO);
+						r1 = setRelationSemantic(r1, RESULT_PROJECT, PUBLICATION_DATASET, IS_RELATED_TO);
+						r2 = setRelationSemantic(r2, RESULT_PROJECT, PUBLICATION_DATASET, IS_RELATED_TO);
 						break;
 					default:
 						throw new IllegalArgumentException("claim semantics not managed: " + semantics);
@@ -547,6 +514,27 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private Relation prepareRelation(String sourceId, String targetId, String validationDate) {
+		Relation r = new Relation();
+		if (StringUtils.isNotBlank(validationDate)) {
+			r.setValidated(true);
+			r.setValidationDate(validationDate);
+		}
+		r.setCollectedfrom(COLLECTED_FROM_CLAIM);
+		r.setSource(sourceId);
+		r.setTarget(targetId);
+		r.setDataInfo(DATA_INFO_CLAIM);
+		r.setLastupdatetimestamp(lastUpdateTimestamp);
+		return r;
+	}
+
+	private Relation setRelationSemantic(Relation r, String relType, String subRelType, String relClass) {
+		r.setRelType(relType);
+		r.setSubRelType(subRelType);
+		r.setRelClass(relClass);
+		return r;
 	}
 
 	private List<Context> prepareContext(final String id, final DataInfo dataInfo) {
