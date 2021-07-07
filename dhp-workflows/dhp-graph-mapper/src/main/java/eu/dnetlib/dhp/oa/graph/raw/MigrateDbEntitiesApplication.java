@@ -502,8 +502,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 						r2 = setRelationSemantic(r2, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY);
 						break;
 					case "resultResult_publicationDataset_isRelatedTo":
-						r1 = setRelationSemantic(r1, RESULT_PROJECT, PUBLICATION_DATASET, IS_RELATED_TO);
-						r2 = setRelationSemantic(r2, RESULT_PROJECT, PUBLICATION_DATASET, IS_RELATED_TO);
+						r1 = setRelationSemantic(r1, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
+						r2 = setRelationSemantic(r2, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
 						break;
 					default:
 						throw new IllegalArgumentException("claim semantics not managed: " + semantics);
