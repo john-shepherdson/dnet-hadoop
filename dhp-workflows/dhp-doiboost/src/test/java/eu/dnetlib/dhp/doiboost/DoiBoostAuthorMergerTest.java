@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.neethi.Assertion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ public class DoiBoostAuthorMergerTest {
 
 	private List<List<Author>> authors;
 
+
 	@BeforeEach
 	public void setUp() throws Exception {
 
@@ -38,15 +40,15 @@ public class DoiBoostAuthorMergerTest {
 			.toFile()
 			.getAbsolutePath();
 
-		authors = readSample(publicationsBasePath + "/matching_authors_first.json", Publication.class)
-			.stream()
-			.map(p -> p._2().getAuthor())
-			.collect(Collectors.toList());
-
 	}
 
 	@Test
-	public void mergeTest() { // used in the dedup: threshold set to 0.95
+	public void mergeTestOrcid() {
+
+		authors = readSample(publicationsBasePath + "/matching_authors_first.json", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
 
 		for (List<Author> authors1 : authors) {
 			System.out.println("List " + (authors.indexOf(authors1) + 1));
@@ -55,7 +57,7 @@ public class DoiBoostAuthorMergerTest {
 			}
 		}
 
-		List<Author> merge = DoiBoostAuthorMerger.merge(authors);
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
 
 		System.out.println("Merge ");
 		for (Author author : merge) {
@@ -117,4 +119,192 @@ public class DoiBoostAuthorMergerTest {
 		print += "]";
 		return print;
 	}
+
+	@Test
+	public void mergeTestMAG() {
+
+		authors = readSample(publicationsBasePath + "/matching_authors_second", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
+
+		for (List<Author> authors1 : authors) {
+			System.out.println("List " + (authors.indexOf(authors1) + 1));
+			for (Author author : authors1) {
+				System.out.println(authorToString(author));
+			}
+		}
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors, true);
+
+		System.out.println("Merge ");
+		for (Author author : merge) {
+			System.out.println(authorToString(author));
+		}
+
+		Assertions.assertEquals(10, merge.size());
+
+		Assertions.assertEquals(10, merge.stream().filter(a -> a.getPid() != null).count());
+
+		merge
+				.stream()
+				.filter(a -> a.getPid() != null)
+				.forEach(
+						a -> Assertions
+								.assertTrue(
+										a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals("URL"))));
+		merge.stream().filter(a -> a.getPid() != null).forEach(a -> {
+			try {
+				System.out.println(new ObjectMapper().writeValueAsString(a));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		});
+
+	}
+
+
+	@Test
+	public void mergeTestCrossrefEmpty1() throws JsonProcessingException {
+
+		authors = readSample(publicationsBasePath + "/empty_crossref_authors_first.json", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
+
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
+
+		System.out.println("Merge ");
+		for (Author author : merge) {
+			System.out.println(authorToString(author));
+		}
+
+		Assertions.assertEquals(3, merge.size());
+
+		Assertions.assertEquals(3, merge.stream().filter(a -> a.getPid() != null).count());
+
+		merge
+				.stream()
+				.filter(a -> a.getPid() != null)
+				.forEach(
+						a -> Assertions
+								.assertTrue(
+										a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))));
+		merge.stream().filter(a -> a.getPid() != null).forEach(a -> {
+			try {
+				System.out.println(new ObjectMapper().writeValueAsString(a));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		});
+
+		System.out.println(new ObjectMapper().writeValueAsString(merge));
+
+	}
+
+
+	@Test
+	public void mergeTestCrossrefEmpty2() throws JsonProcessingException {
+
+		authors = readSample(publicationsBasePath + "/empty_crossref_authors_second.json", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
+
+
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors, false);
+
+		System.out.println("Merge ");
+		for (Author author : merge) {
+			System.out.println(authorToString(author));
+		}
+
+		Assertions.assertEquals(10, merge.size());
+
+		Assertions.assertEquals(10, merge.stream().filter(a -> a.getPid() != null).count());
+
+		merge
+				.stream()
+				.filter(a -> a.getPid() != null)
+				.forEach(
+						a -> Assertions
+								.assertTrue(
+										a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals("URL"))));
+		merge.stream().filter(a -> a.getPid() != null).forEach(a -> {
+			try {
+				System.out.println(new ObjectMapper().writeValueAsString(a));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		});
+
+		Assertions.assertTrue(3 == merge.stream().filter(a -> a.getPid() !=null)
+		.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
+
+	}
+
+	@Test
+	public void mergeTestCrossrefEmpty3() throws JsonProcessingException {
+
+		authors = readSample(publicationsBasePath + "/empty_crossref_author_third.json", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
+
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
+
+		System.out.println("Merge ");
+		for (Author author : merge) {
+			System.out.println(authorToString(author));
+		}
+
+		Assertions.assertEquals(10, merge.size());
+
+		Assertions.assertEquals(10, merge.stream().filter(a -> a.getPid() != null).count());
+
+		merge
+				.stream()
+				.filter(a -> a.getPid() != null)
+				.forEach(
+						a -> Assertions
+								.assertTrue(
+										a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals("URL"))));
+
+		Assertions.assertTrue(3 == merge.stream().filter(a -> a.getPid() !=null)
+				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
+
+
+	}
+
+
+	@Test
+	public void mergeTestCrossrefEmpty4() throws JsonProcessingException {
+
+		authors = readSample(publicationsBasePath + "/empty_crossref_author_fourth.json", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
+
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
+
+		System.out.println("Merge ");
+		for (Author author : merge) {
+			System.out.println(authorToString(author));
+		}
+
+		Assertions.assertEquals(3, merge.size());
+
+		Assertions.assertEquals(3, merge.stream().filter(a -> a.getPid() != null).count());
+
+
+		Assertions.assertTrue(3 == merge.stream().filter(a -> a.getPid() !=null)
+				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
+
+
+	}
+
 }
