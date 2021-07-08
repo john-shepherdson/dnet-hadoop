@@ -5,6 +5,10 @@
             <description>the Baseline Working Path</description>
         </property>
         <property>
+            <name>targetPath</name>
+            <description>the Target Path</description>
+        </property>
+        <property>
             <name>isLookupUrl</name>
             <description>The IS lookUp service endopoint</description>
         </property>
@@ -34,6 +38,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--workingPath</arg><arg>${baselineWorkingPath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
             <arg>--master</arg><arg>yarn</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>

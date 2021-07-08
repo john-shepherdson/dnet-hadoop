@@ -45,6 +45,11 @@ object SparkCreateBaselineDataFrame {
     parser.parseArgument(args)
     val isLookupUrl: String = parser.get("isLookupUrl")
     log.info("isLookupUrl: {}", isLookupUrl)
+    val workingPath = parser.get("workingPath")
+    log.info("workingPath: {}", workingPath)
+
+    val targetPath = parser.get("targetPath")
+    log.info("targetPath: {}", targetPath)
 
     val isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl)
     val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
@@ -59,7 +64,7 @@ object SparkCreateBaselineDataFrame {
 
     val sc = spark.sparkContext
 
-    val workingPath = parser.get("workingPath")
+
 
     implicit  val PMEncoder: Encoder[PMArticle] = Encoders.kryo(classOf[PMArticle])
     implicit  val PMJEncoder: Encoder[PMJournal] = Encoders.kryo(classOf[PMJournal])
@@ -81,6 +86,8 @@ object SparkCreateBaselineDataFrame {
     exported_dataset
       .map(a => PubMedToOaf.convert(a, vocabularies)).as[Result]
       .filter(p => p!= null)
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/oaf/baseline_oaf")
+      .write.mode(SaveMode.Overwrite).save(targetPath)
+
+    //s"$workingPath/oaf/baseline_oaf"
   }
 }
