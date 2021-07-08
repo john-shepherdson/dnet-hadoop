@@ -15,6 +15,37 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 import scala.Tuple2;
 
+/**
+ * This is a version of the AuthorMerger specific for DoiBoost.
+ * Here we suppose a match must exist for the authors. We compare via JaroWrinkler similarity measure each author in the list
+ * that should be enriched with each author in the enriching list. For each enriching author we select the best match that is
+ * the author with the highest similarity score.
+ * The association is done from the enriching author to the enriched because in this way only one match per enriching author can be found
+ * One enriching author can have the same maximum similarity score with more than one
+ *
+ *
+ *
+ *
+ * The idea is to enrich the most similar authors having at least one
+ * word of the name in
+ * common
+ * Quello che faccio e’ abbastanza semplice: ho una struttura dati che mantine l’informazione di associazione fra il record che puo’ possibilmente arricchire e quello che deve essere arricchito.
+ * 6:22
+ * Questa struttura ha la lista di autori che possono essere arricchiti, l’autore che arricchisce e lo score di similarita fra l’autore che arricchisce e gli autori arricchiti. E’ il valore di una mappa che per chiave la il fullname dell’autore che arricchisce
+ * 6:23
+ * per ogni autore che puo’ essere arricchito verifico se la entri nella mappa di quello che arricchisce e’ associata ad un autore con score di similarita’ piu’ basso. Se cosi’ e’ modifico l’associazione nella mappa per l’autore che arricchisce, sostituendo l’autore arricchito a cui era associato prima con quello nuovo che ha score piu’ alto. Se lo score e’ lo stesso, aggiungo il nuovo autore da arricchire alla lista degli autori associata all’autore che arricchisce
+ * 6:25
+ * Alla fine caso facile: ogni entry e’ associata ad un unico autore da arricchire => verifico che almeno una delle parole che sono nei due nomi sia in comune fra i due insiemi Se e’ cosi’, aggiungo i pid mancanti all’autore da arricchire dell’autore che arricchisce
+ * 6:26
+ * caso brutto: ci sono piu’ autori da arricchire con la stessa similarita: arricchisco quello che ha il maggior numero di parole del fullname uguali a quelle dell’autore che arricchisce. In caso di parita’ non si arricchisce
+ * 6:28
+ * ricordiamoci che si parte dal presupposto che un match debba esistere visto che abbiamo lo stesso doi
+ * 6:29
+ * di conseguenza l’autore che ha lo score di similarita’ piu’ alto fra quelli presenti ed anche una parola in comune del nome dovrebbe essere sufficiente per poterlo arricchire.
+ * 6:30
+ * I casi di omonimia che potrebbero portare problemi con i rank degli autori non si mappano
+ */
+
 public class DoiBoostAuthorMerger {
 
 
