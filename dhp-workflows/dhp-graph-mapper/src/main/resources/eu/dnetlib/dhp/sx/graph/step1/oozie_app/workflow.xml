@@ -10,7 +10,7 @@
         </property>
     </parameters>
 
-    <start to="CreateScholix"/>
+    <start to="ExtractEntities"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
