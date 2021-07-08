@@ -1,0 +1,140 @@
+// from PROD 2021-07-06 , tf script of DOAJ with more than 6mill. records
+declare_script "dc_cleaning_OpenAIREplus_compliant_doaj";
+declare_ns oaf = "http://namespace.openaire.eu/oaf";
+declare_ns dri = "http://www.driver-repository.eu/namespace/dri";
+declare_ns dr = "http://www.driver-repository.eu/namespace/dr";
+declare_ns dc = "http://purl.org/dc/elements/1.1/";
+declare_ns prov = "http://www.openarchives.org/OAI/2.0/provenance";
+$var0 = "''";
+$varFP7 = "'corda_______::'";
+$varH2020 = "'corda__h2020::'";
+$varDummy = "''";
+// $varUnknownRepoId = "'openaire____::55045bd2a65019fd8e6741a755395c8c'";
+//
+$varUnknownRepoId = "'openaire____::1256f046-bf1f-4afc-8b47-d0b147148b18'";
+$varUnknownRepoName = "'Unknown Repository'";
+static $varDatasourceid = getValue(PROFILEFIELD, [xpath:"concat('collection(&amp;apos;/db/DRIVER/RepositoryServiceResources&amp;apos;)//RESOURCE_PROFILE[.//EXTRA_FIELDS/FIELD[key=&amp;quot;NamespacePrefix&amp;quot;][value=&amp;quot;', //oaf:datasourceprefix, '&amp;quot;]]')", xpath:"//EXTRA_FIELDS/FIELD[key='OpenAireDataSourceId']/value"]);
+static $varRepoid = xpath:"//dri:repositoryId";
+static $varOfficialname = getValue(PROFILEFIELD, [xpath:"concat('collection(&amp;apos;/db/DRIVER/RepositoryServiceResources&amp;apos;)//RESOURCE_PROFILE[.//EXTRA_FIELDS/FIELD[key=&amp;quot;NamespacePrefix&amp;quot;][value=&amp;quot;', //oaf:datasourceprefix, '&amp;quot;]]')", xpath:"//CONFIGURATION/OFFICIAL_NAME"]);
+dri:objIdentifier = xpath:"//dri:objIdentifier";
+dri:repositoryId = $varRepoid;
+dri:recordIdentifier = xpath:"//dri:recordIdentifier";
+
+if xpath:"//dc:creator[string-length(normalize-space(.)) &amp;gt; 0][contains(., 'CDATA')][starts-with(normalize-space(.), '(')][starts-with(normalize-space(.), '.')]" dc:creator = skipRecord(); else $varDummy = "''";
+//apply xpath:"//dc:creator" if xpath:"string-length(normalize-space(.)) &amp;amp;gt; 0 and not(contains(., 'CDATA')) and not(starts-with(normalize-space(.), '.')) and not(starts-with(normalize-space(.), '('))" dc:creator = Convert(xpath:".", Person); else $varDummy = "''";
+if xpath:"count(//dc:creator) = 0" dc:creator = skipRecord(); else $varDummy = "''";
+//apply xpath:"//dc:creator" if xpath:"string-length(.) &amp;gt; 0 and normalize-space(.) != ','" dc:creator = xpath:"normalize-space(.)"; else $varDummy = "''";
+$varOrcidName = xpath:"//dc:creator[string-length(normalize-space(.)) &gt; 0]";
+$varOrcidOrcid = xpath:"//dc:creator[string-length(normalize-space(.)) &gt; 0]/@id/replace(., 'https?://orcid.org/', '')";
+dc:creator = set(xpath:"$varOrcidName", @nameIdentifier = xpath:"subsequence($varOrcidOrcid,position(),1)";, @nameIdentifierScheme=xpath:"replace(subsequence($varOrcidOrcid,position(),1),'^.+$','ORCID')";, @schemeUri=xpath:"replace(subsequence($varOrcidOrcid,position(),1),'^.+$','http://orcid.org/')";);
+
+if xpath:"count(//dc:title[string-length(.) &amp;gt; 0]) = 0" dc:title = skipRecord(); else $varDummy = "''";
+dc:title = xpath:"//dc:title/normalize-space(replace(., '^(&amp;lt;title language=)(.)*(&amp;gt;)', ''))";
+// apply xpath:"//dc:title" if xpath:"string-length(.) &amp;gt; 0" dc:title = xpath:"normalize-space(.)"; else $varDummy = "''";
+
+apply xpath:"//dc:subject" if xpath:"string-length(.) &amp;gt; 0 and not(@xsi:type = 'dcterms:LCSH')" dc:subject = xpath:"normalize-space(.)"; else $varDummy = "''";
+dc:subject = set(xpath:"//dc:subject[@xsi:type = 'dcterms:LCSH']/concat('lcsh:', .)", @classid=xpath:"'lcsh'";, @classname=xpath:"'lcsh'";, @schemeid=xpath:"'dnet:subject_classification_typologies'";, @schemename=xpath:"'dnet:subject_classification_typologies'";);
+
+apply xpath:"//dc:publisher" if xpath:"string-length(.) &amp;gt; 0" dc:publisher = xpath:"normalize-space(replace(., '(&amp;lt;br&amp;gt;)', ''))"; else $varDummy = "''";
+apply xpath:"//dc:source" if xpath:"string-length(.) &amp;gt; 0" dc:source = xpath:"normalize-space(.)"; else $varDummy = "''";
+dc:contributor = xpath:"//dc:contributor";
+dc:description = xpath:"//dc:description[not(starts-with(., 'URN: urn:nbn:') or starts-with(., 'URN: http'))]";
+dc:format = xpath:"//dc:format";
+$varHttpTest = "''";
+if xpath:"//dc:relation[starts-with(., 'http') or starts-with(., 'www.')]" $varHttpTest = "true"; else dc:identifier = skipRecord();
+//apply xpath:"//dc:relation" if xpath:"starts-with(normalize-space(.), 'http')" dc:identifier = xpath:"normalize-space(.)"; else dr:CobjIdentifier = xpath:"normalize-space(.)";
+//apply xpath:"//dc:relation" if xpath:"starts-with(normalize-space(.), 'www.')" dc:identifier = xpath:"concat('http://', normalize-space(.))"; else dr:CobjIdentifier = xpath:"normalize-space(.)";
+dr:CobjIdentifier = xpath:"distinct-values(//dc:identifier[not(starts-with(normalize-space(.), 'http'))][not(normalize-space(.) = ($varIdList))][not(starts-with(normalize-space(.), 'urn:nbn:') or starts-with(normalize-space(.), 'URN:NBN:'))][not(. = ($varISSN[1], $varISSN[2]))][normalize-space(.) != ''])";
+dc:identifier = xpath:"($varIdUrl//value[not(starts-with(., 'www'))], $varIdUrl//value[starts-with(., 'www')]/concat('http://', .), $varIdLdpg//value, $varIdDoi//value)[1]";
+dc:relation = xpath:"//dc:relation[starts-with(., 'https://doaj.org/toc/')]";
+
+dr:dateOfCollection = xpath:"//dri:dateOfCollection";
+static dr:dateOfTransformation = xpath:"current-dateTime()";
+// dc:type = xpath:"//dc:type";
+dc:language = Convert(xpath:"//dc:language", Languages);
+//if xpath:"//dc:rights[text()='info:eu-repo/semantics/openAccess']" dc:publisher = xpath:"//dc:publisher"; else dc:publisher = skipRecord();
+dc:date = xpath:"//dc:date";
+oaf:dateAccepted = Convert(xpath:"descendant-or-self::dc:date", DateISO8601, "yyyy-MM-dd", "min()");
+apply xpath:"//dc:date" if xpath:"starts-with(normalize-space(.), 'info:eu-repo/date')" oaf:embargoenddate = RegExpr(xpath:"normalize-space(.)", $var0, "s/^(.*info:eu-repo\/date\/embargoEnd\/)//gmi"); else $var0 = "''";
+//apply xpath:"//dc:relation" if xpath:"string-length(substring-after(normalize-space(.), 'info:eu-repo/grantAgreement/EC/FP7/')) = 6" oaf:projectid = RegExpr(xpath:"normalize-space(.)", $var1, "s/^(.*info:eu-repo\/grantAgreement\/EC\/FP7\/)//gmi"); else dc:relation = xpath:"normalize-space(.)";
+//comment-js-09-10-2012 apply xpath:"//dc:rights" if xpath:"starts-with(normalize-space(.), 'info:eu-repo/semantics')" dc:rights = empty; else dc:rights = xpath:"normalize-space(.)";
+//
+oaf:collectedDatasourceid = $varDatasourceid;
+//
+// apply xpath:"//dc:type" if xpath:"." dr:CobjCategory = Convert(xpath:"normalize-space(.)", TextTypologies); else dc:type = xpath:".";
+//dr:CobjCategory = "0001";
+$varCobjCategory = Convert(xpath:"//dc:type", TextTypologies);
+$varSuperType = Convert(xpath:"normalize-space($varCobjCategory)", SuperTypes);
+dr:CobjCategory = set($varCobjCategory, @type = $varSuperType;);
+dc:type = xpath:"//dc:type";
+//
+// review status
+
+$varRefereedIdntf = xpath:"(//*[string(node-name(.)) = 'dc:identifier' and matches(., '^(https?://(dx\.)?doi.org/)?10\.12688/(f1000research|wellcomeopenres|aasopenres|gatesopenres|hrbopenres)\.\d*(\.\d*|-\d*\.v\d*)$')]/'0001', //*[string(node-name(.)) = 'dc:relation' and matches(., '^info:eu-repo/semantics/altIdentifier/doi/10\.12688/(f1000research|wellcomeopenres|aasopenres|gatesopenres|hrbopenres)\.\d*(\.\d*|-\d*\.v\d*)$', 'i')]/'0001')";
+
+$varRefereedProse =  xpath:"(//*[string(node-name(.)) = 'dc:description' and matches(lower-case(.), '.*this\s*preprint\s*has\s*been\s*reviewed\s*and\s*recommended\s*by\s*peer\s*community') and contains(., '10.24072/')]/'0001', //dc:title[matches(lower-case(.), '.*\[.*peer[\s\-\._]*review\s*:.*\]\s*$')]/'0001')";
+$varRefereedReltn = xpath:"(//dc:relation, //dc:identifier)[contains(., '://www.dovepress.com/') and matches(lower-case(.), '.*-peer-reviewed-(fulltext-)?article-.*')]/'0001'";
+$varRefereedTitle = xpath:"//dc:title[matches(lower-case(.), '.*\[.*peer[\s\-\._]*review\s*:.*\]\s*$')]/'0001'";
+$varRefereedDesct = xpath:"(//dc:description[matches(lower-case(.), '.*peer[\.\-_/\s\(\)]?review\s*under\s*responsibility\s*of.*') or matches(lower-case(.), '(this|a)\s*(article|preprint)\s*(has\s*been\s*)?(peer[\-\s]*)?reviewed\s*and\s*recommended\s*by\s*peer[\-\s]*community')]/'0001')";
+$varRefereed = xpath:"($varRefereedIdntf, $varRefereedProse, $varRefereedReltn, $varRefereedTitle, $varRefereedDesct)";
+//if xpath:"$varRefereed" oaf:refereed = xpath:"'0001'"; else $varDummy= "''";
+if xpath:"count(index-of($varRefereed, '0001')) &gt;0" oaf:refereed = xpath:"'0001'"; else $varDummy= "''";
+if xpath:"count(index-of($varRefereed, '0002')) &gt;0 and count(index-of($varRefereed, '0001')) = 0" oaf:refereed = xpath:"'0002'"; else $varDummy= "''";
+//
+apply xpath:"//dc:rights" if xpath:"starts-with(normalize-space(.), 'info:eu-repo/semantics')" oaf:accessrights = Convert(xpath:"normalize-space(.)", AccessRights); else dc:rights = xpath:".";
+if xpath:"//dc:rights[starts-with(normalize-space(.), 'info:eu-repo/semantics')]" $var0 = "''"; else oaf:accessrights = "OPEN";
+//if xpath:"count(//dc:rights) = 0" oaf:accessrights = "OPEN"; else $var0 = "''";
+// oaf:accessrights = Convert(xpath:"normalize-space(//dc:rights)", AccessRights);
+oaf:license = xpath:"(//dc:rights, //dc:relation)[starts-with(normalize-space(.), 'http') and (contains(., '/licenses/') or contains(., '/licence/') or contains(., '/licencias/') or contains(., '/licencia/') or contains(., '://creativecommons.org/') or contains(., '://rightsstatements.org/')) or matches(., '^CC[- ]BY([- ](NC([- ](ND|SA))?|ND|SA))([- ]\d(\.\d)?)?$', 'i')][not(contains(normalize-space(.), ' '))]/normalize-space(.)";
+//
+static oaf:collectedFrom = set("''", @name = $varOfficialname; , @id = $varDatasourceid;);
+static oaf:hostedBy = set("''", @name = $varOfficialname; , @id = $varDatasourceid;);
+// 
+//$varId = identifierExtract('["//dc:identifier", "//dc:relation"]' , xpath:"./*[local-name()='record']" , '(10[.][0-9]{4,}[^\s"/&amp;lt;&amp;gt;]*/[^\s"&amp;lt;&amp;gt;]+)');
+$varIdDoi = identifierExtract('["//dc:identifier[starts-with(., \"10.\") or starts-with(., \"DOI:\") or starts-with(., \"doi:\") or (starts-with(., \"http\") and contains(., \"doi.org/\"))]", "//dc:relation[starts-with(., \"10.\") or starts-with(., \"DOI:\") or starts-with(., \"doi:\") or (starts-with(., \"http\") and contains(., \"doi.org/\"))]"]' , xpath:"./*[local-name()='record']" , '(10[.][0-9]{4,}[^\s"/&lt;&gt;]*/[^\s"&lt;&gt;]+)');
+$varIdHdl =  identifierExtract('["//dc:relation[starts-with(., \"http\") and contains(., \"://hdl.handle.net/\")][not(contains(., \"123456789\"))]"]' , xpath:"./*[local-name()='record']" , '(?!(://hdl.handle.net/))(\d.*)');
+$varIdUrn = identifierExtract('["//dc:relation[starts-with(., \"urn:nbn:\") or starts-with(., \"URN:NBN:\") or (starts-with(., \"http\") and (contains(., \"://nbn-resolving.org/urn:nbn:\") or contains(., \"://nbn-resolving.de/urn/resolver.pl?urn:nbn:\") or contains(., \"://nbn-resolving.de/urn:nbn:\") or contains(., \"://resolver.obvsg.at/urn:nbn:\") or contains(., \"://urn.fi/URN:NBN:\") or contains(., \"://urn.kb.se/resolve?urn=urn:nbn:\")))]", "//dc:description[contains(., \"URN: urn:nbn:de:0114-\") or contains(., \"URN: http://nbn-resolving.de/urn:nbn:de:0114-\") or (contains(., \"URN:NBN:no-\") and //dc:identifier = \"1893-1774\")]"]' , xpath:"./*[local-name()='record']" , '((urn:nbn:|URN:NBN:).*)');
+$varIdArk =  identifierExtract('["//dc:relation[starts-with(normalize-space(.), \"http\") and contains(., \"/ark:\")]"]' , xpath:"./*[local-name()='record']" , '(http.*)');
+$varIdPmid = identifierExtract('["//dc:relation[starts-with(., \"http\") and contains(., \"://www.ncbi.nlm.nih.gov/pmc/articles/pmid/\")]"]' , xpath:"./*[local-name()='record']" , '(http.*)');
+$varIdPmc = identifierExtract('["//dc:relation[starts-with(., \"http\") and (contains(., \"://www.ncbi.nlm.nih.gov/pmc/articles/PMC\") or contains(., \"//europepmc.org/articles/PMC\"))]"]' , xpath:"./*[local-name()='record']" , '(http.*)');
+$varIdHal = identifierExtract('["//dc:relation[starts-with(., \"hal-\") or starts-with(., \"halshs-\") or starts-with(., \"halsde-\") or (starts-with(., \"http\") and (contains(., \"://hal.archives-ouvertes.fr/hal\") or contains(., \"://halshs.archives-ouvertes.fr/hal\") or contains(., \"://halsde.archives-ouvertes.fr/hal\")))]"]' , xpath:"./*[local-name()='record']" , '(hal(shs|sde)?-.*)');
+$varIdArxv = identifierExtract('["//dc:relation[starts-with(., \"http\") and (contains(., \"://arxiv.org/pdf/\") or contains(., \"://arxiv.org/abs/\"))]"]' , xpath:"./*[local-name()='record']" , '(\d.*)');
+$varIdLdpg =  identifierExtract('["//dc:identifier[starts-with(., \"https://doaj.org/article/\")]"]', xpath:"./*[local-name()='record']" , '(http.*)');
+$varIdUrl =  identifierExtract('["//dc:relation[starts-with(., \"http\")][not(contains(., \"://doaj.org\"))][not(contains(., \"doi.org/\"))][not(contains(., \"hdl.handle.net/\"))][not(contains(., \"://nbn-resolving.de/\") or contains(., \"://nbn-resolving.org/\") or contains(., \"://resolver.obvsg.at/\") or contains(., \"://urn.fi/URN:NBN:\") or contains(., \"://urn.kb.se/resolve\"))][not(contains(., \"://arxiv.org/pdf/\") or contains(., \"://arxiv.org/abs/\"))][not(contains(., \"://localhost/\") or contains(., \"://localhost:\"))]", "//dc:relation[starts-with(., \"www\")]"]', xpath:"./*[local-name()='record']" , '((http|www).*)');
+
+$varIdList = xpath:"(($varIdDoi//value, $varIdHdl//value, $varIdUrn//value, $varIdArk//value, $varIdPmid//value, $varIdPmc//value, $varIdLdpg//value, $varIdUrl//value))";
+
+// dropping/cleaning wrong DOIs, as
+// 2 DOIs just different in 1 ending with . (mostly, but not exclusively, prefixed with 10.5216)
+// noise stemming from odd/wrong DOI statements' formats
+// DOIs with 2 prefixes
+// DOI statements containing first the DOI prefix and then the DOI incl. the resolver prefix
+//oaf:identifier = set(xpath:"$varId//value", @identifierType = "doi";);
+//oaf:identifier = set(xpath:"$varIdDoi//value", @identifierType = "doi";);
+
+oaf:identifier = set(xpath:"distinct-values(($varIdDoi//value[not(ends-with(., '.') and exists(index-of($varIdDoi//value, substring(., 1, string-length(.)-1))))][not(. = '10.4313/article-4')][not(lower-case(.) = ('10.30659/ijibe.2.1.171-181', '10.30659/ijibe.2.1.171', '10.26843/rencima.v8i4.149', '10.26843/rencima.v11i1.215', '10.18273/revfue.v14n2-2016002revista', '10.17061/phrp3112015', '10.21789/24222704', '10.22432/pjsr.2017.14.', '10.22432/pjsr.2017.18.02', '10.22432/pjsr.2017.18.'))][not(starts-with(., '10.1530/VAB-'))][not(starts-with(lower-case(.), '10.1155/s168761720'))][not(starts-with(., '10.15561/10.6084/') or starts-with(., '10.5935/10.19180/'))][not(starts-with(., '10.7454/jvi.v') and string-length(.) = 16)][not(starts-with(., '10.15094/0000') and string-length(.) = 16)][not(matches(., '^10\.\d*/DOI:$'))][not(starts-with(., concat(substring-before(., '/'), '/', substring-before(., '/'), '/')))][not(matches(substring-after(., '/'), '^https?://(dx.)?doi.org/.*') and starts-with(substring-after(., 'doi.org/'), substring-before(., '/')))][not(starts-with(., '10.1371/journal.') and matches(., '^10\.1371/journal\.[a-z]{4}\.\d{7}\.(eor|20050521)$'))][not(substring-before(., '/') = ('10.19183', '10.18066') and matches(., '^(10\.19183/how\.\d*\.\d*|10\.18066/revunivap\.v\d*i\d*)$'))]/lower-case(.), $varIdDoi//value[matches(substring-after(., '/'), '^https?://(dx.)?doi.org/.*') and starts-with(substring-after(., 'doi.org/'), substring-before(., '/'))]/substring-after(., 'doi.org/'), $varIdDoi//value[starts-with(., '10.1371/journal.') and matches(., '^10\.1371/journal\.[a-z]{4}\.\d{7}\.eor$')]/substring(., 1, 28), $varIdDoi//value[starts-with(., '10.15561/10.6084/') or starts-with(., '10.5935/10.19180/')]/substring-after(., '/')))", @identifierType = "doi";);
+
+oaf:identifier = set(xpath:"distinct-values($varIdHdl//value/normalize-space(replace(., '\?locatt=view:master', '')))", @identifierType = "handle";);
+oaf:identifier = set(xpath:"$varIdUrn//value", @identifierType = "urn";);
+oaf:identifier = set(xpath:"distinct-values($varIdArk//value/replace(substring-after(., '/ark:'), '^/', ''))", @identifierType = "ark";);
+oaf:identifier = set(xpath:"distinct-values($varIdPmid//value/replace(., 'https?://www.ncbi.nlm.nih.gov/pmc/articles/pmid/(\d+)(/.*)?', '$1'))", @identifierType = "pmid";);
+oaf:identifier = set(xpath:"distinct-values($varIdPmc//value/replace(., 'https?://(www.ncbi.nlm.nih.gov/pmc|europepmc.org)/articles/(PMC\d*)([/\?].*)?', '$2'))", @identifierType = "pmcid";);
+oaf:identifier = set(xpath:"distinct-values($varIdHal//value/replace(., '/document', ''))", @identifierType = "hal";);
+oaf:identifier = set(xpath:"$varIdArxv//value", @identifierType = "arxiv";);
+oaf:identifier = set(xpath:"$varIdLdpg//value", @identifierType = "landingPage";);
+oaf:identifier = set(xpath:"($varIdUrl//value[not(starts-with(., 'www'))], $varIdUrl//value[starts-with(., 'www')]/concat('http://', .))", @identifierType = "url";);
+
+oaf:datasourceprefix = xpath:"//oaf:datasourceprefix";
+
+//$varJournalName = xpath:"substring-before(//dc:source, ',')";
+$varJournalTitle = xpath:"(//dc:source[contains(., ', Vol ')]/substring-before(., ', Vol '), //dc:source[contains(., ', Iss ')]/substring-before(., ', Iss '))[1]";
+$varVol = xpath:"//dc:source[contains(., ', Vol ')][matches(., ', Vol \d+')]/replace(substring-after(., ', Vol '), '^(\d+).*$', '$1')";
+$varIss = xpath:"//dc:source[contains(., ', Iss ')][matches(., ', Iss \d+')]/replace(substring-after(., ', Iss '), '^(\d+).*$', '$1')";
+$varSp = xpath:"//dc:source[contains(., ', Pp ')][matches(., ', Pp \d+-\d+')]/substring-before(substring-after(., ', Pp '), '-')";
+$varEp = xpath:"//dc:source[contains(., ', Pp ')][matches(., ', Pp \d+-\d+')]/replace(substring-after(substring-after(., ', Pp '), '-'), '^(\d+).*$', '$1')";
+$varISSN = xpath:"//dc:identifier[string-length() = 9 and matches(., '(\d{4})-(\d{4})')][1]";
+//oaf:journal = set($varJournalName, @issn = xpath:"//dc:identifier[string-length() = 9 and matches(., '^(\d{4})-(\d{4}|\d{3}X)')][1]"; , @eissn = xpath:"//dc:identifier[string-length() = 9 and matches(., '^(\d{4})-(\d{4}|\d{3}X)')][2]";);
+//oaf:journal = set($varJournalName, @issn = xpath:"//dc:identifier[string-length() = 9]";);
+oaf:journal = set($varJournalTitle, @issn = xpath:"//dc:identifier[string-length() = 9 and matches(., '(\d{4})-(\d{4})')][1]";, @eissn = xpath:"//dc:identifier[string-length() = 9 and matches(., '(\d{4})-(\d{4})')][2]";, @vol = xpath:"$varVol";, @iss = xpath:"$varIss";, @sp = xpath:"$varSp";, @ep = xpath:"$varEp";);
+
+end
