@@ -5,100 +5,158 @@ import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 import com.wcohen.ss.JaroWinkler;
 
-import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import eu.dnetlib.pace.model.Person;
+
 import scala.Tuple2;
 
 public class DoiBoostAuthorMerger {
 
-	private static final Double THRESHOLD = 0.95;
 
-	public static List<Author> merge(List<List<Author>> authors) {
+	public static List<Author> merge(List<List<Author>> authors,  Boolean crossref) {
 
 		Iterator<List<Author>> it = authors.iterator();
-		final List<Author> author = it.next();
+		List<Author> author = it.next();
 
-		it.forEachRemaining(autList -> enrichPidFromList(author, autList, THRESHOLD));
+		while (it.hasNext()){
+			List<Author> autList = it.next();
+			Tuple2<List<Author>, Boolean> tmp = mergeAuthor(author, autList, crossref);
+			author = tmp._1();
+			crossref = tmp._2();
+		}
 
 		return author;
 
 	}
 
-	public static List<Author> mergeAuthor(final List<Author> crossrefAuthor, final List<Author> otherAuthor,
-		Double threshold) {
+	public static Tuple2<List<Author>, Boolean> mergeAuthor(final List<Author> baseAuthor, final List<Author> otherAuthor,
+										    final Boolean crossref) {
 
-		enrichPidFromList(crossrefAuthor, otherAuthor, threshold);
-		return crossrefAuthor;
+		if(baseAuthor == null || baseAuthor.size() == 0)
+			return new Tuple2<>(otherAuthor, false);
+		if(otherAuthor == null || otherAuthor.size() == 0)
+			return new Tuple2<>(baseAuthor, crossref);
+
+		if(crossref) {
+			enrichPidFromList(baseAuthor, otherAuthor);
+			return new Tuple2<>(baseAuthor, true);
+		}
+		else
+			if (baseAuthor.size() > otherAuthor.size()){
+				enrichPidFromList(baseAuthor, otherAuthor);
+				return new Tuple2<>(baseAuthor, false);
+			}else{
+				enrichPidFromList(otherAuthor, baseAuthor);
+				return new Tuple2<>(otherAuthor, false);
+			}
+
 	}
 
-	public static List<Author> mergeAuthor(final List<Author> crossrefAuthor, final List<Author> otherAuthor) {
-		return mergeAuthor(crossrefAuthor, otherAuthor, THRESHOLD);
-	}
 
-	private static void enrichPidFromList(List<Author> base, List<Author> enrich, Double threshold) {
-		if (base == null || enrich == null)
-			return;
+	private static void enrichPidFromList(List<Author> base, List<Author> enrich) {
+		if(base == null || enrich == null)
+			return ;
 
-		// <pidComparableString, Author> (if an Author has more than 1 pid, it appears 2 times in the list)
-		final Map<String, Author> basePidAuthorMap = base
-			.stream()
-			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
-			.flatMap(
-				a -> a
-					.getPid()
-					.stream()
-					.map(p -> new Tuple2<>(pidToComparableString(p), a)))
-			.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
+		//search authors having identifiers in the enrich list
+        final List<Author> authorsWithPids = enrich
+                .stream()
+                .filter(a -> a.getPid() != null && a.getPid().size() > 0)
+                .collect(Collectors.toList());
 
-		// <pid, Author> (list of pid that are missing in the other list)
-		final List<Tuple2<StructuredProperty, Author>> pidToEnrich = enrich
-			.stream()
-			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
-			.flatMap(
-				a -> a
-					.getPid()
-					.stream()
-					.filter(p -> !basePidAuthorMap.containsKey(pidToComparableString(p)))
-					.map(p -> new Tuple2<>(p, a)))
-			.collect(Collectors.toList());
+		Map<String, AuthorAssoc> assocMap = authorsWithPids
+				.stream()
+				.map(
+						a -> new Tuple2<>(DHPUtils.md5(a.getFullname()), AuthorAssoc.newInstance(a)))
+				.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
-		pidToEnrich
-			.forEach(
-				a -> {
-					Optional<Tuple2<Double, Author>> simAuthor = base
-						.stream()
-						.map(ba -> new Tuple2<>(sim(ba, a._2()), ba))
-						.max(Comparator.comparing(Tuple2::_1));
 
-					if (simAuthor.isPresent()) {
-						double th = threshold;
-						// increase the threshold if the surname is too short
-						if (simAuthor.get()._2().getSurname() != null
-							&& simAuthor.get()._2().getSurname().length() <= 3 && threshold > 0.0)
-							th = 0.99;
+		//for each author in the base list, we search the best enriched match
+		base.stream()
+				.map(a -> new Tuple2<>(a, authorsWithPids.stream()
+						.map(e -> new Tuple2<>(e, sim(a, e))).collect(Collectors.toList())))
+                .forEach(t2 -> {
 
-						if (simAuthor.get()._1() > th) {
-							Author r = simAuthor.get()._2();
-							if (r.getPid() == null) {
-								r.setPid(new ArrayList<>());
-							}
-
-							// TERRIBLE HACK but for some reason when we create and Array with Arrays.asList,
-							// it creates of fixed size, and the add method raise UnsupportedOperationException at
-							// java.util.AbstractList.add
-							final List<StructuredProperty> tmp = new ArrayList<>(r.getPid());
-							tmp.add(a._1());
-							r.setPid(tmp);
+                    for (Tuple2<Author, Double> t : t2._2()) {
+                    	String mapEntry = DHPUtils.md5(t._1().getFullname());
+                    	AuthorAssoc aa = assocMap.get(mapEntry);
+                    	if(aa.getScore() < t._2()){
+							aa.setScore(t._2());
+							aa.setTo_be_enriched(new ArrayList<>());
+							aa.getTo_be_enriched().add(t2._1());
+						}else if(aa.getScore() == t._2()){
+                    		aa.getTo_be_enriched().add(t2._1());
 						}
+                    }
+
+                });
+                
+		assocMap.keySet().forEach(k -> enrichAuthor(assocMap.get(k)));
+
+
+	}
+
+	private static long getCommonWords(List<String> fullEnrich, List<String> fullEnriching){
+		return fullEnrich.stream().filter( w -> fullEnriching.contains(w)).count();
+	}
+
+
+	private static void enrichAuthor(Author enrich, Author enriching){
+		//verify if some of the words in the fullname are contained in the other
+		//get normalized fullname
+
+		long commonWords = getCommonWords(normalize(enrich.getFullname()),
+				normalize(enriching.getFullname()));
+		if(commonWords > 0 ){
+			if(enrich.getPid() == null){
+				enrich.setPid(new ArrayList<>());
+			}
+				Set<String> aPids = enrich.getPid().stream().map(p -> pidToComparableString(p)).collect(Collectors.toSet());
+			enriching.getPid().forEach(p -> {
+					if (!aPids.contains(pidToComparableString(p))){
+						enrich.getPid().add(p);
 					}
 				});
+			if (enrich.getAffiliation() == null){
+				if (enriching.getAffiliation() != null){
+					enrich.setAffiliation(enriching.getAffiliation());
+				}
+			}
+		}
+
+
 	}
+
+	//Verify the number of words in common. The one that has more, wins. If the number of words in common are the same we
+	//enrich no author
+	private static void enrichAuthor(AuthorAssoc authorAssoc) {
+		if (authorAssoc.getTo_be_enriched().size() == 1){
+			enrichAuthor(authorAssoc.getTo_be_enriched().get(0), authorAssoc.getWith_enricheing_content());
+		}else{
+			long common = 0;
+			List<Author> selected = new ArrayList<>() ;
+			for(Author a : authorAssoc.getTo_be_enriched()){
+				long current_common = getCommonWords(normalize(a.getFullname()),
+						normalize(authorAssoc.getWith_enricheing_content().getFullname()));
+				if (current_common > common){
+					common = current_common;
+					selected = new ArrayList<>();
+					selected.add(a);
+				}else if(current_common == common){
+					selected.add(a);
+				}
+			}
+			if (selected.size() == 1){
+				enrichAuthor(selected.get(0), authorAssoc.getWith_enricheing_content());
+			}
+		}
+
+	}
+
 
 	public static String pidToComparableString(StructuredProperty pid) {
 		return (pid.getQualifier() != null
@@ -107,49 +165,21 @@ public class DoiBoostAuthorMerger {
 			+ (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
 	}
 
-	public static int countAuthorsPids(List<Author> authors) {
-		if (authors == null)
-			return 0;
 
-		return (int) authors.stream().filter(DoiBoostAuthorMerger::hasPid).count();
-	}
 
-	private static int authorsSize(List<Author> authors) {
-		if (authors == null)
-			return 0;
-		return authors.size();
-	}
 
 	private static Double sim(Author a, Author b) {
-
-		final Person pa = parse(a);
-		final Person pb = parse(b);
-
-		// if both are accurate (e.g. they have name and surname)
-		if (pa.isAccurate() & pb.isAccurate()) {
-			return new JaroWinkler().score(normalize(pa.getSurnameString()), normalize(pb.getSurnameString())) * 0.5
-				+ new JaroWinkler().score(normalize(pa.getNameString()), normalize(pb.getNameString())) * 0.5;
-		} else {
 			return new JaroWinkler()
-				.score(normalize(pa.getNormalisedFullname()), normalize(pb.getNormalisedFullname()));
-		}
+				.score(normalizeString(a.getFullname()), normalizeString(b.getFullname()));
+
 	}
 
-	private static boolean hasPid(Author a) {
-		if (a == null || a.getPid() == null || a.getPid().size() == 0)
-			return false;
-		return a.getPid().stream().anyMatch(p -> p != null && StringUtils.isNotBlank(p.getValue()));
+	private static String normalizeString(String fullname) {
+		return String.join(" ", normalize(fullname));
 	}
 
-	private static Person parse(Author author) {
-		if (StringUtils.isNotBlank(author.getSurname())) {
-			return new Person(author.getSurname() + ", " + author.getName(), false);
-		} else {
-			return new Person(author.getFullname(), false);
-		}
-	}
 
-	private static String normalize(final String s) {
+	private static List<String> normalize(final String s) {
 		String[] normalized = nfd(s)
 			.replaceAll("[^\\p{ASCII}]", "")
 			.toLowerCase()
@@ -166,7 +196,9 @@ public class DoiBoostAuthorMerger {
 
 		Arrays.sort(normalized);
 
-		return String.join(" ", normalized);
+		return Arrays.asList(normalized);
+
+
 	}
 
 	private static String nfd(final String s) {
