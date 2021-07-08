@@ -36,7 +36,7 @@ object SparkEBILinksToOaf {
 
     ebi_rdd.write.mode(SaveMode.Overwrite).save(s"${sourcePath}_dataset")
 
-    val ebLinks:Dataset[EBILinkItem] = spark.read.load(sourcePath).as[EBILinkItem].filter(l => l.links!= null)
+    val ebLinks:Dataset[EBILinkItem] = spark.read.load(s"${sourcePath}_dataset").as[EBILinkItem].filter(l => l.links!= null)
 
     ebLinks.flatMap(j =>BioDBToOAF.parse_ebi_links(j.links))
       .repartition(4000)
