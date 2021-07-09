@@ -141,6 +141,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch-hadoop</artifactId>
+
+        </dependency>
+
+        <dependency>
             <groupId>org.noggit</groupId>
             <artifactId>noggit</artifactId>
         </dependency>
