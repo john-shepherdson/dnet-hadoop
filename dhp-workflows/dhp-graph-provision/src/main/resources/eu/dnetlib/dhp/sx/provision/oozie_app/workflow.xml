@@ -81,7 +81,7 @@
             <arg>--idPath</arg><arg>identifier</arg>
             <arg>--cluster</arg><arg>${esCluster}</arg>
         </spark>
-        <ok to="indexScholix"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
