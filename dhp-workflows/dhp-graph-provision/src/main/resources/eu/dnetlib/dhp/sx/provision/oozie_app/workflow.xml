@@ -38,8 +38,8 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Index summary</name>
-            <class>eu.dnetlib.dhp.sx.graph.SparkCreateInputGraph</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <class>eu.dnetlib.dhp.sx.provision.SparkIndexCollectionOnES</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --conf spark.dynamicAllocation.maxExecutors="8"
@@ -64,8 +64,8 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Index summary</name>
-            <class>eu.dnetlib.dhp.sx.graph.SparkCreateInputGraph</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <class>eu.dnetlib.dhp.sx.provision.SparkIndexCollectionOnES</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --conf spark.dynamicAllocation.maxExecutors="8"
