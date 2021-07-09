@@ -331,7 +331,7 @@ object ScholixUtils {
         s.setDate(dt.distinct.asJava)
     }
     if (r.getDescription!= null && !r.getDescription.isEmpty) {
-      val d = r.getDescription.asScala.find(f => f.getValue!=null)
+      val d = r.getDescription.asScala.find(f => f!= null && f.getValue!=null)
       if (d.isDefined)
         s.setDescription(d.get.getValue)
     }
