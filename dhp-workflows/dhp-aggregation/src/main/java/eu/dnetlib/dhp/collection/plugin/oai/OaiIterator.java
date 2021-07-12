@@ -107,10 +107,12 @@ public class OaiIterator implements Iterator<String> {
 			if (set != null && !set.isEmpty()) {
 				url += "&set=" + URLEncoder.encode(set, "UTF-8");
 			}
-			if (fromDate != null && fromDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+			if (fromDate != null && (fromDate.matches(OaiCollectorPlugin.DATE_REGEX)
+				|| fromDate.matches(OaiCollectorPlugin.UTC_DATETIME_REGEX))) {
 				url += "&from=" + URLEncoder.encode(fromDate, "UTF-8");
 			}
-			if (untilDate != null && untilDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+			if (untilDate != null && (untilDate.matches(OaiCollectorPlugin.DATE_REGEX)
+				|| untilDate.matches(OaiCollectorPlugin.UTC_DATETIME_REGEX))) {
 				url += "&until=" + URLEncoder.encode(untilDate, "UTF-8");
 			}
 			log.info("Start harvesting using url: " + url);

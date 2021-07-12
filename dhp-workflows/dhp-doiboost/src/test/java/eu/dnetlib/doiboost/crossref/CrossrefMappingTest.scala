@@ -461,5 +461,37 @@ class CrossrefMappingTest {
 //    })
   }
 
+  @Test
+  def testNormalizeDOI(): Unit = {
+    val template = Source.fromInputStream(getClass.getResourceAsStream("article_funder_template.json")).mkString
+    val line :String = "\"funder\": [{\"name\": \"Wellcome Trust Masters Fellowship\",\"award\": [\"090633\"]}],"
+    val json = template.replace("%s", line)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    assertTrue(resultList.nonEmpty)
+    val items = resultList.filter(p => p.isInstanceOf[Publication])
+    val result: Result = items.head.asInstanceOf[Publication]
+
+    result.getPid.asScala.foreach(pid => assertTrue(pid.getQualifier.getClassid.equals("doi")))
+    assertTrue(result.getPid.size() == 1)
+    result.getPid.asScala.foreach(pid => assertTrue(pid.getValue.equals("10.26850/1678-4618EQJ.v35.1.2010.p41-46".toLowerCase())))
+
+  }
+
+  @Test
+  def testNormalizeDOI2(): Unit = {
+    val template = Source.fromInputStream(getClass.getResourceAsStream("article.json")).mkString
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(template)
+    assertTrue(resultList.nonEmpty)
+    val items = resultList.filter(p => p.isInstanceOf[Publication])
+    val result: Result = items.head.asInstanceOf[Publication]
+
+    result.getPid.asScala.foreach(pid => assertTrue(pid.getQualifier.getClassid.equals("doi")))
+    assertTrue(result.getPid.size() == 1)
+    result.getPid.asScala.foreach(pid => assertTrue(pid.getValue.equals("10.26850/1678-4618EQJ.v35.1.2010.p41-46".toLowerCase())))
+
+  }
+
+
 
 }

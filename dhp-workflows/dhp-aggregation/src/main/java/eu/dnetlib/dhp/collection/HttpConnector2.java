@@ -131,18 +131,9 @@ public class HttpConnector2 {
 				}
 				return attemptDownload(newUrl, retryNumber + 1, report);
 			}
-			if (is4xx(urlConn.getResponseCode())) {
-				// CLIENT ERROR, DO NOT RETRY
-				report
-					.put(
-						REPORT_PREFIX + urlConn.getResponseCode(),
-						String
-							.format(
-								"%s error: %s", requestUrl, urlConn.getResponseMessage()));
-				throw new CollectorException("4xx error: request will not be repeated. " + report);
-			}
-			if (is5xx(urlConn.getResponseCode())) {
+			if (is4xx(urlConn.getResponseCode()) || is5xx(urlConn.getResponseCode())) {
 				switch (urlConn.getResponseCode()) {
+					case HttpURLConnection.HTTP_NOT_FOUND:
 					case HttpURLConnection.HTTP_BAD_GATEWAY:
 					case HttpURLConnection.HTTP_UNAVAILABLE:
 					case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:

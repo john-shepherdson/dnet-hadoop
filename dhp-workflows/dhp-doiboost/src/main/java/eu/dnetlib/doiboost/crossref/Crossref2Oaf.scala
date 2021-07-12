@@ -17,6 +17,8 @@ import scala.collection.mutable
 import scala.util.matching.Regex
 import java.util
 
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
+
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
 case class mappingAffiliation(name: String) {}
@@ -87,7 +89,7 @@ case object Crossref2Oaf {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
-    val doi: String = (json \ "DOI").extract[String]
+    val doi: String = DoiBoostMappingUtil.normalizeDoi((json \ "DOI").extract[String])
     result.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
 
     //MAPPING Crossref DOI into OriginalId
@@ -98,6 +100,7 @@ case object Crossref2Oaf {
 
     val originalIds = new util.ArrayList(tmp.filter(id => id != null).asJava)
     result.setOriginalId(originalIds)
+
 
     // Add DataInfo
     result.setDataInfo(generateDataInfo())
@@ -140,7 +143,6 @@ case object Crossref2Oaf {
       result.setDateofacceptance(asField(issuedDate))
     }
     else {
-      // TODO: take the oldest date between publishedPrint and publishedOnline
       result.setDateofacceptance(asField(createdDate.getValue))
     }
     result.setRelevantdate(List(createdDate, postedDate, acceptedDate, publishedOnlineDate, publishedPrintDate).filter(p => p != null).asJava)
@@ -407,14 +409,6 @@ case object Crossref2Oaf {
     // TODO check if there are other info to map into the Dataset
   }
 
-
-  def extractDump(input:String):List[String] = {
-    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    lazy val json: json4s.JValue = parse(input)
-
-    val a = (json \ "items").extract[JArray]
-    a.arr.map(s => compact(render(s)))
-  }
 
   def convertPublication(publication: Publication, json: JValue, cobjCategory: String): Unit = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats

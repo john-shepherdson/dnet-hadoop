@@ -80,6 +80,7 @@ public class GenerateStatsJob {
 				.map(
 					(MapFunction<Tuple2<String, DatasourceStats>, DatasourceStats>) t -> t._2,
 					Encoders.bean(DatasourceStats.class))
+				.coalesce(1)
 				.write()
 				.mode(SaveMode.Overwrite)
 				.jdbc(dbUrl, "oa_datasource_stats_temp", connectionProperties);
