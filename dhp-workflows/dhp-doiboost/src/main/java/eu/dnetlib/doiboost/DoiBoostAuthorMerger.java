@@ -90,8 +90,6 @@ public class DoiBoostAuthorMerger {
 
 
 	private static void enrichPidFromList(List<Author> base, List<Author> enrich) {
-		if(base == null || enrich == null)
-			return ;
 
 		//search authors having identifiers in the enrich list
         final List<Author> authorsWithPids = enrich
@@ -115,11 +113,11 @@ public class DoiBoostAuthorMerger {
                     for (Tuple2<Author, Double> t : t2._2()) {
                     	String mapEntry = DHPUtils.md5(t._1().getFullname());
                     	AuthorAssoc aa = assocMap.get(mapEntry);
-                    	if(aa.getScore() < t._2()){
+                    	if(aa.getScore() < t._2() && aa.getScore() < 0.9){
 							aa.setScore(t._2());
 							aa.setTo_be_enriched(new ArrayList<>());
 							aa.getTo_be_enriched().add(t2._1());
-						}else if(aa.getScore() == t._2()){
+						}else if(t._2() > 0.9){
                     		aa.getTo_be_enriched().add(t2._1());
 						}
                     }

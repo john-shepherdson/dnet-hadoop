@@ -307,4 +307,100 @@ public class DoiBoostAuthorMergerTest {
 
 	}
 
+	@Test
+	public void shouldMergeTest1() throws JsonProcessingException {
+
+		authors = readSample(publicationsBasePath + "/should_appear_author1.json", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
+
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
+
+		Assertions.assertTrue(6 == merge.stream().filter(a -> a.getPid() !=null)
+				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
+
+		Assertions.assertTrue(34 == merge.stream().filter(a -> a.getPid() !=null)
+				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))).count());
+
+		merge.stream().filter(a -> a.getRank() == 26)
+				.forEach(a ->
+						Assertions.assertTrue(a.getPid()
+								.stream()
+								.anyMatch(pid -> pid.getValue().equals("0000-0002-2445-5275")
+										&& pid.getQualifier().getClassid().equals(ModelConstants.ORCID)
+								)
+						)
+				);
+
+
+	}
+
+	@Test
+	public void shouldMergeTest2() throws JsonProcessingException {
+
+		authors = readSample(publicationsBasePath + "/should_appear_author2.json", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
+
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
+
+
+
+		Assertions.assertTrue(5 == merge.stream().filter(a -> a.getPid() !=null)
+				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
+
+		Assertions.assertTrue(34 == merge.stream().filter(a -> a.getPid() !=null)
+				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))).count());
+
+		merge.stream().filter(a -> a.getFullname().equals("da luz geraldo eduardo"))
+				.forEach(a ->
+						Assertions.assertTrue(a.getPid()
+								.stream()
+								.anyMatch(pid -> pid.getValue().equals("http://orcid.org/0000-0003-2434-0387")
+										&& pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING)
+								)
+						)
+				);
+
+
+	}
+
+	@Test
+	public void shouldNotMergeTest1() throws JsonProcessingException {
+
+		authors = readSample(publicationsBasePath + "/should_appear_author3.json", Publication.class)
+				.stream()
+				.map(p -> p._2().getAuthor())
+				.collect(Collectors.toList());
+
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
+
+		System.out.println("Merge ");
+		for (Author author : merge) {
+			System.out.println(authorToString(author));
+		}
+
+//		Assertions.assertTrue(5 == merge.stream().filter(a -> a.getPid() !=null)
+//				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
+//
+//		Assertions.assertTrue(34 == merge.stream().filter(a -> a.getPid() !=null)
+//				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))).count());
+//
+//		merge.stream().filter(a -> a.getFullname().equals("da luz geraldo eduardo"))
+//				.forEach(a ->
+//						Assertions.assertTrue(a.getPid()
+//								.stream()
+//								.anyMatch(pid -> pid.getValue().equals("http://orcid.org/0000-0003-2434-0387")
+//										&& pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING)
+//								)
+//						)
+//				);
+
+
+	}
 }
