@@ -159,7 +159,7 @@ public class QueryInformationSystem {
 				if (funding == null) {
 					return null;
 				}
-				if (funding.toLowerCase().startsWith("h2020")) {
+				if (funding.toLowerCase().contains("h2020")) {
 					nsp = "corda__h2020::";
 				} else {
 					nsp = "corda_______::";
