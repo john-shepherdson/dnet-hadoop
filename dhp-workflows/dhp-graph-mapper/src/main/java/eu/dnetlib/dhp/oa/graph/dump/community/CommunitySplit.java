@@ -74,7 +74,7 @@ public class CommunitySplit implements Serializable {
 				.stream()
 					.map(con -> con.getCode())
 					.collect(Collectors.toList())
-					.contains(c)
+					.contains(c);
 		}
 		return false;
 	}
