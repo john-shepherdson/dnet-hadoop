@@ -139,8 +139,8 @@ public class SplitPerFunderTest {
 
 		// MZOS 1
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/MZOS")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/MZOS")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(1, tmp.count());
 
 	}

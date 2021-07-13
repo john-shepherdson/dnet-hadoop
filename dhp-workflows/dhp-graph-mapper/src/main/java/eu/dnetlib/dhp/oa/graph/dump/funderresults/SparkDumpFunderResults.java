@@ -103,12 +103,13 @@ public class SparkDumpFunderResults implements Serializable {
 			} else {
 				funderdump = fundernsp.substring(0, fundernsp.indexOf("_")).toUpperCase();
 			}
-			writeFunderResult(funder, result, outputPath ,  funderdump);
+			writeFunderResult(funder, result, outputPath, funderdump);
 		});
 
 	}
 
-	private static void dumpResults(String nsp, Dataset<CommunityResult> results, String outputPath, String funderName) {
+	private static void dumpResults(String nsp, Dataset<CommunityResult> results, String outputPath,
+		String funderName) {
 
 		results.map((MapFunction<CommunityResult, CommunityResult>) r -> {
 			if (!Optional.ofNullable(r.getProjects()).isPresent()) {
@@ -128,24 +129,22 @@ public class SparkDumpFunderResults implements Serializable {
 			}
 			return null;
 		}, Encoders.bean(CommunityResult.class))
-			.filter((FilterFunction<CommunityResult>) r -> r!= null)
+			.filter((FilterFunction<CommunityResult>) r -> r != null)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath + "/" + funderName);
 	}
 
-
 	private static void writeFunderResult(String funder, Dataset<CommunityResult> results, String outputPath,
-										  String funderDump) {
+		String funderDump) {
 
 		if (funder.startsWith("40|irb")) {
-			dumpResults(funder, results, outputPath,  "HRZZ");
-			dumpResults(funder, results, outputPath,  "MZOS");
+			dumpResults(funder, results, outputPath, "HRZZ");
+			dumpResults(funder, results, outputPath, "MZOS");
 		} else
-			dumpResults(funder, results, outputPath,  funderDump);
+			dumpResults(funder, results, outputPath, funderDump);
 
 	}
-
 
 }

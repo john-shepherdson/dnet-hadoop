@@ -48,14 +48,14 @@ public class SendToZenodoHDFS implements Serializable {
 			.orElse(false);
 
 		final String depositionId = Optional.ofNullable(parser.get("depositionId")).orElse(null);
-		final String communityMapPath = parser.get("communityMapPath");
+		//final String communityMapPath = parser.get("communityMapPath");
 
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
 
-		CommunityMap communityMap = Utils.readCommunityMap(fileSystem, communityMapPath);
+		//CommunityMap communityMap = Utils.readCommunityMap(fileSystem, communityMapPath);
 
 		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
 			.listFiles(
@@ -87,10 +87,10 @@ public class SendToZenodoHDFS implements Serializable {
 			if (!p_string.endsWith("_SUCCESS")) {
 				// String tmp = p_string.substring(0, p_string.lastIndexOf("/"));
 				String name = p_string.substring(p_string.lastIndexOf("/") + 1);
-				log.info("Sending information for community: " + name);
-				if (communityMap.containsKey(name.substring(0, name.lastIndexOf(".")))) {
-					name = communityMap.get(name.substring(0, name.lastIndexOf("."))).replace(" ", "_") + ".tar";
-				}
+//				log.info("Sending information for community: " + name);
+//				if (communityMap.containsKey(name.substring(0, name.lastIndexOf(".")))) {
+//					name = communityMap.get(name.substring(0, name.lastIndexOf("."))).replace(" ", "_") + ".tar";
+//				}
 
 				FSDataInputStream inputStream = fileSystem.open(p);
 				zenodoApiClient.uploadIS(inputStream, name, fileStatus.getLen());
