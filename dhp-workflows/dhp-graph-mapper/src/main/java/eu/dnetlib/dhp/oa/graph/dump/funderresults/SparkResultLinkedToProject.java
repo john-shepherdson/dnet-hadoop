@@ -97,6 +97,11 @@ public class SparkResultLinkedToProject implements Serializable {
 								"on rel.target = p.id " +
 								"")
 				.as(Encoders.bean(inputClazz))
+		.groupByKey(
+				(MapFunction< R, String>) value -> value
+						.getId(),
+				Encoders.STRING())
+				.mapGroups((MapGroupsFunction<String, R, R>) (k, it) -> it.next(), Encoders.bean(inputClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
