@@ -412,48 +412,48 @@ public class DumpJobTest {
 	@Test
 	public void testArticlePCA() {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_pca")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_pca")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
 
 		DumpProducts dump = new DumpProducts();
 		dump
-				.run(
-						// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-						false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-						GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<GraphResult> tmp = sc
-				.textFile(workingDir.toString() + "/result")
-				.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
 
 		org.apache.spark.sql.Dataset<GraphResult> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
+			.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
 
 		Assertions.assertEquals(23, verificationDataset.count());
-		//verificationDataset.show(false);
+		// verificationDataset.show(false);
 
 		Assertions.assertEquals(23, verificationDataset.filter("type = 'publication'").count());
 
 		verificationDataset.createOrReplaceTempView("check");
 
-		org.apache.spark.sql.Dataset<Row> temp = spark.sql("select id " +
-				"from check " +
-				"lateral view explode (instance) i as inst " +
-				"where inst.articleprocessingcharge is not null");
+		org.apache.spark.sql.Dataset<Row> temp = spark
+			.sql(
+				"select id " +
+					"from check " +
+					"lateral view explode (instance) i as inst " +
+					"where inst.articleprocessingcharge is not null");
 
 		Assertions.assertTrue(temp.count() == 2);
 
 		Assertions.assertTrue(temp.filter("id = '50|datacite____::05c611fdfc93d7a2a703d1324e28104a'").count() == 1);
 
 		Assertions.assertTrue(temp.filter("id = '50|dedup_wf_001::01e6a28565ca01376b7548e530c6f6e8'").count() == 1);
-
-
 
 //		verificationDataset.filter("bestAccessright.code = 'c_abf2'").count() == verificationDataset
 //				.filter("bestAccessright.code = 'c_abf2' and bestAccessright.label = 'OPEN'")

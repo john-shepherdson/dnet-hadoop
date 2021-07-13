@@ -129,7 +129,7 @@ public class Extractor implements Serializable {
 
 				return relationList.iterator();
 			}, Encoders.bean(Relation.class))
-			.write()
+				.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
 			.json(outputPath);
@@ -147,7 +147,7 @@ public class Extractor implements Serializable {
 					.map(
 						paction -> Provenance
 							.newInstance(
-								paction.getClassid(),
+								paction.getClassname(),
 								dinfo.getTrust()))
 					.orElse(
 						Provenance

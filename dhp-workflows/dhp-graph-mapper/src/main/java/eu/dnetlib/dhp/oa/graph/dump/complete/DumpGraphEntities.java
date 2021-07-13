@@ -453,7 +453,7 @@ public class DumpGraphEntities implements Serializable {
 			.map(
 				(MapFunction<E, Organization>) o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o),
 				Encoders.bean(Organization.class))
-				.filter(Objects::nonNull)
+			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -461,7 +461,7 @@ public class DumpGraphEntities implements Serializable {
 	}
 
 	private static Organization mapOrganization(eu.dnetlib.dhp.schema.oaf.Organization org) {
-		if(org.getDataInfo().getDeletedbyinference())
+		if (org.getDataInfo().getDeletedbyinference())
 			return null;
 		Organization organization = new Organization();
 

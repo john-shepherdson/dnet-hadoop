@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.oa.graph.dump.complete;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -25,113 +26,112 @@ import eu.dnetlib.dhp.schema.oaf.*;
  * with this view for both the source and the target
  */
 
-
 public class SparkSelectValidRelationsJob implements Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(SparkSelectValidRelationsJob.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkSelectValidRelationsJob.class);
 
-    public static void main(String[] args) throws Exception {
-        String jsonConfiguration = IOUtils
-                .toString(
-                        SparkSelectValidRelationsJob.class
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/graph/dump/complete/input_relationdump_parameters.json"));
+	public static void main(String[] args) throws Exception {
+		String jsonConfiguration = IOUtils
+			.toString(
+				SparkSelectValidRelationsJob.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_relationdump_parameters.json"));
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(args);
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		Boolean isSparkSessionManaged = Optional
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        final String inputPath = parser.get("sourcePath");
-        log.info("inputPath: {}", inputPath);
+		final String inputPath = parser.get("sourcePath");
+		log.info("inputPath: {}", inputPath);
 
-        final String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath: {}", outputPath);
 
-        SparkConf conf = new SparkConf();
+		SparkConf conf = new SparkConf();
 
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    Utils.removeOutputDir(spark, outputPath);
-                    selectValidRelation(spark, inputPath, outputPath);
+		runWithSparkSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				Utils.removeOutputDir(spark, outputPath);
+				selectValidRelation(spark, inputPath, outputPath);
 
-                });
+			});
 
-    }
+	}
 
-    private static void selectValidRelation(SparkSession spark, String inputPath, String outputPath) {
-        Dataset<Relation> relation = Utils.readPath(spark, inputPath + "/relation", Relation.class);
-        Dataset<Publication> publication = Utils.readPath(spark, inputPath + "/publication", Publication.class);
-        Dataset<eu.dnetlib.dhp.schema.oaf.Dataset> dataset = Utils
-                .readPath(spark, inputPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
-        Dataset<Software> software = Utils.readPath(spark, inputPath + "/software", Software.class);
-        Dataset<OtherResearchProduct> other = Utils
-                .readPath(spark, inputPath + "/otherresearchproduct", OtherResearchProduct.class);
-        Dataset<Organization> organization = Utils.readPath(spark, inputPath + "/organization", Organization.class);
-        Dataset<Project> project = Utils.readPath(spark, inputPath + "/project", Project.class);
-        Dataset<Datasource> datasource = Utils.readPath(spark, inputPath + "/datasource", Datasource.class);
+	private static void selectValidRelation(SparkSession spark, String inputPath, String outputPath) {
+		Dataset<Relation> relation = Utils.readPath(spark, inputPath + "/relation", Relation.class);
+		Dataset<Publication> publication = Utils.readPath(spark, inputPath + "/publication", Publication.class);
+		Dataset<eu.dnetlib.dhp.schema.oaf.Dataset> dataset = Utils
+			.readPath(spark, inputPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class);
+		Dataset<Software> software = Utils.readPath(spark, inputPath + "/software", Software.class);
+		Dataset<OtherResearchProduct> other = Utils
+			.readPath(spark, inputPath + "/otherresearchproduct", OtherResearchProduct.class);
+		Dataset<Organization> organization = Utils.readPath(spark, inputPath + "/organization", Organization.class);
+		Dataset<Project> project = Utils.readPath(spark, inputPath + "/project", Project.class);
+		Dataset<Datasource> datasource = Utils.readPath(spark, inputPath + "/datasource", Datasource.class);
 
-        relation.createOrReplaceTempView("relation");
-        publication.createOrReplaceTempView("publication");
-        dataset.createOrReplaceTempView("dataset");
-        other.createOrReplaceTempView("other");
-        software.createOrReplaceTempView("software");
-        organization.createOrReplaceTempView("organization");
-        project.createOrReplaceTempView("project");
-        datasource.createOrReplaceTempView("datasource");
+		relation.createOrReplaceTempView("relation");
+		publication.createOrReplaceTempView("publication");
+		dataset.createOrReplaceTempView("dataset");
+		other.createOrReplaceTempView("other");
+		software.createOrReplaceTempView("software");
+		organization.createOrReplaceTempView("organization");
+		project.createOrReplaceTempView("project");
+		datasource.createOrReplaceTempView("datasource");
 
-        spark
-                .sql(
-                        "SELECT id " +
-                                "FROM publication " +
-                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
-                                "UNION ALL " +
-                                "SELECT id " +
-                                "FROM dataset " +
-                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
-                                "UNION ALL " +
-                                "SELECT id " +
-                                "FROM other " +
-                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
-                                "UNION ALL " +
-                                "SELECT id " +
-                                "FROM software " +
-                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
-                                "UNION ALL " +
-                                "SELECT id " +
-                                "FROM organization " +
-                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
-                                "UNION ALL " +
-                                "SELECT id " +
-                                "FROM project " +
-                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
-                                "UNION ALL " +
-                                "SELECT id " +
-                                "FROM datasource " +
-                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " )
-                .createOrReplaceTempView("identifiers");
+		spark
+			.sql(
+				"SELECT id " +
+					"FROM publication " +
+					"WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
+					"UNION ALL " +
+					"SELECT id " +
+					"FROM dataset " +
+					"WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
+					"UNION ALL " +
+					"SELECT id " +
+					"FROM other " +
+					"WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
+					"UNION ALL " +
+					"SELECT id " +
+					"FROM software " +
+					"WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
+					"UNION ALL " +
+					"SELECT id " +
+					"FROM organization " +
+					"WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
+					"UNION ALL " +
+					"SELECT id " +
+					"FROM project " +
+					"WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
+					"UNION ALL " +
+					"SELECT id " +
+					"FROM datasource " +
+					"WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false ")
+			.createOrReplaceTempView("identifiers");
 
-        spark
-                .sql(
-                        "SELECT relation.* " +
-                                "FROM relation " +
-                                "JOIN identifiers i1 " +
-                                "ON source = i1.id " +
-                                "JOIN identifiers i2 " +
-                                "ON target = i2.id " +
-                                "WHERE datainfo.deletedbyinference = false")
-                .as(Encoders.bean(Relation.class))
-                .write()
-                .option("compression", "gzip")
-                .mode(SaveMode.Overwrite)
-                .json(outputPath);
-        ;
+		spark
+			.sql(
+				"SELECT relation.* " +
+					"FROM relation " +
+					"JOIN identifiers i1 " +
+					"ON source = i1.id " +
+					"JOIN identifiers i2 " +
+					"ON target = i2.id " +
+					"WHERE datainfo.deletedbyinference = false")
+			.as(Encoders.bean(Relation.class))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath);
+		;
 
-    }
+	}
 }

@@ -428,7 +428,7 @@ public class ResultMapper implements Serializable {
 		if (oPca.isPresent() && oPcc.isPresent()) {
 			Field<String> pca = oPca.get();
 			Field<String> pcc = oPcc.get();
-			if(!pca.getValue().trim().equals("") && !pcc.getValue().trim().equals("")){
+			if (!pca.getValue().trim().equals("") && !pcc.getValue().trim().equals("")) {
 				APC apc = new APC();
 				apc.setCurrency(oPcc.get().getValue());
 				apc.setAmount(oPca.get().getValue());
