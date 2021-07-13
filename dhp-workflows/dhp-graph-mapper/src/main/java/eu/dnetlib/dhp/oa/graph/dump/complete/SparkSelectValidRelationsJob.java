@@ -110,9 +110,11 @@ public class SparkSelectValidRelationsJob implements Serializable {
                                 "UNION ALL " +
                                 "SELECT id " +
                                 "FROM project " +
+                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " +
                                 "UNION ALL " +
                                 "SELECT id " +
-                                "FROM datasource ")
+                                "FROM datasource " +
+                                "WHERE datainfo.deletedbyinference = false AND  datainfo.invisible = false " )
                 .createOrReplaceTempView("identifiers");
 
         spark
