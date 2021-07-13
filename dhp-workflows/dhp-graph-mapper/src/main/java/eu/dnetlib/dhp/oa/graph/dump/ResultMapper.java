@@ -423,6 +423,14 @@ public class ResultMapper implements Serializable {
 			.ofNullable(i.getInstancetype())
 			.ifPresent(value -> instance.setType(value.getClassname()));
 		Optional.ofNullable(i.getUrl()).ifPresent(value -> instance.setUrl(value));
+		Optional<Field<String>> oPca = Optional.ofNullable(i.getProcessingchargeamount());
+		Optional<Field<String>> oPcc = Optional.ofNullable(i.getProcessingchargecurrency());
+		if (oPca.isPresent() && oPcc.isPresent()) {
+			APC apc = new APC();
+			apc.setCurrency(oPcc.get().getValue());
+			apc.setAmount(oPca.get().getValue());
+			instance.setArticleprocessingcharge(apc);
+		}
 
 	}
 
