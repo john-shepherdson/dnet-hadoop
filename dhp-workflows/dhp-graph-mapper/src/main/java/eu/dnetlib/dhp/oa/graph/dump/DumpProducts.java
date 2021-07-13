@@ -89,7 +89,7 @@ public class DumpProducts implements Serializable {
 					return c.getId();
 				}
 				if (c.getId().contains("::") && communities.contains(c.getId().substring(0, c.getId().indexOf("::")))) {
-					return c.getId().substring(0, 3);
+					return c.getId().substring(0, c.getId().indexOf("::"));
 				}
 				return null;
 			}).filter(Objects::nonNull).collect(Collectors.toList());
