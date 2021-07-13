@@ -13,15 +13,26 @@
             <value>100</value>
             <description>The request block size</description>
         </property>
+        <property>
+            <name>exportLinks</name>
+            <value>false</value>
+            <description>instructs the transformation phase to produce the links or not</description>
+        </property>
 
     </parameters>
 
-    <start to="TransformJob"/>
+    <start to="resume_from"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+    <decision name="resume_from">
+        <switch>
+            <case to="TransformDatacite">${wf:conf('resumeFrom') eq 'TransformDatacite'}</case>
+            <default to="ImportDatacite"/>
+        </switch>
+    </decision>
 
     <action name="ImportDatacite">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -49,8 +60,7 @@
         <error to="Kill"/>
     </action>
 
-
-    <action name="TransformJob">
+    <action name="TransformDatacite">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
@@ -70,7 +80,7 @@
             <arg>--sourcePath</arg><arg>${mainPath}/datacite_dump</arg>
             <arg>--targetPath</arg><arg>${mainPath}/datacite_oaf</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--exportLinks</arg><arg>true</arg>
+            <arg>--exportLinks</arg><arg>${exportLinks}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="End"/>
