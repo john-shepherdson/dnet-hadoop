@@ -12,12 +12,7 @@
     "paramDescription": "The id of the concept record for a new version",
     "paramRequired": false
   },
-  {
-    "paramName":"cmp",
-    "paramLongName":"communityMapPath",
-    "paramDescription": "the path to the serialization of the community map",
-    "paramRequired": false
-  },
+
   {
     "paramName":"di",
     "paramLongName":"depositionId",
