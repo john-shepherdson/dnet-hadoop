@@ -106,8 +106,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${inputPathCrossref}/crossref_ds</arg>
-            <arg>--targetPath</arg><ar
-                g>${workingPath}</arg>
+            <arg>--targetPath</arg><arg>${workingPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="ProcessMAG"/>
@@ -195,8 +194,7 @@
     </action>
 
     <!-- INTERSECTION SECTION-->
-    <actio
-            n name="CreateDOIBoost">
+    <action name="CreateDOIBoost">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
