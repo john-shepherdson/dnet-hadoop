@@ -50,7 +50,7 @@ object SparkPreprocessORCID {
 
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkConvertORCIDToOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_orcid_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkConvertORCIDToOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/preprocess_orcid_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession

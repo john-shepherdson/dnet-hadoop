@@ -1,22 +1,15 @@
 package eu.dnetlib.doiboost.mag
 
-import java.sql.Timestamp
-
-import eu.dnetlib.dhp.schema.oaf.Publication
-import org.apache.htrace.fasterxml.jackson.databind.SerializationFeature
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.api.java.function.MapFunction
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
-import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
-import org.junit.jupiter.api.Test
-import org.slf4j.{Logger, LoggerFactory}
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.{Dataset, SparkSession}
+import org.codehaus.jackson.map.ObjectMapper
 import org.junit.jupiter.api.Assertions._
-import org.apache.spark.sql.functions._
+import org.junit.jupiter.api.Test
+import org.json4s.DefaultFormats
+import org.slf4j.{Logger, LoggerFactory}
 
-import scala.collection.JavaConverters._
+import java.sql.Timestamp
 import scala.io.Source
-import scala.reflect.ClassTag
-import scala.util.matching.Regex
 
 
 
@@ -65,14 +58,19 @@ class MAGMappingTest {
   @Test
   def normalizeDoiTest():Unit = {
 
-    import org.json4s.jackson.Serialization.write
-    import org.json4s.DefaultFormats
+
 
     implicit val formats = DefaultFormats
 
-    val conf = new SparkConf().setAppName("test").setMaster("local[2]")
-    val sc = new SparkContext(conf)
-    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val conf = new SparkConf()
+    conf.setMaster("local[*]")
+    conf.set("spark.driver.host", "localhost")
+    val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName(getClass.getSimpleName)
+        .config(conf)
+        .getOrCreate()
     val path = getClass.getResource("magPapers.json").getPath
 
     import org.apache.spark.sql.Encoders
@@ -90,14 +88,19 @@ class MAGMappingTest {
   @Test
   def normalizeDoiTest2():Unit = {
 
-    import org.json4s.jackson.Serialization.write
     import org.json4s.DefaultFormats
 
     implicit val formats = DefaultFormats
 
-    val conf = new SparkConf().setAppName("test").setMaster("local[2]")
-    val sc = new SparkContext(conf)
-    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val conf = new SparkConf()
+    conf.setMaster("local[*]")
+    conf.set("spark.driver.host", "localhost")
+    val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName(getClass.getSimpleName)
+        .config(conf)
+        .getOrCreate()
     val path = getClass.getResource("duplicatedMagPapers.json").getPath
 
     import org.apache.spark.sql.Encoders
