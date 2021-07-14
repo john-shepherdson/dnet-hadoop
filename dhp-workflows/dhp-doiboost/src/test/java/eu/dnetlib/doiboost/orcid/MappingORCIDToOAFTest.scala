@@ -46,7 +46,7 @@ class MappingORCIDToOAFTest {
     implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
     import spark.implicits._
 
-    SparkConvertORCIDToOAF.run( spark,sourcePath, workingPath, targetPath)
+    SparkPreprocessORCID.run( spark,sourcePath, workingPath)
 
     val mapper = new ObjectMapper()
 
