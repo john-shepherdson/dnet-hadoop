@@ -26,7 +26,7 @@ object UnpayWallToOAF {
 
 
   def get_unpaywall_color(input:String):Option[OpenAccessRoute] = {
-    if(input.equalsIgnoreCase("close"))
+    if(input == null || input.equalsIgnoreCase("close"))
       return None
     if(input.equalsIgnoreCase("green"))
       return Some(OpenAccessRoute.green)
