@@ -1,7 +1,11 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
@@ -16,13 +20,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.oa.graph.clean.CleaningFunctionTest;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +61,7 @@ public class MappersTest {
 
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
 
-		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Publication);
@@ -62,8 +74,8 @@ public class MappersTest {
 
 		assertValidId(p.getId());
 
-		assertTrue(p.getOriginalId().size() == 1);
-		assertEquals("10.3897/oneeco.2.e13718", p.getOriginalId().get(0));
+		assertEquals(1, p.getOriginalId().size());
+		assertTrue(p.getOriginalId().contains("10.3897/oneeco.2.e13718"));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
@@ -87,8 +99,8 @@ public class MappersTest {
 			.findFirst()
 			.get();
 		assertEquals("0000-0001-6651-1178", pid.getValue());
-		assertEquals("ORCID", pid.getQualifier().getClassid());
-		assertEquals("Open Researcher and Contributor ID", pid.getQualifier().getClassname());
+		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
+		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Votsi,Nefta", author.get().getFullname());
@@ -99,9 +111,7 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
 
-		assertTrue(p.getPid().size() > 0);
-		assertEquals(p.getPid().get(0).getValue(), "10.3897/oneeco.2.e13718");
-		assertEquals(p.getPid().get(0).getQualifier().getClassid(), "doi");
+		assertTrue(p.getPid().isEmpty());
 
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
@@ -113,6 +123,12 @@ public class MappersTest {
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
 		assertEquals("0001", p.getInstance().get(0).getRefereed().getClassid());
+		assertNotNull(p.getInstance().get(0).getPid());
+		assertTrue(p.getInstance().get(0).getPid().isEmpty());
+
+		assertTrue(!p.getInstance().get(0).getAlternateIdentifier().isEmpty());
+		assertEquals("doi", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
@@ -142,11 +158,83 @@ public class MappersTest {
 	}
 
 	@Test
+	void testPublication_PubMed() throws IOException {
+
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record_pubmed.xml"));
+
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Publication);
+
+		final Publication p = (Publication) list.get(0);
+
+		assertValidId(p.getId());
+
+		assertEquals(2, p.getOriginalId().size());
+		assertTrue(p.getOriginalId().contains("oai:pubmedcentral.nih.gov:1517292"));
+
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertFalse(p.getDataInfo().getInvisible());
+		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
+		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
+
+		assertTrue(p.getAuthor().size() > 0);
+		final Optional<Author> author = p
+			.getAuthor()
+			.stream()
+			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+			.findFirst();
+		assertTrue(author.isPresent());
+
+		final StructuredProperty pid = author
+			.get()
+			.getPid()
+			.stream()
+			.findFirst()
+			.get();
+		assertEquals("0000-0001-6651-1178", pid.getValue());
+		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
+		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
+		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
+		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
+		assertEquals("Votsi,Nefta", author.get().getFullname());
+		assertEquals("Votsi", author.get().getSurname());
+		assertEquals("Nefta", author.get().getName());
+
+		assertTrue(p.getSubject().size() > 0);
+		assertTrue(p.getPid().size() > 0);
+		assertEquals(p.getPid().get(0).getValue(), "PMC1517292");
+		assertEquals(p.getPid().get(0).getQualifier().getClassid(), "pmc");
+
+		assertNotNull(p.getInstance());
+		assertTrue(p.getInstance().size() > 0);
+		p
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("OPEN", i.getAccessright().getClassid());
+			});
+		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+		assertNotNull(p.getInstance().get(0).getPid());
+		assertTrue(p.getInstance().get(0).getPid().size() == 2);
+
+		assertTrue(p.getInstance().get(0).getAlternateIdentifier().size() == 1);
+		assertEquals("doi", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
+
+		assertNotNull(p.getBestaccessright());
+		assertEquals("OPEN", p.getBestaccessright().getClassid());
+	}
+
+	@Test
 	void testPublicationInvisible() throws IOException {
 
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
 
-		final List<Oaf> list = new OafToOafMapper(vocs, true).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
 
 		assertTrue(list.size() > 0);
 		assertTrue(list.get(0) instanceof Publication);
@@ -161,7 +249,7 @@ public class MappersTest {
 	void testDataset() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Dataset);
@@ -173,8 +261,8 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
-		assertTrue(d.getOriginalId().size() == 1);
-		assertEquals("oai:zenodo.org:3234526", d.getOriginalId().get(0));
+		assertEquals(1, d.getOriginalId().size());
+		assertTrue(d.getOriginalId().contains("oai:zenodo.org:3234526"));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
@@ -192,8 +280,8 @@ public class MappersTest {
 			.findFirst()
 			.get();
 		assertEquals("0000-0001-9074-1619", pid.getValue());
-		assertEquals("ORCID", pid.getQualifier().getClassid());
-		assertEquals("Open Researcher and Contributor ID", pid.getQualifier().getClassname());
+		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
+		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Baracchini, Theo", author.get().getFullname());
@@ -225,6 +313,11 @@ public class MappersTest {
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
 		assertEquals("0001", d.getInstance().get(0).getRefereed().getClassid());
+		assertNotNull(d.getInstance().get(0).getPid());
+		assertTrue(d.getInstance().get(0).getPid().isEmpty());
+
+		assertEquals("doi", d.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.5281/zenodo.3234526", d.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
 
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());
@@ -250,7 +343,7 @@ public class MappersTest {
 	void testOdfBielefeld() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_bielefeld.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof Publication);
@@ -295,7 +388,7 @@ public class MappersTest {
 	void testOpentrial() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_opentrial.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof Dataset);
@@ -328,7 +421,10 @@ public class MappersTest {
 		assertEquals(1, d.getTitle().size());
 		assertEquals(
 			"Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia",
-			d.getTitle().get(0).getValue());
+			d
+				.getTitle()
+				.get(0)
+				.getValue());
 
 		assertNotNull(d.getDescription());
 		assertEquals(1, d.getDescription().size());
@@ -343,12 +439,7 @@ public class MappersTest {
 		assertTrue(d.getAuthor().get(0).getPid().isEmpty());
 
 		assertNotNull(d.getPid());
-		assertEquals(1, d.getPid().size());
-		assertEquals("NCT02321059", d.getPid().get(0).getValue());
-		assertEquals("nct", d.getPid().get(0).getQualifier().getClassid());
-		assertEquals("ClinicalTrials.gov Identifier", d.getPid().get(0).getQualifier().getClassname());
-		assertEquals(ModelConstants.DNET_PID_TYPES, d.getPid().get(0).getQualifier().getSchemeid());
-		assertEquals(ModelConstants.DNET_PID_TYPES, d.getPid().get(0).getQualifier().getSchemename());
+		assertEquals(0, d.getPid().size());
 
 		assertNotNull(d.getPublisher());
 		assertEquals("nct", d.getPublisher().getValue());
@@ -359,7 +450,7 @@ public class MappersTest {
 		assertNotNull(d.getInstance());
 		assertTrue(d.getInstance().size() == 1);
 
-		Instance i = d.getInstance().get(0);
+		final Instance i = d.getInstance().get(0);
 
 		assertNotNull(i.getAccessright());
 		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemeid());
@@ -389,6 +480,17 @@ public class MappersTest {
 		assertNull(i.getProcessingchargeamount());
 		assertNull(i.getProcessingchargecurrency());
 
+		assertNotNull(i.getPid());
+		assertEquals(0, i.getPid().size());
+
+		assertNotNull(i.getAlternateIdentifier());
+		assertEquals(1, i.getAlternateIdentifier().size());
+		assertEquals("NCT02321059", i.getAlternateIdentifier().get(0).getValue());
+		assertEquals("nct", i.getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("ClinicalTrials.gov Identifier", i.getAlternateIdentifier().get(0).getQualifier().getClassname());
+		assertEquals(ModelConstants.DNET_PID_TYPES, i.getAlternateIdentifier().get(0).getQualifier().getSchemeid());
+		assertEquals(ModelConstants.DNET_PID_TYPES, i.getAlternateIdentifier().get(0).getQualifier().getSchemename());
+
 		assertNotNull(i.getUrl());
 		assertEquals(2, i.getUrl().size());
 		assertTrue(i.getUrl().contains("http://apps.who.int/trialsearch/Trial3.aspx?trialid=NCT02321059"));
@@ -401,7 +503,7 @@ public class MappersTest {
 	void testSoftware() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_software.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof Software);
@@ -420,7 +522,7 @@ public class MappersTest {
 	void testDataset_2() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset_2.xml"));
 
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -430,7 +532,7 @@ public class MappersTest {
 	@Test
 	void testClaimDedup() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_dedup.xml"));
-		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -440,7 +542,7 @@ public class MappersTest {
 	@Test
 	void testNakala() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_nakala.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -457,14 +559,18 @@ public class MappersTest {
 		assertEquals(1, d.getAuthor().size());
 		assertEquals(1, d.getSubject().size());
 		assertEquals(1, d.getInstance().size());
+		assertNotNull(d.getPid());
 		assertEquals(1, d.getPid().size());
+		assertTrue(PidType.isValid(d.getPid().get(0).getQualifier().getClassid()));
+		assertEquals(PidType.handle, PidType.valueOf(d.getPid().get(0).getQualifier().getClassid()));
+
 		assertNotNull(d.getInstance().get(0).getUrl());
 	}
 
 	@Test
 	void testClaimFromCrossref() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
-		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -475,13 +581,12 @@ public class MappersTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
-
 	}
 
 	@Test
 	void testODFRecord() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_record.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
@@ -495,7 +600,7 @@ public class MappersTest {
 	@Test
 	void testTextGrid() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("textgrid.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -507,8 +612,11 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertEquals(1, p.getAuthor().size());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
-		assertTrue(StringUtils.isNotBlank(p.getPid().get(0).getValue()));
-		assertTrue(StringUtils.isNotBlank(p.getPid().get(0).getQualifier().getClassid()));
+
+		assertTrue(p.getPid().size() == 1);
+		assertTrue(PidType.isValid(p.getPid().get(0).getQualifier().getClassid()));
+		assertTrue(PidType.handle.equals(PidType.valueOf(p.getPid().get(0).getQualifier().getClassid())));
+		assertEquals("hdl:11858/00-1734-0000-0003-EE73-2", p.getPid().get(0).getValue());
 		assertEquals("dataset", p.getResulttype().getClassname());
 		assertEquals(1, p.getInstance().size());
 		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
@@ -516,26 +624,17 @@ public class MappersTest {
 		assertValidId(p.getInstance().get(0).getHostedby().getKey());
 		assertEquals(
 			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+
+		assertEquals(1, p.getInstance().size());
+		assertNotNull(p.getInstance().get(0).getAlternateIdentifier());
+		assertEquals(0, p.getInstance().get(0).getAlternateIdentifier().size());
 		assertEquals(1, p.getInstance().get(0).getUrl().size());
-//		System.out.println(p.getInstance().get(0).getUrl().get(0));
-//		System.out.println(p.getInstance().get(0).getHostedby().getValue());
-		System.out.println(p.getPid().get(0).getValue());
-	}
-
-	@Test
-	void testTextGridNoAuthor() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("textgrid-noauthor.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
-
-		System.out.println("***************");
-		System.out.println(new ObjectMapper().writeValueAsString(list));
-		System.out.println("***************");
 	}
 
 	@Test
 	void testBologna() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf-bologna.xml"));
-		final List<Oaf> list = new OafToOafMapper(vocs, false).processMdRecord(xml);
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -550,34 +649,54 @@ public class MappersTest {
 	}
 
 	@Test
-	void testEUOpenDataPortal() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("eu_odp.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false).processMdRecord(xml);
+	void testOdfFromHdfs() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_from_hdfs.xml"));
 
-		System.out.println("***************");
-		System.out.println(new ObjectMapper().writeValueAsString(list));
-		System.out.println("***************");
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		assertEquals(1, list.size());
+
+		System.out.println(list.get(0).getClass());
+
+		assertTrue(list.get(0) instanceof Dataset);
+
 		final Dataset p = (Dataset) list.get(0);
+
 		assertValidId(p.getId());
+		assertTrue(p.getOriginalId().size() == 1);
+		assertEquals("df76e73f-0483-49a4-a9bb-63f2f985574a", p.getOriginalId().get(0));
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
-		assertEquals(0, p.getAuthor().size());
-		assertEquals(1, p.getPid().size());
-		assertEquals("OPEN", p.getBestaccessright().getClassid());
-		assertEquals("dataset", p.getResulttype().getClassname());
-		assertEquals(1, p.getInstance().size());
-		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
-		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
-		assertValidId(p.getInstance().get(0).getHostedby().getKey());
-		assertEquals(
-			"CC_BY_4_0", p.getInstance().get(0).getLicense().getValue());
-		assertEquals(1, p.getInstance().get(0).getUrl().size());
-		assertEquals(1, p.getInstance().size());
-		System.out.println(p.getInstance().get(0).getUrl().get(0));
-		System.out.println(p.getInstance().get(0).getHostedby().getValue());
+		assertTrue(p.getAuthor().size() > 0);
+
+		final Optional<Author> author = p
+			.getAuthor()
+			.stream()
+			.findFirst();
+		assertTrue(author.isPresent());
+
+		assertEquals("Museum Sønderjylland", author.get().getFullname());
+
+		assertTrue(p.getSubject().size() > 0);
+		assertTrue(p.getInstance().size() > 0);
+
+		assertNotNull(p.getTitle());
+		assertFalse(p.getTitle().isEmpty());
+
+		assertNotNull(p.getInstance());
+		assertTrue(p.getInstance().size() > 0);
+		p
+			.getInstance()
+			.stream()
+			.forEach(i -> {
+				assertNotNull(i.getAccessright());
+				assertEquals("UNKNOWN", i.getAccessright().getClassid());
+			});
+		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
 	}
 
 	private void assertValidId(final String id) {
+		System.out.println(id);
+
 		assertEquals(49, id.length());
 		assertEquals('|', id.charAt(2));
 		assertEquals(':', id.charAt(15));
@@ -586,12 +705,14 @@ public class MappersTest {
 
 	private List<String> vocs() throws IOException {
 		return IOUtils
-			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+			.readLines(
+				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
-			.readLines(CleaningFunctionTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+			.readLines(
+				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 
 }

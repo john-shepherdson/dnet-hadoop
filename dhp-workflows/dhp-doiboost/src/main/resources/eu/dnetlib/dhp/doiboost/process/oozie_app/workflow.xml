@@ -1,4 +1,4 @@
-<workflow-app name="Generate DOIBoost ActionSet" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Generate DOIBoost ActionSet for PROD" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sparkDriverMemory</name>
@@ -40,7 +40,7 @@
         </property>
 
         <!--    MAG Parameters    -->
-         <property>
+        <property>
             <name>inputPathMAG</name>
             <description>the MAG working path</description>
         </property>

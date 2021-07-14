@@ -4,9 +4,9 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Dataset => OafDataset}
 import org.apache.commons.io.IOUtils
-import org.apache.hadoop.io.{IntWritable, Text}
+
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
+
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -17,10 +17,11 @@ object SparkMapDumpIntoOAF {
 
   def main(args: Array[String]): Unit = {
 
+    implicit val mrEncoder: Encoder[CrossrefDT] = Encoders.kryo[CrossrefDT]
 
     val logger: Logger = LoggerFactory.getLogger(SparkMapDumpIntoOAF.getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkMapDumpIntoOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_crossref_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkMapDumpIntoOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_crossref_dump_to_oaf_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
@@ -35,7 +36,6 @@ object SparkMapDumpIntoOAF {
     implicit val mapEncoderDatasets: Encoder[oaf.Dataset] = Encoders.kryo[OafDataset]
 
     val targetPath = parser.get("targetPath")
-    import spark.implicits._
 
     spark.read.load(parser.get("sourcePath")).as[CrossrefDT]
       .flatMap(k => Crossref2Oaf.convert(k.json))

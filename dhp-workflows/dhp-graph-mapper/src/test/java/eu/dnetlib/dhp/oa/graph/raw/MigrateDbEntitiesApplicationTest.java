@@ -27,8 +27,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class MigrateDbEntitiesApplicationTest {
@@ -118,6 +119,10 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemeid());
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemename());
 		assertEquals(getValueAsString("collectedfromname", fields), o.getCollectedfrom().get(0).getValue());
+		List<String> alternativenames = getValueAsList("alternativenames", fields);
+		assertEquals(2, alternativenames.size());
+		assertTrue(alternativenames.contains("Pippo"));
+		assertTrue(alternativenames.contains("Foo"));
 	}
 
 	@Test
@@ -338,6 +343,10 @@ public class MigrateDbEntitiesApplicationTest {
 			.map(o -> (T) o)
 			.findFirst()
 			.get();
+	}
+
+	private List<String> getValueAsList(final String name, final List<TypedField> fields) {
+		return getValueAs(name, fields);
 	}
 }
 

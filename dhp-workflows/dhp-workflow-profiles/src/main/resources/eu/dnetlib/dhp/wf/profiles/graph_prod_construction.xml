@@ -44,6 +44,7 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setRawGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the RAW graph</DESCRIPTION>
                 <PARAMETERS>
@@ -54,31 +55,45 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
+            <NODE isStart="true" name="setFirstCleanedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the first CLEANED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">firstCleanedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/02_graph_first_cleaned</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+
             <NODE isStart="true" name="setDedupGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the DEDUPED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">dedupGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/02_graph_dedup</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/03_graph_dedup</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setInferredGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the INFERRED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">inferredGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/03_graph_inferred</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/04_graph_inferred</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+
             <NODE isStart="true" name="setConsistentGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the CONSISTENCY graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">consistentGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/04_graph_consistent</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/05_graph_consistent</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -89,7 +104,7 @@
                 <DESCRIPTION>Set the target path to store the ORCID enriched graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">orcidGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/05_graph_orcid</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/06_graph_orcid</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -100,7 +115,7 @@
                 <DESCRIPTION>Set the target path to store the BULK TAGGED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">bulkTaggingGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/06_graph_bulktagging</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/07_graph_bulktagging</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -111,7 +126,7 @@
                 <DESCRIPTION>Set the target path to store the AFFILIATION from INSTITUTIONAL REPOS graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">affiliationGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/07_graph_affiliation</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/08_graph_affiliation</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -122,7 +137,7 @@
                 <DESCRIPTION>Set the target path to store the COMMUNITY from SELECTED SOURCES graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">communityOrganizationGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/08_graph_comunity_organization</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/09_graph_comunity_organization</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -133,7 +148,7 @@
                 <DESCRIPTION>Set the target path to store the FUNDING from SEMANTIC RELATION graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">fundingGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/09_graph_funding</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/10_graph_funding</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -144,7 +159,7 @@
                 <DESCRIPTION>Set the target path to store the COMMUNITY from SEMANTIC RELATION graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">communitySemRelGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/10_graph_comunity_sem_rel</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/11_graph_comunity_sem_rel</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -155,7 +170,7 @@
                 <DESCRIPTION>Set the target path to store the COUNTRY enriched graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">countryGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/11_graph_country</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/12_graph_country</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -166,7 +181,7 @@
                 <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/12_graph_cleaned</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/13_graph_cleaned</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -177,7 +192,7 @@
                 <DESCRIPTION>Set the target path to store the blacklisted graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">blacklistedGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/13_graph_blacklisted</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_provision/graph/14_graph_blacklisted</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -325,6 +340,31 @@
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
                 </PARAMETERS>
                 <ARCS>
+                    <ARC to="graphCleaningFirst"/>
+                </ARCS>
+            </NODE>
+
+            <NODE name="graphCleaningFirst" type="SubmitHadoopJob">
+                <DESCRIPTION>clean the properties in the graph typed as Qualifier according to the vocabulary indicated in schemeid</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphInputPath' : 'rawGraphPath',
+                        'graphOutputPath': 'firstCleanedGraphPath',
+                        'isLookupUrl': 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/oa/graph/clean/oozie_app',
+                        'workingPath' : '/tmp/beta_provision/working_dir/first_clean'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
                     <ARC to="duplicateScan"/>
                 </ARCS>
             </NODE>
@@ -337,7 +377,7 @@
                     <PARAM managedBy="system" name="envParams" required="true" type="string">
                         {
                         'actionSetId' : 'dedupConfig',
-                        'graphBasePath' : 'rawGraphPath',
+                        'graphBasePath' : 'firstCleanedGraphPath',
                         'dedupGraphPath': 'dedupGraphPath',
                         'isLookUpUrl' : 'isLookUpUrl'
                         }

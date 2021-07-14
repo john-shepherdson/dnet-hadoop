@@ -301,7 +301,7 @@
       },
       "trust": "0.9"
     },
-    "value": "2016-01-01"
+    "value": "7 oct 1970"
   },
   "dateofcollection": "",
   "dateoftransformation": "2020-04-22T12:34:08.009Z",
@@ -318,6 +318,50 @@
   "id": "50|CSC_________::2250a70c903c6ac6e4c01438259e9375",
   "instance": [
     {
+      "pid": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1008/abcd"
+        }
+      ],
+      "alternateIdentifier": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1009/qwerty"
+        }
+      ],
       "accessright": {
         "classid": "CLOSED",
         "classname": "CLOSED",
@@ -821,6 +865,28 @@
         "schemename": "dnet:dataCite_title"
       },
       "value": "Optical response of strained- and unstrained-silicon cold-electron bolometers"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "test test 123 test"
     }
   ]
 }

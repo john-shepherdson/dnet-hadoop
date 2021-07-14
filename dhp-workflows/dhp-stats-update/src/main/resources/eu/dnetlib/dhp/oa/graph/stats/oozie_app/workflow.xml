@@ -26,6 +26,14 @@
             <description>the name of the shadow monitor db</description>
         </property>
         <property>
+            <name>observatory_db_name</name>
+            <description>the target monitor db name</description>
+        </property>
+        <property>
+            <name>observatory_db_shadow_name</name>
+            <description>the name of the shadow monitor db</description>
+        </property>
+        <property>
             <name>stats_tool_api_url</name>
             <description>The url of the API of the stats tool. Is used to trigger the cache update.</description>
         </property>
@@ -264,6 +272,19 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
+        <ok to="Step16_7-createIndicatorsTables"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step16_7-createIndicatorsTables">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>indicators.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${wf:appPath()}/scripts/step16_7-createIndicatorsTables.sql</argument>
+            <file>indicators.sh</file>
+        </shell>
         <ok to="Step17"/>
         <error to="Kill"/>
     </action>
@@ -305,11 +326,26 @@
             <argument>${wf:appPath()}/scripts/step20-createMonitorDB.sql</argument>
             <file>monitor.sh</file>
         </shell>
-        <ok to="Step21"/>
+        <ok to="step21-createObservatoryDB"/>
         <error to="Kill"/>
     </action>
 
-    <action name="Step21">
+    <action name="step21-createObservatoryDB">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>observatory.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${observatory_db_name}</argument>
+            <argument>${observatory_db_shadow_name}</argument>
+            <argument>${wf:appPath()}/scripts/step21-createObservatoryDB.sql</argument>
+            <file>observatory.sh</file>
+        </shell>
+        <ok to="Step22"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step22">
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>

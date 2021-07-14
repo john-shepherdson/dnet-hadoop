@@ -50,7 +50,7 @@ public class SparkGenEnrichedOrcidWorks {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -185,7 +185,7 @@ public class SparkGenEnrichedOrcidWorks {
 				oafPublicationRDD
 					.mapToPair(
 						p -> new Tuple2<>(p.getClass().toString(),
-							OBJECT_MAPPER.writeValueAsString(new AtomicAction<>(Publication.class, (Publication) p))))
+							OBJECT_MAPPER.writeValueAsString(new AtomicAction<>(Publication.class, p))))
 					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
 					.saveAsNewAPIHadoopFile(
 						workingPath.concat(outputEnrichedWorksPath),

@@ -50,7 +50,7 @@ public class OrcidNoDoiTest {
 		}
 		WorkDetail workData = null;
 		try {
-			workData = p.VTDParseWorkData(xml.getBytes());
+			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
 			logger.error("parsing xml", e);
 		}
@@ -107,7 +107,7 @@ public class OrcidNoDoiTest {
 		}
 		WorkDetail workData = null;
 		try {
-			workData = p.VTDParseWorkData(xml.getBytes());
+			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
 			logger.error("parsing xml", e);
 		}
@@ -138,7 +138,7 @@ public class OrcidNoDoiTest {
 		}
 		WorkDetail workData = null;
 		try {
-			workData = p.VTDParseWorkData(xml.getBytes());
+			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
 			logger.error("parsing xml", e);
 		}
@@ -181,7 +181,7 @@ public class OrcidNoDoiTest {
 		}
 		WorkDetail workData = null;
 		try {
-			workData = p.VTDParseWorkData(xml.getBytes());
+			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
 			logger.error("parsing xml", e);
 		}
@@ -217,16 +217,16 @@ public class OrcidNoDoiTest {
 			.stream()
 			.filter(c -> !StringUtils.isBlank(c.getCreditName()))
 			.forEach(c -> {
-				if (am.simpleMatch(c.getCreditName(), author.getName()) ||
-					am.simpleMatch(c.getCreditName(), author.getSurname()) ||
-					am.simpleMatchOnOtherNames(c.getCreditName(), author.getOtherNames())) {
+				if (AuthorMatcher.simpleMatch(c.getCreditName(), author.getName()) ||
+					AuthorMatcher.simpleMatch(c.getCreditName(), author.getSurname()) ||
+					AuthorMatcher.simpleMatchOnOtherNames(c.getCreditName(), author.getOtherNames())) {
 					matchCounters.set(0, matchCounters.get(0) + 1);
 					c.setSimpleMatch(true);
 				}
 			});
 
 		assertTrue(matchCounters.get(0) == 1);
-		am.updateAuthorsSimpleMatch(contributors, author);
+		AuthorMatcher.updateAuthorsSimpleMatch(contributors, author);
 		assertTrue(contributors.get(0).getName().equals("Joe"));
 		assertTrue(contributors.get(0).getSurname().equals("Dodge"));
 		assertTrue(contributors.get(0).getCreditName().equals("Joe Dodge"));
@@ -249,9 +249,9 @@ public class OrcidNoDoiTest {
 			.stream()
 			.filter(c -> !StringUtils.isBlank(c.getCreditName()))
 			.forEach(c -> {
-				if (am.simpleMatch(c.getCreditName(), authorX.getName()) ||
-					am.simpleMatch(c.getCreditName(), authorX.getSurname()) ||
-					am.simpleMatchOnOtherNames(c.getCreditName(), author.getOtherNames())) {
+				if (AuthorMatcher.simpleMatch(c.getCreditName(), authorX.getName()) ||
+					AuthorMatcher.simpleMatch(c.getCreditName(), authorX.getSurname()) ||
+					AuthorMatcher.simpleMatchOnOtherNames(c.getCreditName(), author.getOtherNames())) {
 					int currentCounter = matchCounters2.get(0);
 					currentCounter += 1;
 					matchCounters2.set(0, currentCounter);
@@ -268,7 +268,7 @@ public class OrcidNoDoiTest {
 			.filter(c -> c.isSimpleMatch())
 			.filter(c -> !StringUtils.isBlank(c.getCreditName()))
 			.map(c -> {
-				c.setScore(am.bestMatch(authorX.getName(), authorX.getSurname(), c.getCreditName()));
+				c.setScore(AuthorMatcher.bestMatch(authorX.getName(), authorX.getSurname(), c.getCreditName()));
 				return c;
 			})
 			.filter(c -> c.getScore() >= AuthorMatcher.threshold)
@@ -280,7 +280,7 @@ public class OrcidNoDoiTest {
 		assertTrue(bestMatchContributor.getCreditName().equals("Abdel-Dayem Khai"));
 		assertTrue(contributorList.get(0).isBestMatch());
 		assertTrue(!contributorList.get(1).isBestMatch());
-		am.updateAuthorsSimilarityMatch(contributorList, authorX);
+		AuthorMatcher.updateAuthorsSimilarityMatch(contributorList, authorX);
 		assertTrue(contributorList.get(0).getName().equals(nameA));
 		assertTrue(contributorList.get(0).getSurname().equals(surnameA));
 		assertTrue(contributorList.get(0).getCreditName().equals("Abdel-Dayem Khai"));
@@ -310,7 +310,7 @@ public class OrcidNoDoiTest {
 		}
 		WorkDetail workData = null;
 		try {
-			workData = p.VTDParseWorkData(xml.getBytes());
+			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
 		} catch (Exception e) {
 			logger.error("parsing xml", e);
 		}
@@ -331,8 +331,8 @@ public class OrcidNoDoiTest {
 		author.setName("Joe");
 		author.setSurname("Dodge");
 		author.setOid("0000-1111-2222-3333");
-		String otherName1 = new String("Joe Dr. Dodge");
-		String otherName2 = new String("XY");
+		String otherName1 = "Joe Dr. Dodge";
+		String otherName2 = "XY";
 		List<String> others = Lists.newArrayList();
 		others.add(otherName1);
 		others.add(otherName2);

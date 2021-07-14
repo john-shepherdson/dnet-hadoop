@@ -1,4 +1,4 @@
-<workflow-app name="preprocess DOIBoost ActionSet" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Generate DOIBoost ActionSet" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sparkDriverMemory</name>
@@ -9,31 +9,20 @@
             <description>memory for individual executor</description>
         </property>
         <property>
-            <name>sparkExecutorIntersectionMemory</name>
-            <description>memory for individual executor</description>
-        </property>
-
-        <property>
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
+
         <!-- Crossref Parameters -->
         <property>
             <name>inputPathCrossref</name>
             <description>the Crossref input path</description>
         </property>
         <property>
-            <name>crossrefTimestamp</name>
-            <description>Timestamp for the Crossref incremental Harvesting</description>
+            <name>crossrefDumpPath</name>
+            <description>the Crossref dump path</description>
         </property>
-        <property>
-            <name>esServer</name>
-            <description>elasticsearch server url for the Crossref Harvesting</description>
-        </property>
-        <property>
-            <name>esIndex</name>
-            <description>elasticsearch index name for the Crossref Harvesting</description>
-        </property>
+
         <!--    MAG Parameters    -->
         <property>
             <name>MAGDumpPath</name>
@@ -44,6 +33,8 @@
             <name>inputPathMAG</name>
             <description>the MAG working path</description>
         </property>
+
+
         <!--    ORCID Parameters    -->
         <property>
             <name>inputPathOrcid</name>
@@ -68,7 +59,18 @@
         </configuration>
     </global>
 
-    <start to="ImportCrossRef"/>
+    <start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="UnpackCrossrefEntries">${wf:conf('resumeFrom') eq 'UnpackCrossrefEntries'}</case>
+            <case to="GenerateCrossrefDataset">${wf:conf('resumeFrom') eq 'GenerateCrossrefDataset'}</case>
+            <case to="ResetMagWorkingPath">${wf:conf('resumeFrom') eq 'ResetMagWorkingPath'}</case>
+            <case to="ConvertMagToDataset">${wf:conf('resumeFrom') eq 'ConvertMagToDataset'}</case>
+            <case to="PreProcessORCID">${wf:conf('resumeFrom') eq 'PreProcessORCID'}</case>
+            <default to="ImportCrossRef"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -76,26 +78,24 @@
 
     <action name="ImportCrossRef">
         <java>
-            <main-class>eu.dnetlib.doiboost.crossref.CrossrefImporter</main-class>
-            <arg>--targetPath</arg><arg>${inputPathCrossref}/index_update</arg>
-            <arg>--namenode</arg><arg>${nameNode}</arg>
-            <arg>--esServer</arg><arg>${esServer}</arg>
-            <arg>--esIndex</arg><arg>${esIndex}</arg>
-            <arg>--timestamp</arg><arg>${crossrefTimestamp}</arg>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.doiboost.crossref.ExtractCrossrefRecords</main-class>
+            <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
+            <arg>--crossrefFileNameTarGz</arg><arg>${crossrefDumpPath}/crossref.tar.gz</arg>
+            <arg>--workingPath</arg><arg>${crossrefDumpPath}</arg>
+            <arg>--outputPath</arg><arg>${crossrefDumpPath}/files/</arg>
         </java>
-        <ok to="GenerateCrossrefDataset"/>
+        <ok to="UnpackCrossrefEntries"/>
         <error to="Kill"/>
     </action>
 
-
-    <!-- CROSSREF SECTION -->
-
-    <action name="GenerateCrossrefDataset">
+    <action name="UnpackCrossrefEntries">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>GenerateCrossrefDataset</name>
-            <class>eu.dnetlib.doiboost.crossref.CrossrefDataset</class>
+            <name>SparkUnpackCrossrefEntries</name>
+            <class>eu.dnetlib.doiboost.crossref.UnpackCrtossrefEntries</class>
             <jar>dhp-doiboost-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -107,24 +107,49 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--workingPath</arg><arg>${inputPathCrossref}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${crossrefDumpPath}/files</arg>
+            <arg>--targetPath</arg><arg>${crossrefDumpPath}/crossref_unpack/</arg>
+
         </spark>
-        <ok to="RenameDataset"/>
+        <ok to="GenerateCrossrefDataset"/>
         <error to="Kill"/>
     </action>
 
-    <action name="RenameDataset">
-        <fs>
-            <delete path="${inputPathCrossref}/crossref_ds"/>
-            <move source="${inputPathCrossref}/crossref_ds_updated"
-                  target="${inputPathCrossref}/crossref_ds"/>
-        </fs>
-        <ok to="ResetMagWorkingPath"/>
+    <action name="GenerateCrossrefDataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>SparkGenerateCrossrefDataset</name>
+            <class>eu.dnetlib.doiboost.crossref.GenerateCrossrefDataset</class>
+            <jar>dhp-doiboost-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=7G
+                --executor-cores=2
+                --driver-memory=7G
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+            <arg>--sourcePath</arg><arg>${crossrefDumpPath}/crossref_unpack/</arg>
+            <arg>--targetPath</arg><arg>${inputPathCrossref}/crossref_ds</arg>
+
+        </spark>
+        <ok to="removeFiles"/>
         <error to="Kill"/>
     </action>
 
-
+        <action name="removeFiles">
+            <fs>
+<!--                <delete path="${crossrefDumpPath}/files"/>-->
+                    <delete path="${crossrefDumpPath}/crossref_unpack/"/>
+            </fs>
+            <ok to="ResetMagWorkingPath"/>
+            <error to="Kill"/>
+        </action>
 
     <!-- MAG SECTION -->
     <action name="ResetMagWorkingPath">
@@ -157,14 +182,12 @@
             <arg>--targetPath</arg><arg>${inputPathMAG}/dataset</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
-        <ok to="PreprocessORCID"/>
+        <ok to="PreProcessORCID"/>
         <error to="Kill"/>
     </action>
 
-
-
     <!--  ORCID  SECTION -->
-    <action name="PreprocessORCID">
+    <action name="PreProcessORCID">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
@@ -188,7 +211,6 @@
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
 
     <end name="End"/>
 </workflow-app>

@@ -51,7 +51,7 @@ public class GraphHiveImporterJobTest {
 		conf
 			.set(
 				"javax.jdo.option.ConnectionURL",
-				String.format(JDBC_DERBY_TEMPLATE, workingDir.resolve("warehouse").toString()));
+				String.format(JDBC_DERBY_TEMPLATE, workingDir.resolve("warehouse")));
 
 		spark = SparkSession
 			.builder()

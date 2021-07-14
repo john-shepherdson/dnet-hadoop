@@ -43,7 +43,7 @@ public class XMLRecordParserNoDoi {
 	private static final String NS_ERROR = "error";
 
 	public static WorkDetail VTDParseWorkData(byte[] bytes)
-		throws VtdException, EncodingException, EOFException, EntityException, ParseException, XPathParseException,
+		throws VtdException, ParseException, XPathParseException,
 		NavException, XPathEvalException {
 		final VTDGen vg = new VTDGen();
 		vg.setDoc(bytes);

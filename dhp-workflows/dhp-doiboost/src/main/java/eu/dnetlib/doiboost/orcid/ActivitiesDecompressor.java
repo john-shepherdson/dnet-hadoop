@@ -113,7 +113,7 @@ public class ActivitiesDecompressor {
 								}
 
 							} else {
-								Log.warn("Data not retrievable [" + entry.getName() + "] " + buffer.toString());
+								Log.warn("Data not retrievable [" + entry.getName() + "] " + buffer);
 								xmlParserErrorFound += 1;
 							}
 						}

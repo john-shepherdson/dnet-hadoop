@@ -5,12 +5,12 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -68,6 +68,12 @@ public class PromoteActionPayloadForGraphTableJob {
 		MergeAndGet.Strategy strategy = MergeAndGet.Strategy.valueOf(parser.get("mergeAndGetStrategy").toUpperCase());
 		logger.info("strategy: {}", strategy);
 
+		Boolean shouldGroupById = Optional
+			.ofNullable(parser.get("shouldGroupById"))
+			.map(Boolean::valueOf)
+			.orElse(true);
+		logger.info("shouldGroupById: {}", shouldGroupById);
+
 		Class<? extends Oaf> rowClazz = (Class<? extends Oaf>) Class.forName(graphTableClassName);
 		Class<? extends Oaf> actionPayloadClazz = (Class<? extends Oaf>) Class.forName(actionPayloadClassName);
 
@@ -89,7 +95,8 @@ public class PromoteActionPayloadForGraphTableJob {
 					outputGraphTablePath,
 					strategy,
 					rowClazz,
-					actionPayloadClazz);
+					actionPayloadClazz,
+					shouldGroupById);
 			});
 	}
 
@@ -115,12 +122,12 @@ public class PromoteActionPayloadForGraphTableJob {
 		String outputGraphTablePath,
 		MergeAndGet.Strategy strategy,
 		Class<G> rowClazz,
-		Class<A> actionPayloadClazz) {
+		Class<A> actionPayloadClazz, Boolean shouldGroupById) {
 		Dataset<G> rowDS = readGraphTable(spark, inputGraphTablePath, rowClazz);
 		Dataset<A> actionPayloadDS = readActionPayload(spark, inputActionPayloadPath, actionPayloadClazz);
 
 		Dataset<G> result = promoteActionPayloadForGraphTable(
-			rowDS, actionPayloadDS, strategy, rowClazz, actionPayloadClazz)
+			rowDS, actionPayloadDS, strategy, rowClazz, actionPayloadClazz, shouldGroupById)
 				.map((MapFunction<G, G>) value -> value, Encoders.bean(rowClazz));
 
 		saveGraphTable(result, outputGraphTablePath);
@@ -153,9 +160,9 @@ public class PromoteActionPayloadForGraphTableJob {
 
 	private static String extractPayload(Row value) {
 		try {
-			return value.<String> getAs("payload");
+			return value.getAs("payload");
 		} catch (IllegalArgumentException | ClassCastException e) {
-			logger.error("cannot extract payload from action: {}", value.toString());
+			logger.error("cannot extract payload from action: {}", value);
 			throw e;
 		}
 	}
@@ -174,7 +181,8 @@ public class PromoteActionPayloadForGraphTableJob {
 		Dataset<A> actionPayloadDS,
 		MergeAndGet.Strategy strategy,
 		Class<G> rowClazz,
-		Class<A> actionPayloadClazz) {
+		Class<A> actionPayloadClazz,
+		Boolean shouldGroupById) {
 		logger
 			.info(
 				"Promoting action payload for graph table: payload={}, table={}",
@@ -186,7 +194,7 @@ public class PromoteActionPayloadForGraphTableJob {
 		SerializableSupplier<BiFunction<G, A, G>> mergeRowWithActionPayloadAndGetFn = MergeAndGet.functionFor(strategy);
 		SerializableSupplier<BiFunction<G, G, G>> mergeRowsAndGetFn = MergeAndGet.functionFor(strategy);
 		SerializableSupplier<G> zeroFn = zeroFn(rowClazz);
-		SerializableSupplier<Function<G, Boolean>> isNotZeroFn = PromoteActionPayloadForGraphTableJob::isNotZeroFnUsingIdOrSource;
+		SerializableSupplier<Function<G, Boolean>> isNotZeroFn = PromoteActionPayloadForGraphTableJob::isNotZeroFnUsingIdOrSourceAndTarget;
 
 		Dataset<G> joinedAndMerged = PromoteActionPayloadFunctions
 			.joinGraphTableWithActionPayloadAndMerge(
@@ -198,9 +206,13 @@ public class PromoteActionPayloadForGraphTableJob {
 				rowClazz,
 				actionPayloadClazz);
 
-		return PromoteActionPayloadFunctions
-			.groupGraphTableByIdAndMerge(
-				joinedAndMerged, rowIdFn, mergeRowsAndGetFn, zeroFn, isNotZeroFn, rowClazz);
+		if (shouldGroupById) {
+			return PromoteActionPayloadFunctions
+				.groupGraphTableByIdAndMerge(
+					joinedAndMerged, rowIdFn, mergeRowsAndGetFn, zeroFn, isNotZeroFn, rowClazz);
+		} else {
+			return joinedAndMerged;
+		}
 	}
 
 	private static <T extends Oaf> SerializableSupplier<T> zeroFn(Class<T> clazz) {
@@ -226,12 +238,13 @@ public class PromoteActionPayloadForGraphTableJob {
 		}
 	}
 
-	private static <T extends Oaf> Function<T, Boolean> isNotZeroFnUsingIdOrSource() {
+	private static <T extends Oaf> Function<T, Boolean> isNotZeroFnUsingIdOrSourceAndTarget() {
 		return t -> {
 			if (isSubClass(t, Relation.class)) {
-				return Objects.nonNull(((Relation) t).getSource());
+				final Relation rel = (Relation) t;
+				return StringUtils.isNotBlank(rel.getSource()) && StringUtils.isNotBlank(rel.getTarget());
 			}
-			return Objects.nonNull(((OafEntity) t).getId());
+			return StringUtils.isNotBlank(((OafEntity) t).getId());
 		};
 	}
 

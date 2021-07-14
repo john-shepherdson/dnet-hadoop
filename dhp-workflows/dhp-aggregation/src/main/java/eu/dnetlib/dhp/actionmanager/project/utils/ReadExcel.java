@@ -14,19 +14,18 @@ import org.apache.hadoop.fs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.httpconnector.HttpConnector;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.collection.HttpConnector2;
 
 /**
  * Applies the parsing of an excel file and writes the Serialization of it in hdfs
  */
-
 public class ReadExcel implements Closeable {
 	private static final Log log = LogFactory.getLog(ReadCSV.class);
 	private final Configuration conf;
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private InputStream excelFile;
+	private final InputStream excelFile;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -73,7 +72,7 @@ public class ReadExcel implements Closeable {
 		throws Exception {
 		this.conf = new Configuration();
 		this.conf.set("fs.defaultFS", hdfsNameNode);
-		HttpConnector httpConnector = new HttpConnector();
+		HttpConnector2 httpConnector = new HttpConnector2();
 		FileSystem fileSystem = FileSystem.get(this.conf);
 		Path hdfsWritePath = new Path(hdfsPath);
 		FSDataOutputStream fsDataOutputStream = null;
@@ -84,7 +83,6 @@ public class ReadExcel implements Closeable {
 
 		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
 		this.excelFile = httpConnector.getInputSourceAsStream(fileURL);
-		;
 	}
 
 	protected void write(final Object p) {

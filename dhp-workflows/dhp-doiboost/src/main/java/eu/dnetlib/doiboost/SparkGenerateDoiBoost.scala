@@ -160,17 +160,17 @@ object SparkGenerateDoiBoost {
       val r:Relation = new Relation
       r.setSource(pub.getId)
       r.setTarget(affId)
-      r.setRelType("resultOrganization")
-      r.setRelClass("hasAuthorInstitution")
-      r.setSubRelType("affiliation")
+      r.setRelType(ModelConstants.RESULT_ORGANIZATION)
+      r.setRelClass(ModelConstants.HAS_AUTHOR_INSTITUTION)
+      r.setSubRelType(ModelConstants.AFFILIATION)
       r.setDataInfo(pub.getDataInfo)
       r.setCollectedfrom(List(DoiBoostMappingUtil.createMAGCollectedFrom()).asJava)
       val r1:Relation = new Relation
       r1.setTarget(pub.getId)
       r1.setSource(affId)
-      r1.setRelType("resultOrganization")
-      r1.setRelClass("isAuthorInstitutionOf")
-      r1.setSubRelType("affiliation")
+      r1.setRelType(ModelConstants.RESULT_ORGANIZATION)
+      r1.setRelClass(ModelConstants.IS_AUTHOR_INSTITUTION_OF)
+      r1.setSubRelType(ModelConstants.AFFILIATION)
       r1.setDataInfo(pub.getDataInfo)
       r1.setCollectedfrom(List(DoiBoostMappingUtil.createMAGCollectedFrom()).asJava)
       List(r, r1)
@@ -195,6 +195,6 @@ object SparkGenerateDoiBoost {
       else
         null
     }).filter(o=> o!=null).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostOrganization")
-  }
+    }
 
 }

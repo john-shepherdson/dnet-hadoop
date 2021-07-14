@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -12,8 +11,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -27,9 +24,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
@@ -39,6 +37,22 @@ public class GenerateEntitiesApplication {
 	private static final Logger log = LoggerFactory.getLogger(GenerateEntitiesApplication.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	/**
+	 * Operation mode
+	 */
+	enum Mode {
+
+		/**
+		 * Groups all the objects by id to merge them
+		 */
+		claim,
+
+		/**
+		 * Default mode
+		 */
+		graph
+	}
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -64,13 +78,25 @@ public class GenerateEntitiesApplication {
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
+		final boolean shouldHashId = Optional
+			.ofNullable(parser.get("shouldHashId"))
+			.map(Boolean::valueOf)
+			.orElse(true);
+		log.info("shouldHashId: {}", shouldHashId);
+
+		final Mode mode = Optional
+			.ofNullable(parser.get("mode"))
+			.map(Mode::valueOf)
+			.orElse(Mode.graph);
+		log.info("mode: {}", mode);
+
 		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
 		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);
 
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			HdfsSupport.remove(targetPath, spark.sparkContext().hadoopConfiguration());
-			generateEntities(spark, vocs, sourcePaths, targetPath);
+			generateEntities(spark, vocs, sourcePaths, targetPath, shouldHashId, mode);
 		});
 	}
 
@@ -78,7 +104,9 @@ public class GenerateEntitiesApplication {
 		final SparkSession spark,
 		final VocabularyGroup vocs,
 		final String sourcePaths,
-		final String targetPath) {
+		final String targetPath,
+		final boolean shouldHashId,
+		final Mode mode) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		final List<String> existingSourcePaths = Arrays
@@ -97,15 +125,28 @@ public class GenerateEntitiesApplication {
 					sc
 						.sequenceFile(sp, Text.class, Text.class)
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
-						.map(k -> convertToListOaf(k._1(), k._2(), vocs))
+						.map(k -> convertToListOaf(k._1(), k._2(), shouldHashId, vocs))
 						.filter(Objects::nonNull)
 						.flatMap(list -> list.iterator()));
 		}
 
-		inputRdd
-			.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
-			.reduceByKey((o1, o2) -> OafMapperUtils.merge(o1, o2))
-			.map(Tuple2::_2)
+		switch (mode) {
+			case claim:
+				save(
+					inputRdd
+						.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
+						.reduceByKey((o1, o2) -> OafMapperUtils.merge(o1, o2))
+						.map(Tuple2::_2),
+					targetPath);
+				break;
+			case graph:
+				save(inputRdd, targetPath);
+				break;
+		}
+	}
+
+	private static void save(final JavaRDD<Oaf> rdd, final String targetPath) {
+		rdd
 			.map(
 				oaf -> oaf.getClass().getSimpleName().toLowerCase()
 					+ "|"
@@ -116,20 +157,21 @@ public class GenerateEntitiesApplication {
 	private static List<Oaf> convertToListOaf(
 		final String id,
 		final String s,
+		final boolean shouldHashId,
 		final VocabularyGroup vocs) {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
 			case "oaf-store-cleaned":
 			case "oaf-store-claim":
-				return new OafToOafMapper(vocs, false).processMdRecord(s);
+				return new OafToOafMapper(vocs, false, shouldHashId).processMdRecord(s);
 			case "odf-store-cleaned":
 			case "odf-store-claim":
-				return new OdfToOafMapper(vocs, false).processMdRecord(s);
+				return new OdfToOafMapper(vocs, false, shouldHashId).processMdRecord(s);
 			case "oaf-store-intersection":
-				return new OafToOafMapper(vocs, true).processMdRecord(s);
+				return new OafToOafMapper(vocs, true, shouldHashId).processMdRecord(s);
 			case "odf-store-intersection":
-				return new OdfToOafMapper(vocs, true).processMdRecord(s);
+				return new OdfToOafMapper(vocs, true, shouldHashId).processMdRecord(s);
 			case "datasource":
 				return Arrays.asList(convertFromJson(s, Datasource.class));
 			case "organization":

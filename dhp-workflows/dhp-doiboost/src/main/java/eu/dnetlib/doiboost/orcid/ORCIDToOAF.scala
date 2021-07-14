@@ -2,6 +2,7 @@ package eu.dnetlib.doiboost.orcid
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelConstants
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
 import eu.dnetlib.dhp.schema.orcid.{AuthorData, OrcidDOI}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
@@ -83,7 +84,7 @@ object ORCIDToOAF {
       JField("type", JString(typeValue)) <- extIds
       JField("value", JString(value)) <- extIds
       if "doi".equalsIgnoreCase(typeValue)
-    } yield (typeValue, value)
+    } yield (typeValue, DoiBoostMappingUtil.normalizeDoi(value))
     if (doi.nonEmpty) {
       return doi.map(l =>OrcidWork(oid, l._2))
     }
@@ -95,16 +96,18 @@ object ORCIDToOAF {
     lazy val json: json4s.JValue = parse(input)
 
     (json \"authorData" ).extractOrElse[OrcidAuthor](null)
-  }
+   }
 
 
   def convertTOOAF(input:ORCIDItem) :Publication = {
     val doi = input.doi
     val pub:Publication = new Publication
-    pub.setPid(List(createSP(doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+    pub.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
 
-    pub.setId(DoiBoostMappingUtil.generateIdentifier(pub, doi.toLowerCase))
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
+    if (pub.getId == null)
+      return null
 
     try{
 
@@ -125,15 +128,15 @@ object ORCIDToOAF {
 
   def generateOricPIDDatainfo():DataInfo = {
     val di =DoiBoostMappingUtil.generateDataInfo("0.91")
-    di.getProvenanceaction.setClassid("sysimport:crosswalk:entityregistry")
-    di.getProvenanceaction.setClassname("Harvested")
+    di.getProvenanceaction.setClassid(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)
+    di.getProvenanceaction.setClassname(ModelConstants.HARVESTED)
     di
   }
 
   def generateAuthor(o : OrcidAuthor): Author = {
     val a = new Author
     if (strValid(o.name)) {
-      a.setName(o.name.get.capitalize)
+    a.setName(o.name.get.capitalize)
     }
     if (strValid(o.surname)) {
       a.setSurname(o.surname.get.capitalize)

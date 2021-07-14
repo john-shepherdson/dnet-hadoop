@@ -29,7 +29,7 @@ public class CommunityConfigurationFactory {
 
 	private static final Log log = LogFactory.getLog(CommunityConfigurationFactory.class);
 
-	private static VerbResolver resolver = VerbResolverFactory.newInstance();
+	private static final VerbResolver resolver = VerbResolverFactory.newInstance();
 
 	public static CommunityConfiguration newInstance(final String xml) throws DocumentException {
 
@@ -51,7 +51,7 @@ public class CommunityConfigurationFactory {
 		}
 
 		log.info(String.format("loaded %s community configuration profiles", communities.size()));
-		log.debug(String.format("loaded community configuration:\n%s", communities.toString()));
+		log.debug(String.format("loaded community configuration:\n%s", communities));
 
 		return new CommunityConfiguration(communities);
 	}

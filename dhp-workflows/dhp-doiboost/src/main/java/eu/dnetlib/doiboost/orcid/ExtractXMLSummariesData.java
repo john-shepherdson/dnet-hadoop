@@ -17,13 +17,13 @@ public class ExtractXMLSummariesData extends OrcidDSManager {
 	private String outputAuthorsPath;
 	private String summariesFileNameTarGz;
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		ExtractXMLSummariesData extractXMLSummariesData = new ExtractXMLSummariesData();
 		extractXMLSummariesData.loadArgs(args);
 		extractXMLSummariesData.extractAuthors();
 	}
 
-	private void loadArgs(String[] args) throws IOException, Exception {
+	private void loadArgs(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

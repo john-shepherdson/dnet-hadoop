@@ -7,6 +7,7 @@
 		<artifactId>dhp</artifactId>
 		<version>1.2.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
+
 	</parent>
 
 	<artifactId>dhp-common</artifactId>
@@ -19,6 +20,10 @@
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.sisyphsu</groupId>
+			<artifactId>dateparser</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
@@ -52,11 +57,6 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.rabbitmq/amqp-client -->
-		<dependency>
-			<groupId>com.rabbitmq</groupId>
-			<artifactId>amqp-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
@@ -96,6 +96,16 @@
 		<dependency>
 			<groupId>eu.dnetlib</groupId>
 			<artifactId>dnet-pace-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
 		</dependency>
 
 		<dependency>

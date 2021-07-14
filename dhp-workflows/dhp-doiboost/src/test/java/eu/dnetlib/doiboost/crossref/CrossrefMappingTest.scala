@@ -60,6 +60,17 @@ class CrossrefMappingTest {
 
 
   @Test
+  def testSum() :Unit = {
+    val from:Long = 1613135645000L
+    val delta:Long = 1000000L
+
+
+    println(s"updating from value: $from  -> ${from+delta}")
+
+
+  }
+
+  @Test
   def testOrcidID() :Unit = {
     val json = Source.fromInputStream(getClass.getResourceAsStream("orcid_data.json")).mkString
 
@@ -383,5 +394,104 @@ class CrossrefMappingTest {
 
 
   }
+
+
+
+  @Test
+  def testSetDateOfAcceptanceCrossRef2Oaf(): Unit = {
+
+    val json = Source.fromInputStream(getClass.getResourceAsStream("dump_file.json")).mkString
+    assertNotNull(json)
+
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Publication])
+
+    assert(items.nonEmpty)
+    assert(items.size == 1)
+    val result: Result = items.head.asInstanceOf[Publication]
+    assertNotNull(result)
+
+    logger.info(mapper.writeValueAsString(result));
+
+//    assertNotNull(result.getDataInfo, "Datainfo test not null Failed");
+//    assertNotNull(
+//      result.getDataInfo.getProvenanceaction,
+//      "DataInfo/Provenance test not null Failed");
+//    assertFalse(
+//      result.getDataInfo.getProvenanceaction.getClassid.isEmpty,
+//      "DataInfo/Provenance/classId test not null Failed");
+//    assertFalse(
+//      result.getDataInfo.getProvenanceaction.getClassname.isEmpty,
+//      "DataInfo/Provenance/className test not null Failed");
+//    assertFalse(
+//      result.getDataInfo.getProvenanceaction.getSchemeid.isEmpty,
+//      "DataInfo/Provenance/SchemeId test not null Failed");
+//    assertFalse(
+//      result.getDataInfo.getProvenanceaction.getSchemename.isEmpty,
+//      "DataInfo/Provenance/SchemeName test not null Failed");
+//
+//    assertNotNull(result.getCollectedfrom, "CollectedFrom test not null Failed");
+//    assertFalse(result.getCollectedfrom.isEmpty);
+//
+//    val collectedFromList = result.getCollectedfrom.asScala
+//    assert(collectedFromList.exists(c => c.getKey.equalsIgnoreCase("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")), "Wrong collected from assertion")
+//
+//    assert(collectedFromList.exists(c => c.getValue.equalsIgnoreCase("crossref")), "Wrong collected from assertion")
+//
+//
+//    val relevantDates = result.getRelevantdate.asScala
+//
+//    assert(relevantDates.exists(d => d.getQualifier.getClassid.equalsIgnoreCase("created")), "Missing relevant date of type created")
+//
+//    val rels = resultList.filter(p => p.isInstanceOf[Relation]).asInstanceOf[List[Relation]]
+//    assertFalse(rels.isEmpty)
+//    rels.foreach(relation => {
+//      assertNotNull(relation)
+//      assertFalse(relation.getSource.isEmpty)
+//      assertFalse(relation.getTarget.isEmpty)
+//      assertFalse(relation.getRelClass.isEmpty)
+//      assertFalse(relation.getRelType.isEmpty)
+//      assertFalse(relation.getSubRelType.isEmpty)
+//
+//    })
+  }
+
+  @Test
+  def testNormalizeDOI(): Unit = {
+    val template = Source.fromInputStream(getClass.getResourceAsStream("article_funder_template.json")).mkString
+    val line :String = "\"funder\": [{\"name\": \"Wellcome Trust Masters Fellowship\",\"award\": [\"090633\"]}],"
+    val json = template.replace("%s", line)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    assertTrue(resultList.nonEmpty)
+    val items = resultList.filter(p => p.isInstanceOf[Publication])
+    val result: Result = items.head.asInstanceOf[Publication]
+
+    result.getPid.asScala.foreach(pid => assertTrue(pid.getQualifier.getClassid.equals("doi")))
+    assertTrue(result.getPid.size() == 1)
+    result.getPid.asScala.foreach(pid => assertTrue(pid.getValue.equals("10.26850/1678-4618EQJ.v35.1.2010.p41-46".toLowerCase())))
+
+  }
+
+  @Test
+  def testNormalizeDOI2(): Unit = {
+    val template = Source.fromInputStream(getClass.getResourceAsStream("article.json")).mkString
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(template)
+    assertTrue(resultList.nonEmpty)
+    val items = resultList.filter(p => p.isInstanceOf[Publication])
+    val result: Result = items.head.asInstanceOf[Publication]
+
+    result.getPid.asScala.foreach(pid => assertTrue(pid.getQualifier.getClassid.equals("doi")))
+    assertTrue(result.getPid.size() == 1)
+    result.getPid.asScala.foreach(pid => assertTrue(pid.getValue.equals("10.26850/1678-4618EQJ.v35.1.2010.p41-46".toLowerCase())))
+
+  }
+
+
 
 }

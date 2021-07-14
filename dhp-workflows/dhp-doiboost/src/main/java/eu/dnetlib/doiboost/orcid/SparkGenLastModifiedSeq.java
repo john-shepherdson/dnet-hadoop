@@ -33,7 +33,7 @@ public class SparkGenLastModifiedSeq {
 	private static String outputPath;
 	private static String lambdaFileName;
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

@@ -1,19 +1,29 @@
 package eu.dnetlib.doiboost.orcid
 
+import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.oa.merge.AuthorMerger
 import eu.dnetlib.dhp.schema.oaf.Publication
+import eu.dnetlib.dhp.schema.orcid.OrcidDOI
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
-import org.apache.spark.sql.functions.{col, collect_list}
 import org.slf4j.{Logger, LoggerFactory}
 
-class SparkPreprocessORCID {
-  val logger: Logger = LoggerFactory.getLogger(getClass)
+object SparkPreprocessORCID {
+  val logger: Logger = LoggerFactory.getLogger(SparkConvertORCIDToOAF.getClass)
+
+    def fixORCIDItem(item :ORCIDItem):ORCIDItem = {
+      ORCIDItem(item.doi, item.authors.groupBy(_.oid).map(_._2.head).toList)
+
+  }
+
 
   def run(spark:SparkSession,sourcePath:String,workingPath:String):Unit = {
     import spark.implicits._
+    implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
 
     val inputRDD:RDD[OrcidAuthor]  = spark.sparkContext.textFile(s"$sourcePath/authors").map(s => ORCIDToOAF.convertORCIDAuthor(s)).filter(s => s!= null).filter(s => ORCIDToOAF.authorValid(s))
 
@@ -31,9 +41,10 @@ class SparkPreprocessORCID {
       .map(i =>{
         val doi = i._1.doi
         val author = i._2
-        (doi, author)
-      }).groupBy(col("_1").alias("doi"))
-      .agg(collect_list(col("_2")).alias("authors"))
+      (doi, author)
+    }).groupBy(col("_1").alias("doi"))
+      .agg(collect_list(col("_2")).alias("authors")).as[ORCIDItem]
+      .map(s => fixORCIDItem(s))
       .write.mode(SaveMode.Overwrite).save(s"$workingPath/orcidworksWithAuthor")
   }
 
@@ -48,9 +59,12 @@ class SparkPreprocessORCID {
         .appName(getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
 
+
     val sourcePath = parser.get("sourcePath")
     val workingPath = parser.get("workingPath")
+
     run(spark, sourcePath, workingPath)
+
   }
 
 }

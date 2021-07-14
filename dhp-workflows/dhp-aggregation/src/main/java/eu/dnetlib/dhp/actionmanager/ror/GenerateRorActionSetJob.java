@@ -3,11 +3,11 @@ package eu.dnetlib.dhp.actionmanager.ror;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listKeyValues;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
 import java.io.InputStream;
 import java.util.ArrayList;

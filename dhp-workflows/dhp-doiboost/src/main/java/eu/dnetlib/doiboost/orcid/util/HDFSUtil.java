@@ -35,7 +35,7 @@ public class HDFSUtil {
 		if (!fileSystem.exists(toReadPath)) {
 			throw new RuntimeException("File not exist: " + path);
 		}
-		logger.info("Last_update_path " + toReadPath.toString());
+		logger.info("Last_update_path " + toReadPath);
 		FSDataInputStream inputStream = new FSDataInputStream(fileSystem.open(toReadPath));
 		BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 		StringBuffer sb = new StringBuffer();
@@ -60,7 +60,7 @@ public class HDFSUtil {
 			fileSystem.delete(toWritePath, true);
 		}
 		FSDataOutputStream os = fileSystem.create(toWritePath);
-		BufferedWriter br = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+		BufferedWriter br = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
 		br.write(text);
 		br.close();
 	}

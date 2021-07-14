@@ -15,8 +15,8 @@ public class ISLookupClientFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ISLookupClientFactory.class);
 
-	private static int requestTimeout = 60000 * 10;
-	private static int connectTimeout = 60000 * 10;
+	private static final int requestTimeout = 60000 * 10;
+	private static final int connectTimeout = 60000 * 10;
 
 	public static ISLookUpService getLookUpService(final String isLookupUrl) {
 		return getServiceStub(ISLookUpService.class, isLookupUrl);

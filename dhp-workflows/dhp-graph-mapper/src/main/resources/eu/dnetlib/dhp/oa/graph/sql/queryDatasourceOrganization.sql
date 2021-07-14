@@ -13,4 +13,4 @@ SELECT
 	d.provenanceaction || '@@@dnet:provenanceActions'        AS provenanceaction
 FROM dsm_datasource_organization dor
 	LEFT OUTER JOIN dsm_datasources d  ON (dor.datasource = d.id)
-	LEFT OUTER JOIN dsm_datasources dc ON (dc.id = d.collectedfrom)
+	LEFT OUTER JOIN dsm_datasources dc ON (dc.id = d.collectedfrom);

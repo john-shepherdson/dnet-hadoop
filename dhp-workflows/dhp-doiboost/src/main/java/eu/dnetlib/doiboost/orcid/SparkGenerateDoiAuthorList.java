@@ -36,7 +36,7 @@ import scala.Tuple2;
 
 public class SparkGenerateDoiAuthorList {
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		Logger logger = LoggerFactory.getLogger(SparkGenerateDoiAuthorList.class);
 		logger.info("[ SparkGenerateDoiAuthorList STARTED]");
 

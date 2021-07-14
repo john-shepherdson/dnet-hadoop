@@ -16,13 +16,13 @@ public class ExtractXMLActivitiesData extends OrcidDSManager {
 	private String outputWorksPath;
 	private String activitiesFileNameTarGz;
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		ExtractXMLActivitiesData extractXMLActivitiesData = new ExtractXMLActivitiesData();
 		extractXMLActivitiesData.loadArgs(args);
 		extractXMLActivitiesData.extractWorks();
 	}
 
-	private void loadArgs(String[] args) throws IOException, Exception {
+	private void loadArgs(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

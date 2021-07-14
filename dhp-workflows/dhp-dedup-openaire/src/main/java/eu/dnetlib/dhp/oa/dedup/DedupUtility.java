@@ -2,14 +2,8 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.text.Normalizer;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
@@ -18,20 +12,18 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.google.common.collect.Sets;
-import com.wcohen.ss.JaroWinkler;
 
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
-import eu.dnetlib.pace.model.Person;
-import scala.Tuple2;
 
 public class DedupUtility {
+
+	public static final String OPENORGS_ID_PREFIX = "openorgs____";
+	public static final String CORDA_ID_PREFIX = "corda";
 
 	public static Map<String, LongAccumulator> constructAccumulator(
 		final DedupConfig dedupConf, final SparkContext context) {
@@ -70,17 +62,6 @@ public class DedupUtility {
 		return Sets.newHashSet(BlacklistAwareClusteringCombiner.filterAndCombine(doc, conf));
 	}
 
-	public static String md5(final String s) {
-		try {
-			final MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(s.getBytes(StandardCharsets.UTF_8));
-			return new String(Hex.encodeHex(md.digest()));
-		} catch (final Exception e) {
-			System.err.println("Error creating id");
-			return null;
-		}
-	}
-
 	public static String createDedupRecordPath(
 		final String basePath, final String actionSetId, final String entityType) {
 		return String.format("%s/%s/%s_deduprecord", basePath, actionSetId, entityType);
@@ -93,6 +74,11 @@ public class DedupUtility {
 	public static String createSimRelPath(
 		final String basePath, final String actionSetId, final String entityType) {
 		return String.format("%s/%s/%s_simrel", basePath, actionSetId, entityType);
+	}
+
+	public static String createOpenorgsMergeRelsPath(
+		final String basePath, final String actionSetId, final String entityType) {
+		return String.format("%s/%s/%s_openorgs_mergerels", basePath, actionSetId, entityType);
 	}
 
 	public static String createMergeRelPath(
@@ -140,4 +126,24 @@ public class DedupUtility {
 		dedupConfig.getWf().setConfigurationId(actionSetId);
 		return dedupConfig;
 	}
+
+	public static int compareOpenOrgIds(String o1, String o2) {
+		if (o1.contains(OPENORGS_ID_PREFIX) && o2.contains(OPENORGS_ID_PREFIX))
+			return o1.compareTo(o2);
+		if (o1.contains(CORDA_ID_PREFIX) && o2.contains(CORDA_ID_PREFIX))
+			return o1.compareTo(o2);
+
+		if (o1.contains(OPENORGS_ID_PREFIX))
+			return -1;
+		if (o2.contains(OPENORGS_ID_PREFIX))
+			return 1;
+
+		if (o1.contains(CORDA_ID_PREFIX))
+			return -1;
+		if (o2.contains(CORDA_ID_PREFIX))
+			return 1;
+
+		return o1.compareTo(o2);
+	}
+
 }

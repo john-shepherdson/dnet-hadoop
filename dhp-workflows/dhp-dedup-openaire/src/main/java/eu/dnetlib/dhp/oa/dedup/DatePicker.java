@@ -18,7 +18,7 @@ import eu.dnetlib.dhp.schema.oaf.Field;
 
 public class DatePicker {
 
-	private static final String DATE_PATTERN = "\\d{4}-\\d{2}-\\d{2}";
+	public static final String DATE_PATTERN = "^(\\d{4})-(\\d{2})-(\\d{2})";
 	private static final String DATE_DEFAULT_SUFFIX = "01-01";
 	private static final int YEAR_LB = 1300;
 	private static final int YEAR_UB = Year.now().getValue() + 5;
@@ -28,6 +28,7 @@ public class DatePicker {
 		final Map<String, Integer> frequencies = dateofacceptance
 			.parallelStream()
 			.filter(StringUtils::isNotBlank)
+			.map(d -> substringBefore(d, "T"))
 			.collect(Collectors.toConcurrentMap(w -> w, w -> 1, Integer::sum));
 
 		if (frequencies.isEmpty()) {
@@ -114,7 +115,7 @@ public class DatePicker {
 		}
 	}
 
-	private static boolean inRange(final String date) {
+	public static boolean inRange(final String date) {
 		final int year = Integer.parseInt(substringBefore(date, "-"));
 		return year >= YEAR_LB && year <= YEAR_UB;
 	}

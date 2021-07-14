@@ -141,6 +141,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch-hadoop</artifactId>
+
+        </dependency>
+
+        <dependency>
             <groupId>org.noggit</groupId>
             <artifactId>noggit</artifactId>
         </dependency>
@@ -155,15 +161,10 @@
             </exclusions>
         </dependency>
 
-
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-schemas</artifactId>
         </dependency>
 
     </dependencies>

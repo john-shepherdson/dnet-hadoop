@@ -1,0 +1,62 @@
+[
+  {
+    "paramName": "i",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "the base path of raw graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "the working directory path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "la",
+    "paramLongName": "isLookUpUrl",
+    "paramDescription": "the url of the lookup service",
+    "paramRequired": true
+  },
+  {
+    "paramName": "asi",
+    "paramLongName": "actionSetId",
+    "paramDescription": "the id of the actionset (orchestrator)",
+    "paramRequired": true
+  },
+  {
+    "paramName": "nc",
+    "paramLongName": "numConnections",
+    "paramDescription": "number of connections to the postgres db (for the write operation)",
+    "paramRequired": false
+  },
+  {
+    "paramName": "au",
+    "paramLongName": "apiUrl",
+    "paramDescription": "the url for the APIs of the openorgs service",
+    "paramRequired": false
+  },
+  {
+    "paramName": "du",
+    "paramLongName": "dbUrl",
+    "paramDescription": "the url of the database",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dusr",
+    "paramLongName": "dbUser",
+    "paramDescription": "the user of the database",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "dbTable",
+    "paramDescription": "the name of the table in the database",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dpwd",
+    "paramLongName": "dbPwd",
+    "paramDescription": "the password for the user of the database",
+    "paramRequired": true
+  }
+]

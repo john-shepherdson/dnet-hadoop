@@ -2,6 +2,7 @@ package eu.dnetlib.doiboost.mag
 
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.json4s
@@ -129,17 +130,21 @@ case object ConversionUtil {
     val publication = item._1._2
     val fieldOfStudy = item._2
     if (fieldOfStudy != null && fieldOfStudy.subjects != null && fieldOfStudy.subjects.nonEmpty) {
+
+      val className = "Microsoft Academic Graph classification"
+      val classid = "MAG"
+
       val p: List[StructuredProperty] = fieldOfStudy.subjects.flatMap(s => {
-        val s1 = createSP(s.DisplayName, "MAG","Microsoft Academic Graph classification", "dnet:subject_classification_typologies", "dnet:subject_classification_typologies")
+        val s1 = createSP(s.DisplayName, classid,className, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES)
         val di = DoiBoostMappingUtil.generateDataInfo(s.Score.toString)
         var resList: List[StructuredProperty] = List(s1)
         if (s.MainType.isDefined) {
           val maintp = s.MainType.get
-          val s2 = createSP(s.MainType.get, "MAG","Microsoft Academic Graph classification", "dnet:subject_classification_typologies", "dnet:subject_classification_typologies")
+          val s2 = createSP(s.MainType.get, classid,className, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES)
           s2.setDataInfo(di)
           resList = resList ::: List(s2)
           if (maintp.contains(".")) {
-            val s3 = createSP(maintp.split("\\.").head, "MAG","Microsoft Academic Graph classification", "dnet:subject_classification_typologies", "dnet:subject_classification_typologies")
+            val s3 = createSP(maintp.split("\\.").head, classid,className, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES)
             s3.setDataInfo(di)
             resList = resList ::: List(s3)
           }
@@ -171,6 +176,9 @@ case object ConversionUtil {
     else
       i.setUrl(List(s"https://academic.microsoft.com/#/detail/${extractMagIdentifier(pub.getOriginalId.asScala)}").asJava)
 
+    // Ticket #6281 added pid to Instance
+    i.setPid(pub.getPid)
+
     i.setCollectedfrom(createMAGCollectedFrom())
     pub.setInstance(List(i).asJava)
     pub
@@ -188,14 +196,17 @@ case object ConversionUtil {
     val authors = inputParams._2
 
     val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
-    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
+    pub.setPid(List(createSP(paper.Doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi).asJava)
 
-    //Set identifier as 50|doiboost____::md5(DOI)
-    pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //will be replaced using IdentifierFactory
 
-    val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
-    val originalTitles = createSP(paper.OriginalTitle, "alternative title", "dnet:dataCite_title")
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
+
+    val mainTitles = createSP(paper.PaperTitle, "main title", ModelConstants.DNET_DATACITE_TITLE)
+    val originalTitles = createSP(paper.OriginalTitle, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
     pub.setTitle(List(mainTitles, originalTitles).asJava)
 
     pub.setSource(List(asField(paper.BookTitle)).asJava)
@@ -247,14 +258,17 @@ case object ConversionUtil {
     val description = inputParams._2
 
     val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi.toLowerCase, "doi", PID_TYPES)).asJava)
-    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi.toLowerCase).asJava)
+    pub.setPid(List(createSP(paper.Doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi).asJava)
 
-    //Set identifier as 50 | doiboost____::md5(DOI)
-    pub.setId(generateIdentifier(pub, paper.Doi.toLowerCase))
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //will be replaced using IdentifierFactory
 
-    val mainTitles = createSP(paper.PaperTitle, "main title", "dnet:dataCite_title")
-    val originalTitles = createSP(paper.OriginalTitle, "alternative title", "dnet:dataCite_title")
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
+
+    val mainTitles = createSP(paper.PaperTitle, "main title", ModelConstants.DNET_DATACITE_TITLE)
+    val originalTitles = createSP(paper.OriginalTitle, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
     pub.setTitle(List(mainTitles, originalTitles).asJava)
 
     pub.setSource(List(asField(paper.BookTitle)).asJava)
@@ -306,10 +320,10 @@ case object ConversionUtil {
       for {(k: String, v: List[Int]) <- iid} {
         v.foreach(item => res(item) = k)
       }
-      (0 until idl).foreach(i => {
-        if (res(i) == null)
-          res(i) = ""
-      })
+     (0 until idl).foreach(i => {
+       if (res(i) == null)
+         res(i) = ""
+     })
       return res.mkString(" ")
     }
     ""

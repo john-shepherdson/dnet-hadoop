@@ -18,7 +18,7 @@ object SparkMapUnpayWallToOAF {
 
     val logger: Logger = LoggerFactory.getLogger(SparkMapDumpIntoOAF.getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkMapDumpIntoOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_crossref_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkMapDumpIntoOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_uw_to_oaf_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession

@@ -1,5 +1,5 @@
 {
-  "DOI": "10.26850/1678-4618eqj.v35.1.2010.p41-46",
+  "DOI": " 10.26850/1678-4618eqj.v35.1.2010.p41-46",
   "issued": {
     "date-parts": [
       [
@@ -12,14 +12,6 @@
   "abstract": "<jats:p>A qualitative spot-test and tandem quantitative analysis of dipyrone in the bulk drugand in pharmaceutical preparations is proposed. The formation of a reddish-violet\u00a0 color indicates a positive result. In sequence a quantitative procedure can be performed in the same flask. The quantitative results obtained were statistically compared with those obtained with the method indicated by the Brazilian\u00a0 Pharmacopoeia, using the Student\u2019s t and the F tests. Considering the concentration in a 100 \u03bcL aliquot, the qualitative visual limit of detection is about 5\u00d710-6 g; instrumental LOD \u2245 1.4\u00d710-4 mol L-1 ; LOQ \u2245 4.5\u00d710-4 mol L-1.</jats:p>",
   "prefix": "10.26850",
   "author": [
-    {
-      "authenticated-orcid": false,
-      "given": "Matthieu",
-      "family": "Tubino",
-      "sequence": "first",
-      "affiliation": [],
-      "ORCID": "http://orcid.org/0000-0002-1987-3907"
-    },
     {
       "affiliation": [],
       "given": "A. C.",
@@ -49,6 +41,14 @@
       "sequence": "additional",
       "affiliation": [],
       "ORCID": "http://orcid.org/0000-0001-5564-1639"
+    },
+    {
+      "authenticated-orcid": false,
+      "given": "Matthieu",
+      "family": "Tubino",
+      "sequence": "first",
+      "affiliation": [],
+      "ORCID": "http://orcid.org/0000-0002-1987-3907"
     }
   ],
   "reference-count": 0,

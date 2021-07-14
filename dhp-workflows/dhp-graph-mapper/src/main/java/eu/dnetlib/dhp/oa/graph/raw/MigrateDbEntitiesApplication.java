@@ -1,37 +1,8 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASOURCE_ORGANIZATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTICIPANT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PARTICIPANT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PROVIDED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_RELATED_TO;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PARTICIPATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROJECT_ORGANIZATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVIDES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVISION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RELATIONSHIP;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.asString;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -42,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -55,15 +25,16 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.oa.graph.raw.common.MigrateAction;
 import eu.dnetlib.dhp.oa.graph.raw.common.VerifyNsPrefixPredicate;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Journal;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
@@ -80,6 +51,13 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(MigrateDbEntitiesApplication.class);
+
+	private static final DataInfo DATA_INFO_CLAIM = dataInfo(
+		false, null, false, false,
+		qualifier(USER_CLAIM, USER_CLAIM, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), "0.9");
+
+	private static final List<KeyValue> COLLECTED_FROM_CLAIM = listKeyValues(
+		createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
 
 	public static final String SOURCE_TYPE = "source_type";
 	public static final String TARGET_TYPE = "target_type";
@@ -122,35 +100,68 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 		final Predicate<Oaf> verifyNamespacePrefix = new VerifyNsPrefixPredicate(nsPrefixBlacklist);
 
-		final boolean processClaims = parser.get("action") != null && parser.get("action").equalsIgnoreCase("claims");
-		log.info("processClaims: {}", processClaims);
+		final MigrateAction process = parser.get("action") != null ? MigrateAction.valueOf(parser.get("action"))
+			: MigrateAction.openaire;
+		log.info("migrateAction: {}", process);
 
 		try (final MigrateDbEntitiesApplication smdbe = new MigrateDbEntitiesApplication(hdfsPath, dbUrl, dbUser,
 			dbPassword, isLookupUrl)) {
-			if (processClaims) {
-				log.info("Processing claims...");
-				smdbe.execute("queryClaims.sql", smdbe::processClaims);
-			} else {
-				log.info("Processing datasources...");
-				smdbe.execute("queryDatasources.sql", smdbe::processDatasource, verifyNamespacePrefix);
 
-				log.info("Processing projects...");
-				if (dbSchema.equalsIgnoreCase("beta")) {
-					smdbe.execute("queryProjects.sql", smdbe::processProject, verifyNamespacePrefix);
-				} else {
-					smdbe.execute("queryProjects_production.sql", smdbe::processProject, verifyNamespacePrefix);
-				}
+			switch (process) {
+				case claims:
+					log.info("Processing claims...");
+					smdbe.execute("queryClaims.sql", smdbe::processClaims);
+					break;
+				case openaire:
+					log.info("Processing datasources...");
+					smdbe.execute("queryDatasources.sql", smdbe::processDatasource, verifyNamespacePrefix);
 
-				log.info("Processing orgs...");
-				smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
+					log.info("Processing projects...");
+					if (dbSchema.equalsIgnoreCase("beta")) {
+						smdbe.execute("queryProjects.sql", smdbe::processProject, verifyNamespacePrefix);
+					} else {
+						smdbe.execute("queryProjects_production.sql", smdbe::processProject, verifyNamespacePrefix);
+					}
 
-				log.info("Processing relationsNoRemoval ds <-> orgs ...");
-				smdbe
-					.execute(
-						"queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization, verifyNamespacePrefix);
+					log.info("Processing Organizations...");
+					smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
-				log.info("Processing projects <-> orgs ...");
-				smdbe.execute("queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
+					log.info("Processing relationsNoRemoval ds <-> orgs ...");
+					smdbe
+						.execute(
+							"queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization,
+							verifyNamespacePrefix);
+
+					log.info("Processing projects <-> orgs ...");
+					smdbe
+						.execute(
+							"queryProjectOrganization.sql", smdbe::processProjectOrganization, verifyNamespacePrefix);
+					break;
+				case openorgs_dedup: // generates organization entities and relations for openorgs dedup
+					log.info("Processing Openorgs...");
+					smdbe
+						.execute(
+							"queryOpenOrgsForOrgsDedup.sql", smdbe::processOrganization, verifyNamespacePrefix);
+
+					log.info("Processing Openorgs Sim Rels...");
+					smdbe.execute("queryOpenOrgsSimilarityForOrgsDedup.sql", smdbe::processOrgOrgSimRels);
+					break;
+
+				case openorgs: // generates organization entities and relations for provision
+					log.info("Processing Openorgs For Provision...");
+					smdbe
+						.execute(
+							"queryOpenOrgsForProvision.sql", smdbe::processOrganization, verifyNamespacePrefix);
+
+					log.info("Processing Openorgs Merge Rels...");
+					smdbe.execute("queryOpenOrgsSimilarityForProvision.sql", smdbe::processOrgOrgMergeRels);
+					break;
+
+				case openaire_organizations:
+
+					log.info("Processing Organizations...");
+					smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
+					break;
 			}
 			log.info("All done.");
 		}
@@ -340,7 +351,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			o.setOaiprovenance(null); // Values not present in the DB
 			o.setLegalshortname(field(rs.getString("legalshortname"), info));
 			o.setLegalname(field(rs.getString("legalname"), info));
-			o.setAlternativeNames(new ArrayList<>()); // Values not returned by the SQL query
+			o.setAlternativeNames(prepareListFields(rs.getArray("alternativenames"), info));
 			o.setWebsiteurl(field(rs.getString("websiteurl"), info));
 			o.setLogourl(field(rs.getString("logourl"), info));
 			o.setEclegalbody(field(Boolean.toString(rs.getBoolean("eclegalbody")), info));
@@ -437,25 +448,19 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 	}
 
 	public List<Oaf> processClaims(final ResultSet rs) {
-
-		final DataInfo info = dataInfo(
-			false, null, false, false,
-			qualifier(USER_CLAIM, USER_CLAIM, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), "0.9");
-
-		final List<KeyValue> collectedFrom = listKeyValues(
-			createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
-
 		try {
-			if (rs.getString(SOURCE_TYPE).equals("context")) {
+			final String sourceType = rs.getString(SOURCE_TYPE);
+			final String targetType = rs.getString(TARGET_TYPE);
+			if (sourceType.equals("context")) {
 				final Result r;
 
-				if (rs.getString(TARGET_TYPE).equals("dataset")) {
+				if (targetType.equals("dataset")) {
 					r = new Dataset();
 					r.setResulttype(DATASET_DEFAULT_RESULTTYPE);
-				} else if (rs.getString(TARGET_TYPE).equals("software")) {
+				} else if (targetType.equals("software")) {
 					r = new Software();
 					r.setResulttype(SOFTWARE_DEFAULT_RESULTTYPE);
-				} else if (rs.getString(TARGET_TYPE).equals("other")) {
+				} else if (targetType.equals("other")) {
 					r = new OtherResearchProduct();
 					r.setResulttype(ORP_DEFAULT_RESULTTYPE);
 				} else {
@@ -464,60 +469,72 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				}
 				r.setId(createOpenaireId(50, rs.getString("target_id"), false));
 				r.setLastupdatetimestamp(lastUpdateTimestamp);
-				r.setContext(prepareContext(rs.getString("source_id"), info));
-				r.setDataInfo(info);
-				r.setCollectedfrom(collectedFrom);
+				r.setContext(prepareContext(rs.getString("source_id"), DATA_INFO_CLAIM));
+				r.setDataInfo(DATA_INFO_CLAIM);
+				r.setCollectedfrom(COLLECTED_FROM_CLAIM);
 
 				return Arrays.asList(r);
 			} else {
 				final String validationDate = rs.getString("curation_date");
 
-				final String sourceId = createOpenaireId(rs.getString(SOURCE_TYPE), rs.getString("source_id"), false);
-				final String targetId = createOpenaireId(rs.getString(TARGET_TYPE), rs.getString("target_id"), false);
+				final String sourceId = createOpenaireId(sourceType, rs.getString("source_id"), false);
+				final String targetId = createOpenaireId(targetType, rs.getString("target_id"), false);
 
-				final Relation r1 = new Relation();
-				final Relation r2 = new Relation();
+				Relation r1 = prepareRelation(sourceId, targetId, validationDate);
+				Relation r2 = prepareRelation(targetId, sourceId, validationDate);
 
-				r1.setValidated(true);
-				r1.setValidationDate(validationDate);
-				r1.setCollectedfrom(collectedFrom);
-				r1.setSource(sourceId);
-				r1.setTarget(targetId);
-				r1.setDataInfo(info);
-				r1.setLastupdatetimestamp(lastUpdateTimestamp);
+				final String semantics = rs.getString("semantics");
 
-				r2.setValidationDate(validationDate);
-				r2.setValidated(true);
-				r2.setCollectedfrom(collectedFrom);
-				r2.setSource(targetId);
-				r2.setTarget(sourceId);
-				r2.setDataInfo(info);
-				r2.setLastupdatetimestamp(lastUpdateTimestamp);
-
-				if (rs.getString(SOURCE_TYPE).equals("project")) {
-					r1.setRelType(RESULT_PROJECT);
-					r1.setSubRelType(OUTCOME);
-					r1.setRelClass(PRODUCES);
-
-					r2.setRelType(RESULT_PROJECT);
-					r2.setSubRelType(OUTCOME);
-					r2.setRelClass(IS_PRODUCED_BY);
-				} else {
-					r1.setRelType(RESULT_RESULT);
-					r1.setSubRelType(RELATIONSHIP);
-					r1.setRelClass(IS_RELATED_TO);
-
-					r2.setRelType(RESULT_RESULT);
-					r2.setSubRelType(RELATIONSHIP);
-					r2.setRelClass(IS_RELATED_TO);
+				switch (semantics) {
+					case "resultResult_relationship_isRelatedTo":
+						r1 = setRelationSemantic(r1, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO);
+						r2 = setRelationSemantic(r2, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO);
+						break;
+					case "resultProject_outcome_produces":
+						if (!"project".equals(sourceType)) {
+							throw new IllegalStateException(
+								String
+									.format(
+										"invalid claim, sourceId: %s, targetId: %s, semantics: %s",
+										sourceId, targetId, semantics));
+						}
+						r1 = setRelationSemantic(r1, RESULT_PROJECT, OUTCOME, PRODUCES);
+						r2 = setRelationSemantic(r2, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY);
+						break;
+					case "resultResult_publicationDataset_isRelatedTo":
+						r1 = setRelationSemantic(r1, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
+						r2 = setRelationSemantic(r2, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
+						break;
+					default:
+						throw new IllegalArgumentException("claim semantics not managed: " + semantics);
 				}
 
 				return Arrays.asList(r1, r2);
 			}
-
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private Relation prepareRelation(String sourceId, String targetId, String validationDate) {
+		Relation r = new Relation();
+		if (StringUtils.isNotBlank(validationDate)) {
+			r.setValidated(true);
+			r.setValidationDate(validationDate);
+		}
+		r.setCollectedfrom(COLLECTED_FROM_CLAIM);
+		r.setSource(sourceId);
+		r.setTarget(targetId);
+		r.setDataInfo(DATA_INFO_CLAIM);
+		r.setLastupdatetimestamp(lastUpdateTimestamp);
+		return r;
+	}
+
+	private Relation setRelationSemantic(Relation r, String relType, String subRelType, String relClass) {
+		r.setRelType(relType);
+		r.setSubRelType(subRelType);
+		r.setRelClass(relClass);
+		return r;
 	}
 
 	private List<Context> prepareContext(final String id, final DataInfo dataInfo) {
@@ -584,6 +601,80 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		}
 
 		return res;
+	}
+
+	public List<Oaf> processOrgOrgMergeRels(final ResultSet rs) {
+		try {
+			final DataInfo info = prepareDataInfo(rs); // TODO
+
+			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
+			final String orgId2 = createOpenaireId(20, rs.getString("id2"), true);
+
+			final List<KeyValue> collectedFrom = listKeyValues(
+				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
+
+			final Relation r1 = new Relation();
+			r1.setRelType(ORG_ORG_RELTYPE);
+			r1.setSubRelType(ModelConstants.DEDUP);
+			r1.setRelClass(MERGES);
+			r1.setSource(orgId1);
+			r1.setTarget(orgId2);
+			r1.setCollectedfrom(collectedFrom);
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+
+			final Relation r2 = new Relation();
+			r2.setRelType(ORG_ORG_RELTYPE);
+			r2.setSubRelType(ModelConstants.DEDUP);
+			r2.setRelClass(IS_MERGED_IN);
+			r2.setSource(orgId2);
+			r2.setTarget(orgId1);
+			r2.setCollectedfrom(collectedFrom);
+			r2.setDataInfo(info);
+			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+			return Arrays.asList(r1, r2);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public List<Oaf> processOrgOrgSimRels(final ResultSet rs) {
+		try {
+			final DataInfo info = prepareDataInfo(rs); // TODO
+
+			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
+			final String orgId2 = createOpenaireId(20, rs.getString("id2"), true);
+			final String relClass = rs.getString("relclass");
+
+			final List<KeyValue> collectedFrom = listKeyValues(
+				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
+
+			final Relation r1 = new Relation();
+			r1.setRelType(ORG_ORG_RELTYPE);
+			r1.setSubRelType(ModelConstants.DEDUP);
+			r1.setRelClass(relClass);
+			r1.setSource(orgId1);
+			r1.setTarget(orgId2);
+			r1.setCollectedfrom(collectedFrom);
+			r1.setDataInfo(info);
+			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+
+			// removed because there's no difference between two sides //TODO
+//			final Relation r2 = new Relation();
+//			r2.setRelType(ORG_ORG_RELTYPE);
+//			r2.setSubRelType(ORG_ORG_SUBRELTYPE);
+//			r2.setRelClass(relClass);
+//			r2.setSource(orgId2);
+//			r2.setTarget(orgId1);
+//			r2.setCollectedfrom(collectedFrom);
+//			r2.setDataInfo(info);
+//			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+//			return Arrays.asList(r1, r2);
+
+			return Arrays.asList(r1);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

@@ -1,23 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "AccessRight":{
-      "type":"object",
-      "properties":{
-        "code": {
-          "type": "string",
-          "description": "COAR access mode code: http://vocabularies.coar-repositories.org/documentation/access_rights/"
-        },
-        "label": {
-          "type": "string",
-          "description": "Label for the access mode"
-        },
-        "scheme": {
-          "type": "string",
-          "description": "Scheme of reference for access right code. Always set to COAR access rights vocabulary: http://vocabularies.coar-repositories.org/documentation/access_rights/"
-        }
-      }
-    },
     "ControlledField": {
       "type": "object",
       "properties": {
@@ -283,59 +266,6 @@
         ]
       }
     },
-    "instance":{
-      "description":"Each instance is one specific materialisation or version of the result. For example, you can have one result with three instance: one is the pre-print, one is the post-print, one is te published version",
-      "type":"array",
-      "items":{
-        "type":"object",
-        "properties":{
-          "accessright":{
-            "allOf":[
-              {
-                "$ref":"#/definitions/AccessRight"
-              },
-              {
-                "description":"The accessright of this instance. One result may have multiple instances, each with a different accessright"
-              }
-            ]
-          },
-          "articleprocessingcharge":{
-            "description": "The money spent to make this book or article available in Open Access. Source for this information is the OpenAPC initiative.",
-            "type":"object",
-            "properties":{
-              "amount":{
-                "type":"string"
-              },
-              "currency":{
-                "type":"string"
-              }
-            }
-          },
-          "license":{
-            "type":"string"
-          },
-          "publicationdate":{
-            "type":"string"
-          },
-          "refereed":{
-            "description": "If this instance has been peer-reviewed or not. Allowed values are peerReviewed, nonPeerReviewed, UNKNOWN (as defined in https://api.openaire.eu/vocabularies/dnet:review_levels)",
-            "type":"string"
-          },
-          "type":{
-            "type":"string",
-            "description":"The specific sub-type of this instance (see https://api.openaire.eu/vocabularies/dnet:result_typologies following the links)"
-          },
-          "url":{
-            "description":"URLs to the instance. They may link to the actual full-text or to the landing page at the hosting source. ",
-            "type":"array",
-            "items":{
-              "type":"string"
-            }
-          }
-        }
-
-      }
-    },
     "programmingLanguage": {
       "type": "string",
       "description": "Only for results with type 'software': the programming language"
@@ -372,7 +302,7 @@
           "subject": {
             "allOf": [
               {"$ref": "#/definitions/ControlledField"},
-              {"description": "OpenAIRE subject classification scheme (https://api.openaire.eu/vocabularies/dnet:subject_classification_typologies) and value. When the scheme is 'keyword', it means that the subject is free-text (i.e. not a term from a controlled vocabulary)."}
+              {"description": "OpenAIRE subject classification scheme (https://api.openaire.eu/vocabularies/dnet:subject_classification_typologies) and value. When the scheme is 'keyword', it means that the subject is free-text (i.e. not a term from a controlled vocabulary)."},
             ]
           }
         }

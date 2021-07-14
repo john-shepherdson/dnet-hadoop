@@ -188,7 +188,7 @@ public class PrepareRelationsJob {
 	public static class RelationAggregator
 		extends Aggregator<Relation, RelationList, RelationList> {
 
-		private int maxRelations;
+		private final int maxRelations;
 
 		public RelationAggregator(int maxRelations) {
 			this.maxRelations = maxRelations;

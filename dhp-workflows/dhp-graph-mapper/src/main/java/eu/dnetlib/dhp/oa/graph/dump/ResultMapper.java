@@ -503,7 +503,7 @@ public class ResultMapper implements Serializable {
 
 	private static Pid getOrcid(List<StructuredProperty> p) {
 		for (StructuredProperty pid : p) {
-			if (pid.getQualifier().getClassid().equals(Constants.ORCID)) {
+			if (pid.getQualifier().getClassid().equals(ModelConstants.ORCID)) {
 				Optional<DataInfo> di = Optional.ofNullable(pid.getDataInfo());
 				if (di.isPresent()) {
 					return Pid

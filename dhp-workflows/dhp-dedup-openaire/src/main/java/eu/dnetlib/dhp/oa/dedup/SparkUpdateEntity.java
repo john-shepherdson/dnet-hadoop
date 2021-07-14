@@ -23,11 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.util.MapDocumentUtil;
@@ -103,14 +102,20 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 							.mapToPair(
 								(PairFunction<String, String, String>) s -> new Tuple2<>(
 									MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
+						if (type == EntityType.organization) // exclude root records from organizations
+							entitiesWithId = excludeRootOrgs(entitiesWithId, rel);
+
 						JavaRDD<String> map = entitiesWithId
 							.leftOuterJoin(mergedIds)
-							.map(
-								k -> k._2()._2().isPresent()
-									? updateDeletedByInference(k._2()._1(), clazz)
-									: k._2()._1());
+							.map(k -> {
+								if (k._2()._2().isPresent()) {
+									return updateDeletedByInference(k._2()._1(), clazz);
+								}
+								return k._2()._1();
+							});
 
 						sourceEntity = map.union(sc.textFile(dedupRecordPath));
+
 					}
 
 					sourceEntity.saveAsTextFile(outputPath, GzipCodec.class);
@@ -150,5 +155,22 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to convert json", e);
 		}
+	}
+
+	private static JavaPairRDD<String, String> excludeRootOrgs(JavaPairRDD<String, String> entitiesWithId,
+		Dataset<Relation> rel) {
+
+		JavaPairRDD<String, String> roots = rel
+			.where("relClass == 'merges'")
+			.select(rel.col("source"))
+			.distinct()
+			.toJavaRDD()
+			.mapToPair(
+				(PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "root"));
+
+		return entitiesWithId
+			.leftOuterJoin(roots)
+			.filter(e -> !e._2()._2().isPresent())
+			.mapToPair(e -> new Tuple2<>(e._1(), e._2()._1()));
 	}
 }

@@ -25,7 +25,7 @@
 
 	<issueManagement>
 		<system>Redmine</system>
-		<url>https://issue.openaire.research-infrastructures.eu/projects/openaire</url>
+		<url>https://support.openaire.eu/projects/openaire</url>
 	</issueManagement>
 
 	<ciManagement>
@@ -129,9 +129,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
-
-
 	</dependencies>
 
 	<dependencyManagement>
@@ -139,7 +136,7 @@
 			<dependency>
 				<groupId>eu.dnetlib.dhp</groupId>
 				<artifactId>dhp-schemas</artifactId>
-				<version>${dhp.schemas.version}</version>
+				<version>${dhp-schemas.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
@@ -201,6 +198,12 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>${dhp.commons.lang.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.sisyphsu</groupId>
+				<artifactId>dateparser</artifactId>
+				<version>1.0.7</version>
 			</dependency>
 
 			<dependency>
@@ -346,7 +349,7 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-actionmanager-common</artifactId>
-				<version>6.0.5</version>
+				<version>${dnet-actionmanager-common.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.apache.hadoop</groupId>
@@ -357,32 +360,33 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-actionmanager-api</artifactId>
-				<version>[4.0.1,5.0.0)</version>
+				<version>${dnet-actionmanager-api.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>eu.dnetlib</groupId>
+						<artifactId>cnr-misc-utils</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
-				<artifactId>dnet-openaire-data-protos</artifactId>
-				<version>3.9.8-proto250</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-pace-core</artifactId>
-				<version>4.0.5</version>
+				<version>${dnet-pace-core.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>cnr-rmi-api</artifactId>
-				<version>[2.0.0,3.0.0)</version>
+				<version>${cnr-rmi-api.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>eu.dnetlib.dhp</groupId>
 				<artifactId>dnet-openaire-broker-common</artifactId>
-				<version>${dnet.openaire.broker.common}</version>
+				<version>${dnet-openaire-broker-common.version}</version>
 			</dependency>
 
-            <dependency>
+			<dependency>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-rt-transports-http</artifactId>
 				<version>3.1.5</version>
@@ -394,11 +398,6 @@
 				<scope>provided</scope>
 			</dependency>
 
-			<dependency>
-				<groupId>com.rabbitmq</groupId>
-				<artifactId>amqp-client</artifactId>
-				<version>5.6.0</version>
-			</dependency>
 			<dependency>
 				<groupId>com.jayway.jsonpath</groupId>
 				<artifactId>json-path</artifactId>
@@ -420,6 +419,11 @@
 				<version>${mongodb.driver.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>io.fares.junit.mongodb</groupId>
+				<artifactId>mongodb-junit-test</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>42.2.10</version>
@@ -431,20 +435,20 @@
 				<version>4.0</version>
 			</dependency>
 
-            <dependency>
-                <groupId>com.ximpleware</groupId>
-                <artifactId>vtd-xml</artifactId>
-                <version>${vtd.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>com.ximpleware</groupId>
+				<artifactId>vtd-xml</artifactId>
+				<version>${vtd.version}</version>
+			</dependency>
 
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch-hadoop</artifactId>
-                <version>7.6.0</version>
-            </dependency>
+			<dependency>
+				<groupId>org.elasticsearch</groupId>
+				<artifactId>elasticsearch-hadoop</artifactId>
+				<version>7.6.0</version>
+			</dependency>
 
 
-            <dependency>
+			<dependency>
 				<groupId>org.apache.oozie</groupId>
 				<artifactId>oozie-client</artifactId>
 				<version>${dhp.oozie.version}</version>
@@ -484,6 +488,12 @@
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml</artifactId>
 				<version>${apache.poi.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>20180813</version>
 			</dependency>
 
 			<dependency>
@@ -710,9 +720,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
 		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
-		<dhp.schemas.version>2.2.4</dhp.schemas.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
 		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
@@ -725,7 +736,12 @@
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dnet.openaire.broker.common>3.1.6</dnet.openaire.broker.common>
+		<dhp-schemas.version>[2.6.14]</dhp-schemas.version>
+		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
+		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
+		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
+		<dnet-pace-core.version>[4.1.7]</dnet-pace-core.version>
+		<cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
 		<solr.version>7.5.0</solr.version>
 		<okhttp.version>4.7.2</okhttp.version>
 		<common.compress.version>1.20</common.compress.version>

@@ -40,7 +40,7 @@ public class VerbResolver implements Serializable {
 								.getParameterValues()
 								.get(0)
 								.getValue(),
-							value -> (Class<Selection>) ((ClassInfo) value).loadClass()));
+							value -> (Class<Selection>) value.loadClass()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

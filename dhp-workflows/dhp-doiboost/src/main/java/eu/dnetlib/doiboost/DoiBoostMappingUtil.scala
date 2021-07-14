@@ -1,10 +1,12 @@
 package eu.dnetlib.doiboost
 
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{DataInfo, Dataset, Field, Instance, KeyValue, Oaf, Organization, Publication, Qualifier, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{AccessRight, DataInfo, Dataset, Field, Instance, KeyValue, Oaf, Organization, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.schema.common.ModelConstants
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -28,8 +30,6 @@ object DoiBoostMappingUtil {
   //STATIC STRING
   val MAG = "microsoft"
   val MAG_NAME = "Microsoft Academic Graph"
-  val ORCID = "orcid"
-  val ORCID_PENDING = "orcid_pending"
   val CROSSREF = "Crossref"
   val UNPAYWALL = "UnpayWall"
   val GRID_AC = "grid.ac"
@@ -37,8 +37,9 @@ object DoiBoostMappingUtil {
   val doiBoostNSPREFIX = "doiboost____"
   val OPENAIRE_PREFIX = "openaire____"
   val SEPARATOR = "::"
-  val DNET_LANGUAGES = "dnet:languages"
-  val PID_TYPES = "dnet:pid_types"
+
+  val DOI_PREFIX_REGEX = "(^10\\.|\\/10.)"
+  val DOI_PREFIX = "10."
 
   val invalidName = List(",", "none none", "none, none", "none &na;", "(:null)", "test test test", "test test", "test", "&na; &na;")
 
@@ -106,33 +107,30 @@ object DoiBoostMappingUtil {
 
 
   def fixResult(result: Dataset) :Dataset = {
-    val instanceType = result.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
+    val instanceType = extractInstance(result)
     if (instanceType.isDefined) {
       result.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
     }
     result.getInstance().asScala.foreach(i => {
-      i.setHostedby(getUbknownHostedBy())
+      i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY)
     })
     result
   }
 
-  def getUbknownHostedBy():KeyValue = {
-    val hb = new KeyValue
-    hb.setValue("Unknown Repository")
-    hb.setKey(s"10|$OPENAIRE_PREFIX::55045bd2a65019fd8e6741a755395c8c")
-    hb
 
+
+
+  def getOpenAccessQualifier():AccessRight = {
+    OafMapperUtils.accessRight("OPEN","Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+  }
+
+  def getRestrictedQualifier():AccessRight = {
+    OafMapperUtils.accessRight("RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
 
-  def getOpenAccessQualifier():Qualifier = {
-    createQualifier("OPEN","Open Access","dnet:access_modes", "dnet:access_modes")
-
-  }
-
-  def getRestrictedQualifier():Qualifier = {
-    createQualifier("RESTRICTED","Restricted","dnet:access_modes", "dnet:access_modes")
-
+  def extractInstance(r:Result):Option[Instance] = {
+    r.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
   }
 
   def fixPublication(input:((String,Publication), (String,HostedByItemType))): Publication = {
@@ -141,42 +139,41 @@ object DoiBoostMappingUtil {
 
     val item = if (input._2 != null) input._2._2 else null
 
-
-    val instanceType = publication.getInstance().asScala.find(i => i.getInstancetype != null && i.getInstancetype.getClassid.nonEmpty)
+    val instanceType:Option[Instance] = extractInstance(publication)
 
     if (instanceType.isDefined) {
       publication.getInstance().asScala.foreach(i => i.setInstancetype(instanceType.get.getInstancetype))
     }
 
-
     publication.getInstance().asScala.foreach(i => {
-      val hb = new KeyValue
+      var hb = new KeyValue
       if (item != null) {
         hb.setValue(item.officialname)
         hb.setKey(generateDSId(item.id))
         if (item.openAccess)
           i.setAccessright(getOpenAccessQualifier())
-        publication.setBestaccessright(getOpenAccessQualifier())
+        val ar = getOpenAccessQualifier()
+        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
-        hb.setValue("Unknown Repository")
-        hb.setKey(s"10|$OPENAIRE_PREFIX::55045bd2a65019fd8e6741a755395c8c")
+        hb = ModelConstants.UNKNOWN_REPOSITORY
       }
       i.setHostedby(hb)
     })
 
     val ar = publication.getInstance().asScala.filter(i => i.getInstancetype != null && i.getAccessright!= null && i.getAccessright.getClassid!= null).map(f=> f.getAccessright.getClassid)
     if (ar.nonEmpty) {
-      if(ar.contains("OPEN")){
-        publication.setBestaccessright(getOpenAccessQualifier())
+      if(ar.contains(ModelConstants.ACCESS_RIGHT_OPEN)){
+        val ar = getOpenAccessQualifier()
+        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
-        publication.setBestaccessright(getRestrictedQualifier())
+        val ar = getRestrictedQualifier()
+        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
     }
     publication
   }
-
 
   def generateDSId(input: String): String = {
 
@@ -185,16 +182,16 @@ object DoiBoostMappingUtil {
     s"10|${b}::${DHPUtils.md5(a)}"
   }
 
-
   def generateDataInfo(): DataInfo = {
     generateDataInfo("0.9")
   }
-
 
   def filterPublication(publication: Publication): Boolean = {
 
     //Case empty publication
     if (publication == null)
+      return false
+    if (publication.getId == null || publication.getId.isEmpty)
       return false
 
     //Case publication with no title
@@ -260,7 +257,7 @@ object DoiBoostMappingUtil {
     di.setInferred(false)
     di.setInvisible(false)
     di.setTrust(trust)
-    di.setProvenanceaction(createQualifier("sysimport:actionset", "dnet:provenanceActions"))
+    di.setProvenanceaction(OafMapperUtils.qualifier(ModelConstants.SYSIMPORT_ACTIONSET,ModelConstants.SYSIMPORT_ACTIONSET, ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS))
     di
   }
 
@@ -268,7 +265,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String,className:String, schemeId: String, schemeName:String): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId,className, schemeId, schemeName))
+    sp.setQualifier(OafMapperUtils.qualifier(classId,className, schemeId, schemeName))
     sp.setValue(value)
     sp
 
@@ -278,7 +275,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String,className:String, schemeId: String, schemeName:String, dataInfo: DataInfo): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId,className, schemeId, schemeName))
+    sp.setQualifier(OafMapperUtils.qualifier(classId,className, schemeId, schemeName))
     sp.setValue(value)
     sp.setDataInfo(dataInfo)
     sp
@@ -287,7 +284,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
+    sp.setQualifier(OafMapperUtils.qualifier(classId,classId, schemeId, schemeId))
     sp.setValue(value)
     sp
 
@@ -297,7 +294,7 @@ object DoiBoostMappingUtil {
 
   def createSP(value: String, classId: String, schemeId: String, dataInfo: DataInfo): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(createQualifier(classId, schemeId))
+    sp.setQualifier(OafMapperUtils.qualifier(classId,classId, schemeId, schemeId))
     sp.setValue(value)
     sp.setDataInfo(dataInfo)
     sp
@@ -326,8 +323,8 @@ object DoiBoostMappingUtil {
   def createORIDCollectedFrom(): KeyValue = {
 
     val cf = new KeyValue
-    cf.setValue(ORCID)
-    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(ORCID.toLowerCase))
+    cf.setValue(StringUtils.upperCase(ModelConstants.ORCID))
+    cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(ModelConstants.ORCID.toLowerCase))
     cf
 
   }
@@ -350,20 +347,6 @@ object DoiBoostMappingUtil {
 
   }
 
-  def createQualifier(clsName: String, clsValue: String, schName: String, schValue: String): Qualifier = {
-    val q = new Qualifier
-    q.setClassid(clsName)
-    q.setClassname(clsValue)
-    q.setSchemeid(schName)
-    q.setSchemename(schValue)
-    q
-  }
-
-  def createQualifier(cls: String, sch: String): Qualifier = {
-    createQualifier(cls, cls, sch, sch)
-  }
-
-
   def asField[T](value: T): Field[T] = {
     val tmp = new Field[T]
     tmp.setValue(value)
@@ -371,6 +354,29 @@ object DoiBoostMappingUtil {
 
 
   }
+
+  def isEmpty(x: String) = x == null || x.trim.isEmpty
+
+  def normalizeDoi(input : String) :String ={
+    if(input == null)
+      return null
+    val replaced = input.replaceAll("(?:\\n|\\r|\\t|\\s)", "").toLowerCase.replaceFirst(DOI_PREFIX_REGEX, DOI_PREFIX)
+    if  (isEmpty(replaced))
+      return null
+
+    if(replaced.indexOf("10.") < 0)
+      return null
+
+    val ret = replaced.substring(replaced.indexOf("10."))
+
+    if (!ret.startsWith(DOI_PREFIX))
+      return null
+
+    return ret
+
+
+  }
+
 
 
 }

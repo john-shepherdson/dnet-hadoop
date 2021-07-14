@@ -23,6 +23,7 @@ SELECT
 		d.id                                                      AS collectedfromid,
 		d.officialname                                            AS collectedfromname,
 		o.country || '@@@dnet:countries'                          AS country,
+		array[]::text[]                                           AS alternativenames,
 		'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
 		 array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype || '@@@' || i.issuertype), NULL) AS pid
 FROM dsm_organizations o

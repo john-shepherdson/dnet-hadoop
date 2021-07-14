@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -86,6 +87,7 @@ public class DedupRecordFactory {
 			.forEachRemaining(
 				t -> {
 					T duplicate = t._2();
+
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
 						Result r1 = (Result) duplicate;
@@ -94,6 +96,7 @@ public class DedupRecordFactory {
 						if (r1.getDateofacceptance() != null)
 							dates.add(r1.getDateofacceptance().getValue());
 					}
+
 				});
 
 		// set authors and date
@@ -103,9 +106,11 @@ public class DedupRecordFactory {
 		}
 
 		entity.setId(id);
+
 		entity.setLastupdatetimestamp(ts);
 		entity.setDataInfo(dataInfo);
 
 		return entity;
 	}
+
 }

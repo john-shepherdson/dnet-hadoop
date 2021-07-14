@@ -2,6 +2,7 @@ package eu.dnetlib.doiboost.mag
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.Publication
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
@@ -12,6 +13,23 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 
 object SparkProcessMAG {
+
+  def getDistinctResults (d:Dataset[MagPapers]):Dataset[MagPapers]={
+    d.where(col("Doi").isNotNull)
+      .groupByKey(mp => DoiBoostMappingUtil.normalizeDoi(mp.Doi))(Encoders.STRING)
+      .reduceGroups((p1:MagPapers,p2:MagPapers) => ConversionUtil.choiceLatestMagArtitcle(p1,p2))
+      .map(_._2)(Encoders.product[MagPapers])
+      .map(mp => {
+        new MagPapers(mp.PaperId, mp.Rank, DoiBoostMappingUtil.normalizeDoi(mp.Doi),
+          mp.DocType, mp.PaperTitle, mp.OriginalTitle,
+          mp.BookTitle, mp.Year, mp.Date, mp.Publisher: String,
+          mp.JournalId, mp.ConferenceSeriesId, mp.ConferenceInstanceId,
+          mp.Volume, mp.Issue, mp.FirstPage, mp.LastPage,
+          mp.ReferenceCount, mp.CitationCount, mp.EstimatedCitation,
+          mp.OriginalVenue, mp.FamilyId, mp.CreatedDate)
+      })(Encoders.product[MagPapers])
+  }
+
   def main(args: Array[String]): Unit = {
 
     val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -33,17 +51,11 @@ object SparkProcessMAG {
     implicit val mapEncoderPubs: Encoder[Publication] = org.apache.spark.sql.Encoders.kryo[Publication]
     implicit val tupleForJoinEncoder: Encoder[(String, Publication)] = Encoders.tuple(Encoders.STRING, mapEncoderPubs)
 
-    logger.info("Phase 1) make uninque DOI in Papers:")
+    logger.info("Phase 1) make uninue DOI in Papers:")
     val d: Dataset[MagPapers] = spark.read.load(s"$sourcePath/Papers").as[MagPapers]
 
     // Filtering Papers with DOI, and since for the same DOI we have multiple version of item with different PapersId we get the last one
-    val result: RDD[MagPapers] = d.where(col("Doi").isNotNull)
-      .rdd
-      .map{ p: MagPapers => Tuple2(p.Doi, p) }
-      .reduceByKey((p1:MagPapers,p2:MagPapers) => ConversionUtil.choiceLatestMagArtitcle(p1,p2))
-      .map(_._2)
-
-    val distinctPaper: Dataset[MagPapers] = spark.createDataset(result)
+    val distinctPaper: Dataset[MagPapers] = getDistinctResults(d)
 
     distinctPaper.write.mode(SaveMode.Overwrite).save(s"$workingPath/Papers_distinct")
 
@@ -86,7 +98,7 @@ object SparkProcessMAG {
 
     var magPubs: Dataset[(String, Publication)] =
       spark.read.load(s"$workingPath/merge_step_2").as[Publication]
-        .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
 
 
     val conference = spark.read.load(s"$sourcePath/ConferenceInstances")
@@ -115,9 +127,10 @@ object SparkProcessMAG {
       .save(s"$workingPath/merge_step_3")
 
 
-    //    logger.info("Phase 6) Enrich Publication with description")
-    //    val pa = spark.read.load(s"${parser.get("sourcePath")}/PaperAbstractsInvertedIndex").as[MagPaperAbstract]
-    //    pa.map(ConversionUtil.transformPaperAbstract).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/PaperAbstract")
+//    logger.info("Phase 6) Enrich Publication with description")
+//    val pa = spark.read.load(s"${parser.get("sourcePath")}/PaperAbstractsInvertedIndex").as[MagPaperAbstract]
+//    pa.map(ConversionUtil.transformPaperAbstract).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/PaperAbstract")
+
     val paperAbstract = spark.read.load((s"$workingPath/PaperAbstract")).as[MagPaperAbstract]
 
 
@@ -126,7 +139,7 @@ object SparkProcessMAG {
 
     magPubs.joinWith(paperAbstract, col("_1").equalTo(paperAbstract("PaperId")), "left")
       .map(item => ConversionUtil.updatePubsWithDescription(item)
-      ).write.mode(SaveMode.Overwrite).save(s"$workingPath/merge_step_4")
+    ).write.mode(SaveMode.Overwrite).save(s"$workingPath/merge_step_4")
 
 
     logger.info("Phase 7) Enrich Publication with FieldOfStudy")
@@ -152,7 +165,7 @@ object SparkProcessMAG {
 
     val s:RDD[Publication] = spark.read.load(s"$workingPath/mag_publication").as[Publication]
       .map(p=>Tuple2(p.getId, p)).rdd.reduceByKey((a:Publication, b:Publication) => ConversionUtil.mergePublication(a,b))
-      .map(_._2)
+    .map(_._2)
 
     spark.createDataset(s).as[Publication].write.mode(SaveMode.Overwrite).save(s"$targetPath/magPublication")
 

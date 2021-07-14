@@ -25,19 +25,13 @@
             <description>access token</description>
         </property>
         <property>
-            <name>shell_cmd</name>
-            <value>wget -O /tmp/last_modified.csv.tar http://74804fb637bd8e2fba5b-e0a029c2f87486cddec3b416996a6057.r3.cf1.rackcdn.com/last_modified.csv.tar ; hdfs dfs -copyFromLocal /tmp/last_modified.csv.tar /data/orcid_activities_2020/last_modified.csv.tar ; rm -f /tmp/last_modified.csv.tar
-            </value>
-            <description>the shell command that downloads the lambda file from orcid containing last orcid update informations</description>
-        </property>
-        <property>
             <name>sparkDriverMemory</name>
             <value>7G</value>
             <description>memory for driver process</description>
         </property>
         <property>
             <name>sparkExecutorMemory</name>
-            <value>2G</value>
+            <value>4G</value>
             <description>memory for individual executor</description>
         </property>
         <property>
@@ -103,9 +97,8 @@
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <exec>bash</exec>
-            <argument>-c</argument>
-            <argument>${shell_cmd}</argument>
+            <exec>get_orcid_lambda_file.sh</exec>
+            <file>get_orcid_lambda_file.sh</file>
             <capture-output/>
         </shell>
         <ok to="GenLastModifiedSeq"/>
@@ -197,6 +190,14 @@
             <arg>-o</arg><arg>downloads/updated_works</arg>
             <arg>-t</arg><arg>${token}</arg>
         </spark>
+        <ok to="ResetNewAuthors"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ResetNewAuthors">
+        <fs>
+            <delete path='${workingPath}/orcid_dataset/new_authors'/>
+        </fs>
         <ok to="UpdateOrcidAuthors"/>
         <error to="Kill"/>
     </action>
@@ -224,6 +225,14 @@
             <arg>-o</arg><arg>-</arg>
             <arg>-t</arg><arg>-</arg>
         </spark>
+        <ok to="ResetNewWorks"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ResetNewWorks">
+        <fs>
+            <delete path='${workingPath}/orcid_dataset/new_works'/>
+        </fs>
         <ok to="UpdateOrcidWorks"/>
         <error to="Kill"/>
     </action>
@@ -277,15 +286,6 @@
             <arg>${workingPath}/orcid_dataset/new_works/*</arg>
             <arg>${workingPath}/orcid_dataset/works</arg>
         </distcp>
-        <ok to="CleanWorkingPath"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="CleanWorkingPath">
-        <fs>
-            <delete path='${workingPath}/orcid_dataset/new_authors'/>
-            <delete path='${workingPath}/orcid_dataset/new_works'/>
-        </fs>
         <ok to="updateLastOrcidAuthorsDataset"/>
         <error to="Kill"/>
     </action>
@@ -316,5 +316,5 @@
         <error to="Kill"/>
     </action>
 
-   <end name="End"/>
+    <end name="End"/>
 </workflow-app>

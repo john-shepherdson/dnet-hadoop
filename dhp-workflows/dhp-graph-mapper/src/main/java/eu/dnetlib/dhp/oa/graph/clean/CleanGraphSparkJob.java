@@ -6,7 +6,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -21,9 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -86,9 +86,10 @@ public class CleanGraphSparkJob {
 		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
 
 		readTableFromPath(spark, inputPath, clazz)
-			.map((MapFunction<T, T>) value -> CleaningFunctions.fixVocabularyNames(value), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) GraphCleaningFunctions::fixVocabularyNames, Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
-			.map((MapFunction<T, T>) value -> CleaningFunctions.fixDefaults(value), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) GraphCleaningFunctions::cleanup, Encoders.bean(clazz))
+			.filter((FilterFunction<T>) GraphCleaningFunctions::filter)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -102,15 +103,9 @@ public class CleanGraphSparkJob {
 		return spark
 			.read()
 			.textFile(inputEntityPath)
-			.filter((FilterFunction<String>) s -> isEntityType(s, clazz))
-			.map((MapFunction<String, String>) s -> StringUtils.substringAfter(s, "|"), Encoders.STRING())
 			.map(
 				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, clazz),
 				Encoders.bean(clazz));
-	}
-
-	private static <T extends Oaf> boolean isEntityType(final String s, final Class<T> clazz) {
-		return StringUtils.substringBefore(s, "|").equals(clazz.getName());
 	}
 
 }

@@ -100,7 +100,7 @@ public class MakeTarArchive implements Serializable {
 			BufferedInputStream bis = new BufferedInputStream(is);
 
 			int count;
-			byte data[] = new byte[1024];
+			byte[] data = new byte[1024];
 			while ((count = bis.read(data, 0, data.length)) != -1) {
 				ar.write(data, 0, count);
 			}

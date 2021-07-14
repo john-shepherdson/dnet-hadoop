@@ -57,6 +57,11 @@
             <description>strategy for merging graph table objects with action payload instances, MERGE_FROM_AND_GET or SELECT_NEWER_AND_GET</description>
         </property>
         <property>
+            <name>shouldGroupById</name>
+            <value>false</value>
+            <description>indicates whether the promotion operation should group objects in the graph by id or not</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>

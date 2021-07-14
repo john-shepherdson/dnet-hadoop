@@ -6,8 +6,13 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -21,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -29,6 +35,10 @@ import eu.dnetlib.pace.config.DedupConfig;
 abstract class AbstractSparkAction implements Serializable {
 
 	protected static final int NUM_PARTITIONS = 1000;
+	protected static final int NUM_CONNECTIONS = 20;
+
+	protected static final String TYPE_VALUE_SEPARATOR = "###";
+	protected static final String SP_SEPARATOR = "@@@";
 
 	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -93,7 +103,53 @@ abstract class AbstractSparkAction implements Serializable {
 		dataset.write().option("compression", "gzip").mode(mode).json(outPath);
 	}
 
+	protected static <T> void saveParquet(Dataset<T> dataset, String outPath, SaveMode mode) {
+		dataset.write().option("compression", "gzip").mode(mode).parquet(outPath);
+	}
+
 	protected static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+	}
+
+	protected static String structuredPropertyListToString(List<StructuredProperty> list) {
+
+		return list
+			.stream()
+			.filter(p -> p.getQualifier() != null)
+			.filter(p -> StringUtils.isNotBlank(p.getQualifier().getClassid()))
+			.filter(p -> StringUtils.isNotBlank(p.getValue()))
+			.map(p -> p.getValue() + TYPE_VALUE_SEPARATOR + p.getQualifier().getClassid())
+			.collect(Collectors.joining(SP_SEPARATOR));
+	}
+
+	protected static MapFunction<String, Relation> patchRelFn() {
+		return value -> {
+			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
+			if (rel.getDataInfo() == null) {
+				rel.setDataInfo(new DataInfo());
+			}
+			return rel;
+		};
+	}
+
+	protected boolean isOpenorgs(Relation rel) {
+		return Optional
+			.ofNullable(rel.getCollectedfrom())
+			.map(
+				c -> c
+					.stream()
+					.filter(Objects::nonNull)
+					.filter(kv -> ModelConstants.OPENORGS_NAME.equals(kv.getValue()))
+					.findFirst()
+					.isPresent())
+			.orElse(false);
+	}
+
+	protected static Boolean parseECField(Field<String> field) {
+		if (field == null)
+			return null;
+		if (StringUtils.isBlank(field.getValue()) || field.getValue().equalsIgnoreCase("null"))
+			return null;
+		return field.getValue().equalsIgnoreCase("true");
 	}
 }

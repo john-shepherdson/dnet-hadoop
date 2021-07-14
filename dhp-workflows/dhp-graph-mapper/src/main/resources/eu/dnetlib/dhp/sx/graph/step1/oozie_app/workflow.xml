@@ -1,121 +1,190 @@
-<workflow-app name="Create Raw Graph Step 1: import Entities from aggregator to HDFS" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Create Raw Graph Step 1: extract Entities in raw graph" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>reuseContent</name>
-            <value>false</value>
-            <description>should import content from the aggregator or reuse a previous version</description>
-        </property>
-        <property>
-            <name>workingPath</name>
+            <name>sourcePath</name>
             <description>the working dir base path</description>
         </property>
         <property>
-            <name>targetXMLPath</name>
+            <name>targetPath</name>
             <description>the graph Raw base path</description>
-        </property>
-        <property>
-            <name>targetEntityPath</name>
-            <description>the graph Raw base path</description>
-        </property>
-        <property>
-            <name>format</name>
-            <description>the postgres URL to access to the database</description>
-        </property>
-        <property>
-            <name>layout</name>
-            <description>the user postgres</description>
-        </property>
-        <property>
-            <name>interpretation</name>
-            <description>the password postgres</description>
-        </property>
-        <property>
-            <name>dbhost</name>
-            <description>mongoDB url, example: mongodb://[username:password@]host[:port]</description>
-        </property>
-        <property>
-            <name>dbName</name>
-            <description>mongo database</description>
-        </property>
-        <property>
-            <name>entity</name>
-            <description>the entity type</description>
         </property>
     </parameters>
 
-    <start to="ReuseContent"/>
-
-    <decision name="ReuseContent">
-        <switch>
-            <case to="ImportEntitiesFromMongo">${wf:conf('reuseContent') eq false}</case>
-            <case to="ConvertXML2Entity">${wf:conf('reuseContent') eq true}</case>
-            <default to="ResetWorkingPath"/>
-        </switch>
-    </decision>
-
+    <start to="ExtractEntities"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="ResetWorkingPath">
-        <fs>
-            <delete path='${workingPath}'/>
-            <mkdir path='${workingPath}/input'/>
-        </fs>
-        <ok to="ImportEntitiesFromMongo"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ImportEntitiesFromMongo">
-        <java>
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <main-class>eu.dnetlib.dhp.sx.graph.ImportDataFromMongo</main-class>
-            <arg>-t</arg><arg>${targetXMLPath}</arg>
-            <arg>-n</arg><arg>${nameNode}</arg>
-            <arg>-h</arg><arg>${dbhost}</arg>
-            <arg>-p</arg><arg>27017</arg>
-            <arg>-dn</arg><arg>${dbName}</arg>
-            <arg>-f</arg><arg>${format}</arg>
-            <arg>-l</arg><arg>${layout}</arg>
-            <arg>-i</arg><arg>${interpretation}</arg>
-        </java>
-        <ok to="ResetTargetPath"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="ResetTargetPath">
-        <fs>
-            <delete path='${targetEntityPath}'/>
-        </fs>
-        <ok to="ConvertXML2Entity"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="ConvertXML2Entity">
+    <action name="ExtractEntities">
         <spark xmlns="uri:oozie:spark-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <master>yarn-cluster</master>
+            <master>yarn</master>
             <mode>cluster</mode>
-            <name>Import ${entity} and related entities</name>
-            <class>eu.dnetlib.dhp.sx.graph.SparkXMLToOAFDataset</class>
+            <name>Extract entities in raw graph</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkCreateInputGraph</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory ${sparkExecutorMemory}
+                --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
-                ${sparkExtraOPT}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=2000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>-mt</arg> <arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>${targetXMLPath}</arg>
-            <arg>--targetPath</arg><arg>${workingPath}/input/OAFDataset</arg>
-            <arg>--entity</arg><arg>${entity}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+        </spark>
+        <ok to="ResolveRelations"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="ResolveRelations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Resolve Relations in raw graph</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkResolveRelation</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--relationPath</arg><arg>${targetPath}/extracted/relation</arg>
+            <arg>--workingPath</arg><arg>${targetPath}/resolved/</arg>
+            <arg>--entityPath</arg><arg>${targetPath}/dedup</arg>
+        </spark>
+        <ok to="CreateSummaries"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="CreateSummaries">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Convert Entities to summaries</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkCreateSummaryObject</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=5000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/dedup</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/provision/summaries</arg>
+        </spark>
+        <ok to="CreateScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate Scholix Dataset</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkCreateScholix</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=6000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--summaryPath</arg><arg>${targetPath}/provision/summaries</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/provision/scholix</arg>
+            <arg>--relationPath</arg><arg>${targetPath}/resolved/resolvedRelation</arg>
+
+        </spark>
+        <ok to="DropJSONPath"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="DropJSONPath">
+        <fs>
+            <delete path='${targetPath}/index'/>
+            <mkdir path='${targetPath}/index/'/>
+        </fs>
+        <ok to="SerializeScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="SerializeScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Serialize scholix to JSON</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkConvertObjectToJson</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=6000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/provision/scholix/scholix</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/index/scholix_json</arg>
+            <arg>--objectType</arg><arg>scholix</arg>
+
+        </spark>
+        <ok to="SerializeSummary"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="SerializeSummary">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Serialize summary to JSON</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkConvertObjectToJson</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=6000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/provision/summaries_filtered</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/index/summaries_json</arg>
+            <arg>--objectType</arg><arg>summary</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+
+
+
     <end name="End"/>
 </workflow-app>

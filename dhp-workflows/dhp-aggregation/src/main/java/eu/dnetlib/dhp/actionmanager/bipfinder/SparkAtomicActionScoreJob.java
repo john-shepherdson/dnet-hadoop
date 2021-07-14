@@ -36,7 +36,7 @@ import scala.Tuple2;
  */
 public class SparkAtomicActionScoreJob implements Serializable {
 
-	private static String DOI = "doi";
+	private static final String DOI = "doi";
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionScoreJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 

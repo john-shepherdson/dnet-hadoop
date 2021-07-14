@@ -27,7 +27,7 @@ public class SolrAdminApplication implements Closeable {
 		DELETE_BY_QUERY, COMMIT
 	}
 
-	private CloudSolrClient solrClient;
+	private final CloudSolrClient solrClient;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -90,7 +90,7 @@ public class SolrAdminApplication implements Closeable {
 			case COMMIT:
 				return solrClient.commit(collection);
 			default:
-				throw new IllegalArgumentException("action not managed: " + action.toString());
+				throw new IllegalArgumentException("action not managed: " + action);
 		}
 	}
 

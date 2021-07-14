@@ -11,17 +11,17 @@
     </parameters>
 
     <start to="deleteoutputpath"/>
-
+    
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-
+    
     <action name="deleteoutputpath">
         <fs>
-            <delete path="${rorActionSetPath}"/>
-            <mkdir path="${rorActionSetPath}"/>
-            <delete path="${workingDir}"/>
-            <mkdir path="${workingDir}"/>
+            <delete path='${rorActionSetPath}'/>
+            <mkdir path='${rorActionSetPath}'/>
+            <delete path='${workingDir}'/>
+            <mkdir path='${workingDir}'/>
         </fs>
         <ok to="processRorFile"/>
         <error to="Kill"/>

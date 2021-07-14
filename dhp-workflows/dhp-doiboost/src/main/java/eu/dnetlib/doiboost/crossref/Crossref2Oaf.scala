@@ -2,19 +2,22 @@ package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.lang.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
-import org.json4s.JsonAST._
+import org.json4s.JsonAST.{JValue, _}
 import org.json4s.jackson.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
-import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
+import java.util
+
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
 
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
@@ -86,8 +89,8 @@ case object Crossref2Oaf {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
-    val doi: String = (json \ "DOI").extract[String]
-    result.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
+    val doi: String = DoiBoostMappingUtil.normalizeDoi((json \ "DOI").extract[String])
+    result.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
 
     //MAPPING Crossref DOI into OriginalId
     //and Other Original Identifier of dataset like clinical-trial-number
@@ -95,10 +98,9 @@ case object Crossref2Oaf {
     val alternativeIds = for (JString(ids) <- json \ "alternative-id") yield ids
     val tmp = clinicalTrialNumbers ::: alternativeIds ::: List(doi)
 
-    result.setOriginalId(tmp.filter(id => id != null).asJava)
+    val originalIds = new util.ArrayList(tmp.filter(id => id != null).asJava)
+    result.setOriginalId(originalIds)
 
-    //Set identifier as 50 | doiboost____::md5(DOI)
-    result.setId(generateIdentifier(result, doi))
 
     // Add DataInfo
     result.setDataInfo(generateDataInfo())
@@ -115,10 +117,10 @@ case object Crossref2Oaf {
 
 
     // TITLE
-    val mainTitles = for {JString(title) <- json \ "title" if title.nonEmpty} yield createSP(title, "main title", "dnet:dataCite_title")
-    val originalTitles = for {JString(title) <- json \ "original-title" if title.nonEmpty} yield createSP(title, "alternative title", "dnet:dataCite_title")
-    val shortTitles = for {JString(title) <- json \ "short-title" if title.nonEmpty} yield createSP(title, "alternative title", "dnet:dataCite_title")
-    val subtitles = for {JString(title) <- json \ "subtitle" if title.nonEmpty} yield createSP(title, "subtitle", "dnet:dataCite_title")
+    val mainTitles = for {JString(title) <- json \ "title" if title.nonEmpty} yield createSP(title, "main title", ModelConstants.DNET_DATACITE_TITLE)
+    val originalTitles = for {JString(title) <- json \ "original-title" if title.nonEmpty} yield createSP(title, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
+    val shortTitles = for {JString(title) <- json \ "short-title" if title.nonEmpty} yield createSP(title, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
+    val subtitles = for {JString(title) <- json \ "subtitle" if title.nonEmpty} yield createSP(title, "subtitle", ModelConstants.DNET_DATACITE_TITLE)
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
     // DESCRIPTION
@@ -130,11 +132,11 @@ case object Crossref2Oaf {
     result.setSource(sourceList.asJava)
 
     //RELEVANT DATE Mapping
-    val createdDate = generateDate((json \ "created" \ "date-time").extract[String], (json \ "created" \ "date-parts").extract[List[List[Int]]], "created", "dnet:dataCite_date")
-    val postedDate = generateDate((json \ "posted" \ "date-time").extractOrElse[String](null), (json \ "posted" \ "date-parts").extract[List[List[Int]]], "available", "dnet:dataCite_date")
-    val acceptedDate = generateDate((json \ "accepted" \ "date-time").extractOrElse[String](null), (json \ "accepted" \ "date-parts").extract[List[List[Int]]], "accepted", "dnet:dataCite_date")
-    val publishedPrintDate = generateDate((json \ "published-print" \ "date-time").extractOrElse[String](null), (json \ "published-print" \ "date-parts").extract[List[List[Int]]], "published-print", "dnet:dataCite_date")
-    val publishedOnlineDate = generateDate((json \ "published-online" \ "date-time").extractOrElse[String](null), (json \ "published-online" \ "date-parts").extract[List[List[Int]]], "published-online", "dnet:dataCite_date")
+    val createdDate = generateDate((json \ "created" \ "date-time").extract[String], (json \ "created" \ "date-parts").extract[List[List[Int]]], "created", ModelConstants.DNET_DATACITE_DATE)
+    val postedDate = generateDate((json \ "posted" \ "date-time").extractOrElse[String](null), (json \ "posted" \ "date-parts").extract[List[List[Int]]], "available", ModelConstants.DNET_DATACITE_DATE)
+    val acceptedDate = generateDate((json \ "accepted" \ "date-time").extractOrElse[String](null), (json \ "accepted" \ "date-parts").extract[List[List[Int]]], "accepted", ModelConstants.DNET_DATACITE_DATE)
+    val publishedPrintDate = generateDate((json \ "published-print" \ "date-time").extractOrElse[String](null), (json \ "published-print" \ "date-parts").extract[List[List[Int]]], "published-print", ModelConstants.DNET_DATACITE_DATE)
+    val publishedOnlineDate = generateDate((json \ "published-online" \ "date-time").extractOrElse[String](null), (json \ "published-online" \ "date-parts").extract[List[List[Int]]], "published-online", ModelConstants.DNET_DATACITE_DATE)
 
     val issuedDate = extractDate((json \ "issued" \ "date-time").extractOrElse[String](null), (json \ "issued" \ "date-parts").extract[List[List[Int]]])
     if (StringUtils.isNotBlank(issuedDate)) {
@@ -149,7 +151,7 @@ case object Crossref2Oaf {
     val subjectList:List[String] = (json \ "subject").extractOrElse[List[String]](List())
 
     if (subjectList.nonEmpty) {
-      result.setSubject(subjectList.map(s=> createSP(s, "keywords", "dnet:subject_classification_typologies")).asJava)
+      result.setSubject(subjectList.map(s=> createSP(s, "keywords", ModelConstants.DNET_SUBJECT_TYPOLOGIES)).asJava)
     }
 
 
@@ -173,18 +175,19 @@ case object Crossref2Oaf {
       instance.setLicense(l.head)
 
 
-    val has_review = (json \ "relation" \"has-review" \ "id")
+    // Ticket #6281 added pid to Instance
+    instance.setPid(result.getPid)
+
+    val has_review = json \ "relation" \"has-review" \ "id"
 
     if(has_review != JNothing) {
       instance.setRefereed(
-        OafUtils.createQualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS, ModelConstants.DNET_REVIEW_LEVELS))
+        OafMapperUtils.qualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS, ModelConstants.DNET_REVIEW_LEVELS))
     }
 
-
     instance.setAccessright(getRestrictedQualifier())
-    result.setInstance(List(instance).asJava)
-    instance.setInstancetype(OafUtils.createQualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
-    result.setResourcetype(OafUtils.createQualifier(cobjCategory.substring(0, 4),"dnet:dataCite_resource"))
+    instance.setInstancetype(OafMapperUtils.qualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
+    result.setResourcetype(OafMapperUtils.qualifier(cobjCategory.substring(0, 4),   cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
@@ -195,9 +198,28 @@ case object Crossref2Oaf {
     }
     val s: String = (json \ "URL").extract[String]
     val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
-    if (links.nonEmpty)
+    if (links.nonEmpty) {
       instance.setUrl(links.asJava)
-    result
+    }
+    result.setInstance(List(instance).asJava)
+
+    //IMPORTANT
+    //The old method result.setId(generateIdentifier(result, doi))
+    //is replaced using IdentifierFactory, but the old identifier
+    //is preserved among the originalId(s)
+    val oldId = generateIdentifier(result, doi)
+    result.setId(oldId)
+
+    val newId = IdentifierFactory.createDOIBoostIdentifier(result)
+    if (!oldId.equalsIgnoreCase(newId)) {
+      result.getOriginalId.add(oldId)
+    }
+    result.setId(newId)
+
+    if (result.getId == null)
+      null
+    else
+      result
   }
 
 
@@ -231,6 +253,8 @@ case object Crossref2Oaf {
       return List()
     val cOBJCategory = mappingCrossrefSubType.getOrElse(objectType, mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type"))
     mappingResult(result, json, cOBJCategory)
+    if (result == null || result.getId == null)
+      return List()
 
 
     val funderList: List[mappingFunder] = (json \ "funder").extractOrElse[List[mappingFunder]](List())
@@ -278,9 +302,9 @@ case object Crossref2Oaf {
       val r = new Relation
       r.setSource(sourceId)
       r.setTarget(targetId)
-      r.setRelType("resultProject")
+      r.setRelType(ModelConstants.RESULT_PROJECT)
       r.setRelClass(relClass)
-      r.setSubRelType("outcome")
+      r.setSubRelType(ModelConstants.OUTCOME)
       r.setCollectedfrom(List(cf).asJava)
       r.setDataInfo(di)
       r.setLastupdatetimestamp(ts)
@@ -295,8 +319,8 @@ case object Crossref2Oaf {
         funder.award.get.map(extractField).filter(a => a!= null &&  a.nonEmpty).foreach(
           award => {
             val targetId = getProjectId(nsPrefix, DHPUtils.md5(award))
-            queue += generateRelation(sourceId, targetId , "isProducedBy")
-            queue += generateRelation(targetId , sourceId,  "produces")
+            queue += generateRelation(sourceId, targetId , ModelConstants.IS_PRODUCED_BY)
+            queue += generateRelation(targetId , sourceId, ModelConstants.PRODUCES)
           }
         )
     }
@@ -307,77 +331,77 @@ case object Crossref2Oaf {
 
 
     if (funders != null)
-      funders.foreach(funder => {
-        if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
-          funder.DOI.get match {
-            case "10.13039/100010663" |
-                 "10.13039/100010661" |
-                 "10.13039/501100007601" |
-                 "10.13039/501100000780" |
-                 "10.13039/100010665" =>      generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-            case "10.13039/100011199" |
-                 "10.13039/100004431" |
-                 "10.13039/501100004963" |
-                 "10.13039/501100000780" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
-            case "10.13039/501100000781" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
-              generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-            case "10.13039/100000001" =>      generateSimpleRelationFromAward(funder, "nsf_________", a => a)
-            case "10.13039/501100001665" =>   generateSimpleRelationFromAward(funder, "anr_________", a => a)
-            case "10.13039/501100002341" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a)
-            case "10.13039/501100001602" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a.replace("SFI", ""))
-            case "10.13039/501100000923" =>   generateSimpleRelationFromAward(funder, "arc_________", a => a)
-            case "10.13039/501100000038"=>    val targetId = getProjectId("nserc_______" , "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, "isProducedBy" )
-              queue += generateRelation(targetId, sourceId, "produces" )
-            case "10.13039/501100000155"=>    val targetId = getProjectId("sshrc_______" , "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId,targetId, "isProducedBy" )
-              queue += generateRelation(targetId,sourceId, "produces" )
-            case "10.13039/501100000024"=>    val targetId = getProjectId("cihr________" , "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId,targetId, "isProducedBy" )
-              queue += generateRelation(targetId,sourceId, "produces" )
-            case "10.13039/501100002848" =>   generateSimpleRelationFromAward(funder, "conicytf____", a => a)
-            case "10.13039/501100003448" =>   generateSimpleRelationFromAward(funder, "gsrt________", extractECAward)
-            case "10.13039/501100010198" =>   generateSimpleRelationFromAward(funder, "sgov________", a=>a)
-            case "10.13039/501100004564" =>   generateSimpleRelationFromAward(funder, "mestd_______", extractECAward)
-            case "10.13039/501100003407" =>   generateSimpleRelationFromAward(funder, "miur________", a=>a)
-              val targetId = getProjectId("miur________" , "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId,targetId, "isProducedBy" )
-              queue += generateRelation(targetId,sourceId, "produces" )
-            case "10.13039/501100006588" |
-                 "10.13039/501100004488" =>  generateSimpleRelationFromAward(funder, "irb_hr______", a=>a.replaceAll("Project No.", "").replaceAll("HRZZ-","") )
-            case "10.13039/501100006769"=>    generateSimpleRelationFromAward(funder, "rsf_________", a=>a)
-            case "10.13039/501100001711"=>    generateSimpleRelationFromAward(funder, "snsf________", snsfRule)
-            case "10.13039/501100004410"=>    generateSimpleRelationFromAward(funder, "tubitakf____", a =>a)
-            case "10.10.13039/100004440"=>    generateSimpleRelationFromAward(funder, "wt__________", a =>a)
-            case "10.13039/100004440"=>       val targetId = getProjectId("wt__________" , "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId,targetId, "isProducedBy" )
-              queue += generateRelation(targetId,sourceId, "produces" )
+    funders.foreach(funder => {
+      if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
+        funder.DOI.get match {
+          case "10.13039/100010663" |
+               "10.13039/100010661" |
+               "10.13039/501100007601" |
+               "10.13039/501100000780" |
+               "10.13039/100010665" =>      generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+          case "10.13039/100011199" |
+               "10.13039/100004431" |
+               "10.13039/501100004963" |
+               "10.13039/501100000780" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+          case "10.13039/501100000781" =>   generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+                                            generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+          case "10.13039/100000001" =>      generateSimpleRelationFromAward(funder, "nsf_________", a => a)
+          case "10.13039/501100001665" =>   generateSimpleRelationFromAward(funder, "anr_________", a => a)
+          case "10.13039/501100002341" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a)
+          case "10.13039/501100001602" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a.replace("SFI", ""))
+          case "10.13039/501100000923" =>   generateSimpleRelationFromAward(funder, "arc_________", a => a)
+          case "10.13039/501100000038"=>    val targetId = getProjectId("nserc_______" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+                                            queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+          case "10.13039/501100000155"=>    val targetId = getProjectId("sshrc_______" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId,targetId, ModelConstants.IS_PRODUCED_BY)
+                                            queue += generateRelation(targetId,sourceId, ModelConstants.PRODUCES)
+          case "10.13039/501100000024"=>    val targetId = getProjectId("cihr________" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId,targetId, ModelConstants.IS_PRODUCED_BY)
+                                            queue += generateRelation(targetId,sourceId, ModelConstants.PRODUCES)
+          case "10.13039/501100002848" =>   generateSimpleRelationFromAward(funder, "conicytf____", a => a)
+          case "10.13039/501100003448" =>   generateSimpleRelationFromAward(funder, "gsrt________", extractECAward)
+          case "10.13039/501100010198" =>   generateSimpleRelationFromAward(funder, "sgov________", a=>a)
+          case "10.13039/501100004564" =>   generateSimpleRelationFromAward(funder, "mestd_______", extractECAward)
+          case "10.13039/501100003407" =>   generateSimpleRelationFromAward(funder, "miur________", a=>a)
+                                            val targetId = getProjectId("miur________" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId,targetId, ModelConstants.IS_PRODUCED_BY)
+                                            queue += generateRelation(targetId,sourceId, ModelConstants.PRODUCES)
+          case "10.13039/501100006588" |
+                "10.13039/501100004488" =>  generateSimpleRelationFromAward(funder, "irb_hr______", a=>a.replaceAll("Project No.", "").replaceAll("HRZZ-","") )
+          case "10.13039/501100006769"=>    generateSimpleRelationFromAward(funder, "rsf_________", a=>a)
+          case "10.13039/501100001711"=>    generateSimpleRelationFromAward(funder, "snsf________", snsfRule)
+          case "10.13039/501100004410"=>    generateSimpleRelationFromAward(funder, "tubitakf____", a =>a)
+          case "10.10.13039/100004440"=>    generateSimpleRelationFromAward(funder, "wt__________", a =>a)
+          case "10.13039/100004440"=>       val targetId = getProjectId("wt__________" , "1e5e62235d094afd01cd56e65112fc63")
+                                            queue += generateRelation(sourceId,targetId, ModelConstants.IS_PRODUCED_BY)
+                                            queue += generateRelation(targetId,sourceId, ModelConstants.PRODUCES)
 
-            case _ =>                         logger.debug("no match for "+funder.DOI.get )
-
-
-          }
+          case _ =>                         logger.debug("no match for "+funder.DOI.get )
 
 
-        } else {
-          funder.name match {
-            case   "European Union’s Horizon 2020 research and innovation program" => generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-            case "European Union's" =>
-              generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-              generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
-            case "The French National Research Agency (ANR)" |
-                 "The French National Research Agency" => generateSimpleRelationFromAward(funder, "anr_________", a => a)
-            case "CONICYT, Programa de Formación de Capital Humano Avanzado" => generateSimpleRelationFromAward(funder, "conicytf____", extractECAward)
-            case "Wellcome Trust Masters Fellowship" =>  val targetId = getProjectId("wt__________", "1e5e62235d094afd01cd56e65112fc63")
-              queue +=  generateRelation(sourceId, targetId, "isProducedBy" )
-              queue +=  generateRelation(targetId, sourceId, "produces" )
-            case _ =>                         logger.debug("no match for "+funder.name )
-
-          }
         }
 
+
+      } else {
+        funder.name match {
+          case "European Union’s Horizon 2020 research and innovation program" => generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+          case "European Union's" =>
+            generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+            generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+          case "The French National Research Agency (ANR)" |
+               "The French National Research Agency" => generateSimpleRelationFromAward(funder, "anr_________", a => a)
+          case "CONICYT, Programa de Formación de Capital Humano Avanzado" => generateSimpleRelationFromAward(funder, "conicytf____", extractECAward)
+          case "Wellcome Trust Masters Fellowship" =>  val targetId = getProjectId("wt__________", "1e5e62235d094afd01cd56e65112fc63")
+                                                        queue +=  generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY )
+                                                        queue +=  generateRelation(targetId, sourceId, ModelConstants.PRODUCES )
+          case _ =>                         logger.debug("no match for "+funder.name )
+
+        }
       }
-      )
+
+    }
+    )
     queue.toList
   }
 

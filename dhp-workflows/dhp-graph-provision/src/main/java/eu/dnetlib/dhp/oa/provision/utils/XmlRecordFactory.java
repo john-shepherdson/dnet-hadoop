@@ -38,13 +38,13 @@ import com.mycila.xmltool.XMLTag;
 import eu.dnetlib.dhp.oa.provision.model.*;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.MainEntityType;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class XmlRecordFactory implements Serializable {
 
-	private static final String REL_SUBTYPE_DEDUP = "dedup";
 	private final Map<String, LongAccumulator> accumulators;
 
 	private final Set<String> specialDatasourceTypes;
@@ -1091,7 +1091,7 @@ public class XmlRecordFactory implements Serializable {
 
 		if (StringUtils.isBlank(scheme)) {
 			throw new IllegalArgumentException(
-				String.format("missing scheme for: <%s - %s>", type.toString(), targetType));
+				String.format("missing scheme for: <%s - %s>", type, targetType));
 		}
 		final HashSet<String> fields = Sets.newHashSet(mapFields(link, contexts));
 		if (rel.getValidated() == null)
@@ -1160,6 +1160,27 @@ public class XmlRecordFactory implements Serializable {
 									.asXmlElement(
 										"distributionlocation", instance.getDistributionlocation()));
 					}
+					if (instance.getPid() != null) {
+						fields
+							.addAll(
+								instance
+									.getPid()
+									.stream()
+									.filter(Objects::nonNull)
+									.map(p -> XmlSerializationUtils.mapStructuredProperty("pid", p))
+									.collect(Collectors.toList()));
+					}
+					if (instance.getAlternateIdentifier() != null) {
+						fields
+							.addAll(
+								instance
+									.getAlternateIdentifier()
+									.stream()
+									.filter(Objects::nonNull)
+									.map(p -> XmlSerializationUtils.mapStructuredProperty("alternateidentifier", p))
+									.collect(Collectors.toList()));
+					}
+
 					if (instance.getRefereed() != null && !instance.getRefereed().isBlank()) {
 						fields
 							.add(
@@ -1201,11 +1222,17 @@ public class XmlRecordFactory implements Serializable {
 					if (isNotBlank(er.getLabel())) {
 						fields.add(XmlSerializationUtils.asXmlElement("label", er.getLabel()));
 					}
+					Optional
+						.ofNullable(er.getAlternateLabel())
+						.map(
+							altLabel -> altLabel
+								.stream()
+								.filter(StringUtils::isNotBlank)
+								.collect(Collectors.toList()))
+						.orElse(Lists.newArrayList())
+						.forEach(alt -> fields.add(XmlSerializationUtils.asXmlElement("alternatelabel", alt)));
 					if (isNotBlank(er.getUrl())) {
 						fields.add(XmlSerializationUtils.asXmlElement("url", er.getUrl()));
-					}
-					if (isNotBlank(er.getDescription())) {
-						fields.add(XmlSerializationUtils.asXmlElement("description", er.getDescription()));
 					}
 					if (isNotBlank(er.getUrl())) {
 						fields.add(XmlSerializationUtils.mapQualifier("qualifier", er.getQualifier()));
@@ -1226,7 +1253,7 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	private boolean isDuplicate(RelatedEntityWrapper link) {
-		return REL_SUBTYPE_DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
+		return ModelConstants.DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
 	}
 
 	private List<String> listExtraInfo(OafEntity entity) {

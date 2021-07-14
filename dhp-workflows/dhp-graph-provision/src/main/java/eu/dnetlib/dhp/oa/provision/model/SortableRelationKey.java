@@ -9,6 +9,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Maps;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class SortableRelationKey implements Comparable<SortableRelationKey>, Serializable {
@@ -16,18 +17,18 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 	private static final Map<String, Integer> weights = Maps.newHashMap();
 
 	static {
-		weights.put("participation", 0);
+		weights.put(ModelConstants.PARTICIPATION, 0);
 
-		weights.put("outcome", 1);
-		weights.put("affiliation", 2);
-		weights.put("dedup", 3);
-		weights.put("publicationDataset", 4);
-		weights.put("citation", 5);
-		weights.put("supplement", 6);
-		weights.put("review", 7);
-		weights.put("relationship", 8);
-		weights.put("provision", 9);
-		weights.put("similarity", 10);
+		weights.put(ModelConstants.OUTCOME, 1);
+		weights.put(ModelConstants.AFFILIATION, 2);
+		weights.put(ModelConstants.DEDUP, 3);
+		weights.put(ModelConstants.PUBLICATION_DATASET, 4);
+		weights.put(ModelConstants.CITATION, 5);
+		weights.put(ModelConstants.SUPPLEMENT, 6);
+		weights.put(ModelConstants.REVIEW, 7);
+		weights.put(ModelConstants.RELATIONSHIP, 8);
+		weights.put(ModelConstants.PROVISION, 9);
+		weights.put(ModelConstants.SIMILARITY, 10);
 	}
 
 	private static final long serialVersionUID = 3232323;

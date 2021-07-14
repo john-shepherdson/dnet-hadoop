@@ -12,6 +12,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
@@ -77,11 +79,11 @@ public class GenerateEventsJob {
 
 			final Dataset<Event> dataset = groups
 				.map(
-					g -> EventFinder
+					(MapFunction<ResultGroup, EventGroup>) g -> EventFinder
 						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, topicWhitelist, accumulators),
 					Encoders
 						.bean(EventGroup.class))
-				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
+				.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class));
 
 			ClusterUtils.save(dataset, eventsPath, Event.class, total);
 

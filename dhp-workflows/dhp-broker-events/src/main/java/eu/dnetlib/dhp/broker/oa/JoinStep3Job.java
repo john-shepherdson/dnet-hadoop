@@ -69,7 +69,9 @@ public class JoinStep3Job {
 					(MapFunction<Tuple2<OaBrokerMainEntity, RelatedDataset>, String>) t -> t._1.getOpenaireId(),
 					Encoders.STRING())
 				.agg(aggr)
-				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class));
+				.map(
+					(MapFunction<Tuple2<String, OaBrokerMainEntity>, OaBrokerMainEntity>) t -> t._2,
+					Encoders.bean(OaBrokerMainEntity.class));
 
 			ClusterUtils.save(dataset, joinedEntitiesPath, OaBrokerMainEntity.class, total);
 

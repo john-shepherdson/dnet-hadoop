@@ -37,7 +37,7 @@ public class DumpOrganizationProjectDatasourceTest {
 	private static final Logger log = LoggerFactory
 		.getLogger(DumpOrganizationProjectDatasourceTest.class);
 
-	private static HashMap<String, String> map = new HashMap<>();
+	private static final HashMap<String, String> map = new HashMap<>();
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {

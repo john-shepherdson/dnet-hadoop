@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "asi",
+    "paramLongName": "actionSetId",
+    "paramDescription": "action set identifier (name of the orchestrator)",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "the base path of the raw graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "path of the working directory",
+    "paramRequired": true
+  },
+  {
+    "paramName": "np",
+    "paramLongName": "numPartitions",
+    "paramDescription": "number of partitions for the similarity relations intermediate phases",
+    "paramRequired": false
+  },
+  {
+    "paramName": "la",
+    "paramLongName": "isLookUpUrl",
+    "paramDescription": "the url for the lookup service",
+    "paramRequired": true
+  }
+]

@@ -13,6 +13,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -30,6 +32,7 @@ import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.EventGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.subset.EventSubsetAggregator;
+import scala.Tuple2;
 
 public class IndexEventSubsetJob {
 
@@ -83,13 +86,15 @@ public class IndexEventSubsetJob {
 
 		final Dataset<Event> subset = ClusterUtils
 			.readPath(spark, eventsPath, Event.class)
-			.groupByKey(e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(), Encoders.STRING())
+			.groupByKey(
+				(MapFunction<Event, String>) e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(),
+				Encoders.STRING())
 			.agg(aggr)
-			.map(t -> t._2, Encoders.bean(EventGroup.class))
-			.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
+			.map((MapFunction<Tuple2<String, EventGroup>, EventGroup>) t -> t._2, Encoders.bean(EventGroup.class))
+			.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class));
 
 		final JavaRDD<String> inputRdd = subset
-			.map(e -> prepareEventForIndexing(e, now, total), Encoders.STRING())
+			.map((MapFunction<Event, String>) e -> prepareEventForIndexing(e, now, total), Encoders.STRING())
 			.javaRDD();
 
 		final Map<String, String> esCfg = new HashMap<>();

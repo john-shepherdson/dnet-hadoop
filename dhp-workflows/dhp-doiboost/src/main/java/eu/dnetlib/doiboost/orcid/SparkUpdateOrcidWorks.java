@@ -35,7 +35,7 @@ public class SparkUpdateOrcidWorks {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidWorks.class);
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(

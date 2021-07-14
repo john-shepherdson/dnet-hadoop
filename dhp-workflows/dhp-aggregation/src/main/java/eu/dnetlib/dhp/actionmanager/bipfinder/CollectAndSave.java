@@ -75,7 +75,6 @@ public class CollectAndSave implements Serializable {
 			.union(sc.sequenceFile(inputPath + "/otherresearchproduct", Text.class, Text.class))
 			.union(sc.sequenceFile(inputPath + "/software", Text.class, Text.class))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
-		;
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

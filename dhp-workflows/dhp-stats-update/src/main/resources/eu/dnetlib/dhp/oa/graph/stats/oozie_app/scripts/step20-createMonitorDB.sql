@@ -10,17 +10,19 @@ create view if not exists TARGET.creation_date as select * from SOURCE.creation_
 create view if not exists TARGET.funder as select * from SOURCE.funder;
 create view if not exists TARGET.fundref as select * from SOURCE.fundref;
 create view if not exists TARGET.rndexpenditure as select * from SOURCE.rndexpediture;
---create view if not exists TARGET.roarmap as select * from SOURCE.roarmap;
 
 create table TARGET.result as
     select distinct * from (
         select * from SOURCE.result r where exists (select 1 from SOURCE.result_projects rp join SOURCE.project p on rp.project=p.id where rp.id=r.id)
         union all
-        select * from SOURCE.result r where exists (select 1 from SOURCE.result_concepts rc where rc.id=r.id) ) foo;
+        select * from SOURCE.result r where exists (select 1 from SOURCE.result_concepts rc where rc.id=r.id)
+        union all
+        select * from SOURCE.result r where exists (select 1 from SOURCE.result_projects rp join SOURCE.project p on p.id=rp.project join SOURCE.project_organizations po on po.id=p.id where rp.id=r.id and po.organization in (
+            'openorgs____::759d59f05d77188faee99b7493b46805',
+            'openorgs____::b84450f9864182c67b8611b5593f4250',
+            'openorgs____::d41cf6bd4ab1b1362a44397e0b95c975',
+            'openorgs____::eadc8da90a546e98c03f896661a2e4d4') )) foo;
 compute stats TARGET.result;
-
-create table TARGET.result_affiliated_country as select * from SOURCE.result_affiliated_country rac where exists (select 1 from TARGET.result r where r.id=rac.id);
-compute stats TARGET.result_affiliated_country;
 
 create table TARGET.result_citations as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_citations;
@@ -33,9 +35,6 @@ compute stats TARGET.result_concepts;
 
 create table TARGET.result_datasources as select * from SOURCE.result_datasources orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_datasources;
-
-create table TARGET.result_deposited_country as select * from SOURCE.result_deposited_country orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.result_deposited_country;
 
 create table TARGET.result_fundercount as select * from SOURCE.result_fundercount orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_fundercount;
@@ -103,6 +102,19 @@ create view if not exists TARGET.project_resultcount as select * from SOURCE.pro
 
 create table TARGET.project_results as select id as result, project as id from TARGET.result_projects;
 compute stats TARGET.project_results;
+
+-- indicators
+create table TARGET.indi_pub_green_oa as select * from SOURCE.indi_pub_green_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_green_oa;
+
+create table TARGET.indi_pub_grey_lit as select * from SOURCE.indi_pub_grey_lit orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_grey_lit;
+
+create table TARGET.indi_pub_doi_from_crossref as select * from SOURCE.indi_pub_doi_from_crossref orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_doi_from_crossref;
+
+create table TARGET.indi_pub_gold_oa as select * from SOURCE.indi_pub_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_gold_oa;
 
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;

@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static org.apache.spark.sql.functions.col;
 
+import java.util.Objects;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -13,12 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
+import scala.Tuple3;
 
 public class SparkPropagateRelation extends AbstractSparkAction {
 
@@ -28,8 +32,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		SOURCE, TARGET
 	}
 
-	public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark)
-		throws Exception {
+	public SparkPropagateRelation(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
 	}
 
@@ -56,13 +59,13 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 		final String graphBasePath = parser.get("graphBasePath");
 		final String workingPath = parser.get("workingPath");
-		final String dedupGraphPath = parser.get("dedupGraphPath");
+		final String graphOutputPath = parser.get("graphOutputPath");
 
 		log.info("graphBasePath: '{}'", graphBasePath);
 		log.info("workingPath: '{}'", workingPath);
-		log.info("dedupGraphPath: '{}'", dedupGraphPath);
+		log.info("graphOutputPath: '{}'", graphOutputPath);
 
-		final String outputRelationPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
+		final String outputRelationPath = DedupUtility.createEntityPath(graphOutputPath, "relation");
 		removeOutputDir(spark, outputRelationPath);
 
 		Dataset<Relation> mergeRels = spark
@@ -70,8 +73,9 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			.load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
 			.as(Encoders.bean(Relation.class));
 
+		// <mergedObjectID, dedupID>
 		Dataset<Tuple2<String, String>> mergedIds = mergeRels
-			.where(col("relClass").equalTo("merges"))
+			.where(col("relClass").equalTo(ModelConstants.MERGES))
 			.select(col("source"), col("target"))
 			.distinct()
 			.map(
@@ -83,13 +87,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 		Dataset<Relation> rels = spark.read().textFile(relationPath).map(patchRelFn(), Encoders.bean(Relation.class));
 
-		Dataset<Relation> newRels = processDataset(
-			processDataset(rels, mergedIds, FieldType.SOURCE, getFixRelFn(FieldType.SOURCE)),
-			mergedIds,
-			FieldType.TARGET,
-			getFixRelFn(FieldType.TARGET))
-				.filter(SparkPropagateRelation::containsDedup)
-				.distinct();
+		Dataset<Relation> newRels = createNewRels(rels, mergedIds, getFixRelFn());
 
 		Dataset<Relation> updated = processDataset(
 			processDataset(rels, mergedIds, FieldType.SOURCE, getDeletedFn()),
@@ -102,7 +100,8 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 				newRels
 					.union(updated)
 					.union(mergeRels)
-					.map((MapFunction<Relation, Relation>) r -> r, Encoders.kryo(Relation.class))),
+					.map((MapFunction<Relation, Relation>) r -> r, Encoders.kryo(Relation.class)))
+						.filter((FilterFunction<Relation>) r -> !Objects.equals(r.getSource(), r.getTarget())),
 			outputRelationPath, SaveMode.Overwrite);
 	}
 
@@ -115,6 +114,36 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 				Encoders.STRING())
 			.agg(new RelationAggregator().toColumn())
 			.map((MapFunction<Tuple2<String, Relation>, Relation>) t -> t._2(), Encoders.bean(Relation.class));
+	}
+
+	// redirect the relations to the dedupID
+	private static Dataset<Relation> createNewRels(
+		Dataset<Relation> rels, // all the relations to be redirected
+		Dataset<Tuple2<String, String>> mergedIds, // merge rels: <mergedObjectID, dedupID>
+		MapFunction<Tuple2<Tuple2<Tuple3<String, Relation, String>, Tuple2<String, String>>, Tuple2<String, String>>, Relation> mapRel) {
+
+		// <sourceID, relation, targetID>
+		Dataset<Tuple3<String, Relation, String>> mapped = rels
+			.map(
+				(MapFunction<Relation, Tuple3<String, Relation, String>>) r -> new Tuple3<>(getId(r, FieldType.SOURCE),
+					r, getId(r, FieldType.TARGET)),
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class), Encoders.STRING()));
+
+		// < <sourceID, relation, target>, <sourceID, dedupID> >
+		Dataset<Tuple2<Tuple3<String, Relation, String>, Tuple2<String, String>>> relSource = mapped
+			.joinWith(mergedIds, mapped.col("_1").equalTo(mergedIds.col("_1")), "left_outer");
+
+		// < <<sourceID, relation, targetID>, <sourceID, dedupID>>, <targetID, dedupID> >
+		Dataset<Tuple2<Tuple2<Tuple3<String, Relation, String>, Tuple2<String, String>>, Tuple2<String, String>>> relSourceTarget = relSource
+			.joinWith(mergedIds, relSource.col("_1._3").equalTo(mergedIds.col("_1")), "left_outer");
+
+		return relSourceTarget
+			.filter(
+				(FilterFunction<Tuple2<Tuple2<Tuple3<String, Relation, String>, Tuple2<String, String>>, Tuple2<String, String>>>) r -> r
+					._1()
+					._1() != null || r._2() != null)
+			.map(mapRel, Encoders.bean(Relation.class))
+			.distinct();
 	}
 
 	private static Dataset<Relation> processDataset(
@@ -132,21 +161,11 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 	}
 
 	private FilterFunction<Relation> getRelationFilterFunction() {
-		return (FilterFunction<Relation>) r -> StringUtils.isNotBlank(r.getSource()) ||
+		return r -> StringUtils.isNotBlank(r.getSource()) ||
 			StringUtils.isNotBlank(r.getTarget()) ||
 			StringUtils.isNotBlank(r.getRelClass()) ||
 			StringUtils.isNotBlank(r.getSubRelType()) ||
 			StringUtils.isNotBlank(r.getRelClass());
-	}
-
-	private static MapFunction<String, Relation> patchRelFn() {
-		return value -> {
-			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			if (rel.getDataInfo() == null) {
-				rel.setDataInfo(new DataInfo());
-			}
-			return rel;
-		};
 	}
 
 	private static String getId(Relation r, FieldType type) {
@@ -160,28 +179,25 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		}
 	}
 
-	private static MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation> getFixRelFn(
-		FieldType type) {
+	private static MapFunction<Tuple2<Tuple2<Tuple3<String, Relation, String>, Tuple2<String, String>>, Tuple2<String, String>>, Relation> getFixRelFn() {
 		return value -> {
-			if (value._2() != null) {
-				Relation r = value._1()._2();
-				String id = value._2()._2();
-				if (r.getDataInfo() == null) {
-					r.setDataInfo(new DataInfo());
-				}
-				r.getDataInfo().setDeletedbyinference(false);
-				switch (type) {
-					case SOURCE:
-						r.setSource(id);
-						return r;
-					case TARGET:
-						r.setTarget(id);
-						return r;
-					default:
-						throw new IllegalArgumentException("");
-				}
+
+			Relation r = value._1()._1()._2();
+			String newSource = value._1()._2() != null ? value._1()._2()._2() : null;
+			String newTarget = value._2() != null ? value._2()._2() : null;
+
+			if (r.getDataInfo() == null) {
+				r.setDataInfo(new DataInfo());
 			}
-			return value._1()._2();
+			r.getDataInfo().setDeletedbyinference(false);
+
+			if (newSource != null)
+				r.setSource(newSource);
+
+			if (newTarget != null)
+				r.setTarget(newTarget);
+
+			return r;
 		};
 	}
 
@@ -199,8 +215,4 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		};
 	}
 
-	private static boolean containsDedup(final Relation r) {
-		return r.getSource().toLowerCase().contains("dedup")
-			|| r.getTarget().toLowerCase().contains("dedup");
-	}
 }

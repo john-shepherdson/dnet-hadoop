@@ -1,6 +1,9 @@
 package eu.dnetlib.doiboost.uw
 
-import eu.dnetlib.dhp.schema.oaf.{Instance, Publication}
+import eu.dnetlib.dhp.schema.common.ModelConstants
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
+import eu.dnetlib.dhp.schema.oaf.{AccessRight, Instance, OpenAccessRoute, Publication}
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -20,20 +23,49 @@ case class OALocation(evidence:Option[String], host_type:Option[String], is_best
 object UnpayWallToOAF {
   val logger: Logger = LoggerFactory.getLogger(getClass)
 
+  def get_color(is_oa:Boolean, location: OALocation, journal_is_oa:Boolean):Option[OpenAccessRoute] = {
+    if (is_oa) {
+      if (location.host_type.isDefined) {
+        {
+          if (location.host_type.get.equalsIgnoreCase("repository"))
+            return Some(OpenAccessRoute.green)
+          else if (location.host_type.get.equalsIgnoreCase("publisher")) {
+            if (journal_is_oa)
+              return Some(OpenAccessRoute.gold)
+            else {
+              if (location.license.isDefined)
+                return Some(OpenAccessRoute.hybrid)
+              else
+                return Some(OpenAccessRoute.bronze)
+            }
+
+          }
+        }
+
+      }
+    }
+    None
+  }
+
+
   def convertToOAF(input:String):Publication = {
     val pub = new Publication
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
-    val doi = (json \"doi").extract[String]
+    val doi = DoiBoostMappingUtil.normalizeDoi((json \"doi").extract[String])
 
+    if(doi == null)
+      return null
 
     val is_oa = (json\ "is_oa").extract[Boolean]
 
+    val journal_is_oa= (json\ "journal_is_oa").extract[Boolean]
+
     val oaLocation:OALocation = (json \ "best_oa_location").extractOrElse[OALocation](null)
-    pub.setPid(List(createSP(doi, "doi", PID_TYPES)).asJava)
-    pub.setId(generateIdentifier(pub, doi.toLowerCase))
+
+    val colour = get_color(is_oa, oaLocation, journal_is_oa)
 
     pub.setCollectedfrom(List(createUnpayWallCollectedFrom()).asJava)
     pub.setDataInfo(generateDataInfo())
@@ -46,13 +78,31 @@ object UnpayWallToOAF {
     val i :Instance= new Instance()
 
     i.setCollectedfrom(createUnpayWallCollectedFrom())
-    i.setAccessright(getOpenAccessQualifier())
+//    i.setAccessright(getOpenAccessQualifier())
     i.setUrl(List(oaLocation.url.get).asJava)
 
     if (oaLocation.license.isDefined)
       i.setLicense(asField(oaLocation.license.get))
+    pub.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+
+    // Ticket #6282 Adding open Access Colour
+    if (colour.isDefined) {
+      val a = new AccessRight
+      a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
+      a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
+      a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
+      a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
+      a.setOpenAccessRoute(colour.get)
+      i.setAccessright(a)
+      i.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+    }
     pub.setInstance(List(i).asJava)
 
+    //IMPORTANT
+    //The old method pub.setId(IdentifierFactory.createIdentifier(pub))
+    //will be replaced using IdentifierFactory
+    //pub.setId(generateIdentifier(pub, doi.toLowerCase))
+    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
     pub
 
   }

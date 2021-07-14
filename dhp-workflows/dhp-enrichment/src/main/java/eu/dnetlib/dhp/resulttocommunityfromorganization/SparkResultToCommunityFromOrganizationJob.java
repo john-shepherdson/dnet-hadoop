@@ -98,7 +98,7 @@ public class SparkResultToCommunityFromOrganizationJob {
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> resultCommunityFn() {
-		return (MapFunction<Tuple2<R, ResultCommunityList>, R>) value -> {
+		return value -> {
 			R ret = value._1();
 			Optional<ResultCommunityList> rcl = Optional.ofNullable(value._2());
 			if (rcl.isPresent()) {

@@ -20,7 +20,7 @@ public class DumpToActionsUtility {
 	public static String getStringValue(final JsonObject root, final String key) {
 		if (root.has(key) && !root.get(key).isJsonNull())
 			return root.get(key).getAsString();
-		return new String("");
+		return "";
 	}
 
 	public static List<String> getArrayValues(final JsonObject root, final String key) {

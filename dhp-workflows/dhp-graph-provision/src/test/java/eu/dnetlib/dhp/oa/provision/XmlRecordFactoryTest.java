@@ -29,9 +29,9 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class XmlRecordFactoryTest {
 
-	private static final String otherDsTypeId = "scholarcomminfra,infospace,pubsrepository::mock,entityregistry,entityregistry::projects,entityregistry::repositories,websource";
+	public static final String otherDsTypeId = "scholarcomminfra,infospace,pubsrepository::mock,entityregistry,entityregistry::projects,entityregistry::repositories,websource";
 
-	private static ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+	public static ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Test
@@ -61,6 +61,11 @@ public class XmlRecordFactoryTest {
 		Assertions.assertEquals("0000-0001-9613-9956", doc.valueOf("//creator[@rank = '2']/@orcid"));
 		Assertions.assertEquals("", doc.valueOf("//creator[@rank = '2']/@orcid_pending"));
 
+		Assertions.assertEquals("doi", doc.valueOf("//instance/pid/@classid"));
+		Assertions.assertEquals("10.1109/TED.2018.2853550", doc.valueOf("//instance/pid/text()"));
+
+		Assertions.assertEquals("doi", doc.valueOf("//instance/alternateidentifier/@classid"));
+		Assertions.assertEquals("10.5689/LIB.2018.2853550", doc.valueOf("//instance/alternateidentifier/text()"));
 		// TODO add assertions based of values extracted from the XML record
 	}
 

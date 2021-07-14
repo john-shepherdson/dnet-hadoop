@@ -142,7 +142,7 @@ public class AuthorMatcher {
 
 	public static String normalize(final String s) {
 		if (s == null) {
-			return new String("");
+			return "";
 		}
 		return nfd(s)
 			.toLowerCase()
@@ -189,16 +189,13 @@ public class AuthorMatcher {
 	}
 
 	private static void updateRanks(List<Contributor> contributors) {
-		boolean seqFound = false;
-		if (contributors
+		boolean seqFound = contributors
 			.stream()
 			.filter(
 				c -> c.getRole() != null && c.getSequence() != null &&
 					c.getRole().equals("author") && (c.getSequence().equals("first") ||
 						c.getSequence().equals("additional")))
-			.count() > 0) {
-			seqFound = true;
-		}
+			.count() > 0;
 		if (!seqFound) {
 			List<Integer> seqIds = Arrays.asList(0);
 			contributors.forEach(c -> {

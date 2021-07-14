@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.graph.merge;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.xml.crypto.Data;
 
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -45,7 +47,7 @@ public class MergeGraphTableSparkJob {
 
 	static {
 		Qualifier compatibility = new Qualifier();
-		compatibility.setClassid("UNKNOWN");
+		compatibility.setClassid(ModelConstants.UNKNOWN);
 		DATASOURCE.setOpenairecompatibility(compatibility);
 	}
 
@@ -127,6 +129,13 @@ public class MergeGraphTableSparkJob {
 				}
 			}, Encoders.bean(p_clazz))
 			.filter((FilterFunction<P>) Objects::nonNull)
+			.filter((FilterFunction<P>) o -> {
+				HashSet<String> collectedFromNames = Optional
+					.ofNullable(o.getCollectedfrom())
+					.map(c -> c.stream().map(KeyValue::getValue).collect(Collectors.toCollection(HashSet::new)))
+					.orElse(new HashSet<String>());
+				return !collectedFromNames.contains("Datacite");
+			})
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
