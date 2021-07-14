@@ -48,6 +48,8 @@ class MappingORCIDToOAFTest {
 
     SparkPreprocessORCID.run( spark,sourcePath, workingPath)
 
+    SparkConvertORCIDToOAF.run(spark, workingPath,targetPath)
+
     val mapper = new ObjectMapper()
 
 
@@ -62,6 +64,8 @@ class MappingORCIDToOAFTest {
     println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p.first()))
 
     spark.close()
+
+
   }
 
 
