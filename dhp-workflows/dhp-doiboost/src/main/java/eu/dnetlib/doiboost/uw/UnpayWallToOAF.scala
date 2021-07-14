@@ -11,6 +11,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
+import eu.dnetlib.doiboost.uw.UnpayWallToOAF.get_unpaywall_color
 
 
 
@@ -22,6 +23,21 @@ case class OALocation(evidence:Option[String], host_type:Option[String], is_best
 
 object UnpayWallToOAF {
   val logger: Logger = LoggerFactory.getLogger(getClass)
+
+
+  def get_unpaywall_color(input:String):Option[OpenAccessRoute] = {
+    if(input.equalsIgnoreCase("close"))
+      return None
+    if(input.equalsIgnoreCase("green"))
+      return Some(OpenAccessRoute.green)
+    if(input.equalsIgnoreCase("bronze"))
+      return Some(OpenAccessRoute.bronze)
+    if(input.equalsIgnoreCase("hybrid"))
+      return Some(OpenAccessRoute.hybrid)
+    else
+      return Some(OpenAccessRoute.gold)
+
+  }
 
   def get_color(is_oa:Boolean, location: OALocation, journal_is_oa:Boolean):Option[OpenAccessRoute] = {
     if (is_oa) {
@@ -65,7 +81,7 @@ object UnpayWallToOAF {
 
     val oaLocation:OALocation = (json \ "best_oa_location").extractOrElse[OALocation](null)
 
-    val colour = get_color(is_oa, oaLocation, journal_is_oa)
+    val colour = get_unpaywall_color((json \ "oa_status").extractOrElse[String](null))
 
     pub.setCollectedfrom(List(createUnpayWallCollectedFrom()).asJava)
     pub.setDataInfo(generateDataInfo())
