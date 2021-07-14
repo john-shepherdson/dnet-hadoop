@@ -48,6 +48,8 @@ class MappingORCIDToOAFTest {
 
     SparkPreprocessORCID.run( spark,sourcePath, workingPath)
 
+    SparkConvertORCIDToOAF.run(spark, workingPath,targetPath)
+
     val mapper = new ObjectMapper()
 
 
@@ -60,6 +62,8 @@ class MappingORCIDToOAFTest {
 
     assertTrue(oA == p.count())
     println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p.first()))
+
+    spark.close()
 
 
   }
@@ -78,7 +82,7 @@ class MappingORCIDToOAFTest {
     val oaf = ORCIDToOAF.convertTOOAF(orcid)
     assert(oaf.getPid.size() == 1)
     oaf.getPid.toList.foreach(pid => assert(pid.getQualifier.getClassid.equals("doi")))
-    oaf.getPid.toList.foreach(pid => assert(pid.getValue.equals("10.1042/BCJ20160876".toLowerCase())))
+    oaf.getPid.toList.foreach(pid => assert(pid.getValue.equals("10.1042/BCJ20160876")))
     //println(mapper.writeValueAsString(ORCIDToOAF.convertTOOAF(orcid)))
 
 
