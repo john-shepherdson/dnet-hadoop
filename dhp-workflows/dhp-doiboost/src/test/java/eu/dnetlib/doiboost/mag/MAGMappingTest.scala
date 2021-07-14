@@ -70,9 +70,15 @@ class MAGMappingTest {
 
     implicit val formats = DefaultFormats
 
-    val conf = new SparkConf().setAppName("test").setMaster("local[2]")
-    val sc = new SparkContext(conf)
-    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val conf = new SparkConf()
+    conf.setMaster("local[*]")
+    conf.set("spark.driver.host", "localhost")
+    val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName(getClass.getSimpleName)
+        .config(conf)
+        .getOrCreate()
     val path = getClass.getResource("magPapers.json").getPath
 
     import org.apache.spark.sql.Encoders
@@ -95,9 +101,15 @@ class MAGMappingTest {
 
     implicit val formats = DefaultFormats
 
-    val conf = new SparkConf().setAppName("test").setMaster("local[2]")
-    val sc = new SparkContext(conf)
-    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val conf = new SparkConf()
+    conf.setMaster("local[*]")
+    conf.set("spark.driver.host", "localhost")
+    val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName(getClass.getSimpleName)
+        .config(conf)
+        .getOrCreate()
     val path = getClass.getResource("duplicatedMagPapers.json").getPath
 
     import org.apache.spark.sql.Encoders
