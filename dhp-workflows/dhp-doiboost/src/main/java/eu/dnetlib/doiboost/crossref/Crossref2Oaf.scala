@@ -168,12 +168,22 @@ case object Crossref2Oaf {
     // Mapping instance
     val instance = new Instance()
     val license = for {
-      JString(lic) <- json \ "license" \ "URL"
-    } yield asField(lic)
-    val l = license.filter(d => StringUtils.isNotBlank(d.getValue))
-    if (l.nonEmpty)
-      instance.setLicense(l.head)
-
+      JObject(license) <- json \ "license"
+      JField("URL", JString(lic)) <- license
+      JField("content-version", JString(content_version)) <- license
+    } yield (asField(lic), content_version)
+    val l = license.filter(d => StringUtils.isNotBlank(d._1.getValue))
+    if (l.nonEmpty){
+      if (l exists (d => d._2.equals("vor"))){
+        for(d <- l){
+          if (d._2.equals("vor")){
+            instance.setLicense(d._1)
+          }
+        }
+      }
+      else{
+        instance.setLicense(l.head._1)}
+    }
 
     // Ticket #6281 added pid to Instance
     instance.setPid(result.getPid)
