@@ -188,7 +188,7 @@ public class SparkGenEnrichedOrcidWorks {
 							OBJECT_MAPPER.writeValueAsString(new AtomicAction<>(Publication.class, p))))
 					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
 					.saveAsNewAPIHadoopFile(
-						workingPath.concat(outputEnrichedWorksPath),
+						outputEnrichedWorksPath,
 						Text.class,
 						Text.class,
 						SequenceFileOutputFormat.class,
