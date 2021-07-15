@@ -4,6 +4,7 @@ package eu.dnetlib.doiboost.orcidnodoi;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,10 +33,7 @@ import com.google.gson.JsonParser;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.orcid.AuthorData;
-import eu.dnetlib.dhp.schema.orcid.AuthorSummary;
-import eu.dnetlib.dhp.schema.orcid.Work;
-import eu.dnetlib.dhp.schema.orcid.WorkDetail;
+import eu.dnetlib.dhp.schema.orcid.*;
 import eu.dnetlib.doiboost.orcid.json.JsonHelper;
 import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
@@ -111,6 +109,10 @@ public class SparkGenEnrichedOrcidWorks {
 						Encoders.bean(WorkDetail.class));
 				logger.info("Works data loaded: " + workDataset.count());
 
+				final LongAccumulator warnNotFoundContributors = spark
+					.sparkContext()
+					.longAccumulator("warnNotFoundContributors");
+
 				JavaRDD<Tuple2<String, String>> enrichedWorksRDD = workDataset
 					.joinWith(
 						authorDataset,
@@ -119,7 +121,21 @@ public class SparkGenEnrichedOrcidWorks {
 						(MapFunction<Tuple2<WorkDetail, AuthorData>, Tuple2<String, String>>) value -> {
 							WorkDetail w = value._1;
 							AuthorData a = value._2;
-							AuthorMatcher.match(a, w.getContributors());
+							if (w.getContributors() == null
+								|| (w.getContributors() != null && w.getContributors().size() == 0)) {
+								Contributor c = new Contributor();
+								c.setName(a.getName());
+								c.setSurname(a.getSurname());
+								c.setCreditName(a.getCreditName());
+								c.setOid(a.getOid());
+								List<Contributor> contributors = Arrays.asList(c);
+								w.setContributors(contributors);
+								if (warnNotFoundContributors != null) {
+									warnNotFoundContributors.add(1);
+								}
+							} else {
+								AuthorMatcher.match(a, w.getContributors());
+							}
 							return new Tuple2<>(a.getOid(), JsonHelper.createOidWork(w));
 						},
 						Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
@@ -172,7 +188,7 @@ public class SparkGenEnrichedOrcidWorks {
 							OBJECT_MAPPER.writeValueAsString(new AtomicAction<>(Publication.class, p))))
 					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
 					.saveAsNewAPIHadoopFile(
-						workingPath.concat(outputEnrichedWorksPath),
+						outputEnrichedWorksPath,
 						Text.class,
 						Text.class,
 						SequenceFileOutputFormat.class,
@@ -180,6 +196,7 @@ public class SparkGenEnrichedOrcidWorks {
 
 				logger.info("parsedPublications: " + parsedPublications.value().toString());
 				logger.info("enrichedPublications: " + enrichedPublications.value().toString());
+				logger.info("warnNotFoundContributors: " + warnNotFoundContributors.value().toString());
 				logger.info("errorsGeneric: " + errorsGeneric.value().toString());
 				logger.info("errorsInvalidTitle: " + errorsInvalidTitle.value().toString());
 				logger.info("errorsNotFoundAuthors: " + errorsNotFoundAuthors.value().toString());
