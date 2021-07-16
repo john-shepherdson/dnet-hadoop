@@ -213,8 +213,10 @@ object DoiBoostMappingUtil {
       if (item != null) {
         hb.setValue(item.officialname)
         hb.setKey(generateDSId(item.id))
-        if (item.openAccess)
+        if (item.openAccess) {
           i.setAccessright(getOpenAccessQualifier())
+          i.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)
+        }
         val ar = getOpenAccessQualifier()
         publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
