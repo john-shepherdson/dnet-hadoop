@@ -149,18 +149,50 @@ object DoiBoostMappingUtil {
     //OUP (BUT ONLY AFTER 12 MONTHS FROM THE PUBLICATION DATE, OTHERWISE THEY ARE EMBARGOED)
     if(license.equals("https://academic.oup.com/journals/pages/open_access/funder_policies/chorus/standard_publication_model")){
       val now = java.time.LocalDate.now
-      val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-      val pub_date = LocalDate.parse(date, formatter)
+      try{
+        val pub_date = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        if (((now.toEpochDay - pub_date.toEpochDay)/365.0) > 1){
+          val oaq : AccessRight = getOpenAccessQualifier()
+          oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+          return oaq
+        }
+        else{
+          return getEmbargoedAccessQualifier()
+        }
+      }catch {
+        case e: Exception => {
+          try{
+          val pub_date = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+          if (((now.toEpochDay - pub_date.toEpochDay)/365.0) > 1){
+            val oaq : AccessRight = getOpenAccessQualifier()
+            oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+            return oaq
+          }
+          else{
+            return getEmbargoedAccessQualifier()
+          }
+          }catch{
+            case ex: Exception => return getClosedAccessQualifier()
+          }
+        }
 
-      if (((now.toEpochDay - pub_date.toEpochDay)/365.0) > 1){
-        val oaq : AccessRight = getOpenAccessQualifier()
-        oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
-        return oaq
       }
-      else{
-        return getEmbargoedAccessQualifier()
-      }
+
+      //val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+
+
+     // val pub_date = LocalDate.parse(date, formatter)
+
+//      if (((now.toEpochDay - pub_date.toEpochDay)/365.0) > 1){
+//        val oaq : AccessRight = getOpenAccessQualifier()
+//        oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+//        return oaq
+//      }
+//      else{
+//        return getEmbargoedAccessQualifier()
+//      }
     }
 
     return getClosedAccessQualifier()

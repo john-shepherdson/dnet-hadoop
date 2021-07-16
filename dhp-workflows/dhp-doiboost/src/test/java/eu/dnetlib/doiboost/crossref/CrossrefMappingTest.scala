@@ -589,6 +589,27 @@ class CrossrefMappingTest {
   }
 
 
+  @Test
+  def testLicenseEmbargoDateTime() :Unit = {
+    val json = Source.fromInputStream(getClass.getResourceAsStream("publication_license_embargo_datetime.json")).mkString
 
+
+    assertNotNull(json)
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+
+    val item : Result = resultList.filter(p => p.isInstanceOf[Result]).head.asInstanceOf[Result]
+
+    assertTrue(item.getInstance().asScala exists (i => i.getLicense.getValue.equals("https://academic.oup.com/journals/pages/open_access/funder_policies/chorus/standard_publication_model")))
+    assertTrue(item.getInstance().asScala exists (i => i.getAccessright.getClassid.equals("EMBARGO")))
+    assertTrue(item.getInstance().asScala exists (i => i.getAccessright.getOpenAccessRoute == null))
+    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
+    println(mapper.writeValueAsString(item))
+
+  }
 
 }
