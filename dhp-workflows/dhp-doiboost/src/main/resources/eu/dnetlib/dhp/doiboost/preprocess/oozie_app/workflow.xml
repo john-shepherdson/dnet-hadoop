@@ -63,18 +63,41 @@
 
     <decision name="resume_from">
         <switch>
+            <case to="End">${wf:conf('resumeFrom') eq 'Skip'}</case>
+            <case to="ImportCrossRef">${wf:conf('resumeFrom') eq 'ImportCrossRef'}</case>
             <case to="UnpackCrossrefEntries">${wf:conf('resumeFrom') eq 'UnpackCrossrefEntries'}</case>
             <case to="GenerateCrossrefDataset">${wf:conf('resumeFrom') eq 'GenerateCrossrefDataset'}</case>
             <case to="ResetMagWorkingPath">${wf:conf('resumeFrom') eq 'ResetMagWorkingPath'}</case>
             <case to="ConvertMagToDataset">${wf:conf('resumeFrom') eq 'ConvertMagToDataset'}</case>
             <case to="PreProcessORCID">${wf:conf('resumeFrom') eq 'PreProcessORCID'}</case>
-            <default to="ImportCrossRef"/>
+            <default to="DownloadDump"/>
         </switch>
     </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="DownloadDump">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>download.sh</exec>
+            <argument>${url}</argument>
+            <argument>${crossrefDumpPath}</argument>
+            <argument>${crossrefdumpfilename}</argument>
+            <file>download.sh</file>
+            <capture-output/>
+        </shell>
+        <ok to="ImportCrossRef"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="ImportCrossRef">
         <java>
