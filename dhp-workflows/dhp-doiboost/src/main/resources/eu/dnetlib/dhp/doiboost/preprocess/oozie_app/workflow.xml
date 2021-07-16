@@ -70,13 +70,14 @@
             <case to="ResetMagWorkingPath">${wf:conf('resumeFrom') eq 'ResetMagWorkingPath'}</case>
             <case to="ConvertMagToDataset">${wf:conf('resumeFrom') eq 'ConvertMagToDataset'}</case>
             <case to="PreProcessORCID">${wf:conf('resumeFrom') eq 'PreProcessORCID'}</case>
-            <default to="DownloadDump"/>
+            <default to="removeFiles"/> <!-- first action to be done when downloadDump is to be performed -->
         </switch>
     </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
 
     <action name="DownloadDump">
         <shell xmlns="uri:oozie:shell-action:0.2">
@@ -105,7 +106,7 @@
             <name-node>${nameNode}</name-node>
             <main-class>eu.dnetlib.doiboost.crossref.ExtractCrossrefRecords</main-class>
             <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
-            <arg>--crossrefFileNameTarGz</arg><arg>${crossrefDumpPath}/crossref.tar.gz</arg>
+            <arg>--crossrefFileNameTarGz</arg><arg>${crossrefdumpfilename}</arg>
             <arg>--workingPath</arg><arg>${crossrefDumpPath}</arg>
             <arg>--outputPath</arg><arg>${crossrefDumpPath}/files/</arg>
         </java>
@@ -161,16 +162,16 @@
             <arg>--targetPath</arg><arg>${inputPathCrossref}/crossref_ds</arg>
 
         </spark>
-        <ok to="removeFiles"/>
+        <ok to="ResetMagWorkingPath"/>
         <error to="Kill"/>
     </action>
 
         <action name="removeFiles">
             <fs>
-<!--                <delete path="${crossrefDumpPath}/files"/>-->
-                    <delete path="${crossrefDumpPath}/crossref_unpack/"/>
+              <delete path="${crossrefDumpPath}/files"/>
+                <delete path="${crossrefDumpPath}/crossref_unpack/"/>
             </fs>
-            <ok to="ResetMagWorkingPath"/>
+            <ok to="DownloadDump"/>
             <error to="Kill"/>
         </action>
 
