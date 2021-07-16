@@ -1,11 +1,10 @@
 package eu.dnetlib.dhp.sx.graph.scholix
 
 
-import eu.dnetlib.dhp.schema.oaf.{Dataset, Relation, Result, StructuredProperty}
-import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixCollectedFrom, ScholixEntityId, ScholixIdentifier, ScholixRelationship, ScholixResource}
+import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.sx.scholix._
 import eu.dnetlib.dhp.schema.sx.summary.{CollectedFromType, SchemeValue, ScholixSummary, Typology}
 import eu.dnetlib.dhp.utils.DHPUtils
-import org.apache.spark.sql.Encoders.bean
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.{Encoder, Encoders}
 import org.json4s
@@ -301,14 +300,14 @@ object ScholixUtils {
     if (r.getPid == null || r.getPid.isEmpty)
       return null
 
-    val pids:List[ScholixIdentifier] =  extractTypedIdentifierFromInstance(r)
-    if (pids.isEmpty)
+    val persistentIdentifiers:List[ScholixIdentifier] =  extractTypedIdentifierFromInstance(r)
+    if (persistentIdentifiers.isEmpty)
       return null
-    s.setLocalIdentifier(pids.asJava)
-    if (r.isInstanceOf[Dataset])
-      s.setTypology(Typology.dataset)
-    else
+    s.setLocalIdentifier(persistentIdentifiers.asJava)
+    if (r.isInstanceOf[Publication] )
       s.setTypology(Typology.publication)
+    else
+      s.setTypology(Typology.dataset)
 
     s.setSubType(r.getInstance().get(0).getInstancetype.getClassname)
 
