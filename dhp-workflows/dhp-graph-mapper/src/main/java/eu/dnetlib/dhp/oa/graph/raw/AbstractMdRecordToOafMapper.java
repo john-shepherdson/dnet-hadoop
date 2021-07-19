@@ -71,6 +71,8 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	private final boolean shouldHashId;
 
+	private final boolean forceOriginalId;
+
 	protected static final String DATACITE_SCHEMA_KERNEL_4 = "http://datacite.org/schema/kernel-4";
 	protected static final String DATACITE_SCHEMA_KERNEL_4_SLASH = "http://datacite.org/schema/kernel-4/";
 	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
@@ -99,10 +101,19 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible,
+		final boolean shouldHashId, final boolean forceOriginalId) {
+		this.vocs = vocs;
+		this.invisible = invisible;
+		this.shouldHashId = shouldHashId;
+		this.forceOriginalId = forceOriginalId;
+	}
+
+	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible,
 		final boolean shouldHashId) {
 		this.vocs = vocs;
 		this.invisible = invisible;
 		this.shouldHashId = shouldHashId;
+		this.forceOriginalId = false;
 	}
 
 	public List<Oaf> processMdRecord(final String xml) {
@@ -190,10 +201,15 @@ public abstract class AbstractMdRecordToOafMapper {
 		final long lastUpdateTimestamp) {
 
 		final OafEntity entity = createEntity(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
-		final String id = IdentifierFactory.createIdentifier(entity, shouldHashId);
-		if (!id.equals(entity.getId())) {
-			entity.getOriginalId().add(entity.getId());
-			entity.setId(id);
+
+		if (!forceOriginalId) {
+			final String id = IdentifierFactory.createIdentifier(entity, shouldHashId);
+			if (!id.equals(entity.getId())) {
+				final Set<String> originalId = Sets.newHashSet(entity.getOriginalId());
+				originalId.add(entity.getId());
+				entity.setOriginalId(Lists.newArrayList(originalId));
+				entity.setId(id);
+			}
 		}
 
 		final List<Oaf> oafs = Lists.newArrayList(entity);

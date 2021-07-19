@@ -163,11 +163,13 @@ public class GenerateEntitiesApplication {
 
 		switch (type.toLowerCase()) {
 			case "oaf-store-cleaned":
-			case "oaf-store-claim":
 				return new OafToOafMapper(vocs, false, shouldHashId).processMdRecord(s);
+			case "oaf-store-claim":
+				return new OafToOafMapper(vocs, false, shouldHashId, true).processMdRecord(s);
 			case "odf-store-cleaned":
-			case "odf-store-claim":
 				return new OdfToOafMapper(vocs, false, shouldHashId).processMdRecord(s);
+			case "odf-store-claim":
+				return new OdfToOafMapper(vocs, false, shouldHashId, true).processMdRecord(s);
 			case "oaf-store-intersection":
 				return new OafToOafMapper(vocs, true, shouldHashId).processMdRecord(s);
 			case "odf-store-intersection":
