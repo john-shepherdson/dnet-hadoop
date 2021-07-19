@@ -202,12 +202,13 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		final OafEntity entity = createEntity(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 
+		final Set<String> originalId = Sets.newHashSet(entity.getOriginalId());
+		originalId.add(entity.getId());
+		entity.setOriginalId(Lists.newArrayList(originalId));
+
 		if (!forceOriginalId) {
 			final String id = IdentifierFactory.createIdentifier(entity, shouldHashId);
 			if (!id.equals(entity.getId())) {
-				final Set<String> originalId = Sets.newHashSet(entity.getOriginalId());
-				originalId.add(entity.getId());
-				entity.setOriginalId(Lists.newArrayList(originalId));
 				entity.setId(id);
 			}
 		}
