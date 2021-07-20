@@ -560,6 +560,31 @@ public class MappersTest {
 	}
 
 	@Test
+	void testEnermaps() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("enermaps.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Dataset);
+
+		final Dataset d = (Dataset) list.get(0);
+
+		assertValidId(d.getId());
+		assertValidId(d.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
+		assertEquals(1, d.getAuthor().size());
+		assertEquals(1, d.getInstance().size());
+		assertNotNull(d.getInstance().get(0).getUrl());
+		assertNotNull(d.getContext());
+		assertTrue(StringUtils.isNotBlank(d.getContext().get(0).getId()));
+		assertEquals("enermaps::selection::tgs00004", d.getContext().get(0).getId());
+	}
+
+	@Test
 	void testClaimFromCrossref() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
