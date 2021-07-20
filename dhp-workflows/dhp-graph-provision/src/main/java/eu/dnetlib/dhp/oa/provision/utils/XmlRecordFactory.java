@@ -16,6 +16,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
@@ -183,6 +184,7 @@ public class XmlRecordFactory implements Serializable {
 						.getOriginalId()
 						.stream()
 						.filter(Objects::nonNull)
+						.filter(id -> !id.matches("^\\d{2}" + IdentifierFactory.ID_PREFIX_SEPARATOR))
 						.map(s -> XmlSerializationUtils.asXmlElement("originalId", s))
 						.collect(Collectors.toList()));
 		}
