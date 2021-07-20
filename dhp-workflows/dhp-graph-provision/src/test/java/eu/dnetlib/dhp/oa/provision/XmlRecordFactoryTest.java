@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
+import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -130,5 +132,32 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 		assertEquals("", doc.valueOf("//rel/validated"));
+	}
+
+	@Test
+	public void testEnermapsRecord() throws IOException, DocumentException {
+
+		String contextmap = "<entries><entry id=\"enermaps\" label=\"Energy Research\" name=\"context\" type=\"community\"/>" +
+				"<entry id=\"enermaps::selection\" label=\"Featured dataset\" name=\"category\"/>"+
+				"<entry id=\"enermaps::selection::tgs00004\" label=\"Dataset title\" name=\"concept\"/>"+
+				"</entries>";
+
+		ContextMapper contextMapper = ContextMapper.fromXml(contextmap);
+		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
+				otherDsTypeId);
+
+		Dataset d = OBJECT_MAPPER
+				.readValue(IOUtils.toString(getClass().getResourceAsStream("enermaps.json")), Dataset.class);
+
+		JoinedEntity je = new JoinedEntity<>(d);
+
+		String xml = xmlRecordFactory.build(je);
+
+		assertNotNull(xml);
+
+		Document doc = new SAXReader().read(new StringReader(xml));
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+		assertEquals("enermaps::selection::tgs00004", doc.valueOf("//concept/@id"));
 	}
 }
