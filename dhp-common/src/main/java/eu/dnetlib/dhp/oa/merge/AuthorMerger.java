@@ -78,6 +78,7 @@ public class AuthorMerger {
 				a -> a
 					.getPid()
 					.stream()
+					.filter(Objects::nonNull)
 					.filter(p -> !basePidAuthorMap.containsKey(pidToComparableString(p)))
 					.map(p -> new Tuple2<>(p, a)))
 			.collect(Collectors.toList());
