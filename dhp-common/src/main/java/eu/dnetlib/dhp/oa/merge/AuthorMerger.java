@@ -67,6 +67,7 @@ public class AuthorMerger {
 				a -> a
 					.getPid()
 					.stream()
+					.filter(Objects::nonNull)
 					.map(p -> new Tuple2<>(pidToComparableString(p), a)))
 			.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
