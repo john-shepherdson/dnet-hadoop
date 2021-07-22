@@ -152,7 +152,7 @@ public class AuthorMerger {
 	}
 
 	private static boolean hasPid(Author a) {
-		if (a == null || a.getPid() == null || a.getPid().size() == 0)
+		if (a == null || a.getPid() == null || a.getPid().isEmpty())
 			return false;
 		return a.getPid().stream().anyMatch(p -> p != null && StringUtils.isNotBlank(p.getValue()));
 	}
@@ -161,7 +161,10 @@ public class AuthorMerger {
 		if (StringUtils.isNotBlank(author.getSurname())) {
 			return new Person(author.getSurname() + ", " + author.getName(), false);
 		} else {
-			return new Person(author.getFullname(), false);
+			if (StringUtils.isNotBlank(author.getFullname()))
+				return new Person(author.getFullname(), false);
+			else
+				return new Person("", false);
 		}
 	}
 

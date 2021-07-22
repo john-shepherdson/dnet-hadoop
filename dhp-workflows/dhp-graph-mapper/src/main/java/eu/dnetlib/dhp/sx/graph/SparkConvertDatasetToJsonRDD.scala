@@ -33,6 +33,7 @@ object SparkConvertDatasetToJsonRDD {
     val mapper = new ObjectMapper()
     implicit  val oafEncoder: Encoder[Result] = Encoders.kryo(classOf[Result])
 
+
     resultObject.foreach{item =>
       spark.read.load(s"$sourcePath/$item").as[Result].map(r=> mapper.writeValueAsString(r))(Encoders.STRING).rdd.saveAsTextFile(s"$targetPath/${item.toLowerCase}", classOf[GzipCodec])
     }
