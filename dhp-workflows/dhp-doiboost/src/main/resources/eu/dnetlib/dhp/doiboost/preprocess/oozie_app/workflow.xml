@@ -63,6 +63,7 @@
 
     <decision name="resume_from">
         <switch>
+            <case to="DownloadGoldIssn">${wf:conf('resumeFrom') eq 'DownloadGoldIssn'}</case>
             <case to="UnpackCrossrefEntries">${wf:conf('resumeFrom') eq 'UnpackCrossrefEntries'}</case>
             <case to="GenerateCrossrefDataset">${wf:conf('resumeFrom') eq 'GenerateCrossrefDataset'}</case>
             <case to="ResetMagWorkingPath">${wf:conf('resumeFrom') eq 'ResetMagWorkingPath'}</case>
@@ -75,6 +76,19 @@
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="DownloadGoldIssn">
+        <java>
+            <main-class>eu.dnetlib.doiboost.GetCSV</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--fileURL</arg><arg>${unibiGoldIssnFileURL}</arg>
+            <arg>--hdfsPath</arg><arg>${hdfsPath}</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.doiboost.UnibiGoldModel</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
 
     <action name="ImportCrossRef">
         <java>

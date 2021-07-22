@@ -31,7 +31,7 @@ public class ReadExcel implements Closeable {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					ReadCSV.class
+					ReadExcel.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/actionmanager/project/parameters.json")));
 
