@@ -249,8 +249,8 @@ object DoiBoostMappingUtil {
           i.setAccessright(getOpenAccessQualifier())
           i.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)
         }
-        val ar = getOpenAccessQualifier()
-        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
+//        val ar = getOpenAccessQualifier()
+//        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
       }
       else {
         hb = ModelConstants.UNKNOWN_REPOSITORY
