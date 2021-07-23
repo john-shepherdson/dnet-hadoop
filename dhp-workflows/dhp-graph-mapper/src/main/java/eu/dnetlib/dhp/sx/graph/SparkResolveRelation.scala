@@ -44,7 +44,7 @@ object SparkResolveRelation {
 
     val relationDs:Dataset[(String,Relation)] = spark.read.load(relationPath).as[Relation].map(r => (r.getSource.toLowerCase, r))(Encoders.tuple(Encoders.STRING, relEncoder))
 
-    relationDs.joinWith(rPid, relationDs("_1").equalTo(rPid("_1")), "left").map{
+    relationDs.joinWith(rPid, relationDs("_1").equalTo(rPid("_2")), "left").map{
       m =>
         val sourceResolved = m._2
         val currentRelation = m._1._2
@@ -57,7 +57,7 @@ object SparkResolveRelation {
 
 
     val relationSourceResolved:Dataset[(String,Relation)] = spark.read.load(s"$workingPath/resolvedSource").as[Relation].map(r => (r.getTarget.toLowerCase, r))(Encoders.tuple(Encoders.STRING, relEncoder))
-    relationSourceResolved.joinWith(rPid, relationSourceResolved("_1").equalTo(rPid("_1")), "left").map{
+    relationSourceResolved.joinWith(rPid, relationSourceResolved("_1").equalTo(rPid("_2")), "left").map{
       m =>
         val targetResolved = m._2
         val currentRelation = m._1._2
