@@ -48,7 +48,7 @@ object SparkResolveRelation {
       m =>
         val sourceResolved = m._2
         val currentRelation = m._1._2
-        if (sourceResolved!=null && sourceResolved._2.nonEmpty)
+        if (sourceResolved!=null && sourceResolved._2!=null && sourceResolved._2.nonEmpty)
           currentRelation.setSource(sourceResolved._2)
         currentRelation
     }.write
