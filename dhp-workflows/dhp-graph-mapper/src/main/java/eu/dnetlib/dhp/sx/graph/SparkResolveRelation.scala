@@ -30,7 +30,7 @@ object SparkResolveRelation {
     val relationPath = parser.get("relationPath")
     log.info(s"sourcePath  -> $relationPath")
     val entityPath = parser.get("entityPath")
-    log.info(s"targetPath  -> $entityPath")
+    log.info(s"entityPath  -> $entityPath")
     val workingPath = parser.get("workingPath")
     log.info(s"workingPath  -> $workingPath")
 
@@ -48,8 +48,8 @@ object SparkResolveRelation {
       m =>
         val sourceResolved = m._2
         val currentRelation = m._1._2
-        if (sourceResolved!=null && sourceResolved._2!=null && sourceResolved._2.nonEmpty)
-          currentRelation.setSource(sourceResolved._2)
+        if (sourceResolved!=null && sourceResolved._1!=null && sourceResolved._1.nonEmpty)
+          currentRelation.setSource(sourceResolved._1)
         currentRelation
     }.write
       .mode(SaveMode.Overwrite)
@@ -61,13 +61,13 @@ object SparkResolveRelation {
       m =>
         val targetResolved = m._2
         val currentRelation = m._1._2
-        if (targetResolved!=null && targetResolved._2.nonEmpty)
-          currentRelation.setTarget(targetResolved._2)
+        if (targetResolved!=null && targetResolved._1.nonEmpty)
+          currentRelation.setTarget(targetResolved._1)
         currentRelation
     }.filter(r => r.getSource.startsWith("50")&& r.getTarget.startsWith("50"))
       .write
       .mode(SaveMode.Overwrite)
-      .save(s"$workingPath/relation")
+      .save(s"$workingPath/relation_resolved")
   }
 
 
@@ -89,16 +89,16 @@ object SparkResolveRelation {
 
     val d: RDD[(String,String)] = spark.sparkContext.textFile(s"$entityPath/*")
       .map(i => extractPidsFromRecord(i))
-      .filter(s => s != null && s._2!=null && s._2.nonEmpty)
+      .filter(s => s != null && s._1!= null && s._2!=null && s._2.nonEmpty)
       .flatMap{ p =>
                   p._2.map(pid =>
-                    (p._1,convertPidToDNETIdentifier(pid._1, pid._2))
+                    (p._1, convertPidToDNETIdentifier(pid._1, pid._2))
                   )
-      }
+      }.filter(r =>r._1 != null || r._2 != null)
 
     spark.createDataset(d)
-    .groupByKey(_._1)
-      .reduceGroups((x, y) => if (x._2.startsWith("50|doi") || x._2.startsWith("50|pmid")) x else y)
+    .groupByKey(_._2)
+      .reduceGroups((x, y) => if (x._1.startsWith("50|doi") || x._1.startsWith("50|pmid")) x else y)
       .map(s => s._2)
       .write
       .mode(SaveMode.Overwrite)

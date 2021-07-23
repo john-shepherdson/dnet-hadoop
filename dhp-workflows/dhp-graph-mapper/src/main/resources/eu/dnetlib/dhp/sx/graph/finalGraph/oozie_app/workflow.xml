@@ -1,4 +1,4 @@
-<workflow-app name="Create Raw Graph Step 1: extract Entities in raw graph" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Create Scholix final Graph" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sourcePath</name>
@@ -6,48 +6,22 @@
         </property>
         <property>
             <name>targetPath</name>
-            <description>the graph Raw base path</description>
+            <description>the final graph path</description>
         </property>
     </parameters>
 
-    <start to="ExtractEntities"/>
+    <start to="ImportDatasetEntities"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="ExtractEntities">
+    <action name="ImportDatasetEntities">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Extract entities in raw graph</name>
-            <class>eu.dnetlib.dhp.sx.graph.SparkCreateInputGraph</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.shuffle.partitions=2000
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-            </spark-opts>
-            <arg>--master</arg><arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
-        </spark>
-        <ok to="ResolveRelations"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="ResolveRelations">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Resolve Relations in raw graph</name>
-            <class>eu.dnetlib.dhp.sx.graph.SparkResolveRelation</class>
+            <name>Import JSONRDD to Dataset kryo</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkConvertRDDtoDataset</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -60,9 +34,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
-            <arg>--relationPath</arg><arg>${targetPath}/extracted/relation</arg>
-            <arg>--workingPath</arg><arg>${targetPath}/resolved/</arg>
-            <arg>--entityPath</arg><arg>${targetPath}/dedup</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/entities</arg>
         </spark>
         <ok to="CreateSummaries"/>
         <error to="Kill"/>
@@ -87,7 +60,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>${targetPath}/dedup</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/entities</arg>
             <arg>--targetPath</arg><arg>${targetPath}/provision/summaries</arg>
         </spark>
         <ok to="CreateScholix"/>
@@ -114,7 +87,7 @@
             <arg>--master</arg><arg>yarn</arg>
             <arg>--summaryPath</arg><arg>${targetPath}/provision/summaries</arg>
             <arg>--targetPath</arg><arg>${targetPath}/provision/scholix</arg>
-            <arg>--relationPath</arg><arg>${targetPath}/resolved/resolvedRelation</arg>
+            <arg>--relationPath</arg><arg>${sourcePath}/relation_resolved</arg>
 
         </spark>
         <ok to="DropJSONPath"/>
@@ -182,9 +155,5 @@
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
-
-
-
     <end name="End"/>
 </workflow-app>

@@ -15,14 +15,24 @@
 
     </parameters>
 
-    <start to="ResolveRelations"/>
+    <start to="DropRelFolder"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
 
+    <action name="DropRelFolder">
+        <fs>
+            <delete path='${targetPath}/relation'/>
+            <delete path='${targetPath}/relation_resolved'/>
+            <delete path='${targetPath}/resolvedSource'/>
+            <delete path='${targetPath}/resolvedPid'/>
 
+        </fs>
+        <ok to="ResolveRelations"/>
+        <error to="Kill"/>
+    </action>
     <action name="ResolveRelations">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
