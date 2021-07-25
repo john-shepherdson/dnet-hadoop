@@ -34,7 +34,7 @@ object SparkCreateSummaryObject {
     implicit val summaryEncoder:Encoder[ScholixSummary] = Encoders.kryo[ScholixSummary]
 
 
-    val ds:Dataset[Result] = spark.read.load(s"$sourcePath/*").as[Oaf].filter(r => r.isInstanceOf[Result]).map(r => r.asInstanceOf[Result])
+    val ds:Dataset[Result] = spark.read.load(s"$sourcePath/*").as[Result].filter(r=>r.getDataInfo== null ||  r.getDataInfo.getDeletedbyinference== false)
 
     ds.repartition(6000).map(r => ScholixUtils.resultToSummary(r)).filter(s => s!= null).write.mode(SaveMode.Overwrite).save(targetPath)
 
