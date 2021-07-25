@@ -57,10 +57,10 @@ object SparkResolveRelation {
         currentRelation
     }.write
       .mode(SaveMode.Overwrite)
-      .save(s"$workingPath/resolvedSource")
+      .save(s"$workingPath/relationResolvedSource")
 
 
-    val relationSourceResolved:Dataset[(String,Relation)] = spark.read.load(s"$workingPath/resolvedSource").as[Relation].map(r => (r.getTarget.toLowerCase, r))(Encoders.tuple(Encoders.STRING, relEncoder))
+    val relationSourceResolved:Dataset[(String,Relation)] = spark.read.load(s"$workingPath/relationResolvedSource").as[Relation].map(r => (r.getTarget.toLowerCase, r))(Encoders.tuple(Encoders.STRING, relEncoder))
     relationSourceResolved.joinWith(rPid, relationSourceResolved("_1").equalTo(rPid("_2")), "left").map{
       m =>
         val targetResolved = m._2
