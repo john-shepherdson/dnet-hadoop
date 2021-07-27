@@ -70,7 +70,7 @@ object SparkCreateInputGraph {
 
     resultObject.foreach { r =>
       log.info(s"Make ${r._1} unique")
-      makeDatasetUnique(s"$targetPath/extracted/${r._1}",s"$targetPath/dedup/${r._1}",spark, r._2)
+      makeDatasetUnique(s"$targetPath/extracted/${r._1}",s"$targetPath/preprocess/${r._1}",spark, r._2)
     }
   }
 

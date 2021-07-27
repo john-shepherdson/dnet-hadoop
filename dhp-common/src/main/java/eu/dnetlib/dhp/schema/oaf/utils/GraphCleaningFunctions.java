@@ -98,7 +98,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 			Result r = (Result) value;
 
-			if (Objects.nonNull(r.getTitle()) && r.getTitle().isEmpty()) {
+			if (Objects.isNull(r.getTitle()) || r.getTitle().isEmpty()) {
 				return false;
 			}
 
