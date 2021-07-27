@@ -1009,7 +1009,7 @@ datacite:id_typologies @=@ datacite:id_typologies @=@ EAN13 @=@ EAN13
 datacite:id_typologies @=@ datacite:id_typologies @=@ EISSN @=@ EISSN
 datacite:id_typologies @=@ datacite:id_typologies @=@ Handle @=@ Handle
 datacite:id_typologies @=@ datacite:id_typologies @=@ ISBN @=@ ISBN
-datacite:id_typologies @=@ datacite:id_typologies @=@ ISSN @=@ ISSN
+datacite:id_typologies @=@ datacite:id_typologies @=@ issn @=@ issn
 datacite:id_typologies @=@ datacite:id_typologies @=@ ISTC @=@ ISTC
 datacite:id_typologies @=@ datacite:id_typologies @=@ LISSN @=@ LISSN
 datacite:id_typologies @=@ datacite:id_typologies @=@ LSID @=@ LSID

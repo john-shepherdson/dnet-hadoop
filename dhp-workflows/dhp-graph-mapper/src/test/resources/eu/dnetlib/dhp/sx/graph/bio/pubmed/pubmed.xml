@@ -16,7 +16,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2944</ISSN>
+                    <issn IssnType="Print">0006-2944</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>13</Volume>
                         <Issue>2</Issue>
@@ -182,7 +182,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Electronic">1090-2104</ISSN>
+                    <issn IssnType="Electronic">1090-2104</issn>
                     <JournalIssue CitedMedium="Internet">
                         <Volume>66</Volume>
                         <Issue>4</Issue>
@@ -314,7 +314,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-291X</ISSN>
+                    <issn IssnType="Print">0006-291X</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>66</Volume>
                         <Issue>4</Issue>
@@ -460,7 +460,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Electronic">1090-2104</ISSN>
+                    <issn IssnType="Electronic">1090-2104</issn>
                     <JournalIssue CitedMedium="Internet">
                         <Volume>66</Volume>
                         <Issue>4</Issue>
@@ -644,7 +644,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Electronic">1090-2104</ISSN>
+                    <issn IssnType="Electronic">1090-2104</issn>
                     <JournalIssue CitedMedium="Internet">
                         <Volume>66</Volume>
                         <Issue>4</Issue>
@@ -774,7 +774,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-291X</ISSN>
+                    <issn IssnType="Print">0006-291X</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>66</Volume>
                         <Issue>4</Issue>
@@ -934,7 +934,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Electronic">1873-2968</ISSN>
+                    <issn IssnType="Electronic">1873-2968</issn>
                     <JournalIssue CitedMedium="Internet">
                         <Volume>24</Volume>
                         <Issue>16</Issue>
@@ -1614,7 +1614,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Electronic">1873-2968</ISSN>
+                    <issn IssnType="Electronic">1873-2968</issn>
                     <JournalIssue CitedMedium="Internet">
                         <Volume>24</Volume>
                         <Issue>16</Issue>
@@ -2017,7 +2017,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>17</Issue>
@@ -2185,7 +2185,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Electronic">1873-2968</ISSN>
+                    <issn IssnType="Electronic">1873-2968</issn>
                     <JournalIssue CitedMedium="Internet">
                         <Volume>24</Volume>
                         <Issue>17</Issue>
@@ -2337,7 +2337,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>18</Issue>
@@ -2585,7 +2585,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>18</Issue>
@@ -2838,7 +2838,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>18</Issue>
@@ -3020,7 +3020,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>18</Issue>
@@ -3204,7 +3204,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>18</Issue>
@@ -3450,7 +3450,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>18</Issue>
@@ -3683,7 +3683,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>18</Issue>
@@ -3880,7 +3880,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>20</Issue>
@@ -4069,7 +4069,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>20</Issue>
@@ -4428,7 +4428,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0006-2952</ISSN>
+                    <issn IssnType="Print">0006-2952</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>24</Volume>
                         <Issue>20</Issue>
@@ -4590,7 +4590,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0004-4172</ISSN>
+                    <issn IssnType="Print">0004-4172</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>25</Volume>
                         <Issue>9</Issue>
@@ -4741,7 +4741,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0004-4172</ISSN>
+                    <issn IssnType="Print">0004-4172</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>25</Volume>
                         <Issue>9</Issue>
@@ -4999,7 +4999,7 @@
             </DateRevised>
             <Article PubModel="Print">
                 <Journal>
-                    <ISSN IssnType="Print">0004-4172</ISSN>
+                    <issn IssnType="Print">0004-4172</issn>
                     <JournalIssue CitedMedium="Print">
                         <Volume>25</Volume>
                         <Issue>9</Issue>

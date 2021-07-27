@@ -31,7 +31,7 @@
                     <datacite:relatedIdentifier relatedIdentifierType="URL" relationType="HasMetadata">https://pub.uni-bielefeld.de/record/1997560.json</datacite:relatedIdentifier>
                 </datacite:relatedIdentifiers>
                 <datacite:alternateIdentifiers>
-                    <datacite:alternateIdentifier alternateIdentifierType="ISSN">0016-9056</datacite:alternateIdentifier>
+                    <datacite:alternateIdentifier alternateIdentifierType="issn">0016-9056</datacite:alternateIdentifier>
                 </datacite:alternateIdentifiers>
                 <dc:language>ger</dc:language>
                 <dc:publisher>Friedrich</dc:publisher>

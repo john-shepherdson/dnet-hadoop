@@ -122,6 +122,11 @@
             <groupId>org.json4s</groupId>
             <artifactId>json4s-jackson_2.11</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.5</version>
+        </dependency>
 
     </dependencies>
 

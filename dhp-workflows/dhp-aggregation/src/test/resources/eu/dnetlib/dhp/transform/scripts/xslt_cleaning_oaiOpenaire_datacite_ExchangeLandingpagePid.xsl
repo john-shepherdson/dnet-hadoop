@@ -159,7 +159,7 @@
 
 
                         <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)
-                                       [not($varCobjCategory = '0001' and ./@alternateIdentifierType = ('ISSN', 'EISSN'))]
+                                       [not($varCobjCategory = '0001' and ./@alternateIdentifierType = ('issn', 'EISSN'))]
                                        [not($varCobjCategory = '0013' and ./@alternateIdentifierType = 'ISBN')]
                                        [not(//oaf:datasourceprefix = 'od______4225' and ends-with(., 'pdf'))]
                                        [not(//oaf:datasourceprefix = ('od______1562', 'od______4732'))]
@@ -212,7 +212,7 @@
                         <xsl:copy-of select="//datacite:relatedIdentifier"  copy-namespaces="no"/>
 
                         <xsl:for-each select="(//datacite:alternateIdentifier, //datacite:identifier)
-                                       [$varCobjCategory = '0001' and ./@alternateIdentifierType = ('ISSN', 'EISSN')]">
+                                       [$varCobjCategory = '0001' and ./@alternateIdentifierType = ('issn', 'EISSN')]">
                             <datacite:relatedIdentifier>
                                 <xsl:attribute name="relatedIdentifierType" select="./@alternateIdentifierType"/>
                                 <xsl:attribute name="relationType" select="'isPartOf'"/>
@@ -571,13 +571,13 @@
                 </oaf:collectedFrom>
 
                 <!-- oaf:journal -->
-                <!-- ISSN  is erroneously stuffed in alternateIdentifier, should be put into relatedIdentifier -->
+                <!-- issn  is erroneously stuffed in alternateIdentifier, should be put into relatedIdentifier -->
                 <!-- check/ensure that oaf:journal is not prepared for a journal itself, perhaps limit to Rothamsted -->
                 <!-- Huelva marks L, E ISSNs as ISSNs, with mark within field in spaces or after blanc -->
                 <!-- Qeios declares many records as text, although many seem to be definitions which are also related to 'journal' volumes/issues -->
-                <xsl:if test="($varCobjCategory = '0001' or contains(//dri:recordIdentifier, 'www.qeios.com')) and (//*[local-name() = 'alternateIdentifier']/@alternateIdentifierType[. = 'ISSN'] or //*[local-name() = 'relatedIdentifier'][lower-case(@relationType) = 'ispartof'][@relatedIdentifierType = 'ISSN'])">
+                <xsl:if test="($varCobjCategory = '0001' or contains(//dri:recordIdentifier, 'www.qeios.com')) and (//*[local-name() = 'alternateIdentifier']/@alternateIdentifierType[. = 'issn'] or //*[local-name() = 'relatedIdentifier'][lower-case(@relationType) = 'ispartof'][@relatedIdentifierType = 'issn'])">
                     <oaf:journal>
-                        <xsl:attribute name="issn" select="(//*[local-name() = 'alternateIdentifier'][./@alternateIdentifierType = 'ISSN'], //*[local-name() = 'relatedIdentifier'][lower-case(./@relationType) = 'ispartof'][./@relatedIdentifierType = 'ISSN'])[1]/concat(substring(., 1, 4), '-', substring(., string-length(.)-3, 4))"/>
+                        <xsl:attribute name="issn" select="(//*[local-name() = 'alternateIdentifier'][./@alternateIdentifierType = 'issn'], //*[local-name() = 'relatedIdentifier'][lower-case(./@relationType) = 'ispartof'][./@relatedIdentifierType = 'issn'])[1]/concat(substring(., 1, 4), '-', substring(., string-length(.)-3, 4))"/>
                         <xsl:if test="//*[local-name() = 'citationVolume']">
                             <xsl:attribute name="vol" select="//*[local-name() = 'citationVolume']"/>
                         </xsl:if>
@@ -594,9 +594,9 @@
                     </oaf:journal>
                 </xsl:if>
 
-                <xsl:if test="$varCobjCategory = '0001' and //*[local-name() = 'relatedIdentifier']/@relatedIdentifierType[. = ('ISSN', 'PISSN', 'EISSN', 'LISSN')]">
+                <xsl:if test="$varCobjCategory = '0001' and //*[local-name() = 'relatedIdentifier']/@relatedIdentifierType[. = ('issn', 'PISSN', 'EISSN', 'LISSN')]">
                     <oaf:journal>
-                        <xsl:for-each select="//*[local-name() = 'relatedIdentifier'][@relatedIdentifierType[. = ('ISSN', 'PISSN', 'EISSN', 'LISSN')]][@relationType/lower-case(.) = 'ispartof']">
+                        <xsl:for-each select="//*[local-name() = 'relatedIdentifier'][@relatedIdentifierType[. = ('issn', 'PISSN', 'EISSN', 'LISSN')]][@relationType/lower-case(.) = 'ispartof']">
 
                             <xsl:attribute name="{./@relatedIdentifierType}" select="./concat(substring(., 1, 4), '-', substring(., string-length(.)-3, 4))"/>
                             <!-- -->
