@@ -44,22 +44,22 @@ on p.id= tmp.id;
 create table indi_project_pubs_count stored as parquet as
 select  pr.id id, count(p.id) total_pubs from project_results pr
 join publication p on p.id=pr.result
-group by pr.id
+group by pr.id;
 
 create table indi_project_datasets_count stored as parquet as
 select pr.id id, count(d.id) total_datasets from project_results pr
 join dataset d on d.id=pr.result
-group by pr.id
+group by pr.id;
 
 create table indi_project_software_count stored as parquet as
 select  pr.id id, count(s.id) total_software from project_results pr
 join software s on s.id=pr.result
-group by pr.id
+group by pr.id;
 
 create table indi_project_otherresearch_count stored as parquet as
 select pr.id id, count(o.id) total_other from project_results pr
 join otherresearchproduct o on o.id=pr.result
-group by pr.id
+group by pr.id;
 
 create table indi_pub_avg_year_country_oa stored as parquet as
 select year, country, round(OpenAccess/(OpenAccess+NonOpenAccess)*100,3) as averageOA,
@@ -76,7 +76,7 @@ round(NonOpenAccess/(OpenAccess+NonOpenAccess)*100,3) as averageNonOA
  join result_organization ro on p.id=ro.id
  join organization o on o.id=ro.organization
  where cast(year as int)>=2003 and cast(year as int)<=2021
- group by year, country) tmp
+ group by year, country) tmp;
 
 create table indi_dataset_avg_year_country_oa stored as parquet as
 select year, country, round(OpenAccess/(OpenAccess+NonOpenAccess)*100,3) as averageOA,
@@ -93,7 +93,7 @@ round(NonOpenAccess/(OpenAccess+NonOpenAccess)*100,3) as averageNonOA
  join result_organization ro on d.id=ro.id
  join organization o on o.id=ro.organization
  where cast(year as int)>=2003 and cast(year as int)<=2021
- group by year, country) tmp
+ group by year, country) tmp;
 
 create table indi_software_avg_year_country_oa stored as parquet as
 select year, country, round(OpenAccess/(OpenAccess+NonOpenAccess)*100,3) as averageOA,
@@ -110,7 +110,7 @@ round(NonOpenAccess/(OpenAccess+NonOpenAccess)*100,3) as averageNonOA
  join result_organization ro on s.id=ro.id
  join SOURCER.organization o on o.id=ro.organization
  where cast(year as int)>=2003 and cast(year as int)<=2021
- group by year, country) tmp
+ group by year, country) tmp;
 
 
 create table indi_other_avg_year_country_oa stored as parquet as
@@ -128,7 +128,7 @@ round(NonOpenAccess/(OpenAccess+NonOpenAccess)*100,3) as averageNonOA
  join result_organization ro on orp.id=ro.id
  join organization o on o.id=ro.organization
  where cast(year as int)>=2003 and cast(year as int)<=2021
- group by year, country) tmp
+ group by year, country) tmp;
 
 create table indi_pub_avg_year_context_oa stored as parquet as
 with total as
@@ -138,7 +138,7 @@ join publication p on p.id=pc.id
 where cast(year as int)>=2003 and cast(year as int)<=2021
 group by c.name, year )
 select year, name, round(no_of_pubs/total*100,3) averageofpubs
-from total
+from total;
 
 create table indi_dataset_avg_year_context_oa stored as parquet as
 with total as
@@ -148,7 +148,7 @@ join dataset p on p.id=pc.id
 where cast(year as int)>=2003 and cast(year as int)<=2021
 group by c.name, year )
 select year, name, round(no_of_pubs/total*100,3) averageofdataset
-from total
+from total;
 
 create table indi_software_avg_year_context_oa stored as parquet as
 with total as
@@ -158,7 +158,7 @@ join software p on p.id=pc.id
 where cast(year as int)>=2003 and cast(year as int)<=2021
 group by c.name, year )
 select year, name, round(no_of_pubs/total*100,3) averageofsoftware
-from total
+from total;
 
 create table indi_other_avg_year_context_oa stored as parquet as
 with total as
@@ -168,7 +168,7 @@ join otherresearchproduct p on p.id=pc.id
 where cast(year as int)>=2003 and cast(year as int)<=2021
 group by c.name, year )
 select year, name, round(no_of_pubs/total*100,3) averageofother
-from total
+from total;
 
 create table indi_other_avg_year_content_oa stored as parquet as
 with total as
@@ -179,7 +179,7 @@ join otherresearchproduct p on p.id=pd.id
 where cast(year as int)>=2003 and cast(year as int)<=2021
 group by d.type, year)
 select year, type, round(no_of_pubs/total*100,3) averageOfOtherresearchproduct
-from total
+from total;
 
 create table indi_software_avg_year_content_oa stored as parquet as
 with total as
@@ -190,7 +190,7 @@ join software p on p.id=pd.id
 where cast(year as int)>=2003 and cast(year as int)<=2021
 group by d.type, year)
 select year, type, round(no_of_pubs/total*100,3) averageOfSoftware
-from total
+from total;
 
 create table indi_dataset_avg_year_content_oa stored as parquet as
 with total as
@@ -201,7 +201,7 @@ join dataset p on p.id=pd.id
 where cast(year as int)>=2003 and cast(year as int)<=2021
 group by d.type, year)
 select year, type, round(no_of_pubs/total*100,3) averageOfDatasets
-from total
+from total;
 
 create table indi_pub_avg_year_content_oa stored as parquet as
 with total as
@@ -212,7 +212,7 @@ join publication p on p.id=pd.id
 where cast(year as int)>=2003 and cast(year as int)<=2021
 group by d.type, year)
 select year, type, round(no_of_pubs/total*100,3) averageOfPubs
-from total
+from total;
 
 create table indi_pub_has_cc_licence stored as parquet as
 select distinct p.id, (case when lic='' or lic is null then 0 else 1 end) as has_cc_license
@@ -220,7 +220,7 @@ from publication p
 left outer join (select p.id, license.type as lic from publication p
 join publication_licenses as license on license.id = p.id
 where lower(license.type) LIKE '%creativecommons.org%' OR lower(license.type) LIKE '%cc-%') tmp
-on p.id= tmp.id
+on p.id= tmp.id;
 
 create table indi_pub_has_cc_licence_url stored as parquet as
 select distinct p.id, (case when lic_host='' or lic_host is null then 0 else 1 end) as has_cc_license_url
@@ -229,9 +229,8 @@ left outer join (select p.id, lower(parse_url(license.type, "HOST")) as lic_host
 from publication p
 join publication_licenses as license on license.id = p.id
 WHERE lower(parse_url(license.type, 'HOST')) = 'creativecommons.org') tmp
-on p.id= tmp.id
-
+on p.id= tmp.id;
 
 create table indi_pub_has_abstract stored as parquet as
 select distinct publication.id, coalesce(abstract, 1) has_abstract
-from publication
+from publication;
