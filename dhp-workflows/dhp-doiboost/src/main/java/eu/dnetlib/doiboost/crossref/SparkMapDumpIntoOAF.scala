@@ -21,7 +21,7 @@ object SparkMapDumpIntoOAF {
 
     val logger: Logger = LoggerFactory.getLogger(SparkMapDumpIntoOAF.getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkMapDumpIntoOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_map_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkMapDumpIntoOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_crossref_dump_to_oaf_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession

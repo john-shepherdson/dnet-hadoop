@@ -5,6 +5,10 @@
             <description>the working path of Datacite stores</description>
         </property>
         <property>
+            <name>oafTargetPath</name>
+            <description>the target path where the OAF records are stored</description>
+        </property>
+        <property>
             <name>isLookupUrl</name>
             <description>The IS lookUp service endopoint</description>
         </property>
@@ -56,7 +60,7 @@
             <arg>--master</arg><arg>yarn-cluster</arg>
             <arg>--blocksize</arg><arg>${blocksize}</arg>
         </spark>
-        <ok to="TransformJob"/>
+        <ok to="TransformDatacite"/>
         <error to="Kill"/>
     </action>
 
@@ -78,7 +82,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${mainPath}/datacite_dump</arg>
-            <arg>--targetPath</arg><arg>${mainPath}/datacite_oaf</arg>
+            <arg>--targetPath</arg><arg>${oafTargetPath}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--exportLinks</arg><arg>${exportLinks}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>

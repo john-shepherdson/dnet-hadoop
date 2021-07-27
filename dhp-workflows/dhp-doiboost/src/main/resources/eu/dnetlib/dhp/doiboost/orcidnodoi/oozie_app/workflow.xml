@@ -7,9 +7,14 @@
         </property>
         <property>
             <name>outputPath</name>
+            <value>/data/orcid_activities_2020/no_doi_dataset_prod/</value>
             <description>path where to store the action set</description>
         </property>
-
+        <property>
+            <name>processOutputPath</name>
+            <value>/data/orcid_activities_2020/process_no_doi_dataset_prod</value>
+            <description>temporary path where to store the action set</description>
+        </property>
         <property>
             <name>spark2GenNoDoiDatasetMaxExecutors</name>
             <value>40</value>
@@ -66,7 +71,7 @@
     
     <action name="ResetWorkingPath">
         <fs>
-            <delete path='${workingPath}/no_doi_dataset'/>
+            <delete path='${processOutputPath}'/>
         </fs>
         <ok to="GenOrcidNoDoiDataset"/>
         <error to="Kill"/>
@@ -92,7 +97,7 @@
             <arg>--workingPath</arg><arg>${workingPath}/</arg>
             <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
             <arg>--orcidDataFolder</arg><arg>last_orcid_dataset</arg>
-            <arg>--outputEnrichedWorksPath</arg><arg>no_doi_dataset</arg>
+            <arg>--outputEnrichedWorksPath</arg><arg>${processOutputPath}</arg>
         </spark>
         <ok to="importOrcidNoDoi"/>
         <error to="Kill"/>
@@ -100,7 +105,7 @@
 
     <action name="importOrcidNoDoi">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${workingPath}/no_doi_dataset/*</arg>
+            <arg>${processOutputPath}/*</arg>
             <arg>${outputPath}</arg>
         </distcp>
         <ok to="End"/>
