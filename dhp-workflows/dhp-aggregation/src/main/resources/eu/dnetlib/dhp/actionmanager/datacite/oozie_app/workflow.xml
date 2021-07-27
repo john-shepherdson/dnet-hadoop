@@ -16,7 +16,7 @@
 
     </parameters>
 
-    <start to="TransformJob"/>
+    <start to="ImportDatacite"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
