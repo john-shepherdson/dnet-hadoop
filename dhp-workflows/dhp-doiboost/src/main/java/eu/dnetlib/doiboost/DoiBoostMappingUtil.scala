@@ -1,12 +1,16 @@
 package eu.dnetlib.doiboost
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{AccessRight, DataInfo, Dataset, Field, Instance, KeyValue, Oaf, Organization, Publication, Qualifier, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{AccessRight, DataInfo, Dataset, Field, Instance, KeyValue, Oaf, OpenAccessRoute, Organization, Publication, Qualifier, Relation, Result, StructuredProperty}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
+import eu.dnetlib.doiboost.DoiBoostMappingUtil.{getClosedAccessQualifier, getEmbargoedAccessQualifier, getUnknownQualifier}
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -118,14 +122,92 @@ object DoiBoostMappingUtil {
   }
 
 
+  def decideAccessRight(lic : Field[String], date:String) : AccessRight = {
+    if(lic == null){
+      //Default value Unknown
+      return getUnknownQualifier()
+    }
+    val license : String = lic.getValue
+    //CC licenses
+    if(license.startsWith("cc") ||
+      license.startsWith("http://creativecommons.org/licenses") ||
+      license.startsWith("https://creativecommons.org/licenses") ||
+
+      //ACS Publications Author choice licenses (considered OPEN also by Unpaywall)
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_ccby_termsofuse.html") ||
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_termsofuse.html") ||
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_ccbyncnd_termsofuse.html") ||
+
+      //APA (considered OPEN also by Unpaywall)
+      license.equals("http://www.apa.org/pubs/journals/resources/open-access.aspx")){
+
+      val oaq : AccessRight = getOpenAccessQualifier()
+      oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+      return oaq
+    }
+
+    //OUP (BUT ONLY AFTER 12 MONTHS FROM THE PUBLICATION DATE, OTHERWISE THEY ARE EMBARGOED)
+    if(license.equals("https://academic.oup.com/journals/pages/open_access/funder_policies/chorus/standard_publication_model")){
+      val now = java.time.LocalDate.now
+
+      try{
+        val pub_date = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        if (((now.toEpochDay - pub_date.toEpochDay)/365.0) > 1){
+          val oaq : AccessRight = getOpenAccessQualifier()
+          oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+          return oaq
+        }
+        else{
+          return getEmbargoedAccessQualifier()
+        }
+      }catch {
+        case e: Exception => {
+          try{
+          val pub_date = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+          if (((now.toEpochDay - pub_date.toEpochDay)/365.0) > 1){
+            val oaq : AccessRight = getOpenAccessQualifier()
+            oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+            return oaq
+          }
+          else{
+            return getEmbargoedAccessQualifier()
+          }
+          }catch{
+            case ex: Exception => return getClosedAccessQualifier()
+          }
+        }
+
+      }
+
+    }
+
+    return getClosedAccessQualifier()
+
+  }
+
 
 
   def getOpenAccessQualifier():AccessRight = {
-    OafMapperUtils.accessRight("OPEN","Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+
+    OafMapperUtils.accessRight(ModelConstants.ACCESS_RIGHT_OPEN,"Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
   def getRestrictedQualifier():AccessRight = {
-    OafMapperUtils.accessRight("RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+    OafMapperUtils.accessRight( "RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+  }
+
+
+  def getUnknownQualifier():AccessRight = {
+    OafMapperUtils.accessRight(ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+  }
+
+
+  def getEmbargoedAccessQualifier():AccessRight = {
+    OafMapperUtils.accessRight("EMBARGO","Embargo",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+  }
+
+  def getClosedAccessQualifier():AccessRight = {
+    OafMapperUtils.accessRight("CLOSED","Closed Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
 
@@ -150,10 +232,11 @@ object DoiBoostMappingUtil {
       if (item != null) {
         hb.setValue(item.officialname)
         hb.setKey(generateDSId(item.id))
-        if (item.openAccess)
+        if (item.openAccess) {
           i.setAccessright(getOpenAccessQualifier())
-        val ar = getOpenAccessQualifier()
-        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
+          i.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)
+        }
+
       }
       else {
         hb = ModelConstants.UNKNOWN_REPOSITORY
@@ -161,17 +244,8 @@ object DoiBoostMappingUtil {
       i.setHostedby(hb)
     })
 
-    val ar = publication.getInstance().asScala.filter(i => i.getInstancetype != null && i.getAccessright!= null && i.getAccessright.getClassid!= null).map(f=> f.getAccessright.getClassid)
-    if (ar.nonEmpty) {
-      if(ar.contains(ModelConstants.ACCESS_RIGHT_OPEN)){
-        val ar = getOpenAccessQualifier()
-        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
-      }
-      else {
-        val ar = getRestrictedQualifier()
-        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
-      }
-    }
+    publication.setBestaccessright(OafMapperUtils.createBestAccessRights(publication.getInstance()))
+
     publication
   }
 
