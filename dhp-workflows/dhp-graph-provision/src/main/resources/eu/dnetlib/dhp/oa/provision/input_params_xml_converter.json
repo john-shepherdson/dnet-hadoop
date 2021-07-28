@@ -16,11 +16,5 @@
     "paramLongName": "isLookupUrl",
     "paramDescription": "URL of the isLookUp Service",
     "paramRequired": true
-  },
-  {
-    "paramName": "odt",
-    "paramLongName": "otherDsTypeId",
-    "paramDescription": "list of datasource types to populate field datasourcetypeui",
-    "paramRequired": true
   }
 ]
