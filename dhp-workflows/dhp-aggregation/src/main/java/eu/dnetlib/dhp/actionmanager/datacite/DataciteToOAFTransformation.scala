@@ -367,7 +367,7 @@ object DataciteToOAFTransformation {
 
 
     result.setDateofcollection(ISO8601FORMAT.format(d))
-    result.setDateoftransformation(ISO8601FORMAT.format(ts))
+    result.setDateoftransformation(ISO8601FORMAT.format(d))
     result.setDataInfo(dataInfo)
 
     val creators = (json \\ "creators").extractOrElse[List[CreatorType]](List())
