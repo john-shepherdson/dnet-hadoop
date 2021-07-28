@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -52,15 +53,15 @@ public class ClusterUtils {
 	}
 
 	public static boolean isDedupRoot(final String id) {
-		return id.contains("dedup_wf_");
+		return id.contains("dedup");
 	}
 
 	public static final boolean isValidResultResultClass(final String s) {
-		return s.equals("isReferencedBy")
-			|| s.equals("isRelatedTo")
-			|| s.equals("references")
-			|| s.equals("isSupplementedBy")
-			|| s.equals("isSupplementedTo");
+		return s.equals(ModelConstants.IS_REFERENCED_BY)
+			|| s.equals(ModelConstants.IS_RELATED_TO)
+			|| s.equals(ModelConstants.REFERENCES)
+			|| s.equals(ModelConstants.IS_SUPPLEMENTED_BY)
+			|| s.equals(ModelConstants.IS_SUPPLEMENT_TO);
 	}
 
 	public static <T> T incrementAccumulator(final T o, final LongAccumulator acc) {
