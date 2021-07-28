@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns="http://datacite.org/schema/kernel-4"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr" xmlns:oaf="http://namespace.openaire.eu/oaf">
+    <oai:header xmlns="http://namespace.openaire.eu/"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <dri:objIdentifier>enermaps____::04149ee428d07360314c2cb3ba95d41e</dri:objIdentifier>
+        <dri:recordIdentifier>tgs00004</dri:recordIdentifier>
+        <dri:dateOfCollection>2021-07-20T18:43:12.096+02:00</dri:dateOfCollection>
+        <oaf:datasourceprefix>enermaps____</oaf:datasourceprefix>
+    </oai:header>
+    <metadata>
+        <resource>
+            <identifier identifierType="URL">https://ec.europa.eu/eurostat/web/products-datasets/-/tgs00004</identifier>
+            <creators>
+                <creator>
+                    <creatorName>Statistical Office of the European Union (Eurostat)</creatorName>
+                </creator>
+            </creators>
+            <titles>
+                <title>
+                    Regional GDP
+                </title>
+            </titles>
+            <publisher>Statistical Office of the European Union (Eurostat)</publisher>
+            <publicationYear>2020</publicationYear>
+            <dates>
+                <date dateType="Issued">2020-10-07</date>
+            </dates>
+            <resourceType resourceTypeGeneral="Dataset"/>
+            <rightsList>
+                <rights rightsURI="info:eu-repo/semantics/openAccess">OPEN</rights>
+                <rights rightsURI="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International</rights>
+            </rightsList>
+            <descriptions>
+                <description descriptionType="Abstract" xml:lang="EN">GDP expressed in PPS (purchasing power standards) eliminates differences in price levels between countries. Calculations on a per inhabitant basis allow for the comparison of economies and regions significantly different in absolute size. GDP per inhabitant in PPS is the key variable for determining the eligibility of NUTS 2 regions in the framework of the European Unions structural policy.</description>
+            </descriptions>
+            <dr:CobjCategory type="dataset">0021</dr:CobjCategory>
+            <oaf:dateAccepted>2020-10-07</oaf:dateAccepted>
+            <oaf:accessrights>OPEN</oaf:accessrights>
+            <oaf:license>Creative Commons Attribution 4.0 International</oaf:license>
+            <oaf:hostedBy
+                    id="openaire____::1256f046-bf1f-4afc-8b47-d0b147148b18" name="Unknown Repository"/>
+            <oaf:collectedFrom id="enermaps____::db" name="Enermaps"/>
+            <oaf:concept id="enermaps::selection::tgs00004"/>
+        </resource>
+    </metadata>
+    <about xmlns="" xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+           xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+           xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2021-07-20T18:43:12.096+02:00">
+                <baseURL>https%3A%2F%2Flab.idiap.ch%2Fenermaps%2Fapi%2Fdatacite</baseURL>
+                <identifier/>
+                <datestamp/>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk"
+                                  classname="sysimport:crosswalk"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>
