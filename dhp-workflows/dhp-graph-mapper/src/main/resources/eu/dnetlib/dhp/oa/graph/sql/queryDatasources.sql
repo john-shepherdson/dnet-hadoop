@@ -89,10 +89,10 @@ SELECT
 	d.issn                                                                                                     AS issnPrinted,
 	d.eissn                                                                                                    AS issnOnline,
 	d.lissn                                                                                                    AS issnLinking,
-	de.jurisdiction                                                                                            AS jurisdiction,
+	de.jurisdiction||'@@@eosc:jurisdictions'                                                                   AS jurisdiction,
 	de.thematic                                                                                                AS thematic,
 	de.knowledge_graph                                                                                         AS knowledgegraph,
-	de.content_policies                                                                                        AS contentpolicies
+	array(select unnest(de.content_policies)||'@@@eosc:contentpolicies')                                       AS contentpolicies
 
 FROM dsm_datasources d
 LEFT OUTER JOIN dsm_datasources_eosc de on (d.id = de.id)
