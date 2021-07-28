@@ -236,8 +236,7 @@ object DoiBoostMappingUtil {
           i.setAccessright(getOpenAccessQualifier())
           i.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)
         }
-//        val ar = getOpenAccessQualifier()
-//        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
+
       }
       else {
         hb = ModelConstants.UNKNOWN_REPOSITORY
@@ -246,17 +245,7 @@ object DoiBoostMappingUtil {
     })
 
     publication.setBestaccessright(OafMapperUtils.createBestAccessRights(publication.getInstance()))
-//    val ar = publication.getInstance().asScala.filter(i => i.getInstancetype != null && i.getAccessright!= null && i.getAccessright.getClassid!= null).map(f=> f.getAccessright.getClassid)
-//    if (ar.nonEmpty) {
-//      if(ar.contains(ModelConstants.ACCESS_RIGHT_OPEN)){
-//        val ar = getOpenAccessQualifier()
-//        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
-//      }
-//      else {
-//        val ar = getRestrictedQualifier()
-//        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
-//      }
-//    }
+
     publication
   }
 
