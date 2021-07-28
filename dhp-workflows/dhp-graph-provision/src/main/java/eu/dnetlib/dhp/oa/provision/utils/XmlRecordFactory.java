@@ -735,6 +735,30 @@ public class XmlRecordFactory implements Serializable {
 								.collect(Collectors.toList()));
 				}
 
+				if (ds.getJurisdiction() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("jurisdiction", ds.getJurisdiction()));
+				}
+
+				if (ds.getThematic() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("thematic", ds.getThematic().toString()));
+				}
+
+				if (ds.getKnowledgegraph() != null) {
+					metadata
+						.add(XmlSerializationUtils.asXmlElement("knowledgegraph", ds.getKnowledgegraph().toString()));
+				}
+
+				if (ds.getContentpolicies() != null) {
+					metadata
+						.addAll(
+							ds
+								.getContentpolicies()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(q -> XmlSerializationUtils.mapQualifier("contentpolicy", q))
+								.collect(Collectors.toList()));
+				}
+
 				break;
 			case organization:
 				final Organization o = (Organization) entity;
