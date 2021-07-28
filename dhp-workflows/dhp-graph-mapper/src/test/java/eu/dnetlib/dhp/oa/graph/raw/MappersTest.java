@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
+import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.cleanup;
+import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.fixVocabularyNames;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
@@ -638,6 +640,30 @@ public class MappersTest {
 		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		System.out.println(p.getTitle().get(0).getValue());
+	}
+
+	@Test
+	void testJairo() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_jairo.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+
+		assertNotNull(p.getTitle());
+		assertFalse(p.getTitle().isEmpty());
+		assertTrue(p.getTitle().size() == 1);
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
+		final Publication p_cleaned = cleanup(fixVocabularyNames(p));
+
+		assertNotNull(p_cleaned.getTitle());
+		assertFalse(p_cleaned.getTitle().isEmpty());
 	}
 
 	@Test
