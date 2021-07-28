@@ -18,6 +18,12 @@ FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultProject'
   and r.datainfo.deletedbyinference = false;
 
+create table ${stats_db_name}.project_classification as
+select substr(p.id, 4) as id, class.h2020programme.code, class.level1, class.level2, class.level3
+from ${openaire_db_name}project p
+    lateral view explode(p.h2020classification) classifs as class
+where p.datainfo.deletedbyinference=false and class.h2020programme is not null;
+
 CREATE TABLE ${stats_db_name}.project_tmp
 (
     id             STRING,
