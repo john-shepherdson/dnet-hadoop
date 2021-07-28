@@ -2,22 +2,23 @@ package eu.dnetlib.dhp.oa.graph.hostedbymap
 
 import java.sql.Timestamp
 
-import eu.dnetlib.dhp.oa.graph.hostebymap.SparkPrepareHostedByMapData
-import eu.dnetlib.dhp.oa.graph.hostebymap.SparkPrepareHostedByMapData.HostedByInfo
+import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.oa.graph.hostebymap.{Constants, HostedByInfo, SparkPrepareHostedByMapData}
+import eu.dnetlib.dhp.schema.oaf.Datasource
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{Dataset, SparkSession}
-import org.codehaus.jackson.map.ObjectMapper
+import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.json4s.DefaultFormats
 import org.junit.jupiter.api.Assertions.{assertNotNull, assertTrue}
 import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
-class TestPreprocess {
+class TestPreprocess extends java.io.Serializable{
 
-  val logger: Logger = LoggerFactory.getLogger(getClass)
-  val mapper = new ObjectMapper()
+  implicit val mapEncoderDats: Encoder[Datasource] = Encoders.kryo[Datasource]
+  implicit val schema = Encoders.product[HostedByInfo]
 
 
 
@@ -27,7 +28,11 @@ class TestPreprocess {
 
     import org.apache.spark.sql.Encoders
     implicit val formats = DefaultFormats
-    import org.json4s.jackson.Serialization.write
+
+    val logger: Logger = LoggerFactory.getLogger(getClass)
+    val mapper = new ObjectMapper()
+
+
 
     val conf = new SparkConf()
     conf.setMaster("local[*]")
@@ -41,17 +46,71 @@ class TestPreprocess {
     val path = getClass.getResource("datasource.json").getPath
 
 
-    val schema = Encoders.product[HostedByInfo]
+    println(SparkPrepareHostedByMapData.oaHostedByDataset(spark, path).count)
 
-    spark.read.textFile(path).foreach(r => println(mapper.writeValueAsString(r)))
-
-//    SparkPrepareHostedByMapData.readOADataset(path, spark)
-//      .foreach(r => println(write(r)))
 
 
     spark.close()
   }
 
+
+  @Test
+  def readGold():Unit = {
+
+    implicit val formats = DefaultFormats
+
+    val logger: Logger = LoggerFactory.getLogger(getClass)
+    val mapper = new ObjectMapper()
+
+
+
+    val conf = new SparkConf()
+    conf.setMaster("local[*]")
+    conf.set("spark.driver.host", "localhost")
+    val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName(getClass.getSimpleName)
+        .config(conf)
+        .getOrCreate()
+    val path = getClass.getResource("unibi_transformed.json").getPath
+
+
+    println(SparkPrepareHostedByMapData.goldHostedByDataset(spark, path).count)
+
+
+
+    spark.close()
+  }
+
+  @Test
+  def readDoaj():Unit = {
+
+    implicit val formats = DefaultFormats
+
+    val logger: Logger = LoggerFactory.getLogger(getClass)
+    val mapper = new ObjectMapper()
+
+
+
+    val conf = new SparkConf()
+    conf.setMaster("local[*]")
+    conf.set("spark.driver.host", "localhost")
+    val spark: SparkSession =
+      SparkSession
+        .builder()
+        .appName(getClass.getSimpleName)
+        .config(conf)
+        .getOrCreate()
+    val path = getClass.getResource("doaj_transformed.json").getPath
+
+
+    println(SparkPrepareHostedByMapData.doajHostedByDataset(spark, path).count)
+
+
+
+    spark.close()
+  }
 
 
 

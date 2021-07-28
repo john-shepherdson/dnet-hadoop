@@ -5,7 +5,7 @@ import org.apache.spark.sql.expressions.Aggregator
 
 
 case class HostedByItemType(id: String, officialname: String, issn: String, eissn: String, lissn: String, openAccess: Boolean) {}
-
+case class HostedByInfo(id: String, officialname: String, journal_id: String, provenance : String, id_type: String) {}
 
 object Aggregators {
 

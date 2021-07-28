@@ -2,27 +2,23 @@ package eu.dnetlib.dhp.oa.graph.hostebymap
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.oa.graph.hostebymap.model.{DOAJModel, UnibiGoldModel}
-import eu.dnetlib.dhp.oa.merge.AuthorMerger
-import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.{Datasource, Organization, Publication, Relation}
+import eu.dnetlib.dhp.schema.oaf.{Datasource}
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.json4s.DefaultFormats
 import org.slf4j.{Logger, LoggerFactory}
-import org.json4s.jackson.Serialization.write
 
-import scala.collection.mutable.ListBuffer
+import com.fasterxml.jackson.databind.ObjectMapper
 
 object SparkPrepareHostedByMapData {
 
-  case class HostedByInfo(id: Option[String], officialname: String, journal_id: String, provenance : String, id_type: String) {}
 
   implicit val tupleForJoinEncoder: Encoder[(String, HostedByItemType)] = Encoders.tuple(Encoders.STRING, Encoders.product[HostedByItemType])
-  implicit val mapEncoderDats: Encoder[Datasource] = Encoders.bean(classOf[Datasource])
-  implicit val mapEncoderDOAJ: Encoder[DOAJModel] = Encoders.kryo[DOAJModel]
-  implicit val mapEncoderUnibi: Encoder[UnibiGoldModel] = Encoders.kryo[UnibiGoldModel]
-  implicit val mapEncoderHBI: Encoder[HostedByInfo] = Encoders.product[HostedByInfo]
+
+
+
+
 
 
   def toHostedByItemType(input: ((HostedByInfo, HostedByInfo), HostedByInfo)) : HostedByItemType = {
@@ -32,58 +28,143 @@ object SparkPrepareHostedByMapData {
     val isOpenAccess: Boolean = doaj == null && gold == null
 
     openaire.journal_id match {
-      case Constants.ISSN => return HostedByItemType(openaire.id.get, openaire.officialname, openaire.journal_id, "", "", isOpenAccess)
-      case Constants.EISSN => return HostedByItemType(openaire.id.get, openaire.officialname, "", openaire.journal_id, "", isOpenAccess)
-      case Constants.ISSNL => return HostedByItemType(openaire.id.get, openaire.officialname, "", "", openaire.journal_id, isOpenAccess)
+      case Constants.ISSN =>  HostedByItemType(openaire.id, openaire.officialname, openaire.journal_id, "", "", isOpenAccess)
+      case Constants.EISSN =>  HostedByItemType(openaire.id, openaire.officialname, "", openaire.journal_id, "", isOpenAccess)
+      case Constants.ISSNL =>  HostedByItemType(openaire.id, openaire.officialname, "", "", openaire.journal_id, isOpenAccess)
 
       // catch the default with a variable so you can print it
-      case whoa => return null
+      case whoa =>  null
     }
   }
 
-  def toHostedByMap(input: HostedByItemType): ListBuffer[String] = {
-    implicit val formats = DefaultFormats
-    val serializedJSON:String = write(input)
+//  def toHostedByMap(input: HostedByItemType): ListBuffer[String] = {
+//    implicit val formats = DefaultFormats
+//    val serializedJSON:String = write(input)
+//
+//    var hostedBy  = new ListBuffer[String]()
+//    if(!input.issn.equals("")){
+//      hostedBy += "{\"" + input.issn + "\":" + serializedJSON + "}"
+//    }
+//    if(!input.eissn.equals("")){
+//      hostedBy += "{\"" + input.eissn + "\":" + serializedJSON + "}"
+//    }
+//    if(!input.lissn.equals("")){
+//      hostedBy += "{\"" + input.lissn + "\":" + serializedJSON + "}"
+//    }
+//
+//    hostedBy
+//
+//  }
 
-    var hostedBy  = new ListBuffer[String]()
+  def getHostedByItemType(id:String, officialname: String, issn:String, eissn:String, issnl:String, oa:Boolean): HostedByItemType = {
+    if(issn != null){
+      if(eissn != null){
+        if(issnl != null){
+          HostedByItemType(id, officialname, issn, eissn, issnl  , oa)
+        }else{
+          HostedByItemType(id, officialname, issn, eissn, ""  , oa)
+        }
+      }else{
+        if(issnl != null){
+          HostedByItemType(id, officialname, issn, "", issnl  , oa)
+        }else{
+          HostedByItemType(id, officialname, issn, "", ""  , oa)
+        }
+      }
+    }else{
+      if(eissn != null){
+        if(issnl != null){
+          HostedByItemType(id, officialname, "", eissn, issnl  , oa)
+        }else{
+          HostedByItemType(id, officialname, "", eissn, ""  , oa)
+        }
+      }else{
+        if(issnl != null){
+          HostedByItemType(id, officialname, "", "", issnl  , oa)
+        }else{
+          HostedByItemType("", "", "", "", ""  , oa)
+        }
+      }
+    }
+  }
+
+  def oaToHostedbyItemType(dats: Datasource): HostedByItemType = {
+    if (dats.getJournal != null) {
+
+      return getHostedByItemType(dats.getId, dats.getOfficialname.getValue, dats.getJournal.getIssnPrinted, dats.getJournal.getIssnOnline, dats.getJournal.getIssnLinking, false)
+    }
+    HostedByItemType("","","","","",false)
+  }
+
+  def oaHostedByDataset(spark:SparkSession, datasourcePath : String) : Dataset[HostedByItemType] = {
+
+    import spark.implicits._
+
+
+    val mapper = new ObjectMapper()
+
+    implicit var encoderD = Encoders.kryo[Datasource]
+
+    val dd : Dataset[Datasource] = spark.read.textFile(datasourcePath)
+      .map(r => mapper.readValue(r, classOf[Datasource]))
+
+    dd.map{ddt => oaToHostedbyItemType(ddt)}.filter(hb => !(hb.id.equals("")))
+
+  }
+
+
+  def goldToHostedbyItemType(gold: UnibiGoldModel): HostedByItemType = {
+    return getHostedByItemType(Constants.UNIBI, gold.getTitle, gold.getIssn, "", gold.getIssn_l, true)
+  }
+
+
+  def goldHostedByDataset(spark:SparkSession, datasourcePath:String) : Dataset[HostedByItemType] = {
+    import spark.implicits._
+
+    implicit val mapEncoderUnibi: Encoder[UnibiGoldModel] = Encoders.kryo[UnibiGoldModel]
+
+    val mapper = new ObjectMapper()
+
+    val dd : Dataset[UnibiGoldModel] = spark.read.textFile(datasourcePath)
+      .map(r => mapper.readValue(r, classOf[UnibiGoldModel]))
+
+    dd.map{ddt => goldToHostedbyItemType(ddt)}.filter(hb => !(hb.id.equals("")))
+
+  }
+
+  def doajToHostedbyItemType(doaj: DOAJModel): HostedByItemType = {
+
+    return getHostedByItemType(Constants.DOAJ, doaj.getJournalTitle, doaj.getIssn, doaj.getEissn, "", true)
+  }
+
+  def doajHostedByDataset(spark:SparkSession, datasourcePath:String) : Dataset[HostedByItemType] = {
+    import spark.implicits._
+
+    implicit val mapEncoderDOAJ: Encoder[DOAJModel] = Encoders.kryo[DOAJModel]
+
+    val mapper = new ObjectMapper()
+
+    val dd : Dataset[DOAJModel] = spark.read.textFile(datasourcePath)
+      .map(r => mapper.readValue(r, classOf[DOAJModel]))
+
+    dd.map{ddt => doajToHostedbyItemType(ddt)}.filter(hb => !(hb.id.equals("")))
+
+  }
+
+  def toList(input: HostedByItemType): List[(String, HostedByItemType)] = {
+    var lst : List[(String, HostedByItemType)] = List()
     if(!input.issn.equals("")){
-      hostedBy += "{\"" + input.issn + "\":" + serializedJSON + "}"
+      lst = (input.issn, input) :: lst
     }
     if(!input.eissn.equals("")){
-      hostedBy += "{\"" + input.eissn + "\":" + serializedJSON + "}"
+      lst = (input.eissn, input) :: lst
     }
     if(!input.lissn.equals("")){
-      hostedBy += "{\"" + input.lissn + "\":" + serializedJSON + "}"
+      lst = (input.lissn, input) :: lst
     }
-
-    hostedBy
-
+    lst
   }
 
-
-  def readOADataset(input:String, spark: SparkSession): Dataset[HostedByInfo] = {
-    spark.read.textFile(input).as[Datasource].flatMap(ds => {
-      val lst = new ListBuffer[HostedByInfo]()
-      if (ds.getJournal == null) {
-        return null
-      }
-      val issn: String = ds.getJournal.getIssnPrinted
-      val issnl: String = ds.getJournal.getIssnOnline
-      val eissn: String = ds.getJournal.getIssnOnline
-      val id: String = ds.getId
-      val officialname: String = ds.getOfficialname.getValue
-      if (issn != null) {
-        lst += HostedByInfo(Some(id), officialname, issn, Constants.OPENAIRE, Constants.ISSN)
-      }
-      if (issnl != null) {
-        lst += HostedByInfo(Some(id), officialname, issnl, Constants.OPENAIRE, Constants.ISSNL)
-      }
-      if (eissn != null) {
-        lst += HostedByInfo(Some(id), officialname, eissn, Constants.OPENAIRE, Constants.EISSN)
-      }
-      lst
-    }).filter(i => i != null)
-  }
 
   def main(args: Array[String]): Unit = {
 
@@ -105,53 +186,34 @@ object SparkPrepareHostedByMapData {
 
 
 
+    implicit val formats = DefaultFormats
+
 
     logger.info("Getting the Datasources")
 
-    val doajDataset: Dataset[DOAJModel] = spark.read.load(workingDirPath + "/doaj").as[DOAJModel]
-    val unibiDataset: Dataset[UnibiGoldModel] = spark.read.load(datasourcePath).as[UnibiGoldModel]
+   // val doajDataset: Dataset[DOAJModel] = spark.read.textFile(workingDirPath + "/doaj").as[DOAJModel]
 
-    val oa: Dataset[HostedByInfo] = readOADataset(datasourcePath, spark)
-
-    val doaj: Dataset[HostedByInfo] = doajDataset.flatMap(doaj => {
-      val lst = new ListBuffer[HostedByInfo]()
-      val issn: String = doaj.getIssn
-      val eissn: String = doaj.getEissn
-      val officialname: String = doaj.getJournalTitle
-      if (issn != null) {
-        lst += HostedByInfo(null, officialname, issn, Constants.DOAJ, Constants.ISSN)
-      }
-      if (eissn != null) {
-        lst += HostedByInfo(null, officialname, eissn, Constants.DOAJ, Constants.EISSN)
-      }
-      lst
-    })
-
-    val gold: Dataset[HostedByInfo] = unibiDataset.flatMap(gold => {
-      val lst = new ListBuffer[HostedByInfo]()
-      val issn: String = gold.getIssn
-      val issnl: String = gold.getIssn_l
-      val officialname: String = gold.getTitle
-      if (issn != null) {
-        lst += HostedByInfo(null, officialname, issn, Constants.UNIBI, Constants.ISSN)
-      }
-      if (issnl != null) {
-        lst += HostedByInfo(null, officialname, issnl, Constants.UNIBI, Constants.ISSNL)
-      }
-      lst
-    })
-
-    Aggregators.createHostedByItemTypes(oa.joinWith(doaj, oa.col("journal_id").equalTo(doaj.col("journal_id")), "left")
-      .joinWith(gold, $"_1.col('journal_id')".equalTo(gold.col("journal_id")), "left").map(toHostedByItemType)
-      .filter(i => i != null))
-      .flatMap(toHostedByMap)
-      //      .map(i => (i.id,i))
-      //      .groupByKey(_._1)
-      //      .agg(hostedByAggregator.toColumn)
-      //      .map(p => p._2)
-      .write.mode(SaveMode.Overwrite).save(s"$workingDirPath/HostedByMap")
+    val dats : Dataset[HostedByItemType] =
+      oaHostedByDataset(spark, datasourcePath)
+      .union(goldHostedByDataset(spark, workingDirPath + "/unibi_gold"))
+      .union(doajHostedByDataset(spark, workingDirPath + "/doaj"))
+    dats.flatMap(hbi => toList(hbi))
+      .groupByKey(_._1)
 
 
+//
+//
+
+//
+
+//
+//    Aggregators.createHostedByItemTypes(oa.joinWith(doaj, oa.col("journal_id").equalTo(doaj.col("journal_id")), "left")
+//      .joinWith(gold, $"_1.col('journal_id')".equalTo(gold.col("journal_id")), "left").map(toHostedByItemType)
+//      .filter(i => i != null))
+//      .flatMap(toHostedByMap)
+//      .write.mode(SaveMode.Overwrite).save(s"$workingDirPath/HostedByMap")
+//
+//
   }
 
 
