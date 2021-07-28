@@ -13,7 +13,7 @@ WHERE r.reltype = 'projectOrganization'
   and r.datainfo.deletedbyinference = false;
 
 CREATE TABLE ${stats_db_name}.project_results AS
-SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result
+SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result, r.datainfo.provenanceaction.classname as provenance
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultProject'
   and r.datainfo.deletedbyinference = false;
