@@ -1,17 +1,13 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.lenient;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,22 +16,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 public class MappersTest {
@@ -74,7 +60,7 @@ public class MappersTest {
 
 		assertValidId(p.getId());
 
-		assertEquals(1, p.getOriginalId().size());
+		assertEquals(2, p.getOriginalId().size());
 		assertTrue(p.getOriginalId().contains("10.3897/oneeco.2.e13718"));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
@@ -261,8 +247,8 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
-		assertEquals(1, d.getOriginalId().size());
-		assertTrue(d.getOriginalId().contains("oai:zenodo.org:3234526"));
+		assertEquals(2, d.getOriginalId().size());
+		assertTrue(d.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:zenodo.org:3234526")));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
@@ -351,8 +337,11 @@ public class MappersTest {
 		final Publication p = (Publication) list.get(0);
 
 		assertValidId(p.getId());
-		assertTrue(p.getOriginalId().size() == 1);
-		assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
+		assertEquals(2, p.getOriginalId().size());
+
+		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:pub.uni-bielefeld.de:2949739")));
+		//assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
+
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(p.getAuthor().size() > 0);
 
@@ -413,7 +402,8 @@ public class MappersTest {
 		assertEquals(ModelConstants.DNET_PROVENANCE_ACTIONS, d.getDataInfo().getProvenanceaction().getSchemename());
 
 		assertValidId(d.getId());
-		assertTrue(d.getOriginalId().size() == 1);
+		assertEquals(2, d.getOriginalId().size());
+
 		assertEquals("feabb67c-1fd1-423b-aec6-606d04ce53c6", d.getOriginalId().get(0));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 
@@ -663,8 +653,8 @@ public class MappersTest {
 		final Dataset p = (Dataset) list.get(0);
 
 		assertValidId(p.getId());
-		assertTrue(p.getOriginalId().size() == 1);
-		assertEquals("df76e73f-0483-49a4-a9bb-63f2f985574a", p.getOriginalId().get(0));
+		assertEquals(2, p.getOriginalId().size());
+		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("df76e73f-0483-49a4-a9bb-63f2f985574a")));
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(p.getAuthor().size() > 0);
 

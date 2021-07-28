@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -77,48 +78,54 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 				(type, clazz) -> {
 					final String outputPath = dedupGraphPath + "/" + type;
 					removeOutputDir(spark, outputPath);
+					final String ip = DedupUtility.createEntityPath(graphBasePath, type.toString());
+					if (HdfsSupport.exists(ip, sc.hadoopConfiguration())) {
+						JavaRDD<String> sourceEntity = sc
+							.textFile(DedupUtility.createEntityPath(graphBasePath, type.toString()));
 
-					JavaRDD<String> sourceEntity = sc
-						.textFile(DedupUtility.createEntityPath(graphBasePath, type.toString()));
+						if (mergeRelExists(workingPath, type.toString())) {
 
-					if (mergeRelExists(workingPath, type.toString())) {
+							final String mergeRelPath = DedupUtility
+								.createMergeRelPath(workingPath, "*", type.toString());
+							final String dedupRecordPath = DedupUtility
+								.createDedupRecordPath(workingPath, "*", type.toString());
 
-						final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, "*", type.toString());
-						final String dedupRecordPath = DedupUtility
-							.createDedupRecordPath(workingPath, "*", type.toString());
+							final Dataset<Relation> rel = spark
+								.read()
+								.load(mergeRelPath)
+								.as(Encoders.bean(Relation.class));
 
-						final Dataset<Relation> rel = spark.read().load(mergeRelPath).as(Encoders.bean(Relation.class));
+							final JavaPairRDD<String, String> mergedIds = rel
+								.where("relClass == 'merges'")
+								.where("source != target")
+								.select(rel.col("target"))
+								.distinct()
+								.toJavaRDD()
+								.mapToPair(
+									(PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "d"));
 
-						final JavaPairRDD<String, String> mergedIds = rel
-							.where("relClass == 'merges'")
-							.where("source != target")
-							.select(rel.col("target"))
-							.distinct()
-							.toJavaRDD()
-							.mapToPair(
-								(PairFunction<Row, String, String>) r -> new Tuple2<>(r.getString(0), "d"));
+							JavaPairRDD<String, String> entitiesWithId = sourceEntity
+								.mapToPair(
+									(PairFunction<String, String, String>) s -> new Tuple2<>(
+										MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
+							if (type == EntityType.organization) // exclude root records from organizations
+								entitiesWithId = excludeRootOrgs(entitiesWithId, rel);
 
-						JavaPairRDD<String, String> entitiesWithId = sourceEntity
-							.mapToPair(
-								(PairFunction<String, String, String>) s -> new Tuple2<>(
-									MapDocumentUtil.getJPathString(IDJSONPATH, s), s));
-						if (type == EntityType.organization) // exclude root records from organizations
-							entitiesWithId = excludeRootOrgs(entitiesWithId, rel);
+							JavaRDD<String> map = entitiesWithId
+								.leftOuterJoin(mergedIds)
+								.map(k -> {
+									if (k._2()._2().isPresent()) {
+										return updateDeletedByInference(k._2()._1(), clazz);
+									}
+									return k._2()._1();
+								});
 
-						JavaRDD<String> map = entitiesWithId
-							.leftOuterJoin(mergedIds)
-							.map(k -> {
-								if (k._2()._2().isPresent()) {
-									return updateDeletedByInference(k._2()._1(), clazz);
-								}
-								return k._2()._1();
-							});
+							sourceEntity = map.union(sc.textFile(dedupRecordPath));
 
-						sourceEntity = map.union(sc.textFile(dedupRecordPath));
+						}
 
+						sourceEntity.saveAsTextFile(outputPath, GzipCodec.class);
 					}
-
-					sourceEntity.saveAsTextFile(outputPath, GzipCodec.class);
 				});
 	}
 
