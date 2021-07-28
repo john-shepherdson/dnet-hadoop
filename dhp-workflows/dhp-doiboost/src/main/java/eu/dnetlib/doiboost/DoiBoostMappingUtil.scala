@@ -179,20 +179,6 @@ object DoiBoostMappingUtil {
 
       }
 
-      //val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
-
-
-     // val pub_date = LocalDate.parse(date, formatter)
-
-//      if (((now.toEpochDay - pub_date.toEpochDay)/365.0) > 1){
-//        val oaq : AccessRight = getOpenAccessQualifier()
-//        oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
-//        return oaq
-//      }
-//      else{
-//        return getEmbargoedAccessQualifier()
-//      }
     }
 
     return getClosedAccessQualifier()
@@ -206,12 +192,12 @@ object DoiBoostMappingUtil {
   }
 
   def getRestrictedQualifier():AccessRight = {
-    OafMapperUtils.accessRight("RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+    OafMapperUtils.accessRight( "RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
 
   def getUnknownQualifier():AccessRight = {
-    OafMapperUtils.accessRight("UNKNOWN","not available",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+    OafMapperUtils.accessRight(ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
 
