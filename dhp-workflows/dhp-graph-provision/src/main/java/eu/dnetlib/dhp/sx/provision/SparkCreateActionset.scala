@@ -43,7 +43,7 @@ object SparkCreateActionset {
     val relation = spark.read.load(s"$sourcePath/relation").as[Relation]
 
     relation.filter(r => (r.getDataInfo== null || r.getDataInfo.getDeletedbyinference == false) && !r.getRelClass.toLowerCase.contains("merge"))
-      .flatMap(r => List(r.getSource,r.getTarget)).distinct().write.save(s"$workingDirFolder/id_relation")
+      .flatMap(r => List(r.getSource,r.getTarget)).distinct().write.mode(SaveMode.Overwrite).save(s"$workingDirFolder/id_relation")
 
 
     val idRelation = spark.read.load(s"$workingDirFolder/id_relation").as[String]
@@ -56,35 +56,18 @@ object SparkCreateActionset {
     relation.filter(r => (r.getDataInfo== null || r.getDataInfo.getDeletedbyinference == false) && !r.getRelClass.toLowerCase.contains("merge"))
       .write.mode(SaveMode.Overwrite).save(s"$workingDirFolder/actionSetOaf")
 
-    log.info("saving publication")
+    log.info("saving entities")
 
-    val publication:Dataset[(String, Result)] = spark.read.load(s"$sourcePath/publication").as[Result].map(p => (p.getId, p))
+    val entities:Dataset[(String, Result)] = spark.read.load(s"$sourcePath/entities/*").as[Result].map(p => (p.getId, p))(Encoders.tuple(Encoders.STRING, resultEncoders))
 
-    publication
-      .joinWith(idRelation, publication("_1").equalTo(idRelation("value")))
+
+    entities.filter(r => r.isInstanceOf[Result]).map(r => r.asInstanceOf[Result])
+    entities
+      .joinWith(idRelation, entities("_1").equalTo(idRelation("value")))
       .map(p => p._1._2)
       .write.mode(SaveMode.Append).save(s"$workingDirFolder/actionSetOaf")
 
-    log.info("saving dataset")
-    val dataset:Dataset[(String, Result)] = spark.read.load(s"$sourcePath/dataset").as[Result].map(p => (p.getId, p))
-    dataset
-      .joinWith(idRelation, publication("_1").equalTo(idRelation("value")))
-      .map(p => p._1._2)
-      .write.mode(SaveMode.Append).save(s"$workingDirFolder/actionSetOaf")
 
-    log.info("saving software")
-    val software:Dataset[(String, Result)] = spark.read.load(s"$sourcePath/software").as[Result].map(p => (p.getId, p))
-    software
-      .joinWith(idRelation, publication("_1").equalTo(idRelation("value")))
-      .map(p => p._1._2)
-      .write.mode(SaveMode.Append).save(s"$workingDirFolder/actionSetOaf")
-
-    log.info("saving Other Research product")
-    val orp:Dataset[(String, Result)] = spark.read.load(s"$sourcePath/otherresearchproduct").as[Result].map(p => (p.getId, p))
-    orp
-      .joinWith(idRelation, publication("_1").equalTo(idRelation("value")))
-      .map(p => p._1._2)
-      .write.mode(SaveMode.Append).save(s"$workingDirFolder/actionSetOaf")
   }
 
 }
