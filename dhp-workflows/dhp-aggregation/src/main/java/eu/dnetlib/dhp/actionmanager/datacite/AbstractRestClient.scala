@@ -1,9 +1,10 @@
 package eu.dnetlib.dhp.actionmanager.datacite
 
 import org.apache.commons.io.IOUtils
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.{HttpGet, HttpPost, HttpRequestBase, HttpUriRequest}
 import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.HttpClients
+import org.apache.http.impl.client.{HttpClientBuilder, HttpClients}
 
 import java.io.IOException
 
@@ -56,11 +57,15 @@ abstract class AbstractRestClient extends Iterator[String]{
 
 
   private def doHTTPRequest[A <: HttpUriRequest](r: A) :String ={
-    val client = HttpClients.createDefault
+    val timeout = 60; // seconds
+    val config = RequestConfig.custom()
+      .setConnectTimeout(timeout * 1000)
+      .setConnectionRequestTimeout(timeout * 1000)
+      .setSocketTimeout(timeout * 1000).build()
+    val client =HttpClientBuilder.create().setDefaultRequestConfig(config).build()
     var tries = 4
     try {
       while (tries > 0) {
-
         println(s"requesting ${r.getURI}")
         val response = client.execute(r)
         println(s"get response with status${response.getStatusLine.getStatusCode}")
@@ -80,7 +85,5 @@ abstract class AbstractRestClient extends Iterator[String]{
         throw new RuntimeException("Unable to close client ", e)
     }
   }
-
   getBufferData()
-
 }
