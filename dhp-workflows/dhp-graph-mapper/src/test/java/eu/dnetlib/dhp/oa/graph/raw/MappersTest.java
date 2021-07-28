@@ -1,13 +1,13 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +16,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
 public class MappersTest {
@@ -340,7 +342,7 @@ public class MappersTest {
 		assertEquals(2, p.getOriginalId().size());
 
 		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:pub.uni-bielefeld.de:2949739")));
-		//assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
+		// assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(p.getAuthor().size() > 0);
