@@ -188,7 +188,8 @@ object DoiBoostMappingUtil {
 
 
   def getOpenAccessQualifier():AccessRight = {
-    OafMapperUtils.accessRight("OPEN","Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+
+    OafMapperUtils.accessRight(ModelConstants.ACCESS_RIGHT_OPEN,"Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
   def getRestrictedQualifier():AccessRight = {
