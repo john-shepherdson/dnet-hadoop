@@ -20,7 +20,7 @@ WHERE r.reltype = 'resultProject'
 
 create table ${stats_db_name}.project_classification as
 select substr(p.id, 4) as id, class.h2020programme.code, class.level1, class.level2, class.level3
-from ${openaire_db_name}project p
+from ${openaire_db_name}.project p
     lateral view explode(p.h2020classification) classifs as class
 where p.datainfo.deletedbyinference=false and class.h2020programme is not null;
 
