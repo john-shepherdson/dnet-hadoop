@@ -55,7 +55,7 @@ CREATE TABLE ${stats_db_name}.dual
 INSERT INTO ${stats_db_name}.dual
 VALUES ('X');
 INSERT INTO ${stats_db_name}.datasource_tmp (`id`, `name`, `type`, `dateofvalidation`, `yearofvalidation`, `harvested`,
-                                             `piwik_id`, `latitude`, `longitude`, `websiteurl`, `compatibility`)
+                                             `piwik_id`, `latitude`, `longitude`, `websiteurl`, `compatibility`, `issn_printed`, `issn_online`)
 SELECT 'other',
        'Other',
        'Repository',
@@ -66,7 +66,9 @@ SELECT 'other',
        NULL,
        NULL,
        NULL,
-       'unknown'
+       'unknown',
+       null,
+       null
 FROM ${stats_db_name}.dual
 WHERE 'other' not in (SELECT id FROM ${stats_db_name}.datasource_tmp WHERE name = 'Unknown Repository');
 DROP TABLE ${stats_db_name}.dual;
