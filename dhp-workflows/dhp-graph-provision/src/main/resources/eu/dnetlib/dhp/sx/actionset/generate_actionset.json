@@ -1,0 +1,6 @@
+[
+  {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",      "paramRequired": true},
+  {"paramName":"s",   "paramLongName":"sourcePath","paramDescription": "source path",                   "paramRequired": true},
+  {"paramName":"w",   "paramLongName":"workingDirFolder","paramDescription": "the working Dir Folder",  "paramRequired": true},
+  {"paramName":"t",   "paramLongName":"targetPath","paramDescription": "the target path ",              "paramRequired": true}
+]
