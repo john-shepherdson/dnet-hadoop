@@ -1,9 +1,9 @@
-package eu.dnetlib.dhp.sx.provision
+package eu.dnetlib.dhp.actionmanager.scholix
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
-import org.apache.spark.{SparkConf, sql}
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
+import org.apache.spark.SparkConf
+import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.io.Source
@@ -34,16 +34,16 @@ object SparkCreateActionset {
     val workingDirFolder = parser.get("workingDirFolder")
     log.info(s"workingDirFolder  -> $workingDirFolder")
 
-    implicit val oafEncoders:Encoder[Oaf] = Encoders.kryo[Oaf]
-    implicit val resultEncoders:Encoder[Result] = Encoders.kryo[Result]
-    implicit val relationEncoders:Encoder[Relation] = Encoders.kryo[Relation]
+    implicit val oafEncoders: Encoder[Oaf] = Encoders.kryo[Oaf]
+    implicit val resultEncoders: Encoder[Result] = Encoders.kryo[Result]
+    implicit val relationEncoders: Encoder[Relation] = Encoders.kryo[Relation]
 
-    import  spark.implicits._
+    import spark.implicits._
 
     val relation = spark.read.load(s"$sourcePath/relation").as[Relation]
 
-    relation.filter(r => (r.getDataInfo== null || r.getDataInfo.getDeletedbyinference == false) && !r.getRelClass.toLowerCase.contains("merge"))
-      .flatMap(r => List(r.getSource,r.getTarget)).distinct().write.mode(SaveMode.Overwrite).save(s"$workingDirFolder/id_relation")
+    relation.filter(r => (r.getDataInfo == null || r.getDataInfo.getDeletedbyinference == false) && !r.getRelClass.toLowerCase.contains("merge"))
+      .flatMap(r => List(r.getSource, r.getTarget)).distinct().write.mode(SaveMode.Overwrite).save(s"$workingDirFolder/id_relation")
 
 
     val idRelation = spark.read.load(s"$workingDirFolder/id_relation").as[String]
@@ -53,12 +53,12 @@ object SparkCreateActionset {
 
     log.info("save relation filtered")
 
-    relation.filter(r => (r.getDataInfo== null || r.getDataInfo.getDeletedbyinference == false) && !r.getRelClass.toLowerCase.contains("merge"))
+    relation.filter(r => (r.getDataInfo == null || r.getDataInfo.getDeletedbyinference == false) && !r.getRelClass.toLowerCase.contains("merge"))
       .write.mode(SaveMode.Overwrite).save(s"$workingDirFolder/actionSetOaf")
 
     log.info("saving entities")
 
-    val entities:Dataset[(String, Result)] = spark.read.load(s"$sourcePath/entities/*").as[Result].map(p => (p.getId, p))(Encoders.tuple(Encoders.STRING, resultEncoders))
+    val entities: Dataset[(String, Result)] = spark.read.load(s"$sourcePath/entities/*").as[Result].map(p => (p.getId, p))(Encoders.tuple(Encoders.STRING, resultEncoders))
 
 
     entities.filter(r => r.isInstanceOf[Result]).map(r => r.asInstanceOf[Result])
