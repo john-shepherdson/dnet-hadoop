@@ -80,8 +80,7 @@ public class PatchRelationsApplication {
         final Dataset<RelationIdMapping> idMapping = Utils.readPath(spark, idMappingPath, RelationIdMapping.class);
 
         rels
-                .joinWith(idMapping, rels.col("source").equalTo(idMapping.col("oldId")), "full")
-                .filter((FilterFunction<Tuple2<Relation, RelationIdMapping>>) t -> Objects.nonNull(t._1()))
+                .joinWith(idMapping, rels.col("source").equalTo(idMapping.col("oldId")), "left")
                 .map((MapFunction<Tuple2<Relation, RelationIdMapping>, Relation>) t -> {
                     final Relation r = t._1();
                     Optional.ofNullable(t._2())
@@ -89,8 +88,7 @@ public class PatchRelationsApplication {
                             .ifPresent(r::setSource);
                     return r;
                 }, Encoders.bean(Relation.class))
-                .joinWith(idMapping, rels.col("target").equalTo(idMapping.col("oldId")), "full")
-                .filter((FilterFunction<Tuple2<Relation, RelationIdMapping>>) t -> Objects.nonNull(t._1()))
+                .joinWith(idMapping, rels.col("target").equalTo(idMapping.col("oldId")), "left")
                 .map((MapFunction<Tuple2<Relation, RelationIdMapping>, Relation>) t -> {
                     final Relation r = t._1();
                     Optional.ofNullable(t._2())
