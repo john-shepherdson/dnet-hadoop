@@ -38,8 +38,7 @@ import scala.Tuple2;
 /**
  * Groups the graph content by entity identifier to ensure ID uniqueness
  */
-public class
-GroupEntitiesSparkJob {
+public class GroupEntitiesSparkJob {
 
 	private static final Logger log = LoggerFactory.getLogger(GroupEntitiesSparkJob.class);
 

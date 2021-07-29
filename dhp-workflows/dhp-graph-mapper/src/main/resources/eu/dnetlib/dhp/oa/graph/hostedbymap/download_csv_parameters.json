@@ -1,0 +1,37 @@
+
+[
+
+  {
+    "paramName":"fu",
+    "paramLongName":"fileURL",
+    "paramDescription": "the url to download the csv file ",
+    "paramRequired": true
+  },
+
+  {
+    "paramName":"wp",
+    "paramLongName":"workingPath",
+    "paramDescription": "the path where to find the pre-processed data for unibi gold list and doj artciles",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hnn",
+    "paramLongName": "hdfsNameNode",
+    "paramDescription": "the path used to store the HostedByMap",
+    "paramRequired": true
+  },
+  {
+    "paramName": "cfn",
+    "paramLongName": "classForName",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": true
+  },
+  {
+    "paramName": "sr",
+    "paramLongName": "replace",
+    "paramDescription": "true if the input file has to be cleaned before parsing",
+    "paramRequired": false
+  }
+]
+
+

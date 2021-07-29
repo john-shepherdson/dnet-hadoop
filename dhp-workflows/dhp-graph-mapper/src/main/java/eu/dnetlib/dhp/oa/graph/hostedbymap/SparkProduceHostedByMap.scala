@@ -1,17 +1,23 @@
-package eu.dnetlib.dhp.oa.graph.hostebymap
+package eu.dnetlib.dhp.oa.graph.hostedbymap
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.oa.graph.hostebymap.model.{DOAJModel, UnibiGoldModel}
-import eu.dnetlib.dhp.schema.oaf.{Datasource}
+import eu.dnetlib.dhp.oa.graph.hostedbymap.model.{DOAJModel, UnibiGoldModel}
+import eu.dnetlib.dhp.schema.oaf.Datasource
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
 import org.json4s.DefaultFormats
 import org.slf4j.{Logger, LoggerFactory}
-
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.FileSystem
+import org.apache.hadoop.fs.Path
+import java.io.PrintWriter
 
-object SparkPrepareHostedByMapData {
+import org.apache.hadoop.io.compress.GzipCodec
+
+
+object SparkProduceHostedByMap {
 
 
   implicit val tupleForJoinEncoder: Encoder[(String, HostedByItemType)] = Encoders.tuple(Encoders.STRING, Encoders.product[HostedByItemType])
@@ -37,24 +43,32 @@ object SparkPrepareHostedByMapData {
     }
   }
 
-//  def toHostedByMap(input: HostedByItemType): ListBuffer[String] = {
-//    implicit val formats = DefaultFormats
-//    val serializedJSON:String = write(input)
-//
-//    var hostedBy  = new ListBuffer[String]()
-//    if(!input.issn.equals("")){
-//      hostedBy += "{\"" + input.issn + "\":" + serializedJSON + "}"
-//    }
-//    if(!input.eissn.equals("")){
-//      hostedBy += "{\"" + input.eissn + "\":" + serializedJSON + "}"
-//    }
-//    if(!input.lissn.equals("")){
-//      hostedBy += "{\"" + input.lissn + "\":" + serializedJSON + "}"
-//    }
-//
-//    hostedBy
-//
-//  }
+  def toHostedByMap(input: (String, HostedByItemType)): String = {
+    import org.json4s.jackson.Serialization
+
+    implicit val formats = org.json4s.DefaultFormats
+
+    val map: Map [String, HostedByItemType] = Map (input._1 -> input._2 )
+
+    Serialization.write(map)
+
+
+  }
+
+  /**
+    *
+  def toHostedByMap(input: Map[String, HostedByItemType]): String = {
+    import org.json4s.jackson.Serialization
+
+    implicit val formats = org.json4s.DefaultFormats
+
+
+
+    Serialization.write(input)
+
+
+  }
+    */
 
   def getHostedByItemType(id:String, officialname: String, issn:String, eissn:String, issnl:String, oa:Boolean): HostedByItemType = {
     if(issn != null){
@@ -166,11 +180,31 @@ object SparkPrepareHostedByMapData {
   }
 
 
+
+  def writeToHDFS(input: Array[String], outputPath: String, hdfsNameNode : String):Unit = {
+    val conf = new Configuration()
+
+    conf.set("fs.defaultFS", hdfsNameNode)
+    val fs= FileSystem.get(conf)
+    val output = fs.create(new Path(outputPath))
+    val writer = new PrintWriter(output)
+    try {
+      input.foreach(hbi => writer.println(hbi))
+    }
+    finally {
+      writer.close()
+
+    }
+
+  }
+
+
+
   def main(args: Array[String]): Unit = {
 
     val logger: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/hostedby/prepare_hostedby_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/hostedbymap/hostedby_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
@@ -179,11 +213,10 @@ object SparkPrepareHostedByMapData {
         .appName(getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
 
-    import spark.implicits._
 
     val datasourcePath = parser.get("datasourcePath")
     val workingDirPath = parser.get("workingPath")
-
+    val outputPath = parser.get("outputPath")
 
 
     implicit val formats = DefaultFormats
@@ -191,29 +224,15 @@ object SparkPrepareHostedByMapData {
 
     logger.info("Getting the Datasources")
 
-   // val doajDataset: Dataset[DOAJModel] = spark.read.textFile(workingDirPath + "/doaj").as[DOAJModel]
 
-    val dats : Dataset[HostedByItemType] =
-      oaHostedByDataset(spark, datasourcePath)
+    Aggregators.explodeHostedByItemType(oaHostedByDataset(spark, datasourcePath)
       .union(goldHostedByDataset(spark, workingDirPath + "/unibi_gold"))
       .union(doajHostedByDataset(spark, workingDirPath + "/doaj"))
-    dats.flatMap(hbi => toList(hbi))
-      .groupByKey(_._1)
+      .flatMap(hbi => toList(hbi))).filter(hbi => hbi._2.id.startsWith("10|"))
+      .map(hbi => toHostedByMap(hbi))(Encoders.STRING)
+      .rdd.saveAsTextFile(outputPath + "/hostedByMap", classOf[GzipCodec])
 
 
-//
-//
-
-//
-
-//
-//    Aggregators.createHostedByItemTypes(oa.joinWith(doaj, oa.col("journal_id").equalTo(doaj.col("journal_id")), "left")
-//      .joinWith(gold, $"_1.col('journal_id')".equalTo(gold.col("journal_id")), "left").map(toHostedByItemType)
-//      .filter(i => i != null))
-//      .flatMap(toHostedByMap)
-//      .write.mode(SaveMode.Overwrite).save(s"$workingDirPath/HostedByMap")
-//
-//
   }
 
 
