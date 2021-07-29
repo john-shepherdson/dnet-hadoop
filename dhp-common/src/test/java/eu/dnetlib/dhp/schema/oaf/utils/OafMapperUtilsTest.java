@@ -4,12 +4,8 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -19,12 +15,31 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import me.xuender.unidecode.Unidecode;
 
 public class OafMapperUtilsTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+	@Test
+	public void testUnidecode() {
+
+		assertEquals("Liu Ben Mu hiruzuSen tawa", Unidecode.decode("六本木ヒルズ森タワ"));
+		assertEquals("Nan Wu A Mi Tuo Fo", Unidecode.decode("南无阿弥陀佛"));
+		assertEquals("Yi Tiao Hui Zou Lu De Yu", Unidecode.decode("一条会走路的鱼"));
+		assertEquals("amidaniyorai", Unidecode.decode("あみだにょらい"));
+		assertEquals("T`owrk`iayi", Unidecode.decode("Թուրքիայի"));
+		assertEquals("Obzor tematiki", Unidecode.decode("Обзор тематики"));
+		assertEquals("GERMANSKIE IaZYKI", Unidecode.decode("ГЕРМАНСКИЕ ЯЗЫКИ"));
+		assertEquals("Diereunese tes ikanopoieses", Unidecode.decode("Διερεύνηση της ικανοποίησης"));
+		assertEquals("lqDy l'wly@", Unidecode.decode("القضايا الأولية"));
+		assertEquals("abc def ghi", Unidecode.decode("abc def ghi"));
+	}
 
 	@Test
 	public void testDateValidation() {
