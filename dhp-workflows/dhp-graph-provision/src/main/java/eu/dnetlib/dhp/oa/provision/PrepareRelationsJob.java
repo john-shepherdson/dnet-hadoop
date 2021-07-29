@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -81,6 +82,7 @@ public class PrepareRelationsJob {
 
 		Set<String> relationFilter = Optional
 			.ofNullable(parser.get("relationFilter"))
+			.map(String::toLowerCase)
 			.map(s -> Sets.newHashSet(Splitter.on(",").split(s)))
 			.orElse(new HashSet<>());
 		log.info("relationFilter: {}", relationFilter);
@@ -130,7 +132,7 @@ public class PrepareRelationsJob {
 
 		JavaRDD<Relation> rels = readPathRelationRDD(spark, inputRelationsPath)
 			.filter(rel -> rel.getDataInfo().getDeletedbyinference() == false)
-			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false);
+			.filter(rel -> relationFilter.contains(StringUtils.lowerCase(rel.getRelClass())) == false);
 
 		JavaRDD<Relation> pruned = pruneRels(
 			pruneRels(
