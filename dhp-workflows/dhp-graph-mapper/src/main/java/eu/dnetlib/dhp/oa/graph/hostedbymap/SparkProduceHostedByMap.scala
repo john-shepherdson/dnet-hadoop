@@ -55,20 +55,7 @@ object SparkProduceHostedByMap {
 
   }
 
-  /**
-    *
-  def toHostedByMap(input: Map[String, HostedByItemType]): String = {
-    import org.json4s.jackson.Serialization
 
-    implicit val formats = org.json4s.DefaultFormats
-
-
-
-    Serialization.write(input)
-
-
-  }
-    */
 
   def getHostedByItemType(id:String, officialname: String, issn:String, eissn:String, issnl:String, oa:Boolean): HostedByItemType = {
     if(issn != null){
