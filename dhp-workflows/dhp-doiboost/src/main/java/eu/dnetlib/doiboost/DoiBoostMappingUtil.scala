@@ -179,20 +179,6 @@ object DoiBoostMappingUtil {
 
       }
 
-      //val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
-
-
-     // val pub_date = LocalDate.parse(date, formatter)
-
-//      if (((now.toEpochDay - pub_date.toEpochDay)/365.0) > 1){
-//        val oaq : AccessRight = getOpenAccessQualifier()
-//        oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
-//        return oaq
-//      }
-//      else{
-//        return getEmbargoedAccessQualifier()
-//      }
     }
 
     return getClosedAccessQualifier()
@@ -202,16 +188,17 @@ object DoiBoostMappingUtil {
 
 
   def getOpenAccessQualifier():AccessRight = {
-    OafMapperUtils.accessRight("OPEN","Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+
+    OafMapperUtils.accessRight(ModelConstants.ACCESS_RIGHT_OPEN,"Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
   def getRestrictedQualifier():AccessRight = {
-    OafMapperUtils.accessRight("RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+    OafMapperUtils.accessRight( "RESTRICTED","Restricted",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
 
   def getUnknownQualifier():AccessRight = {
-    OafMapperUtils.accessRight("UNKNOWN","not available",ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
+    OafMapperUtils.accessRight(ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
   }
 
 
@@ -251,8 +238,7 @@ object DoiBoostMappingUtil {
           i.setAccessright(getOpenAccessQualifier())
           i.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)
         }
-//        val ar = getOpenAccessQualifier()
-//        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
+
       }
       else {
         hb = ModelConstants.UNKNOWN_REPOSITORY
@@ -261,17 +247,7 @@ object DoiBoostMappingUtil {
     })
 
     publication.setBestaccessright(OafMapperUtils.createBestAccessRights(publication.getInstance()))
-//    val ar = publication.getInstance().asScala.filter(i => i.getInstancetype != null && i.getAccessright!= null && i.getAccessright.getClassid!= null).map(f=> f.getAccessright.getClassid)
-//    if (ar.nonEmpty) {
-//      if(ar.contains(ModelConstants.ACCESS_RIGHT_OPEN)){
-//        val ar = getOpenAccessQualifier()
-//        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
-//      }
-//      else {
-//        val ar = getRestrictedQualifier()
-//        publication.setBestaccessright(OafMapperUtils.qualifier(ar.getClassid, ar.getClassname, ar.getSchemeid, ar.getSchemename))
-//      }
-//    }
+
     publication
   }
 

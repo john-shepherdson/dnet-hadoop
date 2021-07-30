@@ -14,7 +14,7 @@
         </property>
     </parameters>
 
-    <start to="ExportDataset"/>
+    <start to="createActionSet"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -25,7 +25,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Create Action Set</name>
-            <class>eu.dnetlib.dhp.sx.provision.SparkCreateActionset</class>
+            <class>eu.dnetlib.dhp.actionmanager.scholix.SparkCreateActionset</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -42,7 +42,7 @@
             <arg>--workingDirFolder</arg><arg>${workingDirFolder}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="SaveActionSet"/>
         <error to="Kill"/>
     </action>
 
@@ -52,7 +52,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Save Action Set</name>
-            <class>eu.dnetlib.dhp.sx.provision.SparkSaveActionSet</class>
+            <class>eu.dnetlib.dhp.actionmanager.scholix.SparkSaveActionSet</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

@@ -1,9 +1,9 @@
-package eu.dnetlib.dhp.sx.provision
+package eu.dnetlib.dhp.actionmanager.scholix
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{Oaf, OtherResearchProduct, Publication, Relation, Software, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Dataset => OafDataset,Publication, Software, OtherResearchProduct, Relation}
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.io.compress.GzipCodec
 import org.apache.hadoop.mapred.SequenceFileOutputFormat
@@ -73,13 +73,13 @@ object SparkSaveActionSet {
     val targetPath = parser.get("targetPath")
     log.info(s"targetPath  -> $targetPath")
 
-    implicit val oafEncoders:Encoder[Oaf] = Encoders.kryo[Oaf]
-    implicit val tEncoder:Encoder[(String,String)] = Encoders.tuple(Encoders.STRING,Encoders.STRING)
+    implicit val oafEncoders: Encoder[Oaf] = Encoders.kryo[Oaf]
+    implicit val tEncoder: Encoder[(String, String)] = Encoders.tuple(Encoders.STRING, Encoders.STRING)
 
     spark.read.load(sourcePath).as[Oaf]
-      .map(o =>toActionSet(o))
-      .filter(o => o!= null)
-      .rdd.map(s => (new Text(s._1), new Text(s._2))).saveAsHadoopFile(s"$targetPath", classOf[Text], classOf[Text], classOf[SequenceFileOutputFormat[Text,Text]], classOf[GzipCodec])
+      .map(o => toActionSet(o))
+      .filter(o => o != null)
+      .rdd.map(s => (new Text(s._1), new Text(s._2))).saveAsHadoopFile(s"$targetPath", classOf[Text], classOf[Text], classOf[SequenceFileOutputFormat[Text, Text]], classOf[GzipCodec])
 
   }
 

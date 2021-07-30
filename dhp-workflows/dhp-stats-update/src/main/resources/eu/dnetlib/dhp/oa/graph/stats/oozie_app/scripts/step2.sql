@@ -90,27 +90,8 @@ FROM ${openaire_db_name}.publication p
 where p.datainfo.deletedbyinference = false;
 
 CREATE TABLE ${stats_db_name}.publication_citations AS
-SELECT substr(p.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS result
+SELECT substr(p.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
 FROM ${openaire_db_name}.publication p
          lateral view explode(p.extrainfo) citations AS citation
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
   and p.datainfo.deletedbyinference = false;
-
--- ANALYZE TABLE ${stats_db_name}.publication_tmp COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_tmp COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.publication_classifications COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_classifications COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.publication_concepts COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_concepts COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.publication_datasources COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_datasources COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.publication_languages COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_languages COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.publication_oids COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_oids COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.publication_pids COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_pids COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.publication_topics COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_topics COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.publication_citations COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_citations COMPUTE STATISTICS FOR COLUMNS;

@@ -205,6 +205,11 @@
 				<artifactId>dateparser</artifactId>
 				<version>1.0.7</version>
 			</dependency>
+			<dependency>
+				<groupId>me.xuender</groupId>
+				<artifactId>unidecode</artifactId>
+				<version>0.0.7</version>
+			</dependency>
 
 			<dependency>
 				<groupId>com.google.guava</groupId>

@@ -64,26 +64,24 @@ abstract class AbstractRestClient extends Iterator[String]{
       .setSocketTimeout(timeout * 1000).build()
     val client =HttpClientBuilder.create().setDefaultRequestConfig(config).build()
     var tries = 4
-    try {
-      while (tries > 0) {
+       while (tries > 0) {
         println(s"requesting ${r.getURI}")
-        val response = client.execute(r)
-        println(s"get response with status${response.getStatusLine.getStatusCode}")
-        if (response.getStatusLine.getStatusCode > 400) {
-          tries -= 1
+        try {
+          val response = client.execute(r)
+          println(s"get response with status${response.getStatusLine.getStatusCode}")
+          if (response.getStatusLine.getStatusCode > 400) {
+            tries -= 1
+          }
+          else
+            return IOUtils.toString(response.getEntity.getContent)
+        } catch {
+          case e: Throwable =>
+            println(s"Error on requesting ${r.getURI}")
+            e.printStackTrace()
+            tries-=1
         }
-        else
-          return IOUtils.toString(response.getEntity.getContent)
       }
       ""
-    } catch {
-      case e: Throwable =>
-        throw new RuntimeException("Error on executing request ", e)
-    } finally try client.close()
-    catch {
-      case e: IOException =>
-        throw new RuntimeException("Unable to close client ", e)
-    }
-  }
+   }
   getBufferData()
 }

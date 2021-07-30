@@ -1,6 +1,7 @@
-
 package eu.dnetlib.dhp.oa.graph.raw;
 
+import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.cleanup;
+import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.fixVocabularyNames;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
@@ -38,8 +39,8 @@ public class MappersTest {
 	public void setUp() throws Exception {
 		lenient().when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARIES_XQUERY)).thenReturn(vocs());
 		lenient()
-			.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
-			.thenReturn(synonyms());
+				.when(isLookUpService.quickSearchProfile(VocabularyGroup.VOCABULARY_SYNONYMS_XQUERY))
+				.thenReturn(synonyms());
 
 		vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
 	}
@@ -74,18 +75,18 @@ public class MappersTest {
 
 		assertTrue(p.getAuthor().size() > 0);
 		final Optional<Author> author = p
-			.getAuthor()
-			.stream()
-			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
-			.findFirst();
+				.getAuthor()
+				.stream()
+				.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+				.findFirst();
 		assertTrue(author.isPresent());
 
 		final StructuredProperty pid = author
-			.get()
-			.getPid()
-			.stream()
-			.findFirst()
-			.get();
+				.get()
+				.getPid()
+				.stream()
+				.findFirst()
+				.get();
 		assertEquals("0000-0001-6651-1178", pid.getValue());
 		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
 		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
@@ -104,12 +105,12 @@ public class MappersTest {
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
 		p
-			.getInstance()
-			.stream()
-			.forEach(i -> {
-				assertNotNull(i.getAccessright());
-				assertEquals("OPEN", i.getAccessright().getClassid());
-			});
+				.getInstance()
+				.stream()
+				.forEach(i -> {
+					assertNotNull(i.getAccessright());
+					assertEquals("OPEN", i.getAccessright().getClassid());
+				});
 		assertEquals("0001", p.getInstance().get(0).getRefereed().getClassid());
 		assertNotNull(p.getInstance().get(0).getPid());
 		assertTrue(p.getInstance().get(0).getPid().isEmpty());
@@ -170,18 +171,18 @@ public class MappersTest {
 
 		assertTrue(p.getAuthor().size() > 0);
 		final Optional<Author> author = p
-			.getAuthor()
-			.stream()
-			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
-			.findFirst();
+				.getAuthor()
+				.stream()
+				.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+				.findFirst();
 		assertTrue(author.isPresent());
 
 		final StructuredProperty pid = author
-			.get()
-			.getPid()
-			.stream()
-			.findFirst()
-			.get();
+				.get()
+				.getPid()
+				.stream()
+				.findFirst()
+				.get();
 		assertEquals("0000-0001-6651-1178", pid.getValue());
 		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
 		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
@@ -199,12 +200,12 @@ public class MappersTest {
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
 		p
-			.getInstance()
-			.stream()
-			.forEach(i -> {
-				assertNotNull(i.getAccessright());
-				assertEquals("OPEN", i.getAccessright().getClassid());
-			});
+				.getInstance()
+				.stream()
+				.forEach(i -> {
+					assertNotNull(i.getAccessright());
+					assertEquals("OPEN", i.getAccessright().getClassid());
+				});
 		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
 		assertNotNull(p.getInstance().get(0).getPid());
 		assertTrue(p.getInstance().get(0).getPid().size() == 2);
@@ -256,17 +257,17 @@ public class MappersTest {
 		assertTrue(d.getAuthor().size() > 0);
 
 		final Optional<Author> author = d
-			.getAuthor()
-			.stream()
-			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
-			.findFirst();
+				.getAuthor()
+				.stream()
+				.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
+				.findFirst();
 		assertTrue(author.isPresent());
 		final StructuredProperty pid = author
-			.get()
-			.getPid()
-			.stream()
-			.findFirst()
-			.get();
+				.get()
+				.getPid()
+				.stream()
+				.findFirst()
+				.get();
 		assertEquals("0000-0001-9074-1619", pid.getValue());
 		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
 		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
@@ -278,10 +279,10 @@ public class MappersTest {
 
 		assertEquals(1, author.get().getAffiliation().size());
 		final Optional<Field<String>> opAff = author
-			.get()
-			.getAffiliation()
-			.stream()
-			.findFirst();
+				.get()
+				.getAffiliation()
+				.stream()
+				.findFirst();
 		assertTrue(opAff.isPresent());
 		final Field<String> affiliation = opAff.get();
 		assertEquals("ISTI-CNR", affiliation.getValue());
@@ -294,12 +295,12 @@ public class MappersTest {
 		assertNotNull(d.getInstance());
 		assertTrue(d.getInstance().size() > 0);
 		d
-			.getInstance()
-			.stream()
-			.forEach(i -> {
-				assertNotNull(i.getAccessright());
-				assertEquals("OPEN", i.getAccessright().getClassid());
-			});
+				.getInstance()
+				.stream()
+				.forEach(i -> {
+					assertNotNull(i.getAccessright());
+					assertEquals("OPEN", i.getAccessright().getClassid());
+				});
 		assertEquals("0001", d.getInstance().get(0).getRefereed().getClassid());
 		assertNotNull(d.getInstance().get(0).getPid());
 		assertTrue(d.getInstance().get(0).getPid().isEmpty());
@@ -343,14 +344,13 @@ public class MappersTest {
 
 		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:pub.uni-bielefeld.de:2949739")));
 		// assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
-
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(p.getAuthor().size() > 0);
 
 		final Optional<Author> author = p
-			.getAuthor()
-			.stream()
-			.findFirst();
+				.getAuthor()
+				.stream()
+				.findFirst();
 		assertTrue(author.isPresent());
 
 		assertEquals("Potwarka, Luke R.", author.get().getFullname());
@@ -366,12 +366,12 @@ public class MappersTest {
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
 		p
-			.getInstance()
-			.stream()
-			.forEach(i -> {
-				assertNotNull(i.getAccessright());
-				assertEquals("OPEN", i.getAccessright().getClassid());
-			});
+				.getInstance()
+				.stream()
+				.forEach(i -> {
+					assertNotNull(i.getAccessright());
+					assertEquals("OPEN", i.getAccessright().getClassid());
+				});
 		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
 	}
 
@@ -412,11 +412,11 @@ public class MappersTest {
 		assertNotNull(d.getTitle());
 		assertEquals(1, d.getTitle().size());
 		assertEquals(
-			"Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia",
-			d
-				.getTitle()
-				.get(0)
-				.getValue());
+				"Validation of the Goodstrength System for Assessment of Abdominal Wall Strength in Patients With Incisional Hernia",
+				d
+						.getTitle()
+						.get(0)
+						.getValue());
 
 		assertNotNull(d.getDescription());
 		assertEquals(1, d.getDescription().size());
@@ -560,6 +560,31 @@ public class MappersTest {
 	}
 
 	@Test
+	void testEnermaps() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("enermaps.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Dataset);
+
+		final Dataset d = (Dataset) list.get(0);
+
+		assertValidId(d.getId());
+		assertValidId(d.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
+		assertEquals(1, d.getAuthor().size());
+		assertEquals(1, d.getInstance().size());
+		assertNotNull(d.getInstance().get(0).getUrl());
+		assertNotNull(d.getContext());
+		assertTrue(StringUtils.isNotBlank(d.getContext().get(0).getId()));
+		assertEquals("enermaps::selection::tgs00004", d.getContext().get(0).getId());
+	}
+
+	@Test
 	void testClaimFromCrossref() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -615,7 +640,7 @@ public class MappersTest {
 		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
 		assertValidId(p.getInstance().get(0).getHostedby().getKey());
 		assertEquals(
-			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+				"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
 
 		assertEquals(1, p.getInstance().size());
 		assertNotNull(p.getInstance().get(0).getAlternateIdentifier());
@@ -641,6 +666,30 @@ public class MappersTest {
 	}
 
 	@Test
+	void testJairo() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_jairo.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+
+		assertNotNull(p.getTitle());
+		assertFalse(p.getTitle().isEmpty());
+		assertTrue(p.getTitle().size() == 1);
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
+		final Publication p_cleaned = cleanup(fixVocabularyNames(p));
+
+		assertNotNull(p_cleaned.getTitle());
+		assertFalse(p_cleaned.getTitle().isEmpty());
+	}
+
+	@Test
 	void testOdfFromHdfs() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_from_hdfs.xml"));
 
@@ -661,9 +710,9 @@ public class MappersTest {
 		assertTrue(p.getAuthor().size() > 0);
 
 		final Optional<Author> author = p
-			.getAuthor()
-			.stream()
-			.findFirst();
+				.getAuthor()
+				.stream()
+				.findFirst();
 		assertTrue(author.isPresent());
 
 		assertEquals("Museum Sønderjylland", author.get().getFullname());
@@ -677,12 +726,12 @@ public class MappersTest {
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
 		p
-			.getInstance()
-			.stream()
-			.forEach(i -> {
-				assertNotNull(i.getAccessright());
-				assertEquals("UNKNOWN", i.getAccessright().getClassid());
-			});
+				.getInstance()
+				.stream()
+				.forEach(i -> {
+					assertNotNull(i.getAccessright());
+					assertEquals("UNKNOWN", i.getAccessright().getClassid());
+				});
 		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
 	}
 
@@ -697,14 +746,14 @@ public class MappersTest {
 
 	private List<String> vocs() throws IOException {
 		return IOUtils
-			.readLines(
-				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+				.readLines(
+						GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
-			.readLines(
-				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+				.readLines(
+						GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 
 }
