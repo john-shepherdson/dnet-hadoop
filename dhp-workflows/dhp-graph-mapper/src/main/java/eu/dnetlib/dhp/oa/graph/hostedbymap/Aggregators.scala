@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.oa.graph.hostedbymap
 
+import eu.dnetlib.dhp.oa.graph.hostedbymap.model.EntityInfo
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, TypedColumn}
 import org.apache.spark.sql.expressions.Aggregator
 
@@ -25,43 +26,10 @@ object Aggregators {
   }
 
 
-  def createHostedByItemTypes(df: Dataset[HostedByItemType]): Dataset[HostedByItemType] = {
-      val transformedData : Dataset[HostedByItemType] = df
-          .groupByKey(_.id)(Encoders.STRING)
-        .agg(Aggregators.hostedByAggregator)
-          .map{
-            case (id:String , res:HostedByItemType) => res
-          }(Encoders.product[HostedByItemType])
-
-    transformedData
-    }
-
-  val hostedByAggregator: TypedColumn[HostedByItemType, HostedByItemType] = new Aggregator[HostedByItemType, HostedByItemType, HostedByItemType] {
-    override def zero: HostedByItemType = HostedByItemType("","","","","",false)
-    override def reduce(b: HostedByItemType, a:HostedByItemType): HostedByItemType = {
-      return merge(b, a)
-    }
-    override def merge(b1: HostedByItemType, b2: HostedByItemType): HostedByItemType = {
-      if (b1 == null){
-        return b2
-      }
-      if(b2 == null){
-        return b1
-      }
-
-      HostedByItemType(getId(b1.id, b2.id), getId(b1.officialname, b2.officialname),  getId(b1.issn, b2.issn), getId(b1.eissn, b2.eissn), getId(b1.lissn, b2.lissn), b1.openAccess || b2.openAccess)
-
-    }
-    override def finish(reduction: HostedByItemType): HostedByItemType = reduction
-    override def bufferEncoder: Encoder[HostedByItemType] = Encoders.product[HostedByItemType]
-
-    override def outputEncoder: Encoder[HostedByItemType] = Encoders.product[HostedByItemType]
-  }.toColumn
-
   def explodeHostedByItemType(df: Dataset[(String, HostedByItemType)]): Dataset[(String, HostedByItemType)] = {
     val transformedData : Dataset[(String, HostedByItemType)] = df
       .groupByKey(_._1)(Encoders.STRING)
-      .agg(Aggregators.hostedByAggregator1)
+      .agg(Aggregators.hostedByAggregator)
       .map{
         case (id:String , res:(String, HostedByItemType)) => res
       }(Encoders.tuple(Encoders.STRING, Encoders.product[HostedByItemType]))
@@ -69,7 +37,7 @@ object Aggregators {
     transformedData
   }
 
-  val hostedByAggregator1: TypedColumn[(String, HostedByItemType), (String, HostedByItemType)] = new Aggregator[(String, HostedByItemType), (String, HostedByItemType), (String, HostedByItemType)] {
+  val hostedByAggregator: TypedColumn[(String, HostedByItemType), (String, HostedByItemType)] = new Aggregator[(String, HostedByItemType), (String, HostedByItemType), (String, HostedByItemType)] {
     override def zero: (String, HostedByItemType) = ("", HostedByItemType("","","","","",false))
     override def reduce(b: (String, HostedByItemType), a:(String,HostedByItemType)): (String, HostedByItemType) = {
       return merge(b, a)
@@ -93,5 +61,80 @@ object Aggregators {
 
     override def outputEncoder: Encoder[(String,HostedByItemType)] = Encoders.tuple(Encoders.STRING,Encoders.product[HostedByItemType])
   }.toColumn
+
+  def hostedByToSingleDSId(df: Dataset[ HostedByItemType]): Dataset[ HostedByItemType] = {
+    val transformedData : Dataset[HostedByItemType] = df
+      .groupByKey(_.id)(Encoders.STRING)
+      .agg(Aggregators.hostedByToDSAggregator)
+      .map{
+        case (id:String , res: HostedByItemType) => res
+      }(Encoders.product[HostedByItemType])
+
+    transformedData
+  }
+
+  def hostedByToDSAggregator: TypedColumn[HostedByItemType, HostedByItemType] = new Aggregator[HostedByItemType, HostedByItemType, HostedByItemType] {
+    override def zero: HostedByItemType = HostedByItemType("","","","","",false)
+
+    override def reduce(b: HostedByItemType, a:HostedByItemType):  HostedByItemType = {
+      return merge(b, a)
+    }
+    override def merge(b1: HostedByItemType, b2: HostedByItemType): HostedByItemType = {
+      if (b1 == null){
+        return b2
+      }
+      if(b2 == null){
+        return b1
+      }
+      if(!b1.id.equals("")){
+        return HostedByItemType(b1.id, b1.officialname, b1.issn, b1.eissn, b1.lissn, b1.openAccess || b2.openAccess)
+
+      }
+      return HostedByItemType(b2.id, b2.officialname, b2.issn, b2.eissn, b2.lissn, b1.openAccess || b2.openAccess)
+
+    }
+    override def finish(reduction: HostedByItemType):  HostedByItemType = reduction
+    override def bufferEncoder: Encoder[HostedByItemType] = Encoders.product[HostedByItemType]
+
+    override def outputEncoder: Encoder[HostedByItemType] = Encoders.product[HostedByItemType]
+  }.toColumn
+
+
+  def resultToSingleIdAggregator: TypedColumn[EntityInfo, EntityInfo] = new Aggregator[EntityInfo, EntityInfo, EntityInfo]{
+    override def zero: EntityInfo = EntityInfo.newInstance("","","")
+
+    override def reduce(b: EntityInfo, a:EntityInfo):  EntityInfo = {
+      return merge(b, a)
+    }
+    override def merge(b1: EntityInfo, b2: EntityInfo): EntityInfo = {
+      if (b1 == null){
+        return b2
+      }
+      if(b2 == null){
+        return b1
+      }
+      if(!b1.getHb_id.equals("")){
+        b1.setOpenaccess(b1.getOpenaccess || b2.getOpenaccess)
+      }
+      b2.setOpenaccess(b1.getOpenaccess || b2.getOpenaccess)
+      b2
+
+    }
+    override def finish(reduction: EntityInfo):  EntityInfo = reduction
+    override def bufferEncoder: Encoder[EntityInfo] = Encoders.bean(classOf[EntityInfo])
+
+    override def outputEncoder: Encoder[EntityInfo] = Encoders.bean(classOf[EntityInfo])
+  }.toColumn
+
+  def resultToSingleId(df:Dataset[EntityInfo]): Dataset[EntityInfo] = {
+    val transformedData : Dataset[EntityInfo] = df
+      .groupByKey(_.getId)(Encoders.STRING)
+      .agg(Aggregators.resultToSingleIdAggregator)
+      .map{
+        case (id:String , res: EntityInfo) => res
+      }(Encoders.bean(classOf[EntityInfo]))
+
+    transformedData
+  }
 
 }
