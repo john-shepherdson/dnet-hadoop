@@ -82,7 +82,7 @@ public class PatchRelationsApplication {
         log.info("relations: {}", rels.count());
         log.info("idMapping: {}", idMapping.count());
 
-        rels
+        Dataset<Relation> fj = rels
                 .joinWith(idMapping, rels.col("source").equalTo(idMapping.col("oldId")), "left")
                 .map((MapFunction<Tuple2<Relation, RelationIdMapping>, Relation>) t -> {
                     final Relation r = t._1();
@@ -90,8 +90,9 @@ public class PatchRelationsApplication {
                             .map(RelationIdMapping::getNewId)
                             .ifPresent(r::setSource);
                     return r;
-                }, Encoders.bean(Relation.class))
-                .joinWith(idMapping, rels.col("target").equalTo(idMapping.col("oldId")), "left")
+                }, Encoders.bean(Relation.class));
+
+        fj.joinWith(idMapping, fj.col("target").equalTo(idMapping.col("oldId")), "left")
                 .map((MapFunction<Tuple2<Relation, RelationIdMapping>, Relation>) t -> {
                     final Relation r = t._1();
                     Optional.ofNullable(t._2())
