@@ -199,7 +199,7 @@ object BioDBToOAF {
         d.setDateofacceptance(OafMapperUtils.field(i_date.get.date, DATA_INFO))
       }
       val relevant_dates: List[StructuredProperty] = dates.filter(d => !d.date_info.contains("entry version"))
-        .map(date => OafMapperUtils.structuredProperty(date.date, "UNKNOWN", "UNKNOWN", ModelConstants.DNET_DATACITE_DATE, ModelConstants.DNET_DATACITE_DATE, DATA_INFO))
+        .map(date => OafMapperUtils.structuredProperty(date.date, ModelConstants.UNKNOWN, ModelConstants.UNKNOWN, ModelConstants.DNET_DATACITE_DATE, ModelConstants.DNET_DATACITE_DATE, DATA_INFO))
       if (relevant_dates != null && relevant_dates.nonEmpty)
         d.setRelevantdate(relevant_dates.asJava)
       d.setDateofacceptance(OafMapperUtils.field(i_date.get.date, DATA_INFO))
@@ -218,12 +218,12 @@ object BioDBToOAF {
 
 
     if (references_pmid != null && references_pmid.nonEmpty) {
-      val rel = createRelation(references_pmid.head, "pmid", d.getId, collectedFromMap("uniprot"), "relationship", "isRelatedTo", if  (i_date.isDefined) i_date.get.date else null)
+      val rel = createRelation(references_pmid.head, "pmid", d.getId, collectedFromMap("uniprot"), ModelConstants.RELATIONSHIP, ModelConstants.IS_RELATED_TO, if  (i_date.isDefined) i_date.get.date else null)
       rel.getCollectedfrom
       List(d, rel)
     }
     else if (references_doi != null && references_doi.nonEmpty) {
-      val rel = createRelation(references_doi.head, "doi", d.getId, collectedFromMap("uniprot"), "relationship", "isRelatedTo", if  (i_date.isDefined) i_date.get.date else null)
+      val rel = createRelation(references_doi.head, "doi", d.getId, collectedFromMap("uniprot"), ModelConstants.RELATIONSHIP, ModelConstants.IS_RELATED_TO, if  (i_date.isDefined) i_date.get.date else null)
       List(d, rel)
     }
     else
@@ -243,7 +243,7 @@ object BioDBToOAF {
     rel.setCollectedfrom(List(collectedFromMap("pdb")).asJava)
     rel.setDataInfo(DATA_INFO)
 
-    rel.setRelType("resultResult")
+    rel.setRelType(ModelConstants.RESULT_RESULT)
     rel.setSubRelType(subRelType)
     rel.setRelClass(relClass)
 
@@ -263,7 +263,7 @@ object BioDBToOAF {
 
 
   def createSupplementaryRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, date:String): Relation = {
-    createRelation(pid,pidType,sourceId,collectedFrom, "supplement","IsSupplementTo", date)
+    createRelation(pid,pidType,sourceId,collectedFrom, ModelConstants.SUPPLEMENT, ModelConstants.IS_SUPPLEMENT_TO, date)
   }
 
 
@@ -392,6 +392,6 @@ object BioDBToOAF {
     i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(input.date), DATA_INFO))
     d.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(input.date), DATA_INFO))
 
-    List(d, createRelation(input.pmid, "pmid", d.getId, collectedFromMap("ebi"),"relationship", "isRelatedTo", GraphCleaningFunctions.cleanDate(input.date)))
+    List(d, createRelation(input.pmid, "pmid", d.getId, collectedFromMap("ebi"), ModelConstants.RELATIONSHIP, ModelConstants.IS_RELATED_TO, GraphCleaningFunctions.cleanDate(input.date)))
   }
 }

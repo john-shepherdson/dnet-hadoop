@@ -16,7 +16,7 @@ object PubMedToOaf {
   )
 
   def createResult(cobjQualifier: Qualifier, vocabularies: VocabularyGroup): Result = {
-    val result_typologies = getVocabularyTerm("dnet:result_typologies", vocabularies, cobjQualifier.getClassid)
+    val result_typologies = getVocabularyTerm(ModelConstants.DNET_RESULT_TYPOLOGIES, vocabularies, cobjQualifier.getClassid)
     result_typologies.getClassid match {
       case "dataset" => new Dataset
       case "publication" => new Publication
@@ -68,11 +68,11 @@ object PubMedToOaf {
     //else We have to find a terms that match the vocabulary otherwise we discard it
     val ja = article.getPublicationTypes.asScala.find(s => "Journal Article".equalsIgnoreCase(s.getValue))
     if (ja.isDefined) {
-      val cojbCategory = getVocabularyTerm("dnet:publication_resource", vocabularies, ja.get.getValue)
+      val cojbCategory = getVocabularyTerm(ModelConstants.DNET_PUBLICATION_RESOURCE, vocabularies, ja.get.getValue)
       i.setInstancetype(cojbCategory)
     } else {
       val i_type = article.getPublicationTypes.asScala
-        .map(s => getVocabularyTerm("dnet:publication_resource", vocabularies, s.getValue))
+        .map(s => getVocabularyTerm(ModelConstants.DNET_PUBLICATION_RESOURCE, vocabularies, s.getValue))
         .find(q => q != null)
       if (i_type.isDefined)
         i.setInstancetype(i_type.get)
@@ -112,7 +112,7 @@ object PubMedToOaf {
 
     if (article.getLanguage != null) {
 
-      val term = vocabularies.getSynonymAsQualifier("dnet:languages", article.getLanguage)
+      val term = vocabularies.getSynonymAsQualifier(ModelConstants.DNET_LANGUAGES, article.getLanguage)
       if (term != null)
         result.setLanguage(term)
     }
