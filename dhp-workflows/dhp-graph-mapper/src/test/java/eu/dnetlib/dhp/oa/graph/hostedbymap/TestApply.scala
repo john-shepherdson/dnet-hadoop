@@ -98,7 +98,7 @@ class TestApply extends java.io.Serializable{
 
 
     val dats_ds :Dataset[Datasource] = spark.read.textFile(dats).map(p => mapper.readValue(p, classOf[Datasource]))
-    val hbm_ds :Dataset[EntityInfo] = spark.read.textFile(hbm).map(p => mapper.readValue(p, classOf[EntityInfo]))
+    val hbm_ds :Dataset[EntityInfo] = Aggregators.datasourceToSingleId(spark.read.textFile(hbm).map(p => mapper.readValue(p, classOf[EntityInfo])))
 
 
     assertEquals(10, dats_ds.count())
@@ -122,7 +122,7 @@ class TestApply extends java.io.Serializable{
 
       }else{
         assertTrue(pa.getOpenairecompatibility().getClassid.equals(pb.getOpenairecompatibility.getClassid))
-        assertTrue(pa.getOpenairecompatibility().getClassname.equals(pb.getOpenairecompatibility.getClassid))
+        assertTrue(pa.getOpenairecompatibility().getClassname.equals(pb.getOpenairecompatibility.getClassname))
 
       }
     })
