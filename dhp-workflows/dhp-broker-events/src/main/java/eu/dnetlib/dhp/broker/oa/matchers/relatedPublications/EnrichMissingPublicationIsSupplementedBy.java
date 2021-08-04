@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.broker.oa.matchers.relatedPublications;
 
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class EnrichMissingPublicationIsSupplementedBy extends AbstractEnrichMissingPublication {
 
@@ -11,6 +12,6 @@ public class EnrichMissingPublicationIsSupplementedBy extends AbstractEnrichMiss
 
 	@Override
 	protected boolean filterByType(final String relType) {
-		return relType.equals("isSupplementedBy");
+		return relType.equals(ModelConstants.IS_SUPPLEMENTED_BY);
 	}
 }

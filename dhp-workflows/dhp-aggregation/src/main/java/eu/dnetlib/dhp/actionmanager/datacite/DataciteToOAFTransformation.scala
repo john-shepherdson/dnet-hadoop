@@ -367,7 +367,7 @@ object DataciteToOAFTransformation {
 
 
     result.setDateofcollection(ISO8601FORMAT.format(d))
-    result.setDateoftransformation(ISO8601FORMAT.format(ts))
+    result.setDateoftransformation(ISO8601FORMAT.format(d))
     result.setDataInfo(dataInfo)
 
     val creators = (json \\ "creators").extractOrElse[List[CreatorType]](List())
@@ -532,11 +532,11 @@ object DataciteToOAFTransformation {
       JField("awardUri", JString(awardUri)) <- fundingReferences
     } yield awardUri
 
+    result.setId(IdentifierFactory.createIdentifier(result))
     var relations: List[Relation] = awardUris.flatMap(a => get_projectRelation(a, result.getId)).filter(r => r != null)
 
-
     fix_figshare(result)
-    result.setId(IdentifierFactory.createIdentifier(result))
+
     if (result.getId == null)
       return List()
 

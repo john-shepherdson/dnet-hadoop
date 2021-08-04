@@ -140,7 +140,7 @@ object ImportDatacite {
 
   private def writeSequenceFile(hdfsTargetPath: Path, timestamp: Long, conf: Configuration, bs:Int): Long = {
     var from:Long = timestamp * 1000
-    val delta:Long = 50000000L
+    val delta:Long = 100000000L
     var client: DataciteAPIImporter = null
     val now :Long =System.currentTimeMillis()
     var i = 0

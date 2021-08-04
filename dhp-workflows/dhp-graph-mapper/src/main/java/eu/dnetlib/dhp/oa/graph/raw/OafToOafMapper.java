@@ -27,6 +27,11 @@ import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
+	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId,
+		final boolean forceOrginalId) {
+		super(vocs, invisible, shouldHashId, forceOrginalId);
+	}
+
 	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId) {
 		super(vocs, invisible, shouldHashId);
 	}

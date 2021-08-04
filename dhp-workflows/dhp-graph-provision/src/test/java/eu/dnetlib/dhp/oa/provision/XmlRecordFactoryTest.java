@@ -21,8 +21,10 @@ import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -130,5 +132,33 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 		assertEquals("", doc.valueOf("//rel/validated"));
+	}
+
+	@Test
+	public void testEnermapsRecord() throws IOException, DocumentException {
+
+		String contextmap = "<entries><entry id=\"enermaps\" label=\"Energy Research\" name=\"context\" type=\"community\"/>"
+			+
+			"<entry id=\"enermaps::selection\" label=\"Featured dataset\" name=\"category\"/>" +
+			"<entry id=\"enermaps::selection::tgs00004\" label=\"Dataset title\" name=\"concept\"/>" +
+			"</entries>";
+
+		ContextMapper contextMapper = ContextMapper.fromXml(contextmap);
+		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
+			otherDsTypeId);
+
+		Dataset d = OBJECT_MAPPER
+			.readValue(IOUtils.toString(getClass().getResourceAsStream("enermaps.json")), Dataset.class);
+
+		JoinedEntity je = new JoinedEntity<>(d);
+
+		String xml = xmlRecordFactory.build(je);
+
+		assertNotNull(xml);
+
+		Document doc = new SAXReader().read(new StringReader(xml));
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+		assertEquals("enermaps::selection::tgs00004", doc.valueOf("//concept/@id"));
 	}
 }

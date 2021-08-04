@@ -42,6 +42,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class XmlRecordFactory implements Serializable {
 
@@ -183,6 +184,7 @@ public class XmlRecordFactory implements Serializable {
 						.getOriginalId()
 						.stream()
 						.filter(Objects::nonNull)
+						.filter(id -> !id.matches("^\\d{2}" + IdentifierFactory.ID_PREFIX_SEPARATOR))
 						.map(s -> XmlSerializationUtils.asXmlElement("originalId", s))
 						.collect(Collectors.toList()));
 		}

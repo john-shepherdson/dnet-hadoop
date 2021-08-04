@@ -71,6 +71,9 @@ public class DropAndCreateESIndex {
 			log.info(STATUS_CODE_TEXT, response.getStatusLine());
 		}
 
+		log.info("Sleeping 60 seconds to avoid to lost the creation of index request");
+		Thread.sleep(60000);
+
 		try (CloseableHttpClient client = HttpClients.createDefault()) {
 
 			final String summaryConf = IOUtils
