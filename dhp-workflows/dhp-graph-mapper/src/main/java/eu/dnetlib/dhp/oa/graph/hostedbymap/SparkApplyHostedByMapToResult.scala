@@ -29,7 +29,6 @@ object SparkApplyHostedByMapToResult {
           val i = p.getInstance().asScala
           if (i.size == 1) {
             val inst: Instance = i(0)
-
             inst.getHostedby.setKey(ei.getHb_id)
             inst.getHostedby.setValue(ei.getName)
             if (ei.getOpenaccess) {
@@ -60,7 +59,7 @@ object SparkApplyHostedByMapToResult {
     val graphPath = parser.get("graphPath")
 
     val outputPath = parser.get("outputPath")
-    val workingPath = parser.get("workingPath")
+    val preparedInfoPath = parser.get("preparedInfoPath")
 
 
     implicit val formats = DefaultFormats
@@ -70,15 +69,15 @@ object SparkApplyHostedByMapToResult {
     implicit val mapEncoderEinfo: Encoder[EntityInfo] = Encoders.bean(classOf[EntityInfo])
     val mapper = new ObjectMapper()
 
-    val pubs : Dataset[Publication] = spark.read.textFile("$graphPath/publication")
+    val pubs : Dataset[Publication] = spark.read.textFile(graphPath + "/publication")
       .map(r => mapper.readValue(r, classOf[Publication]))
 
-    val pinfo : Dataset[EntityInfo] = spark.read.textFile("$workingPath/preparedInfo")
+    val pinfo : Dataset[EntityInfo] = spark.read.textFile(preparedInfoPath)
         .map(ei => mapper.readValue(ei, classOf[EntityInfo]))
 
     //a. publication join risultato del passo precedente su result id (left) setto la istanza (se piu' di una instance
     // nel result => salto)con l'hosted by anche access right della instance se openaccess e' true
-    applyHBtoPubs(pinfo, pubs).write.mode(SaveMode.Overwrite).option("compression","gzip").json("$graphPath/publication")
+    applyHBtoPubs(pinfo, pubs).write.mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath)
 
 
 
