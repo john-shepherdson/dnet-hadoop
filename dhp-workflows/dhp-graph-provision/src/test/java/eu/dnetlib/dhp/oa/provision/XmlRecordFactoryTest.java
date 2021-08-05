@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
 import eu.dnetlib.dhp.schema.oaf.Dataset;

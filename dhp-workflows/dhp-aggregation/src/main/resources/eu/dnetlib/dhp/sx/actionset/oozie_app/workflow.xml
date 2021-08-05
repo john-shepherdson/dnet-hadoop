@@ -1,0 +1,76 @@
+<workflow-app name="Scholexplorer_to_ActionSet_Workflow" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the path of the consistent graph</description>
+        </property>
+        <property>
+            <name>workingDirFolder</name>
+            <description>the path of working dir ActionSet</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the path of Scholexplorer ActionSet</description>
+        </property>
+    </parameters>
+
+    <start to="createActionSet"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="createActionSet">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Create Action Set</name>
+            <class>eu.dnetlib.dhp.actionmanager.scholix.SparkCreateActionset</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${outputPath}</arg>
+            <arg>--workingDirFolder</arg><arg>${workingDirFolder}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="SaveActionSet"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="SaveActionSet">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>Save Action Set</name>
+            <class>eu.dnetlib.dhp.actionmanager.scholix.SparkSaveActionSet</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDirFolder}/actionSetOaf</arg>
+            <arg>--targetPath</arg><arg>${outputPath}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

@@ -24,6 +24,7 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -250,7 +251,24 @@ public class MappersTest {
 		final Relation r1 = (Relation) list.get(1);
 		final Relation r2 = (Relation) list.get(2);
 
+		assertEquals(d.getId(), r1.getSource());
+		assertEquals("40|corda_______::e06332dee33bec6c2ba4c98601053229", r1.getTarget());
+		assertEquals(ModelConstants.RESULT_PROJECT, r1.getRelType());
+		assertEquals(ModelConstants.OUTCOME, r1.getSubRelType());
+		assertEquals(ModelConstants.IS_PRODUCED_BY, r1.getRelClass());
+		assertTrue(r1.getValidated());
+		assertEquals("2020-01-01", r1.getValidationDate());
+
+		assertEquals(d.getId(), r2.getTarget());
+		assertEquals("40|corda_______::e06332dee33bec6c2ba4c98601053229", r2.getSource());
+		assertEquals(ModelConstants.RESULT_PROJECT, r2.getRelType());
+		assertEquals(ModelConstants.OUTCOME, r2.getSubRelType());
+		assertEquals(ModelConstants.PRODUCES, r2.getRelClass());
+		assertTrue(r2.getValidated());
+		assertEquals("2020-01-01", r2.getValidationDate());
+
 		assertValidId(d.getId());
+		assertEquals("50|doi_________::000374d100a9db469bd42b69dbb40b36", d.getId());
 		assertEquals(2, d.getOriginalId().size());
 		assertTrue(d.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:zenodo.org:3234526")));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
@@ -304,10 +322,12 @@ public class MappersTest {
 			});
 		assertEquals("0001", d.getInstance().get(0).getRefereed().getClassid());
 		assertNotNull(d.getInstance().get(0).getPid());
-		assertTrue(d.getInstance().get(0).getPid().isEmpty());
+		assertFalse(d.getInstance().get(0).getPid().isEmpty());
 
-		assertEquals("doi", d.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
-		assertEquals("10.5281/zenodo.3234526", d.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
+		assertEquals("doi", d.getInstance().get(0).getPid().get(0).getQualifier().getClassid());
+		assertEquals("10.5281/zenodo.3234526", d.getInstance().get(0).getPid().get(0).getValue());
+
+		assertTrue(d.getInstance().get(0).getAlternateIdentifier().isEmpty());
 
 		assertValidId(r1.getSource());
 		assertValidId(r1.getTarget());
@@ -562,6 +582,31 @@ public class MappersTest {
 	}
 
 	@Test
+	void testEnermaps() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("enermaps.xml"));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Dataset);
+
+		final Dataset d = (Dataset) list.get(0);
+
+		assertValidId(d.getId());
+		assertValidId(d.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
+		assertEquals(1, d.getAuthor().size());
+		assertEquals(1, d.getInstance().size());
+		assertNotNull(d.getInstance().get(0).getUrl());
+		assertNotNull(d.getContext());
+		assertTrue(StringUtils.isNotBlank(d.getContext().get(0).getId()));
+		assertEquals("enermaps::selection::tgs00004", d.getContext().get(0).getId());
+	}
+
+	@Test
 	void testClaimFromCrossref() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -713,12 +758,11 @@ public class MappersTest {
 	}
 
 	private void assertValidId(final String id) {
-		System.out.println(id);
+		// System.out.println(id);
 
 		assertEquals(49, id.length());
-		assertEquals('|', id.charAt(2));
-		assertEquals(':', id.charAt(15));
-		assertEquals(':', id.charAt(16));
+		assertEquals(IdentifierFactory.ID_PREFIX_SEPARATOR, id.substring(2, 3));
+		assertEquals(IdentifierFactory.ID_SEPARATOR, id.substring(15, 17));
 	}
 
 	private List<String> vocs() throws IOException {

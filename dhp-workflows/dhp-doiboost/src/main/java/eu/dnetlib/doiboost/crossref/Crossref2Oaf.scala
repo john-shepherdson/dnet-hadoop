@@ -4,7 +4,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
 import eu.dnetlib.dhp.utils.DHPUtils
-import eu.dnetlib.doiboost.DoiBoostMappingUtil._
+import eu.dnetlib.doiboost.DoiBoostMappingUtil.{decideAccessRight, _}
 import org.apache.commons.lang.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
@@ -168,12 +168,22 @@ case object Crossref2Oaf {
     // Mapping instance
     val instance = new Instance()
     val license = for {
-      JString(lic) <- json \ "license" \ "URL"
-    } yield asField(lic)
-    val l = license.filter(d => StringUtils.isNotBlank(d.getValue))
-    if (l.nonEmpty)
-      instance.setLicense(l.head)
-
+      JObject(license) <- json \ "license"
+      JField("URL", JString(lic)) <- license
+      JField("content-version", JString(content_version)) <- license
+    } yield (asField(lic), content_version)
+    val l = license.filter(d => StringUtils.isNotBlank(d._1.getValue))
+    if (l.nonEmpty){
+      if (l exists (d => d._2.equals("vor"))){
+        for(d <- l){
+          if (d._2.equals("vor")){
+            instance.setLicense(d._1)
+          }
+        }
+      }
+      else{
+        instance.setLicense(l.head._1)}
+    }
 
     // Ticket #6281 added pid to Instance
     instance.setPid(result.getPid)
@@ -185,7 +195,7 @@ case object Crossref2Oaf {
         OafMapperUtils.qualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS, ModelConstants.DNET_REVIEW_LEVELS))
     }
 
-    instance.setAccessright(getRestrictedQualifier())
+    instance.setAccessright(decideAccessRight(instance.getLicense, result.getDateofacceptance.getValue))
     instance.setInstancetype(OafMapperUtils.qualifier(cobjCategory.substring(0, 4), cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
     result.setResourcetype(OafMapperUtils.qualifier(cobjCategory.substring(0, 4),   cobjCategory.substring(5), ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE))
 
