@@ -29,16 +29,16 @@ public class ExtractCrossrefRecords {
 							"/eu/dnetlib/dhp/doiboost/crossref_dump_reader.json")));
 		parser.parseArgument(args);
 		final String hdfsServerUri = parser.get("hdfsServerUri");
-		final String workingPath = parser.get("workingPath");
+		final String workingPath = hdfsServerUri.concat(parser.get("workingPath"));
 		final String outputPath = parser.get("outputPath");
 		final String crossrefFileNameTarGz = parser.get("crossrefFileNameTarGz");
 
-		Path hdfsreadpath = new Path(hdfsServerUri.concat(crossrefFileNameTarGz));
+		Path hdfsreadpath = new Path(workingPath.concat("/").concat(crossrefFileNameTarGz));
 		Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsServerUri.concat(workingPath));
+		conf.set("fs.defaultFS", workingPath);
 		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
 		conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-		FileSystem fs = FileSystem.get(URI.create(hdfsServerUri.concat(workingPath)), conf);
+		FileSystem fs = FileSystem.get(URI.create(workingPath), conf);
 		FSDataInputStream crossrefFileStream = fs.open(hdfsreadpath);
 		try (TarArchiveInputStream tais = new TarArchiveInputStream(
 			new GzipCompressorInputStream(crossrefFileStream))) {
