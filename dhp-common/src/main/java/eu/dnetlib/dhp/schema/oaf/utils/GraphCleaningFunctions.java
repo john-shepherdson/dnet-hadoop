@@ -7,22 +7,19 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import me.xuender.unidecode.Unidecode;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 
@@ -194,11 +191,15 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							.filter(Objects::nonNull)
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 							.filter(
-								sp -> sp
-									.getValue()
-									.toLowerCase()
-									.replaceAll(TITLE_FILTER_REGEX, "")
-									.length() > TITLE_FILTER_RESIDUAL_LENGTH)
+								sp -> {
+									final String title = sp
+										.getValue()
+										.toLowerCase();
+									final String residual = Unidecode
+										.decode(title)
+										.replaceAll(TITLE_FILTER_REGEX, "");
+									return residual.length() > TITLE_FILTER_RESIDUAL_LENGTH;
+								})
 							.map(GraphCleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}

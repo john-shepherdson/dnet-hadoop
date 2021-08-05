@@ -1,11 +1,9 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.cleanup;
+import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.fixVocabularyNames;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
@@ -25,15 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -74,7 +64,7 @@ public class MappersTest {
 
 		assertValidId(p.getId());
 
-		assertEquals(1, p.getOriginalId().size());
+		assertEquals(2, p.getOriginalId().size());
 		assertTrue(p.getOriginalId().contains("10.3897/oneeco.2.e13718"));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
@@ -261,8 +251,8 @@ public class MappersTest {
 		final Relation r2 = (Relation) list.get(2);
 
 		assertValidId(d.getId());
-		assertEquals(1, d.getOriginalId().size());
-		assertTrue(d.getOriginalId().contains("oai:zenodo.org:3234526"));
+		assertEquals(2, d.getOriginalId().size());
+		assertTrue(d.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:zenodo.org:3234526")));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 		assertTrue(d.getAuthor().size() > 0);
@@ -351,8 +341,11 @@ public class MappersTest {
 		final Publication p = (Publication) list.get(0);
 
 		assertValidId(p.getId());
-		assertTrue(p.getOriginalId().size() == 1);
-		assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
+		assertEquals(2, p.getOriginalId().size());
+
+		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:pub.uni-bielefeld.de:2949739")));
+		// assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
+
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(p.getAuthor().size() > 0);
 
@@ -413,7 +406,8 @@ public class MappersTest {
 		assertEquals(ModelConstants.DNET_PROVENANCE_ACTIONS, d.getDataInfo().getProvenanceaction().getSchemename());
 
 		assertValidId(d.getId());
-		assertTrue(d.getOriginalId().size() == 1);
+		assertEquals(2, d.getOriginalId().size());
+
 		assertEquals("feabb67c-1fd1-423b-aec6-606d04ce53c6", d.getOriginalId().get(0));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 
@@ -568,31 +562,6 @@ public class MappersTest {
 	}
 
 	@Test
-	void testEnermaps() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("enermaps.xml"));
-		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
-
-		System.out.println("***************");
-		System.out.println(new ObjectMapper().writeValueAsString(list));
-		System.out.println("***************");
-
-		assertEquals(1, list.size());
-		assertTrue(list.get(0) instanceof Dataset);
-
-		final Dataset d = (Dataset) list.get(0);
-
-		assertValidId(d.getId());
-		assertValidId(d.getCollectedfrom().get(0).getKey());
-		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
-		assertEquals(1, d.getAuthor().size());
-		assertEquals(1, d.getInstance().size());
-		assertNotNull(d.getInstance().get(0).getUrl());
-		assertNotNull(d.getContext());
-		assertTrue(StringUtils.isNotBlank(d.getContext().get(0).getId()));
-		assertEquals("enermaps::selection::tgs00004", d.getContext().get(0).getId());
-	}
-
-	@Test
 	void testClaimFromCrossref() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -674,6 +643,30 @@ public class MappersTest {
 	}
 
 	@Test
+	void testJairo() throws IOException {
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_jairo.xml"));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+
+		assertNotNull(p.getTitle());
+		assertFalse(p.getTitle().isEmpty());
+		assertTrue(p.getTitle().size() == 1);
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
+		final Publication p_cleaned = cleanup(fixVocabularyNames(p));
+
+		assertNotNull(p_cleaned.getTitle());
+		assertFalse(p_cleaned.getTitle().isEmpty());
+	}
+
+	@Test
 	void testOdfFromHdfs() throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_from_hdfs.xml"));
 
@@ -688,8 +681,8 @@ public class MappersTest {
 		final Dataset p = (Dataset) list.get(0);
 
 		assertValidId(p.getId());
-		assertTrue(p.getOriginalId().size() == 1);
-		assertEquals("df76e73f-0483-49a4-a9bb-63f2f985574a", p.getOriginalId().get(0));
+		assertEquals(2, p.getOriginalId().size());
+		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("df76e73f-0483-49a4-a9bb-63f2f985574a")));
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(p.getAuthor().size() > 0);
 

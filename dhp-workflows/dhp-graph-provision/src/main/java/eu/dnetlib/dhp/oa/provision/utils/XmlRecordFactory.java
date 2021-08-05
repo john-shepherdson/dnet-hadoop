@@ -16,7 +16,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
@@ -43,6 +42,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class XmlRecordFactory implements Serializable {
 
