@@ -5,6 +5,16 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.dump.oaf.AccessRight;
+import eu.dnetlib.dhp.schema.dump.oaf.Author;
+import eu.dnetlib.dhp.schema.dump.oaf.Country;
+import eu.dnetlib.dhp.schema.dump.oaf.GeoLocation;
+import eu.dnetlib.dhp.schema.dump.oaf.Instance;
+import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
+import eu.dnetlib.dhp.schema.dump.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -13,10 +23,6 @@ import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class ResultMapper implements Serializable {
 
@@ -128,6 +134,13 @@ public class ResultMapper implements Serializable {
 					out.setType(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
 
 					break;
+			}
+
+			Optional<List<Measure>> mes = Optional.ofNullable(input.getMeasures());
+			if(mes.isPresent()){
+				List<KeyValue> measure = new ArrayList<>();
+				mes.get().forEach(m -> m.getUnit().forEach(u -> measure.add(KeyValue.newInstance(u.getKey(), u.getValue()))));
+				out.setMeasures(measure);
 			}
 
 			Optional
@@ -395,11 +408,12 @@ public class ResultMapper implements Serializable {
 	}
 
 	private static <I extends Instance> void setCommonValue(eu.dnetlib.dhp.schema.oaf.Instance i, I instance) {
-		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> opAr = Optional
-			.ofNullable(i.getAccessright());
+		Optional<eu.dnetlib.dhp.schema.oaf.AccessRight> opAr = Optional.ofNullable(i.getAccessright());
+
 		if (opAr.isPresent()) {
 			if (Constants.accessRightsCoarMap.containsKey(opAr.get().getClassid())) {
 				String code = Constants.accessRightsCoarMap.get(opAr.get().getClassid());
+
 				instance
 					.setAccessright(
 						AccessRight
@@ -407,8 +421,34 @@ public class ResultMapper implements Serializable {
 								code,
 								Constants.coarCodeLabelMap.get(code),
 								Constants.COAR_ACCESS_RIGHT_SCHEMA));
+				if (opAr.get().getOpenAccessRoute() != null){
+					switch (opAr.get().getOpenAccessRoute()){
+						case hybrid:
+							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.hybrid);
+							break;
+						case gold:
+							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.gold);
+							break;
+						case green:
+							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.green);
+							break;
+						case bronze:
+							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.bronze);
+							break;
+
+					}
+				}
 			}
 		}
+
+		Optional.ofNullable(i.getPid())
+				.ifPresent(pid -> instance.setPid(
+						pid.stream().map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+								.collect(Collectors.toList())));
+
+		Optional.ofNullable(i.getAlternateIdentifier())
+				.ifPresent(ai -> instance.setAlternateIdentifier(ai.stream().map(p -> ControlledField.
+						newInstance(p.getQualifier().getClassid(), p.getValue())).collect(Collectors.toList())));
 
 		Optional
 			.ofNullable(i.getLicense())
