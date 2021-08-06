@@ -5,6 +5,10 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.AccessRight;
 import eu.dnetlib.dhp.schema.dump.oaf.Author;
 import eu.dnetlib.dhp.schema.dump.oaf.Country;
@@ -14,15 +18,13 @@ import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.dump.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.commons.lang3.StringUtils;
-
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
+import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
 
 public class ResultMapper implements Serializable {
 
@@ -137,9 +139,12 @@ public class ResultMapper implements Serializable {
 			}
 
 			Optional<List<Measure>> mes = Optional.ofNullable(input.getMeasures());
-			if(mes.isPresent()){
+			if (mes.isPresent()) {
 				List<KeyValue> measure = new ArrayList<>();
-				mes.get().forEach(m -> m.getUnit().forEach(u -> measure.add(KeyValue.newInstance(u.getKey(), u.getValue()))));
+				mes
+					.get()
+					.forEach(
+						m -> m.getUnit().forEach(u -> measure.add(KeyValue.newInstance(m.getId(), u.getValue()))));
 				out.setMeasures(measure);
 			}
 
@@ -271,18 +276,17 @@ public class ResultMapper implements Serializable {
 
 			}
 
-			List<ControlledField> pids = new ArrayList<>();
+
 			Optional
 				.ofNullable(input.getPid())
 				.ifPresent(
-					value -> value
+					value -> out.setPid(value
 						.stream()
-						.forEach(
-							p -> pids
-								.add(
+						.map(
+							p ->
 									ControlledField
-										.newInstance(p.getQualifier().getClassid(), p.getValue()))));
-			out.setPid(pids);
+										.newInstance(p.getQualifier().getClassid(), p.getValue())).collect(Collectors.toList())));
+
 			oStr = Optional.ofNullable(input.getDateofacceptance());
 			if (oStr.isPresent()) {
 				out.setPublicationdate(oStr.get().getValue());
@@ -292,10 +296,11 @@ public class ResultMapper implements Serializable {
 				out.setPublisher(oStr.get().getValue());
 			}
 
-			List<String> sourceList = new ArrayList<>();
+
 			Optional
 				.ofNullable(input.getSource())
-				.ifPresent(value -> value.stream().forEach(s -> sourceList.add(s.getValue())));
+				.ifPresent(value -> out.setSource(value.stream().map(s -> s.getValue()).collect(Collectors.toList()) ));
+					//	value.stream().forEach(s -> sourceList.add(s.getValue())));
 			// out.setSource(input.getSource().stream().map(s -> s.getValue()).collect(Collectors.toList()));
 			List<Subject> subjectList = new ArrayList<>();
 			Optional
@@ -421,8 +426,8 @@ public class ResultMapper implements Serializable {
 								code,
 								Constants.coarCodeLabelMap.get(code),
 								Constants.COAR_ACCESS_RIGHT_SCHEMA));
-				if (opAr.get().getOpenAccessRoute() != null){
-					switch (opAr.get().getOpenAccessRoute()){
+				if (opAr.get().getOpenAccessRoute() != null) {
+					switch (opAr.get().getOpenAccessRoute()) {
 						case hybrid:
 							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.hybrid);
 							break;
@@ -441,14 +446,25 @@ public class ResultMapper implements Serializable {
 			}
 		}
 
-		Optional.ofNullable(i.getPid())
-				.ifPresent(pid -> instance.setPid(
-						pid.stream().map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
-								.collect(Collectors.toList())));
+		Optional
+			.ofNullable(i.getPid())
+			.ifPresent(
+				pid -> instance
+					.setPid(
+						pid
+							.stream()
+							.map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+							.collect(Collectors.toList())));
 
-		Optional.ofNullable(i.getAlternateIdentifier())
-				.ifPresent(ai -> instance.setAlternateIdentifier(ai.stream().map(p -> ControlledField.
-						newInstance(p.getQualifier().getClassid(), p.getValue())).collect(Collectors.toList())));
+		Optional
+			.ofNullable(i.getAlternateIdentifier())
+			.ifPresent(
+				ai -> instance
+					.setAlternateIdentifier(
+						ai
+							.stream()
+							.map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+							.collect(Collectors.toList())));
 
 		Optional
 			.ofNullable(i.getLicense())
@@ -554,34 +570,55 @@ public class ResultMapper implements Serializable {
 		return a;
 	}
 
-	private static Pid getOrcid(List<StructuredProperty> p) {
-		for (StructuredProperty pid : p) {
-			if (pid.getQualifier().getClassid().equals(ModelConstants.ORCID)) {
-				Optional<DataInfo> di = Optional.ofNullable(pid.getDataInfo());
-				if (di.isPresent()) {
-					return Pid
-						.newInstance(
+	private static Pid getAuthorPid(StructuredProperty pid) {
+		Optional<DataInfo> di = Optional.ofNullable(pid.getDataInfo());
+		if (di.isPresent()) {
+			return Pid
+					.newInstance(
 							ControlledField
-								.newInstance(
-									pid.getQualifier().getClassid(),
-									pid.getValue()),
+									.newInstance(
+											pid.getQualifier().getClassid(),
+											pid.getValue()),
 							Provenance
-								.newInstance(
-									di.get().getProvenanceaction().getClassname(),
-									di.get().getTrust()));
-				} else {
-					return Pid
-						.newInstance(
+									.newInstance(
+											di.get().getProvenanceaction().getClassname(),
+											di.get().getTrust()));
+		} else {
+			return Pid
+					.newInstance(
 							ControlledField
-								.newInstance(
-									pid.getQualifier().getClassid(),
-									pid.getValue())
+									.newInstance(
+											pid.getQualifier().getClassid(),
+											pid.getValue())
 
-						);
-				}
-
-			}
+					);
 		}
+	}
+
+	private static Pid getOrcid(List<StructuredProperty> p) {
+		List<StructuredProperty> pid_list = p.stream().map(pid -> {
+			if (pid.getQualifier().getClassid().equals(ModelConstants.ORCID) ||
+					(pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))){
+				return pid;
+			}
+			return  null;
+		}).filter(pid -> pid != null).collect(Collectors.toList());
+
+		if(pid_list.size() == 1){
+			return getAuthorPid(pid_list.get(0));
+		}
+
+		List<StructuredProperty> orcid = pid_list.stream().filter(ap -> ap.getQualifier().getClassid()
+				.equals(ModelConstants.ORCID)).collect(Collectors.toList());
+		if(orcid.size() == 1){
+			return getAuthorPid(orcid.get(0));
+		}
+		orcid = pid_list.stream().filter(ap -> ap.getQualifier().getClassid()
+				.equals(ModelConstants.ORCID_PENDING)).collect(Collectors.toList());
+		if(orcid.size() == 1){
+			return getAuthorPid(orcid.get(0));
+		}
+
 		return null;
 	}
 

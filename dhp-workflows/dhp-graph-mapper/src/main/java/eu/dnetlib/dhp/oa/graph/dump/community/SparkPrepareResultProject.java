@@ -8,6 +8,8 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Validated;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -76,7 +78,7 @@ public class SparkPrepareResultProject implements Serializable {
 	private static void prepareResultProjectList(SparkSession spark, String inputPath, String outputPath) {
 		Dataset<Relation> relation = Utils
 			.readPath(spark, inputPath + "/relation", Relation.class)
-			.filter("dataInfo.deletedbyinference = false and lower(relClass) = 'isproducedby'");
+			.filter("dataInfo.deletedbyinference = false and lower(relClass) = '" + ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
 		Dataset<eu.dnetlib.dhp.schema.oaf.Project> projects = Utils
 			.readPath(spark, inputPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
 
@@ -96,7 +98,7 @@ public class SparkPrepareResultProject implements Serializable {
 					rp.setResultId(s);
 					eu.dnetlib.dhp.schema.oaf.Project p = first._1();
 					projectSet.add(p.getId());
-					Project ps = getProject(p);
+					Project ps = getProject(p, first._2);
 
 					List<Project> projList = new ArrayList<>();
 					projList.add(ps);
@@ -105,7 +107,7 @@ public class SparkPrepareResultProject implements Serializable {
 						eu.dnetlib.dhp.schema.oaf.Project op = c._1();
 						if (!projectSet.contains(op.getId())) {
 							projList
-								.add(getProject(op));
+								.add(getProject(op, c._2));
 
 							projectSet.add(op.getId());
 
@@ -120,7 +122,7 @@ public class SparkPrepareResultProject implements Serializable {
 			.json(outputPath);
 	}
 
-	private static Project getProject(eu.dnetlib.dhp.schema.oaf.Project op) {
+	private static Project getProject(eu.dnetlib.dhp.schema.oaf.Project op, Relation relation) {
 		Project p = Project
 			.newInstance(
 				op.getId(),
@@ -155,7 +157,9 @@ public class SparkPrepareResultProject implements Serializable {
 			provenance.setTrust(di.get().getTrust());
 			p.setProvenance(provenance);
 		}
-
+		if (relation.getValidated()){
+			p.setValidated(Validated.newInstance(relation.getValidated(), relation.getValidationDate()));
+		}
 		return p;
 
 	}

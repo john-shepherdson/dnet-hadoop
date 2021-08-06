@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -71,7 +72,7 @@ public class DumpRelationTest {
 	public void test1() throws Exception {
 
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation")
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation/relation")
 			.getPath();
 
 		SparkDumpRelationJob.main(new String[] {
@@ -92,6 +93,8 @@ public class DumpRelationTest {
 			.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 
 		verificationDataset.createOrReplaceTempView("table");
+
+		verificationDataset.foreach((ForeachFunction<Relation>)r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
 
 		Dataset<Row> check = spark
 			.sql(
@@ -127,4 +130,75 @@ public class DumpRelationTest {
 					.count());
 	}
 
+	@Test
+	public void test2() throws Exception {
+
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation/relation_validated")
+				.getPath();
+
+		SparkDumpRelationJob.main(new String[] {
+				"-isSparkSessionManaged", Boolean.FALSE.toString(),
+				"-outputPath", workingDir.toString() + "/relation",
+				"-sourcePath", sourcePath
+		});
+
+//		dumpCommunityProducts.exec(MOCK_IS_LOOK_UP_URL,Boolean.FALSE, workingDir.toString()+"/dataset",sourcePath,"eu.dnetlib.dhp.schema.oaf.Dataset","eu.dnetlib.dhp.schema.dump.oaf.Dataset");
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> tmp = sc
+				.textFile(workingDir.toString() + "/relation")
+				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+
+		org.apache.spark.sql.Dataset<Relation> verificationDataset = spark
+				.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+
+		verificationDataset.createOrReplaceTempView("table");
+
+		verificationDataset.foreach((ForeachFunction<Relation>)r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+
+		Dataset<Row> check = spark
+				.sql(
+						"SELECT reltype.name, source.id source, source.type stype, target.id target,target.type ttype, provenance.provenance "
+								+
+								"from table ");
+
+		Assertions.assertEquals(20, check.filter("name = 'isProvidedBy'").count());
+		Assertions
+				.assertEquals(
+						20, check
+								.filter(
+										"name = 'isProvidedBy' and stype = 'datasource' and ttype = 'organization' and " +
+												"provenance = 'Harvested'")
+								.count());
+
+		Assertions.assertEquals(7, check.filter("name = 'isParticipant'").count());
+		Assertions
+				.assertEquals(
+						7, check
+								.filter(
+										"name = 'isParticipant' and stype = 'organization' and ttype = 'project' " +
+												"and provenance = 'Harvested'")
+								.count());
+
+		Assertions.assertEquals(1, check.filter("name = 'isAuthorInstitutionOf'").count());
+		Assertions
+				.assertEquals(
+						1, check
+								.filter(
+										"name = 'isAuthorInstitutionOf' and stype = 'organization' and ttype = 'result' " +
+												"and provenance = 'Inferred by OpenAIRE'")
+								.count());
+
+		Assertions.assertEquals(2, check.filter("name = 'isProducedBy'").count());
+		Assertions
+				.assertEquals(
+						2, check
+								.filter(
+										"name = 'isProducedBy' and stype = 'project' and ttype = 'result' " +
+												"and provenance = 'Harvested' and validated = true " +
+												"and validationDate = '2021-08-06'")
+								.count());
+	}
 }

@@ -107,13 +107,10 @@ public class SparkDumpRelationJob implements Serializable {
 						}
 					}
 				}
-//						Optional
-//								.ofNullable(relation.getDataInfo())
-//								.ifPresent(
-//										datainfo -> rel_new
-//												.setProvenance(
-//														Provenance
-//																.newInstance(datainfo.getProvenanceaction().getClassname(), datainfo.getTrust())));
+				if(relation.getValidated()){
+					rel_new.setValidated(relation.getValidated());
+					rel_new.setValidationDate(relation.getValidationDate());
+				}
 
 				return rel_new;
 

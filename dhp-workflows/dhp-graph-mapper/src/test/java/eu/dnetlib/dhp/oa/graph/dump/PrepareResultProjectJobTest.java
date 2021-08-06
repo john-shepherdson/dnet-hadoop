@@ -7,9 +7,11 @@ import java.nio.file.Path;
 import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.neethi.Assertion;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -236,4 +238,111 @@ public class PrepareResultProjectJobTest {
 
 	}
 
+	@Test
+	public void testMatchValidated() throws Exception {
+
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultProject/match_validatedRels")
+				.getPath();
+
+		SparkPrepareResultProject.main(new String[] {
+				"-isSparkSessionManaged", Boolean.FALSE.toString(),
+				"-outputPath", workingDir.toString() + "/preparedInfo",
+				"-sourcePath", sourcePath
+		});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<ResultProject> tmp = sc
+				.textFile(workingDir.toString() + "/preparedInfo")
+				.map(item -> OBJECT_MAPPER.readValue(item, ResultProject.class));
+
+		org.apache.spark.sql.Dataset<ResultProject> verificationDataset = spark
+				.createDataset(tmp.rdd(), Encoders.bean(ResultProject.class));
+
+		Assertions.assertTrue(verificationDataset.count() == 2);
+
+		Assertions
+				.assertEquals(
+						1,
+						verificationDataset.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
+		Assertions
+				.assertEquals(
+						1,
+						verificationDataset.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'").count());
+
+		verificationDataset.createOrReplaceTempView("dataset");
+
+		String query = "select resultId, MyT.id project , MyT.title title, MyT.acronym acronym , MyT.provenance.provenance provenance, " +
+				"MyT.validated.validatedByFunder, MyT.validated.validationDate "
+				+ "from dataset "
+				+ "lateral view explode(projectsList) p as MyT ";
+
+		org.apache.spark.sql.Dataset<Row> resultExplodedProvenance = spark.sql(query);
+		Assertions.assertEquals(3, resultExplodedProvenance.count());
+		Assertions.assertEquals(3, resultExplodedProvenance.filter("validatedByFunder = true").count());
+		Assertions
+				.assertEquals(
+						2,
+						resultExplodedProvenance
+								.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
+								.count());
+
+		Assertions
+				.assertEquals(
+						1,
+						resultExplodedProvenance
+								.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'")
+								.count());
+
+		Assertions
+				.assertEquals(
+						2,
+						resultExplodedProvenance
+								.filter("project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6'")
+								.count());
+
+		Assertions
+				.assertEquals(
+						1,
+						resultExplodedProvenance
+								.filter(
+										"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' " +
+												"and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb' " +
+												"and validatedByFunder = true " +
+												"and validationDate = '2021-08-06'")
+								.count());
+
+		Assertions
+				.assertEquals(
+						1,
+						resultExplodedProvenance
+								.filter(
+										"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' " +
+												"and resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80' " +
+												"and validatedByFunder = true and validationDate = '2021-08-04'")
+								.count());
+
+		Assertions
+				.assertEquals(
+						1,
+						resultExplodedProvenance
+								.filter("project = '40|aka_________::03376222b28a3aebf2730ac514818d04'")
+								.count());
+
+		Assertions
+				.assertEquals(
+						1,
+						resultExplodedProvenance
+								.filter(
+										"project = '40|aka_________::03376222b28a3aebf2730ac514818d04' " +
+												"and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb' " +
+												"and validatedByFunder = true and validationDate = '2021-08-05'")
+								.count());
+
+		Assertions
+				.assertEquals(
+						3, resultExplodedProvenance.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
+
+	}
 }

@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -21,14 +22,14 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
-import org.apache.spark.sql.*;
-import eu.dnetlib.dhp.schema.oaf.Project;
+
 /**
  * Selects the results linked to projects. Only for these results the dump will be performed.
- * The code to perform the dump and to expend the dumped results with the informaiton related to projects
+ * The code to perform the dump and to expend the dumped results with the information related to projects
  * is the one used for the dump of the community products
  */
 public class SparkResultLinkedToProject implements Serializable {
@@ -78,6 +79,7 @@ public class SparkResultLinkedToProject implements Serializable {
 	private static <R extends Result> void writeResultsLinkedToProjects(SparkSession spark, Class<R> inputClazz,
 		String inputPath, String outputPath, String graphPath) {
 
+		
 		Dataset<R> results = Utils
 			.readPath(spark, inputPath, inputClazz)
 			.filter("dataInfo.deletedbyinference = false and datainfo.invisible = false");
@@ -86,25 +88,32 @@ public class SparkResultLinkedToProject implements Serializable {
 			.filter(
 				"dataInfo.deletedbyinference = false and lower(relClass) = '"
 					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
+		Dataset<Project> project = Utils.readPath(spark, graphPath + "/project", Project.class);
 
-		spark
-				.sql(
-						"Select res.* " +
-								"from relation rel " +
-								"join result res " +
-								"on rel.source = res.id " +
-								"join project p " +
-								"on rel.target = p.id " +
-								"")
-				.as(Encoders.bean(inputClazz))
-		.groupByKey(
-				(MapFunction< R, String>) value -> value
-						.getId(),
+		results.createOrReplaceTempView("result");
+		relations.createOrReplaceTempView("relation");
+		project.createOrReplaceTempView("project");
+
+		Dataset<R> tmp = spark
+			.sql(
+				"Select res.* " +
+					"from relation rel " +
+					"join result res " +
+					"on rel.source = res.id " +
+					"join project p " +
+					"on rel.target = p.id " +
+					"")
+			.as(Encoders.bean(inputClazz));
+		tmp
+			.groupByKey(
+				(MapFunction<R, String>) value -> value
+					.getId(),
 				Encoders.STRING())
-				.mapGroups((MapGroupsFunction<String, R, R>) (k, it) -> it.next(), Encoders.bean(inputClazz))
+			.mapGroups((MapGroupsFunction<String, R, R>) (k, it) -> it.next(), Encoders.bean(inputClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+	
 	}
 }

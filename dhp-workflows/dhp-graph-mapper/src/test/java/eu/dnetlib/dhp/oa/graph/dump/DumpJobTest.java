@@ -7,7 +7,13 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sun.xml.internal.ws.policy.AssertionSet;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.dump.oaf.Instance;
+import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
 import org.apache.commons.io.FileUtils;
+import org.apache.neethi.Assertion;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -199,7 +205,7 @@ public class DumpJobTest {
 
 		Assertions.assertTrue(verificationDataset.filter("type = 'dataset'").count() == 90);
 
-//TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
+
 
 	}
 
@@ -301,6 +307,178 @@ public class DumpJobTest {
 		Assertions.assertEquals(74, verificationDataset.filter("type = 'publication'").count());
 
 //TODO verify value and name of the fields for vocab related value (i.e. accessright, bestaccessright)
+
+	}
+
+	@Test
+	public void testPublicationExtendedInstance(){
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_extendedinstance")
+				.getPath();
+
+		final String communityMapPath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+				.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+				.run(
+						// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+						false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+						GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<GraphResult> tmp = sc
+				.textFile(workingDir.toString() + "/result")
+				.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
+
+		org.apache.spark.sql.Dataset<GraphResult> verificationDataset = spark
+				.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
+
+		Assertions.assertEquals(1, verificationDataset.count());
+		verificationDataset.show(false);
+
+		GraphResult gr = verificationDataset.first();
+
+
+		Assertions.assertEquals(2, gr.getMeasures().size());
+		Assertions.assertTrue(gr.getMeasures().stream().anyMatch(m -> m.getKey().equals("influence")
+				&& m.getValue().equals("1.62759106106e-08")));
+		Assertions.assertTrue(gr.getMeasures().stream().anyMatch(m -> m.getKey().equals("popularity")
+				&& m.getValue().equals("0.22519296")));
+
+		Assertions.assertEquals(6, gr.getAuthor().size());
+		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Nikolaidou,Charitini") &&
+				a.getName().equals("Charitini") && a.getSurname().equals("Nikolaidou")
+				&& a.getRank() == 1 && a.getPid() == null));
+
+		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Votsi,Nefta") &&
+				a.getName().equals("Nefta") && a.getSurname().equals("Votsi")
+				&& a.getRank() == 2 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID)
+				&& a.getPid().getId().getValue().equals("0000-0001-6651-1178") && a.getPid().getProvenance() != null));
+
+		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Sgardelis,Steanos") &&
+				a.getName().equals("Steanos") && a.getSurname().equals("Sgardelis")
+				&& a.getRank() == 3 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID_PENDING)
+				&& a.getPid().getId().getValue().equals("0000-0001-6651-1178") && a.getPid().getProvenance() != null));
+
+		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Halley,John") &&
+				a.getName().equals("John") && a.getSurname().equals("Halley")
+				&& a.getRank() == 4 && a.getPid() == null));
+
+		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Pantis,John") &&
+				a.getName().equals("John") && a.getSurname().equals("Pantis")
+				&& a.getRank() == 5 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID)
+				&& a.getPid().getId().getValue().equals("0000-0001-6651-1178") && a.getPid().getProvenance() != null));
+
+		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Tsiafouli,Maria") &&
+				a.getName().equals("Maria") && a.getSurname().equals("Tsiafouli")
+				&& a.getRank() == 6 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID_PENDING)
+				&& a.getPid().getId().getValue().equals("0000-0001-6651-1178") && a.getPid().getProvenance() != null));
+
+		Assertions.assertEquals("publication", gr.getType());
+
+		Assertions.assertEquals("eng", gr.getLanguage().getCode());
+		Assertions.assertEquals("English", gr.getLanguage().getLabel());
+
+		Assertions.assertEquals(1, gr.getCountry().size());
+		Assertions.assertEquals("IT" , gr.getCountry().get(0).getCode());
+		Assertions.assertEquals("Italy" , gr.getCountry().get(0).getLabel());
+		Assertions.assertTrue( gr.getCountry().get(0).getProvenance() == null);
+
+		Assertions.assertEquals(12, gr.getSubjects().size());
+		Assertions.assertTrue(gr.getSubjects().stream().anyMatch(s -> s.getSubject().getValue().equals("Ecosystem Services hotspots")
+				&& s.getSubject().getScheme().equals("ACM") && s.getProvenance() != null  &&
+				s.getProvenance().getProvenance().equals("sysimport:crosswalk:repository")));
+		Assertions.assertTrue(gr.getSubjects().stream().anyMatch(s -> s.getSubject().getValue().equals("Natura 2000")
+				&& s.getSubject().getScheme().equals("") && s.getProvenance() != null  &&
+				s.getProvenance().getProvenance().equals("sysimport:crosswalk:repository")));
+
+		Assertions.assertEquals("Ecosystem Service capacity is higher in areas of multiple designation types",
+				gr.getMaintitle());
+
+		Assertions.assertEquals(null, gr.getSubtitle());
+
+		Assertions.assertEquals(1, gr.getDescription().size());
+
+		Assertions.assertTrue(gr.getDescription().get(0).startsWith("The implementation of the Ecosystem Service (ES) concept into practice"));
+		Assertions.assertTrue(gr.getDescription().get(0).endsWith("start complying with new standards and demands for nature conservation and environmental management."));
+
+		Assertions.assertEquals("2017-01-01", gr.getPublicationdate());
+
+		Assertions.assertEquals("Pensoft Publishers", gr.getPublisher());
+
+		Assertions.assertEquals(null, gr.getEmbargoenddate());
+
+		Assertions.assertEquals(1, gr.getSource().size());
+		Assertions.assertEquals("One Ecosystem 2: e13718", gr.getSource().get(0));
+
+		Assertions.assertEquals(1, gr.getFormat().size());
+		Assertions.assertEquals("text/html", gr.getFormat().get(0));
+
+		Assertions.assertEquals(0, gr.getContributor().size());
+
+		Assertions.assertEquals(0, gr.getCoverage().size());
+
+		Assertions.assertEquals(ModelConstants.ACCESS_RIGHT_OPEN, gr.getBestaccessright().getLabel());
+		Assertions.assertEquals(Constants.accessRightsCoarMap.get(ModelConstants.ACCESS_RIGHT_OPEN), gr.getBestaccessright().getCode());
+		Assertions.assertEquals(null, gr.getBestaccessright().getOpenAccessRoute());
+
+		Assertions.assertEquals("One Ecosystem", gr.getContainer().getName());
+		Assertions.assertEquals("2367-8194", gr.getContainer().getIssnOnline());
+		Assertions.assertEquals("", gr.getContainer().getIssnPrinted());
+		Assertions.assertEquals("", gr.getContainer().getIssnLinking());
+
+		Assertions.assertTrue(null == gr.getDocumentationUrl() || gr.getDocumentationUrl().size() == 0);
+
+		Assertions.assertTrue(null == gr.getCodeRepositoryUrl());
+
+		Assertions.assertEquals(null, gr.getProgrammingLanguage());
+
+		Assertions.assertTrue(null == gr.getContactperson() || gr.getContactperson().size() == 0);
+
+		Assertions.assertTrue(null == gr.getContactgroup() || gr.getContactgroup().size() == 0);
+
+		Assertions.assertTrue(null == gr.getTool() || gr.getTool().size() == 0);
+
+		Assertions.assertEquals(null, gr.getSize());
+
+		Assertions.assertEquals(null, gr.getVersion());
+
+		Assertions.assertTrue(null == gr.getGeolocation() || gr.getGeolocation().size() == 0);
+
+		Assertions.assertEquals("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2", gr.getId());
+
+		Assertions.assertEquals(2, gr.getOriginalId().size());
+		Assertions.assertTrue(gr.getOriginalId().contains("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2")
+				&& gr.getOriginalId().contains("10.3897/oneeco.2.e13718"));
+
+		Assertions.assertEquals(1, gr.getPid().size());
+		Assertions.assertTrue(gr.getPid().get(0).getScheme().equals("doi")
+				&& gr.getPid().get(0).getValue().equals("10.1016/j.triboint.2014.05.004"));
+
+		Assertions.assertEquals("2020-03-23T00:20:51.392Z", gr.getDateofcollection());
+
+		Assertions.assertEquals(1, gr.getInstance().size());
+
+		Instance instance = gr.getInstance().get(0);
+		Assertions.assertEquals(0, instance.getPid().size());
+		Assertions.assertEquals(1, instance.getAlternateIdentifier().size());
+		Assertions.assertTrue(instance.getAlternateIdentifier().get(0).getScheme().equals("doi")
+		&& instance.getAlternateIdentifier().get(0).getValue().equals("10.3897/oneeco.2.e13718"));
+		Assertions.assertEquals(null, instance.getLicense());
+		Assertions.assertTrue(instance.getAccessright().getCode().equals(Constants.accessRightsCoarMap
+				.get(ModelConstants.ACCESS_RIGHT_OPEN)));
+		Assertions.assertTrue(instance.getAccessright().getLabel().equals(ModelConstants.ACCESS_RIGHT_OPEN));
+		Assertions.assertTrue(instance.getAccessright().getOpenAccessRoute().equals(OpenAccessRoute.green));
+		Assertions.assertEquals(2, instance.getUrl().size());
+		Assertions.assertTrue(instance.getUrl().contains("https://doi.org/10.3897/oneeco.2.e13718")
+				&& instance.getUrl().contains("https://oneecosystem.pensoft.net/article/13718/"));
+		Assertions.assertEquals("2017-01-01",instance.getPublicationdate());
+		Assertions.assertEquals(null,instance.getArticleprocessingcharge());
+		Assertions.assertEquals("peerReviewed", instance.getRefereed());
+
 
 	}
 
@@ -454,6 +632,8 @@ public class DumpJobTest {
 		Assertions.assertTrue(temp.filter("id = '50|datacite____::05c611fdfc93d7a2a703d1324e28104a'").count() == 1);
 
 		Assertions.assertTrue(temp.filter("id = '50|dedup_wf_001::01e6a28565ca01376b7548e530c6f6e8'").count() == 1);
+
+
 
 //		verificationDataset.filter("bestAccessright.code = 'c_abf2'").count() == verificationDataset
 //				.filter("bestAccessright.code = 'c_abf2' and bestAccessright.label = 'OPEN'")

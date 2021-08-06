@@ -6,6 +6,7 @@ import static org.mockito.Mockito.lenient;
 import java.util.*;
 import java.util.function.Consumer;
 
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -528,7 +529,7 @@ public class QueryInformationSystemTest {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.execContextRelationQuery();
-		queryInformationSystem.getContextRelation(consumer, "contentproviders", "10|");
+		queryInformationSystem.getContextRelation(consumer, "contentproviders", ModelSupport.entityIdPrefix.get("datasource"));
 
 		Assertions.assertEquals(5, cInfoList.size());
 	}
@@ -539,7 +540,7 @@ public class QueryInformationSystemTest {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.execContextRelationQuery();
-		queryInformationSystem.getContextRelation(consumer, "contentproviders", "10");
+		queryInformationSystem.getContextRelation(consumer, "contentproviders", ModelSupport.entityIdPrefix.get("datasource"));
 
 		cInfoList.forEach(contextInfo -> {
 			switch (contextInfo.getId()) {

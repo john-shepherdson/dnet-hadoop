@@ -29,15 +29,15 @@ public class QueryInformationSystem {
 		"</community>";
 
 	private static final String XQUERY_CI = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
-			+
-			"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-			" and  $x//CONFIGURATION/context[./@id=%s]  "
-			+
-			"  return " +
-			"<community> " +
-			"{$x//CONFIGURATION/context/@id}" +
-			"{$x//CONFIGURATION/context/@label}" +
-			"</community>";
+		+
+		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
+		" and  $x//CONFIGURATION/context[./@id=%s]  "
+		+
+		"  return " +
+		"<community> " +
+		"{$x//CONFIGURATION/context/@id}" +
+		"{$x//CONFIGURATION/context/@label}" +
+		"</community>";
 
 	public CommunityMap getCommunityMap(boolean singleCommunity, String community_id)
 		throws ISLookUpException, DocumentException {

@@ -129,7 +129,7 @@ public class Extractor implements Serializable {
 
 				return relationList.iterator();
 			}, Encoders.bean(Relation.class))
-				.write()
+			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
 			.json(outputPath);

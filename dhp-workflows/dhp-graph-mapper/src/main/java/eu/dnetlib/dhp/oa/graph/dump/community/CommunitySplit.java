@@ -49,7 +49,7 @@ public class CommunitySplit implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		communities
-				.keySet()
+			.keySet()
 			.stream()
 			.forEach(c -> printResult(c, result, outputPath + "/" + communities.get(c).replace(" ", "_")));
 

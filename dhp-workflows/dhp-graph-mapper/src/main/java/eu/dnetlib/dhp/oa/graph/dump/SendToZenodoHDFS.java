@@ -48,14 +48,14 @@ public class SendToZenodoHDFS implements Serializable {
 			.orElse(false);
 
 		final String depositionId = Optional.ofNullable(parser.get("depositionId")).orElse(null);
-		//final String communityMapPath = parser.get("communityMapPath");
+		// final String communityMapPath = parser.get("communityMapPath");
 
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
 
-		//CommunityMap communityMap = Utils.readCommunityMap(fileSystem, communityMapPath);
+		// CommunityMap communityMap = Utils.readCommunityMap(fileSystem, communityMapPath);
 
 		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
 			.listFiles(

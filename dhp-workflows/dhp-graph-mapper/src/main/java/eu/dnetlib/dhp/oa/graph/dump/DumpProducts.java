@@ -37,8 +37,8 @@ public class DumpProducts implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-                execDump(
-                        spark, inputPath, outputPath, communityMapPath, inputClazz, outputClazz, dumpType);
+				execDump(
+					spark, inputPath, outputPath, communityMapPath, inputClazz, outputClazz, dumpType);
 			});
 	}
 

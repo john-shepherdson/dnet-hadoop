@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.oa.graph.dump;
 
 import java.io.BufferedWriter;
@@ -54,10 +55,10 @@ public class SaveCommunityMap implements Serializable {
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
-				.toString(
-						SaveCommunityMap.class
-								.getResourceAsStream(
-										"/eu/dnetlib/dhp/oa/graph/dump/input_cm_parameters.json"));
+			.toString(
+				SaveCommunityMap.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/dump/input_cm_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
@@ -71,8 +72,10 @@ public class SaveCommunityMap implements Serializable {
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
 
-		final Boolean singleCommunity = Optional.ofNullable(parser.get("singleDeposition"))
-				.map(Boolean::valueOf).orElse(false);
+		final Boolean singleCommunity = Optional
+			.ofNullable(parser.get("singleDeposition"))
+			.map(Boolean::valueOf)
+			.orElse(false);
 
 		final String community_id = Optional.ofNullable(parser.get("communityId")).orElse(null);
 
@@ -82,8 +85,12 @@ public class SaveCommunityMap implements Serializable {
 
 	}
 
-	private void saveCommunityMap(boolean singleCommunity, String community_id) throws ISLookUpException, IOException, DocumentException {
-		writer.write(Utils.OBJECT_MAPPER.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, community_id)));
+	private void saveCommunityMap(boolean singleCommunity, String community_id)
+		throws ISLookUpException, IOException, DocumentException {
+		writer
+			.write(
+				Utils.OBJECT_MAPPER
+					.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, community_id)));
 		writer.close();
 	}
 }
