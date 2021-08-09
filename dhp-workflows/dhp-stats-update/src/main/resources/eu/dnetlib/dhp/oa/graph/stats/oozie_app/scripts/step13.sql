@@ -57,12 +57,14 @@ UNION ALL
 SELECT * FROM ${stats_db_name}.software_sources
 UNION ALL
 SELECT * FROM ${stats_db_name}.otherresearchproduct_sources;
---
--- ANALYZE TABLE ${stats_db_name}.publication_sources COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_sources COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.dataset_sources COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.dataset_sources COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.software_sources COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.software_sources COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.otherresearchproduct_sources COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.otherresearchproduct_sources COMPUTE STATISTICS FOR COLUMNS;
+
+
+create table ${stats_db_name}.result_orcid as
+select distinct res.id, regexp_replace(res.orcid, 'http://orcid.org/' ,'') as orcid
+from (
+    SELECT substr(res.id, 4) as id, auth_pid.value as orcid
+    FROM ${openaire_db_name}.result res
+    LATERAL VIEW explode(author) a as auth
+    LATERAL VIEW explode(auth.pid) ap as auth_pid
+    LATERAL VIEW explode(auth.pid.qualifier.classid) apt as author_pid_type
+    WHERE res.datainfo.deletedbyinference = FALSE and res.datainfo.invisible = FALSE and author_pid_type = 'orcid') as res

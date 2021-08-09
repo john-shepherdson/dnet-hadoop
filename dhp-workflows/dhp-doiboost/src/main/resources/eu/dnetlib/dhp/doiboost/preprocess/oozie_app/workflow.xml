@@ -1,4 +1,4 @@
-<workflow-app name="Generate DOIBoost ActionSet" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Generate DOIBoost ActionSet - PREPROCESS" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sparkDriverMemory</name>

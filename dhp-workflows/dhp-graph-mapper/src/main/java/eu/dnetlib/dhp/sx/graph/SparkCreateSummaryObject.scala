@@ -1,7 +1,7 @@
 package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.Result
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
 import eu.dnetlib.dhp.schema.sx.summary.ScholixSummary
 import eu.dnetlib.dhp.sx.graph.scholix.ScholixUtils
 import org.apache.commons.io.IOUtils
@@ -29,11 +29,12 @@ object SparkCreateSummaryObject {
     log.info(s"targetPath  -> $targetPath")
 
     implicit val resultEncoder:Encoder[Result] = Encoders.kryo[Result]
+    implicit val oafEncoder:Encoder[Oaf] = Encoders.kryo[Oaf]
 
     implicit val summaryEncoder:Encoder[ScholixSummary] = Encoders.kryo[ScholixSummary]
 
 
-    val ds:Dataset[Result] = spark.read.load(s"$sourcePath/*").as[Result]
+    val ds:Dataset[Result] = spark.read.load(s"$sourcePath/*").as[Result].filter(r=>r.getDataInfo== null ||  r.getDataInfo.getDeletedbyinference== false)
 
     ds.repartition(6000).map(r => ScholixUtils.resultToSummary(r)).filter(s => s!= null).write.mode(SaveMode.Overwrite).save(targetPath)
 
