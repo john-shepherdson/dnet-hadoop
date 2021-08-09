@@ -108,7 +108,7 @@ round(NonOpenAccess/(OpenAccess+NonOpenAccess)*100,3) as averageNonOA
  END) AS NonOpenAccess
  FROM software s
  join result_organization ro on s.id=ro.id
- join SOURCER.organization o on o.id=ro.organization
+ join organization o on o.id=ro.organization
  where cast(year as int)>=2003 and cast(year as int)<=2021
  group by year, country) tmp;
 
