@@ -311,6 +311,60 @@ public class DumpJobTest {
 	}
 
 	@Test
+	public void testPublicationExtendedInstance2Community() throws JsonProcessingException {
+
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_extendedinstance")
+				.getPath();
+
+		final String communityMapPath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+				.getPath();
+
+		DumpProducts dump = new DumpProducts();
+		dump
+				.run(false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+						CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<CommunityResult> tmp = sc
+				.textFile(workingDir.toString() + "/result")
+				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+
+		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
+				.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+
+		Assertions.assertEquals(1, verificationDataset.count());
+
+		Assertions.assertEquals(1, verificationDataset.filter("type = 'publication'").count());
+
+		//the common fields in the result have been checked with the test below. Now checking only
+		// community specific fields
+
+		CommunityResult cr = verificationDataset.first();
+
+		Assertions.assertEquals(1, cr.getContext().size());
+		Assertions.assertEquals("dh-ch", cr.getContext().get(0).getCode());
+		Assertions.assertEquals("Digital Humanities and Cultural Heritage", cr.getContext().get(0).getLabel());
+		Assertions.assertEquals(1, cr.getContext().get(0).getProvenance().size());
+		Assertions.assertEquals("Inferred by OpenAIRE", cr.getContext().get(0).getProvenance().get(0).getProvenance());
+		Assertions.assertEquals("0.9", cr.getContext().get(0).getProvenance().get(0).getTrust());
+
+		Assertions.assertEquals(1, cr.getCollectedfrom().size());
+		Assertions.assertEquals("10|openaire____::fdc7e0400d8c1634cdaf8051dbae23db", cr.getCollectedfrom().get(0).getKey());
+		Assertions.assertEquals("Pensoft", cr.getCollectedfrom().get(0).getValue());
+
+		Assertions.assertEquals(1, cr.getInstance().size());
+		Assertions.assertEquals("10|openaire____::fdc7e0400d8c1634cdaf8051dbae23db", cr.getInstance().get(0).getCollectedfrom().getKey());
+		Assertions.assertEquals("Pensoft", cr.getInstance().get(0).getCollectedfrom().getValue());
+		Assertions.assertEquals("10|openaire____::e707e544b9a5bd23fc27fbfa65eb60dd", cr.getInstance().get(0).getHostedby().getKey());
+		Assertions.assertEquals("One Ecosystem",cr.getInstance().get(0).getHostedby().getValue());
+
+
+	}
+
+	@Test
 	public void testPublicationExtendedInstance(){
 		final String sourcePath = getClass()
 				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_extendedinstance")
@@ -337,7 +391,6 @@ public class DumpJobTest {
 				.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
 
 		Assertions.assertEquals(1, verificationDataset.count());
-		verificationDataset.show(false);
 
 		GraphResult gr = verificationDataset.first();
 
@@ -472,6 +525,7 @@ public class DumpJobTest {
 				.get(ModelConstants.ACCESS_RIGHT_OPEN)));
 		Assertions.assertTrue(instance.getAccessright().getLabel().equals(ModelConstants.ACCESS_RIGHT_OPEN));
 		Assertions.assertTrue(instance.getAccessright().getOpenAccessRoute().equals(OpenAccessRoute.green));
+		Assertions.assertTrue(instance.getType().equals("Article"));
 		Assertions.assertEquals(2, instance.getUrl().size());
 		Assertions.assertTrue(instance.getUrl().contains("https://doi.org/10.3897/oneeco.2.e13718")
 				&& instance.getUrl().contains("https://oneecosystem.pensoft.net/article/13718/"));
