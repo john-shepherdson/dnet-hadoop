@@ -726,8 +726,8 @@ public class MappersTest {
 		final Dataset p = (Dataset) list.get(0);
 
 		assertValidId(p.getId());
-		assertTrue(p.getOriginalId().size() == 1);
-		assertEquals("df76e73f-0483-49a4-a9bb-63f2f985574a", p.getOriginalId().get(0));
+		assertEquals(2, p.getOriginalId().size());
+		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("df76e73f-0483-49a4-a9bb-63f2f985574a")));
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(p.getAuthor().size() > 0);
 
