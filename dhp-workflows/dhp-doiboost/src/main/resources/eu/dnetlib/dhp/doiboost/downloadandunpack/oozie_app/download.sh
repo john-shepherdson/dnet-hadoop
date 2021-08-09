@@ -1,2 +1,0 @@
-#!/bin/bash
-curl -LSs -H "Crossref-Plus-API-Token: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vY3Jvc3NyZWYub3JnLyIsImF1ZCI6Im1kcGx1cyIsImp0aSI6Ijk3YTZkNGVkLTg5MjktNGQ2Yi05NWY1LTY2YmMyNDgzNTRjNCJ9.5DPM4gRibUBYBtrUSpRz3RGHYVB-8f61jQBW_q-r-hs"  $1 | hdfs dfs -put - $2/$3
