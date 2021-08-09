@@ -22,6 +22,10 @@
             <name>crossrefDumpPath</name>
             <description>the Crossref dump path</description>
         </property>
+        <property>
+            <name>crossrefdumptoken</name>
+            <description>the token for the API dump path</description>
+        </property>
 
 
     </parameters>
@@ -37,7 +41,7 @@
         </configuration>
     </global>
 
-    <start to="ImportCrossRef"/>
+    <start to="removeFiles"/>
 
 
     <kill name="Kill">
@@ -69,6 +73,7 @@
             <argument>${url}</argument>
             <argument>${crossrefDumpPath}</argument>
             <argument>${crossrefdumpfilename}</argument>
+            <argument>${crossrefdumptoken}</argument>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>download.sh</file>
             <capture-output/>
