@@ -34,6 +34,7 @@ object SparkApplyHostedByMapToResult {
             if (ei.getOpenaccess) {
               inst.setAccessright(OafMapperUtils.accessRight(ModelConstants.ACCESS_RIGHT_OPEN, "Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES))
               inst.getAccessright.setOpenAccessRoute(OpenAccessRoute.hybrid)
+              p.setBestaccessright(OafMapperUtils.createBestAccessRights(p.getInstance()));
             }
 
           }
