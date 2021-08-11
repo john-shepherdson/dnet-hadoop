@@ -21,7 +21,7 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
 
-public class AuthorMergerTest {
+class AuthorMergerTest {
 
 	private String publicationsBasePath;
 
@@ -43,7 +43,7 @@ public class AuthorMergerTest {
 	}
 
 	@Test
-	public void mergeTest() { // used in the dedup: threshold set to 0.95
+	void mergeTest() { // used in the dedup: threshold set to 0.95
 
 		for (List<Author> authors1 : authors) {
 			System.out.println("List " + (authors.indexOf(authors1) + 1));

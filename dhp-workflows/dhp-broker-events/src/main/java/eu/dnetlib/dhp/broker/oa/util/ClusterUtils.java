@@ -24,6 +24,9 @@ public class ClusterUtils {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+	private ClusterUtils() {
+	}
+
 	public static void createDirIfMissing(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}

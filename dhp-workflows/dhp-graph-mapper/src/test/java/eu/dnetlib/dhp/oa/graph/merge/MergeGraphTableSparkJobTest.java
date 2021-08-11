@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 
-public class MergeGraphTableSparkJobTest {
+class MergeGraphTableSparkJobTest {
 
 	private ObjectMapper mapper;
 
@@ -25,7 +25,7 @@ public class MergeGraphTableSparkJobTest {
 	}
 
 	@Test
-	public void testMergeDatasources() throws IOException {
+	void testMergeDatasources() throws IOException {
 		assertEquals(
 			"openaire-cris_1.1",
 			MergeGraphTableSparkJob

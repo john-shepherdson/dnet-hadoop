@@ -10,10 +10,10 @@ import com.github.victools.jsonschema.generator.*;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 
 @Disabled
-public class GenerateJsonSchema {
+class GenerateJsonSchema {
 
 	@Test
-	public void generateSchema() {
+	void generateSchema() {
 		SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_7,
 			OptionPreset.PLAIN_JSON)
 				.with(Option.SCHEMA_VERSION_INDICATOR)

@@ -66,7 +66,7 @@ public class PrepareH2020ProgrammeTest {
 	}
 
 	@Test
-	public void numberDistinctProgrammeTest() throws Exception {
+	void numberDistinctProgrammeTest() throws Exception {
 		PrepareProgramme
 			.main(
 				new String[] {

@@ -13,6 +13,7 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
@@ -29,14 +30,16 @@ import eu.dnetlib.dhp.schema.orcid.Work;
 import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
+import scala.Tuple2;
 
 public class SparkUpdateOrcidWorks {
+
+	public static final Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidWorks.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 	public static void main(String[] args) throws Exception {
-		Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidWorks.class);
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -83,7 +86,6 @@ public class SparkUpdateOrcidWorks {
 					JsonElement jElement = new JsonParser().parse(jsonData);
 					String statusCode = getJsonValue(jElement, "statusCode");
 					work.setStatusCode(statusCode);
-					String downloadDate = getJsonValue(jElement, "lastModifiedDate");
 					work.setDownloadDate(Long.toString(System.currentTimeMillis()));
 					if (statusCode.equals("200")) {
 						String compressedData = getJsonValue(jElement, "compressedData");
@@ -112,9 +114,7 @@ public class SparkUpdateOrcidWorks {
 					.createDataset(
 						sc
 							.textFile(workingPath + "downloads/updated_works/*")
-							.map(s -> {
-								return s.substring(21, s.length() - 1);
-							})
+							.map(s -> s.substring(21, s.length() - 1))
 							.map(retrieveWorkFunction)
 							.rdd(),
 						Encoders.bean(Work.class));
@@ -136,7 +136,7 @@ public class SparkUpdateOrcidWorks {
 									.col("workDetail.oid")
 									.equalTo(downloadedWorksDS.col("workDetail.oid"))),
 						"full_outer")
-					.map(value -> {
+					.map((MapFunction<Tuple2<Work, Work>, Work>) value -> {
 						Optional<Work> opCurrent = Optional.ofNullable(value._1());
 						Optional<Work> opDownloaded = Optional.ofNullable(value._2());
 						if (!opCurrent.isPresent()) {
@@ -159,12 +159,12 @@ public class SparkUpdateOrcidWorks {
 					.map(work -> OBJECT_MAPPER.writeValueAsString(work))
 					.saveAsTextFile(workingPath.concat("orcid_dataset/new_works"), GzipCodec.class);
 
-				logger.info("oldWorksFoundAcc: " + oldWorksFoundAcc.value().toString());
-				logger.info("newWorksFoundAcc: " + newWorksFoundAcc.value().toString());
-				logger.info("updatedWorksFoundAcc: " + updatedWorksFoundAcc.value().toString());
-				logger.info("errorCodeWorksFoundAcc: " + errorCodeWorksFoundAcc.value().toString());
-				logger.info("errorLoadingJsonWorksFoundAcc: " + errorLoadingWorksJsonFoundAcc.value().toString());
-				logger.info("errorParsingXMLWorksFoundAcc: " + errorParsingWorksXMLFoundAcc.value().toString());
+				logger.info("oldWorksFoundAcc: {}", oldWorksFoundAcc.value());
+				logger.info("newWorksFoundAcc: {}", newWorksFoundAcc.value());
+				logger.info("updatedWorksFoundAcc: {}", updatedWorksFoundAcc.value());
+				logger.info("errorCodeWorksFoundAcc: {}", errorCodeWorksFoundAcc.value());
+				logger.info("errorLoadingJsonWorksFoundAcc: {}", errorLoadingWorksJsonFoundAcc.value());
+				logger.info("errorParsingXMLWorksFoundAcc: {}", errorParsingWorksXMLFoundAcc.value());
 
 				String lastModifiedDateFromLambdaFile = HDFSUtil
 					.readFromTextFile(hdfsServerUri, workingPath, "last_modified_date_from_lambda_file.txt");
@@ -175,8 +175,7 @@ public class SparkUpdateOrcidWorks {
 
 	private static String getJsonValue(JsonElement jElement, String property) {
 		if (jElement.getAsJsonObject().has(property)) {
-			JsonElement name = null;
-			name = jElement.getAsJsonObject().get(property);
+			JsonElement name = jElement.getAsJsonObject().get(property);
 			if (name != null && !name.isJsonNull()) {
 				return name.getAsString();
 			}

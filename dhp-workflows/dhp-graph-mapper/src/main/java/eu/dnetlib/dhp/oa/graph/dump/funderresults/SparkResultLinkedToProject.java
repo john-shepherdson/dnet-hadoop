@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -62,6 +61,7 @@ public class SparkResultLinkedToProject implements Serializable {
 		final String relationPath = parser.get("relationPath");
 		log.info("relationPath: {}", relationPath);
 
+		@SuppressWarnings("unchecked")
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
 		SparkConf conf = new SparkConf();
 
@@ -95,9 +95,9 @@ public class SparkResultLinkedToProject implements Serializable {
 					._2()
 					.getId(),
 				Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, Tuple2<Relation, R>, R>) (k, it) -> {
-				return it.next()._2();
-			}, Encoders.bean(inputClazz))
+			.mapGroups(
+				(MapGroupsFunction<String, Tuple2<Relation, R>, R>) (k, it) -> it.next()._2(),
+				Encoders.bean(inputClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

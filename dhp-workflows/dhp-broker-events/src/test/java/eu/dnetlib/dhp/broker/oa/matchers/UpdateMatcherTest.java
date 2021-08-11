@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
@@ -72,7 +73,7 @@ class UpdateMatcherTest {
 		final Collection<UpdateInfo<String>> list = matcher
 			.searchUpdatesForRecord(res, targetDs, Arrays.asList(p1, p2, p3, p4), null);
 
-		assertTrue(list.size() == 1);
+		assertEquals(1, list.size());
 	}
 
 	@Test
@@ -127,7 +128,7 @@ class UpdateMatcherTest {
 		final Collection<UpdateInfo<String>> list = matcher
 			.searchUpdatesForRecord(res, targetDs, Arrays.asList(p1, p2, p3, p4), null);
 
-		assertTrue(list.size() == 1);
+		assertEquals(1, list.size());
 	}
 
 }

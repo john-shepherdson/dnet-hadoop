@@ -284,7 +284,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						r
 							.getAuthor()
 							.stream()
-							.filter(a -> Objects.nonNull(a))
+							.filter(Objects::nonNull)
 							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
 							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
 							.collect(Collectors.toList()));

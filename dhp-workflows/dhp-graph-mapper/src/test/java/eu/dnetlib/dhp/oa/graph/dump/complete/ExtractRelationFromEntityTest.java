@@ -60,7 +60,7 @@ public class ExtractRelationFromEntityTest {
 	}
 
 	@Test
-	public void test1() {
+	void test1() {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/singelRecord_pub.json")

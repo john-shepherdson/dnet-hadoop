@@ -6,10 +6,6 @@ import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -23,9 +19,9 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -84,8 +80,9 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		log.info("table:         '{}'", dbTable);
 		log.info("dbPwd:         '{}'", "xxx");
 
-		final String entityPath = DedupUtility.createEntityPath(graphBasePath, "organization");
-		final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, "organization");
+		final String organizazion = ModelSupport.getMainType(EntityType.organization);
+		final String entityPath = DedupUtility.createEntityPath(graphBasePath, organizazion);
+		final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, organizazion);
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
 		Dataset<OrgSimRel> newOrgs = createNewOrgs(spark, mergeRelPath, relationPath, entityPath);
@@ -115,7 +112,7 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.textFile(relationPath)
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
-			.filter(r -> filterRels(r, "organization"))
+			.filter(r -> filterRels(r, ModelSupport.getMainType(EntityType.organization)))
 			// take the worst id of the diffrel: <other id, "diffRel">
 			.mapToPair(rel -> {
 				if (DedupUtility.compareOpenOrgIds(rel.getSource(), rel.getTarget()) > 0)

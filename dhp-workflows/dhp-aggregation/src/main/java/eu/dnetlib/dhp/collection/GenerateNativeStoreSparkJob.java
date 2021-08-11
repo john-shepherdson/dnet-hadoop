@@ -207,6 +207,7 @@ public class GenerateNativeStoreSparkJob {
 			totalItems.add(1);
 		try {
 			SAXReader reader = new SAXReader();
+			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			Document document = reader.read(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
 			Node node = document.selectSingleNode(xpath);
 			final String originalIdentifier = node.getText();

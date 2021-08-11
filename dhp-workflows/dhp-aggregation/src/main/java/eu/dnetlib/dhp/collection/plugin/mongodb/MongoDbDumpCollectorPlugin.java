@@ -23,7 +23,7 @@ public class MongoDbDumpCollectorPlugin implements CollectorPlugin {
 	public static final String PATH_PARAM = "path";
 	public static final String BODY_JSONPATH = "$.body";
 
-	public FileSystem fileSystem;
+	private final FileSystem fileSystem;
 
 	public MongoDbDumpCollectorPlugin(FileSystem fileSystem) {
 		this.fileSystem = fileSystem;

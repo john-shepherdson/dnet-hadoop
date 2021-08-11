@@ -25,7 +25,7 @@ public class MDStoreActionNode {
 		NEW_VERSION, ROLLBACK, COMMIT, READ_LOCK, READ_UNLOCK
 	}
 
-	public static String NEW_VERSION_URI = "%s/mdstore/%s/newVersion";
+	public static final String NEW_VERSION_URI = "%s/mdstore/%s/newVersion";
 
 	public static final String COMMIT_VERSION_URL = "%s/version/%s/commit/%s";
 	public static final String ROLLBACK_VERSION_URL = "%s/version/%s/abort";
@@ -70,7 +70,7 @@ public class MDStoreActionNode {
 				if (StringUtils.isBlank(hdfsuri)) {
 					throw new IllegalArgumentException("missing or empty argument namenode");
 				}
-				final String mdStoreVersion_params = argumentParser.get("mdStoreVersion");
+				final String mdStoreVersion_params = argumentParser.get(MDSTOREVERSIONPARAM);
 				final MDStoreVersion mdStoreVersion = MAPPER.readValue(mdStoreVersion_params, MDStoreVersion.class);
 
 				if (StringUtils.isBlank(mdStoreVersion.getId())) {
@@ -94,7 +94,7 @@ public class MDStoreActionNode {
 				break;
 			}
 			case ROLLBACK: {
-				final String mdStoreVersion_params = argumentParser.get("mdStoreVersion");
+				final String mdStoreVersion_params = argumentParser.get(MDSTOREVERSIONPARAM);
 				final MDStoreVersion mdStoreVersion = MAPPER.readValue(mdStoreVersion_params, MDStoreVersion.class);
 
 				if (StringUtils.isBlank(mdStoreVersion.getId())) {

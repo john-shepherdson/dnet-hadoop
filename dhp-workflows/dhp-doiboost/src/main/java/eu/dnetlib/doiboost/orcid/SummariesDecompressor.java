@@ -20,6 +20,9 @@ import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.mortbay.log.Log;
 
+import com.ximpleware.ParseException;
+
+import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcid.xml.XMLRecordParser;
 import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
@@ -28,22 +31,23 @@ public class SummariesDecompressor {
 
 	private static final int MAX_XML_RECORDS_PARSED = -1;
 
-	public static void parseGzSummaries(Configuration conf, String inputUri, Path outputPath)
-		throws Exception {
-		String uri = inputUri;
-		FileSystem fs = FileSystem.get(URI.create(uri), conf);
-		Path inputPath = new Path(uri);
+	private SummariesDecompressor() {
+	}
+
+	public static void parseGzSummaries(Configuration conf, String inputUri, Path outputPath) throws IOException {
+		FileSystem fs = FileSystem.get(URI.create(inputUri), conf);
+		Path inputPath = new Path(inputUri);
 		CompressionCodecFactory factory = new CompressionCodecFactory(conf);
 		CompressionCodec codec = factory.getCodec(inputPath);
 		if (codec == null) {
-			System.err.println("No codec found for " + uri);
+			System.err.println("No codec found for " + inputUri);
 			System.exit(1);
 		}
-		CompressionCodecFactory.removeSuffix(uri, codec.getDefaultExtension());
+		CompressionCodecFactory.removeSuffix(inputUri, codec.getDefaultExtension());
 		InputStream gzipInputStream = null;
 		try {
 			gzipInputStream = codec.createInputStream(fs.open(inputPath));
-			parseTarSummaries(fs, conf, gzipInputStream, outputPath);
+			parseTarSummaries(conf, gzipInputStream, outputPath);
 
 		} finally {
 			Log.debug("Closing gzip stream");
@@ -52,7 +56,7 @@ public class SummariesDecompressor {
 	}
 
 	private static void parseTarSummaries(
-		FileSystem fs, Configuration conf, InputStream gzipInputStream, Path outputPath) {
+		Configuration conf, InputStream gzipInputStream, Path outputPath) {
 		int counter = 0;
 		int nameFound = 0;
 		int surnameFound = 0;
@@ -163,7 +167,7 @@ public class SummariesDecompressor {
 	}
 
 	public static void extractXML(Configuration conf, String inputUri, Path outputPath)
-		throws Exception {
+		throws IOException, VtdException, ParseException {
 		String uri = inputUri;
 		FileSystem fs = FileSystem.get(URI.create(uri), conf);
 		Path inputPath = new Path(uri);

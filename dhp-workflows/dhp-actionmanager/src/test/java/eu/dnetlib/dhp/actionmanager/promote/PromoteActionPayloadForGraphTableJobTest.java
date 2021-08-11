@@ -77,7 +77,7 @@ public class PromoteActionPayloadForGraphTableJobTest {
 	class Main {
 
 		@Test
-		public void shouldThrowWhenGraphTableClassIsNotASubClassOfActionPayloadClass() {
+		void shouldThrowWhenGraphTableClassIsNotASubClassOfActionPayloadClass() {
 			// given
 			Class<Relation> rowClazz = Relation.class;
 			Class<OafEntity> actionPayloadClazz = OafEntity.class;
@@ -116,7 +116,7 @@ public class PromoteActionPayloadForGraphTableJobTest {
 
 		@ParameterizedTest(name = "strategy: {0}, graph table: {1}, action payload: {2}")
 		@MethodSource("eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJobTest#promoteJobTestParams")
-		public void shouldPromoteActionPayloadForGraphTable(
+		void shouldPromoteActionPayloadForGraphTable(
 			MergeAndGet.Strategy strategy,
 			Class<? extends Oaf> rowClazz,
 			Class<? extends Oaf> actionPayloadClazz)

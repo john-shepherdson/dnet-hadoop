@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
@@ -21,8 +19,8 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
  * context entity and datasource/projects related to the context.
  */
 public class Process implements Serializable {
-	private static final Logger log = LoggerFactory.getLogger(Process.class);
 
+	@SuppressWarnings("unchecked")
 	public static <R extends ResearchInitiative> R getEntity(ContextInfo ci) {
 		try {
 			ResearchInitiative ri;

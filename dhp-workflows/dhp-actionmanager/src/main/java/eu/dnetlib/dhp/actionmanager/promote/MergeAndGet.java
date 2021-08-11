@@ -62,6 +62,7 @@ public class MergeAndGet {
 					x.getClass().getCanonicalName(), y.getClass().getCanonicalName()));
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <G extends Oaf, A extends Oaf> G selectNewerAndGet(G x, A y) {
 		if (x.getClass().equals(y.getClass())
 			&& x.getLastupdatetimestamp() > y.getLastupdatetimestamp()) {

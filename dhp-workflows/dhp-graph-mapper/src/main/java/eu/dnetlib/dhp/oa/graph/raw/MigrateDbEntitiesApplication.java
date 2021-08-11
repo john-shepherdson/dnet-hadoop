@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -72,8 +69,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					MigrateDbEntitiesApplication.class
-						.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_db_entities_parameters.json")));
+					Objects
+						.requireNonNull(
+							MigrateDbEntitiesApplication.class
+								.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/migrate_db_entities_parameters.json"))));
 
 		parser.parseArgument(args);
 
@@ -87,7 +86,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		log.info("postgresPassword: xxx");
 
 		final String dbSchema = parser.get("dbschema");
-		log.info("dbSchema {}: " + dbSchema);
+		log.info("dbSchema {}: ", dbSchema);
 
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
@@ -658,18 +657,6 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			r1.setCollectedfrom(collectedFrom);
 			r1.setDataInfo(info);
 			r1.setLastupdatetimestamp(lastUpdateTimestamp);
-
-			// removed because there's no difference between two sides //TODO
-//			final Relation r2 = new Relation();
-//			r2.setRelType(ORG_ORG_RELTYPE);
-//			r2.setSubRelType(ORG_ORG_SUBRELTYPE);
-//			r2.setRelClass(relClass);
-//			r2.setSource(orgId2);
-//			r2.setTarget(orgId1);
-//			r2.setCollectedfrom(collectedFrom);
-//			r2.setDataInfo(info);
-//			r2.setLastupdatetimestamp(lastUpdateTimestamp);
-//			return Arrays.asList(r1, r2);
 
 			return Arrays.asList(r1);
 		} catch (final Exception e) {

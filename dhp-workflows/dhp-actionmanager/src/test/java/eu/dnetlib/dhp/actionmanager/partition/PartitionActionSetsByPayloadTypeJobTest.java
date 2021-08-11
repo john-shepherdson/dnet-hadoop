@@ -80,7 +80,7 @@ public class PartitionActionSetsByPayloadTypeJobTest {
 		private ISClient isClient;
 
 		@Test
-		public void shouldPartitionActionSetsByPayloadType(@TempDir Path workingDir) throws Exception {
+		void shouldPartitionActionSetsByPayloadType(@TempDir Path workingDir) throws Exception {
 			// given
 			Path inputActionSetsBaseDir = workingDir.resolve("input").resolve("action_sets");
 			Path outputDir = workingDir.resolve("output");

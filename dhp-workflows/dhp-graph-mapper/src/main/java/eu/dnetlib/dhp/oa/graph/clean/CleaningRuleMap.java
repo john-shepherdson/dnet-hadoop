@@ -13,7 +13,7 @@ import eu.dnetlib.dhp.schema.oaf.AccessRight;
 import eu.dnetlib.dhp.schema.oaf.Country;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
-public class CleaningRuleMap extends HashMap<Class, SerializableConsumer<Object>> implements Serializable {
+public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Object>> implements Serializable {
 
 	/**
 	 * Creates the mapping for the Oaf types subject to cleaning

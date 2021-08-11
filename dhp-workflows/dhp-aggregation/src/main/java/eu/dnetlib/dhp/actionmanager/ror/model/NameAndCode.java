@@ -7,13 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class NameAndCode implements Serializable {
 
+	private static final long serialVersionUID = 5459836979206140843L;
+
 	@JsonProperty("name")
 	private String name;
 
 	@JsonProperty("code")
 	private String code;
-
-	private final static long serialVersionUID = 5459836979206140843L;
 
 	public String getName() {
 		return name;

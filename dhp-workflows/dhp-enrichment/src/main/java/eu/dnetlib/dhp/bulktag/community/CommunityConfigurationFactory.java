@@ -13,6 +13,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -31,11 +32,16 @@ public class CommunityConfigurationFactory {
 
 	private static final VerbResolver resolver = VerbResolverFactory.newInstance();
 
-	public static CommunityConfiguration newInstance(final String xml) throws DocumentException {
+	private CommunityConfigurationFactory() {
+	}
+
+	public static CommunityConfiguration newInstance(final String xml) throws DocumentException, SAXException {
 
 		log.debug(String.format("parsing community configuration from:\n%s", xml));
 
-		final Document doc = new SAXReader().read(new StringReader(xml));
+		final SAXReader reader = new SAXReader();
+		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		final Document doc = reader.read(new StringReader(xml));
 
 		final Map<String, Community> communities = Maps.newHashMap();
 

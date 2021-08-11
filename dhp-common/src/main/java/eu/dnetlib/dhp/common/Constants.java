@@ -12,6 +12,9 @@ public class Constants {
 
 	public static String COAR_ACCESS_RIGHT_SCHEMA = "http://vocabularies.coar-repositories.org/documentation/access_rights/";
 
+	private Constants() {
+	}
+
 	static {
 		accessRightsCoarMap.put("OPEN", "c_abf2");
 		accessRightsCoarMap.put("RESTRICTED", "c_16ec");

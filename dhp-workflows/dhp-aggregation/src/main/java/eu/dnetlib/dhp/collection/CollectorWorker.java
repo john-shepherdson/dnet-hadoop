@@ -116,7 +116,7 @@ public class CollectorWorker extends ReportingJob {
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(api.getParams().get("other_plugin_type"))
 					.map(CollectorPlugin.NAME.OTHER_NAME::valueOf)
-					.get();
+					.orElseThrow(() -> new IllegalArgumentException("invalid other_plugin_type"));
 
 				switch (plugin) {
 					case mdstore_mongodb_dump:

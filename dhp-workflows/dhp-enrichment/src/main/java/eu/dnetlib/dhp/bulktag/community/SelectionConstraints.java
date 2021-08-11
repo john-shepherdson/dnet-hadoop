@@ -15,9 +15,6 @@ import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 public class SelectionConstraints implements Serializable {
 	private List<Constraints> criteria;
 
-	public SelectionConstraints() {
-	}
-
 	public List<Constraints> getCriteria() {
 		return criteria;
 	}

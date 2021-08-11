@@ -60,7 +60,7 @@ public class SparkUpdateProjectInfo implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				extend(spark, inputPath, outputPath, preparedInfoPath);// , inputClazz);
+				extend(spark, inputPath, outputPath, preparedInfoPath);
 			});
 	}
 
@@ -77,9 +77,7 @@ public class SparkUpdateProjectInfo implements Serializable {
 				"left")
 			.map((MapFunction<Tuple2<CommunityResult, ResultProject>, CommunityResult>) value -> {
 				CommunityResult r = value._1();
-				Optional.ofNullable(value._2()).ifPresent(rp -> {
-					r.setProjects(rp.getProjectsList());
-				});
+				Optional.ofNullable(value._2()).ifPresent(rp -> r.setProjects(rp.getProjectsList()));
 				return r;
 			}, Encoders.bean(CommunityResult.class))
 			.write()

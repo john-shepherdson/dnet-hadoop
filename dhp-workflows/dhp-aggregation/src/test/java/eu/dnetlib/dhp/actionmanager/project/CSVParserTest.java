@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.actionmanager.project.utils.CSVParser;
 
-public class CSVParserTest {
+class CSVParserTest {
 
 	@Test
-	public void readProgrammeTest() throws Exception {
+	void readProgrammeTest() throws Exception {
 
 		String programmecsv = IOUtils
 			.toString(

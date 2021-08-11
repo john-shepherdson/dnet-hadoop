@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-public class ReflectionTest {
+class ReflectionTest {
 
 	private final Cleaner cleaner = new Cleaner();
 
