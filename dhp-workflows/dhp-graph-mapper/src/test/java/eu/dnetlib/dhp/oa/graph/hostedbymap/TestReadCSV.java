@@ -33,10 +33,15 @@ public class TestReadCSV {
 
 		Assertions.assertEquals(36, beans.size());
 		Assertions.assertEquals(1, beans.stream().filter(e -> e.getIssn().equals("0001-625X")).count());
-		Assertions.assertTrue(beans.stream().anyMatch(e -> e.getIssn().equals("0001-625X") && e.getTitle().equals("Acta Mycologica")));
+		Assertions
+			.assertTrue(
+				beans
+					.stream()
+					.anyMatch(e -> e.getIssn().equals("0001-625X") && e.getTitle().equals("Acta Mycologica")));
 		Assertions.assertTrue(beans.stream().allMatch(e -> e.getIssn().equals(e.getIssn_l())));
 
 	}
+
 	@Disabled
 	@Test
 	public void testCSVUrlUnibi() throws IOException {
