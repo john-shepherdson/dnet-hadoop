@@ -3,7 +3,7 @@ package eu.dnetlib.doiboost
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.oa.merge.AuthorMerger
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.{Organization, Publication, Relation, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{Author, Organization, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.doiboost.mag.ConversionUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
@@ -25,6 +25,7 @@ object SparkGenerateDoiBoost {
     val conf: SparkConf = new SparkConf()
     val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/generate_doiboost_params.json")))
     parser.parseArgument(args)
+    var crossref : Boolean = true
     val spark: SparkSession =
       SparkSession
         .builder()
@@ -52,8 +53,8 @@ object SparkGenerateDoiBoost {
           if (a != null && a._2 != null) {
             b.mergeFrom(a._2)
             b.setId(a._1)
-            val authors =AuthorMerger.mergeAuthor(b.getAuthor, a._2.getAuthor)
-            b.setAuthor(authors)
+            val authors =DoiBoostAuthorMerger.mergeAuthor(b.getAuthor, a._2.getAuthor, true)
+            b.setAuthor(authors._1)
             return b
           }
         }
@@ -68,8 +69,8 @@ object SparkGenerateDoiBoost {
         else {
           if (b2 != null ) {
             b1.mergeFrom(b2)
-            val authors =AuthorMerger.mergeAuthor(b1.getAuthor, b2.getAuthor)
-            b1.setAuthor(authors)
+            val authors = DoiBoostAuthorMerger.mergeAuthor(b1.getAuthor, b2.getAuthor, true)
+            b1.setAuthor(authors._1)
             if (b2.getId!= null && b2.getId.nonEmpty)
               b1.setId(b2.getId)
             return b1
@@ -104,7 +105,10 @@ object SparkGenerateDoiBoost {
         val otherPub = item._2._2
         if (otherPub != null) {
           crossrefPub.mergeFrom(otherPub)
-          crossrefPub.setAuthor(AuthorMerger.mergeAuthor(crossrefPub.getAuthor, otherPub.getAuthor))
+          val mergeRes : (java.util.List[Author], java.lang.Boolean) = DoiBoostAuthorMerger.mergeAuthor(crossrefPub.getAuthor, otherPub.getAuthor, crossref)
+          crossrefPub.setAuthor(mergeRes._1)
+          crossref = mergeRes._2
+
         }
       }
       crossrefPub
