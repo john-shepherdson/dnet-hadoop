@@ -14,9 +14,6 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 
-//a. publication join risultato del passo precedente su result id (left) setto la istanza (se piu' di una instance
-// nel result => salto)con l'hosted by anche access right della instance se openaccess e' true
-
 
 object SparkApplyHostedByMapToResult {
 
@@ -76,8 +73,6 @@ object SparkApplyHostedByMapToResult {
     val pinfo : Dataset[EntityInfo] = spark.read.textFile(preparedInfoPath)
         .map(ei => mapper.readValue(ei, classOf[EntityInfo]))
 
-    //a. publication join risultato del passo precedente su result id (left) setto la istanza (se piu' di una instance
-    // nel result => salto)con l'hosted by anche access right della instance se openaccess e' true
     applyHBtoPubs(pinfo, pubs).write.mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath)
 
 

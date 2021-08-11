@@ -61,8 +61,6 @@ object SparkApplyHostedByMapToDatasource {
     val pinfo : Dataset[EntityInfo] = Aggregators.datasourceToSingleId( spark.read.textFile(preparedInfoPath)
       .map(ei => mapper.readValue(ei, classOf[EntityInfo])))
 
-    //c. dataset join risultato del passo prima di a per datasource id, gruppo per ds id e cambio compatibilita' se necessario
-
     applyHBtoDats(pinfo, dats).write.mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath)
   }
 
