@@ -67,10 +67,10 @@ public class TransformSparkJobNode {
 		log.info("outputBasePath: {}", outputBasePath);
 
 		final String isLookupUrl = parser.get("isLookupUrl");
-		log.info(String.format("isLookupUrl: %s", isLookupUrl));
+		log.info("isLookupUrl: {}", isLookupUrl);
 
 		final String dateOfTransformation = parser.get("dateOfTransformation");
-		log.info(String.format("dateOfTransformation: %s", dateOfTransformation));
+		log.info("dateOfTransformation: {}", dateOfTransformation);
 
 		final Integer rpt = Optional
 			.ofNullable(parser.get("recordsPerTask"))
@@ -129,9 +129,9 @@ public class TransformSparkJobNode {
 					.map((Function<MetadataRecord, MetadataRecord>) x::call);
 				saveDataset(spark.createDataset(mdstore.rdd(), encoder), outputBasePath + MDSTORE_DATA_PATH);
 
-				log.info("Transformed item " + ct.getProcessedItems().count());
-				log.info("Total item " + ct.getTotalItems().count());
-				log.info("Transformation Error item " + ct.getErrorItems().count());
+				log.info("Transformed item {}", ct.getProcessedItems().count());
+				log.info("Total item {}", ct.getTotalItems().count());
+				log.info("Transformation Error item {}", ct.getErrorItems().count());
 
 				final long mdStoreSize = spark.read().load(outputBasePath + MDSTORE_DATA_PATH).count();
 				writeHdfsFile(

@@ -51,10 +51,10 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 
 	public void execute(final String format, final String layout, final String interpretation) {
 		final Map<String, String> colls = mdstoreClient.validCollections(format, layout, interpretation);
-		log.info("Found " + colls.size() + " mdstores");
+		log.info("Found {} mdstores", colls.size());
 
 		for (final Entry<String, String> entry : colls.entrySet()) {
-			log.info("Processing mdstore " + entry.getKey() + " (collection: " + entry.getValue() + ")");
+			log.info("Processing mdstore {} (collection: {})", entry.getKey(), entry.getValue());
 			final String currentColl = entry.getValue();
 
 			for (final String xml : mdstoreClient.listRecords(currentColl)) {

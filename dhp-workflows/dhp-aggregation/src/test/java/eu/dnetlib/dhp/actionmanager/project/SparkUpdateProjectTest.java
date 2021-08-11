@@ -69,7 +69,7 @@ public class SparkUpdateProjectTest {
 	}
 
 	@Test
-	public void numberDistinctProgrammeTest() throws Exception {
+	void numberDistinctProgrammeTest() throws Exception {
 		SparkAtomicActionJob
 			.main(
 				new String[] {

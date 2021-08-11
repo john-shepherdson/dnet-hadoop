@@ -62,7 +62,7 @@ public class BlackListTest {
 	}
 
 	@Test
-	public void noRemoveTest() throws Exception {
+	void noRemoveTest() throws Exception {
 		SparkRemoveBlacklistedRelationJob
 			.main(
 				new String[] {
@@ -89,7 +89,7 @@ public class BlackListTest {
 	}
 
 	@Test
-	public void removeNoMergeMatchTest() throws Exception {
+	void removeNoMergeMatchTest() throws Exception {
 		SparkRemoveBlacklistedRelationJob
 			.main(
 				new String[] {
@@ -128,7 +128,7 @@ public class BlackListTest {
 	}
 
 	@Test
-	public void removeMergeMatchTest() throws Exception {
+	void removeMergeMatchTest() throws Exception {
 		SparkRemoveBlacklistedRelationJob
 			.main(
 				new String[] {

@@ -22,7 +22,6 @@ import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -40,7 +39,7 @@ public class XmlConverterJob {
 
 	private static final Logger log = LoggerFactory.getLogger(XmlConverterJob.class);
 
-	public static final String schemaLocation = "https://www.openaire.eu/schema/1.0/oaf-1.0.xsd";
+	public static final String SCHEMA_LOCATION = "https://www.openaire.eu/schema/1.0/oaf-1.0.xsd";
 
 	public static void main(String[] args) throws Exception {
 
@@ -95,7 +94,7 @@ public class XmlConverterJob {
 			prepareAccumulators(spark.sparkContext()),
 			contextMapper,
 			false,
-			schemaLocation,
+			SCHEMA_LOCATION,
 			otherDsTypeId);
 
 		final List<String> paths = HdfsSupport
@@ -186,7 +185,7 @@ public class XmlConverterJob {
 		accumulators
 			.put(
 				"organizationOrganization_dedup_merges",
-				sc.longAccumulator("resultProject_outcome_produces"));
+				sc.longAccumulator("organizationOrganization_dedup_merges"));
 		accumulators
 			.put(
 				"datasourceOrganization_provision_isProvidedBy",

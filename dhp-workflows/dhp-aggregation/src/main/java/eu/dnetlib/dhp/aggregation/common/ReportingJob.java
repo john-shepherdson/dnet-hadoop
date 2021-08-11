@@ -22,7 +22,7 @@ public abstract class ReportingJob {
 
 	protected final AggregatorReport report;
 
-	public ReportingJob(AggregatorReport report) {
+	protected ReportingJob(AggregatorReport report) {
 		this.report = report;
 	}
 

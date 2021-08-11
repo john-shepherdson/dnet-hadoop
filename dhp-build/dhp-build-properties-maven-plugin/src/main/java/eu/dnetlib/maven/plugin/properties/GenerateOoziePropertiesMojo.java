@@ -8,8 +8,6 @@ import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * Generates oozie properties which were not provided from commandline.
@@ -27,7 +25,7 @@ public class GenerateOoziePropertiesMojo extends AbstractMojo {
 	};
 
 	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
+	public void execute() {
 		if (System.getProperties().containsKey(PROPERTY_NAME_WF_SOURCE_DIR)
 			&& !System.getProperties().containsKey(PROPERTY_NAME_SANDBOX_NAME)) {
 			String generatedSandboxName = generateSandboxName(
@@ -46,24 +44,24 @@ public class GenerateOoziePropertiesMojo extends AbstractMojo {
 	/**
 	 * Generates sandbox name from workflow source directory.
 	 *
-	 * @param wfSourceDir
+	 * @param wfSourceDir workflow source directory
 	 * @return generated sandbox name
 	 */
 	private String generateSandboxName(String wfSourceDir) {
 		// utilize all dir names until finding one of the limiters
-		List<String> sandboxNameParts = new ArrayList<String>();
+		List<String> sandboxNameParts = new ArrayList<>();
 		String[] tokens = StringUtils.split(wfSourceDir, File.separatorChar);
 		ArrayUtils.reverse(tokens);
 		if (tokens.length > 0) {
 			for (String token : tokens) {
 				for (String limiter : limiters) {
 					if (limiter.equals(token)) {
-						return sandboxNameParts.size() > 0
+						return !sandboxNameParts.isEmpty()
 							? StringUtils.join(sandboxNameParts.toArray())
 							: null;
 					}
 				}
-				if (sandboxNameParts.size() > 0) {
+				if (!sandboxNameParts.isEmpty()) {
 					sandboxNameParts.add(0, File.separator);
 				}
 				sandboxNameParts.add(0, token);

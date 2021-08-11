@@ -1,6 +1,7 @@
 
 package eu.dnetlib.doiboost.crossref;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,8 +12,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -57,8 +56,8 @@ public class ESClient implements Iterator<String> {
 			try (CloseableHttpResponse response = client.execute(httpPost)) {
 				return IOUtils.toString(response.getEntity().getContent());
 			}
-		} catch (Throwable e) {
-			throw new RuntimeException("Error on executing request ", e);
+		} catch (IOException e) {
+			throw new IllegalStateException("Error on executing request ", e);
 		}
 	}
 

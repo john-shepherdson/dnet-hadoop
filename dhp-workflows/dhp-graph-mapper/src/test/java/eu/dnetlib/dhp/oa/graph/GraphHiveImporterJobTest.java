@@ -68,7 +68,7 @@ public class GraphHiveImporterJobTest {
 	}
 
 	@Test
-	public void testImportGraphAsHiveDB() throws Exception {
+	void testImportGraphAsHiveDB() throws Exception {
 
 		GraphHiveImporterJob
 			.main(

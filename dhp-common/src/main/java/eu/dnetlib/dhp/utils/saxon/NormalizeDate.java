@@ -30,7 +30,7 @@ public class NormalizeDate extends AbstractExtensionFunction {
 
 	@Override
 	public Sequence doCall(XPathContext context, Sequence[] arguments) throws XPathException {
-		if (arguments == null | arguments.length == 0) {
+		if (arguments == null || arguments.length == 0) {
 			return new StringValue(BLANK);
 		}
 		String s = arguments[0].head().getStringValue();

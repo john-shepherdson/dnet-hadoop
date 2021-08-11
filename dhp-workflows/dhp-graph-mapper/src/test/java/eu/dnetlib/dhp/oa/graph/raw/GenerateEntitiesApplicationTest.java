@@ -24,7 +24,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
-public class GenerateEntitiesApplicationTest {
+class GenerateEntitiesApplicationTest {
 
 	@Mock
 	private ISLookUpService isLookUpService;
@@ -44,7 +44,7 @@ public class GenerateEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testMergeResult() throws IOException {
+	void testMergeResult() throws IOException {
 		Result publication = getResult("oaf_record.xml", Publication.class);
 		Result dataset = getResult("odf_dataset.xml", Dataset.class);
 		Result software = getResult("odf_software.xml", Software.class);

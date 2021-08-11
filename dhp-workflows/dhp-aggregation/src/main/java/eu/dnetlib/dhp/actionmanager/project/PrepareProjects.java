@@ -29,7 +29,7 @@ import scala.Tuple2;
  */
 public class PrepareProjects {
 
-	private static final Logger log = LoggerFactory.getLogger(PrepareProgramme.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareProjects.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {

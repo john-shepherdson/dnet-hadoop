@@ -3,8 +3,6 @@ package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -13,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -61,7 +58,7 @@ public class SparkDownloadOrcidWorks {
 			.orElse(Boolean.TRUE);
 		logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 		final String workingPath = parser.get("workingPath");
-		logger.info("workingPath: ", workingPath);
+		logger.info("workingPath: {}", workingPath);
 		final String outputPath = parser.get("outputPath");
 		final String token = parser.get("token");
 		final String hdfsServerUri = parser.get("hdfsServerUri");
@@ -169,20 +166,25 @@ public class SparkDownloadOrcidWorks {
 						switch (statusCode) {
 							case 403:
 								errorHTTP403Acc.add(1);
+								break;
 							case 404:
 								errorHTTP404Acc.add(1);
+								break;
 							case 409:
 								errorHTTP409Acc.add(1);
+								break;
 							case 503:
 								errorHTTP503Acc.add(1);
+								break;
 							case 525:
 								errorHTTP525Acc.add(1);
+								break;
 							default:
 								errorHTTPGenericAcc.add(1);
 								logger
 									.info(
-										"Downloading " + orcidId + " status code: "
-											+ response.getStatusLine().getStatusCode());
+										"Downloading {} status code: {}", orcidId,
+										response.getStatusLine().getStatusCode());
 						}
 						return downloaded.toTuple2();
 					}
@@ -199,24 +201,24 @@ public class SparkDownloadOrcidWorks {
 					.flatMap(retrieveWorkUrlFunction)
 					.repartition(100)
 					.map(downloadWorkFunction)
-					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
+					.mapToPair(t -> new Tuple2<>(new Text(t._1()), new Text(t._2())))
 					.saveAsTextFile(workingPath.concat(outputPath), GzipCodec.class);
 
-				logger.info("updatedAuthorsAcc: " + updatedAuthorsAcc.value().toString());
-				logger.info("parsedAuthorsAcc: " + parsedAuthorsAcc.value().toString());
-				logger.info("parsedWorksAcc: " + parsedWorksAcc.value().toString());
-				logger.info("modifiedWorksAcc: " + modifiedWorksAcc.value().toString());
-				logger.info("maxModifiedWorksLimitAcc: " + maxModifiedWorksLimitAcc.value().toString());
-				logger.info("errorCodeFoundAcc: " + errorCodeFoundAcc.value().toString());
-				logger.info("errorLoadingJsonFoundAcc: " + errorLoadingJsonFoundAcc.value().toString());
-				logger.info("errorLoadingXMLFoundAcc: " + errorLoadingXMLFoundAcc.value().toString());
-				logger.info("errorParsingXMLFoundAcc: " + errorParsingXMLFoundAcc.value().toString());
-				logger.info("downloadedRecordsAcc: " + downloadedRecordsAcc.value().toString());
-				logger.info("errorHTTP403Acc: " + errorHTTP403Acc.value().toString());
-				logger.info("errorHTTP409Acc: " + errorHTTP409Acc.value().toString());
-				logger.info("errorHTTP503Acc: " + errorHTTP503Acc.value().toString());
-				logger.info("errorHTTP525Acc: " + errorHTTP525Acc.value().toString());
-				logger.info("errorHTTPGenericAcc: " + errorHTTPGenericAcc.value().toString());
+				logger.info("updatedAuthorsAcc: {}", updatedAuthorsAcc.value());
+				logger.info("parsedAuthorsAcc: {}", parsedAuthorsAcc.value());
+				logger.info("parsedWorksAcc: {}", parsedWorksAcc.value());
+				logger.info("modifiedWorksAcc: {}", modifiedWorksAcc.value());
+				logger.info("maxModifiedWorksLimitAcc: {}", maxModifiedWorksLimitAcc.value());
+				logger.info("errorCodeFoundAcc: {}", errorCodeFoundAcc.value());
+				logger.info("errorLoadingJsonFoundAcc: {}", errorLoadingJsonFoundAcc.value());
+				logger.info("errorLoadingXMLFoundAcc: {}", errorLoadingXMLFoundAcc.value());
+				logger.info("errorParsingXMLFoundAcc: {}", errorParsingXMLFoundAcc.value());
+				logger.info("downloadedRecordsAcc: {}", downloadedRecordsAcc.value());
+				logger.info("errorHTTP403Acc: {}", errorHTTP403Acc.value());
+				logger.info("errorHTTP409Acc: {}", errorHTTP409Acc.value());
+				logger.info("errorHTTP503Acc: {}", errorHTTP503Acc.value());
+				logger.info("errorHTTP525Acc: {}", errorHTTP525Acc.value());
+				logger.info("errorHTTPGenericAcc: {}", errorHTTPGenericAcc.value());
 			});
 
 	}

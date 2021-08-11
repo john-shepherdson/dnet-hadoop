@@ -33,11 +33,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.broker.model.ConditionParams;
-import eu.dnetlib.dhp.broker.model.Event;
-import eu.dnetlib.dhp.broker.model.MappedFields;
-import eu.dnetlib.dhp.broker.model.Notification;
-import eu.dnetlib.dhp.broker.model.Subscription;
+import eu.dnetlib.dhp.broker.model.*;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.NotificationGroup;
 import eu.dnetlib.dhp.broker.oa.util.SubscriptionUtils;
@@ -89,9 +85,9 @@ public class IndexNotificationsJob {
 
 		final List<Subscription> subscriptions = listSubscriptions(brokerApiBaseUrl);
 
-		log.info("Number of subscriptions: " + subscriptions.size());
+		log.info("Number of subscriptions: {}", subscriptions.size());
 
-		if (subscriptions.size() > 0) {
+		if (!subscriptions.isEmpty()) {
 			final Encoder<NotificationGroup> ngEncoder = Encoders.bean(NotificationGroup.class);
 			final Encoder<Notification> nEncoder = Encoders.bean(Notification.class);
 			final Dataset<Notification> notifications = ClusterUtils
@@ -106,7 +102,6 @@ public class IndexNotificationsJob {
 				.javaRDD();
 
 			final Map<String, String> esCfg = new HashMap<>();
-			// esCfg.put("es.nodes", "10.19.65.51, 10.19.65.52, 10.19.65.53, 10.19.65.54");
 
 			esCfg.put("es.index.auto.create", "false");
 			esCfg.put("es.nodes", indexHost);
@@ -122,7 +117,7 @@ public class IndexNotificationsJob {
 
 			log.info("*** Deleting old notifications");
 			final String message = deleteOldNotifications(brokerApiBaseUrl, startTime - 1000);
-			log.info("*** Deleted notifications: " + message);
+			log.info("*** Deleted notifications: {}", message);
 
 			log.info("*** sendNotifications (emails, ...)");
 			sendNotifications(brokerApiBaseUrl, startTime - 1000);
@@ -174,28 +169,28 @@ public class IndexNotificationsJob {
 			return false;
 		}
 
-		if (conditions.containsKey("targetDateofacceptance") && !conditions
+		if (conditions.containsKey("targetDateofacceptance") && conditions
 			.get("targetDateofacceptance")
 			.stream()
-			.anyMatch(
+			.noneMatch(
 				c -> SubscriptionUtils
 					.verifyDateRange(map.getTargetDateofacceptance(), c.getValue(), c.getOtherValue()))) {
 			return false;
 		}
 
 		if (conditions.containsKey("targetResultTitle")
-			&& !conditions
+			&& conditions
 				.get("targetResultTitle")
 				.stream()
-				.anyMatch(c -> SubscriptionUtils.verifySimilar(map.getTargetResultTitle(), c.getValue()))) {
+				.noneMatch(c -> SubscriptionUtils.verifySimilar(map.getTargetResultTitle(), c.getValue()))) {
 			return false;
 		}
 
 		if (conditions.containsKey("targetAuthors")
-			&& !conditions
+			&& conditions
 				.get("targetAuthors")
 				.stream()
-				.allMatch(c -> SubscriptionUtils.verifyListSimilar(map.getTargetAuthors(), c.getValue()))) {
+				.noneMatch(c -> SubscriptionUtils.verifyListSimilar(map.getTargetAuthors(), c.getValue()))) {
 			return false;
 		}
 
@@ -207,7 +202,7 @@ public class IndexNotificationsJob {
 
 	}
 
-	private static List<Subscription> listSubscriptions(final String brokerApiBaseUrl) throws Exception {
+	private static List<Subscription> listSubscriptions(final String brokerApiBaseUrl) throws IOException {
 		final String url = brokerApiBaseUrl + "/api/subscriptions";
 		final HttpGet req = new HttpGet(url);
 
@@ -222,7 +217,7 @@ public class IndexNotificationsJob {
 		}
 	}
 
-	private static String deleteOldNotifications(final String brokerApiBaseUrl, final long l) throws Exception {
+	private static String deleteOldNotifications(final String brokerApiBaseUrl, final long l) throws IOException {
 		final String url = brokerApiBaseUrl + "/api/notifications/byDate/0/" + l;
 		final HttpDelete req = new HttpDelete(url);
 

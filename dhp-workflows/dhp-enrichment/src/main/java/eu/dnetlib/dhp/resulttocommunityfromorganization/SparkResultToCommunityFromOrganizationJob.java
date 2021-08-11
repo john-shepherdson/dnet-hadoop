@@ -4,7 +4,10 @@ package eu.dnetlib.dhp.resulttocommunityfromorganization;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -17,10 +20,9 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Context;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
 
 public class SparkResultToCommunityFromOrganizationJob {
@@ -59,6 +61,7 @@ public class SparkResultToCommunityFromOrganizationJob {
 			.orElse(Boolean.TRUE);
 		log.info("saveGraph: {}", saveGraph);
 
+		@SuppressWarnings("unchecked")
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
@@ -106,9 +109,12 @@ public class SparkResultToCommunityFromOrganizationJob {
 				List<String> contextList = ret
 					.getContext()
 					.stream()
-					.map(con -> con.getId())
+					.map(Context::getId)
 					.collect(Collectors.toList());
+
+				@SuppressWarnings("unchecked")
 				R res = (R) ret.getClass().newInstance();
+
 				res.setId(ret.getId());
 				List<Context> propagatedContexts = new ArrayList<>();
 				for (String cId : communitySet) {

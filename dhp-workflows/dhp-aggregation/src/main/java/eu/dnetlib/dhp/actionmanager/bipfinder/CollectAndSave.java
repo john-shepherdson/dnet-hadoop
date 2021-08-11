@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.actionmanager.bipfinder;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -28,15 +29,16 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 public class CollectAndSave implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectAndSave.class);
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static <I extends Result> void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				CollectAndSave.class
-					.getResourceAsStream(
-						"/eu/dnetlib/dhp/actionmanager/bipfinder/input_actionset_parameter.json"));
+				Objects
+					.requireNonNull(
+						CollectAndSave.class
+							.getResourceAsStream(
+								"/eu/dnetlib/dhp/actionmanager/bipfinder/input_actionset_parameter.json")));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 

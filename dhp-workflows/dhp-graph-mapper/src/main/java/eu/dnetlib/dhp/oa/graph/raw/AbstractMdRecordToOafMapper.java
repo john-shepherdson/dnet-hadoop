@@ -32,8 +32,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -88,8 +86,6 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected static final Map<String, String> nsContext = new HashMap<>();
 
-	private static final Logger log = LoggerFactory.getLogger(DispatchEntitiesApplication.class);
-
 	static {
 		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
 		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
@@ -117,9 +113,6 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	public List<Oaf> processMdRecord(final String xml) {
-
-		// log.info("Processing record: " + xml);
-
 		try {
 			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
@@ -134,7 +127,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
 
 			if (collectedFrom == null) {
-				return null;
+				return Lists.newArrayList();
 			}
 
 			final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
@@ -142,7 +135,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				: getProvenanceDatasource(doc, "//oaf:hostedBy/@id", "//oaf:hostedBy/@name");
 
 			if (hostedBy == null) {
-				return null;
+				return Lists.newArrayList();
 			}
 
 			final DataInfo info = prepareDataInfo(doc, invisible);
@@ -161,21 +154,17 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected String getResultType(final Document doc, final List<Instance> instances) {
 		final String type = doc.valueOf("//dr:CobjCategory/@type");
 
-		if (StringUtils.isBlank(type) & vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
+		if (StringUtils.isBlank(type) && vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
 			final String instanceType = instances
 				.stream()
 				.map(i -> i.getInstancetype().getClassid())
 				.findFirst()
-				.map(s -> UNKNOWN.equalsIgnoreCase(s) ? "0000" : s)
+				.filter(s -> !UNKNOWN.equalsIgnoreCase(s))
 				.orElse("0000"); // Unknown
 			return Optional
 				.ofNullable(vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType))
-				.map(q -> q.getClassid())
+				.map(Qualifier::getClassid)
 				.orElse("0000");
-			/*
-			 * .orElseThrow( () -> new IllegalArgumentException( String.format("'%s' not mapped in %s", instanceType,
-			 * DNET_RESULT_TYPOLOGIES)));
-			 */
 		}
 
 		return type;
@@ -185,7 +174,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		final String dsId = doc.valueOf(xpathId);
 		final String dsName = doc.valueOf(xpathName);
 
-		if (StringUtils.isBlank(dsId) | StringUtils.isBlank(dsName)) {
+		if (StringUtils.isBlank(dsId) || StringUtils.isBlank(dsName)) {
 			return null;
 		}
 
@@ -498,7 +487,6 @@ public abstract class AbstractMdRecordToOafMapper {
 		accessRight.setSchemename(qualifier.getSchemename());
 
 		// TODO set the OAStatus
-		// accessRight.setOaStatus(...);
 
 		return accessRight;
 	}

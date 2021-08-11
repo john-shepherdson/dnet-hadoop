@@ -33,7 +33,7 @@ import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 @ExtendWith(MockitoExtension.class)
-public class TransformationJobTest extends AbstractVocabularyTest {
+class TransformationJobTest extends AbstractVocabularyTest {
 
 	private SparkConf sparkConf;
 
@@ -49,7 +49,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test Date cleaner")
-	public void testDateCleaner() throws Exception {
+	void testDateCleaner() throws Exception {
 		DateCleaner dc = new DateCleaner();
 		assertEquals("1982-09-20", dc.clean("20/09/1982"));
 		assertEquals("2002-09-20", dc.clean("20-09-2002"));
@@ -60,7 +60,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test Transform Single XML using zenodo_tr XSLTTransformator")
-	public void testTransformSaxonHE() throws Exception {
+	void testTransformSaxonHE() throws Exception {
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
@@ -79,7 +79,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test Transform Inst.&Them.v4 record XML with zenodo_tr")
-	public void testTransformITGv4Zenodo() throws Exception {
+	void testTransformITGv4Zenodo() throws Exception {
 
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
@@ -97,7 +97,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test Transform record XML with xslt_cleaning_datarepo_datacite/oaiOpenAIRE")
-	public void testTransformMostlyUsedScript() throws Exception {
+	void testTransformMostlyUsedScript() throws Exception {
 
 		String xslTransformationScript = "";
 		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_datarepo_datacite.xsl";
@@ -119,7 +119,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test Transform record XML with xslt_cleaning_REST_OmicsDI")
-	public void testTransformRestScript() throws Exception {
+	void testTransformRestScript() throws Exception {
 
 		String xslTransformationScript = "";
 		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_REST_OmicsDI.xsl";
@@ -140,7 +140,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test TransformSparkJobNode.main with oaiOpenaire_datacite (v4)")
-	public void transformTestITGv4OAIdatacite(@TempDir Path testDir) throws Exception {
+	void transformTestITGv4OAIdatacite(@TempDir Path testDir) throws Exception {
 
 		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
 
@@ -203,7 +203,7 @@ public class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test TransformSparkJobNode.main")
-	public void transformTest(@TempDir Path testDir) throws Exception {
+	void transformTest(@TempDir Path testDir) throws Exception {
 
 		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
 

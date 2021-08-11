@@ -9,18 +9,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /** @author mhorst, claudio.atzori */
-public class GenerateOoziePropertiesMojoTest {
+class GenerateOoziePropertiesMojoTest {
 
 	private final GenerateOoziePropertiesMojo mojo = new GenerateOoziePropertiesMojo();
 
 	@BeforeEach
-	public void clearSystemProperties() {
+	void clearSystemProperties() {
 		System.clearProperty(PROPERTY_NAME_SANDBOX_NAME);
 		System.clearProperty(PROPERTY_NAME_WF_SOURCE_DIR);
 	}
 
 	@Test
-	public void testExecuteEmpty() throws Exception {
+	void testExecuteEmpty() throws Exception {
 		// execute
 		mojo.execute();
 
@@ -29,7 +29,7 @@ public class GenerateOoziePropertiesMojoTest {
 	}
 
 	@Test
-	public void testExecuteSandboxNameAlreadySet() throws Exception {
+	void testExecuteSandboxNameAlreadySet() throws Exception {
 		// given
 		String workflowSourceDir = "eu/dnetlib/dhp/wf/transformers";
 		String sandboxName = "originalSandboxName";
@@ -44,7 +44,7 @@ public class GenerateOoziePropertiesMojoTest {
 	}
 
 	@Test
-	public void testExecuteEmptyWorkflowSourceDir() throws Exception {
+	void testExecuteEmptyWorkflowSourceDir() throws Exception {
 		// given
 		String workflowSourceDir = "";
 		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
@@ -57,7 +57,7 @@ public class GenerateOoziePropertiesMojoTest {
 	}
 
 	@Test
-	public void testExecuteNullSandboxNameGenerated() throws Exception {
+	void testExecuteNullSandboxNameGenerated() throws Exception {
 		// given
 		String workflowSourceDir = "eu/dnetlib/dhp/";
 		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
@@ -70,7 +70,7 @@ public class GenerateOoziePropertiesMojoTest {
 	}
 
 	@Test
-	public void testExecute() throws Exception {
+	void testExecute() throws Exception {
 		// given
 		String workflowSourceDir = "eu/dnetlib/dhp/wf/transformers";
 		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);
@@ -83,7 +83,7 @@ public class GenerateOoziePropertiesMojoTest {
 	}
 
 	@Test
-	public void testExecuteWithoutRoot() throws Exception {
+	void testExecuteWithoutRoot() throws Exception {
 		// given
 		String workflowSourceDir = "wf/transformers";
 		System.setProperty(PROPERTY_NAME_WF_SOURCE_DIR, workflowSourceDir);

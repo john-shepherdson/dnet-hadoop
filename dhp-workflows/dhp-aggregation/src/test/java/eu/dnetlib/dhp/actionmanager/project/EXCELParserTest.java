@@ -20,7 +20,7 @@ import eu.dnetlib.dhp.collection.HttpConnector2;
 public class EXCELParserTest {
 
 	private static Path workingDir;
-	private HttpConnector2 httpConnector = new HttpConnector2();
+	private final HttpConnector2 httpConnector = new HttpConnector2();
 	private static final String URL = "https://cordis.europa.eu/data/reference/cordisref-h2020topics.xlsx";
 
 	@BeforeAll
@@ -30,7 +30,7 @@ public class EXCELParserTest {
 	}
 
 	@Test
-	public void test1() throws CollectorException, IOException, InvalidFormatException, ClassNotFoundException,
+	void test1() throws CollectorException, IOException, InvalidFormatException, ClassNotFoundException,
 		IllegalAccessException, InstantiationException {
 
 		EXCELParser excelParser = new EXCELParser();

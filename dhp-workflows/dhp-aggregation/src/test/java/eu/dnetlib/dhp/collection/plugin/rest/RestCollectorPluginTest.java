@@ -21,7 +21,7 @@ import eu.dnetlib.dhp.collection.HttpClientParams;
  * @author js, Andreas Czerniak
  *
  */
-public class RestCollectorPluginTest {
+class RestCollectorPluginTest {
 
 	private static final Logger log = LoggerFactory.getLogger(RestCollectorPluginTest.class);
 
@@ -65,7 +65,7 @@ public class RestCollectorPluginTest {
 
 	@Disabled
 	@Test
-	public void test() throws CollectorException {
+	void test() throws CollectorException {
 		AtomicInteger i = new AtomicInteger(0);
 		final Stream<String> stream = rcp.collect(api, new AggregatorReport());
 

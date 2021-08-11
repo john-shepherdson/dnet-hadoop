@@ -3,6 +3,7 @@ package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
@@ -64,7 +65,7 @@ public class SparkDownloadOrcidAuthors {
 				String lastUpdate = HDFSUtil.readFromTextFile(hdfsServerUri, workingPath, "last_update.txt");
 				logger.info("lastUpdate: {}", lastUpdate);
 				if (StringUtils.isBlank(lastUpdate)) {
-					throw new RuntimeException("last update info not found");
+					throw new FileNotFoundException("last update info not found");
 				}
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -82,7 +83,7 @@ public class SparkDownloadOrcidAuthors {
 				JavaPairRDD<Text, Text> lamdaFileRDD = sc
 					.sequenceFile(workingPath + lambdaFileName, Text.class, Text.class);
 				final long lamdaFileRDDCount = lamdaFileRDD.count();
-				logger.info("Data retrieved: " + lamdaFileRDDCount);
+				logger.info("Data retrieved: {}", lamdaFileRDDCount);
 
 				Function<Tuple2<Text, Text>, Boolean> isModifiedAfterFilter = data -> {
 					String orcidId = data._1().toString();
@@ -95,7 +96,7 @@ public class SparkDownloadOrcidAuthors {
 					return false;
 				};
 
-				Function<Tuple2<Text, Text>, Tuple2<String, String>> downloadRecordFunction = data -> {
+				Function<Tuple2<Text, Text>, Tuple2<String, String>> downloadRecordFn = data -> {
 					String orcidId = data._1().toString();
 					String lastModifiedDate = data._2().toString();
 					final DownloadedRecordData downloaded = new DownloadedRecordData();
@@ -118,14 +119,19 @@ public class SparkDownloadOrcidAuthors {
 						switch (statusCode) {
 							case 403:
 								errorHTTP403Acc.add(1);
+								break;
 							case 404:
 								errorHTTP404Acc.add(1);
+								break;
 							case 409:
 								errorHTTP409Acc.add(1);
+								break;
 							case 503:
 								errorHTTP503Acc.add(1);
+								break;
 							case 525:
 								errorHTTP525Acc.add(1);
+								break;
 							default:
 								errorHTTPGenericAcc.add(1);
 						}
@@ -145,31 +151,39 @@ public class SparkDownloadOrcidAuthors {
 				logger.info("Start execution ...");
 				JavaPairRDD<Text, Text> authorsModifiedRDD = lamdaFileRDD.filter(isModifiedAfterFilter);
 				long authorsModifiedCount = authorsModifiedRDD.count();
-				logger.info("Authors modified count: " + authorsModifiedCount);
+				logger.info("Authors modified count: {}", authorsModifiedCount);
 
 				logger.info("Start downloading ...");
-				authorsModifiedRDD
-					.repartition(100)
-					.map(downloadRecordFunction)
-					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
-					.saveAsNewAPIHadoopFile(
-						workingPath.concat(outputPath),
-						Text.class,
-						Text.class,
-						SequenceFileOutputFormat.class,
-						sc.hadoopConfiguration());
 
-				logger.info("parsedRecordsAcc: " + parsedRecordsAcc.value().toString());
-				logger.info("modifiedRecordsAcc: " + modifiedRecordsAcc.value().toString());
-				logger.info("downloadedRecordsAcc: " + downloadedRecordsAcc.value().toString());
-				logger.info("errorHTTP403Acc: " + errorHTTP403Acc.value().toString());
-				logger.info("errorHTTP404Acc: " + errorHTTP404Acc.value().toString());
-				logger.info("errorHTTP409Acc: " + errorHTTP409Acc.value().toString());
-				logger.info("errorHTTP503Acc: " + errorHTTP503Acc.value().toString());
-				logger.info("errorHTTP525Acc: " + errorHTTP525Acc.value().toString());
-				logger.info("errorHTTPGenericAcc: " + errorHTTPGenericAcc.value().toString());
+				final JavaPairRDD<Text, Text> pairRDD = authorsModifiedRDD
+					.repartition(100)
+					.map(downloadRecordFn)
+					.mapToPair(t -> new Tuple2<>(new Text(t._1()), new Text(t._2())));
+
+				saveAsSequenceFile(workingPath, outputPath, sc, pairRDD);
+
+				logger.info("parsedRecordsAcc: {}", parsedRecordsAcc.value());
+				logger.info("modifiedRecordsAcc: {}", modifiedRecordsAcc.value());
+				logger.info("downloadedRecordsAcc: {}", downloadedRecordsAcc.value());
+				logger.info("errorHTTP403Acc: {}", errorHTTP403Acc.value());
+				logger.info("errorHTTP404Acc: {}", errorHTTP404Acc.value());
+				logger.info("errorHTTP409Acc: {}", errorHTTP409Acc.value());
+				logger.info("errorHTTP503Acc: {}", errorHTTP503Acc.value());
+				logger.info("errorHTTP525Acc: {}", errorHTTP525Acc.value());
+				logger.info("errorHTTPGenericAcc: {}", errorHTTPGenericAcc.value());
 			});
 
+	}
+
+	private static void saveAsSequenceFile(String workingPath, String outputPath, JavaSparkContext sc,
+		JavaPairRDD<Text, Text> pairRDD) {
+		pairRDD
+			.saveAsNewAPIHadoopFile(
+				workingPath.concat(outputPath),
+				Text.class,
+				Text.class,
+				SequenceFileOutputFormat.class,
+				sc.hadoopConfiguration());
 	}
 
 	public static boolean isModified(String orcidId, String modifiedDate, String lastUpdate) {

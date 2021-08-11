@@ -69,7 +69,7 @@ public class ResultLinkedToProjectTest {
 	}
 
 	@Test
-	public void testNoMatch() throws Exception {
+	void testNoMatch() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/nomatch/papers.json")
@@ -102,7 +102,7 @@ public class ResultLinkedToProjectTest {
 	}
 
 	@Test
-	public void testMatchOne() throws Exception {
+	void testMatchOne() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match/papers.json")

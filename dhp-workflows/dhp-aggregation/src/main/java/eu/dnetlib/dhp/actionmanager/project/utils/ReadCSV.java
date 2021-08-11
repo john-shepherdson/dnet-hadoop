@@ -26,7 +26,7 @@ import eu.dnetlib.dhp.collection.HttpConnector2;
  */
 public class ReadCSV implements Closeable {
 	private static final Log log = LogFactory.getLog(ReadCSV.class);
-	private final Configuration conf;
+
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private final String csvFile;
@@ -54,18 +54,17 @@ public class ReadCSV implements Closeable {
 
 			log.info("Getting CSV file...");
 			readCSV.execute(classForName);
-
 		}
 
 	}
 
-	public void execute(final String classForName) throws Exception {
+	public void execute(final String classForName)
+		throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
 		CSVParser csvParser = new CSVParser();
 		csvParser
 			.parse(csvFile, classForName, delimiter)
 			.stream()
-			.forEach(p -> write(p));
-
+			.forEach(this::write);
 	}
 
 	@Override
@@ -79,18 +78,18 @@ public class ReadCSV implements Closeable {
 		final String fileURL,
 		char delimiter)
 		throws Exception {
-		this.conf = new Configuration();
-		this.conf.set("fs.defaultFS", hdfsNameNode);
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
 		HttpConnector2 httpConnector = new HttpConnector2();
-		FileSystem fileSystem = FileSystem.get(this.conf);
+		FileSystem fileSystem = FileSystem.get(conf);
 		Path hdfsWritePath = new Path(hdfsPath);
-		FSDataOutputStream fsDataOutputStream = null;
+
 		if (fileSystem.exists(hdfsWritePath)) {
 			fileSystem.delete(hdfsWritePath, false);
 		}
-		fsDataOutputStream = fileSystem.create(hdfsWritePath);
+		final FSDataOutputStream fos = fileSystem.create(hdfsWritePath);
 
-		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
+		this.writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
 		this.csvFile = httpConnector.getInputSource(fileURL);
 		this.delimiter = delimiter;
 	}

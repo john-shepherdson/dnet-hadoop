@@ -42,7 +42,7 @@ public class GroupEntitiesSparkJob {
 
 	private static final Logger log = LoggerFactory.getLogger(GroupEntitiesSparkJob.class);
 
-	private final static String ID_JPATH = "$.id";
+	private static final String ID_JPATH = "$.id";
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -92,7 +92,7 @@ public class GroupEntitiesSparkJob {
 		spark
 			.read()
 			.textFile(toSeq(listEntityPaths(inputPath, sc)))
-			.map((MapFunction<String, OafEntity>) s -> parseOaf(s), Encoders.kryo(OafEntity.class))
+			.map((MapFunction<String, OafEntity>) GroupEntitiesSparkJob::parseOaf, Encoders.kryo(OafEntity.class))
 			.filter((FilterFunction<OafEntity>) e -> StringUtils.isNotBlank(ModelSupport.idFn().apply(e)))
 			.groupByKey((MapFunction<OafEntity, String>) oaf -> ModelSupport.idFn().apply(oaf), Encoders.STRING())
 			.agg(aggregator)
@@ -188,7 +188,7 @@ public class GroupEntitiesSparkJob {
 		try {
 			return OBJECT_MAPPER.readValue(s, clazz);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException(e);
 		}
 	}
 

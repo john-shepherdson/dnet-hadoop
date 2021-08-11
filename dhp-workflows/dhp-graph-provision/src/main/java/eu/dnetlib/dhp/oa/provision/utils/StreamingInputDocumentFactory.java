@@ -3,10 +3,10 @@ package eu.dnetlib.dhp.oa.provision.utils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.stream.*;
 import javax.xml.stream.events.Namespace;
@@ -57,13 +57,13 @@ public class StreamingInputDocumentFactory {
 	private static final int MAX_FIELD_LENGTH = 25000;
 
 	private final ThreadLocal<XMLInputFactory> inputFactory = ThreadLocal
-		.withInitial(() -> XMLInputFactory.newInstance());
+		.withInitial(XMLInputFactory::newInstance);
 
 	private final ThreadLocal<XMLOutputFactory> outputFactory = ThreadLocal
-		.withInitial(() -> XMLOutputFactory.newInstance());
+		.withInitial(XMLOutputFactory::newInstance);
 
 	private final ThreadLocal<XMLEventFactory> eventFactory = ThreadLocal
-		.withInitial(() -> XMLEventFactory.newInstance());
+		.withInitial(XMLEventFactory::newInstance);
 
 	private final String version;
 
@@ -126,6 +126,8 @@ public class StreamingInputDocumentFactory {
 			return indexDocument;
 		} catch (XMLStreamException e) {
 			throw new IllegalStateException(e);
+		} finally {
+			inputFactory.remove();
 		}
 	}
 
@@ -143,9 +145,9 @@ public class StreamingInputDocumentFactory {
 	/**
 	 * Parse the targetFields block and add fields to the solr document.
 	 *
-	 * @param indexDocument
-	 * @param parser
-	 * @throws XMLStreamException
+	 * @param indexDocument the document being populated
+	 * @param parser the XML parser
+	 * @throws XMLStreamException when the parser cannot parse the XML
 	 */
 	protected void parseTargetFields(
 		final SolrInputDocument indexDocument, final XMLEventReader parser)
@@ -165,9 +167,10 @@ public class StreamingInputDocumentFactory {
 				final XMLEvent text = parser.nextEvent();
 
 				String data = getText(text);
-
-				addField(indexDocument, fieldName, data);
-				hasFields = true;
+				if (Objects.nonNull(data)) {
+					addField(indexDocument, fieldName, data);
+					hasFields = true;
+				}
 			}
 		}
 
@@ -192,36 +195,43 @@ public class StreamingInputDocumentFactory {
 		final List<Namespace> nsList,
 		final String dnetResult)
 		throws XMLStreamException {
+
 		final XMLEventWriter writer = outputFactory.get().createXMLEventWriter(results);
+		final XMLEventFactory xmlEventFactory = this.eventFactory.get();
+		try {
 
-		for (Namespace ns : nsList) {
-			eventFactory.get().createNamespace(ns.getPrefix(), ns.getNamespaceURI());
-		}
-
-		StartElement newRecord = eventFactory.get().createStartElement("", null, RESULT, null, nsList.iterator());
-
-		// new root record
-		writer.add(newRecord);
-
-		// copy the rest as it is
-		while (parser.hasNext()) {
-			final XMLEvent resultEvent = parser.nextEvent();
-
-			// TODO: replace with depth tracking instead of close tag tracking.
-			if (resultEvent.isEndElement()
-				&& resultEvent.asEndElement().getName().getLocalPart().equals(dnetResult)) {
-				writer.add(eventFactory.get().createEndElement("", null, RESULT));
-				break;
+			for (Namespace ns : nsList) {
+				xmlEventFactory.createNamespace(ns.getPrefix(), ns.getNamespaceURI());
 			}
 
-			writer.add(resultEvent);
+			StartElement newRecord = xmlEventFactory.createStartElement("", null, RESULT, null, nsList.iterator());
+
+			// new root record
+			writer.add(newRecord);
+
+			// copy the rest as it is
+			while (parser.hasNext()) {
+				final XMLEvent resultEvent = parser.nextEvent();
+
+				// TODO: replace with depth tracking instead of close tag tracking.
+				if (resultEvent.isEndElement()
+					&& resultEvent.asEndElement().getName().getLocalPart().equals(dnetResult)) {
+					writer.add(xmlEventFactory.createEndElement("", null, RESULT));
+					break;
+				}
+
+				writer.add(resultEvent);
+			}
+			writer.close();
+			indexDocument.addField(INDEX_RESULT, results.toString());
+		} finally {
+			outputFactory.remove();
+			eventFactory.remove();
 		}
-		writer.close();
-		indexDocument.addField(INDEX_RESULT, results.toString());
 	}
 
 	/**
-	 * Helper used to add a field to a solr doc. It avoids to add empy fields
+	 * Helper used to add a field to a solr doc, avoids adding empty fields
 	 *
 	 * @param indexDocument
 	 * @param field
@@ -231,7 +241,6 @@ public class StreamingInputDocumentFactory {
 		final SolrInputDocument indexDocument, final String field, final String value) {
 		String cleaned = value.trim();
 		if (!cleaned.isEmpty()) {
-			// log.info("\n\n adding field " + field.toLowerCase() + " value: " + cleaned + "\n");
 			indexDocument.addField(field.toLowerCase(), cleaned);
 		}
 	}
@@ -243,9 +252,9 @@ public class StreamingInputDocumentFactory {
 	 * @return the
 	 */
 	protected final String getText(final XMLEvent text) {
-		if (text.isEndElement()) // log.warn("skipping because isEndOfElement " +
-			// text.asEndElement().getName().getLocalPart());
+		if (text.isEndElement()) {
 			return "";
+		}
 
 		final String data = text.asCharacters().getData();
 		if (data != null && data.length() > MAX_FIELD_LENGTH) {

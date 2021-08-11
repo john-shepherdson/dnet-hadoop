@@ -22,9 +22,8 @@ public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
 		orcidAuthorsDOIsDataGen.generateAuthorsDOIsData();
 	}
 
-	public void generateAuthorsDOIsData() throws Exception {
+	public void generateAuthorsDOIsData() throws IOException {
 		Configuration conf = initConfigurationObject();
-		FileSystem fs = initFileSystemObject(conf);
 		String tarGzUri = hdfsServerUri.concat(workingPath).concat(activitiesFileNameTarGz);
 		Path outputPath = new Path(hdfsServerUri.concat(workingPath).concat(outputAuthorsDOIsPath));
 		ActivitiesDecompressor.parseGzActivities(conf, tarGzUri, outputPath);
