@@ -3,14 +3,12 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
-import javax.swing.text.html.Option;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
@@ -163,7 +161,7 @@ public class XmlIndexingJob {
 			case HDFS:
 				spark
 					.createDataset(
-						docs.map(s -> new SerializableSolrInputDocument(s)).rdd(),
+						docs.map(SerializableSolrInputDocument::new).rdd(),
 						Encoders.kryo(SerializableSolrInputDocument.class))
 					.write()
 					.mode(SaveMode.Overwrite)
@@ -174,14 +172,13 @@ public class XmlIndexingJob {
 		}
 	}
 
-	protected static String toIndexRecord(Transformer tr, final String record) {
+	protected static String toIndexRecord(Transformer tr, final String xmlRecord) {
 		final StreamResult res = new StreamResult(new StringWriter());
 		try {
-			tr.transform(new StreamSource(new StringReader(record)), res);
+			tr.transform(new StreamSource(new StringReader(xmlRecord)), res);
 			return res.getWriter().toString();
-		} catch (Throwable e) {
-			log.error("XPathException on record: \n {}", record, e);
-			throw new IllegalArgumentException(e);
+		} catch (TransformerException e) {
+			throw new IllegalArgumentException("XPathException on record: \n" + xmlRecord, e);
 		}
 	}
 
@@ -192,8 +189,6 @@ public class XmlIndexingJob {
 	 * @param xslt xslt for building the index record transformer
 	 * @param fields the list of fields
 	 * @return the javax.xml.transform.Transformer
-	 * @throws ISLookUpException could happen
-	 * @throws IOException could happen
 	 * @throws TransformerException could happen
 	 */
 	protected static String getLayoutTransformer(String format, String fields, String xslt)

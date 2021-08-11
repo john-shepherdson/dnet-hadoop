@@ -18,6 +18,9 @@ public class JsonWriter {
 	public static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
+	private JsonWriter() {
+	}
+
 	public static String create(AuthorData authorData) throws JsonProcessingException {
 		return OBJECT_MAPPER.writeValueAsString(authorData);
 	}

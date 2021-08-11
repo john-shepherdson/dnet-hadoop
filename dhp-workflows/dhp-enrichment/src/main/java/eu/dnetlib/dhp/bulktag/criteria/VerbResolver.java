@@ -7,16 +7,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 
 public class VerbResolver implements Serializable {
-	private Map<String, Class<Selection>> map = null; // = new HashMap<>();
-	private final ClassGraph classgraph = new ClassGraph();
+
+	private Map<String, Class<Selection>> map = null;
 
 	public VerbResolver() {
 
+		final ClassGraph classgraph = new ClassGraph();
 		try (ScanResult scanResult = // Assign scanResult in try-with-resources
 			classgraph // Create a new ClassGraph instance
 				.verbose() // If you want to enable logging to stderr
@@ -41,8 +41,6 @@ public class VerbResolver implements Serializable {
 								.get(0)
 								.getValue(),
 							value -> (Class<Selection>) value.loadClass()));
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 

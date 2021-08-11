@@ -5,28 +5,27 @@ import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.countrypropagation.PrepareDatasourceCountryAssociation;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
 public class SparkResultToProjectThroughSemRelJob {
 
-	private static final Logger log = LoggerFactory.getLogger(PrepareDatasourceCountryAssociation.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkResultToProjectThroughSemRelJob.class);
 
 	public static void main(String[] args) throws Exception {
 
@@ -95,26 +94,21 @@ public class SparkResultToProjectThroughSemRelJob {
 
 	private static FlatMapFunction<Tuple2<ResultProjectSet, ResultProjectSet>, Relation> mapRelationRn() {
 		return value -> {
-			List<Relation> new_relations = new ArrayList<>();
-			ResultProjectSet potential_update = value._1();
-			Optional<ResultProjectSet> already_linked = Optional.ofNullable(value._2());
-			if (already_linked.isPresent()) {
-				already_linked
-					.get()
-					.getProjectSet()
-					.stream()
-					.forEach(
-						(p -> {
-							potential_update.getProjectSet().remove(p);
-						}));
-			}
-			String resId = potential_update.getResultId();
-			potential_update
+			List<Relation> newRelations = new ArrayList<>();
+			ResultProjectSet potentialUpdate = value._1();
+			Optional<ResultProjectSet> alreadyLinked = Optional.ofNullable(value._2());
+			alreadyLinked
+				.ifPresent(
+					resultProjectSet -> resultProjectSet
+						.getProjectSet()
+						.forEach(
+							(p -> potentialUpdate.getProjectSet().remove(p))));
+			String resId = potentialUpdate.getResultId();
+			potentialUpdate
 				.getProjectSet()
-				.stream()
 				.forEach(
 					projectId -> {
-						new_relations
+						newRelations
 							.add(
 								getRelation(
 									resId,
@@ -125,7 +119,7 @@ public class SparkResultToProjectThroughSemRelJob {
 									PROPAGATION_DATA_INFO_TYPE,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
-						new_relations
+						newRelations
 							.add(
 								getRelation(
 									projectId,
@@ -137,7 +131,7 @@ public class SparkResultToProjectThroughSemRelJob {
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
 									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
 					});
-			return new_relations.iterator();
+			return newRelations.iterator();
 		};
 	}
 

@@ -14,11 +14,11 @@ import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 
 public abstract class AbstractEnrichMissingDataset extends UpdateMatcher<OaBrokerRelatedDataset> {
 
-	public AbstractEnrichMissingDataset(final Topic topic) {
+	protected AbstractEnrichMissingDataset(final Topic topic) {
 		super(10,
 			rel -> topic,
 			(p, rel) -> p.getDatasets().add(rel),
-			rel -> rel.getOpenaireId());
+			OaBrokerRelatedDataset::getOpenaireId);
 	}
 
 	protected abstract boolean filterByType(String relType);

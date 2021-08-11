@@ -46,9 +46,11 @@ public class CreateRelatedEntitiesJob_phase1 {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				PrepareRelationsJob.class
-					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/provision/input_params_related_entities_pahase1.json"));
+				Objects
+					.requireNonNull(
+						CreateRelatedEntitiesJob_phase1.class
+							.getResourceAsStream(
+								"/eu/dnetlib/dhp/oa/provision/input_params_related_entities_pahase1.json")));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
@@ -146,7 +148,11 @@ public class CreateRelatedEntitiesJob_phase1 {
 				Result result = (Result) entity;
 
 				if (result.getTitle() != null && !result.getTitle().isEmpty()) {
-					final StructuredProperty title = result.getTitle().stream().findFirst().get();
+					final StructuredProperty title = result
+						.getTitle()
+						.stream()
+						.findFirst()
+						.orElseThrow(() -> new IllegalStateException("missing title in " + entity.getId()));
 					title.setValue(StringUtils.left(title.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
 					re.setTitle(title);
 				}
@@ -196,7 +202,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 
 				List<Field<String>> f = p.getFundingtree();
 				if (!f.isEmpty()) {
-					re.setFundingtree(f.stream().map(s -> s.getValue()).collect(Collectors.toList()));
+					re.setFundingtree(f.stream().map(Field::getValue).collect(Collectors.toList()));
 				}
 				break;
 		}
@@ -211,7 +217,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 		return Optional
 			.ofNullable(f)
 			.filter(Objects::nonNull)
-			.map(x -> x.getValue())
+			.map(Field::getValue)
 			.orElse(defaultValue);
 	}
 

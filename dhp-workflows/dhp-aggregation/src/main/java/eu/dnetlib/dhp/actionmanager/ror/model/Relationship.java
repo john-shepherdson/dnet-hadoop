@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Relationship implements Serializable {
 
+	private static final long serialVersionUID = 7847399503395576960L;
+
 	@JsonProperty("type")
 	private String type;
 
@@ -15,8 +17,6 @@ public class Relationship implements Serializable {
 
 	@JsonProperty("label")
 	private String label;
-
-	private final static long serialVersionUID = 7847399503395576960L;
 
 	public String getType() {
 		return type;

@@ -4,7 +4,7 @@ package eu.dnetlib.dhp.oa.provision;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Objects;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -16,11 +16,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
@@ -35,7 +33,7 @@ import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
  *
  * The input is a JoinedEntity, i.e. a json representation of an OpenAIRE entity that embeds all the linked entities.
  */
-public class IndexRecordTransformerTest {
+class IndexRecordTransformerTest {
 
 	public static final String VERSION = "2021-04-15T10:05:53Z";
 	public static final String DSID = "b9ee796a-c49f-4473-a708-e7d67b84c16d_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl";
@@ -48,23 +46,23 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
-	public void testPreBuiltRecordTransformation() throws IOException, TransformerException {
-		String record = IOUtils.toString(getClass().getResourceAsStream("record.xml"));
+	void testPreBuiltRecordTransformation() throws IOException, TransformerException {
+		String record = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("record.xml")));
 
 		testRecordTransformation(record);
 	}
 
 	@Test
-	public void testPublicationRecordTransformation() throws IOException, TransformerException {
+	void testPublicationRecordTransformation() throws IOException, TransformerException {
 
-		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
+		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.SCHEMA_LOCATION,
 			XmlRecordFactoryTest.otherDsTypeId);
 
 		Publication p = load("publication.json", Publication.class);
 		Project pj = load("project.json", Project.class);
 		Relation rel = load("relToValidatedProject.json", Relation.class);
 
-		JoinedEntity je = new JoinedEntity<>(p);
+		JoinedEntity<Publication> je = new JoinedEntity<>(p);
 		je
 			.setLinks(
 				Lists
@@ -80,8 +78,9 @@ public class IndexRecordTransformerTest {
 	}
 
 	private void testRecordTransformation(String record) throws IOException, TransformerException {
-		String fields = IOUtils.toString(getClass().getResourceAsStream("fields.xml"));
-		String xslt = IOUtils.toString(getClass().getResourceAsStream("layoutToRecordTransformer.xsl"));
+		String fields = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("fields.xml")));
+		String xslt = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("layoutToRecordTransformer.xsl")));
 
 		String transformer = XmlIndexingJob.getLayoutTransformer("DMF", fields, xslt);
 
@@ -99,7 +98,7 @@ public class IndexRecordTransformerTest {
 
 	private <T> T load(String fileName, Class<T> clazz) throws IOException {
 		return XmlRecordFactoryTest.OBJECT_MAPPER
-			.readValue(IOUtils.toString(getClass().getResourceAsStream(fileName)), clazz);
+			.readValue(IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream(fileName))), clazz);
 	}
 
 }

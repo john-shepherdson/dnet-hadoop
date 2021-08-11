@@ -171,26 +171,23 @@ public class PrepareProgramme {
 	}
 
 	private static CSVProgramme groupProgrammeByCode(CSVProgramme a, CSVProgramme b) {
-		if (!a.getLanguage().equals("en")) {
-			if (b.getLanguage().equalsIgnoreCase("en")) {
-				a.setTitle(b.getTitle());
-				a.setLanguage(b.getLanguage());
-			}
+		if (!a.getLanguage().equals("en") && b.getLanguage().equalsIgnoreCase("en")) {
+			a.setTitle(b.getTitle());
+			a.setLanguage(b.getLanguage());
 		}
-		if (StringUtils.isEmpty(a.getShortTitle())) {
-			if (!StringUtils.isEmpty(b.getShortTitle())) {
-				a.setShortTitle(b.getShortTitle());
-			}
+		if (StringUtils.isEmpty(a.getShortTitle()) && !StringUtils.isEmpty(b.getShortTitle())) {
+			a.setShortTitle(b.getShortTitle());
 		}
 
 		return a;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static List<CSVProgramme> prepareClassification(JavaRDD<CSVProgramme> h2020Programmes) {
 		Object[] codedescription = h2020Programmes
 			.map(
 				value -> new Tuple2<>(value.getCode(),
-					new Tuple2<String, String>(value.getTitle(), value.getShortTitle())))
+					new Tuple2<>(value.getTitle(), value.getShortTitle())))
 			.collect()
 			.toArray();
 
@@ -216,7 +213,7 @@ public class PrepareProgramme {
 			String[] tmp = ent.split("\\.");
 			if (tmp.length <= 2) {
 				if (StringUtils.isEmpty(entry._2()._2())) {
-					map.put(entry._1(), new Tuple2<String, String>(entry._2()._1(), entry._2()._1()));
+					map.put(entry._1(), new Tuple2<>(entry._2()._1(), entry._2()._1()));
 				} else {
 					map.put(entry._1(), entry._2());
 				}

@@ -1,22 +1,21 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Optional;
 
-import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
-import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.MakeTarArchive;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 
 public class MakeTar implements Serializable {
 

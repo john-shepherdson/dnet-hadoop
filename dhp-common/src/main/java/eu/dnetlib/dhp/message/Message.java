@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.message;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -10,8 +9,8 @@ public class Message implements Serializable {
 
 	private static final long serialVersionUID = 401753881204524893L;
 
-	public static String CURRENT_PARAM = "current";
-	public static String TOTAL_PARAM = "total";
+	public static final String CURRENT_PARAM = "current";
+	public static final String TOTAL_PARAM = "total";
 
 	private MessageType messageType;
 

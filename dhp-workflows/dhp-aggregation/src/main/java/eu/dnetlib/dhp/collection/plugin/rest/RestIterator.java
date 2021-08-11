@@ -131,7 +131,9 @@ public class RestIterator implements Iterator<String> {
 
 	private void initXmlTransformation(String resultTotalXpath, String resumptionXpath, String entityXpath)
 		throws TransformerConfigurationException, XPathExpressionException {
-		transformer = TransformerFactory.newInstance().newTransformer();
+		final TransformerFactory factory = TransformerFactory.newInstance();
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		transformer = factory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
 		xpath = XPathFactory.newInstance().newXPath();
@@ -142,7 +144,7 @@ public class RestIterator implements Iterator<String> {
 
 	private void initQueue() {
 		query = baseUrl + "?" + queryParams + querySize + queryFormat;
-		log.info("REST calls starting with " + query);
+		log.info("REST calls starting with {}", query);
 	}
 
 	private void disconnect() {
@@ -174,7 +176,7 @@ public class RestIterator implements Iterator<String> {
 				try {
 					query = downloadPage(query);
 				} catch (CollectorException e) {
-					log.debug("CollectorPlugin.next()-Exception: " + e);
+					log.debug("CollectorPlugin.next()-Exception: {}", e);
 					throw new RuntimeException(e);
 				}
 			}
@@ -198,7 +200,7 @@ public class RestIterator implements Iterator<String> {
 
 		// check if cursor=* is initial set otherwise add it to the queryParam URL
 		if (resumptionType.equalsIgnoreCase("deep-cursor")) {
-			log.debug("check resumptionType deep-cursor and check cursor=*?" + query);
+			log.debug("check resumptionType deep-cursor and check cursor=*?{}", query);
 			if (!query.contains("&cursor=")) {
 				query += "&cursor=*";
 			}
@@ -208,16 +210,16 @@ public class RestIterator implements Iterator<String> {
 			log.info("requestig URL [{}]", query);
 
 			URL qUrl = new URL(query);
-			log.debug("authMethod :" + authMethod);
+			log.debug("authMethod: {}", authMethod);
 			if ("bearer".equalsIgnoreCase(this.authMethod)) {
-				log.trace("authMethod before inputStream: " + resultXml);
+				log.trace("authMethod before inputStream: {}", resultXml);
 				HttpURLConnection conn = (HttpURLConnection) qUrl.openConnection();
 				conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + authToken);
 				conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 				conn.setRequestMethod("GET");
 				theHttpInputStream = conn.getInputStream();
 			} else if (BASIC.equalsIgnoreCase(this.authMethod)) {
-				log.trace("authMethod before inputStream: " + resultXml);
+				log.trace("authMethod before inputStream: {}", resultXml);
 				HttpURLConnection conn = (HttpURLConnection) qUrl.openConnection();
 				conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Basic " + authToken);
 				conn.setRequestProperty(HttpHeaders.ACCEPT, ContentType.APPLICATION_XML.getMimeType());
@@ -237,13 +239,13 @@ public class RestIterator implements Iterator<String> {
 			if (!(emptyXml).equalsIgnoreCase(resultXml)) {
 				resultNode = (Node) xpath.evaluate("/", new InputSource(resultStream), XPathConstants.NODE);
 				nodeList = (NodeList) xprEntity.evaluate(resultNode, XPathConstants.NODESET);
-				log.debug("nodeList.length: " + nodeList.getLength());
+				log.debug("nodeList.length: {}", nodeList.getLength());
 				for (int i = 0; i < nodeList.getLength(); i++) {
 					StringWriter sw = new StringWriter();
 					transformer.transform(new DOMSource(nodeList.item(i)), new StreamResult(sw));
 					String toEnqueue = sw.toString();
 					if (toEnqueue == null || StringUtils.isBlank(toEnqueue) || emptyXml.equalsIgnoreCase(toEnqueue)) {
-						log.warn("The following record resulted in empty item for the feeding queue: " + resultXml);
+						log.warn("The following record resulted in empty item for the feeding queue: {}", resultXml);
 					} else {
 						recordQueue.add(sw.toString());
 					}
@@ -274,9 +276,9 @@ public class RestIterator implements Iterator<String> {
 							String[] resumptionKeyValue = arrayUrlArgStr.split("=");
 							if (isInteger(resumptionKeyValue[1])) {
 								urlOldResumptionSize = Integer.parseInt(resumptionKeyValue[1]);
-								log.debug("discover OldResumptionSize from Url (int): " + urlOldResumptionSize);
+								log.debug("discover OldResumptionSize from Url (int): {}", urlOldResumptionSize);
 							} else {
-								log.debug("discover OldResumptionSize from Url (str): " + resumptionKeyValue[1]);
+								log.debug("discover OldResumptionSize from Url (str): {}", resumptionKeyValue[1]);
 							}
 						}
 					}
@@ -295,7 +297,7 @@ public class RestIterator implements Iterator<String> {
 							discoverResultSize += nodeList.getLength();
 						}
 					}
-					log.info("discoverResultSize:  {}", discoverResultSize);
+					log.info("discoverResultSize: {}", discoverResultSize);
 					break;
 
 				case "pagination":

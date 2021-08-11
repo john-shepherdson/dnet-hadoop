@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +90,7 @@ public class PrepareResultCommunitySetStep2 {
 							});
 					return a;
 				})
-			.map(c -> c._2())
+			.map(Tuple2::_2)
 			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
 			.saveAsTextFile(outputPath, GzipCodec.class);
 	}

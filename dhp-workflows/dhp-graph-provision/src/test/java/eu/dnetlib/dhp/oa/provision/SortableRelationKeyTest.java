@@ -28,7 +28,6 @@ public class SortableRelationKeyTest {
 			.map(r -> SortableRelationKey.create(r, r.getSource()))
 			.sorted()
 			.forEach(
-
 				it -> {
 					try {
 						System.out.println(mapper.writeValueAsString(it));

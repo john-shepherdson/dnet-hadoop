@@ -3,7 +3,8 @@ package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
@@ -28,10 +28,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.doiboost.orcid.util.HDFSUtil;
 
 public class SparkGenLastModifiedSeq {
-	private static String hdfsServerUri;
-	private static String workingPath;
-	private static String outputPath;
-	private static String lambdaFileName;
 
 	public static void main(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -45,12 +41,14 @@ public class SparkGenLastModifiedSeq {
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
-		hdfsServerUri = parser.get("hdfsServerUri");
-		workingPath = parser.get("workingPath");
-		outputPath = parser.get("outputPath");
-		lambdaFileName = parser.get("lambdaFileName");
-		String lambdaFileUri = hdfsServerUri.concat(workingPath).concat(lambdaFileName);
-		String lastModifiedDateFromLambdaFileUri = "last_modified_date_from_lambda_file.txt";
+
+		final String hdfsServerUri = parser.get("hdfsServerUri");
+		final String workingPath = parser.get("workingPath");
+		final String outputPath = parser.get("outputPath");
+		final String lambdaFileName = parser.get("lambdaFileName");
+
+		final String lambdaFileUri = hdfsServerUri.concat(workingPath).concat(lambdaFileName);
+		final String lastModifiedDateFromLambdaFileUri = "last_modified_date_from_lambda_file.txt";
 
 		SparkConf sparkConf = new SparkConf();
 		runWithSparkSession(
@@ -64,7 +62,7 @@ public class SparkGenLastModifiedSeq {
 						.concat(workingPath)
 						.concat(outputPath));
 				Path hdfsreadpath = new Path(lambdaFileUri);
-				Configuration conf = new Configuration();
+				Configuration conf = spark.sparkContext().hadoopConfiguration();
 				conf.set("fs.defaultFS", hdfsServerUri.concat(workingPath));
 				conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
 				conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());

@@ -11,8 +11,6 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
 import eu.dnetlib.dhp.message.MessageSender;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -20,12 +18,12 @@ public class AggregatorReport extends LinkedHashMap<String, String> implements C
 
 	private static final Logger log = LoggerFactory.getLogger(AggregatorReport.class);
 
-	private MessageSender messageSender;
+	private transient MessageSender messageSender;
 
 	public AggregatorReport() {
 	}
 
-	public AggregatorReport(MessageSender messageSender) throws IOException {
+	public AggregatorReport(MessageSender messageSender) {
 		this.messageSender = messageSender;
 	}
 

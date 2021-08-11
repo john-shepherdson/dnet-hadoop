@@ -41,8 +41,6 @@ import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
 
 public class EventFinder {
 
-	private static final Logger log = LoggerFactory.getLogger(EventFinder.class);
-
 	private static final List<UpdateMatcher<?>> matchers = new ArrayList<>();
 	static {
 		matchers.add(new EnrichMissingAbstract());
@@ -70,6 +68,9 @@ public class EventFinder {
 		matchers.add(new EnrichMissingDatasetReferences());
 		matchers.add(new EnrichMissingDatasetIsSupplementedTo());
 		matchers.add(new EnrichMissingDatasetIsSupplementedBy());
+	}
+
+	private EventFinder() {
 	}
 
 	public static EventGroup generateEvents(final ResultGroup results,

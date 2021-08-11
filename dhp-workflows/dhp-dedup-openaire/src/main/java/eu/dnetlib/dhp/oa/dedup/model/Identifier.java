@@ -19,7 +19,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.schema.oaf.utils.PidComparator;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
-public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier> {
+public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier<T>> {
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static final String BASE_DATE = "2000-01-01";
@@ -29,8 +29,8 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 	// cached date value
 	private Date date = null;
 
-	public static <T extends OafEntity> Identifier newInstance(T entity) {
-		return new Identifier(entity);
+	public static <T extends OafEntity> Identifier<T> newInstance(T entity) {
+		return new Identifier<>(entity);
 	}
 
 	public Identifier(T entity) {
@@ -88,7 +88,7 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 	}
 
 	@Override
-	public int compareTo(Identifier i) {
+	public int compareTo(Identifier<T> i) {
 		// priority in comparisons: 1) pidtype, 2) collectedfrom (depending on the entity type) , 3) date 4)
 		// alphabetical order of the originalID
 

@@ -26,52 +26,52 @@ public class EXCELParser {
 		throws ClassNotFoundException, IOException, IllegalAccessException, InstantiationException,
 		InvalidFormatException {
 
-		OPCPackage pkg = OPCPackage.open(file);
-		XSSFWorkbook wb = new XSSFWorkbook(pkg);
+		try (OPCPackage pkg = OPCPackage.open(file); XSSFWorkbook wb = new XSSFWorkbook(pkg)) {
 
-		XSSFSheet sheet = wb.getSheet(sheetName);
+			XSSFSheet sheet = wb.getSheet(sheetName);
 
-		if (sheetName == null) {
-			throw new RuntimeException("Sheet name " + sheetName + " not present in current file");
-		}
-
-		List<R> ret = new ArrayList<>();
-
-		DataFormatter dataFormatter = new DataFormatter();
-		Iterator<Row> rowIterator = sheet.rowIterator();
-		List<String> headers = new ArrayList<>();
-		int count = 0;
-		while (rowIterator.hasNext()) {
-			Row row = rowIterator.next();
-
-			if (count == 0) {
-				Iterator<Cell> cellIterator = row.cellIterator();
-
-				while (cellIterator.hasNext()) {
-					Cell cell = cellIterator.next();
-					headers.add(dataFormatter.formatCellValue(cell));
-				}
-			} else {
-				Class<?> clazz = Class.forName(classForName);
-				final Object cc = clazz.newInstance();
-
-				for (int i = 0; i < headers.size(); i++) {
-					Cell cell = row.getCell(i);
-					FieldUtils.writeField(cc, headers.get(i), dataFormatter.formatCellValue(cell), true);
-
-				}
-
-				EXCELTopic et = (EXCELTopic) cc;
-				if (StringUtils.isNotBlank(et.getRcn())) {
-					ret.add((R) cc);
-				}
-
+			if (sheetName == null) {
+				throw new IllegalArgumentException("Sheet name " + sheetName + " not present in current file");
 			}
 
-			count += 1;
-		}
+			List<R> ret = new ArrayList<>();
 
-		return ret;
+			DataFormatter dataFormatter = new DataFormatter();
+			Iterator<Row> rowIterator = sheet.rowIterator();
+			List<String> headers = new ArrayList<>();
+			int count = 0;
+			while (rowIterator.hasNext()) {
+				Row row = rowIterator.next();
+
+				if (count == 0) {
+					Iterator<Cell> cellIterator = row.cellIterator();
+
+					while (cellIterator.hasNext()) {
+						Cell cell = cellIterator.next();
+						headers.add(dataFormatter.formatCellValue(cell));
+					}
+				} else {
+					Class<?> clazz = Class.forName(classForName);
+					final Object cc = clazz.newInstance();
+
+					for (int i = 0; i < headers.size(); i++) {
+						Cell cell = row.getCell(i);
+						FieldUtils.writeField(cc, headers.get(i), dataFormatter.formatCellValue(cell), true);
+
+					}
+
+					EXCELTopic et = (EXCELTopic) cc;
+					if (StringUtils.isNotBlank(et.getRcn())) {
+						ret.add((R) cc);
+					}
+
+				}
+
+				count += 1;
+			}
+
+			return ret;
+		}
 	}
 
 }

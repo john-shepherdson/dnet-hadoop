@@ -13,7 +13,7 @@ public class Label implements Serializable {
 	@JsonProperty("label")
 	private String label;
 
-	private final static long serialVersionUID = -6576156103297850809L;
+	private static final long serialVersionUID = -6576156103297850809L;
 
 	public String getIso639() {
 		return iso639;

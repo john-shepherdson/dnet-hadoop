@@ -32,7 +32,7 @@ public class HttpConnector2 {
 
 	private String responseType = null;
 
-	private final String userAgent = "Mozilla/5.0 (compatible; OAI; +http://www.openaire.eu)";
+	private static final String userAgent = "Mozilla/5.0 (compatible; OAI; +http://www.openaire.eu)";
 
 	public HttpConnector2() {
 		this(new HttpClientParams());
@@ -120,7 +120,7 @@ public class HttpConnector2 {
 			if (is3xx(urlConn.getResponseCode())) {
 				// REDIRECTS
 				final String newUrl = obtainNewLocation(urlConn.getHeaderFields());
-				log.info(String.format("The requested url has been moved to %s", newUrl));
+				log.info("The requested url has been moved to {}", newUrl);
 				report
 					.put(
 						REPORT_PREFIX + urlConn.getResponseCode(),
@@ -140,14 +140,14 @@ public class HttpConnector2 {
 						if (retryAfter > 0) {
 							log
 								.warn(
-									requestUrl + " - waiting and repeating request after suggested retry-after "
-										+ retryAfter + " sec.");
+									"{} - waiting and repeating request after suggested retry-after {} sec.",
+									requestUrl, retryAfter);
 							backoffAndSleep(retryAfter * 1000);
 						} else {
 							log
 								.warn(
-									requestUrl + " - waiting and repeating request after default delay of "
-										+ getClientParams().getRetryDelay() + " sec.");
+									"{} - waiting and repeating request after default delay of {} sec.",
+									requestUrl, getClientParams().getRetryDelay());
 							backoffAndSleep(retryNumber * getClientParams().getRetryDelay() * 1000);
 						}
 						report.put(REPORT_PREFIX + urlConn.getResponseCode(), requestUrl);
@@ -181,12 +181,12 @@ public class HttpConnector2 {
 	}
 
 	private void logHeaderFields(final HttpURLConnection urlConn) throws IOException {
-		log.debug("StatusCode: " + urlConn.getResponseMessage());
+		log.debug("StatusCode: {}", urlConn.getResponseMessage());
 
 		for (Map.Entry<String, List<String>> e : urlConn.getHeaderFields().entrySet()) {
 			if (e.getKey() != null) {
 				for (String v : e.getValue()) {
-					log.debug("  key: " + e.getKey() + " - value: " + v);
+					log.debug("  key: {} - value: {}", e.getKey(), v);
 				}
 			}
 		}
@@ -204,7 +204,7 @@ public class HttpConnector2 {
 
 	private int obtainRetryAfter(final Map<String, List<String>> headerMap) {
 		for (String key : headerMap.keySet()) {
-			if ((key != null) && key.equalsIgnoreCase(HttpHeaders.RETRY_AFTER) && (headerMap.get(key).size() > 0)
+			if ((key != null) && key.equalsIgnoreCase(HttpHeaders.RETRY_AFTER) && (!headerMap.get(key).isEmpty())
 				&& NumberUtils.isCreatable(headerMap.get(key).get(0))) {
 				return Integer.parseInt(headerMap.get(key).get(0)) + 10;
 			}

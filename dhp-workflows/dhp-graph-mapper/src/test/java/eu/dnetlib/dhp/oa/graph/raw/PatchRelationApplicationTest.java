@@ -75,7 +75,7 @@ public class PatchRelationApplicationTest {
 	}
 
 	@Test
-	public void testPatchRelationApplication() throws Exception {
+	void testPatchRelationApplication() throws Exception {
 
 		final String graphBasePath = workingDir.toString() + "/graphBasePath";
 		PatchRelationsApplication.main(new String[] {

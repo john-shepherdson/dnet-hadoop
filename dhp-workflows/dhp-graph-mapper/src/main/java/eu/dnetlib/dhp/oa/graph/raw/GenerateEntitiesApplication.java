@@ -127,7 +127,7 @@ public class GenerateEntitiesApplication {
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
 						.map(k -> convertToListOaf(k._1(), k._2(), shouldHashId, vocs))
 						.filter(Objects::nonNull)
-						.flatMap(list -> list.iterator()));
+						.flatMap(List::iterator));
 		}
 
 		switch (mode) {
@@ -135,7 +135,7 @@ public class GenerateEntitiesApplication {
 				save(
 					inputRdd
 						.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
-						.reduceByKey((o1, o2) -> OafMapperUtils.merge(o1, o2))
+						.reduceByKey(OafMapperUtils::merge)
 						.map(Tuple2::_2),
 					targetPath);
 				break;
@@ -191,7 +191,7 @@ public class GenerateEntitiesApplication {
 			case "otherresearchproduct":
 				return Arrays.asList(convertFromJson(s, OtherResearchProduct.class));
 			default:
-				throw new RuntimeException("type not managed: " + type.toLowerCase());
+				throw new IllegalArgumentException("type not managed: " + type.toLowerCase());
 		}
 	}
 
@@ -199,9 +199,9 @@ public class GenerateEntitiesApplication {
 		try {
 			return OBJECT_MAPPER.readValue(s, clazz);
 		} catch (final Exception e) {
-			log.error("Error parsing object of class: " + clazz);
+			log.error("Error parsing object of class: {}", clazz);
 			log.error(s);
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException(e);
 		}
 	}
 

@@ -12,6 +12,9 @@ import com.ximpleware.VTDNav;
 /** Created by sandro on 9/29/16. */
 public class VtdUtilityParser {
 
+	private VtdUtilityParser() {
+	}
+
 	public static List<Node> getTextValuesWithAttributes(
 		final AutoPilot ap, final VTDNav vn, final String xpath, final List<String> attributes)
 		throws VtdException {

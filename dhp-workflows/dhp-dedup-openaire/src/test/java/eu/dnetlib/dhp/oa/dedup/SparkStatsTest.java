@@ -124,7 +124,7 @@ public class SparkStatsTest implements Serializable {
 	}
 
 	@Test
-	public void createBlockStatsTest() throws Exception {
+	void createBlockStatsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils

@@ -25,8 +25,8 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -46,6 +46,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class XmlRecordFactory implements Serializable {
 
+	public static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
 	private final Map<String, LongAccumulator> accumulators;
 
 	private final Set<String> specialDatasourceTypes;
@@ -55,8 +56,6 @@ public class XmlRecordFactory implements Serializable {
 	private final String schemaLocation;
 
 	private boolean indent = false;
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public XmlRecordFactory(
 		final ContextMapper contextMapper,
@@ -86,7 +85,6 @@ public class XmlRecordFactory implements Serializable {
 
 		final Set<String> contexts = Sets.newHashSet();
 
-		// final OafEntity entity = toOafEntity(je.getEntity());
 		OafEntity entity = je.getEntity();
 		TemplateFactory templateFactory = new TemplateFactory();
 		try {
@@ -95,8 +93,7 @@ public class XmlRecordFactory implements Serializable {
 			final List<String> metadata = metadata(type, entity, contexts);
 
 			// rels has to be processed before the contexts because they enrich the contextMap with
-			// the
-			// funding info.
+			// the funding info.
 			final List<RelatedEntityWrapper> links = je.getLinks();
 			final List<String> relations = links
 				.stream()
@@ -122,34 +119,11 @@ public class XmlRecordFactory implements Serializable {
 		}
 	}
 
-	private static OafEntity parseOaf(final String json, final String type) {
-		try {
-			switch (EntityType.valueOf(type)) {
-				case publication:
-					return OBJECT_MAPPER.readValue(json, Publication.class);
-				case dataset:
-					return OBJECT_MAPPER.readValue(json, Dataset.class);
-				case otherresearchproduct:
-					return OBJECT_MAPPER.readValue(json, OtherResearchProduct.class);
-				case software:
-					return OBJECT_MAPPER.readValue(json, Software.class);
-				case datasource:
-					return OBJECT_MAPPER.readValue(json, Datasource.class);
-				case organization:
-					return OBJECT_MAPPER.readValue(json, Organization.class);
-				case project:
-					return OBJECT_MAPPER.readValue(json, Project.class);
-				default:
-					throw new IllegalArgumentException("invalid type: " + type);
-			}
-		} catch (IOException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
-
 	private String printXML(String xml, boolean indent) {
 		try {
-			final Document doc = new SAXReader().read(new StringReader(xml));
+			final SAXReader reader = new SAXReader();
+			reader.setFeature(DISALLOW_DOCTYPE_DECL, true);
+			final Document doc = reader.read(new StringReader(xml));
 			OutputFormat format = indent ? OutputFormat.createPrettyPrint() : OutputFormat.createCompactFormat();
 			format.setExpandEmptyElements(false);
 			format.setSuppressDeclaration(true);
@@ -157,7 +131,7 @@ public class XmlRecordFactory implements Serializable {
 			XMLWriter writer = new XMLWriter(sw, format);
 			writer.write(doc);
 			return sw.toString();
-		} catch (IOException | DocumentException e) {
+		} catch (IOException | DocumentException | SAXException e) {
 			throw new IllegalArgumentException("Unable to indent XML. Invalid record:\n" + xml, e);
 		}
 	}
@@ -203,7 +177,7 @@ public class XmlRecordFactory implements Serializable {
 			final Result r = (Result) entity;
 
 			if (r.getContext() != null) {
-				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
+				contexts.addAll(r.getContext().stream().map(Context::getId).collect(Collectors.toList()));
 				/* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */
 				if (contexts.contains("dh-ch::subcommunity::2")) {
 					contexts.add("clarin");
@@ -260,14 +234,14 @@ public class XmlRecordFactory implements Serializable {
 											.collect(
 												Collectors
 													.groupingBy(
-														p -> p.getValue(),
+														StructuredProperty::getValue,
 														Collectors
 															.mapping(
 																p -> p,
 																Collectors.minBy(new AuthorPidTypeComparator()))))
 											.values()
 											.stream()
-											.map(op -> op.get())
+											.map(Optional::get)
 											.forEach(
 												sp -> {
 													String pidType = getAuthorPidType(sp.getQualifier().getClassid());
@@ -938,7 +912,7 @@ public class XmlRecordFactory implements Serializable {
 								.getFundingtree()
 								.stream()
 								.filter(Objects::nonNull)
-								.map(ft -> ft.getValue())
+								.map(Field::getValue)
 								.collect(Collectors.toList()));
 				}
 
@@ -1069,7 +1043,7 @@ public class XmlRecordFactory implements Serializable {
 								.getFundingtree()
 								.stream()
 								.peek(ft -> fillContextMap(ft, contexts))
-								.map(ft -> getRelFundingTree(ft))
+								.map(XmlRecordFactory::getRelFundingTree)
 								.collect(Collectors.toList()));
 				}
 				break;
@@ -1112,7 +1086,7 @@ public class XmlRecordFactory implements Serializable {
 		final List<RelatedEntityWrapper> links = je.getLinks();
 		List<String> children = links
 			.stream()
-			.filter(link -> isDuplicate(link))
+			.filter(this::isDuplicate)
 			.map(link -> {
 				final String targetType = link.getTarget().getType();
 				final String name = ModelSupport.getMainType(EntityType.valueOf(targetType));
@@ -1263,7 +1237,7 @@ public class XmlRecordFactory implements Serializable {
 		return extraInfo != null
 			? extraInfo
 				.stream()
-				.map(e -> XmlSerializationUtils.mapExtraInfo(e))
+				.map(XmlSerializationUtils::mapExtraInfo)
 				.collect(Collectors.toList())
 			: Lists.newArrayList();
 	}
@@ -1287,9 +1261,6 @@ public class XmlRecordFactory implements Serializable {
 
 					if (def == null) {
 						continue;
-						// throw new IllegalStateException(String.format("cannot find context for id
-						// '%s'",
-						// id));
 					}
 
 					if (def.getName().equals("context")) {
@@ -1327,7 +1298,9 @@ public class XmlRecordFactory implements Serializable {
 
 	private Transformer getTransformer() {
 		try {
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			final TransformerFactory factory = TransformerFactory.newInstance();
+			factory.setFeature(DISALLOW_DOCTYPE_DECL, true);
+			Transformer transformer = factory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			return transformer;
 		} catch (TransformerConfigurationException e) {
@@ -1354,8 +1327,10 @@ public class XmlRecordFactory implements Serializable {
 
 		Document fundingPath;
 		try {
-			fundingPath = new SAXReader().read(new StringReader(xmlTree));
-		} catch (final DocumentException e) {
+			final SAXReader reader = new SAXReader();
+			reader.setFeature(DISALLOW_DOCTYPE_DECL, true);
+			fundingPath = reader.read(new StringReader(xmlTree));
+		} catch (final DocumentException | SAXException e) {
 			throw new RuntimeException(e);
 		}
 		try {
@@ -1407,7 +1382,9 @@ public class XmlRecordFactory implements Serializable {
 	protected static String getRelFundingTree(final String xmlTree) {
 		String funding = "<funding>";
 		try {
-			final Document ftree = new SAXReader().read(new StringReader(xmlTree));
+			final SAXReader reader = new SAXReader();
+			reader.setFeature(DISALLOW_DOCTYPE_DECL, true);
+			final Document ftree = reader.read(new StringReader(xmlTree));
 			funding = "<funding>";
 
 			funding += getFunderElement(ftree);
@@ -1427,7 +1404,7 @@ public class XmlRecordFactory implements Serializable {
 					+ e.getName()
 					+ ">";
 			}
-		} catch (final DocumentException e) {
+		} catch (final DocumentException | SAXException e) {
 			throw new IllegalArgumentException(
 				"unable to parse funding tree: " + xmlTree + "\n" + e.getMessage());
 		} finally {

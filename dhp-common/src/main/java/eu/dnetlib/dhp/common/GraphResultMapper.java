@@ -84,7 +84,7 @@ public class GraphResultMapper implements Serializable {
 								.setDocumentationUrl(
 									value
 										.stream()
-										.map(v -> v.getValue())
+										.map(Field::getValue)
 										.collect(Collectors.toList())));
 
 					Optional
@@ -100,20 +100,20 @@ public class GraphResultMapper implements Serializable {
 						.setContactgroup(
 							Optional
 								.ofNullable(ir.getContactgroup())
-								.map(value -> value.stream().map(cg -> cg.getValue()).collect(Collectors.toList()))
+								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
 								.orElse(null));
 
 					out
 						.setContactperson(
 							Optional
 								.ofNullable(ir.getContactperson())
-								.map(value -> value.stream().map(cp -> cp.getValue()).collect(Collectors.toList()))
+								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
 								.orElse(null));
 					out
 						.setTool(
 							Optional
 								.ofNullable(ir.getTool())
-								.map(value -> value.stream().map(t -> t.getValue()).collect(Collectors.toList()))
+								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
 								.orElse(null));
 
 					out.setType(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
@@ -123,7 +123,8 @@ public class GraphResultMapper implements Serializable {
 
 			Optional
 				.ofNullable(input.getAuthor())
-				.ifPresent(ats -> out.setAuthor(ats.stream().map(at -> getAuthor(at)).collect(Collectors.toList())));
+				.ifPresent(
+					ats -> out.setAuthor(ats.stream().map(GraphResultMapper::getAuthor).collect(Collectors.toList())));
 
 			// I do not map Access Right UNKNOWN or OTHER
 
@@ -210,7 +211,7 @@ public class GraphResultMapper implements Serializable {
 			if (oInst.isPresent()) {
 				out
 					.setInstance(
-						oInst.get().stream().map(i -> getInstance(i)).collect(Collectors.toList()));
+						oInst.get().stream().map(GraphResultMapper::getInstance).collect(Collectors.toList()));
 
 			}
 
@@ -230,7 +231,7 @@ public class GraphResultMapper implements Serializable {
 					.stream()
 					.filter(t -> t.getQualifier().getClassid().equalsIgnoreCase("main title"))
 					.collect(Collectors.toList());
-				if (iTitle.size() > 0) {
+				if (!iTitle.isEmpty()) {
 					out.setMaintitle(iTitle.get(0).getValue());
 				}
 
@@ -239,7 +240,7 @@ public class GraphResultMapper implements Serializable {
 					.stream()
 					.filter(t -> t.getQualifier().getClassid().equalsIgnoreCase("subtitle"))
 					.collect(Collectors.toList());
-				if (iTitle.size() > 0) {
+				if (!iTitle.isEmpty()) {
 					out.setSubtitle(iTitle.get(0).getValue());
 				}
 

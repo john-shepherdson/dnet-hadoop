@@ -66,7 +66,7 @@ public class PrepareProjectTest {
 	}
 
 	@Test
-	public void numberDistinctProjectTest() throws Exception {
+	void numberDistinctProjectTest() throws Exception {
 		PrepareProjects
 			.main(
 				new String[] {

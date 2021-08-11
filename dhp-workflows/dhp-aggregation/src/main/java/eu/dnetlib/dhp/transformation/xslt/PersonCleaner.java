@@ -28,22 +28,12 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 
 	private static final Set<String> particles = null;
 
-	public PersonCleaner() {
-
-	}
-
 	private String normalize(String s) {
 		s = Normalizer.normalize(s, Normalizer.Form.NFD); // was NFD
 		s = s.replaceAll("\\(.+\\)", "");
 		s = s.replaceAll("\\[.+\\]", "");
 		s = s.replaceAll("\\{.+\\}", "");
 		s = s.replaceAll("\\s+-\\s+", "-");
-
-//              s = s.replaceAll("[\\W&&[^,-]]", " ");
-
-//              System.out.println("class Person: s: " + s);
-
-//              s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}&&[^,-]]", " ");
 		s = s.replaceAll("[\\p{Punct}&&[^-,]]", " ");
 		s = s.replace("\\d", " ");
 		s = s.replace("\\n", " ");
@@ -51,8 +41,6 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 		s = s.replaceAll("\\s+", " ");
 
 		if (s.contains(",")) {
-			// System.out.println("class Person: s: " + s);
-
 			String[] arr = s.split(",");
 			if (arr.length == 1) {
 
@@ -60,9 +48,6 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 			} else if (arr.length > 1) {
 				surname = splitTerms(arr[0]);
 				firstname = splitTermsFirstName(arr[1]);
-//                              System.out.println("class Person: surname: " + surname);
-//                              System.out.println("class Person: firstname: " + firstname);
-
 				fullname.addAll(surname);
 				fullname.addAll(firstname);
 			}
@@ -82,7 +67,6 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 			}
 			if (lastInitialPosition < fullname.size() - 1) { // Case: Michele G. Artini
 				firstname = fullname.subList(0, lastInitialPosition + 1);
-				System.out.println("name: " + firstname);
 				surname = fullname.subList(lastInitialPosition + 1, fullname.size());
 			} else if (hasSurnameInUpperCase) { // Case: Michele ARTINI
 				for (String term : fullname) {
@@ -119,16 +103,9 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 	}
 
 	private List<String> splitTerms(String s) {
-		if (particles == null) {
-			// particles = NGramUtils.loadFromClasspath("/eu/dnetlib/pace/config/name_particles.txt");
-		}
-
 		List<String> list = Lists.newArrayList();
 		for (String part : Splitter.on(" ").omitEmptyStrings().split(s)) {
-			// if (!particles.contains(part.toLowerCase())) {
 			list.add(part);
-
-			// }
 		}
 		return list;
 	}
@@ -152,9 +129,6 @@ public class PersonCleaner implements ExtensionFunction, Serializable {
 	public String getNormalisedFullname() {
 		return isAccurate() ? Joiner.on(" ").join(getSurname()) + ", " + Joiner.on(" ").join(getNameWithAbbreviations())
 			: Joiner.on(" ").join(fullname);
-		// return isAccurate() ?
-		// Joiner.on(" ").join(getCapitalSurname()) + ", " + Joiner.on(" ").join(getNameWithAbbreviations()) :
-		// Joiner.on(" ").join(fullname);
 	}
 
 	public List<String> getCapitalSurname() {

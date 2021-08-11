@@ -11,6 +11,9 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 
 public class ProvisionModelSupport {
 
+	private ProvisionModelSupport() {
+	}
+
 	public static Class[] getModelClasses() {
 		List<Class<?>> modelClasses = Lists.newArrayList(ModelSupport.getOafModelClasses());
 		modelClasses

@@ -31,6 +31,7 @@ import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.H2020Classification;
 import eu.dnetlib.dhp.schema.oaf.H2020Programme;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
@@ -47,13 +48,10 @@ import scala.Tuple2;
  *
  * To produce one single entry for each project code a step of groupoing is needed: each project can be associated to more
  * than one programme.
- *
- *
  */
 public class SparkAtomicActionJob {
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private static final HashMap<String, String> programmeMap = new HashMap<>();
 
 	public static void main(String[] args) throws Exception {
 
@@ -137,7 +135,6 @@ public class SparkAtomicActionJob {
 						h2020classification.setClassification(csvProgramme.getClassification());
 						h2020classification.setH2020Programme(pm);
 						setLevelsandProgramme(h2020classification, csvProgramme.getClassification_short());
-						// setProgramme(h2020classification, ocsvProgramme.get().getClassification());
 						pp.setH2020classification(Arrays.asList(h2020classification));
 
 						return pp;
@@ -152,20 +149,16 @@ public class SparkAtomicActionJob {
 			.map((MapFunction<Tuple2<Project, EXCELTopic>, Project>) p -> {
 				Optional<EXCELTopic> op = Optional.ofNullable(p._2());
 				Project rp = p._1();
-				if (op.isPresent()) {
-					rp.setH2020topicdescription(op.get().getTitle());
-				}
+				op.ifPresent(excelTopic -> rp.setH2020topicdescription(excelTopic.getTitle()));
 				return rp;
 			}, Encoders.bean(Project.class))
 			.filter(Objects::nonNull)
 			.groupByKey(
-				(MapFunction<Project, String>) p -> p.getId(),
+				(MapFunction<Project, String>) OafEntity::getId,
 				Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, Project, Project>) (s, it) -> {
 				Project first = it.next();
-				it.forEachRemaining(p -> {
-					first.mergeFrom(p);
-				});
+				it.forEachRemaining(first::mergeFrom);
 				return first;
 			}, Encoders.bean(Project.class))
 			.toJavaRDD()
@@ -188,12 +181,6 @@ public class SparkAtomicActionJob {
 		}
 		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length - 1]);
 	}
-
-//	private static void setProgramme(H2020Classification h2020Classification, String classification) {
-//		String[] tmp = classification.split(" \\| ");
-//
-//		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length - 1]);
-//	}
 
 	public static <R> Dataset<R> readPath(
 		SparkSession spark, String inputPath, Class<R> clazz) {

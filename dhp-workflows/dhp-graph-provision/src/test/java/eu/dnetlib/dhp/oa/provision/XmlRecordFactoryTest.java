@@ -13,6 +13,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +22,6 @@ import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -29,7 +29,7 @@ import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
-public class XmlRecordFactoryTest {
+class XmlRecordFactoryTest {
 
 	public static final String otherDsTypeId = "scholarcomminfra,infospace,pubsrepository::mock,entityregistry,entityregistry::projects,entityregistry::repositories,websource";
 
@@ -37,11 +37,11 @@ public class XmlRecordFactoryTest {
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Test
-	public void testXMLRecordFactory() throws IOException, DocumentException {
+	void testXMLRecordFactory() throws IOException, DocumentException {
 
 		ContextMapper contextMapper = new ContextMapper();
 
-		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
+		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.SCHEMA_LOCATION,
 			otherDsTypeId);
 
 		Publication p = OBJECT_MAPPER
@@ -72,11 +72,11 @@ public class XmlRecordFactoryTest {
 	}
 
 	@Test
-	public void testXMLRecordFactoryWithValidatedProject() throws IOException, DocumentException {
+	void testXMLRecordFactoryWithValidatedProject() throws IOException, DocumentException {
 
 		ContextMapper contextMapper = new ContextMapper();
 
-		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
+		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.SCHEMA_LOCATION,
 			otherDsTypeId);
 
 		Publication p = OBJECT_MAPPER
@@ -104,11 +104,11 @@ public class XmlRecordFactoryTest {
 	}
 
 	@Test
-	public void testXMLRecordFactoryWithNonValidatedProject() throws IOException, DocumentException {
+	void testXMLRecordFactoryWithNonValidatedProject() throws IOException, DocumentException {
 
 		ContextMapper contextMapper = new ContextMapper();
 
-		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
+		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.SCHEMA_LOCATION,
 			otherDsTypeId);
 
 		Publication p = OBJECT_MAPPER
@@ -135,7 +135,7 @@ public class XmlRecordFactoryTest {
 	}
 
 	@Test
-	public void testEnermapsRecord() throws IOException, DocumentException {
+	void testEnermapsRecord() throws IOException, DocumentException, SAXException {
 
 		String contextmap = "<entries><entry id=\"enermaps\" label=\"Energy Research\" name=\"context\" type=\"community\"/>"
 			+
@@ -144,7 +144,7 @@ public class XmlRecordFactoryTest {
 			"</entries>";
 
 		ContextMapper contextMapper = ContextMapper.fromXml(contextmap);
-		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
+		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.SCHEMA_LOCATION,
 			otherDsTypeId);
 
 		Dataset d = OBJECT_MAPPER

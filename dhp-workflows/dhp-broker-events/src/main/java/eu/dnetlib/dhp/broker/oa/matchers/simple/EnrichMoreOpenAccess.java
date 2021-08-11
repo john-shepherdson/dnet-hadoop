@@ -33,7 +33,7 @@ public class EnrichMoreOpenAccess extends UpdateMatcher<OaBrokerInstance> {
 			.getInstances()
 			.stream()
 			.filter(i -> i.getLicense().equals(BrokerConstants.OPEN_ACCESS))
-			.map(i -> i.getUrl())
+			.map(OaBrokerInstance::getUrl)
 			.collect(Collectors.toSet());
 
 		return source

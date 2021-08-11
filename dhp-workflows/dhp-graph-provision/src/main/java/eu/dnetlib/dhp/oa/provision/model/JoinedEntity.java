@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.oa.provision.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

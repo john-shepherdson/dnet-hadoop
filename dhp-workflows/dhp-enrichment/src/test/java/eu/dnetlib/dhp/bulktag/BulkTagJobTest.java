@@ -90,7 +90,7 @@ public class BulkTagJobTest {
 	}
 
 	@Test
-	public void noUpdatesTest() throws Exception {
+	void noUpdatesTest() throws Exception {
 		final String pathMap = BulkTagJobTest.pathMap;
 		SparkBulkTagJob
 			.main(
@@ -128,7 +128,7 @@ public class BulkTagJobTest {
 	}
 
 	@Test
-	public void bulktagBySubjectNoPreviousContextTest() throws Exception {
+	void bulktagBySubjectNoPreviousContextTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/nocontext")
 			.getPath();
@@ -224,7 +224,7 @@ public class BulkTagJobTest {
 	}
 
 	@Test
-	public void bulktagBySubjectPreviousContextNoProvenanceTest() throws Exception {
+	void bulktagBySubjectPreviousContextNoProvenanceTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/contextnoprovenance")
@@ -306,7 +306,7 @@ public class BulkTagJobTest {
 	}
 
 	@Test
-	public void bulktagByDatasourceTest() throws Exception {
+	void bulktagByDatasourceTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource")
 			.getPath();
@@ -378,7 +378,7 @@ public class BulkTagJobTest {
 	}
 
 	@Test
-	public void bulktagByZenodoCommunityTest() throws Exception {
+	void bulktagByZenodoCommunityTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/bulktag/sample/otherresearchproduct/update_zenodocommunity")
@@ -500,7 +500,7 @@ public class BulkTagJobTest {
 	}
 
 	@Test
-	public void bulktagBySubjectDatasourceTest() throws Exception {
+	void bulktagBySubjectDatasourceTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject_datasource")
 			.getPath();
@@ -628,7 +628,7 @@ public class BulkTagJobTest {
 	}
 
 	@Test
-	public void bulktagBySubjectDatasourceZenodoCommunityTest() throws Exception {
+	void bulktagBySubjectDatasourceZenodoCommunityTest() throws Exception {
 
 		SparkBulkTagJob
 			.main(
@@ -724,7 +724,7 @@ public class BulkTagJobTest {
 	}
 
 	@Test
-	public void bulktagDatasourcewithConstraintsTest() throws Exception {
+	void bulktagDatasourcewithConstraintsTest() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource(

@@ -27,12 +27,14 @@ public class CSVParser {
 		final Set<String> headers = parser.getHeaderMap().keySet();
 		Class<?> clazz = Class.forName(classForName);
 		for (CSVRecord csvRecord : parser.getRecords()) {
-			final Object cc = clazz.newInstance();
+
+			@SuppressWarnings("unchecked")
+			final R cc = (R) clazz.newInstance();
 			for (String header : headers) {
 				FieldUtils.writeField(cc, header, csvRecord.get(header), true);
 
 			}
-			ret.add((R) cc);
+			ret.add(cc);
 		}
 
 		return ret;

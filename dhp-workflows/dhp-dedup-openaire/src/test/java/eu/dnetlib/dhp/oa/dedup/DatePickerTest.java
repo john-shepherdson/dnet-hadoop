@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test;
 
 import com.clearspring.analytics.util.Lists;
 
-public class DatePickerTest {
+class DatePickerTest {
 
 	Collection<String> dates = Lists.newArrayList();
 
 	@Test
-	public void testPickISO() {
+	void testPickISO() {
 		dates.add("2016-01-01T12:00:00Z");
 		dates.add("2016-06-16T12:00:00Z");
 		dates.add("2020-01-01T12:00:00Z");
@@ -24,7 +24,7 @@ public class DatePickerTest {
 	}
 
 	@Test
-	public void testPickSimple() {
+	void testPickSimple() {
 		dates.add("2016-01-01");
 		dates.add("2016-06-16");
 		dates.add("2020-01-01");
@@ -33,7 +33,7 @@ public class DatePickerTest {
 	}
 
 	@Test
-	public void testPickFrequent() {
+	void testPickFrequent() {
 		dates.add("2016-02-01");
 		dates.add("2016-02-01");
 		dates.add("2016-02-01");

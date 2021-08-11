@@ -18,7 +18,8 @@ public class SparkSessionSupportTest {
 	class RunWithSparkSession {
 
 		@Test
-		public void shouldExecuteFunctionAndNotStopSparkSessionWhenSparkSessionIsNotManaged()
+		@SuppressWarnings("unchecked")
+		void shouldExecuteFunctionAndNotStopSparkSessionWhenSparkSessionIsNotManaged()
 			throws Exception {
 			// given
 			SparkSession spark = mock(SparkSession.class);
@@ -37,7 +38,8 @@ public class SparkSessionSupportTest {
 		}
 
 		@Test
-		public void shouldExecuteFunctionAndStopSparkSessionWhenSparkSessionIsManaged()
+		@SuppressWarnings("unchecked")
+		void shouldExecuteFunctionAndStopSparkSessionWhenSparkSessionIsManaged()
 			throws Exception {
 			// given
 			SparkSession spark = mock(SparkSession.class);

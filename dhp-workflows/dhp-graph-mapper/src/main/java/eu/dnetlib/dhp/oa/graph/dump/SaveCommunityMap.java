@@ -15,6 +15,7 @@ import org.apache.hadoop.fs.Path;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -31,25 +32,23 @@ public class SaveCommunityMap implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SaveCommunityMap.class);
 	private final QueryInformationSystem queryInformationSystem;
 
-	private final Configuration conf;
 	private final BufferedWriter writer;
 
 	public SaveCommunityMap(String hdfsPath, String hdfsNameNode, String isLookUpUrl) throws IOException {
-		conf = new Configuration();
+		final Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 		FileSystem fileSystem = FileSystem.get(conf);
 		Path hdfsWritePath = new Path(hdfsPath);
-		FSDataOutputStream fsDataOutputStream = null;
+
 		if (fileSystem.exists(hdfsWritePath)) {
-			fileSystem.delete(hdfsWritePath);
+			fileSystem.delete(hdfsWritePath, true);
 		}
-		fsDataOutputStream = fileSystem.create(hdfsWritePath);
 
 		queryInformationSystem = new QueryInformationSystem();
 		queryInformationSystem.setIsLookUp(Utils.getIsLookUpService(isLookUpUrl));
 
-		writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
-
+		FSDataOutputStream fos = fileSystem.create(hdfsWritePath);
+		writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -74,10 +73,9 @@ public class SaveCommunityMap implements Serializable {
 		final SaveCommunityMap scm = new SaveCommunityMap(outputPath, nameNode, isLookUpUrl);
 
 		scm.saveCommunityMap();
-
 	}
 
-	private void saveCommunityMap() throws ISLookUpException, IOException, DocumentException {
+	private void saveCommunityMap() throws ISLookUpException, IOException, DocumentException, SAXException {
 		writer.write(Utils.OBJECT_MAPPER.writeValueAsString(queryInformationSystem.getCommunityMap()));
 		writer.close();
 	}

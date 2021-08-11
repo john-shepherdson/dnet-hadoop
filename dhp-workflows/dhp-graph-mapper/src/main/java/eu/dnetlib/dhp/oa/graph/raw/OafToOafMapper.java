@@ -19,7 +19,6 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -56,8 +55,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				.valueOf("./@nameIdentifierScheme")
 				.trim()
 				.toUpperCase()
-				.replaceAll(" ", "")
-				.replaceAll("_", "");
+				.replace(" ", "")
+				.replace("_", "");
 
 			author.setPid(new ArrayList<>());
 

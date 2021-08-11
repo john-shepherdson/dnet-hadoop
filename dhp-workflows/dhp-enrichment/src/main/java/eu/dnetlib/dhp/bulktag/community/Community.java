@@ -5,15 +5,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.google.gson.Gson;
 
 /** Created by miriam on 01/08/2018. */
 public class Community implements Serializable {
-
-	private static final Log log = LogFactory.getLog(Community.class);
 
 	private String id;
 	private List<String> subjects = new ArrayList<>();

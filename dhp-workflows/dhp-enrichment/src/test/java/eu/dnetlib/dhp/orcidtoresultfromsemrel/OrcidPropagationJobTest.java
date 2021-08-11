@@ -65,7 +65,7 @@ public class OrcidPropagationJobTest {
 	}
 
 	@Test
-	public void noUpdateTest() throws Exception {
+	void noUpdateTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
 			.getPath();
@@ -111,7 +111,7 @@ public class OrcidPropagationJobTest {
 	}
 
 	@Test
-	public void oneUpdateTest() throws Exception {
+	void oneUpdateTest() throws Exception {
 		SparkOrcidToResultFromSemRelJob
 			.main(
 				new String[] {
@@ -178,7 +178,7 @@ public class OrcidPropagationJobTest {
 	}
 
 	@Test
-	public void twoUpdatesTest() throws Exception {
+	void twoUpdatesTest() throws Exception {
 		SparkOrcidToResultFromSemRelJob
 			.main(
 				new String[] {

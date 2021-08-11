@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -33,9 +34,11 @@ public class DispatchEntitiesSparkJob {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				DispatchEntitiesSparkJob.class
-					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/dedup/dispatch_entities_parameters.json"));
+				Objects
+					.requireNonNull(
+						DispatchEntitiesSparkJob.class
+							.getResourceAsStream(
+								"/eu/dnetlib/dhp/oa/dedup/dispatch_entities_parameters.json")));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 

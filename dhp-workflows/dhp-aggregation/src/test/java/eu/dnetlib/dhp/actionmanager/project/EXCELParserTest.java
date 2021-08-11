@@ -30,7 +30,7 @@ public class EXCELParserTest {
 	}
 
 	@Test
-	public void test1() throws CollectorException, IOException, InvalidFormatException, ClassNotFoundException,
+	void test1() throws CollectorException, IOException, InvalidFormatException, ClassNotFoundException,
 		IllegalAccessException, InstantiationException {
 
 		EXCELParser excelParser = new EXCELParser();

@@ -40,9 +40,11 @@ public class MergeClaimsApplication {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					MigrateMongoMdstoresApplication.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json")));
+					Objects
+						.requireNonNull(
+							MergeClaimsApplication.class
+								.getResourceAsStream(
+									"/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json"))));
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = Optional

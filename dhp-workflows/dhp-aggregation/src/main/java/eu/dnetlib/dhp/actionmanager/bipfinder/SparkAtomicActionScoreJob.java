@@ -87,7 +87,7 @@ public class SparkAtomicActionScoreJob implements Serializable {
 	private static <I extends Result> void prepareResults(SparkSession spark, String inputPath, String outputPath,
 		String bipScorePath, Class<I> inputClazz) {
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<BipDeserialize> bipDeserializeJavaRDD = sc
 			.textFile(bipScorePath)
@@ -100,8 +100,6 @@ public class SparkAtomicActionScoreJob implements Serializable {
 				bs.setScoreList(entry.get(key));
 				return bs;
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class));
-
-		System.out.println(bipScores.count());
 
 		Dataset<I> results = readPath(spark, inputPath, inputClazz);
 
@@ -124,7 +122,7 @@ public class SparkAtomicActionScoreJob implements Serializable {
 				ret.setId(value._2().getId());
 				return ret;
 			}, Encoders.bean(BipScore.class))
-			.groupByKey((MapFunction<BipScore, String>) value -> value.getId(), Encoders.STRING())
+			.groupByKey((MapFunction<BipScore, String>) BipScore::getId, Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, BipScore, Result>) (k, it) -> {
 				Result ret = new Result();
 				ret.setDataInfo(getDataInfo());
