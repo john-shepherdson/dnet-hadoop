@@ -7,6 +7,8 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,18 +31,13 @@ public class TestReadCSV {
 			.build()
 			.parse();
 
-		ObjectMapper mapper = new ObjectMapper();
-
-		beans.forEach(r -> {
-			try {
-				System.out.println(mapper.writeValueAsString(r));
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
-		});
+		Assertions.assertEquals(36, beans.size());
+		Assertions.assertEquals(1, beans.stream().filter(e -> e.getIssn().equals("0001-625X")).count());
+		Assertions.assertTrue(beans.stream().anyMatch(e -> e.getIssn().equals("0001-625X") && e.getTitle().equals("Acta Mycologica")));
+		Assertions.assertTrue(beans.stream().allMatch(e -> e.getIssn().equals(e.getIssn_l())));
 
 	}
-
+	@Disabled
 	@Test
 	public void testCSVUrlUnibi() throws IOException {
 
@@ -66,6 +63,7 @@ public class TestReadCSV {
 			);
 	}
 
+	@Disabled
 	@Test
 	public void testCSVUrlDOAJ() throws IOException {
 
