@@ -55,13 +55,17 @@ class TestApply extends java.io.Serializable{
         assertTrue(pa.getInstance().get(0).getAccessright.getClassid.equals("OPEN"))
         assertTrue(pa.getInstance().get(0).getAccessright.getClassname.equals("Open Access"))
         assertTrue(pa.getInstance().get(0).getAccessright.getOpenAccessRoute.equals(OpenAccessRoute.hybrid))
+        assertTrue(pa.getBestaccessright.getClassid.equals("OPEN"))
+        assertTrue(pa.getBestaccessright.getClassname.equals("Open Access"))
 
 
         assertTrue(pb.getInstance().get(0).getHostedby.getKey.equals("10|openaire____::0b74b6a356bbf23c245f9ae9a748745c"))
         assertTrue(pb.getInstance().get(0).getHostedby.getValue.equals("Revistas de investigación Universidad Nacional Mayor de San Marcos"))
-        assertTrue(pb.getInstance().get(0).getAccessright.getClassname.equals("Open Access"))
-        assertTrue(pb.getInstance().get(0).getAccessright.getClassid.equals("OPEN"))
+        assertTrue(pb.getInstance().get(0).getAccessright.getClassname.equals("not available"))
+        assertTrue(pb.getInstance().get(0).getAccessright.getClassid.equals("UNKNOWN"))
         assertTrue(pb.getInstance().get(0).getAccessright.getOpenAccessRoute == null)
+        assertTrue(pb.getBestaccessright.getClassid.equals("UNKNOWN"))
+        assertTrue(pb.getBestaccessright.getClassname.equals("not available"))
 
       }else{
         assertTrue(pa.getInstance().get(0).getHostedby.getKey.equals(pb.getInstance().get(0).getHostedby.getKey))
