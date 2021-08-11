@@ -81,8 +81,8 @@ public class PatchRelationApplicationTest {
 		PatchRelationsApplication.main(new String[] {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
 			"-graphBasePath", graphBasePath,
-			"-workingDir", workingDir.toString() + "/workingDir",
-			"-idMappingPath", workingDir.toString() + "/" + ID_MAPPING_PATH
+			"-workingDir", workingDir + "/workingDir",
+			"-idMappingPath", workingDir + "/" + ID_MAPPING_PATH
 		});
 
 		final List<Relation> rels = spark
