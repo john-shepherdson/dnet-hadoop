@@ -117,12 +117,6 @@
 			<groupId>eu.dnetlib.dhp</groupId>
 			<artifactId>dhp-schemas</artifactId>
 		</dependency>
-
-
-
 	</dependencies>
-
-
-
 
 </project>
