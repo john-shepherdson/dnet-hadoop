@@ -4,6 +4,7 @@ package eu.dnetlib.doiboost.orcidnodoi;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +15,13 @@ import com.google.gson.JsonParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.doiboost.orcidnodoi.oaf.PublicationToOaf;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 
 class PublicationToOafTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(PublicationToOafTest.class);
 
 	@Test
-	@Ignore
+	@Disabled
 	void convertOafPublicationTest() throws Exception {
 		String jsonPublication = IOUtils
 			.toString(

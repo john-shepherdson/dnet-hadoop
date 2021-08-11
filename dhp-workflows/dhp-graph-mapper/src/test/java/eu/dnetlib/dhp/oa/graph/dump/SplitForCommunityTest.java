@@ -62,7 +62,7 @@ public class SplitForCommunityTest {
 	}
 
 	@Test
-	void test1() {
+	void testCommunitySplit() {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/splitForCommunity")

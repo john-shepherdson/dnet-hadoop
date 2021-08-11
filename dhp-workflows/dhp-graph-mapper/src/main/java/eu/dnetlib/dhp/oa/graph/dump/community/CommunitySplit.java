@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.graph.dump.community;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,29 +49,32 @@ public class CommunitySplit implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		communities
-			.stream()
 			.forEach(c -> printResult(c, result, outputPath));
 
 	}
 
-	private static void printResult(String c, Dataset<CommunityResult> result, String outputPath) {
-		Dataset<CommunityResult> community_products = result
-			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, c));
+	private static void printResult(String community, Dataset<CommunityResult> result, String outputPath) {
+		Dataset<CommunityResult> communityProducts = result
+			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, community));
 
-		community_products.first();
-		community_products
-			.write()
-			.option("compression", "gzip")
-			.mode(SaveMode.Overwrite)
-			.json(outputPath + "/" + c);
+		try {
+			communityProducts.first();
+			communityProducts
+				.write()
+				.option("compression", "gzip")
+				.mode(SaveMode.Overwrite)
+				.json(outputPath + "/" + community);
+		} catch (NoSuchElementException e) {
+			// ignoring it on purpose
+		}
 	}
 
-	private static boolean containsCommunity(CommunityResult r, String c) {
+	private static boolean containsCommunity(CommunityResult r, String community) {
 		if (Optional.ofNullable(r.getContext()).isPresent()) {
 			return !r
 				.getContext()
 				.stream()
-				.filter(con -> con.getCode().equals(c))
+				.filter(con -> con.getCode().equals(community))
 				.collect(Collectors.toList())
 				.isEmpty();
 		}

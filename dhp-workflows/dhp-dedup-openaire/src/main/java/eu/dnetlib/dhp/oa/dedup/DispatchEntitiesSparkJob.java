@@ -57,6 +57,7 @@ public class DispatchEntitiesSparkJob {
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
 
+		@SuppressWarnings("unchecked")
 		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
 		SparkConf conf = new SparkConf();

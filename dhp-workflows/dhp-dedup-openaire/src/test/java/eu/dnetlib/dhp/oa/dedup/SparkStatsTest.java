@@ -41,7 +41,7 @@ public class SparkStatsTest implements Serializable {
 	private static final String testActionSetId = "test-orchestrator";
 
 	@BeforeAll
-	public static void cleanUp() throws IOException, URISyntaxException {
+	public static void beforeAll() throws IOException, URISyntaxException {
 
 		testGraphBasePath = Paths
 			.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/entities").toURI())
@@ -73,7 +73,7 @@ public class SparkStatsTest implements Serializable {
 			.thenReturn(
 				IOUtils
 					.toString(
-						SparkDedupTest.class
+						SparkStatsTest.class
 							.getResourceAsStream(
 								"/eu/dnetlib/dhp/dedup/profiles/mock_orchestrator.xml")));
 
@@ -82,7 +82,7 @@ public class SparkStatsTest implements Serializable {
 			.thenReturn(
 				IOUtils
 					.toString(
-						SparkDedupTest.class
+						SparkStatsTest.class
 							.getResourceAsStream(
 								"/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
 
@@ -91,7 +91,7 @@ public class SparkStatsTest implements Serializable {
 			.thenReturn(
 				IOUtils
 					.toString(
-						SparkDedupTest.class
+						SparkStatsTest.class
 							.getResourceAsStream(
 								"/eu/dnetlib/dhp/dedup/conf/pub.curr.conf.json")));
 
@@ -100,7 +100,7 @@ public class SparkStatsTest implements Serializable {
 			.thenReturn(
 				IOUtils
 					.toString(
-						SparkDedupTest.class
+						SparkStatsTest.class
 							.getResourceAsStream(
 								"/eu/dnetlib/dhp/dedup/conf/sw.curr.conf.json")));
 
@@ -109,7 +109,7 @@ public class SparkStatsTest implements Serializable {
 			.thenReturn(
 				IOUtils
 					.toString(
-						SparkDedupTest.class
+						SparkStatsTest.class
 							.getResourceAsStream(
 								"/eu/dnetlib/dhp/dedup/conf/ds.curr.conf.json")));
 
@@ -118,7 +118,7 @@ public class SparkStatsTest implements Serializable {
 			.thenReturn(
 				IOUtils
 					.toString(
-						SparkDedupTest.class
+						SparkStatsTest.class
 							.getResourceAsStream(
 								"/eu/dnetlib/dhp/dedup/conf/orp.curr.conf.json")));
 	}
@@ -129,7 +129,7 @@ public class SparkStatsTest implements Serializable {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkStatsTest.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/oa/dedup/createBlockStats_parameters.json")));
 		parser
@@ -168,10 +168,15 @@ public class SparkStatsTest implements Serializable {
 			.textFile(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_blockstats")
 			.count();
 
-		assertEquals(549, orgs_blocks);
-		assertEquals(299, pubs_blocks);
+		assertEquals(477, orgs_blocks);
+		assertEquals(295, pubs_blocks);
 		assertEquals(122, sw_blocks);
-		assertEquals(186, ds_blocks);
-		assertEquals(170, orp_blocks);
+		assertEquals(191, ds_blocks);
+		assertEquals(171, orp_blocks);
+	}
+
+	@AfterAll
+	public static void tearDown() {
+		spark.close();
 	}
 }

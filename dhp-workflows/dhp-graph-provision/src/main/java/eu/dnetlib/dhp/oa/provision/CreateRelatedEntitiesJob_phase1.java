@@ -72,6 +72,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
 
+		@SuppressWarnings("unchecked")
 		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
 		SparkConf conf = new SparkConf();
@@ -223,10 +224,10 @@ public class CreateRelatedEntitiesJob_phase1 {
 
 	/**
 	 * Reads a Dataset of eu.dnetlib.dhp.oa.provision.model.SortableRelation objects from a newline delimited json text
-	 * file,
+	 * file
 	 *
-	 * @param spark
-	 * @param relationPath
+	 * @param spark the SparkSession
+	 * @param relationPath the path storing the relation objects
 	 * @return the Dataset<SortableRelation> containing all the relationships
 	 */
 	private static Dataset<Relation> readPathRelation(

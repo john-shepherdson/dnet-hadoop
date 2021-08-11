@@ -1299,7 +1299,6 @@ public class XmlRecordFactory implements Serializable {
 	private Transformer getTransformer() {
 		try {
 			final TransformerFactory factory = TransformerFactory.newInstance();
-			factory.setFeature(DISALLOW_DOCTYPE_DECL, true);
 			Transformer transformer = factory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			return transformer;

@@ -160,6 +160,7 @@ public class OrcidClientTest {
 	}
 
 	@Test
+	@Disabled
 	void testReadBase64CompressedRecord() throws Exception {
 		final String base64CompressedRecord = IOUtils
 			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));

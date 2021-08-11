@@ -132,7 +132,6 @@ public class RestIterator implements Iterator<String> {
 	private void initXmlTransformation(String resultTotalXpath, String resumptionXpath, String entityXpath)
 		throws TransformerConfigurationException, XPathExpressionException {
 		final TransformerFactory factory = TransformerFactory.newInstance();
-		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 		transformer = factory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
