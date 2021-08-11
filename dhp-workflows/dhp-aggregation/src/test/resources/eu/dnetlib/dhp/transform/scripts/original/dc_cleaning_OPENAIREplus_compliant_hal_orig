@@ -134,9 +134,9 @@ oaf:identifier = set(xpath:"//dri:recordIdentifier", @identifierType = "oai-orig
 oaf:datasourceprefix = xpath:"//oaf:datasourceprefix";
 
 // journal data
-// avoiding regular expressions, while a) correcting ISSNs with no - or other letters instead of - and b) ignoring any stuff after the issn (as e.g. print/online/...)
-$varISSN = xpath:"//dc:source[starts-with(., 'issn:') and string-length(.) &gt; 12]/concat(substring(normalize-space(substring-after(., 'issn:')), 1, 4), '-', normalize-space(substring-after(., substring(normalize-space(substring-after(., 'issn:')), 1, 4))))";
-//$varEISSN = xpath:"//dc:source[starts-with(., 'EISSN:') and string-length(.) &gt; 13]/normalize-space(substring-after(., 'issn:'))";
+// avoiding regular expressions, while a) correcting ISSNs with no - or other letters instead of - and b) ignoring any stuff after the ISSN (as e.g. print/online/...)
+$varISSN = xpath:"//dc:source[starts-with(., 'ISSN:') and string-length(.) &gt; 12]/concat(substring(normalize-space(substring-after(., 'ISSN:')), 1, 4), '-', normalize-space(substring-after(., substring(normalize-space(substring-after(., 'ISSN:')), 1, 4))))";
+//$varEISSN = xpath:"//dc:source[starts-with(., 'EISSN:') and string-length(.) &gt; 13]/normalize-space(substring-after(., 'ISSN:'))";
 $varEISSN = xpath:"//dc:source[starts-with(., 'EISSN:') and string-length(.) &gt; 13]/concat(substring(normalize-space(substring-after(., 'EISSN:')), 1, 4), '-', normalize-space(substring-after(., substring(normalize-space(substring-after(., 'EISSN:')), 1, 4))))";
 oaf:journal = set(xpath:"//oaf:datasourceprefix[$varISSN or $varEISSN]/''", @issn = xpath:"$varISSN";, @eissn = xpath:"$varEISSN";);
 
