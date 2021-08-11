@@ -1,0 +1,144 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="6870f8c4-4e0e-414f-bd0d-2c8de5e7d1a5_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-07-13T14:00:07+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Import Datacite ActionSet</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>Import InfoSpace</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setResumeFrom" type="SetEnvParameter">
+                <DESCRIPTION>set the resume from</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">resumeFrom</PARAM>
+                    <PARAM function="validValues(['TransformDatacite', ''])" managedBy="user" name="parameterValue" required="true" type="string">TransformDatacite</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="setExportLinks"/>
+                </ARCS>
+            </NODE>
+            <NODE name="setExportLinks" type="SetEnvParameter">
+                <DESCRIPTION>shall the datacite mapping produce the links?</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">exportLinks</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="boolean">false</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="setDatacitePathTransformed"/>
+                </ARCS>
+            </NODE>
+            <NODE name="setDatacitePathTransformed" type="SetEnvParameter">
+                <DESCRIPTION>set the path storing the OAF Datacite records</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">oafTargetPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/datacite/production/datacite_oaf</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="setDatacitePath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="setDatacitePath" type="SetEnvParameter">
+                <DESCRIPTION>set the input path for Datacite content</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">datacitePath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/datacite</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prepareActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareActionSets" type="PrepareActionSets">
+                <DESCRIPTION>prepare action sets</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="sets" required="true" type="string">
+                        [
+                        {
+                        'set' : 'datacite',
+                        'jobProperty' : 'export_action_set_datacite',
+                        'enablingProperty' : 'active_datacite',
+                        'enabled' : 'true'
+                        }
+                        ]
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="extractOutputPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="extractOutputPath" type="ExtractOutputPath">
+                <DESCRIPTION>extract the hdfs output path generated in the previous node</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hdfsOutputPathParam" required="true" type="string">outputPath</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="transformDatacite"/>
+                </ARCS>
+            </NODE>
+            <NODE name="transformDatacite" type="SubmitHadoopJob">
+                <DESCRIPTION>prepare a new version of Datacite ActionSet</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'mainPath' : 'datacitePath',
+                        'oafTargetPath' : 'oafTargetPath',
+                        'exportLinks' : 'exportLinks',
+                        'resumeFrom' : 'resumeFrom'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/actionmanager/datacite_import/oozie_app',
+                        'sparkExecutorMemory' : '7G'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="generateDataciteActionSet"/>
+                </ARCS>
+            </NODE>
+            <NODE name="generateDataciteActionSet" type="SubmitHadoopJob">
+                <DESCRIPTION>prepare a new version of Datacite ActionSet</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'oafTargetPath',
+                        'outputPath' : 'outputPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/actionmanager/datacite_actionset/oozie_app',
+                        'sparkExecutorMemory' : '7G'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="updateActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateActionSets" type="UpdateActionSets">
+                <DESCRIPTION>update action sets</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20210723_163342_752</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2021-07-23T16:44:05+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>SUCCESS</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR/>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

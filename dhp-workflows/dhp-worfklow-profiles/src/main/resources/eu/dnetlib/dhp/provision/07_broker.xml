@@ -1,0 +1,131 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="8d36cc94-5b82-413c-923f-e7b3953e41bb_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-02-15T09:52:39+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Update Broker events [PROD OCEAN]</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>Data Provision</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setGraphInputPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the path containing the GRAPH to scan</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">graphInputPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string"></PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setDatasourceIdWhitelist" type="SetEnvParameter">
+                <DESCRIPTION>Set the datasource Ids Whitelist</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">datasourceIdWhitelist</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">openaire____::9ecafa3655143cbc4bc75853035cd432,opendoar____::dc6e224a8d74ce03bf301152d6e33e97,openaire____::09da65eaaa6deac2f785df1e0ae95a06,openaire____::3db634fc5446f389d0b826ea400a5da6,openaire____::5a38cb462ac487bf26bdb86009fe3e74,openaire____::3c29379cc184f66861e858bc7aa9615b,openaire____::4657147e48a1f32637bfe3743bce76c6,openaire____::c3267ea1c3f378c456209b6df241624e,opendoar____::358aee4cc897452c00244351e4d91f69,re3data_____::7b0ad08687b2c960d5aeef06f811d5e6,opendoar____::798ed7d4ee7138d49b8828958048130a,opendoar____::6f4922f45568161a8cdf4ad2299f6d23,opendoar____::4aa0e93b918848be0b7728b4b1568d8a,openaire____::02b55e4f52388520bfe11f959f836e68</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setDatasourceTypeWhitelist" type="SetEnvParameter">
+                <DESCRIPTION>Set the datasource type Whitelist</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">datasourceTypeWhitelist</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">pubsrepository::unknown,pubsrepository::institutional,pubsrepository::thematic,datarepository::unknown,orprepository,softwarerepository</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setDatasourceIdBlacklist" type="SetEnvParameter">
+                <DESCRIPTION>Set the datasource Id Blacklist</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">datasourceIdBlacklist</PARAM>
+                    <PARAM managedBy="system" name="parameterValue" required="true" type="string">-</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setTopicWhitelist" type="SetEnvParameter">
+                <DESCRIPTION>Set the TOPIC whitelist (* = all topics)</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">topicWhitelist</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">ENRICH/MISSING/SUBJECT/DDC,ENRICH/MISSING/SUBJECT/JEL,ENRICH/MISSING/SUBJECT/MESHEUROPMC,ENRICH/MISSING/PUBLICATION_DATE,ENRICH/MISSING/PID,ENRICH/MISSING/PROJECT,ENRICH/MISSING/SUBJECT/ACM,ENRICH/MISSING/SUBJECT/ARXIV,ENRICH/MISSING/OPENACCESS_VERSION,ENRICH/MISSING/AUTHOR/ORCID,ENRICH/MISSING/ABSTRACT,ENRICH/MORE/SUBJECT/ACM,ENRICH/MORE/SUBJECT/ARXIV,ENRICH/MORE/SUBJECT/DDC,ENRICH/MORE/SUBJECT/JEL,ENRICH/MORE/OPENACCESS_VERSION,ENRICH/MORE/SUBJECT/MESHEUROPMC,ENRICH/MORE/PID</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setOutputDir" type="SetEnvParameter">
+                <DESCRIPTION>Set the output path to store the Event records</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">outputDir</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/var/lib/dnet/broker_PROD/events</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitConfig">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="updateBrokerEvents"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateBrokerEvents" type="SubmitHadoopJob">
+                <DESCRIPTION>update the BROKER events</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphInputPath' : 'graphInputPath',
+                        'datasourceIdWhitelist' : 'datasourceIdWhitelist',
+                        'datasourceTypeWhitelist' : 'datasourceTypeWhitelist',
+                        'datasourceIdBlacklist' : 'datasourceIdBlacklist',
+                        'topicWhitelist' : 'topicWhitelist',
+                        'outputDir' : 'outputDir'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/oa/broker/generate_events/oozie_app',
+                        'esEventIndexName' : '',
+                        'esNotificationsIndexName' : '',
+                        'esIndexHost' : '',
+                        'maxIndexedEventsForDsAndTopic' : '100',
+                        'esBatchWriteRetryCount' : '8',
+                        'esBatchWriteRetryWait' : '60s',
+                        'esBatchSizeEntries' : '200',
+                        'esNodesWanOnly' : 'true',
+                        'brokerApiBaseUrl' : '',
+                        'brokerDbUrl' : '',
+                        'brokerDbUser' : '',
+                        'brokerDbPassword' : '',
+                        'sparkDriverMemory' : '3G',
+                        'sparkExecutorMemory' : '7G',
+                        'sparkExecutorCores' : '6',
+                        'workingDir' : '/tmp/prod_provision/working_dir/broker_events'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20210709_073839_206</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2021-07-09T11:01:01+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>FAILURE</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR></LAST_EXECUTION_ERROR>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>
