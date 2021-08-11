@@ -36,10 +36,10 @@ article-number,String,No,,N/A,
 published-print,Partial Date,No,Date on which the work was published in print,"Result/relevantDate with Qualifier(""published-print"", ""dnet:dataCite_date"")",
 published-online,Partial Date,No,Date on which the work was published online,"Result/relevantDate with Qualifier(""published-online"", ""dnet:dataCite_date"")",
 subject,Array of String,No,"Subject category names, a controlled vocabulary from Sci-Val. Available for most journal articles","Result/subject with Qualifier(""keywords"", ""dnet:subject_classification_typologies""). ","Future improvements: map the controlled vocabulary instead of using the generic ""keywords"" qualifier"
-issn,Array of String,No,,"Publication/Journal/issn
+ISSN,Array of String,No,,"Publication/Journal/issn
 Publication/Journal/lissn
 Publication/Journal/eissn",The mapping depends on the value of issn-type
-issn-type,Array of issn with Type,No,List of ISSNs with issn type information,N/A,Its value guides the setting of the properties in Journal (see row above)
+issn-type,Array of ISSN with Type,No,List of ISSNs with ISSN type information,N/A,Its value guides the setting of the properties in Journal (see row above)
 ISBN,Array of String,No,,Publication/source,"In case of Book We can map ISBN and container title on Publication/source using this syntax container-title + ""ISBN: "" + ISBN"
 archive,Array of String,No,,N/A,
 license,Array of License,No,,Result/Instance/License,
