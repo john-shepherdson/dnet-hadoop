@@ -13,11 +13,11 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpClientParams;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
 

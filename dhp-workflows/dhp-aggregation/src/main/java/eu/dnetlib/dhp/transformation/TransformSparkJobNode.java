@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.message.MessageSender;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;

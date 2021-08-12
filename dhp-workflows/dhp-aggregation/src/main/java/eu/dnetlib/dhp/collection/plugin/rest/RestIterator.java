@@ -30,9 +30,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpClientParams;
 import eu.dnetlib.dhp.collection.JsonUtils;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 /**
  * log.info(...) equal to  log.trace(...) in the application-logs
