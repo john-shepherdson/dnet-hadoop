@@ -28,10 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Node;
+import org.dom4j.*;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -112,43 +109,40 @@ public abstract class AbstractMdRecordToOafMapper {
 		this.forceOriginalId = false;
 	}
 
-	public List<Oaf> processMdRecord(final String xml) {
-		try {
-			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
+	public List<Oaf> processMdRecord(final String xml) throws DocumentException {
 
-			final Document doc = DocumentHelper
-				.parseText(
-					xml
-						.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3)
-						.replaceAll(DATACITE_SCHEMA_KERNEL_4_SLASH, DATACITE_SCHEMA_KERNEL_3)
-						.replaceAll(DATACITE_SCHEMA_KERNEL_3_SLASH, DATACITE_SCHEMA_KERNEL_3));
+		DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
-			final KeyValue collectedFrom = getProvenanceDatasource(
-				doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
+		final Document doc = DocumentHelper
+			.parseText(
+				xml
+					.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3)
+					.replaceAll(DATACITE_SCHEMA_KERNEL_4_SLASH, DATACITE_SCHEMA_KERNEL_3)
+					.replaceAll(DATACITE_SCHEMA_KERNEL_3_SLASH, DATACITE_SCHEMA_KERNEL_3));
 
-			if (collectedFrom == null) {
-				return Lists.newArrayList();
-			}
+		final KeyValue collectedFrom = getProvenanceDatasource(
+			doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
 
-			final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
-				? collectedFrom
-				: getProvenanceDatasource(doc, "//oaf:hostedBy/@id", "//oaf:hostedBy/@name");
-
-			if (hostedBy == null) {
-				return Lists.newArrayList();
-			}
-
-			final DataInfo info = prepareDataInfo(doc, invisible);
-			final long lastUpdateTimestamp = new Date().getTime();
-
-			final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
-
-			final String type = getResultType(doc, instances);
-
-			return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
+		if (collectedFrom == null) {
+			return Lists.newArrayList();
 		}
+
+		final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
+			? collectedFrom
+			: getProvenanceDatasource(doc, "//oaf:hostedBy/@id", "//oaf:hostedBy/@name");
+
+		if (hostedBy == null) {
+			return Lists.newArrayList();
+		}
+
+		final DataInfo info = prepareDataInfo(doc, invisible);
+		final long lastUpdateTimestamp = new Date().getTime();
+
+		final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+
+		final String type = getResultType(doc, instances);
+
+		return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 	}
 
 	protected String getResultType(final Document doc, final List<Instance> instances) {
@@ -497,22 +491,6 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected Qualifier prepareQualifier(final String classId, final String schemeId) {
 		return vocs.getTermAsQualifier(schemeId, classId);
-	}
-
-	protected List<StructuredProperty> prepareListStructProps(
-		final Node node,
-		final String xpath,
-		final String xpathClassId,
-		final String schemeId,
-		final DataInfo info) {
-		final List<StructuredProperty> res = new ArrayList<>();
-
-		for (final Object o : node.selectNodes(xpath)) {
-			final Node n = (Node) o;
-			final String classId = n.valueOf(xpathClassId).trim();
-			res.add(structuredProperty(n.getText(), prepareQualifier(classId, schemeId), info));
-		}
-		return res;
 	}
 
 	protected List<StructuredProperty> prepareListStructPropsWithValidQualifier(

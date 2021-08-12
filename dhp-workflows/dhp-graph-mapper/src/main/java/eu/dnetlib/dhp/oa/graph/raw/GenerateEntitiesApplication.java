@@ -17,6 +17,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +159,7 @@ public class GenerateEntitiesApplication {
 		final String id,
 		final String s,
 		final boolean shouldHashId,
-		final VocabularyGroup vocs) {
+		final VocabularyGroup vocs) throws DocumentException {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {

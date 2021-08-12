@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.dom4j.DocumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +45,7 @@ class GenerateEntitiesApplicationTest {
 	}
 
 	@Test
-	void testMergeResult() throws IOException {
+	void testMergeResult() throws IOException, DocumentException {
 		Result publication = getResult("oaf_record.xml", Publication.class);
 		Result dataset = getResult("odf_dataset.xml", Dataset.class);
 		Result software = getResult("odf_software.xml", Software.class);
@@ -76,7 +77,8 @@ class GenerateEntitiesApplicationTest {
 		assertEquals(resultType, merge.getResulttype().getClassid());
 	}
 
-	protected <T extends Result> Result getResult(String xmlFileName, Class<T> clazz) throws IOException {
+	protected <T extends Result> Result getResult(String xmlFileName, Class<T> clazz)
+		throws IOException, DocumentException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream(xmlFileName));
 		return new OdfToOafMapper(vocs, false, true)
 			.processMdRecord(xml)
