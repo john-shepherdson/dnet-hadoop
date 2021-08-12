@@ -17,9 +17,14 @@ public class CSVParser {
 
 	public <R> List<R> parse(String csvFile, String classForName)
 		throws ClassNotFoundException, IOException, IllegalAccessException, InstantiationException {
+		return parse(csvFile, classForName, ';');
+	}
+
+	public <R> List<R> parse(String csvFile, String classForName, char delimiter)
+		throws ClassNotFoundException, IOException, IllegalAccessException, InstantiationException {
 		final CSVFormat format = CSVFormat.EXCEL
 			.withHeader()
-			.withDelimiter(';')
+			.withDelimiter(delimiter)
 			.withQuote('"')
 			.withTrim();
 		List<R> ret = new ArrayList<>();

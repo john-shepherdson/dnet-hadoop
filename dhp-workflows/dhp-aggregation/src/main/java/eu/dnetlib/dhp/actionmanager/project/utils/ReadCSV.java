@@ -6,6 +6,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -29,6 +30,7 @@ public class ReadCSV implements Closeable {
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private final String csvFile;
+	private final char delimiter;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -44,19 +46,23 @@ public class ReadCSV implements Closeable {
 		final String hdfsPath = parser.get("hdfsPath");
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 		final String classForName = parser.get("classForName");
-
-		try (final ReadCSV readCSV = new ReadCSV(hdfsPath, hdfsNameNode, fileURL)) {
+		Optional<String> delimiter = Optional.ofNullable(parser.get("delimiter"));
+		char del = ';';
+		if (delimiter.isPresent())
+			del = delimiter.get().charAt(0);
+		try (final ReadCSV readCSV = new ReadCSV(hdfsPath, hdfsNameNode, fileURL, del)) {
 
 			log.info("Getting CSV file...");
 			readCSV.execute(classForName);
 		}
+
 	}
 
 	public void execute(final String classForName)
 		throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
 		CSVParser csvParser = new CSVParser();
 		csvParser
-			.parse(csvFile, classForName)
+			.parse(csvFile, classForName, delimiter)
 			.stream()
 			.forEach(this::write);
 	}
@@ -69,7 +75,8 @@ public class ReadCSV implements Closeable {
 	public ReadCSV(
 		final String hdfsPath,
 		final String hdfsNameNode,
-		final String fileURL)
+		final String fileURL,
+		char delimiter)
 		throws Exception {
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
@@ -84,6 +91,7 @@ public class ReadCSV implements Closeable {
 
 		this.writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
 		this.csvFile = httpConnector.getInputSource(fileURL);
+		this.delimiter = delimiter;
 	}
 
 	protected void write(final Object p) {
