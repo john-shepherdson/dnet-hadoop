@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
 
 public class PrepareProjectTest {
 

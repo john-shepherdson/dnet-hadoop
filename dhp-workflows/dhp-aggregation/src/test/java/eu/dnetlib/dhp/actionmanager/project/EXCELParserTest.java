@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.actionmanager.project.utils.EXCELParser;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpConnector2;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
 @Disabled
 public class EXCELParserTest {
@@ -25,7 +25,7 @@ public class EXCELParserTest {
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
-		workingDir = Files.createTempDirectory(CSVParserTest.class.getSimpleName());
+		workingDir = Files.createTempDirectory(EXCELParserTest.class.getSimpleName());
 
 	}
 
