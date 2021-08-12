@@ -6,6 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+
 public abstract class ReportingJob {
 
 	/**
