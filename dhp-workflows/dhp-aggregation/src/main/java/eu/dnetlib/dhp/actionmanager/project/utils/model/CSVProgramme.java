@@ -1,20 +1,31 @@
 
-package eu.dnetlib.dhp.actionmanager.project.utils;
+package eu.dnetlib.dhp.actionmanager.project.utils.model;
 
 import java.io.Serializable;
+
+import com.opencsv.bean.CsvBindByName;
 
 /**
  * The model for the programme csv file
  */
 public class CSVProgramme implements Serializable {
 
-	private String rcn;
+	@CsvBindByName(column = "code")
 	private String code;
 
+	@CsvBindByName(column = "title")
 	private String title;
+
+	@CsvBindByName(column = "shortTitle")
 	private String shortTitle;
+
+	@CsvBindByName(column = "language")
 	private String language;
+
+	@CsvBindByName(column = "classification")
 	private String classification;
+
+	@CsvBindByName(column = "classification_short")
 	private String classification_short;
 
 	public String getClassification_short() {
@@ -31,14 +42,6 @@ public class CSVProgramme implements Serializable {
 
 	public void setClassification(String classification) {
 		this.classification = classification;
-	}
-
-	public String getRcn() {
-		return rcn;
-	}
-
-	public void setRcn(String rcn) {
-		this.rcn = rcn;
 	}
 
 	public String getCode() {
@@ -73,5 +76,4 @@ public class CSVProgramme implements Serializable {
 		this.language = language;
 	}
 
-//
 }
