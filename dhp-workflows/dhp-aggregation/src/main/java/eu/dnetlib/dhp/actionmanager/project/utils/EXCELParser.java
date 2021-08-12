@@ -32,7 +32,7 @@ public class EXCELParser {
 
 			XSSFSheet sheet = wb.getSheet(sheetName);
 
-			if (sheetName == null) {
+			if (sheet == null) {
 				throw new IllegalArgumentException("Sheet name " + sheetName + " not present in current file");
 			}
 
