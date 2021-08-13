@@ -75,8 +75,11 @@ object SparkApplyHostedByMapToResult {
 
     applyHBtoPubs(pinfo, pubs).write.mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath)
 
-
-
+    spark.read.textFile(outputPath)
+      .write
+      .mode(SaveMode.Overwrite)
+      .option("compression","gzip")
+      .text(graphPath + "/publication")
   }
 
 

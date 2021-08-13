@@ -27,8 +27,8 @@ object SparkApplyHostedByMapToDatasource {
         d
       })(Encoders.bean((classOf[Datasource])))
   }
-  def main(args: Array[String]): Unit = {
 
+  def main(args: Array[String]): Unit = {
 
     val logger: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
@@ -41,18 +41,15 @@ object SparkApplyHostedByMapToDatasource {
         .appName(getClass.getSimpleName)
         .master(parser.get("master")).getOrCreate()
 
-
     val graphPath = parser.get("graphPath")
-
     val outputPath = parser.get("outputPath")
     val preparedInfoPath = parser.get("preparedInfoPath")
 
-
     implicit val formats = DefaultFormats
-
 
     implicit val mapEncoderPubs: Encoder[Datasource] = Encoders.bean(classOf[Datasource])
     implicit val mapEncoderEinfo: Encoder[EntityInfo] = Encoders.bean(classOf[EntityInfo])
+
     val mapper = new ObjectMapper()
 
     val dats : Dataset[Datasource] = spark.read.textFile(graphPath + "/datasource")
@@ -62,6 +59,12 @@ object SparkApplyHostedByMapToDatasource {
       .map(ei => mapper.readValue(ei, classOf[EntityInfo])))
 
     applyHBtoDats(pinfo, dats).write.mode(SaveMode.Overwrite).option("compression","gzip").json(outputPath)
+
+    spark.read.textFile(outputPath)
+      .write
+      .mode(SaveMode.Overwrite)
+      .option("compression","gzip")
+      .text(graphPath + "/datasource")
   }
 
 

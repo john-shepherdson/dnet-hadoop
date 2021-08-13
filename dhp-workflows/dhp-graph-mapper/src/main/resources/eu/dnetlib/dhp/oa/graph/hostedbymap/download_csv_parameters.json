@@ -12,6 +12,12 @@
     "paramRequired": true
   },
   {
+    "paramName":"of",
+    "paramLongName":"outputFile",
+    "paramDescription": "the output json file produced by the CSV downlaod procedure",
+    "paramRequired": true
+  },
+  {
     "paramName": "hnn",
     "paramLongName": "hdfsNameNode",
     "paramDescription": "the path used to store the HostedByMap",
