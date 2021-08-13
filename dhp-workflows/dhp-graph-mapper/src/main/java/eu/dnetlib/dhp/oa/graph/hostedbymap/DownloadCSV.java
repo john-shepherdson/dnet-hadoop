@@ -2,9 +2,12 @@
 package eu.dnetlib.dhp.oa.graph.hostedbymap;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.common.collection.CollectorException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -56,30 +59,37 @@ public class DownloadCSV {
 			.orElse(DEFAULT_DELIMITER);
 		log.info("delimiter {}", delimiter);
 
-		final HttpConnector2 connector2 = new HttpConnector2();
-
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
+
+		new DownloadCSV().doDownload(fileURL, workingPath, outputFile, classForName, delimiter, fileSystem);
+
+	}
+
+	protected void doDownload(String fileURL, String workingPath, String outputFile, String classForName, char delimiter, FileSystem fs)
+			throws IOException, ClassNotFoundException, CollectorException {
+
+		final HttpConnector2 connector2 = new HttpConnector2();
+
 		final Path path = new Path(workingPath + "/replaced.csv");
 
 		try (BufferedReader in = new BufferedReader(
 			new InputStreamReader(connector2.getInputSourceAsStream(fileURL)))) {
 
-			try (FSDataOutputStream fos = fileSystem.create(path, true)) {
+			try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fs.create(path, true), Charset.defaultCharset()))) {
 				String line;
 				while ((line = in.readLine()) != null) {
-					fos.writeUTF(line.replace("\\\"", "\""));
-					fos.writeUTF("\n");
+					writer.write(line.replace("\\\"", "\""));
+					writer.newLine();
 				}
 			}
 		}
 
-		try (InputStreamReader reader = new InputStreamReader(fileSystem.open(path))) {
-			GetCSV.getCsv(fileSystem, reader, outputFile, classForName, delimiter);
+		try (InputStreamReader reader = new InputStreamReader(fs.open(path))) {
+			GetCSV.getCsv(fs, reader, outputFile, classForName, delimiter);
 		}
-
 	}
 
 }

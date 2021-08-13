@@ -39,14 +39,16 @@ public class DownloadCsvTest {
 
         String fileURL = "https://pub.uni-bielefeld.de/download/2944717/2944718/issn_gold_oa_version_4.csv";
 
-        GetCSV
-                .getCsv(
-                        fs, new BufferedReader(
-                                new InputStreamReader(new HttpConnector2().getInputSourceAsStream(fileURL))),
-                        workingDir + "/programme",
-                        UnibiGoldModel.class.getName());
+        final String outputFile = workingDir + "/unibi_gold.json";
+        new DownloadCSV().doDownload(
+                fileURL,
+                workingDir + "/unibi_gold",
+                outputFile,
+                UnibiGoldModel.class.getName(),
+                ',',
+                fs);
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(fs.open(new Path(workingDir + "/programme"))));
+        BufferedReader in = new BufferedReader(new InputStreamReader(fs.open(new Path(outputFile))));
 
         String line;
         int count = 0;
@@ -82,24 +84,16 @@ public class DownloadCsvTest {
 
         String fileURL = "https://doaj.org/csv";
 
-        try (BufferedReader in = new BufferedReader(
-                new InputStreamReader(new HttpConnector2().getInputSourceAsStream(fileURL)))) {
-            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("/tmp/DOAJ_1.csv")))) {
-                String line;
-                while ((line = in.readLine()) != null) {
-                    writer.println(line.replace("\\\"", "\""));
-                }
-            }
-        }
+        final String outputFile = workingDir + "/doaj.json";
+        new DownloadCSV().doDownload(
+                fileURL,
+                workingDir + "/doaj",
+                outputFile,
+                DOAJModel.class.getName(),
+                ',',
+                fs);
 
-        GetCSV
-                .getCsv(
-                        fs, new BufferedReader(
-                                new FileReader("/tmp/DOAJ_1.csv")),
-                        workingDir + "/programme",
-                        DOAJModel.class.getName());
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(fs.open(new Path(workingDir + "/programme"))));
+        BufferedReader in = new BufferedReader(new InputStreamReader(fs.open(new Path(outputFile))));
 
         String line;
         int count = 0;
