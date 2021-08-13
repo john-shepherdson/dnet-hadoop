@@ -117,7 +117,6 @@
             <arg>--workingPath</arg><arg>${workingDir}/doaj</arg>
             <arg>--outputFile</arg><arg>${workingDir}/doaj.json</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.DOAJModel</arg>
-            <arg>--replace</arg><arg>true</arg>
         </java>
         <ok to="join_download"/>
         <error to="Kill"/>
