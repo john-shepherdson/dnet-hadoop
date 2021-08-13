@@ -231,9 +231,7 @@ object DoiBoostMappingUtil {
       var hb = new KeyValue
       if (item != null) {
         hb.setValue(item.officialname)
-        hb.setKey(generateDSId(item.id))
-        //TODO replace with the one above as soon as  the new HBM will be used
-        //hb.setKey(item.id)
+        hb.setKey(item.id)
         if (item.openAccess) {
           i.setAccessright(getOpenAccessQualifier())
           i.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)
