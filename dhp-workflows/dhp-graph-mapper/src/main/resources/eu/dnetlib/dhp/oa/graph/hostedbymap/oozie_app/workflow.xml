@@ -100,7 +100,7 @@
 
     <action name="download_gold">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.GetCSV</main-class>
+            <main-class>eu.dnetlib.dhp.common.collection.GetCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${unibiFileURL}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/unibi_gold</arg>
@@ -112,7 +112,7 @@
 
     <action name="download_doaj">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.GetCSV</main-class>
+            <main-class>eu.dnetlib.dhp.common.collection.GetCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${doajFileURL}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/doaj</arg>
