@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.actionmanager.project.utils.model;
 import java.io.Serializable;
 
 import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvIgnore;
 
 /**
  * The model for the programme csv file
@@ -22,10 +23,10 @@ public class CSVProgramme implements Serializable {
 	@CsvBindByName(column = "language")
 	private String language;
 
-	@CsvBindByName(column = "classification")
+	@CsvIgnore
 	private String classification;
 
-	@CsvBindByName(column = "classification_short")
+	@CsvIgnore
 	private String classification_short;
 
 	public String getClassification_short() {
