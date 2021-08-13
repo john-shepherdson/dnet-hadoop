@@ -73,7 +73,8 @@
 
     <decision name="resume_from">
         <switch>
-            <case to="remove_hbmpath">${wf:conf('resumeFrom') eq 'ProduceHBM'}</case>
+            <case to="produceHBM">${wf:conf('resumeFrom') eq 'ProduceHBM'}</case>
+            <case to="remove_hbmpath">${wf:conf('resumeFrom') eq 'download_csv'}</case>
             <default to="prepareInfo"/>
         </switch>
     </decision>
@@ -98,10 +99,10 @@
 
     <action name="download_gold">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV2</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${unibiFileURL}</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/unibi_gold</arg>
+            <arg>--tmpFile</arg><arg>/tmp/unibi_gold_replaced.csv</arg>
             <arg>--outputFile</arg><arg>${workingDir}/unibi_gold.json</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.UnibiGoldModel</arg>
         </java>
@@ -111,10 +112,10 @@
 
     <action name="download_doaj">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV2</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${doajFileURL}</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/doaj</arg>
+            <arg>--tmpFile</arg><arg>/tmp/doaj_replaced.csv</arg>
             <arg>--outputFile</arg><arg>${workingDir}/doaj.json</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.DOAJModel</arg>
         </java>
@@ -141,7 +142,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--datasourcePath</arg><arg>${sourcePath}/datasource</arg>
-            <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--workingPath</arg><arg>/user/${wf:user()}/data</arg>
             <arg>--outputPath</arg><arg>${hostedByMapPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
