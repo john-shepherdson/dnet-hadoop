@@ -26,15 +26,6 @@ public class GetCSVTest {
 
 	private static LocalFileSystem fs;
 
-	@BeforeAll
-	public static void beforeAll() throws IOException {
-		workingDir = Files
-			.createTempDirectory(GetCSVTest.class.getSimpleName())
-			.toString();
-
-		fs = FileSystem.getLocal(new Configuration());
-	}
-
 	@Disabled
 	@Test
 	void getProgrammeFileTest() throws Exception {
@@ -42,11 +33,11 @@ public class GetCSVTest {
 		String fileURL = "https://cordis.europa.eu/data/reference/cordisref-h2020programmes.csv";
 
 		GetCSV
-			.getCsv(
-				fs, new BufferedReader(
-					new InputStreamReader(new HttpConnector2().getInputSourceAsStream(fileURL))),
-				workingDir + "/programme",
-				"eu.dnetlib.dhp.common.collection.models.CSVProgramme", ';');
+				.getCsv(
+						fs, new BufferedReader(
+								new InputStreamReader(new HttpConnector2().getInputSourceAsStream(fileURL))),
+						workingDir + "/programme",
+						"eu.dnetlib.dhp.common.collection.models.CSVProgramme", ';');
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(fs.open(new Path(workingDir + "/programme"))));
 
@@ -57,39 +48,39 @@ public class GetCSVTest {
 			if (count == 0) {
 				Assertions.assertTrue(csvp.getCode().equals("H2020-EU.5.f."));
 				Assertions
-					.assertTrue(
-						csvp
-							.getTitle()
-							.startsWith(
-								"Develop the governance for the advancement of responsible research and innovation by all stakeholders"));
+						.assertTrue(
+								csvp
+										.getTitle()
+										.startsWith(
+												"Develop the governance for the advancement of responsible research and innovation by all stakeholders"));
 				Assertions
-					.assertTrue(csvp.getTitle().endsWith("promote an ethics framework for research and innovation"));
+						.assertTrue(csvp.getTitle().endsWith("promote an ethics framework for research and innovation"));
 				Assertions.assertTrue(csvp.getShortTitle().equals(""));
 				Assertions.assertTrue(csvp.getLanguage().equals("en"));
 			}
 			if (count == 28) {
 				Assertions.assertTrue(csvp.getCode().equals("H2020-EU.3.5.4."));
 				Assertions
-					.assertTrue(
-						csvp
-							.getTitle()
-							.equals(
-								"Grundlagen für den Übergang zu einer umweltfreundlichen Wirtschaft und Gesellschaft durch Öko-Innovation"));
+						.assertTrue(
+								csvp
+										.getTitle()
+										.equals(
+												"Grundlagen für den Übergang zu einer umweltfreundlichen Wirtschaft und Gesellschaft durch Öko-Innovation"));
 				Assertions
-					.assertTrue(csvp.getShortTitle().equals("A green economy and society through eco-innovation"));
+						.assertTrue(csvp.getShortTitle().equals("A green economy and society through eco-innovation"));
 				Assertions.assertTrue(csvp.getLanguage().equals("de"));
 			}
 			if (count == 229) {
 				Assertions.assertTrue(csvp.getCode().equals("H2020-EU.3.2."));
 				Assertions
-					.assertTrue(
-						csvp
-							.getTitle()
-							.equals(
-								"SOCIETAL CHALLENGES - Food security, sustainable agriculture and forestry, marine, maritime and inland water research, and the bioeconomy"));
+						.assertTrue(
+								csvp
+										.getTitle()
+										.equals(
+												"SOCIETAL CHALLENGES - Food security, sustainable agriculture and forestry, marine, maritime and inland water research, and the bioeconomy"));
 				Assertions
-					.assertTrue(
-						csvp.getShortTitle().equals("Food, agriculture, forestry, marine research and bioeconomy"));
+						.assertTrue(
+								csvp.getShortTitle().equals("Food, agriculture, forestry, marine research and bioeconomy"));
 				Assertions.assertTrue(csvp.getLanguage().equals("en"));
 			}
 			Assertions.assertTrue(csvp.getCode() != null);
@@ -98,6 +89,15 @@ public class GetCSVTest {
 		}
 
 		Assertions.assertEquals(767, count);
+	}
+
+	@BeforeAll
+	public static void beforeAll() throws IOException {
+		workingDir = Files
+			.createTempDirectory(GetCSVTest.class.getSimpleName())
+			.toString();
+
+		fs = FileSystem.getLocal(new Configuration());
 	}
 
 	@Disabled
@@ -217,29 +217,29 @@ public class GetCSVTest {
 		while ((line = in.readLine()) != null) {
 			DOAJModel doaj = new ObjectMapper().readValue(line, DOAJModel.class);
 			if (count == 0) {
-				Assertions.assertTrue(doaj.getIssn().equals("0001-3765"));
-				Assertions.assertTrue(doaj.getEissn().equals("1678-2690"));
-				Assertions.assertTrue(doaj.getJournalTitle().equals("Anais da Academia Brasileira de Ciências"));
+				Assertions.assertEquals("0001-3765", doaj.getIssn());
+				Assertions.assertEquals("1678-2690", doaj.getEissn());
+				Assertions.assertEquals("Anais da Academia Brasileira de Ciências", doaj.getJournalTitle());
 
 			}
-			if (count == 7902) {
-
-				Assertions.assertTrue(doaj.getIssn().equals(""));
-				Assertions.assertTrue(doaj.getEissn().equals("2055-7159"));
-				Assertions.assertTrue(doaj.getJournalTitle().equals("BJR|case reports"));
+			if (count == 7904) {
+				System.out.println(new ObjectMapper().writeValueAsString(doaj));
+				Assertions.assertEquals("",doaj.getIssn());
+				Assertions.assertEquals("2055-7159", doaj.getEissn());
+				Assertions.assertEquals("BJR|case reports", doaj.getJournalTitle());
 			}
-			if (count == 16703) {
+			if (count == 16707) {
 
-				Assertions.assertTrue(doaj.getIssn().equals(""));
-				Assertions.assertTrue(doaj.getEissn().equals("2788-6298"));
+				Assertions.assertEquals("",doaj.getIssn());
+				Assertions.assertEquals("2788-6298",doaj.getEissn());
 				Assertions
-					.assertTrue(doaj.getJournalTitle().equals("Teacher Education through Flexible Learning in Africa"));
+					.assertEquals("Teacher Education through Flexible Learning in Africa", doaj.getJournalTitle());
 			}
 
 			count += 1;
 		}
 
-		Assertions.assertEquals(16709, count);
+		Assertions.assertEquals(16713, count);
 	}
 
 }
