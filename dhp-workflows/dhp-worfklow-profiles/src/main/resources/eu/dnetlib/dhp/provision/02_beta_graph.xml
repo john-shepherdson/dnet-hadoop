@@ -661,6 +661,31 @@
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
                 </PARAMETERS>
                 <ARCS>
+                    <ARC to="patchHostedBy"/>
+                </ARCS>
+            </NODE>
+            <NODE name="patchHostedBy" type="SubmitHadoopJob">
+                <DESCRIPTION>updates publication's hostedby info according to the ISSNs available from DOAJ and UNIBI</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'cleanedFirstGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'resumeFrom' : 'produceHBM',
+                        'hostedByMapPath' : '/user/dnet.beta/data',
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/hostedbymap/oozie_app',
+                        'workingDir' : '/tmp/beta_provision/working_dir/hostedbymap',
+                        'outputPath' : '/tmp/beta_provision/working_dir/hostedbymap'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
                     <ARC to="duplicateScan"/>
                 </ARCS>
             </NODE>
